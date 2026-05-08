@@ -1,0 +1,3 @@
+[submodule "multiplatform-calendar"]
+	path = multiplatform-calendar
+	url = git@github.com:Infomaniak/multiplatform-calendar.git
