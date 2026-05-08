@@ -14,6 +14,7 @@ uitest-env.properties
 *.iml
 .kotlin/errors
 .kotlin/sessions
+.kotlin/metadata
 **/local.properties
 *.realm
 *.realm.lock
