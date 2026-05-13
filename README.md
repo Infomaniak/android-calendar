@@ -1,7 +1,5 @@
 # android-calendar
 
-
-
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
