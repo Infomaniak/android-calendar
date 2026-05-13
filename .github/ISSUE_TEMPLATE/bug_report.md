@@ -14,6 +14,7 @@ A clear and concise description of what the bug is.
 
 **Steps to reproduce**
 Steps to reproduce the behavior:
+
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
@@ -26,9 +27,10 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Smartphone (please complete the following information):**
- - Device: [e.g. Samsung S20 Ultra 5G]
- - Android version: [e.g. Android 11]
- - App version: [e.g. 4.0.1]
+
+- Device: [e.g. Samsung S20 Ultra 5G]
+- Android version: [e.g. Android 11]
+- App version: [e.g. 4.0.1]
 
 **Additional context**
 Add any other context about the problem here.

@@ -1,5 +1,5 @@
 /*
- * Infomaniak APPNAME - Android
+ * Infomaniak Calendar - Android
  * Copyright (C) 2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-   private fun CalendarApp() {
+    private fun CalendarApp() {
         var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
         NavigationSuiteScaffold(
             navigationSuiteItems = {
@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
         ) {
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                 Greeting(
-                    name = Color(32,43,0, 255).toString(),
+                    name = Color(32, 43, 0, 255).toString(),
                     modifier = Modifier.padding(innerPadding)
                 )
             }
