@@ -34,11 +34,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import com.infomaniak.calendar.ui.theme.CalendarTheme
-import com.infomaniak.multiplatform_calendar.getPlatform
 import com.infomaniak.multiplatform_calendar.model.calendar.Color
 
 class MainActivity : ComponentActivity() {
