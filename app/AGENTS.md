@@ -234,3 +234,7 @@ fun Greeting(
 2. **New Norms**: Add user corrections to "Learned Preferences" immediately.
 3. **Reference Submodule**: When touching imports from `com.infomaniak.multiplatform_calendar.*`, remember the source
    lives in the `multiplatform-calendar` repository — coordinate changes there, not in `app/`.
+4. **Always document architecture changes here**: Any change to the app's architecture, module layout, navigation,
+   theming approach, conventions, commands, testing setup, or anything else that future agents should know about
+   **must** be reflected in this `app/AGENTS.md` (or the root `AGENTS.md` if it is cross-cutting) as part of the same
+   change. Treat AGENTS.md as part of the deliverable, not as optional documentation.

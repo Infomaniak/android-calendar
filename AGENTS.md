@@ -101,6 +101,10 @@ git submodule update --remote multiplatform-calendar
     - `app/src/...` → read `app/AGENTS.md`
     - Build files / submodule pointer → read this file
     - KMP shared code → switch to the `multiplatform-calendar` repository
+4. **Keep AGENTS.md up to date**: For every change to the architecture, build layout, module structure, conventions,
+   commands, or anything else that should be reflected in AGENTS.md, you **must** update the relevant AGENTS.md file
+   (this one for cross-cutting/build/submodule changes, `app/AGENTS.md` for app-specific changes) as part of the same
+   change. If a change is worth notifying agents about, it belongs in AGENTS.md.
 
 ## Self-correction
 
