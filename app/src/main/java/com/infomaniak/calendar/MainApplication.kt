@@ -19,8 +19,22 @@ package com.infomaniak.calendar
 
 import android.app.Application
 import com.infomaniak.calendar.di.AppGraph
+import com.infomaniak.calendar.utils.ConfigUtils
+import com.infomaniak.core.network.NetworkConfiguration
 import dev.zacsweers.metro.createGraphFactory
 
 class MainApplication : Application() {
     val appGraph by lazy { createGraphFactory<AppGraph.Factory>().create(applicationContext) }
+
+    override fun onCreate() {
+        super.onCreate()
+        // Required so that com.infomaniak.core.network.networking.HttpClient.okHttpClient (used by
+        // the WebView login and cross-app login flows) can build its OkHttpClient with the right
+        // user-agent / app identifiers.
+        NetworkConfiguration.init(
+            appId = ConfigUtils.safePackage,
+            appVersionCode = BuildConfig.VERSION_CODE,
+            appVersionName = BuildConfig.VERSION_NAME,
+        )
+    }
 }

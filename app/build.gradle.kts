@@ -33,10 +33,22 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+
+        // TODO: Replace this placeholder with the real Infomaniak OAuth client id once available.
+        buildConfigField("String", "CLIENT_ID", "\"CALENDAR_CLIENT_ID_PLACEHOLDER\"")
     }
 
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("standard") {
+            isDefault = true
+        }
+        create("fdroid")
     }
 
     buildTypes {
@@ -55,6 +67,13 @@ android {
 dependencies {
     implementation(libs.infomaniak.multiplatform.calendar.core)
 
+    implementation(core.infomaniak.core.auth)
+    implementation(core.infomaniak.core.common)
+    implementation(core.infomaniak.core.crossapplogin.front)
+    implementation(core.infomaniak.core.network)
+    implementation(core.infomaniak.core.onboarding)
+    implementation(core.infomaniak.core.ui.compose.margin)
+
     implementation(platform(core.compose.bom))
     implementation(core.activity.compose)
     implementation(core.androidx.core.ktx)
@@ -65,6 +84,7 @@ dependencies {
     implementation(core.compose.ui.graphics)
     implementation(core.compose.ui.tooling.preview)
     implementation(core.material)
+
     testImplementation(core.junit)
     androidTestImplementation(platform(core.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

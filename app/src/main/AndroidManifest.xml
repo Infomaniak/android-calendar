@@ -17,7 +17,7 @@
             android:value="https://afcc80384a2911f1a5c6de3982f677f1@sentry-mobile.infomaniak.com/25" />
 
         <activity
-            android:name="MainActivity"
+            android:name=".ui.screen.onboarding.OnboardingActivity"
             android:exported="true"
             android:theme="@style/Theme.Calendar">
             <intent-filter>
@@ -25,5 +25,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:label="@string/title_activity_main"
+            android:theme="@style/Theme.Calendar" />
     </application>
 </manifest>

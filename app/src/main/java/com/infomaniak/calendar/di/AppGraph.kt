@@ -19,10 +19,16 @@ package com.infomaniak.calendar.di
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import com.infomaniak.calendar.BuildConfig
+import com.infomaniak.calendar.utils.AccountUtils
+import com.infomaniak.calendar.utils.ConfigUtils
+import com.infomaniak.core.network.LOGIN_ENDPOINT_URL
+import com.infomaniak.lib.login.InfomaniakLogin
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provider
 import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlin.reflect.KClass
 
 /**
@@ -39,6 +45,27 @@ import kotlin.reflect.KClass
 interface AppGraph {
     val viewModelFactory: MetroViewModelFactory
     val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>> // Won't build if no ViewModels are defined
+
+    val infomaniakLogin: InfomaniakLogin
+
+    val accountUtils: AccountUtils
+
+    /**
+     * Provides the [InfomaniakLogin] WebView client used by the onboarding flow to launch the
+     * sign-in and account-creation flows.
+     *
+     * Mirrors `providesInfomaniakLogin` in `com.infomaniak.swisstransfer.di.ApplicationModule`.
+     */
+    @Provides
+    @SingleIn(AppScope::class)
+    fun providesInfomaniakLogin(applicationContext: Context): InfomaniakLogin = InfomaniakLogin(
+        context = applicationContext,
+        loginUrl = "$LOGIN_ENDPOINT_URL/",
+        appUID = ConfigUtils.safePackage.substringBefore(".preprod"),
+        clientID = BuildConfig.CLIENT_ID,
+        accessType = null,
+        sentryCallback = null,
+    )
 
     @DependencyGraph.Factory
     fun interface Factory {

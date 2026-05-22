@@ -17,4 +17,14 @@
   -->
 <resources>
     <string name="appName" translatable="false">Calendar</string>
+
+    <!-- Onboarding dummy slides. TODO: replace with the real copy when available. -->
+    <string name="onboardingPageOneTitle">Dummy onboarding title #1</string>
+    <string name="onboardingPageOneDescription">Dummy onboarding description for the first slide. Replace me with the real copy.</string>
+    <string name="onboardingPageTwoTitle">Dummy onboarding title #2</string>
+    <string name="onboardingPageTwoDescription">Dummy onboarding description for the second slide. Replace me with the real copy.</string>
+    <string name="onboardingPageThreeTitle">Dummy onboarding title #3</string>
+    <string name="onboardingPageThreeDescription">Dummy onboarding description for the third slide. Replace me with the real copy.</string>
+    <string name="onboardingPageFourTitle">Sign in to your Infomaniak account</string>
+    <string name="onboardingPageFourDescription">Sign in to start using the Infomaniak Calendar.</string>
 </resources>
