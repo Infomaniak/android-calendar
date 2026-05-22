@@ -21,7 +21,7 @@ import android.app.Application
 import com.infomaniak.calendar.di.AppGraph
 import dev.zacsweers.metro.createGraphFactory
 
-class CalendarApplication : Application() {
+class MainApplication : Application() {
 
     lateinit var appGraph: AppGraph
         private set

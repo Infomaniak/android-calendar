@@ -30,7 +30,7 @@ import com.infomaniak.calendar.ui.theme.CalendarTheme
 class MainActivity : ComponentActivity() {
 
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
-        get() = (application as CalendarApplication).appGraph.viewModelFactory
+        get() = (application as MainApplication).appGraph.viewModelFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
