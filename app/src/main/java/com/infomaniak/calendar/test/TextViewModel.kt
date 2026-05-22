@@ -1,0 +1,47 @@
+/*
+ * Infomaniak Calendar - Android
+ * Copyright (C) 2026 Infomaniak Network SA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.infomaniak.calendar.test
+
+import android.content.Context
+import androidx.lifecycle.ViewModel
+import com.infomaniak.calendar.di.ViewModelKey
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
+
+/**
+ * Example [ViewModel] built by Metro.
+ *
+ * It is contributed into the application's `Map<KClass<out ViewModel>, Provider<ViewModel>>`
+ * multibinding so that [com.infomaniak.calendar.di.MetroViewModelFactory] can instantiate it.
+ *
+ * Usage from a composable mirrors the standard pattern:
+ * ```
+ * val viewModel: TextViewModel = viewModel()
+ * ```
+ */
+@Inject
+@ContributesIntoMap(AppScope::class)
+@ViewModelKey(TextViewModel::class)
+class TextViewModel(
+    applicationContext: Context,
+    private val testUseCase: TestUseCase,
+) : ViewModel() {
+
+    val text: String = "${testUseCase.greet()} Package: ${applicationContext.packageName}"
+}

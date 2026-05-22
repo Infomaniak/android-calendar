@@ -20,6 +20,7 @@ plugins {
     alias(core.plugins.compose.compiler)
     alias(core.plugins.kotlin.android)
     alias(core.plugins.kotlin.serialization)
+    alias(libs.plugins.metro)
 }
 
 android {
@@ -58,6 +59,7 @@ dependencies {
     implementation(core.activity.compose)
     implementation(core.androidx.core.ktx)
     implementation(core.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(core.appcompat)
     implementation(core.compose.material3)
     implementation(core.compose.ui)
