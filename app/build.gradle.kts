@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
+    alias(core.plugins.android.application)
+    alias(core.plugins.compose.compiler)
+    alias(core.plugins.kotlin.android)
 }
 
 android {
@@ -51,25 +51,24 @@ android {
 }
 
 dependencies {
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.material)
-
     implementation(project(":multiplatform-calendar"))
 
-    testImplementation(libs.junit)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
+    implementation(platform(core.compose.bom))
+    implementation(core.activity.compose)
+    implementation(core.androidx.core.ktx)
+    implementation(core.androidx.lifecycle.runtime.ktx)
+    implementation(core.appcompat)
+    implementation(core.compose.material3)
+    implementation(core.compose.ui)
+    implementation(core.compose.ui.graphics)
+    implementation(core.compose.ui.tooling.preview)
+    implementation(core.material)
+
+    testImplementation(core.junit)
+    androidTestImplementation(platform(core.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(core.androidx.espresso.core)
+    androidTestImplementation(core.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-    debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(core.compose.ui.tooling)
 }
