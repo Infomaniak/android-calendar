@@ -41,15 +41,15 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
 
-    @Composable
-    private fun CalendarApp() {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Greeting(
-                name = Color(32, 43, 0, 255).toString(),
-                modifier = Modifier.padding(innerPadding)
-            )
-        }
+@Composable
+private fun CalendarApp() {
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Greeting(
+            name = Color(32, 43, 0, 255).toString(),
+            modifier = Modifier.padding(innerPadding)
+        )
     }
 }
 
@@ -63,7 +63,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+private fun GreetingPreview() {
     CalendarTheme {
         Greeting("Android")
     }
