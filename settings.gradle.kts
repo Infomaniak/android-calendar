@@ -10,10 +10,12 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
     }
+    includeBuild("Core/build-logic")
 }
 
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+    id("com.infomaniak.core.composite")
 }
 
 dependencyResolutionManagement {
@@ -25,6 +27,7 @@ dependencyResolutionManagement {
 
     versionCatalogs {
         create("kmpCalendar") { from(files("multiplatform-calendar/gradle/kmpCalendar.versions.toml")) }
+        create("core") { from(files("Core/gradle/core.versions.toml")) }
     }
 }
 
