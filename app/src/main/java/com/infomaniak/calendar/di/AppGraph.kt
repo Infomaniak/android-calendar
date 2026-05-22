@@ -32,7 +32,7 @@ import kotlin.reflect.KClass
  * available to any injected class that declares a [Context] dependency.
  *
  * The [viewModelProviders] multibindings map is populated by every [ViewModel] that is
- * contributed with `@ContributesIntoMap(AppScope::class) @ClassKey(MyViewModel::class)`.
+ * contributed with `@ContributesIntoMap(AppScope::class) @ViewModelKey(MyViewModel::class)`.
  * It is consumed by [MetroViewModelFactory] to build ViewModels.
  */
 @DependencyGraph(AppScope::class)
