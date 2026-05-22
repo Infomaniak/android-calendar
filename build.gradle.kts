@@ -6,4 +6,5 @@ plugins {
     alias(kmpCalendar.plugins.android.kmp.library) apply false
     alias(kmpCalendar.plugins.kotlin.multiplatform) apply false
     alias(kmpCalendar.plugins.kotlin.serialization) apply false
+    alias(core.plugins.compose.lint)
 }
