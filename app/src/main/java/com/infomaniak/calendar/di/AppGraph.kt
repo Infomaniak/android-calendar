@@ -38,7 +38,7 @@ import kotlin.reflect.KClass
 @DependencyGraph(AppScope::class)
 interface AppGraph {
     val viewModelFactory: MetroViewModelFactory
-    val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>>
+    val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>> // Won't build if no view model are defined
 
     @DependencyGraph.Factory
     fun interface Factory {
