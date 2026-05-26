@@ -19,6 +19,7 @@ plugins {
     alias(core.plugins.android.application)
     alias(core.plugins.compose.compiler)
     alias(core.plugins.kotlin.android)
+    alias(core.plugins.kotlin.serialization)
 }
 
 android {
@@ -63,7 +64,6 @@ dependencies {
     implementation(core.compose.ui.graphics)
     implementation(core.compose.ui.tooling.preview)
     implementation(core.material)
-
     testImplementation(core.junit)
     androidTestImplementation(platform(core.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
@@ -71,4 +71,9 @@ dependencies {
     androidTestImplementation(core.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(core.compose.ui.tooling)
+
+    // Navigation 3
+    implementation(core.androidx.lifecycle.viewmodel.navigation3)
+    implementation(core.androidx.navigation3.runtime)
+    implementation(core.androidx.navigation3.ui)
 }
