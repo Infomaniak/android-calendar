@@ -19,6 +19,7 @@ plugins {
     alias(core.plugins.android.application)
     alias(core.plugins.compose.compiler)
     alias(core.plugins.kotlin.android)
+    alias(core.plugins.kotlin.serialization)
 }
 
 android {
@@ -63,6 +64,10 @@ dependencies {
     implementation(core.compose.ui.graphics)
     implementation(core.compose.ui.tooling.preview)
     implementation(core.material)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(core.kotlinx.collections.immutable)
 
     testImplementation(core.junit)
     androidTestImplementation(platform(core.compose.bom))
