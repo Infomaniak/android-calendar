@@ -17,24 +17,61 @@
  */
 package com.infomaniak.calendar.ui.navigation
 
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.infomaniak.calendar.ui.screen.calendarTest.calendarTest
-import com.infomaniak.calendar.ui.screen.home.HomeScreen
+import com.infomaniak.calendar.ui.component.CalendarBottomBar
+import com.infomaniak.calendar.ui.component.CalendarNavigationRail
+import com.infomaniak.calendar.ui.screen.day.DayScreen
+import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
+import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
+import com.infomaniak.calendar.ui.screen.subDestinationTest.SubDestinationScreen
+import com.infomaniak.calendar.ui.screen.week.WeekScreen
 
 @Composable
-fun MainNavHost(
-    backStack: NavBackStack<NavKey>,
-) {
-    NavDisplay(backStack = backStack, entryProvider = baseEntryProvider(backStack))
+fun MainNavHost(navBackStack: NavBackStack<NavKey>) {
+    val windowInfo = LocalWindowInfo.current
+    val density = LocalDensity.current
+    val screenWidthDp = with(density) { windowInfo.containerSize.width.toDp() }
+    val isExpandedScreen = screenWidthDp >= 600.dp
+
+    SharedTransitionLayout {
+        val navigationStrategy = remember(isExpandedScreen, navBackStack) {
+            NavigationDecoratorStrategy<NavKey>(
+                isExpandedScreen = isExpandedScreen,
+                navBarContent = {
+                    CalendarBottomBar(backStack = navBackStack, sharedTransitionScope = this@SharedTransitionLayout)
+                },
+                navRailContent = {
+                    CalendarNavigationRail(backStack = navBackStack, sharedTransitionScope = this@SharedTransitionLayout)
+                },
+            )
+        }
+
+        NavDisplay(
+            backStack = navBackStack,
+            entryProvider = baseEntryProvider(navBackStack),
+            sceneDecoratorStrategies = listOf(navigationStrategy),
+            sharedTransitionScope = this@SharedTransitionLayout,
+        )
+    }
 }
 
 private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> = entryProvider {
+    entry<NavDestination.Planning> { PlanningScreen(backStack) }
+    entry<NavDestination.Day> { DayScreen() }
+    entry<NavDestination.Week> { WeekScreen() }
+    entry<NavDestination.Month> { MonthScreen() }
+    entry<NavDestination.SubDestinationTest> { SubDestinationScreen() }
     entry<NavDestination.Onboarding> { destination ->
         OnboardingScreen(
             onlyLogin = destination.onlyLogin,
@@ -45,8 +82,9 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
             onPopBack = { backStack.removeLastOrNull() },
         )
     }
-    entry<NavDestination.Home> {
-        HomeScreen()
-    }
-    calendarTest()
+}
+
+fun NavBackStack<NavKey>.addOrMoveToTop(destination: NavKey) {
+    if (this.contains(destination)) this.remove(destination)
+    this.add(destination)
 }

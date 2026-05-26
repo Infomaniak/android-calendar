@@ -1,0 +1,52 @@
+package com.infomaniak.calendar.ui.navigation
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.scene.Scene
+import androidx.navigation3.scene.SceneDecoratorStrategy
+import androidx.navigation3.scene.SceneDecoratorStrategyScope
+
+class NavigationDecoratorStrategy<T : NavKey>(
+    private val isExpandedScreen: Boolean,
+    private val navBarContent: @Composable () -> Unit,
+    private val navRailContent: @Composable () -> Unit,
+) : SceneDecoratorStrategy<T> {
+    private fun shouldDecorate(scene: Scene<T>): Boolean {
+        return when (val key = scene.key) {
+            is BottomBarNavigation -> true
+            is String -> {
+                key.contains("Planning") || key.contains("Day") || key.contains("Week") || key.contains("Month")
+            }
+            else -> false
+        }
+    }
+
+    override fun SceneDecoratorStrategyScope<T>.decorateScene(scene: Scene<T>): Scene<T> {
+        if (!shouldDecorate(scene)) return scene
+
+        return object : Scene<T> by scene {
+            override val content: @Composable () -> Unit = {
+                if (isExpandedScreen) {
+                    Row(modifier = Modifier.fillMaxSize()) {
+                        navRailContent()
+                        Box(modifier = Modifier.weight(1f)) {
+                            scene.content()
+                        }
+                    }
+                } else {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        Box(modifier = Modifier.weight(1f)) {
+                            scene.content()
+                        }
+                        navBarContent()
+                    }
+                }
+            }
+        }
+    }
+}

@@ -71,8 +71,7 @@ private fun MainContent(userLoadState: UserLoadState.Loaded) {
 
     CompositionLocalProvider(LocalUser provides userLoadState.user) {
         NavigateToOnboardingIfLastUserIsDisconnected(backStack, userLoadState.user)
-
-        MainNavHost(backStack = backStack)
+        MainNavHost(backStack)
     }
 }
 
