@@ -12,10 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Calendar">
 
-        <!--TODO-->
         <meta-data
             android:name="io.sentry.dsn"
-            android:value="" />
+            android:value="https://afcc80384a2911f1a5c6de3982f677f1@sentry-mobile.infomaniak.com/25" />
 
         <activity
             android:name=".MainActivity"
