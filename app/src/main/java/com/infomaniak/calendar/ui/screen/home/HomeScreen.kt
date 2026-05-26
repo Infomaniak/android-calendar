@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
-    Scaffold(topBar = { Text("HomeScreen") }, modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)) { paddingValues ->
-        Text("HomeScreenContent", modifier = modifier.padding(paddingValues))
+    Scaffold(topBar = { Text("HomeScreen") }, modifier = modifier.windowInsetsPadding(WindowInsets.statusBars)) { paddingValues ->
+        Text("HomeScreenContent", modifier = Modifier.padding(paddingValues))
     }
 }

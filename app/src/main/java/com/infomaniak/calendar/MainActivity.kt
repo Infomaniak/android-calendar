@@ -18,7 +18,6 @@
 package com.infomaniak.calendar
 
 import android.os.Bundle
-import android.view.Surface
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -34,7 +33,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CalendarTheme {
                 Surface {
-                    MainNavHost(NavDestination.Home)
+                    MainNavHost(startDestination = NavDestination.Home)
                 }
             }
         }
