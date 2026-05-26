@@ -2,13 +2,10 @@
 # Kotlin 2.2.0 (defined in Core/gradle/core.versions.toml) supports Metro 0.4.0 - 0.6.5
 # (see https://github.com/ZacSweers/metro/blob/main/docs/compatibility.md).
 metro = "0.6.5"
-# Keep aligned with `lifecycleRuntimeKtx` in Core/gradle/core.versions.toml.
-lifecycleViewmodelCompose = "2.10.0"
 
 [libraries]
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
 infomaniak-multiplatform-calendar-core = { module = "com.infomaniak.multiplaform-calendar:core" }
 
 [plugins]
