@@ -24,7 +24,7 @@ plugins {
 }
 
 android {
-    compileSdk { version = release(36) }
+    compileSdk = 36
     namespace = "com.infomaniak.calendar"
 
     defaultConfig {
@@ -47,8 +47,13 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+}
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-XXLanguage:+ExplicitBackingFields")
     }
 }
 
