@@ -21,24 +21,48 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.material3.Surface
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.infomaniak.calendar.ui.navigation.MainNavHost
 import com.infomaniak.calendar.ui.navigation.NavDestination
+import com.infomaniak.calendar.ui.screen.onboarding.CrossAppLoginViewModel
 import com.infomaniak.calendar.ui.theme.CalendarTheme
+import com.infomaniak.calendar.utils.AccountUtils
+import com.infomaniak.lib.login.InfomaniakLogin
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
+    private val mainApplication by lazy { application as MainApplication }
+    private val appGraph by lazy { mainApplication.appGraph }
+
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
-        get() = (application as MainApplication).appGraph.viewModelFactory
+        get() = appGraph.viewModelFactory
+
+    private val crossAppLoginViewModel: CrossAppLoginViewModel by viewModels()
+
+    private val accountUtils: AccountUtils by lazy { appGraph.accountUtils }
+    private val infomaniakLogin: InfomaniakLogin by lazy { appGraph.infomaniakLogin }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        lifecycleScope.launch {
+            crossAppLoginViewModel.activateUpdates(this@MainActivity)
+        }
+
         setContent {
             CalendarTheme {
                 Surface {
-                    MainNavHost(startDestination = NavDestination.Home)
+                    MainNavHost(
+                        startDestination = NavDestination.Onboarding(),
+                        crossAppLoginViewModel = crossAppLoginViewModel,
+                        accountUtils = accountUtils,
+                        infomaniakLogin = infomaniakLogin,
+                    )
                 }
             }
         }
