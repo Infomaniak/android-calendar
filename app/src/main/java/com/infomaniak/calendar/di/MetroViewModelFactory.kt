@@ -38,7 +38,6 @@ import kotlin.reflect.KClass
 class MetroViewModelFactory(
     private val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>>,
 ) : ViewModelProvider.Factory {
-
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         val provider = viewModelProviders[modelClass.kotlin]
             ?: error("No Metro ViewModel binding contributed for ${modelClass.name}")

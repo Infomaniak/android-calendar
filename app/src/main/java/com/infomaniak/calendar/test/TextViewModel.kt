@@ -39,9 +39,8 @@ import dev.zacsweers.metro.Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey(TextViewModel::class)
 class TextViewModel(
-    applicationContext: Context,
-    private val testUseCase: TestUseCase,
+    appContext: Context,
+    testUseCase: TestUseCase,
 ) : ViewModel() {
-
-    val text: String = "${testUseCase.greet()} Package: ${applicationContext.packageName}"
+    val text: String = "${testUseCase.greet()} Package: ${appContext.packageName}"
 }

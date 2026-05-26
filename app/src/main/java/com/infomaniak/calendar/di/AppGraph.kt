@@ -37,13 +37,11 @@ import kotlin.reflect.KClass
  */
 @DependencyGraph(AppScope::class)
 interface AppGraph {
-
     val viewModelFactory: MetroViewModelFactory
-
     val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>>
 
     @DependencyGraph.Factory
     fun interface Factory {
-        fun create(@Provides applicationContext: Context): AppGraph
+        fun create(@Provides appContext: Context): AppGraph
     }
 }
