@@ -15,23 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.navigation
+package com.infomaniak.calendar.ui.screen.home.composable
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.navigation3.runtime.NavEntry
-import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.ui.NavDisplay
-import com.infomaniak.calendar.ui.screen.home.Home
-import com.infomaniak.calendar.ui.screen.home.home
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 
 @Composable
-fun MainNavHost() {
-    val backStack = rememberNavBackStack(Home)
-    NavDisplay(backStack = backStack, entryProvider = baseEntryProvider())
-}
-
-private fun baseEntryProvider(): (NavKey) -> NavEntry<NavKey> = entryProvider {
-    home()
+internal fun Loading() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator()
+    }
 }

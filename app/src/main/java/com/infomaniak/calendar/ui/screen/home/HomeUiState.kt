@@ -15,23 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.navigation
+package com.infomaniak.calendar.ui.screen.home
 
-import androidx.compose.runtime.Composable
-import androidx.navigation3.runtime.NavEntry
-import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.ui.NavDisplay
-import com.infomaniak.calendar.ui.screen.home.Home
-import com.infomaniak.calendar.ui.screen.home.home
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 
-@Composable
-fun MainNavHost() {
-    val backStack = rememberNavBackStack(Home)
-    NavDisplay(backStack = backStack, entryProvider = baseEntryProvider())
+sealed interface HomeUiState {
+
+    data object Loading : HomeUiState
+
+    data class Success(val message: String) : HomeUiState
+
+    companion object {
+        internal class HomeUiStatePreviewProvider : PreviewParameterProvider<HomeUiState> {
+            override val values = sequenceOf(Loading, Success("Hello world"))
+
+            companion object {
+                val Success = Success("Hello world")
+            }
+        }
+    }
 }
 
-private fun baseEntryProvider(): (NavKey) -> NavEntry<NavKey> = entryProvider {
-    home()
-}
+
