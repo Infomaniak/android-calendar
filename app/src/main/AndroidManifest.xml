@@ -11,6 +11,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Calendar">
+
+        <!--TODO-->
+        <meta-data
+            android:name="io.sentry.dsn"
+            android:value="" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -22,5 +28,4 @@
             </intent-filter>
         </activity>
     </application>
-
 </manifest>
