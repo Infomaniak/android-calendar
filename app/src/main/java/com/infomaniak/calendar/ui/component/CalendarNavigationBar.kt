@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
@@ -25,7 +26,7 @@ import com.infomaniak.calendar.ui.navigation.addOrMoveToTop
 private const val NAVIGATION_BAR_KEY = "NAVIGATION_BAR"
 
 @Composable
-fun CalendarBottomBar(
+fun CalendarNavigationBar(
     backStack: NavBackStack<NavKey>,
     sharedTransitionScope: SharedTransitionScope,
     modifier: Modifier = Modifier,

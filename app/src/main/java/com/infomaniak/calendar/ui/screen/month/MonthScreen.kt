@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MonthScreen(modifier: Modifier = Modifier) {
-    Scaffold(topBar = { TopAppBar(title = { Text("MonthScreen") }) }) { paddingValues ->
-        Text("MonthScreenContent", modifier = modifier.padding(paddingValues))
+    Scaffold(topBar = { TopAppBar(title = { Text("MonthScreen") }) }, modifier = modifier) { paddingValues ->
+        Text("MonthScreenContent", modifier = Modifier.padding(paddingValues))
     }
 }

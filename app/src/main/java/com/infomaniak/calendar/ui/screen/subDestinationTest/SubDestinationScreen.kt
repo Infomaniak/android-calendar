@@ -12,8 +12,8 @@ import androidx.compose.ui.Modifier
 @Composable
 fun SubDestinationScreen(modifier: Modifier = Modifier) {
     Scaffold(
-        topBar = { TopAppBar(title = { Text("SubDestinationScreen") }) },
+        topBar = { TopAppBar(title = { Text("SubDestinationScreen") }, modifier = modifier) },
     ) { paddingValues ->
-        Text("SubDestinationScreenContent", modifier = modifier.padding(paddingValues))
+        Text("SubDestinationScreenContent", modifier = Modifier.padding(paddingValues))
     }
 }

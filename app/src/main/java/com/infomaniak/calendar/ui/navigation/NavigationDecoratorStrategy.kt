@@ -3,7 +3,12 @@ package com.infomaniak.calendar.ui.navigation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavKey
@@ -34,15 +39,19 @@ class NavigationDecoratorStrategy<T : NavKey>(
                 if (isExpandedScreen) {
                     Row(modifier = Modifier.fillMaxSize()) {
                         navRailContent()
-                        Box(modifier = Modifier.weight(1f)) {
-                            scene.content()
-                        }
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Start))
+                        ) { scene.content() }
                     }
                 } else {
                     Column(modifier = Modifier.fillMaxSize()) {
-                        Box(modifier = Modifier.weight(1f)) {
-                            scene.content()
-                        }
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom))
+                        ) { scene.content() }
                         navBarContent()
                     }
                 }

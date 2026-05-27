@@ -16,7 +16,7 @@ import com.infomaniak.calendar.ui.navigation.NavDestination
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlanningScreen(backStack: NavBackStack<NavKey>, modifier: Modifier = Modifier) {
-    Scaffold(modifier = modifier, topBar = { TopAppBar(title = { Text("PlanningScreen") }) }) { paddingValues ->
+    Scaffold(topBar = { TopAppBar(title = { Text("PlanningScreen") }) }, modifier = modifier) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             Text("PlanningScreenContent")
             Button(onClick = { backStack.add(NavDestination.SubDestinationTest) }) { Text("Test") }

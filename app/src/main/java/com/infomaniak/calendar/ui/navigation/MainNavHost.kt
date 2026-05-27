@@ -28,7 +28,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.infomaniak.calendar.ui.component.CalendarBottomBar
+import com.infomaniak.calendar.ui.component.CalendarNavigationBar
 import com.infomaniak.calendar.ui.component.CalendarNavigationRail
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
@@ -49,7 +49,7 @@ fun MainNavHost(navBackStack: NavBackStack<NavKey>) {
             NavigationDecoratorStrategy<NavKey>(
                 isExpandedScreen = isExpandedScreen,
                 navBarContent = {
-                    CalendarBottomBar(backStack = navBackStack, sharedTransitionScope = this@SharedTransitionLayout)
+                    CalendarNavigationBar(backStack = navBackStack, sharedTransitionScope = this@SharedTransitionLayout)
                 },
                 navRailContent = {
                     CalendarNavigationRail(backStack = navBackStack, sharedTransitionScope = this@SharedTransitionLayout)
