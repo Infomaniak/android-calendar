@@ -19,10 +19,9 @@ package com.infomaniak.calendar.ui.navigation
 
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.ExperimentalMediaQueryApi
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -36,18 +35,18 @@ import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
 import com.infomaniak.calendar.ui.screen.subDestinationTest.SubDestinationScreen
 import com.infomaniak.calendar.ui.screen.week.WeekScreen
+import com.infomaniak.core.ui.compose.navigation.rememberNavigationType
 
+@OptIn(ExperimentalMediaQueryApi::class)
 @Composable
-fun MainNavHost(navBackStack: NavBackStack<NavKey>) {
-    val windowInfo = LocalWindowInfo.current
-    val density = LocalDensity.current
-    val screenWidthDp = with(density) { windowInfo.containerSize.width.toDp() }
-    val isExpandedScreen = screenWidthDp >= 600.dp
+fun MainNavHost(startDestination: NavDestination) {
+    val backStack = rememberNavBackStack(startDestination)
+    val navigationType by rememberNavigationType()
 
     SharedTransitionLayout {
-        val navigationStrategy = remember(isExpandedScreen, navBackStack) {
+        val navigationStrategy = remember(navigationType, backStack) {
             NavigationDecoratorStrategy<NavKey>(
-                isExpandedScreen = isExpandedScreen,
+                navigationType = navigationType,
                 navBarContent = {
                     CalendarNavigationBar(backStack = navBackStack, sharedTransitionScope = this@SharedTransitionLayout)
                 },

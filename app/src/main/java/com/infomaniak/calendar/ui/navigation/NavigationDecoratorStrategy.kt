@@ -15,9 +15,10 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.Scene
 import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.scene.SceneDecoratorStrategyScope
+import com.infomaniak.core.ui.compose.navigation.NavigationType
 
 class NavigationDecoratorStrategy<T : NavKey>(
-    private val isExpandedScreen: Boolean,
+    private val navigationType: NavigationType,
     private val navBarContent: @Composable () -> Unit,
     private val navRailContent: @Composable () -> Unit,
 ) : SceneDecoratorStrategy<T> {
@@ -36,7 +37,7 @@ class NavigationDecoratorStrategy<T : NavKey>(
 
         return object : Scene<T> by scene {
             override val content: @Composable () -> Unit = {
-                if (isExpandedScreen) {
+                if (navigationType == NavigationType.Rail || navigationType == NavigationType.Drawer) {
                     Row(modifier = Modifier.fillMaxSize()) {
                         navRailContent()
                         Box(
