@@ -29,6 +29,7 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.ui.NavDisplay
 import com.infomaniak.calendar.ui.navigation.component.CalendarNavigationBar
 import com.infomaniak.calendar.ui.navigation.component.CalendarNavigationRail
@@ -70,6 +71,27 @@ fun MainNavHost(navBackStack: NavBackStack<NavKey>) {
     }
 }
 
+@Composable
+private fun SharedTransitionScope.sceneDecoratorStrategies(
+    navigationType: NavigationType,
+    backStack: NavBackStack<NavKey>
+): List<SceneDecoratorStrategy<NavKey>> {
+    val navigationStrategy: NavigationDecoratorStrategy<NavKey> = remember(navigationType, backStack) {
+        NavigationDecoratorStrategy(
+            navigationType = navigationType,
+            navBarContent = { animatedContentScope ->
+                CalendarNavigationBar(backStack, this, animatedContentScope)
+            },
+            navRailContent = { animatedContentScope ->
+                CalendarNavigationRail(backStack, this, animatedContentScope)
+            },
+        )
+    }
+
+    return listOf(navigationStrategy)
+}
+
+// metada = metadataOf(Navigation, Fab)
 private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> = entryProvider {
     entry<NavDestination.Planning>(metadata = NavigationMetadata.showNavigation()) { PlanningScreen(backStack) }
     entry<NavDestination.Day>(metadata = NavigationMetadata.showNavigation()) { DayScreen() }
