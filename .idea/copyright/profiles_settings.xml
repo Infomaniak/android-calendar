@@ -1,25 +1,25 @@
 <component name="CopyrightManager">
-  <settings>
-    <module2copyright>
-      <element module="Core project files" copyright="Core copyright" />
-      <element module="Calendar" copyright="Infomaniak Calendar Android" />
-      <element module="Calendar Multiplatform" copyright="Infomaniak Calendar Multiplatform" />
-    </module2copyright>
-    <LanguageOptions name="JAVA">
-      <option name="fileTypeOverride" value="3" />
-      <option name="prefixLines" value="false" />
-    </LanguageOptions>
-    <LanguageOptions name="Kotlin">
-      <option name="fileTypeOverride" value="3" />
-      <option name="addBlankAfter" value="false" />
-    </LanguageOptions>
-    <LanguageOptions name="XML">
-      <option name="fileTypeOverride" value="3" />
-      <option name="addBlankAfter" value="false" />
-    </LanguageOptions>
-    <LanguageOptions name="__TEMPLATE__">
-      <option name="prefixLines" value="false" />
-      <option name="lenBefore" value="0" />
-    </LanguageOptions>
-  </settings>
+    <settings>
+        <module2copyright>
+            <element copyright="Core copyright" module="Core project files" />
+            <element copyright="Infomaniak Open Source" module="Project Source Files" />
+        </module2copyright>
+        <LanguageOptions name="JAVA">
+            <option name="fileTypeOverride" value="3" />
+            <option name="prefixLines" value="false" />
+        </LanguageOptions>
+        <LanguageOptions name="Kotlin">
+            <option name="fileTypeOverride" value="3" />
+            <option name="addBlankAfter" value="false" />
+        </LanguageOptions>
+        <LanguageOptions name="XML">
+            <option name="fileTypeOverride" value="3" />
+            <option name="addBlankAfter" value="false" />
+        </LanguageOptions>
+        <LanguageOptions name="__TEMPLATE__">
+            <option name="addBlankAfter" value="false" />
+            <option name="prefixLines" value="false" />
+            <option name="lenBefore" value="0" />
+        </LanguageOptions>
+    </settings>
 </component>
