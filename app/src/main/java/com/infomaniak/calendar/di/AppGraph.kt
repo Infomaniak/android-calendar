@@ -19,6 +19,10 @@ package com.infomaniak.calendar.di
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import com.infomaniak.calendar.ui.screen.home.HomeViewModel
+import com.infomaniak.multiplatform_calendar.domain.useCases.GetCalendars
+import com.infomaniak.multiplatform_calendar.domain.useCases.InitAccount
+import com.infomaniak.multiplatform_calendar.domain.useCases.SyncCalendars
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provider
@@ -39,6 +43,12 @@ import kotlin.reflect.KClass
 interface AppGraph {
     val viewModelFactory: MetroViewModelFactory
     val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>> // Won't build if no ViewModels are defined
+
+    abstract val initAccount: InitAccount
+    abstract val syncCalendars: SyncCalendars
+    abstract val getCalendars: GetCalendars
+
+    abstract val homeViewModel: HomeViewModel
 
     @DependencyGraph.Factory
     fun interface Factory {

@@ -20,11 +20,11 @@ package com.infomaniak.calendar.ui.screen.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.calendar.di.ViewModelKey
-import com.infomaniak.multiplatform_calendar.core.data.repository.CalendarRepository
-import com.infomaniak.multiplatform_calendar.data.remote.RustCaldavBridge
-import dev.zacsweers.metro.AppScope
-import dev.zacsweers.metro.ContributesIntoMap
+import com.infomaniak.multiplatform_calendar.data.remote.model.CaldavCredentials
+import com.infomaniak.multiplatform_calendar.domain.model.calendar.AccountId
+import com.infomaniak.multiplatform_calendar.domain.useCases.GetCalendars
+import com.infomaniak.multiplatform_calendar.domain.useCases.InitAccount
+import com.infomaniak.multiplatform_calendar.domain.useCases.SyncCalendars
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,38 +33,31 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Inject
-@ViewModelKey(HomeViewModel::class)
-@ContributesIntoMap(AppScope::class)
-class HomeViewModel : ViewModel() {
+class HomeViewModel(
+    private val initAccount: InitAccount,
+    private val syncCalendars: SyncCalendars,
+    private val getCalendars: GetCalendars,
+) : ViewModel() {
 
     val uiState: StateFlow<HomeUiState>
         field = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
 
-    private val calendarRepository = CalendarRepository(caldavClient = RustCaldavBridge)
+    private val accountId = AccountId(1)
 
     init {
-        retrieveCalendars()
+        observeCalendars()
+        syncFromRemote()
     }
 
-    fun retrieveCalendars() {
+    private fun observeCalendars() {
         viewModelScope.launch {
-            try {
-                val calendars = withContext(Dispatchers.IO) {
-                    calendarRepository.discoverCalendars(
-                        baseUrl = "https://sync.infomaniak.com",
-                        username = "USERNAME",
-                        password = "PASSWORD",
-                    )
-                }
-                Log.d("CalDAV-PoC", "Found ${calendars.size} calendar(s)")
-                calendars.forEachIndexed { i, cal ->
-                    Log.d("CalDAV-PoC", "  [$i] ${cal.displayName}  →  ${cal.url}")
-                }
+            getCalendars(accountId).collect { calendars ->
+                Log.d("CalDAV-PoC", "DB updated: ${calendars.size} calendar(s)")
                 val message = if (calendars.isEmpty()) {
-                    "✅ Connected — but 0 calendars found."
+                    "⏳ Syncing…"
                 } else {
                     buildString {
-                        appendLine("✅ Found ${calendars.size} calendar(s):\n")
+                        appendLine("✅ ${calendars.size} calendar(s) in DB:\n")
                         calendars.forEachIndexed { i, cal ->
                             appendLine("[$i] ${cal.displayName}")
                             appendLine("    ${cal.url}")
@@ -73,6 +66,23 @@ class HomeViewModel : ViewModel() {
                     }
                 }
                 uiState.value = HomeUiState.Success(message)
+            }
+        }
+    }
+
+    private fun syncFromRemote() {
+        viewModelScope.launch {
+            try {
+                val credentials = CaldavCredentials(
+                    baseUrl = "https://sync.infomaniak.com",
+                    username = "USERNAME",
+                    password = "PASSWORD",
+                )
+                withContext(Dispatchers.IO) {
+                    initAccount(accountId, credentials)
+                    syncCalendars(accountId)
+                }
+                Log.d("CalDAV-PoC", "Sync completed")
             } catch (e: Exception) {
                 Log.e("CalDAV-PoC", "Discovery failed", e)
                 uiState.value = HomeUiState.Error("❌ Error: ${e.message}")

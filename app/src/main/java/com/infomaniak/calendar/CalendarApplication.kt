@@ -15,20 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.home
+package com.infomaniak.calendar
 
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.EntryProviderScope
-import androidx.navigation3.runtime.NavKey
-import com.infomaniak.calendar.di.metroViewModel
-import kotlinx.serialization.Serializable
+import android.app.Application
+import com.infomaniak.calendar.di.AppGraph
+import dev.zacsweers.metro.createGraphFactory
 
-@Serializable
-data object Home : NavKey
+class CalendarApplication : Application() {
 
-fun EntryProviderScope<NavKey>.home() = entry<Home> {
-    val viewmodel = metroViewModel { homeViewModel }
-    val state by viewmodel.uiState.collectAsStateWithLifecycle()
-    HomeScreenContent(state = state)
+    lateinit var appGraph: AppGraph
+        private set
+
+    override fun onCreate() {
+        super.onCreate()
+        appGraph = createGraphFactory<AppGraph.Factory>().create(context = this)
+    }
 }
+
+
+
+
+

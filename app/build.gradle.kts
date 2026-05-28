@@ -20,7 +20,7 @@ plugins {
     alias(core.plugins.compose.compiler)
     alias(core.plugins.kotlin.android)
     alias(core.plugins.kotlin.serialization)
-    alias(libs.plugins.metro)
+    alias(kmpCalendar.plugins.metro)
 }
 
 android {
@@ -60,6 +60,8 @@ kotlin {
 dependencies {
     implementation(libs.infomaniak.multiplatform.calendar)
     implementation(libs.infomaniak.multiplatform.calendar.core)
+
+    implementation(kmpCalendar.androidx.room.runtime)
 
     implementation(platform(core.compose.bom))
     implementation(core.activity.compose)
