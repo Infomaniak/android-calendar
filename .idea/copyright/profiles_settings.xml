@@ -2,8 +2,8 @@
   <settings>
     <module2copyright>
       <element module="Core project files" copyright="Core copyright" />
-      <element module="Calendar" copyright="Infomaniak Calendar Android" />
-      <element module="Calendar Multiplatform" copyright="Infomaniak Calendar Multiplatform" />
+      <element module="CalendarMultiplatform" copyright="Infomaniak Open Source Multiplatform" />
+      <element module="Calendar" copyright="Infomaniak Open Source" />
     </module2copyright>
     <LanguageOptions name="JAVA">
       <option name="fileTypeOverride" value="3" />
@@ -18,6 +18,7 @@
       <option name="addBlankAfter" value="false" />
     </LanguageOptions>
     <LanguageOptions name="__TEMPLATE__">
+      <option name="addBlankAfter" value="false" />
       <option name="prefixLines" value="false" />
       <option name="lenBefore" value="0" />
     </LanguageOptions>
