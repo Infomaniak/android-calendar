@@ -20,7 +20,6 @@ package com.infomaniak.calendar.ui.screen.onboarding
 import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.BuildConfig
 import com.infomaniak.calendar.di.ViewModelKey
-import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginViewModel
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
@@ -37,6 +36,6 @@ import dev.zacsweers.metro.binding
 @ContributesIntoMap(AppScope::class, binding = binding<ViewModel>())
 @ViewModelKey(CrossAppLoginViewModel::class)
 class CrossAppLoginViewModel : BaseCrossAppLoginViewModel(
-    applicationId = ConfigUtils.safePackage,
+    applicationId = "com.infomaniak.swisstransfer",// TODO: ConfigUtils.safePackage,
     clientId = BuildConfig.CLIENT_ID,
 )

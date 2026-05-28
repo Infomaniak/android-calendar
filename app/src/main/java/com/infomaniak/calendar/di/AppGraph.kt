@@ -21,7 +21,6 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.BuildConfig
 import com.infomaniak.calendar.utils.AccountUtils
-import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.core.network.LOGIN_ENDPOINT_URL
 import com.infomaniak.lib.login.InfomaniakLogin
 import dev.zacsweers.metro.AppScope
@@ -61,7 +60,7 @@ interface AppGraph {
     fun providesInfomaniakLogin(applicationContext: Context): InfomaniakLogin = InfomaniakLogin(
         context = applicationContext,
         loginUrl = "$LOGIN_ENDPOINT_URL/",
-        appUID = ConfigUtils.safePackage.substringBefore(".preprod"),
+        appUID = "com.infomaniak.swisstransfer",// TODO: ConfigUtils.safePackage,
         clientID = BuildConfig.CLIENT_ID,
         accessType = null,
         sentryCallback = null,
