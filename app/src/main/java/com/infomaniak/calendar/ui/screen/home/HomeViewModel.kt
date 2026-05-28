@@ -68,7 +68,7 @@ class HomeViewModel : ViewModel() {
                 uiState.value = HomeUiState.Success(message)
             } catch (e: Exception) {
                 Log.e("CalDAV-PoC", "Discovery failed", e)
-                "❌ Error: ${e.message}"
+                uiState.value = HomeUiState.Error("❌ Error: ${e.message}")
             }
         }
     }

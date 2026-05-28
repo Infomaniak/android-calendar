@@ -25,12 +25,15 @@ sealed interface HomeUiState {
 
     data class Success(val message: String) : HomeUiState
 
+    data class Error(val message: String) : HomeUiState
+
     companion object {
         internal class HomeUiStatePreviewProvider : PreviewParameterProvider<HomeUiState> {
-            override val values = sequenceOf(Loading, Success("Hello world"))
+            override val values = sequenceOf(Loading, Success, Error)
 
             companion object {
                 val Success = Success("Hello world")
+                val Error = Error("Something went wrong")
             }
         }
     }

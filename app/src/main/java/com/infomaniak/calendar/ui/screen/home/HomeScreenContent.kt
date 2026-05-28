@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.infomaniak.calendar.ui.screen.home.HomeUiState.Companion.HomeUiStatePreviewProvider
+import com.infomaniak.calendar.ui.screen.home.composable.Error
 import com.infomaniak.calendar.ui.screen.home.composable.Loading
 import com.infomaniak.calendar.ui.screen.home.composable.Success
 
@@ -42,6 +43,7 @@ fun HomeScreenContent(state: HomeUiState, modifier: Modifier = Modifier) {
             when (state) {
                 HomeUiState.Loading -> Loading()
                 is HomeUiState.Success -> Success(state)
+                is HomeUiState.Error -> Error(state)
             }
         }
     }
