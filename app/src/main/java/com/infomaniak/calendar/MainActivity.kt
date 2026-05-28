@@ -41,8 +41,6 @@ class MainActivity : ComponentActivity() {
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
         get() = appGraph.viewModelFactory
 
-    private val crossAppLoginViewModel: CrossAppLoginViewModel by viewModels()
-
     private val accountUtils: AccountUtils by lazy { appGraph.accountUtils }
     private val infomaniakLogin: InfomaniakLogin by lazy { appGraph.infomaniakLogin }
 
@@ -50,16 +48,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        lifecycleScope.launch {
-            crossAppLoginViewModel.activateUpdates(this@MainActivity)
-        }
-
         setContent {
             CalendarTheme {
                 Surface {
                     MainNavHost(
                         startDestination = NavDestination.Onboarding(),
-                        crossAppLoginViewModel = crossAppLoginViewModel,
                         accountUtils = accountUtils,
                         infomaniakLogin = infomaniakLogin,
                     )

@@ -18,8 +18,11 @@
 package com.infomaniak.calendar.di
 
 import android.content.Context
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.BuildConfig
+import com.infomaniak.calendar.MainApplication
 import com.infomaniak.calendar.utils.AccountUtils
 import com.infomaniak.core.network.LOGIN_ENDPOINT_URL
 import com.infomaniak.lib.login.InfomaniakLogin
@@ -29,6 +32,11 @@ import dev.zacsweers.metro.Provider
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import kotlin.reflect.KClass
+
+val ComposeAppGraph: AppGraph
+    @Composable get() {
+        return (LocalContext.current.applicationContext as MainApplication).appGraph
+    }
 
 /**
  * Root dependency graph for the application, scoped to [AppScope].
@@ -49,12 +57,6 @@ interface AppGraph {
 
     val accountUtils: AccountUtils
 
-    /**
-     * Provides the [InfomaniakLogin] WebView client used by the onboarding flow to launch the
-     * sign-in and account-creation flows.
-     *
-     * Mirrors `providesInfomaniakLogin` in `com.infomaniak.swisstransfer.di.ApplicationModule`.
-     */
     @Provides
     @SingleIn(AppScope::class)
     fun providesInfomaniakLogin(applicationContext: Context): InfomaniakLogin = InfomaniakLogin(

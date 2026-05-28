@@ -33,7 +33,7 @@ import dev.zacsweers.metro.binding
  * Mirrors `com.infomaniak.swisstransfer.ui.screen.onboarding.CrossAppLoginViewModel`.
  */
 @Inject
-@ContributesIntoMap(AppScope::class, binding = binding<ViewModel>())
+@ContributesIntoMap(AppScope::class, binding = binding<ViewModel>()) // TODO: Do we need this binding?
 @ViewModelKey(CrossAppLoginViewModel::class)
 class CrossAppLoginViewModel : BaseCrossAppLoginViewModel(
     applicationId = "com.infomaniak.swisstransfer",// TODO: ConfigUtils.safePackage,

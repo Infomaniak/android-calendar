@@ -17,13 +17,13 @@
  */
 package com.infomaniak.calendar.ui.screen.onboarding
 
+import android.content.Context
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -33,38 +33,113 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
+import com.infomaniak.calendar.di.ComposeAppGraph
+import com.infomaniak.calendar.utils.AccountUtils
+import com.infomaniak.core.auth.models.UserLoginResult
+import com.infomaniak.core.auth.models.user.User
+import com.infomaniak.core.auth.utils.LoginFlowController
+import com.infomaniak.core.auth.utils.LoginUtils
+import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginViewModel
+import com.infomaniak.core.crossapplogin.back.CrossAppLoginFacade
 import com.infomaniak.core.crossapplogin.back.CrossAppLoginFacade.AccountsCheckingState
 import com.infomaniak.core.crossapplogin.back.CrossAppLoginFacade.AccountsCheckingStatus
 import com.infomaniak.core.crossapplogin.back.ExternalAccount
 import com.infomaniak.core.crossapplogin.front.components.CrossLoginBottomContent
 import com.infomaniak.core.crossapplogin.front.components.NoCrossAppLoginAccountsContent
+import com.infomaniak.core.network.ApiEnvironment
 import com.infomaniak.core.onboarding.OnboardingPage
 import com.infomaniak.core.onboarding.OnboardingScaffold
 import com.infomaniak.core.onboarding.components.OnboardingComponents
+import com.infomaniak.core.onboarding.components.OnboardingComponents.DefaultTitleAndDescription
+import com.infomaniak.lib.login.InfomaniakLogin
+import kotlinx.coroutines.launch
+
+private val host = ApiEnvironment.current.host
+private val CREATE_ACCOUNT_URL = "https://welcome.$host/signup/infomaniak-calendar"
+private val CREATE_ACCOUNT_SUCCESS_HOST = "shop.$host"
+private const val CREATE_ACCOUNT_CANCEL_HOST = "" // No cancel host to detect.
+
+@Composable
+fun OnboardingScreen(
+    requiredLogin: Boolean,
+    onNavigateToHome: () -> Unit,
+    onPopBack: () -> Unit,
+    crossAppLoginViewModel: CrossAppLoginViewModel = viewModel(),
+    accountUtils: AccountUtils = ComposeAppGraph.accountUtils,
+    infomaniakLogin: InfomaniakLogin = ComposeAppGraph.infomaniakLogin,
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val hostActivity = LocalActivity.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    var areButtonsLoading by remember { mutableStateOf(false) }
+
+    val accountsCheckingState by crossAppLoginViewModel.accountsCheckingState.collectAsStateWithLifecycle()
+    val skippedIds by crossAppLoginViewModel.skippedAccountIds.collectAsStateWithLifecycle()
+
+    val loginDependencies = OnboardingLoginDependencies(
+        context = context,
+        accountUtils = accountUtils,
+        snackbarHostState = snackbarHostState,
+        requiredLogin = requiredLogin,
+        setButtonsLoading = { areButtonsLoading = it },
+        onNavigateToHome = onNavigateToHome,
+        onPopBack = onPopBack,
+    )
+    val loginFlowController = rememberOnboardingLoginFlowController(
+        infomaniakLogin = infomaniakLogin,
+        dependencies = loginDependencies,
+    )
+
+    LaunchedEffect(Unit) {
+        if (hostActivity !is ComponentActivity) return@LaunchedEffect
+        crossAppLoginViewModel.activateUpdates(hostActivity)
+    }
+
+    OnboardingScreen(
+        shouldDisplayRequiredLogin = requiredLogin,
+        accountsCheckingState = { accountsCheckingState },
+        skippedIds = { skippedIds },
+        areLoginButtonsLoading = { areButtonsLoading },
+        onLoginRequest = { accounts ->
+            if (accounts.isEmpty()) {
+                loginDependencies.setButtonsLoading(true)
+                loginFlowController.login()
+            } else {
+                scope.launch {
+                    connectSelectedAccounts(
+                        accounts = accounts,
+                        viewModel = crossAppLoginViewModel,
+                        dependencies = loginDependencies,
+                    )
+                }
+            }
+        },
+        onCreateAccount = {
+            loginDependencies.setButtonsLoading(true)
+            loginFlowController.createAccount(CREATE_ACCOUNT_URL, CREATE_ACCOUNT_SUCCESS_HOST, CREATE_ACCOUNT_CANCEL_HOST)
+        },
+        onSaveSkippedAccounts = { crossAppLoginViewModel.skippedAccountIds.value = it },
+        snackbarHostState = snackbarHostState,
+    )
+}
 
 /**
- * Calendar onboarding screen.
- *
- * Modeled after `com.infomaniak.swisstransfer.ui.screen.onboarding.OnboardingScreen`, with two
- * deliberate differences:
- *  - **Login is always required.** The bottom content always uses
- *    [NoCrossAppLoginAccountsContent.accountRequired]; there is no "continue as guest" path.
- *  - **No connectAsGuest callback** is exposed.
- *
- * Multi-account is still supported via [shouldDisplayRequiredLogin]: when the activity is reopened
- * from a logged-in user wanting to add another account, only the last (login) slide is shown.
- *
  * @param shouldDisplayRequiredLogin When `true`, only the last login slide is shown and the
  * carousel is skipped. Use this when reopening onboarding from a multi-account flow to add another
  * account.
@@ -80,7 +155,7 @@ import com.infomaniak.core.onboarding.components.OnboardingComponents
  * @param onSaveSkippedAccounts Persists the latest selection of skipped cross-app accounts.
  */
 @Composable
-fun OnboardingScreen(
+private fun OnboardingScreen(
     shouldDisplayRequiredLogin: Boolean,
     accountsCheckingState: () -> AccountsCheckingState,
     skippedIds: () -> Set<Long>,
@@ -90,8 +165,6 @@ fun OnboardingScreen(
     onSaveSkippedAccounts: (Set<Long>) -> Unit,
     snackbarHostState: SnackbarHostState,
 ) {
-    // When relaunching onboarding from a multi-account flow we skip straight to the login slide
-    // (the last entry, by convention).
     val pages: List<Page> = if (shouldDisplayRequiredLogin) listOf(Page.entries.last()) else Page.entries
 
     val pagerState = rememberPagerState(pageCount = { pages.size })
@@ -125,39 +198,36 @@ fun OnboardingScreen(
 }
 
 /**
- * Dummy slides used until the real onboarding content is supplied. Order matters: the last entry
- * is always the "login" slide and is the only one shown when [OnboardingScreen.shouldDisplayRequiredLogin]
- * is `true`.
+ * Dummy slides for now
  */
 private enum class Page(
     @DrawableRes val illustrationRes: Int,
-    @StringRes val titleRes: Int,
-    @StringRes val descriptionRes: Int,
+    val title: String,
+    val description: String,
 ) {
     PageOne(
         illustrationRes = R.drawable.illu_onboarding_placeholder,
-        titleRes = R.string.onboardingPageOneTitle,
-        descriptionRes = R.string.onboardingPageOneDescription,
+        title = "Dummy onboarding title #1",
+        description = "Dummy onboarding description for the first slide. Replace me with the real copy.",
     ),
     PageTwo(
         illustrationRes = R.drawable.illu_onboarding_placeholder,
-        titleRes = R.string.onboardingPageTwoTitle,
-        descriptionRes = R.string.onboardingPageTwoDescription,
+        title = "Dummy onboarding title #2",
+        description = "Dummy onboarding description for the second slide. Replace me with the real copy.",
     ),
     PageThree(
         illustrationRes = R.drawable.illu_onboarding_placeholder,
-        titleRes = R.string.onboardingPageThreeTitle,
-        descriptionRes = R.string.onboardingPageThreeDescription,
+        title = "Dummy onboarding title #3",
+        description = "Dummy onboarding description for the third slide. Replace me with the real copy.",
     ),
     PageFour(
         illustrationRes = R.drawable.illu_onboarding_placeholder,
-        titleRes = R.string.onboardingPageFourTitle,
-        descriptionRes = R.string.onboardingPageFourDescription,
+        title = "Sign in to your Infomaniak account",
+        description = "Sign in to start using the Infomaniak Calendar.",
     );
 
     fun toOnboardingPage(): OnboardingPage = OnboardingPage(
         background = {
-            // Solid background; replace with a themed gradient/illustration when the real assets land.
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -172,25 +242,108 @@ private enum class Page(
             )
         },
         text = {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.padding(horizontal = 24.dp),
-            ) {
-                Text(
-                    text = stringResource(titleRes),
-                    style = MaterialTheme.typography.headlineMedium,
-                    textAlign = TextAlign.Center,
-                )
-                Text(
-                    text = stringResource(descriptionRes),
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center,
-                )
-            }
+            DefaultTitleAndDescription(
+                title = title,
+                description = description,
+                titleStyle = MaterialTheme.typography.headlineMedium,
+                descriptionStyle = MaterialTheme.typography.bodyLarge,
+            )
         },
     )
 }
+
+@Composable
+private fun rememberOnboardingLoginFlowController(
+    infomaniakLogin: InfomaniakLogin,
+    dependencies: OnboardingLoginDependencies,
+): LoginFlowController {
+    val scope = rememberCoroutineScope()
+
+    return LoginUtils.rememberLoginFlowController(
+        infomaniakLogin = infomaniakLogin,
+        userExistenceChecker = dependencies.accountUtils,
+    ) { userLoginResult ->
+        when (userLoginResult) {
+            is UserLoginResult.Success -> scope.launch {
+                loginUsersIntoTheApp(
+                    users = listOf(userLoginResult.user),
+                    requiredLogin = dependencies.requiredLogin,
+                    accountUtils = dependencies.accountUtils,
+                    onNavigateToHome = dependencies.onNavigateToHome,
+                    onPopBack = dependencies.onPopBack,
+                )
+            }
+            is UserLoginResult.Failure -> scope.launch {
+                dependencies.snackbarHostState.showSnackbar(userLoginResult.errorMessage)
+            }
+            null -> Unit // The user canceled the WebView.
+        }
+
+        if (userLoginResult !is UserLoginResult.Success) dependencies.setButtonsLoading(false)
+    }
+}
+
+private suspend fun connectSelectedAccounts(
+    accounts: List<ExternalAccount>,
+    viewModel: BaseCrossAppLoginViewModel,
+    dependencies: OnboardingLoginDependencies,
+) {
+    dependencies.setButtonsLoading(true)
+    val loginResult = viewModel.attemptLogin(selectedAccounts = accounts)
+    loginUsers(loginResult = loginResult, dependencies = dependencies)
+    loginResult.errorMessageIds.forEach { messageResId ->
+        dependencies.snackbarHostState.showSnackbar(dependencies.context.getString(messageResId))
+    }
+}
+
+private suspend fun loginUsers(loginResult: CrossAppLoginFacade.LoginResult, dependencies: OnboardingLoginDependencies) {
+    val results = LoginUtils.getLoginResultsAfterCrossApp(
+        apiTokens = loginResult.tokens,
+        context = dependencies.context,
+        userExistenceChecker = dependencies.accountUtils,
+    )
+    val users = buildList {
+        results.forEach { result ->
+            when (result) {
+                is UserLoginResult.Success -> add(result.user)
+                is UserLoginResult.Failure -> dependencies.snackbarHostState.showSnackbar(result.errorMessage)
+            }
+        }
+    }
+
+    if (users.isEmpty()) {
+        dependencies.setButtonsLoading(false)
+    } else {
+        loginUsersIntoTheApp(
+            users = users,
+            requiredLogin = dependencies.requiredLogin,
+            accountUtils = dependencies.accountUtils,
+            onNavigateToHome = dependencies.onNavigateToHome,
+            onPopBack = dependencies.onPopBack,
+        )
+    }
+}
+
+private suspend fun loginUsersIntoTheApp(
+    users: List<User>,
+    requiredLogin: Boolean,
+    accountUtils: AccountUtils,
+    onNavigateToHome: () -> Unit,
+    onPopBack: () -> Unit,
+) {
+    users.forEach { user -> accountUtils.addUser(user) }
+    if (requiredLogin) onPopBack() else onNavigateToHome()
+}
+
+private data class OnboardingLoginDependencies(
+    val context: Context,
+    val accountUtils: AccountUtils,
+    val snackbarHostState: SnackbarHostState,
+    val requiredLogin: Boolean,
+    val setButtonsLoading: (Boolean) -> Unit,
+    val onNavigateToHome: () -> Unit,
+    val onPopBack: () -> Unit,
+)
 
 @Preview
 @Composable
