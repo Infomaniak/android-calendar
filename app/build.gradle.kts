@@ -52,7 +52,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":multiplatform-calendar"))
+    implementation(libs.infomaniak.multiplaform.calendar.core)
 
     implementation(platform(core.compose.bom))
     implementation(core.activity.compose)
