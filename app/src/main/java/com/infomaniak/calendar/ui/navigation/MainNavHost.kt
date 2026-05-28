@@ -26,26 +26,30 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.infomaniak.calendar.ui.component.CalendarNavigationBar
 import com.infomaniak.calendar.ui.component.CalendarNavigationRail
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationMetadata
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
 import com.infomaniak.calendar.ui.screen.subDestinationTest.SubDestinationScreen
 import com.infomaniak.calendar.ui.screen.week.WeekScreen
+import com.infomaniak.core.ui.compose.navigation.NavigationType
 import com.infomaniak.core.ui.compose.navigation.rememberNavigationType
 
 @OptIn(ExperimentalMediaQueryApi::class)
 @Composable
 fun MainNavHost(startDestination: NavDestination) {
-    val backStack = rememberNavBackStack(startDestination)
-    val navigationType by rememberNavigationType()
+    val backStack: NavBackStack<NavKey> = rememberNavBackStack(startDestination)
+    val navigationType: NavigationType by rememberNavigationType()
 
     SharedTransitionLayout {
-        val navigationStrategy = remember(navigationType, backStack) {
-            NavigationDecoratorStrategy<NavKey>(
+        val navigationStrategy: NavigationDecoratorStrategy<NavKey> = remember(navigationType, backStack) {
+            NavigationDecoratorStrategy(
                 navigationType = navigationType,
                 navBarContent = {
                     CalendarNavigationBar(backStack = navBackStack, sharedTransitionScope = this@SharedTransitionLayout)
@@ -66,11 +70,11 @@ fun MainNavHost(startDestination: NavDestination) {
 }
 
 private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> = entryProvider {
-    entry<NavDestination.Planning> { PlanningScreen(backStack) }
-    entry<NavDestination.Day> { DayScreen() }
-    entry<NavDestination.Week> { WeekScreen() }
-    entry<NavDestination.Month> { MonthScreen() }
-    entry<NavDestination.SubDestinationTest> { SubDestinationScreen() }
+    entry<NavDestination.Planning>(metadata = NavigationMetadata.showNavigation()) { PlanningScreen(backStack) }
+    entry<NavDestination.Day>(metadata = NavigationMetadata.showNavigation()) { DayScreen() }
+    entry<NavDestination.Week>(metadata = NavigationMetadata.showNavigation()) { WeekScreen() }
+    entry<NavDestination.Month>(metadata = NavigationMetadata.showNavigation()) { MonthScreen() }
+    entry<NavDestination.SubDestination> { SubDestinationScreen() }
     entry<NavDestination.Onboarding> { destination ->
         OnboardingScreen(
             onlyLogin = destination.onlyLogin,

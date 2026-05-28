@@ -23,22 +23,20 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface NavDestination : NavKey {
     @Serializable
-    data object Planning : NavDestination, BottomBarNavigation
-
-    @Serializable
     data class Onboarding(val onlyLogin: Boolean = false) : NavDestination
 
-    data object Day : NavDestination, BottomBarNavigation
+    @Serializable
+    data object Planning : NavDestination
 
     @Serializable
-    data object Week : NavDestination, BottomBarNavigation
+    data object Day : NavDestination
 
     @Serializable
-    data object Month : NavDestination, BottomBarNavigation
+    data object Week : NavDestination
 
     @Serializable
-    data object SubDestinationTest : NavDestination //TODO: Don't commit
+    data object Month : NavDestination
+
+    @Serializable
+    data object SubDestination : NavDestination
 }
-
-@Serializable
-sealed interface BottomBarNavigation

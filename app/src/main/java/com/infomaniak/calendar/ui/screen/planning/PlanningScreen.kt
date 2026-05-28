@@ -19,7 +19,7 @@ fun PlanningScreen(backStack: NavBackStack<NavKey>, modifier: Modifier = Modifie
     Scaffold(topBar = { TopAppBar(title = { Text("PlanningScreen") }) }, modifier = modifier) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             Text("PlanningScreenContent")
-            Button(onClick = { backStack.add(NavDestination.SubDestinationTest) }) { Text("Test") }
+            Button(onClick = { backStack.add(NavDestination.SubDestination) }) { Text("Test") }
         }
     }
 }

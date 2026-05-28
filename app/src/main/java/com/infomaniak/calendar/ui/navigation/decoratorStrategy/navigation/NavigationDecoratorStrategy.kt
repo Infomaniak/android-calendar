@@ -1,4 +1,4 @@
-package com.infomaniak.calendar.ui.navigation
+package com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,14 +22,9 @@ class NavigationDecoratorStrategy<T : NavKey>(
     private val navBarContent: @Composable () -> Unit,
     private val navRailContent: @Composable () -> Unit,
 ) : SceneDecoratorStrategy<T> {
+
     private fun shouldDecorate(scene: Scene<T>): Boolean {
-        return when (val key = scene.key) {
-            is BottomBarNavigation -> true
-            is String -> {
-                key.contains("Planning") || key.contains("Day") || key.contains("Week") || key.contains("Month")
-            }
-            else -> false
-        }
+        return (scene.metadata[NavigationMetadata.SHOULD_SHOW_NAVIGATION_KEY] as? Boolean) ?: false
     }
 
     override fun SceneDecoratorStrategyScope<T>.decorateScene(scene: Scene<T>): Scene<T> {
@@ -44,7 +39,9 @@ class NavigationDecoratorStrategy<T : NavKey>(
                             modifier = Modifier
                                 .weight(1f)
                                 .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Start))
-                        ) { scene.content() }
+                        ) {
+                            scene.content()
+                        }
                     }
                 } else {
                     Column(modifier = Modifier.fillMaxSize()) {
@@ -52,11 +49,15 @@ class NavigationDecoratorStrategy<T : NavKey>(
                             modifier = Modifier
                                 .weight(1f)
                                 .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom))
-                        ) { scene.content() }
+                        ) {
+                            scene.content()
+                        }
                         navBarContent()
                     }
                 }
             }
         }
     }
+
+
 }
