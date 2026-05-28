@@ -1,5 +1,6 @@
 package com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation
 
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,12 +16,13 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.Scene
 import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.scene.SceneDecoratorStrategyScope
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.core.ui.compose.navigation.NavigationType
 
 class NavigationDecoratorStrategy<T : NavKey>(
     private val navigationType: NavigationType,
-    private val navBarContent: @Composable () -> Unit,
-    private val navRailContent: @Composable () -> Unit,
+    private val navBarContent: @Composable (AnimatedContentScope) -> Unit,
+    private val navRailContent: @Composable (AnimatedContentScope) -> Unit,
 ) : SceneDecoratorStrategy<T> {
 
     private fun shouldDecorate(scene: Scene<T>): Boolean {
@@ -32,9 +34,11 @@ class NavigationDecoratorStrategy<T : NavKey>(
 
         return object : Scene<T> by scene {
             override val content: @Composable () -> Unit = {
+                val animatedContentScope = LocalNavAnimatedContentScope.current
+
                 if (navigationType == NavigationType.Rail || navigationType == NavigationType.Drawer) {
                     Row(modifier = Modifier.fillMaxSize()) {
-                        navRailContent()
+                        navRailContent(animatedContentScope)
                         Box(
                             modifier = Modifier
                                 .weight(1f)
@@ -52,12 +56,10 @@ class NavigationDecoratorStrategy<T : NavKey>(
                         ) {
                             scene.content()
                         }
-                        navBarContent()
+                        navBarContent(animatedContentScope)
                     }
                 }
             }
         }
     }
-
-
 }

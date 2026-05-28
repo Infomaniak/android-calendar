@@ -28,8 +28,8 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import com.infomaniak.calendar.ui.component.CalendarNavigationBar
-import com.infomaniak.calendar.ui.component.CalendarNavigationRail
+import com.infomaniak.calendar.ui.component.navigation.CalendarNavigationBar
+import com.infomaniak.calendar.ui.component.navigation.CalendarNavigationRail
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationMetadata
 import com.infomaniak.calendar.ui.screen.day.DayScreen
@@ -43,19 +43,18 @@ import com.infomaniak.core.ui.compose.navigation.rememberNavigationType
 
 @OptIn(ExperimentalMediaQueryApi::class)
 @Composable
-fun MainNavHost(startDestination: NavDestination) {
-    val backStack: NavBackStack<NavKey> = rememberNavBackStack(startDestination)
+fun MainNavHost(navBackStack: NavBackStack<NavKey>) {
     val navigationType: NavigationType by rememberNavigationType()
 
     SharedTransitionLayout {
-        val navigationStrategy: NavigationDecoratorStrategy<NavKey> = remember(navigationType, backStack) {
+        val navigationStrategy: NavigationDecoratorStrategy<NavKey> = remember(navigationType, navBackStack) {
             NavigationDecoratorStrategy(
                 navigationType = navigationType,
-                navBarContent = {
-                    CalendarNavigationBar(backStack = navBackStack, sharedTransitionScope = this@SharedTransitionLayout)
+                navBarContent = { animatedContentScope ->
+                    CalendarNavigationBar(navBackStack, this@SharedTransitionLayout, animatedContentScope)
                 },
-                navRailContent = {
-                    CalendarNavigationRail(backStack = navBackStack, sharedTransitionScope = this@SharedTransitionLayout)
+                navRailContent = { animatedContentScope ->
+                    CalendarNavigationRail(navBackStack, this@SharedTransitionLayout, animatedContentScope)
                 },
             )
         }
