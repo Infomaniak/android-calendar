@@ -1,3 +1,3 @@
 <component name="DependencyValidationManager">
-    <scope name="Calendar" pattern="file[*Calendar*]:*/" />
+  <scope name="Calendar" pattern="file[Calendar*]:*/" />
 </component>
