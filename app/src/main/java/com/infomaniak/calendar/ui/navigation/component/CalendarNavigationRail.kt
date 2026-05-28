@@ -1,9 +1,5 @@
-package com.infomaniak.calendar.ui.component.navigation
+package com.infomaniak.calendar.ui.navigation.component
 
-import android.annotation.SuppressLint
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarViewMonth
 import androidx.compose.material.icons.filled.ViewAgenda
@@ -27,13 +23,11 @@ private const val NAVIGATION_RAIL_KEY = "NAVIGATION_RAIL"
 @Composable
 fun CalendarNavigationRail(
     backStack: NavBackStack<NavKey>,
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope?,
     modifier: Modifier = Modifier,
 ) {
     val currentKey: NavKey = backStack.last()
 
-    NavigationRail(modifier = modifier.sharedNavigation(NAVIGATION_RAIL_KEY, sharedTransitionScope, animatedContentScope)) {
+    NavigationRail(modifier = modifier.sharedNavigation(key = NAVIGATION_RAIL_KEY)) {
         NavigationRailItem(
             selected = currentKey is NavDestination.Planning,
             icon = { Icon(imageVector = Icons.Filled.ViewAgenda, contentDescription = null) },
@@ -65,12 +59,5 @@ fun CalendarNavigationRail(
 @Composable
 private fun CalendarNavigationRailPreview() {
     val backStack: NavBackStack<NavKey> = rememberNavBackStack(NavDestination.Week)
-
-    SharedTransitionLayout {
-        CalendarNavigationRail(
-            backStack = backStack,
-            sharedTransitionScope = this@SharedTransitionLayout,
-            animatedContentScope = null,
-        )
-    }
+    CalendarNavigationRail(backStack = backStack)
 }

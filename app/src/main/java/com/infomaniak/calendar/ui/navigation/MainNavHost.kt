@@ -18,18 +18,20 @@
 package com.infomaniak.calendar.ui.navigation
 
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.ExperimentalMediaQueryApi
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import com.infomaniak.calendar.ui.component.navigation.CalendarNavigationBar
-import com.infomaniak.calendar.ui.component.navigation.CalendarNavigationRail
+import com.infomaniak.calendar.ui.navigation.component.CalendarNavigationBar
+import com.infomaniak.calendar.ui.navigation.component.CalendarNavigationRail
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationMetadata
 import com.infomaniak.calendar.ui.screen.day.DayScreen
@@ -41,30 +43,30 @@ import com.infomaniak.calendar.ui.screen.week.WeekScreen
 import com.infomaniak.core.ui.compose.navigation.NavigationType
 import com.infomaniak.core.ui.compose.navigation.rememberNavigationType
 
+val LocalSharedTransitionScope = staticCompositionLocalOf<SharedTransitionScope?> { null }
+
 @OptIn(ExperimentalMediaQueryApi::class)
 @Composable
 fun MainNavHost(navBackStack: NavBackStack<NavKey>) {
     val navigationType: NavigationType by rememberNavigationType()
 
     SharedTransitionLayout {
-        val navigationStrategy: NavigationDecoratorStrategy<NavKey> = remember(navigationType, navBackStack) {
-            NavigationDecoratorStrategy(
-                navigationType = navigationType,
-                navBarContent = { animatedContentScope ->
-                    CalendarNavigationBar(navBackStack, this@SharedTransitionLayout, animatedContentScope)
-                },
-                navRailContent = { animatedContentScope ->
-                    CalendarNavigationRail(navBackStack, this@SharedTransitionLayout, animatedContentScope)
-                },
+        CompositionLocalProvider(LocalSharedTransitionScope provides this@SharedTransitionLayout) {
+            val navigationStrategy: NavigationDecoratorStrategy<NavKey> = remember(navigationType, navBackStack) {
+                NavigationDecoratorStrategy(
+                    navigationType = navigationType,
+                    navBarContent = { CalendarNavigationBar(navBackStack) },
+                    navRailContent = { CalendarNavigationRail(navBackStack) },
+                )
+            }
+
+            NavDisplay(
+                backStack = navBackStack,
+                entryProvider = baseEntryProvider(navBackStack),
+                sceneDecoratorStrategies = listOf(navigationStrategy),
+                sharedTransitionScope = this@SharedTransitionLayout,
             )
         }
-
-        NavDisplay(
-            backStack = navBackStack,
-            entryProvider = baseEntryProvider(navBackStack),
-            sceneDecoratorStrategies = listOf(navigationStrategy),
-            sharedTransitionScope = this@SharedTransitionLayout,
-        )
     }
 }
 

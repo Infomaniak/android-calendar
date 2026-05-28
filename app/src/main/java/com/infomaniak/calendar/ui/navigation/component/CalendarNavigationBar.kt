@@ -1,8 +1,5 @@
-package com.infomaniak.calendar.ui.component.navigation
+package com.infomaniak.calendar.ui.navigation.component
 
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,13 +27,11 @@ private const val NAVIGATION_BAR_KEY = "NAVIGATION_BAR"
 @Composable
 fun CalendarNavigationBar(
     backStack: NavBackStack<NavKey>,
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope?,
     modifier: Modifier = Modifier,
 ) {
     val currentKey: NavKey = backStack.last()
 
-    NavigationBar(modifier = modifier.sharedNavigation(NAVIGATION_BAR_KEY, sharedTransitionScope, animatedContentScope)) {
+    NavigationBar(modifier = modifier.sharedNavigation(key = NAVIGATION_BAR_KEY)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -75,12 +70,5 @@ fun CalendarNavigationBar(
 @Composable
 private fun CalendarNavigationBarPreview() {
     val backStack: NavBackStack<NavKey> = rememberNavBackStack(NavDestination.Week)
-
-    SharedTransitionLayout {
-        CalendarNavigationBar(
-            backStack = backStack,
-            sharedTransitionScope = this@SharedTransitionLayout,
-            animatedContentScope = null,
-        )
-    }
+    CalendarNavigationBar(backStack = backStack)
 }
