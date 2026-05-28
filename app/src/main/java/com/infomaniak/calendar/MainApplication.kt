@@ -22,12 +22,5 @@ import com.infomaniak.calendar.di.AppGraph
 import dev.zacsweers.metro.createGraphFactory
 
 class MainApplication : Application() {
-
-    lateinit var appGraph: AppGraph
-        private set
-
-    override fun onCreate() {
-        super.onCreate()
-        appGraph = createGraphFactory<AppGraph.Factory>().create(applicationContext)
-    }
+    val appGraph by lazy { createGraphFactory<AppGraph.Factory>().create(applicationContext) }
 }
