@@ -20,7 +20,7 @@ android-calendar/
 │   ├── libs.versions.toml          # Android app version catalog
 │   └── wrapper/                    # Gradle wrapper
 ├── build.gradle.kts                # Root build script
-├── settings.gradle.kts             # Includes :app and :multiplatform-calendar
+├── settings.gradle.kts             # Includes :app; uses includeBuild("multiplatform-calendar") for composite build
 └── AGENTS.md                       # This file (top-level overview)
 ```
 
@@ -41,8 +41,10 @@ android-calendar/
     - `gradle/libs.versions.toml` — Android app dependencies (default `libs` catalog).
     - `multiplatform-calendar/gradle/kmpCalendar.versions.toml` — KMP-side dependencies, exposed in `settings.gradle.kts`
       as the `kmpCalendar` catalog.
-- **Project inclusion**: `settings.gradle.kts` includes `:app` and `:multiplatform-calendar`. The app depends on the KMP
-  module via `implementation(project(":multiplatform-calendar"))`.
+- **Project inclusion**: `settings.gradle.kts` includes `:app` and wires `multiplatform-calendar` as a composite build
+  via `includeBuild("multiplatform-calendar")` with a `dependencySubstitution` block. The app depends on the KMP module
+  via the version-catalog alias `libs.infomaniak.multiplaform.calendar.core`
+  (declared in `gradle/libs.versions.toml`), which Gradle transparently substitutes with the included `:Core` project.
 - **Impact**: Editing `multiplatform-calendar/` affects every consumer of that library - changes belong in its own repo
   and PR.
 
@@ -63,7 +65,8 @@ git submodule update --remote multiplatform-calendar
 
 - **Shared models / business logic**: The app imports from `com.infomaniak.multiplatform_calendar.*` (e.g.,
   `com.infomaniak.multiplatform_calendar.model.calendar.Color` used in `MainActivity.kt`).
-- **Dependency wiring**: Declared in `app/build.gradle.kts` via `implementation(project(":multiplatform-calendar"))`.
+- **Dependency wiring**: Declared in `app/build.gradle.kts` via `implementation(libs.infomaniak.multiplaform.calendar.core)`;
+  Gradle substitutes this Maven coordinate with the `:Core` project from the composite build.
 - **Plugin aliases**: Root `build.gradle.kts` registers the Android and Kotlin Multiplatform plugins from both catalogs
   (`libs.plugins.*` and `kmpCalendar.plugins.*`).
 
@@ -81,9 +84,6 @@ git submodule update --remote multiplatform-calendar
 
 # Run instrumented / Compose UI tests (requires a connected device or emulator)
 ./gradlew :app:connectedDebugAndroidTest
-
-# Assemble the KMP module's Android library variant
-./gradlew :multiplatform-calendar:assemble
 
 # Clean
 ./gradlew clean
