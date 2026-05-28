@@ -2,7 +2,7 @@
   <settings>
     <module2copyright>
       <element module="Core project files" copyright="Core copyright" />
-      <element module="Project Source Files" copyright="Infomaniak Open Source" />
+      <element module="Calendar" copyright="Infomaniak Open Source" />
     </module2copyright>
     <LanguageOptions name="JAVA">
       <option name="fileTypeOverride" value="3" />
