@@ -19,22 +19,28 @@ package com.infomaniak.calendar.ui.navigation
 
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.ExperimentalMediaQueryApi
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.ui.NavDisplay
+import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.navigation.component.CalendarNavigationBar
 import com.infomaniak.calendar.ui.navigation.component.CalendarNavigationRail
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.Fab
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.NavigationBar
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
-import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationMetadata
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
@@ -45,59 +51,48 @@ import com.infomaniak.core.ui.compose.navigation.NavigationType
 import com.infomaniak.core.ui.compose.navigation.rememberNavigationType
 
 val LocalSharedTransitionScope = staticCompositionLocalOf<SharedTransitionScope?> { null }
+val LocalGlobalPadding = staticCompositionLocalOf { PaddingValues(0.dp) }
+val LocalGlobalSnackbar = staticCompositionLocalOf<SnackbarHostState> { error("No SnackbarHostState provided") }
 
 @OptIn(ExperimentalMediaQueryApi::class)
 @Composable
 fun MainNavHost(navBackStack: NavBackStack<NavKey>) {
-    val navigationType: NavigationType by rememberNavigationType()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     SharedTransitionLayout {
-        CompositionLocalProvider(LocalSharedTransitionScope provides this@SharedTransitionLayout) {
-            val navigationStrategy: NavigationDecoratorStrategy<NavKey> = remember(navigationType, navBackStack) {
-                NavigationDecoratorStrategy(
-                    navigationType = navigationType,
-                    navBarContent = { CalendarNavigationBar(navBackStack) },
-                    navRailContent = { CalendarNavigationRail(navBackStack) },
-                )
-            }
-
+        CompositionLocalProvider(
+            LocalSharedTransitionScope provides this@SharedTransitionLayout,
+            LocalGlobalSnackbar provides snackbarHostState,
+        ) {
             NavDisplay(
                 backStack = navBackStack,
                 entryProvider = baseEntryProvider(navBackStack),
-                sceneDecoratorStrategies = listOf(navigationStrategy),
+                sceneDecoratorStrategies = sceneDecoratorStrategies(navBackStack),
                 sharedTransitionScope = this@SharedTransitionLayout,
             )
         }
     }
 }
 
-@Composable
-private fun SharedTransitionScope.sceneDecoratorStrategies(
-    navigationType: NavigationType,
-    backStack: NavBackStack<NavKey>
-): List<SceneDecoratorStrategy<NavKey>> {
-    val navigationStrategy: NavigationDecoratorStrategy<NavKey> = remember(navigationType, backStack) {
-        NavigationDecoratorStrategy(
-            navigationType = navigationType,
-            navBarContent = { animatedContentScope ->
-                CalendarNavigationBar(backStack, this, animatedContentScope)
-            },
-            navRailContent = { animatedContentScope ->
-                CalendarNavigationRail(backStack, this, animatedContentScope)
-            },
-        )
-    }
-
-    return listOf(navigationStrategy)
-}
-
-// metada = metadataOf(Navigation, Fab)
 private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> = entryProvider {
-    entry<NavDestination.Planning>(metadata = NavigationMetadata.showNavigation()) { PlanningScreen(backStack) }
-    entry<NavDestination.Day>(metadata = NavigationMetadata.showNavigation()) { DayScreen() }
-    entry<NavDestination.Week>(metadata = NavigationMetadata.showNavigation()) { WeekScreen() }
-    entry<NavDestination.Month>(metadata = NavigationMetadata.showNavigation()) { MonthScreen() }
-    entry<NavDestination.SubDestination> { SubDestinationScreen() }
+    entry<NavDestination.Planning>(metadata = metaDataOf(NavigationBar, Fab)) {
+        PlanningScreen(backStack)
+    }
+    entry<NavDestination.Day>(metadata = metaDataOf(NavigationBar, Fab)) {
+        DayScreen()
+    }
+    entry<NavDestination.Week>(metadata = metaDataOf(NavigationBar, Fab)) {
+        WeekScreen()
+    }
+    entry<NavDestination.Month>(metadata = metaDataOf(Fab)) {
+        MonthScreen()
+    }
+    entry<NavDestination.SubDestination>(metadata = metaDataOf(Fab)) {
+        SubDestinationScreen()
+    }
+    entry<NavDestination.EventCreation> {
+        SubDestinationScreen()
+    }
     entry<NavDestination.Onboarding> { destination ->
         OnboardingScreen(
             onlyLogin = destination.onlyLogin,
@@ -108,6 +103,33 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
             onPopBack = { backStack.removeLastOrNull() },
         )
     }
+}
+
+@Composable
+private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<SceneDecoratorStrategy<NavKey>> {
+    val navigationType: NavigationType by rememberNavigationType()
+
+    val navigationStrategy: NavigationDecoratorStrategy<NavKey> = remember(navigationType, backStack) {
+        NavigationDecoratorStrategy(
+            navigationType = navigationType,
+            navBarContent = {
+                CalendarNavigationBar(backStack)
+            },
+            navRailContent = { floatingActionButton ->
+                CalendarNavigationRail(
+                    backStack = backStack,
+                    floatingActionButton = floatingActionButton,
+                )
+            },
+            floatingActionButton = {
+                CalendarFab {
+                    backStack.addOrMoveToTop(NavDestination.EventCreation)
+                }
+            },
+        )
+    }
+
+    return listOf(navigationStrategy)
 }
 
 fun NavBackStack<NavKey>.addOrMoveToTop(destination: NavKey) {

@@ -38,5 +38,8 @@ sealed interface NavDestination : NavKey {
     data object Month : NavDestination
 
     @Serializable
+    data object EventCreation : NavDestination
+
+    @Serializable
     data object SubDestination : NavDestination
 }

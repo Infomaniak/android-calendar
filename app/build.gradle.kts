@@ -147,6 +147,7 @@ dependencies {
     implementation(core.compose.ui.graphics)
     implementation(core.compose.ui.tooling.preview)
     implementation(core.infomaniak.core.ui.compose.windowinset)
+    implementation(core.infomaniak.core.ui.compose.margin)
     implementation(core.androidx.adaptive)
     implementation(core.material)
 

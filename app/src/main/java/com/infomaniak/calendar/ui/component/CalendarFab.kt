@@ -26,12 +26,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.ui.navigation.component.sharedNavigation
 import com.infomaniak.calendar.ui.theme.CalendarTheme
+
+private const val FAB_KEY = "FAB"
 
 @Composable
 fun CalendarFab(modifier: Modifier = Modifier, onClick: () -> Unit) {
     FloatingActionButton(
-        modifier = modifier,
+        modifier = modifier.sharedNavigation(FAB_KEY),
         onClick = onClick,
         elevation = FloatingActionButtonDefaults.elevation(0.dp),
     ) {

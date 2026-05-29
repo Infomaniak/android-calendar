@@ -1,5 +1,6 @@
 package com.infomaniak.calendar.ui.navigation.component
 
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarViewMonth
 import androidx.compose.material.icons.filled.ViewAgenda
@@ -15,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
+import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.navigation.addOrMoveToTop
 
@@ -24,6 +26,7 @@ private const val NAVIGATION_RAIL_KEY = "NAVIGATION_RAIL"
 fun CalendarNavigationRail(
     backStack: NavBackStack<NavKey>,
     modifier: Modifier = Modifier,
+    floatingActionButton: (@Composable () -> Unit)? = null,
 ) {
     val currentKey: NavKey = backStack.last()
 
@@ -52,6 +55,11 @@ fun CalendarNavigationRail(
             label = { Text("Month") },
             onClick = { backStack.addOrMoveToTop(NavDestination.Month) },
         )
+
+        floatingActionButton?.let {
+            Spacer(modifier = Modifier.weight(1f))
+            it()
+        }
     }
 }
 
@@ -59,5 +67,5 @@ fun CalendarNavigationRail(
 @Composable
 private fun CalendarNavigationRailPreview() {
     val backStack: NavBackStack<NavKey> = rememberNavBackStack(NavDestination.Week)
-    CalendarNavigationRail(backStack = backStack)
+    CalendarNavigationRail(backStack = backStack, floatingActionButton = { CalendarFab { } })
 }
