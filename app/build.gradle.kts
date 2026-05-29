@@ -20,6 +20,7 @@ plugins {
     alias(core.plugins.compose.compiler)
     alias(core.plugins.kotlin.android)
     alias(core.plugins.kotlin.serialization)
+    alias(libs.plugins.metro)
 }
 
 android {

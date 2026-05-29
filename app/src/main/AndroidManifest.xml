@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
+        android:name=".MainApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -10,6 +11,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Calendar">
+
+        <meta-data
+            android:name="io.sentry.dsn"
+            android:value="https://afcc80384a2911f1a5c6de3982f677f1@sentry-mobile.infomaniak.com/25" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -21,5 +27,4 @@
             </intent-filter>
         </activity>
     </application>
-
 </manifest>

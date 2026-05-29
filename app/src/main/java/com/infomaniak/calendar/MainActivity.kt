@@ -22,11 +22,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
+import androidx.lifecycle.ViewModelProvider
 import com.infomaniak.calendar.ui.navigation.MainNavHost
 import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 
 class MainActivity : ComponentActivity() {
+
+    override val defaultViewModelProviderFactory: ViewModelProvider.Factory
+        get() = (application as MainApplication).appGraph.viewModelFactory
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
