@@ -20,11 +20,10 @@ package com.infomaniak.calendar.ui.screen.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.multiplatform_calendar.core.AccountManager
+import com.infomaniak.multiplatform_calendar.core.CalendarManager
 import com.infomaniak.multiplatform_calendar.core.data.remote.model.CaldavCredentials
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.AccountId
-import com.infomaniak.multiplatform_calendar.core.useCases.GetCalendars
-import com.infomaniak.multiplatform_calendar.core.useCases.InitAccount
-import com.infomaniak.multiplatform_calendar.core.useCases.SyncCalendars
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,9 +33,8 @@ import kotlinx.coroutines.withContext
 
 @Inject
 class HomeViewModel(
-    private val initAccount: InitAccount,
-    private val syncCalendars: SyncCalendars,
-    private val getCalendars: GetCalendars,
+    private val accountManager: AccountManager,
+    private val calendarManager: CalendarManager,
 ) : ViewModel() {
 
     val uiState: StateFlow<HomeUiState>
@@ -51,7 +49,7 @@ class HomeViewModel(
 
     private fun observeCalendars() {
         viewModelScope.launch {
-            getCalendars(accountId).collect { calendars ->
+            calendarManager.observeCalendars(accountId).collect { calendars ->
                 Log.d("CalDAV-PoC", "DB updated: ${calendars.size} calendar(s)")
                 val message = if (calendars.isEmpty()) {
                     "⏳ Syncing…"
@@ -75,12 +73,12 @@ class HomeViewModel(
             try {
                 val credentials = CaldavCredentials(
                     baseUrl = "https://sync.infomaniak.com",
-                    username = "USERNAME",
-                    password = "PASSWORD",
+                    username = "JA03117",
+                    password = "qGTwzESRpAAP0P5M",
                 )
                 withContext(Dispatchers.IO) {
-                    initAccount(accountId, credentials)
-                    syncCalendars(accountId)
+                    accountManager.initAccount(accountId, credentials)
+                    accountManager.syncCalendars(accountId)
                 }
                 Log.d("CalDAV-PoC", "Sync completed")
             } catch (e: Exception) {
