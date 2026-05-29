@@ -31,8 +31,3 @@ class CalendarApplication : Application() {
         appGraph = createGraphFactory<AppGraph.Factory>().create(context = this)
     }
 }
-
-
-
-
-

@@ -20,11 +20,11 @@ package com.infomaniak.calendar.ui.screen.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.multiplatform_calendar.data.remote.model.CaldavCredentials
-import com.infomaniak.multiplatform_calendar.domain.model.calendar.AccountId
-import com.infomaniak.multiplatform_calendar.domain.useCases.GetCalendars
-import com.infomaniak.multiplatform_calendar.domain.useCases.InitAccount
-import com.infomaniak.multiplatform_calendar.domain.useCases.SyncCalendars
+import com.infomaniak.multiplatform_calendar.core.data.remote.model.CaldavCredentials
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.AccountId
+import com.infomaniak.multiplatform_calendar.core.useCases.GetCalendars
+import com.infomaniak.multiplatform_calendar.core.useCases.InitAccount
+import com.infomaniak.multiplatform_calendar.core.useCases.SyncCalendars
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

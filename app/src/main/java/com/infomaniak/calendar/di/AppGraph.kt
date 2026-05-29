@@ -20,10 +20,10 @@ package com.infomaniak.calendar.di
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.ui.screen.home.HomeViewModel
-import com.infomaniak.multiplatform_calendar.domain.useCases.GetCalendars
-import com.infomaniak.multiplatform_calendar.domain.useCases.InitAccount
-import com.infomaniak.multiplatform_calendar.domain.useCases.SyncCalendars
 import dev.zacsweers.metro.AppScope
+import com.infomaniak.multiplatform_calendar.core.useCases.GetCalendars
+import com.infomaniak.multiplatform_calendar.core.useCases.InitAccount
+import com.infomaniak.multiplatform_calendar.core.useCases.SyncCalendars
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provider
 import dev.zacsweers.metro.Provides
