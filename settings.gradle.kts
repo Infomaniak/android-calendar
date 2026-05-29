@@ -32,4 +32,10 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Calendar"
-include(":app", ":multiplatform-calendar")
+include(":app")
+
+includeBuild("multiplatform-calendar") {
+    dependencySubstitution {
+        substitute(module("com.infomaniak.multiplaform-calendar:core")).using(project(":Core"))
+    }
+}

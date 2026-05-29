@@ -1,3 +1,4 @@
 [libraries]
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+infomaniak-multiplatform-calendar-core = { module = "com.infomaniak.multiplaform-calendar:core" }
