@@ -76,7 +76,7 @@ private const val CREATE_ACCOUNT_CANCEL_HOST = "" // No cancel host to detect.
 
 @Composable
 fun OnboardingScreen(
-    requiredLogin: Boolean,
+    onlyLogin: Boolean,
     onNavigateToHome: () -> Unit,
     onPopBack: () -> Unit,
     crossAppLoginViewModel: CrossAppLoginViewModel = viewModel(),
@@ -96,7 +96,7 @@ fun OnboardingScreen(
         context = context,
         accountUtils = accountUtils,
         snackbarHostState = snackbarHostState,
-        requiredLogin = requiredLogin,
+        onlyLogin = onlyLogin,
         setButtonsLoading = { areButtonsLoading = it },
         onNavigateToHome = onNavigateToHome,
         onPopBack = onPopBack,
@@ -112,7 +112,7 @@ fun OnboardingScreen(
     }
 
     OnboardingScreen(
-        shouldDisplayRequiredLogin = requiredLogin,
+        onlyLogin = onlyLogin,
         accountsCheckingState = { accountsCheckingState },
         skippedIds = { skippedIds },
         areLoginButtonsLoading = { areButtonsLoading },
@@ -140,9 +140,8 @@ fun OnboardingScreen(
 }
 
 /**
- * @param shouldDisplayRequiredLogin When `true`, only the last login slide is shown and the
- * carousel is skipped. Use this when reopening onboarding from a multi-account flow to add another
- * account.
+ * @param onlyLogin When `true`, only the last login slide is shown and the carousel is skipped.
+ * Use this when reopening onboarding from a multi-account flow to add another account.
  * @param accountsCheckingState The cross-app login facade state (loading / accounts / error).
  * @param skippedIds Cross-app accounts the user has chosen to skip.
  * @param areLoginButtonsLoading Whether the login / sign-up buttons should currently show a loader
@@ -156,7 +155,7 @@ fun OnboardingScreen(
  */
 @Composable
 private fun OnboardingScreen(
-    shouldDisplayRequiredLogin: Boolean,
+    onlyLogin: Boolean,
     accountsCheckingState: () -> AccountsCheckingState,
     skippedIds: () -> Set<Long>,
     areLoginButtonsLoading: () -> Boolean,
@@ -165,7 +164,7 @@ private fun OnboardingScreen(
     onSaveSkippedAccounts: (Set<Long>) -> Unit,
     snackbarHostState: SnackbarHostState,
 ) {
-    val pages: List<Page> = if (shouldDisplayRequiredLogin) listOf(Page.entries.last()) else Page.entries
+    val pages: List<Page> = if (onlyLogin) listOf(Page.entries.last()) else Page.entries
 
     val pagerState = rememberPagerState(pageCount = { pages.size })
 
@@ -267,7 +266,7 @@ private fun rememberOnboardingLoginFlowController(
             is UserLoginResult.Success -> scope.launch {
                 loginUsersIntoTheApp(
                     users = listOf(userLoginResult.user),
-                    requiredLogin = dependencies.requiredLogin,
+                    requiredLogin = dependencies.onlyLogin,
                     accountUtils = dependencies.accountUtils,
                     onNavigateToHome = dependencies.onNavigateToHome,
                     onPopBack = dependencies.onPopBack,
@@ -316,7 +315,7 @@ private suspend fun loginUsers(loginResult: CrossAppLoginFacade.LoginResult, dep
     } else {
         loginUsersIntoTheApp(
             users = users,
-            requiredLogin = dependencies.requiredLogin,
+            requiredLogin = dependencies.onlyLogin,
             accountUtils = dependencies.accountUtils,
             onNavigateToHome = dependencies.onNavigateToHome,
             onPopBack = dependencies.onPopBack,
@@ -339,7 +338,7 @@ private data class OnboardingLoginDependencies(
     val context: Context,
     val accountUtils: AccountUtils,
     val snackbarHostState: SnackbarHostState,
-    val requiredLogin: Boolean,
+    val onlyLogin: Boolean,
     val setButtonsLoading: (Boolean) -> Unit,
     val onNavigateToHome: () -> Unit,
     val onPopBack: () -> Unit,
@@ -351,7 +350,7 @@ private fun OnboardingScreenPreview() {
     MaterialTheme {
         Surface {
             OnboardingScreen(
-                shouldDisplayRequiredLogin = false,
+                onlyLogin = false,
                 accountsCheckingState = { AccountsCheckingState(status = AccountsCheckingStatus.UpToDate) },
                 skippedIds = { emptySet() },
                 areLoginButtonsLoading = { false },

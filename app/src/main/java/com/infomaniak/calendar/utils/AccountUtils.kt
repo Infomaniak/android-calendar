@@ -17,7 +17,8 @@
  */
 package com.infomaniak.calendar.utils
 
-import com.infomaniak.core.auth.UserExistenceChecker
+import android.content.Context
+import com.infomaniak.core.auth.PersistedCurrentUserAccountUtils
 import com.infomaniak.core.auth.models.user.User
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
@@ -36,20 +37,4 @@ import dev.zacsweers.metro.SingleIn
  */
 @Inject
 @SingleIn(AppScope::class)
-class AccountUtils : UserExistenceChecker {
-
-    override suspend fun isUserAlreadyPresent(userId: Int): Boolean {
-        // TODO: Check the local user store once it exists.
-        return false
-    }
-
-    /**
-     * Persist a freshly authenticated user.
-     *
-     * TODO: Wire this up to the real user persistence layer (DB / DataStore / KMP user manager).
-     */
-    @Suppress("UNUSED_PARAMETER")
-    suspend fun addUser(user: User) {
-        // No-op stub; see class kdoc.
-    }
-}
+class AccountUtils(appContext: Context) : PersistedCurrentUserAccountUtils(appContext)

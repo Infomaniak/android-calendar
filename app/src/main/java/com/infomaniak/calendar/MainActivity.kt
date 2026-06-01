@@ -21,17 +21,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
+import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.ui.navigation.MainNavHost
 import com.infomaniak.calendar.ui.navigation.NavDestination
-import com.infomaniak.calendar.ui.screen.onboarding.CrossAppLoginViewModel
 import com.infomaniak.calendar.ui.theme.CalendarTheme
-import com.infomaniak.calendar.utils.AccountUtils
-import com.infomaniak.lib.login.InfomaniakLogin
-import kotlinx.coroutines.launch
+import com.infomaniak.calendar.utils.UserLoadState
+import com.infomaniak.calendar.utils.rememberUserLoadState
 
 class MainActivity : ComponentActivity() {
 
@@ -41,21 +39,28 @@ class MainActivity : ComponentActivity() {
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
         get() = appGraph.viewModelFactory
 
-    private val accountUtils: AccountUtils by lazy { appGraph.accountUtils }
-    private val infomaniakLogin: InfomaniakLogin by lazy { appGraph.infomaniakLogin }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         setContent {
-            CalendarTheme {
-                Surface {
-                    MainNavHost(
-                        startDestination = NavDestination.Onboarding(),
-                        accountUtils = accountUtils,
-                        infomaniakLogin = infomaniakLogin,
-                    )
+            when (val userLoadState = appGraph.accountUtils.rememberUserLoadState().value) {
+                UserLoadState.Loading -> {
+                    CalendarTheme {
+                        Surface { /* Blank surface while waiting for first result */ }
+                    }
+                }
+                is UserLoadState.Loaded -> {
+                    // TODO: Detect empty user list and go back to onboarding
+                    val startDestination = if (userLoadState.user == null) NavDestination.Onboarding() else NavDestination.Home
+
+                    CompositionLocalProvider(LocalUser provides userLoadState.user) {
+                        CalendarTheme {
+                            Surface {
+                                MainNavHost(startDestination = startDestination)
+                            }
+                        }
+                    }
                 }
             }
         }

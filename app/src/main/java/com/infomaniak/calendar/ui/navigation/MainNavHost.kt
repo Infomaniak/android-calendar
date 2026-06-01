@@ -21,22 +21,18 @@ import androidx.compose.runtime.Composable
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import com.infomaniak.calendar.utils.AccountUtils
 import com.infomaniak.calendar.ui.screen.home.HomeScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
-import com.infomaniak.lib.login.InfomaniakLogin
 
 @Composable
 fun MainNavHost(
     startDestination: NavDestination,
-    accountUtils: AccountUtils,
-    infomaniakLogin: InfomaniakLogin,
 ) {
     val backStack = rememberNavBackStack(startDestination)
     NavDisplay(backStack = backStack, entryProvider = entryProvider {
         entry<NavDestination.Onboarding> { destination ->
             OnboardingScreen(
-                requiredLogin = destination.requiredLogin,
+                onlyLogin = destination.onlyLogin,
                 onNavigateToHome = {
                     backStack.clear()
                     backStack.add(NavDestination.Home)

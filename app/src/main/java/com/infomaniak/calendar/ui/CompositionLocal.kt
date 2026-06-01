@@ -1,5 +1,5 @@
 /*
- * Infomaniak Calendar - Android
+ * Infomaniak SwissTransfer - Android
  * Copyright (C) 2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,17 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.navigation
+package com.infomaniak.calendar.ui
 
-import androidx.navigation3.runtime.NavKey
-import kotlinx.serialization.Serializable
+import androidx.compose.runtime.compositionLocalOf
+import com.infomaniak.core.auth.models.user.User
 
-@Serializable
-sealed interface NavDestination : NavKey {
-
-    @Serializable
-    data class Onboarding(val onlyLogin: Boolean = false) : NavDestination
-
-    @Serializable
-    data object Home : NavDestination
-}
+val LocalUser = compositionLocalOf<User?> { null }
