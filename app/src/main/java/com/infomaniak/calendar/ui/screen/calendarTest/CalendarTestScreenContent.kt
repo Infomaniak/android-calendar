@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.home
+package com.infomaniak.calendar.ui.screen.calendarTest
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -28,22 +28,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import com.infomaniak.calendar.ui.screen.home.HomeUiState.Companion.HomeUiStatePreviewProvider
-import com.infomaniak.calendar.ui.screen.home.composable.Error
-import com.infomaniak.calendar.ui.screen.home.composable.Loading
-import com.infomaniak.calendar.ui.screen.home.composable.Success
+import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestUiState.Companion.CalendarTestUiStatePreviewProvider
+import com.infomaniak.calendar.ui.screen.calendarTest.composable.Error
+import com.infomaniak.calendar.ui.screen.calendarTest.composable.Loading
+import com.infomaniak.calendar.ui.screen.calendarTest.composable.Success
 
 @Composable
-fun HomeScreenContent(state: HomeUiState, modifier: Modifier = Modifier) {
+fun CalendarTestScreenContent(state: CalendarTestUiState, modifier: Modifier = Modifier) {
     Scaffold(
-        topBar = { Text("HomeScreen") },
+        topBar = { Text("CalendarTestScreen") },
         modifier = modifier.windowInsetsPadding(WindowInsets.statusBars)
     ) { paddingValues ->
         Box(Modifier.padding(paddingValues)) {
             when (state) {
-                HomeUiState.Loading -> Loading()
-                is HomeUiState.Success -> Success(state)
-                is HomeUiState.Error -> Error(state)
+                CalendarTestUiState.Loading -> Loading()
+                is CalendarTestUiState.Success -> Success(state)
+                is CalendarTestUiState.Error -> Error(state)
             }
         }
     }
@@ -51,8 +51,8 @@ fun HomeScreenContent(state: HomeUiState, modifier: Modifier = Modifier) {
 
 @Composable
 @Preview
-private fun HomeScreenContentPreview(
-    @PreviewParameter(HomeUiStatePreviewProvider::class) state: HomeUiState
+private fun CalendarTestScreenContentPreview(
+    @PreviewParameter(CalendarTestUiStatePreviewProvider::class) state: CalendarTestUiState
 ) {
-    HomeScreenContent(state = state)
+    CalendarTestScreenContent(state = state)
 }

@@ -21,8 +21,15 @@ import androidx.lifecycle.ViewModel
 import dev.zacsweers.metro.MapKey
 import kotlin.reflect.KClass
 
-/** A [MapKey] annotation for binding ViewModels in a multibinding map. */
-@MapKey // TODO: Add `implicitClassKey = true` arg when we use metro 0.12.0+
+/**
+ * A [MapKey] annotation for contributing ViewModels into the multibinding map.
+ *
+ * TODO: When upgrading to Metro 0.12.0+ (requires Kotlin 2.3.20+), add
+ *  `implicitClassKey = true` to `@MapKey` and `= Nothing::class` default to [value]
+ *  so that the class name no longer needs to be repeated. Also consider replacing
+ *  this file with the `metrox-viewmodel` artifact.
+ */
+@MapKey
 @Target(
     AnnotationTarget.FUNCTION,
     AnnotationTarget.FIELD,
@@ -32,4 +39,5 @@ import kotlin.reflect.KClass
     AnnotationTarget.TYPE,
 )
 @Retention(AnnotationRetention.RUNTIME)
-annotation class ViewModelKey(val value: KClass<out ViewModel>) // TODO: Add `= Nothing::class` when we use metro 0.12.0+
+annotation class ViewModelKey(val value: KClass<out ViewModel>)
+

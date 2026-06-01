@@ -19,35 +19,36 @@ package com.infomaniak.calendar.di
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import com.infomaniak.calendar.ui.screen.home.HomeViewModel
 import dev.zacsweers.metro.AppScope
-import com.infomaniak.multiplatform_calendar.core.AccountManager
-import com.infomaniak.multiplatform_calendar.core.CalendarManager
-import com.infomaniak.multiplatform_calendar.core.di.AppScope
 import dev.zacsweers.metro.DependencyGraph
+import dev.zacsweers.metro.Multibinds
 import dev.zacsweers.metro.Provider
 import dev.zacsweers.metro.Provides
 import kotlin.reflect.KClass
 
 /**
- * Root dependency graph for the application, scoped to [AppScope].
+ * Root dependency graph for the Android application, scoped to [AppScope].
  *
- * The application [Context] is supplied at construction time via the [Factory] and is then
- * available to any injected class that declares a [Context] dependency.
+ * The application [Context] is supplied at construction time via the [Factory].
  *
- * The [viewModelProviders] multibindings map is populated by every [ViewModel] that is
- * contributed with `@ContributesIntoMap(AppScope::class) @ViewModelKey(MyViewModel::class)`.
- * It is consumed by [MetroViewModelFactory] to build ViewModels.
+ * Inherits shared bindings automatically via `@ContributesTo(AppScope)` modules:
+ * - `CalendarCoreGraph` → exposes [accountManager][com.infomaniak.multiplatform_calendar.core.AccountManager]
+ *   and [calendarManager][com.infomaniak.multiplatform_calendar.core.CalendarManager]
+ * - `DatabaseModule` → DAO providers
+ * - `AndroidDatabaseModule` → Android Room database
+ * - `CaldavClientModule` → CalDAV client
+ *
+ * ViewModels are auto-discovered via multibinding: any class annotated with
+ * `@Inject @ContributesIntoMap(AppScope::class) @ViewModelKey(…)` is automatically
+ * registered in [viewModelProviders] and resolved by [MetroViewModelFactory].
  */
 @DependencyGraph(AppScope::class)
 interface AppGraph {
     val viewModelFactory: MetroViewModelFactory
-    val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>> // Won't build if no ViewModels are defined
 
-    abstract val accountManager: AccountManager
-    abstract val calendarManager: CalendarManager
+    @Multibinds
+    val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>>
 
-    abstract val homeViewModel: HomeViewModel
 
     @DependencyGraph.Factory
     fun interface Factory {

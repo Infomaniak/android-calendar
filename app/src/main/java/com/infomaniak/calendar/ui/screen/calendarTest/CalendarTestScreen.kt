@@ -15,18 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.home.composable
+package com.infomaniak.calendar.ui.screen.calendarTest
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
+import kotlinx.serialization.Serializable
 
-@Composable
-internal fun Loading() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
-    }
+@Serializable
+data object CalendarTest : NavKey
+
+fun EntryProviderScope<NavKey>.calendarTest() = entry<CalendarTest> {
+    val viewModel = viewModel<CalendarTestViewModel>()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    CalendarTestScreenContent(state = state)
 }

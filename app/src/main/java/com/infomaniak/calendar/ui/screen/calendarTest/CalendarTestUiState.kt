@@ -15,20 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.home
+package com.infomaniak.calendar.ui.screen.calendarTest
 
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.EntryProviderScope
-import androidx.navigation3.runtime.NavKey
-import com.infomaniak.calendar.di.metroViewModel
-import kotlinx.serialization.Serializable
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 
-@Serializable
-data object Home : NavKey
+sealed interface CalendarTestUiState {
 
-fun EntryProviderScope<NavKey>.home() = entry<Home> {
-    val viewmodel = metroViewModel { homeViewModel }
-    val state by viewmodel.uiState.collectAsStateWithLifecycle()
-    HomeScreenContent(state = state)
+    data object Loading : CalendarTestUiState
+
+    data class Success(val message: String) : CalendarTestUiState
+
+    data class Error(val message: String) : CalendarTestUiState
+
+    companion object {
+        internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<CalendarTestUiState> {
+            override val values = sequenceOf(Loading, Success, Error)
+
+            companion object {
+                val Success = Success("Hello world")
+                val Error = Error("Something went wrong")
+            }
+        }
+    }
 }
+
+

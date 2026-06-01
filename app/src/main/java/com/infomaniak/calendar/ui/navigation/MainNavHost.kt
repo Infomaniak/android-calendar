@@ -23,15 +23,15 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import com.infomaniak.calendar.ui.screen.home.Home
-import com.infomaniak.calendar.ui.screen.home.home
+import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTest
+import com.infomaniak.calendar.ui.screen.calendarTest.calendarTest
 
 @Composable
 fun MainNavHost() {
-    val backStack = rememberNavBackStack(Home)
+    val backStack = rememberNavBackStack(CalendarTest)
     NavDisplay(backStack = backStack, entryProvider = baseEntryProvider())
 }
 
 private fun baseEntryProvider(): (NavKey) -> NavEntry<NavKey> = entryProvider {
-    home()
+    calendarTest()
 }
