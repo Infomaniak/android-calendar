@@ -20,14 +20,21 @@ package com.infomaniak.calendar.ui.screen.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.multiplatform_calendar.core.data.repository.CalendarRepository
 import com.infomaniak.multiplatform_calendar.data.remote.RustCaldavBridge
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@Inject
+@ViewModelKey(HomeViewModel::class)
+@ContributesIntoMap(AppScope::class)
 class HomeViewModel : ViewModel() {
 
     val uiState: StateFlow<HomeUiState>
