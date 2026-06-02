@@ -47,7 +47,7 @@ private const val NAVIGATION_BAR_KEY = "NAVIGATION_BAR"
 @Composable
 fun CalendarHorizontalFloatingToolbar(
     onNavigationButtonClicked: (NavDestination.PlageDateDestination) -> Unit,
-    lastMainNavigationSelected: () -> NavDestination.PlageDateDestination,
+    lastMainNavigationSelected: () -> NavDestination.PlageDateDestination?,
     modifier: Modifier = Modifier,
     floatingActionButton: (@Composable () -> Unit)? = null,
 ) {
@@ -97,21 +97,23 @@ fun CalendarHorizontalFloatingToolbar(
 @Composable
 private fun DropdownIconButton(
     onNavigationButtonClicked: (NavDestination.PlageDateDestination) -> Unit,
-    lastMainNavigationSelected: () -> NavDestination.PlageDateDestination,
+    lastMainNavigationSelected: () -> NavDestination.PlageDateDestination?,
     isExpanded: Boolean = false,
 ) {
     var menuExpanded by remember { mutableStateOf(isExpanded) }
 
     Box {
-        IconButton(onClick = { menuExpanded = !menuExpanded }) {
-            Icon(imageVector = getSelectedIcon(lastMainNavigationSelected), contentDescription = null)
+        lastMainNavigationSelected()?.let {
+            IconButton(onClick = { menuExpanded = !menuExpanded }) {
+                Icon(imageVector = getSelectedIcon(lastMainNavigationSelected = it), contentDescription = null)
+            }
         }
 
         DropdownMenuPopup(
             expanded = menuExpanded,
             onDismissRequest = { menuExpanded = false },
             popupPositionProvider = MenuDefaults.rememberDropdownMenuPopupPositionProvider(
-                dropdownMenuAnchorPosition = MenuAnchorPosition.Above
+                dropdownMenuAnchorPosition = MenuAnchorPosition.Above,
             ),
             modifier = Modifier.padding(bottom = Margin.Medium),
             properties = PopupProperties(clippingEnabled = false, focusable = true),
@@ -149,8 +151,8 @@ enum class DateSelectionItems(val label: String, val icon: ImageVector, val dest
 }
 
 @Composable
-private fun getSelectedIcon(lastMainNavigationSelected: () -> NavDestination.PlageDateDestination): ImageVector {
-    return when (lastMainNavigationSelected()) {
+private fun getSelectedIcon(lastMainNavigationSelected: NavDestination.PlageDateDestination): ImageVector {
+    return when (lastMainNavigationSelected) {
         is NavDestination.PlageDateDestination.Day -> Icons.Outlined.ViewDay
         is NavDestination.PlageDateDestination.ThreeDays -> Icons.Outlined.ViewDay
         is NavDestination.PlageDateDestination.Week -> Icons.Outlined.ViewWeek

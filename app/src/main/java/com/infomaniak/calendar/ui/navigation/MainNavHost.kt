@@ -107,7 +107,7 @@ private fun sceneDecoratorStrategies(backStack: () -> NavBackStack<NavKey>): Lis
         NavigationDecoratorStrategy(
             floatingToolbar = { floatingActionButton ->
                 CalendarHorizontalFloatingToolbar(
-                    lastMainNavigationSelected = { backStack().filterIsInstance<NavDestination.PlageDateDestination>().last() },
+                    lastMainNavigationSelected = { backStack().filterIsInstance<NavDestination.PlageDateDestination>().lastOrNull() },
                     onNavigationButtonClicked = { backStack().addOrMoveToTop(it) },
                     floatingActionButton = floatingActionButton,
                 )
