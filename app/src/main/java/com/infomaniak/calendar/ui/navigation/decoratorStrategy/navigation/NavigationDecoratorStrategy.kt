@@ -15,17 +15,17 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.Scene
 import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.scene.SceneDecoratorStrategyScope
-import com.infomaniak.calendar.ui.navigation.LocalGlobalSnackbar
 import com.infomaniak.calendar.ui.navigation.component.sharedNavigation
+import com.infomaniak.calendar.ui.navigation.scroll.LocalSnackbarHostState
 
-private const val SNACKBAR_HOST_KEY = "SNACKBAR_HOST"
+private const val SNACKBAR_KEY = "SNACKBAR_HOST"
 
 class NavigationDecoratorStrategy<T : NavKey>(
     private val floatingToolbar: @Composable (floatingActionButton: (@Composable () -> Unit)?) -> Unit,
     private val floatingActionButton: @Composable () -> Unit,
 ) : SceneDecoratorStrategy<T> {
     override fun SceneDecoratorStrategyScope<T>.decorateScene(scene: Scene<T>): Scene<T> {
-        val shouldShowNavigation = (scene.metadata[SHOULD_SHOW_NAVIGATION_KEY] as? Boolean) ?: false
+        val shouldShowNavigation = (scene.metadata[SHOULD_SHOW_FLOATING_TOOLBAR] as? Boolean) ?: false
         val shouldShowFab = (scene.metadata[SHOULD_DISPLAY_FAB] as? Boolean) ?: false
 
         return object : Scene<T> by scene {
@@ -43,14 +43,14 @@ class NavigationDecoratorStrategy<T : NavKey>(
                 Scaffold(
                     snackbarHost = {
                         SnackbarHost(
-                            hostState = LocalGlobalSnackbar.current,
-                            snackbar = { Snackbar(it, modifier = Modifier.sharedNavigation(SNACKBAR_HOST_KEY)) },
+                            hostState = LocalSnackbarHostState.current?.snackbarHostState ?: return@Scaffold,
+                            snackbar = { Snackbar(it, modifier = Modifier.sharedNavigation(SNACKBAR_KEY)) },
                         )
-                    }
+                    },
                 ) { _ ->
                     Box(
                         modifier = Modifier
-                            .fillMaxSize()
+                            .fillMaxSize(),
                     ) {
                         scene.content()
                     }
@@ -64,10 +64,10 @@ class NavigationDecoratorStrategy<T : NavKey>(
                     floatingActionButton = { floatingActionButton() },
                     snackbarHost = {
                         SnackbarHost(
-                            hostState = LocalGlobalSnackbar.current,
-                            snackbar = { Snackbar(it, modifier = Modifier.sharedNavigation(SNACKBAR_HOST_KEY)) },
+                            hostState = LocalSnackbarHostState.current?.snackbarHostState ?: return@Scaffold,
+                            snackbar = { Snackbar(it, modifier = Modifier.sharedNavigation(SNACKBAR_KEY)) },
                         )
-                    }
+                    },
                 ) { _ ->
                     Box(modifier = Modifier.fillMaxSize()) {
                         scene.content()
@@ -78,12 +78,15 @@ class NavigationDecoratorStrategy<T : NavKey>(
             @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
             @Composable
             private fun DisplayNavigation(showFab: Boolean) {
+
                 Scaffold(
-                    bottomBar = { floatingToolbar { if (showFab) floatingActionButton() } },
+                    bottomBar = {
+                        floatingToolbar(if (showFab) @Composable { -> floatingActionButton() } else null)
+                    },
                     snackbarHost = {
                         SnackbarHost(
-                            hostState = LocalGlobalSnackbar.current,
-                            snackbar = { Snackbar(it, modifier = Modifier.sharedNavigation(SNACKBAR_HOST_KEY)) },
+                            hostState = LocalSnackbarHostState.current?.snackbarHostState ?: return@Scaffold,
+                            snackbar = { Snackbar(it, modifier = Modifier.sharedNavigation(SNACKBAR_KEY)) },
                         )
                     },
                     contentWindowInsets = DrawerDefaults.windowInsets.only(WindowInsetsSides.Bottom),

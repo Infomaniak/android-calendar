@@ -9,17 +9,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.infomaniak.calendar.ui.navigation.LocalGlobalSnackbar
-import kotlinx.coroutines.launch
+import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.ui.navigation.scroll.LocalSnackbarHostState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeekScreen(modifier: Modifier = Modifier) {
-    val snackbarHostState = LocalGlobalSnackbar.current
-    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackbarHostState.current
 
     Scaffold(topBar = { TopAppBar(title = { Text("WeekScreen") }, modifier = modifier) }) { paddingValues ->
         Box(
@@ -30,13 +28,17 @@ fun WeekScreen(modifier: Modifier = Modifier) {
         ) {
             Button(
                 onClick = {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar("Action effectuée avec succès !")
-                    }
-                }
+                    snackbarHostState?.showSnackbar("Action effectuée avec succès !")
+                },
             ) {
                 Text("Afficher la Snackbar")
             }
         }
     }
+}
+
+@Preview
+@Composable
+private fun WeekScreenPreview() {
+    WeekScreen()
 }

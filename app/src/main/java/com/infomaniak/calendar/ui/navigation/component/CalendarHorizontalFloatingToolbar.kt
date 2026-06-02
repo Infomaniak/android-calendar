@@ -18,7 +18,7 @@ import androidx.compose.material.icons.outlined.ViewWeek
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FloatingToolbarDefaults
+import androidx.compose.material3.FloatingToolbarDefaults.vibrantFloatingToolbarColors
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,72 +38,102 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
+import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.navigation.NavDestination
+import com.infomaniak.calendar.ui.navigation.scroll.LocalToolbarScrollableState
 import com.infomaniak.core.ui.compose.margin.Margin
 
-private const val NAVIGATION_BAR_KEY = "NAVIGATION_BAR"
+private const val FLOATING_TOOLBARBAR_KEY = "FloatingToolbar"
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CalendarHorizontalFloatingToolbar(
     onNavigationButtonClicked: (NavDestination.PlageDateDestination) -> Unit,
-    lastMainNavigationSelected: () -> NavDestination.PlageDateDestination?,
+    onCurrentDayClicked: () -> Unit,
+    currentDestination: () -> NavDestination.PlageDateDestination?,
     modifier: Modifier = Modifier,
     floatingActionButton: (@Composable () -> Unit)? = null,
+) {
+    val localToolbarScrollableState = LocalToolbarScrollableState.current
+
+    CalendarHorizontalFloatingToolbar(
+        onNavigationButtonClicked = onNavigationButtonClicked,
+        onCurrentDayClicked = onCurrentDayClicked,
+        currentDestination = currentDestination,
+        modifier = modifier,
+        floatingActionButton = floatingActionButton,
+        isExpanded = { localToolbarScrollableState?.isExpanded ?: true },
+    )
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun CalendarHorizontalFloatingToolbar(
+    onNavigationButtonClicked: (NavDestination.PlageDateDestination) -> Unit,
+    onCurrentDayClicked: () -> Unit,
+    currentDestination: () -> NavDestination.PlageDateDestination?,
+    modifier: Modifier = Modifier,
+    floatingActionButton: (@Composable () -> Unit)? = null,
+    isExpanded: () -> Boolean,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .windowInsetsPadding(NavigationBarDefaults.windowInsets)
-            .sharedNavigation(key = NAVIGATION_BAR_KEY)
+            .sharedNavigation(key = FLOATING_TOOLBARBAR_KEY)
             .padding(end = Margin.Large),
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.Bottom,
     ) {
         if (floatingActionButton != null) {
             HorizontalFloatingToolbar(
-                shape = FloatingToolbarDefaults.ContainerShape,
-                expanded = true,
-                content = {
-                    IconButton(onClick = { onNavigationButtonClicked(NavDestination.PlageDateDestination.Agenda) }) {
-                        Icon(imageVector = Icons.Outlined.CalendarToday, contentDescription = null)
-                    }
-                    DropdownIconButton(
-                        onNavigationButtonClicked = onNavigationButtonClicked,
-                        lastMainNavigationSelected = lastMainNavigationSelected,
-                    )
-                },
+                expanded = isExpanded(),
                 floatingActionButton = { floatingActionButton.invoke() },
+                content = {
+                    ContentFloatingToolbar(onCurrentDayClicked, onNavigationButtonClicked, currentDestination)
+                },
             )
         } else {
             HorizontalFloatingToolbar(
-                shape = FloatingToolbarDefaults.ContainerShape,
-                expanded = true,
+                expanded = isExpanded(),
                 content = {
-                    IconButton(onClick = { onNavigationButtonClicked(NavDestination.PlageDateDestination.Agenda) }) {
-                        Icon(imageVector = Icons.Outlined.CalendarToday, contentDescription = null)
-                    }
-                    DropdownIconButton(
-                        onNavigationButtonClicked = onNavigationButtonClicked,
-                        lastMainNavigationSelected = lastMainNavigationSelected,
-                    )
+                    ContentFloatingToolbar(onCurrentDayClicked, onNavigationButtonClicked, currentDestination)
                 },
             )
         }
     }
 }
 
+@Composable
+private fun ContentFloatingToolbar(
+    onCurrentDayClicked: () -> Unit,
+    onNavigationButtonClicked: (NavDestination.PlageDateDestination) -> Unit,
+    currentDestination: () -> NavDestination.PlageDateDestination?,
+    modifier: Modifier = Modifier,
+) {
+    Row(modifier = modifier) {
+        IconButton(onClick = onCurrentDayClicked) {
+            Icon(imageVector = Icons.Outlined.CalendarToday, contentDescription = null)
+        }
+        DropdownIconButton(
+            onNavigationButtonClicked = onNavigationButtonClicked,
+            currentDestination = currentDestination,
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun DropdownIconButton(
+fun DropdownIconButton(
     onNavigationButtonClicked: (NavDestination.PlageDateDestination) -> Unit,
-    lastMainNavigationSelected: () -> NavDestination.PlageDateDestination?,
+    currentDestination: () -> NavDestination.PlageDateDestination?,
+    modifier: Modifier = Modifier,
     isExpanded: Boolean = false,
 ) {
     var menuExpanded by remember { mutableStateOf(isExpanded) }
 
-    Box {
-        lastMainNavigationSelected()?.let {
+    Box(modifier = modifier) {
+        currentDestination()?.let {
             IconButton(onClick = { menuExpanded = !menuExpanded }) {
                 Icon(imageVector = getSelectedIcon(lastMainNavigationSelected = it), contentDescription = null)
             }
@@ -166,6 +196,8 @@ private fun getSelectedIcon(lastMainNavigationSelected: NavDestination.PlageDate
 private fun CalendarHorizontalFloatingToolbarPreview() {
     CalendarHorizontalFloatingToolbar(
         onNavigationButtonClicked = { },
-        lastMainNavigationSelected = { NavDestination.PlageDateDestination.Week },
+        currentDestination = { NavDestination.PlageDateDestination.Week },
+        floatingActionButton = { CalendarFab(onClick = {}) },
+        onCurrentDayClicked = { },
     )
 }

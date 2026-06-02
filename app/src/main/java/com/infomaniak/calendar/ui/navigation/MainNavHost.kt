@@ -19,12 +19,13 @@ package com.infomaniak.calendar.ui.navigation
 
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.ExperimentalMediaQueryApi
+import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -34,28 +35,37 @@ import androidx.navigation3.ui.NavDisplay
 import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.navigation.component.CalendarHorizontalFloatingToolbar
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.Fab
-import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.NavigationBar
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbar
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
+import com.infomaniak.calendar.ui.navigation.scroll.CustomSnackbarHostState
+import com.infomaniak.calendar.ui.navigation.scroll.LocalSnackbarHostState
+import com.infomaniak.calendar.ui.navigation.scroll.LocalToolbarScrollableState
+import com.infomaniak.calendar.ui.navigation.scroll.ToolbarScrollableState
+import com.infomaniak.calendar.ui.navigation.scroll.rememberCustomSnackbarHostState
+import com.infomaniak.calendar.ui.navigation.scroll.rememberToolbarScrollableState
+import com.infomaniak.calendar.ui.screen.agenda.AgendaScreen
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
 import com.infomaniak.calendar.ui.screen.subDestinationTest.SubDestinationScreen
+import com.infomaniak.calendar.ui.screen.threeDays.ThreeDayScreen
 import com.infomaniak.calendar.ui.screen.week.WeekScreen
 
 val LocalSharedTransitionScope = staticCompositionLocalOf<SharedTransitionScope?> { null }
-val LocalGlobalSnackbar = staticCompositionLocalOf<SnackbarHostState> { error("No SnackbarHostState provided") }
 
 @OptIn(ExperimentalMediaQueryApi::class)
 @Composable
 fun MainNavHost(navBackStack: NavBackStack<NavKey>) {
-    val snackbarHostState = remember { SnackbarHostState() }
+    val toolbarPermissionState: ToolbarScrollableState = rememberToolbarScrollableState()
+    val snackbarHostState: CustomSnackbarHostState = rememberCustomSnackbarHostState()
 
     SharedTransitionLayout {
         CompositionLocalProvider(
             LocalSharedTransitionScope provides this@SharedTransitionLayout,
-            LocalGlobalSnackbar provides snackbarHostState,
+            LocalSnackbarHostState provides snackbarHostState,
+            LocalToolbarScrollableState provides toolbarPermissionState,
         ) {
             NavDisplay(
                 backStack = navBackStack,
@@ -68,19 +78,19 @@ fun MainNavHost(navBackStack: NavBackStack<NavKey>) {
 }
 
 private fun baseEntryProvider(backStack: () -> NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> = entryProvider {
-    entry<NavDestination.PlageDateDestination.Agenda>(metadata = metaDataOf(NavigationBar, Fab)) {
-        PlanningScreen(goToSubDestination = { backStack().add(NavDestination.SubDestination) })
+    entry<NavDestination.PlageDateDestination.Agenda>(metadata = metaDataOf(FloatingToolbar, Fab)) {
+        AgendaScreen(goToSubDestination = { backStack().add(NavDestination.SubDestination) })
     }
-    entry<NavDestination.PlageDateDestination.Day>(metadata = metaDataOf(NavigationBar, Fab)) {
+    entry<NavDestination.PlageDateDestination.Day>(metadata = metaDataOf(FloatingToolbar, Fab)) {
         DayScreen()
     }
-    entry<NavDestination.PlageDateDestination.ThreeDays>(metadata = metaDataOf(NavigationBar, Fab)) {
-        DayScreen()
+    entry<NavDestination.PlageDateDestination.ThreeDays>(metadata = metaDataOf(FloatingToolbar, Fab)) {
+        ThreeDayScreen()
     }
-    entry<NavDestination.PlageDateDestination.Week>(metadata = metaDataOf(NavigationBar, Fab)) {
+    entry<NavDestination.PlageDateDestination.Week>(metadata = metaDataOf(FloatingToolbar, Fab)) {
         WeekScreen()
     }
-    entry<NavDestination.PlageDateDestination.Month>(metadata = metaDataOf(NavigationBar, Fab)) {
+    entry<NavDestination.PlageDateDestination.Month>(metadata = metaDataOf(FloatingToolbar, Fab)) {
         MonthScreen()
     }
     entry<NavDestination.SubDestination>(metadata = metaDataOf(Fab)) {
@@ -107,18 +117,23 @@ private fun sceneDecoratorStrategies(backStack: () -> NavBackStack<NavKey>): Lis
         NavigationDecoratorStrategy(
             floatingToolbar = { floatingActionButton ->
                 CalendarHorizontalFloatingToolbar(
-                    lastMainNavigationSelected = { backStack().filterIsInstance<NavDestination.PlageDateDestination>().lastOrNull() },
                     onNavigationButtonClicked = { backStack().addOrMoveToTop(it) },
+                    onCurrentDayClicked = { },
+                    currentDestination = { backStack().getPlageDateDestination() },
                     floatingActionButton = floatingActionButton,
                 )
             },
             floatingActionButton = {
-                CalendarFab { backStack().addOrMoveToTop(NavDestination.EventCreation) }
+                CalendarFab(modifier = Modifier.fillMaxSize()) { backStack().addOrMoveToTop(NavDestination.EventCreation) }
             },
         )
     }
 
     return listOf(navigationStrategy)
+}
+
+private fun NavBackStack<NavKey>.getPlageDateDestination(): NavDestination.PlageDateDestination? {
+    return this.filterIsInstance<NavDestination.PlageDateDestination>().lastOrNull()
 }
 
 fun NavBackStack<NavKey>.addOrMoveToTop(destination: NavKey) {
