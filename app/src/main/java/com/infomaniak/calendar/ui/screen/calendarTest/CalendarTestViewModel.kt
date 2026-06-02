@@ -75,7 +75,7 @@ class CalendarTestViewModel(
                         appendLine("✅ ${calendars.size} calendar(s) in DB:\n")
                         calendars.forEachIndexed { i, cal ->
                             appendLine("[$i] ${cal.displayName}")
-                            appendLine("    ${cal.url}")
+                            appendLine("    ${cal.id}")
                             appendLine()
                         }
                     }
