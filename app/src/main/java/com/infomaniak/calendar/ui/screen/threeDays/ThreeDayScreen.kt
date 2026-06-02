@@ -1,4 +1,4 @@
-package com.infomaniak.calendar.ui.screen.month
+package com.infomaniak.calendar.ui.screen.threeDays
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,18 +14,15 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MonthScreen(modifier: Modifier = Modifier) {
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("MonthScreen") }) },
-        modifier = modifier,
-    ) { paddingValues ->
+fun ThreeDayScreen(modifier: Modifier = Modifier) {
+    Scaffold(topBar = { TopAppBar(title = { Text("ThreeDayScreen") }) }, modifier = modifier) { paddingValues ->
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = paddingValues,
         ) {
             items(50) { index ->
                 Text(
-                    text = "Événement du mois n°$index",
+                    text = "Événement du jour n°$index",
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 12.dp)

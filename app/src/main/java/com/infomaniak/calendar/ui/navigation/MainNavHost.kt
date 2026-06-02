@@ -19,15 +19,12 @@ package com.infomaniak.calendar.ui.navigation
 
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.ExperimentalMediaQueryApi
-import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -35,8 +32,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.ui.NavDisplay
 import com.infomaniak.calendar.ui.component.CalendarFab
-import com.infomaniak.calendar.ui.navigation.component.CalendarNavigationBar
-import com.infomaniak.calendar.ui.navigation.component.CalendarNavigationRail
+import com.infomaniak.calendar.ui.navigation.component.CalendarHorizontalFloatingToolbar
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.Fab
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.NavigationBar
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
@@ -47,11 +43,8 @@ import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
 import com.infomaniak.calendar.ui.screen.subDestinationTest.SubDestinationScreen
 import com.infomaniak.calendar.ui.screen.week.WeekScreen
-import com.infomaniak.core.ui.compose.navigation.NavigationType
-import com.infomaniak.core.ui.compose.navigation.rememberNavigationType
 
 val LocalSharedTransitionScope = staticCompositionLocalOf<SharedTransitionScope?> { null }
-val LocalGlobalPadding = staticCompositionLocalOf { PaddingValues(0.dp) }
 val LocalGlobalSnackbar = staticCompositionLocalOf<SnackbarHostState> { error("No SnackbarHostState provided") }
 
 @OptIn(ExperimentalMediaQueryApi::class)
@@ -66,25 +59,28 @@ fun MainNavHost(navBackStack: NavBackStack<NavKey>) {
         ) {
             NavDisplay(
                 backStack = navBackStack,
-                entryProvider = baseEntryProvider(navBackStack),
-                sceneDecoratorStrategies = sceneDecoratorStrategies(navBackStack),
+                entryProvider = baseEntryProvider(backStack = { navBackStack }),
+                sceneDecoratorStrategies = sceneDecoratorStrategies(backStack = { navBackStack }),
                 sharedTransitionScope = this@SharedTransitionLayout,
             )
         }
     }
 }
 
-private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> = entryProvider {
-    entry<NavDestination.Planning>(metadata = metaDataOf(NavigationBar, Fab)) {
-        PlanningScreen(backStack)
+private fun baseEntryProvider(backStack: () -> NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> = entryProvider {
+    entry<NavDestination.PlageDateDestination.Agenda>(metadata = metaDataOf(NavigationBar, Fab)) {
+        PlanningScreen(goToSubDestination = { backStack().add(NavDestination.SubDestination) })
     }
-    entry<NavDestination.Day>(metadata = metaDataOf(NavigationBar, Fab)) {
+    entry<NavDestination.PlageDateDestination.Day>(metadata = metaDataOf(NavigationBar, Fab)) {
         DayScreen()
     }
-    entry<NavDestination.Week>(metadata = metaDataOf(NavigationBar, Fab)) {
+    entry<NavDestination.PlageDateDestination.ThreeDays>(metadata = metaDataOf(NavigationBar, Fab)) {
+        DayScreen()
+    }
+    entry<NavDestination.PlageDateDestination.Week>(metadata = metaDataOf(NavigationBar, Fab)) {
         WeekScreen()
     }
-    entry<NavDestination.Month>(metadata = metaDataOf(Fab)) {
+    entry<NavDestination.PlageDateDestination.Month>(metadata = metaDataOf(NavigationBar, Fab)) {
         MonthScreen()
     }
     entry<NavDestination.SubDestination>(metadata = metaDataOf(Fab)) {
@@ -97,34 +93,27 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
         OnboardingScreen(
             onlyLogin = destination.onlyLogin,
             onNavigateToHome = {
-                backStack.clear()
-                backStack.add(NavDestination.CalendarTest)
+                backStack().clear()
+                backStack().add(NavDestination.PlageDateDestination.Day)
             },
-            onPopBack = { backStack.removeLastOrNull() },
+            onPopBack = { backStack().removeLastOrNull() },
         )
     }
 }
 
 @Composable
-private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<SceneDecoratorStrategy<NavKey>> {
-    val navigationType: NavigationType by rememberNavigationType()
-
-    val navigationStrategy: NavigationDecoratorStrategy<NavKey> = remember(navigationType, backStack) {
+private fun sceneDecoratorStrategies(backStack: () -> NavBackStack<NavKey>): List<SceneDecoratorStrategy<NavKey>> {
+    val navigationStrategy: NavigationDecoratorStrategy<NavKey> = remember(backStack) {
         NavigationDecoratorStrategy(
-            navigationType = navigationType,
-            navBarContent = {
-                CalendarNavigationBar(backStack)
-            },
-            navRailContent = { floatingActionButton ->
-                CalendarNavigationRail(
-                    backStack = backStack,
+            floatingToolbar = { floatingActionButton ->
+                CalendarHorizontalFloatingToolbar(
+                    lastMainNavigationSelected = { backStack().filterIsInstance<NavDestination.PlageDateDestination>().last() },
+                    onNavigationButtonClicked = { backStack().addOrMoveToTop(it) },
                     floatingActionButton = floatingActionButton,
                 )
             },
             floatingActionButton = {
-                CalendarFab {
-                    backStack.addOrMoveToTop(NavDestination.EventCreation)
-                }
+                CalendarFab { backStack().addOrMoveToTop(NavDestination.EventCreation) }
             },
         )
     }

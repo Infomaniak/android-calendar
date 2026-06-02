@@ -9,17 +9,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation3.runtime.NavBackStack
-import androidx.navigation3.runtime.NavKey
-import com.infomaniak.calendar.ui.navigation.NavDestination
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlanningScreen(backStack: NavBackStack<NavKey>, modifier: Modifier = Modifier) {
+fun PlanningScreen(goToSubDestination: () -> Unit, modifier: Modifier = Modifier) {
     Scaffold(topBar = { TopAppBar(title = { Text("PlanningScreen") }) }, modifier = modifier) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             Text("PlanningScreenContent")
-            Button(onClick = { backStack.add(NavDestination.SubDestination) }) { Text("Test") }
+            Button(onClick = { goToSubDestination() }) { Text("Test") }
         }
     }
 }
