@@ -54,6 +54,6 @@ include(":app")
 includeBuild("multiplatform-calendar") {
     dependencySubstitution {
         substitute(module("com.infomaniak.multiplaform-calendar:Core")).using(project(":Core"))
-        substitute(module("com.infomaniak.multiplaform-calendar:multiplatform-calendar")).using(project(":"))
+        substitute(module("com.infomaniak.multiplaform-calendar:multiplatform-calendar")).using(project(":kmpdav"))
     }
 }
