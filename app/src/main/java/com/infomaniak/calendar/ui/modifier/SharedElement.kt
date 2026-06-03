@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.navigation.component
+package com.infomaniak.calendar.ui.modifier
 
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
@@ -26,16 +26,14 @@ import androidx.navigation3.ui.LocalNavAnimatedContentScope
 val LocalSharedTransitionScope = staticCompositionLocalOf<SharedTransitionScope?> { null }
 
 @Composable
-fun Modifier.sharedNavigation(key: String): Modifier {
+fun Modifier.sharedElement(key: String): Modifier {
     val sharedScope = LocalSharedTransitionScope.current ?: return this
 
     return with(sharedScope) {
-        val animatedContentScope = LocalNavAnimatedContentScope.current
-
-        this@sharedNavigation.then(
+        this@sharedElement.then(
             Modifier.sharedElement(
                 sharedContentState = rememberSharedContentState(key),
-                animatedVisibilityScope = animatedContentScope,
+                animatedVisibilityScope = LocalNavAnimatedContentScope.current,
             ),
         )
     }

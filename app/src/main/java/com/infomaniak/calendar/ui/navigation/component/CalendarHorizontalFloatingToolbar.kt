@@ -55,8 +55,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.infomaniak.calendar.ui.component.CalendarFab
+import com.infomaniak.calendar.ui.modifier.sharedElement
 import com.infomaniak.calendar.ui.navigation.NavDestination
-import com.infomaniak.calendar.ui.navigation.scroll.LocalToolbarScrollableState
+import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
 import com.infomaniak.core.ui.compose.margin.Margin
 
 private const val FLOATING_TOOLBARBAR_KEY = "FloatingToolbar"
@@ -96,7 +97,7 @@ private fun CalendarHorizontalFloatingToolbar(
         modifier = modifier
             .fillMaxWidth()
             .windowInsetsPadding(NavigationBarDefaults.windowInsets)
-            .sharedNavigation(key = FLOATING_TOOLBARBAR_KEY)
+            .sharedElement(key = FLOATING_TOOLBARBAR_KEY)
             .padding(end = Margin.Large),
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.Bottom,

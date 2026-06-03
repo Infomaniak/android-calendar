@@ -32,16 +32,16 @@ import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.ui.NavDisplay
 import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.navigation.component.CalendarHorizontalFloatingToolbar
-import com.infomaniak.calendar.ui.navigation.component.LocalSharedTransitionScope
+import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
-import com.infomaniak.calendar.ui.navigation.scroll.CustomSnackbarHostState
-import com.infomaniak.calendar.ui.navigation.scroll.LocalSnackbarHostState
-import com.infomaniak.calendar.ui.navigation.scroll.LocalToolbarScrollableState
-import com.infomaniak.calendar.ui.navigation.scroll.ToolbarScrollableState
-import com.infomaniak.calendar.ui.navigation.scroll.rememberCustomSnackbarHostState
-import com.infomaniak.calendar.ui.navigation.scroll.rememberToolbarScrollableState
+import com.infomaniak.calendar.ui.navigation.state.SharedSnackbarHostState
+import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
+import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
+import com.infomaniak.calendar.ui.navigation.state.ToolbarScrollableState
+import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostState
+import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableState
 import com.infomaniak.calendar.ui.screen.agenda.PlanningScreen
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventCreation.EventCreationScreen
@@ -56,12 +56,12 @@ import com.infomaniak.calendar.ui.screen.week.WeekScreen
 @Composable
 fun MainNavHost(navBackStack: NavBackStack<NavKey>) {
     val toolbarPermissionState: ToolbarScrollableState = rememberToolbarScrollableState()
-    val snackbarHostState: CustomSnackbarHostState = rememberCustomSnackbarHostState()
+    val snackbarHostState: SharedSnackbarHostState = rememberCustomSnackbarHostState()
 
     SharedTransitionLayout {
         CompositionLocalProvider(
             LocalSharedTransitionScope provides this@SharedTransitionLayout,
-            LocalSnackbarHostState provides snackbarHostState,
+            LocalSharedSnackbarHostState provides snackbarHostState,
             LocalToolbarScrollableState provides toolbarPermissionState,
         ) {
             NavDisplay(

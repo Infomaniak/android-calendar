@@ -32,8 +32,8 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.Scene
 import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.scene.SceneDecoratorStrategyScope
-import com.infomaniak.calendar.ui.navigation.component.sharedNavigation
-import com.infomaniak.calendar.ui.navigation.scroll.LocalSnackbarHostState
+import com.infomaniak.calendar.ui.modifier.sharedElement
+import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 
 private const val SNACKBAR_KEY = "SNACKBAR_HOST"
 
@@ -57,8 +57,8 @@ class NavigationDecoratorStrategy<T : NavKey>(
                 Scaffold(
                     snackbarHost = {
                         SnackbarHost(
-                            hostState = LocalSnackbarHostState.current?.snackbarHostState ?: return@Scaffold,
-                            snackbar = { Snackbar(it, modifier = Modifier.sharedNavigation(SNACKBAR_KEY)) },
+                            hostState = LocalSharedSnackbarHostState.current?.snackbarHostState ?: return@Scaffold,
+                            snackbar = { Snackbar(it, modifier = Modifier.sharedElement(SNACKBAR_KEY)) },
                         )
                     },
                 ) { _ ->
@@ -78,8 +78,8 @@ class NavigationDecoratorStrategy<T : NavKey>(
                     bottomBar = { floatingToolbar() },
                     snackbarHost = {
                         SnackbarHost(
-                            hostState = LocalSnackbarHostState.current?.snackbarHostState ?: return@Scaffold,
-                            snackbar = { Snackbar(it, modifier = Modifier.sharedNavigation(SNACKBAR_KEY)) },
+                            hostState = LocalSharedSnackbarHostState.current?.snackbarHostState ?: return@Scaffold,
+                            snackbar = { Snackbar(it, modifier = Modifier.sharedElement(SNACKBAR_KEY)) },
                         )
                     },
                     contentWindowInsets = DrawerDefaults.windowInsets.only(WindowInsetsSides.Bottom),

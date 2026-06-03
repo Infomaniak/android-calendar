@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.navigation.scroll
+package com.infomaniak.calendar.ui.navigation.state
 
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -27,18 +27,18 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-val LocalSnackbarHostState = staticCompositionLocalOf<CustomSnackbarHostState?> { null }
+val LocalSharedSnackbarHostState = staticCompositionLocalOf<SharedSnackbarHostState?> { null }
 
 @Composable
-fun rememberCustomSnackbarHostState(): CustomSnackbarHostState {
+fun rememberCustomSnackbarHostState(): SharedSnackbarHostState {
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    return remember { CustomSnackbarHostState(coroutineScope, snackbarHostState) }
+    return remember { SharedSnackbarHostState(coroutineScope, snackbarHostState) }
 }
 
 @Stable
-class CustomSnackbarHostState(private val coroutineScope: CoroutineScope, val snackbarHostState: SnackbarHostState) {
+class SharedSnackbarHostState(private val coroutineScope: CoroutineScope, val snackbarHostState: SnackbarHostState) {
     fun showSnackbar(
         message: String,
         actionLabel: String? = null,

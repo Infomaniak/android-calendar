@@ -29,12 +29,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.ui.navigation.scroll.LocalSnackbarHostState
+import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeekScreen(modifier: Modifier = Modifier) {
-    val snackbarHostState = LocalSnackbarHostState.current
+    val snackbarHostState = LocalSharedSnackbarHostState.current
 
     Scaffold(topBar = { TopAppBar(title = { Text("WeekScreen") }, modifier = modifier) }) { paddingValues ->
         Box(
