@@ -34,8 +34,7 @@ import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.ui.NavDisplay
 import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.navigation.component.CalendarHorizontalFloatingToolbar
-import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.Fab
-import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbar
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
 import com.infomaniak.calendar.ui.navigation.scroll.CustomSnackbarHostState
@@ -77,24 +76,21 @@ fun MainNavHost(navBackStack: NavBackStack<NavKey>) {
     }
 }
 
-private fun baseEntryProvider(backStack: () -> NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> = entryProvider {
-    entry<NavDestination.PlageDateDestination.Agenda>(metadata = metaDataOf(FloatingToolbar, Fab)) {
-        AgendaScreen(goToSubDestination = { backStack().add(NavDestination.SubDestination) })
+private fun baseEntryProvider(): (NavKey) -> NavEntry<NavKey> = entryProvider {
+    entry<NavDestination.PlageDateDestination.Agenda>(metadata = metaDataOf(FloatingToolbarWithFab)) {
+        AgendaScreen()
     }
-    entry<NavDestination.PlageDateDestination.Day>(metadata = metaDataOf(FloatingToolbar, Fab)) {
+    entry<NavDestination.PlageDateDestination.Day>(metadata = metaDataOf(FloatingToolbarWithFab)) {
         DayScreen()
     }
-    entry<NavDestination.PlageDateDestination.ThreeDays>(metadata = metaDataOf(FloatingToolbar, Fab)) {
+    entry<NavDestination.PlageDateDestination.ThreeDays>(metadata = metaDataOf(FloatingToolbarWithFab)) {
         ThreeDayScreen()
     }
-    entry<NavDestination.PlageDateDestination.Week>(metadata = metaDataOf(FloatingToolbar, Fab)) {
+    entry<NavDestination.PlageDateDestination.Week>(metadata = metaDataOf(FloatingToolbarWithFab)) {
         WeekScreen()
     }
-    entry<NavDestination.PlageDateDestination.Month>(metadata = metaDataOf(FloatingToolbar, Fab)) {
+    entry<NavDestination.PlageDateDestination.Month>(metadata = metaDataOf(FloatingToolbarWithFab)) {
         MonthScreen()
-    }
-    entry<NavDestination.SubDestination>(metadata = metaDataOf(Fab)) {
-        SubDestinationScreen()
     }
     entry<NavDestination.EventCreation> {
         SubDestinationScreen()
@@ -115,16 +111,15 @@ private fun baseEntryProvider(backStack: () -> NavBackStack<NavKey>): (NavKey) -
 private fun sceneDecoratorStrategies(backStack: () -> NavBackStack<NavKey>): List<SceneDecoratorStrategy<NavKey>> {
     val navigationStrategy: NavigationDecoratorStrategy<NavKey> = remember(backStack) {
         NavigationDecoratorStrategy(
-            floatingToolbar = { floatingActionButton ->
+            floatingToolbar = {
                 CalendarHorizontalFloatingToolbar(
                     onNavigationButtonClicked = { backStack().addOrMoveToTop(it) },
                     onCurrentDayClicked = { },
                     currentDestination = { backStack().getPlageDateDestination() },
-                    floatingActionButton = floatingActionButton,
+                    floatingActionButton = {
+                        CalendarFab(modifier = Modifier.fillMaxSize()) { backStack().addOrMoveToTop(NavDestination.EventCreation) }
+                    },
                 )
-            },
-            floatingActionButton = {
-                CalendarFab(modifier = Modifier.fillMaxSize()) { backStack().addOrMoveToTop(NavDestination.EventCreation) }
             },
         )
     }

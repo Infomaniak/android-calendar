@@ -44,7 +44,4 @@ sealed interface NavDestination : NavKey {
 
     @Serializable
     data object EventCreation : NavDestination
-
-    @Serializable
-    data object SubDestination : NavDestination
 }

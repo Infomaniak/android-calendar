@@ -16,7 +16,7 @@ fun Modifier.sharedNavigation(key: String): Modifier {
             Modifier.sharedElement(
                 sharedContentState = rememberSharedContentState(key),
                 animatedVisibilityScope = animatedContentScope,
-            )
+            ),
         )
     }
 }

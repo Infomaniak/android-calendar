@@ -21,18 +21,15 @@ import com.infomaniak.calendar.ui.navigation.scroll.LocalSnackbarHostState
 private const val SNACKBAR_KEY = "SNACKBAR_HOST"
 
 class NavigationDecoratorStrategy<T : NavKey>(
-    private val floatingToolbar: @Composable (floatingActionButton: (@Composable () -> Unit)?) -> Unit,
-    private val floatingActionButton: @Composable () -> Unit,
+    private val floatingToolbar: @Composable () -> Unit,
 ) : SceneDecoratorStrategy<T> {
     override fun SceneDecoratorStrategyScope<T>.decorateScene(scene: Scene<T>): Scene<T> {
-        val shouldShowNavigation = (scene.metadata[SHOULD_SHOW_FLOATING_TOOLBAR] as? Boolean) ?: false
-        val shouldShowFab = (scene.metadata[SHOULD_DISPLAY_FAB] as? Boolean) ?: false
+        val shouldShowNavigation = (scene.metadata[SHOULD_SHOW_FLOATING_TOOLBAR_WITH_FAB] as? Boolean) ?: false
 
         return object : Scene<T> by scene {
             override val content: @Composable () -> Unit = {
                 when {
-                    shouldShowNavigation -> DisplayNavigation(showFab = shouldShowFab)
-                    shouldShowFab -> DisplayFabOnly()
+                    shouldShowNavigation -> DisplayToolbar()
                     else -> DisplayContentOnly()
                 }
             }
@@ -59,30 +56,9 @@ class NavigationDecoratorStrategy<T : NavKey>(
 
             @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
             @Composable
-            private fun DisplayFabOnly() {
+            private fun DisplayToolbar() {
                 Scaffold(
-                    floatingActionButton = { floatingActionButton() },
-                    snackbarHost = {
-                        SnackbarHost(
-                            hostState = LocalSnackbarHostState.current?.snackbarHostState ?: return@Scaffold,
-                            snackbar = { Snackbar(it, modifier = Modifier.sharedNavigation(SNACKBAR_KEY)) },
-                        )
-                    },
-                ) { _ ->
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        scene.content()
-                    }
-                }
-            }
-
-            @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-            @Composable
-            private fun DisplayNavigation(showFab: Boolean) {
-
-                Scaffold(
-                    bottomBar = {
-                        floatingToolbar(if (showFab) @Composable { -> floatingActionButton() } else null)
-                    },
+                    bottomBar = { floatingToolbar() },
                     snackbarHost = {
                         SnackbarHost(
                             hostState = LocalSnackbarHostState.current?.snackbarHostState ?: return@Scaffold,
