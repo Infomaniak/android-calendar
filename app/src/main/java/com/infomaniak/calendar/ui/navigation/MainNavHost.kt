@@ -18,12 +18,10 @@
 package com.infomaniak.calendar.ui.navigation
 
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.ExperimentalMediaQueryApi
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavBackStack
@@ -34,6 +32,7 @@ import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.ui.NavDisplay
 import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.navigation.component.CalendarHorizontalFloatingToolbar
+import com.infomaniak.calendar.ui.navigation.component.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
@@ -43,16 +42,15 @@ import com.infomaniak.calendar.ui.navigation.scroll.LocalToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.scroll.ToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.scroll.rememberCustomSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.scroll.rememberToolbarScrollableState
-import com.infomaniak.calendar.ui.screen.agenda.AgendaScreen
+import com.infomaniak.calendar.ui.screen.agenda.PlanningScreen
 import com.infomaniak.calendar.ui.screen.day.DayScreen
+import com.infomaniak.calendar.ui.screen.eventCreation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
 import com.infomaniak.calendar.ui.screen.subDestinationTest.SubDestinationScreen
 import com.infomaniak.calendar.ui.screen.threeDays.ThreeDayScreen
 import com.infomaniak.calendar.ui.screen.week.WeekScreen
-
-val LocalSharedTransitionScope = staticCompositionLocalOf<SharedTransitionScope?> { null }
 
 @OptIn(ExperimentalMediaQueryApi::class)
 @Composable
@@ -77,8 +75,8 @@ fun MainNavHost(navBackStack: NavBackStack<NavKey>) {
 }
 
 private fun baseEntryProvider(): (NavKey) -> NavEntry<NavKey> = entryProvider {
-    entry<NavDestination.PlageDateDestination.Agenda>(metadata = metaDataOf(FloatingToolbarWithFab)) {
-        AgendaScreen()
+    entry<NavDestination.PlageDateDestination.Planning>(metadata = metaDataOf(FloatingToolbarWithFab)) {
+        PlanningScreen()
     }
     entry<NavDestination.PlageDateDestination.Day>(metadata = metaDataOf(FloatingToolbarWithFab)) {
         DayScreen()
@@ -93,7 +91,7 @@ private fun baseEntryProvider(): (NavKey) -> NavEntry<NavKey> = entryProvider {
         MonthScreen()
     }
     entry<NavDestination.EventCreation> {
-        SubDestinationScreen()
+        EventCreationScreen()
     }
     entry<NavDestination.Onboarding> { destination ->
         OnboardingScreen(

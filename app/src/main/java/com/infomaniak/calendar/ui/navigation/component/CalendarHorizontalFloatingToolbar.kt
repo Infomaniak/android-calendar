@@ -1,3 +1,20 @@
+/*
+ * Infomaniak Calendar - Android
+ * Copyright (C) 2026 Infomaniak Network SA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.infomaniak.calendar.ui.navigation.component
 
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +35,6 @@ import androidx.compose.material.icons.outlined.ViewWeek
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FloatingToolbarDefaults.vibrantFloatingToolbarColors
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -177,7 +193,7 @@ enum class DateSelectionItems(val label: String, val icon: ImageVector, val dest
     ThreeDays(label = "Three days", icon = Icons.Outlined.ViewDay, destination = NavDestination.PlageDateDestination.ThreeDays),
     Week(label = "Week", icon = Icons.Outlined.ViewWeek, destination = NavDestination.PlageDateDestination.Week),
     Month(label = "Month", icon = Icons.Outlined.CalendarMonth, destination = NavDestination.PlageDateDestination.Month),
-    Agenda(label = "Agenda", icon = Icons.Outlined.ViewAgenda, destination = NavDestination.PlageDateDestination.Agenda)
+    Planning(label = "Planning", icon = Icons.Outlined.ViewAgenda, destination = NavDestination.PlageDateDestination.Planning)
 }
 
 @Composable
@@ -187,7 +203,7 @@ private fun getSelectedIcon(lastMainNavigationSelected: NavDestination.PlageDate
         is NavDestination.PlageDateDestination.ThreeDays -> Icons.Outlined.ViewDay
         is NavDestination.PlageDateDestination.Week -> Icons.Outlined.ViewWeek
         is NavDestination.PlageDateDestination.Month -> Icons.Outlined.CalendarMonth
-        is NavDestination.PlageDateDestination.Agenda -> Icons.Outlined.ViewAgenda
+        is NavDestination.PlageDateDestination.Planning -> Icons.Outlined.ViewAgenda
     }
 }
 
@@ -197,7 +213,7 @@ private fun CalendarHorizontalFloatingToolbarPreview() {
     CalendarHorizontalFloatingToolbar(
         onNavigationButtonClicked = { },
         currentDestination = { NavDestination.PlageDateDestination.Week },
-        floatingActionButton = { CalendarFab(onClick = {}) },
+        floatingActionButton = { CalendarFab(onClick = { }) },
         onCurrentDayClicked = { },
     )
 }

@@ -15,12 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.month
+package com.infomaniak.calendar.ui.screen.eventCreation
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -28,34 +25,19 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.infomaniak.calendar.ui.screen.day.DayScreen
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MonthScreen(modifier: Modifier = Modifier, monthViewModel: MonthViewModel = viewModel()) {
+fun EventCreationScreen(modifier: Modifier = Modifier) {
     Scaffold(
-        topBar = { TopAppBar(title = { Text("MonthScreen") }) },
-        modifier = modifier,
+        topBar = { TopAppBar(title = { Text("SubDestinationScreen") }, modifier = modifier) },
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = paddingValues,
-        ) {
-            items(50) { index ->
-                Text(
-                    text = "Événement du mois n°$index",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                )
-            }
-        }
+        Text("SubDestinationScreenContent", modifier = Modifier.padding(paddingValues))
     }
 }
 
 @Preview
 @Composable
-private fun MonthScreenPreview() {
-    MonthScreen()
+private fun EventCreationScreenPreview() {
+    EventCreationScreen()
 }
