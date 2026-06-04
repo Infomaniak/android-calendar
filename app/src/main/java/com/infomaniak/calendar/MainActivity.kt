@@ -22,14 +22,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberNavBackStack
 import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.ui.navigation.MainNavHost
 import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.utils.UserLoadState
 import com.infomaniak.calendar.utils.rememberUserLoadState
+import com.infomaniak.core.auth.models.user.User
 
 class MainActivity : ComponentActivity() {
 
@@ -51,18 +57,32 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 is UserLoadState.Loaded -> {
-                    // TODO: Detect empty user list and go back to onboarding
                     val startDestination = if (userLoadState.user == null) NavDestination.Onboarding() else NavDestination.Home
+                    val backStack = rememberNavBackStack(startDestination)
 
                     CompositionLocalProvider(LocalUser provides userLoadState.user) {
+                        NavigateToOnboardingIfLastUserIsDisconnected(backStack, userLoadState.user)
+
                         CalendarTheme {
                             Surface {
-                                MainNavHost(startDestination = startDestination)
+                                MainNavHost(backStack = backStack)
                             }
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun NavigateToOnboardingIfLastUserIsDisconnected(backStack: NavBackStack<NavKey>, user: User?) {
+    val isUserLoaded = user != null
+
+    LaunchedEffect(isUserLoaded) {
+        if (isUserLoaded.not()) {
+            backStack.clear()
+            backStack.add(NavDestination.Onboarding())
         }
     }
 }
