@@ -15,15 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.calendarTest
+package com.infomaniak.calendar.ui.screen.calendarTest.model
 
-import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 
-sealed interface CalendarTestUiState {
 
-    data object Loading : CalendarTestUiState
-
-    data class Loaded(val calendars: List<CalendarUi>) : CalendarTestUiState
-
-    data class Error(val message: String) : CalendarTestUiState
-}
+internal fun Calendar.toUi(events: List<Event>): CalendarUi = CalendarUi(
+    id = id.url,
+    header = "$displayName · ${events.size} event(s)",
+    events = events.map(Event::toUi),
+)

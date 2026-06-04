@@ -15,15 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.calendarTest
+package com.infomaniak.calendar.ui.screen.calendarTest.model
 
-import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
-
-sealed interface CalendarTestUiState {
-
-    data object Loading : CalendarTestUiState
-
-    data class Loaded(val calendars: List<CalendarUi>) : CalendarTestUiState
-
-    data class Error(val message: String) : CalendarTestUiState
-}
+/**
+ * UI model for an event shown in the CalDAV test screen: everything is already formatted/derived
+ * so the composables only have to render plain strings (no date formatting, no business logic).
+ */
+data class EventUi(
+    val id: String,
+    val title: String,
+    val timeRange: String?,
+    val location: String?,
+    val status: String?,
+    val categories: String?,
+    val description: String?,
+    val lastModified: String?,
+)

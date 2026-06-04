@@ -17,19 +17,28 @@
  */
 package com.infomaniak.calendar.ui.screen.calendarTest
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
+import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
+import com.infomaniak.calendar.ui.screen.calendarTest.model.toUi
 import com.infomaniak.multiplatform_calendar.core.AccountManager
 import com.infomaniak.multiplatform_calendar.core.CalendarManager
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCredentials
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @Inject
@@ -40,36 +49,25 @@ class CalendarTestViewModel(
     private val calendarManager: CalendarManager,
 ) : ViewModel() {
 
-    val uiState: StateFlow<CalendarTestUiState>
-        field = MutableStateFlow<CalendarTestUiState>(CalendarTestUiState.Loading)
-
     private val accountId = AccountId(1)
 
-    init {
-        observeCalendars()
-        initCalendar()
-        syncFromRemote()
-    }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val uiState: StateFlow<CalendarTestUiState> = calendarManager.observeCalendars(accountId)
+        .flatMapLatest { calendars -> calendars.map(::observeCalendarUi).combineToList() }
+        .map<List<CalendarUi>, CalendarTestUiState>(CalendarTestUiState::Loaded)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), CalendarTestUiState.Loading)
 
-    private fun observeCalendars() = viewModelScope.launch {
-        calendarManager.observeCalendars(accountId).collect { calendars ->
-            Log.d("CalDAV-PoC", "DB updated: ${calendars.size} calendar(s)")
-            if (calendars.isNotEmpty()) {
-                uiState.value = CalendarTestUiState.Success(
-                    buildString {
-                        appendLine("✅ ${calendars.size} calendar(s) in DB:\n")
-                        calendars.forEachIndexed { i, cal ->
-                            appendLine("[$i] ${cal.displayName}")
-                            appendLine("    ${cal.id}")
-                            appendLine()
-                        }
-                    },
-                )
-            }
+    init {
+        viewModelScope.launch {
+            initCalendar()
+            syncFromRemote()
         }
     }
 
-    private fun initCalendar() = viewModelScope.launch {
+    private fun observeCalendarUi(calendar: Calendar): Flow<CalendarUi> =
+        calendarManager.observeEvents(calendar.id).map { calendar.toUi(it) }
+
+    private suspend fun initCalendar() {
         val credentials = DavCredentials(
             baseUrl = "https://sync.infomaniak.com",
             username = "USERNAME",
@@ -78,9 +76,9 @@ class CalendarTestViewModel(
         accountManager.initAccount(accountId, credentials)
     }
 
-    private fun syncFromRemote() = viewModelScope.launch {
-        runCatching { accountManager.syncCalendars(accountId) }
-            .onFailure { uiState.value = CalendarTestUiState.Error(it.message ?: "Error") }
-    }
+    private fun syncFromRemote() = runCatching { accountManager.syncCalendars(accountId) }
+        .onFailure { uiState.value = CalendarTestUiState.Error(it.message ?: "Error") }
 
+    private inline fun <reified T> List<Flow<T>>.combineToList(): Flow<List<T>> =
+        if (isEmpty()) flowOf(emptyList()) else combine(this) { it.toList() }
 }
