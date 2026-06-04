@@ -18,15 +18,11 @@
 package com.infomaniak.calendar.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.ui.screen.home.HomeScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 
@@ -34,22 +30,21 @@ import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 fun MainNavHost(
     backStack: NavBackStack<NavKey>,
 ) {
-    NavDisplay(
-        backStack = backStack,
-        entryProvider = entryProvider {
-            entry<NavDestination.Onboarding> { destination ->
-                OnboardingScreen(
-                    onlyLogin = destination.onlyLogin,
-                    onNavigateToHome = {
-                        backStack.clear()
-                        backStack.add(NavDestination.Home)
-                    },
-                    onPopBack = { backStack.removeLastOrNull() },
-                )
-            }
-            entry<NavDestination.Home> {
-                HomeScreen()
-            }
-        },
-    )
+    NavDisplay(backStack = backStack, entryProvider = baseEntryProvider(backStack))
+}
+
+private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> = entryProvider {
+    entry<NavDestination.Onboarding> { destination ->
+        OnboardingScreen(
+            onlyLogin = destination.onlyLogin,
+            onNavigateToHome = {
+                backStack.clear()
+                backStack.add(NavDestination.Home)
+            },
+            onPopBack = { backStack.removeLastOrNull() },
+        )
+    }
+    entry<NavDestination.Home> {
+        HomeScreen()
+    }
 }

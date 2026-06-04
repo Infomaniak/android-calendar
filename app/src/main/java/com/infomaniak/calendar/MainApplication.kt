@@ -28,9 +28,7 @@ class MainApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        // Required so that com.infomaniak.core.network.networking.HttpClient.okHttpClient (used by
-        // the WebView login and cross-app login flows) can build its OkHttpClient with the right
-        // user-agent / app identifiers.
+
         NetworkConfiguration.init(
             appId = ConfigUtils.safePackage,
             appVersionCode = BuildConfig.VERSION_CODE,
