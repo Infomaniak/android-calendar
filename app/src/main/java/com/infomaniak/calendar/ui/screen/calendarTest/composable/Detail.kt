@@ -15,15 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.calendarTest
+package com.infomaniak.calendar.ui.screen.calendarTest.composable
 
-import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 
-sealed interface CalendarTestUiState {
+@Composable
+internal fun Detail(label: String, value: String) {
+    Text(
+        text = "$label: $value",
+        style = MaterialTheme.typography.bodySmall,
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis,
+    )
+}
 
-    data object Loading : CalendarTestUiState
-
-    data class Loaded(val calendars: List<CalendarUi>) : CalendarTestUiState
-
-    data class Error(val message: String) : CalendarTestUiState
+@Composable
+@Preview
+internal fun DetailPreview() {
+    Detail(label = "Location", value = "Meeting room A")
 }
