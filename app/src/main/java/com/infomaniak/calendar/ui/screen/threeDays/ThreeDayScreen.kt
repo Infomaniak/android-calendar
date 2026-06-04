@@ -29,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.ui.screen.week.WeekScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +43,7 @@ fun ThreeDayScreen(modifier: Modifier = Modifier) {
                     text = "Événement du jour n°$index",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
                 )
             }
         }

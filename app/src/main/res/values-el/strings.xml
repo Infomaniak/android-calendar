@@ -16,9 +16,12 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <string name="createEventContentDescription">Δημιουργία εκδήλωσης</string>
     <string name="dayTitles">Ημέρα</string>
     <string name="monthTitle">Μήνας</string>
     <string name="planningTitle">Προγραμματισμός</string>
     <string name="threeDaysTitle">Τρεις ημέρες</string>
+    <string name="todayContentDescription">Σήμερα</string>
+    <string name="toolbarCurrentViewButtonContentDescription">Τρέχουσα προβολή: %1$s. Πατήστε για να αλλάξετε την προβολή.</string>
     <string name="weekTitle">Εβδομάδα</string>
 </resources>

@@ -16,9 +16,12 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <string name="createEventContentDescription">Criar um evento</string>
     <string name="dayTitles">Dia</string>
     <string name="monthTitle">Mês</string>
     <string name="planningTitle">Planeamento</string>
     <string name="threeDaysTitle">Três dias</string>
+    <string name="todayContentDescription">Hoje</string>
+    <string name="toolbarCurrentViewButtonContentDescription">Vista atual: %1$s. Toque para mudar de vista.</string>
     <string name="weekTitle">Semana</string>
 </resources>

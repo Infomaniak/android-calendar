@@ -20,12 +20,12 @@ package com.infomaniak.calendar.ui.component
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.modifier.sharedElement
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 
@@ -36,11 +36,10 @@ fun CalendarFab(modifier: Modifier = Modifier, onClick: () -> Unit) {
     FloatingActionButton(
         modifier = modifier.sharedElement(FAB_KEY),
         onClick = onClick,
-        elevation = FloatingActionButtonDefaults.elevation(0.dp),
     ) {
         Icon(
             imageVector = Icons.Filled.Add,
-            contentDescription = "Add",
+            contentDescription = stringResource(R.string.createEventContentDescription),
         )
     }
 }
@@ -49,6 +48,6 @@ fun CalendarFab(modifier: Modifier = Modifier, onClick: () -> Unit) {
 @Composable
 private fun CalendarFabPreview() {
     CalendarTheme {
-        CalendarFab(onClick = {})
+        CalendarFab(onClick = { })
     }
 }

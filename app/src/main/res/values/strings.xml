@@ -15,12 +15,13 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-
-<!--TODO-->
 <resources>
+    <string name="createEventContentDescription">Create an event</string>
     <string name="dayTitles">Day</string>
     <string name="monthTitle">Month</string>
     <string name="planningTitle">Planning</string>
     <string name="threeDaysTitle">Three days</string>
+    <string name="todayContentDescription">Today</string>
+    <string name="toolbarCurrentViewButtonContentDescription">Current view: %1$s. Tap to change view.</string>
     <string name="weekTitle">Week</string>
 </resources>

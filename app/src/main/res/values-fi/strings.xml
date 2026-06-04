@@ -16,9 +16,12 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <string name="createEventContentDescription">Luo tapahtuma</string>
     <string name="dayTitles">Päivä</string>
     <string name="monthTitle">Kuukausi</string>
     <string name="planningTitle">Suunnittelu</string>
     <string name="threeDaysTitle">Kolme päivää</string>
+    <string name="todayContentDescription">Tänään</string>
+    <string name="toolbarCurrentViewButtonContentDescription">Nykyinen näkymä: %1$s. Napauta vaihtaaksesi näkymää.</string>
     <string name="weekTitle">Viikko</string>
 </resources>

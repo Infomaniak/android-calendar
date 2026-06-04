@@ -16,9 +16,12 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <string name="createEventContentDescription">Een evenement maken</string>
     <string name="dayTitles">Dag</string>
     <string name="monthTitle">Maand</string>
     <string name="planningTitle">Planning</string>
     <string name="threeDaysTitle">Drie dagen</string>
+    <string name="todayContentDescription">Vandaag</string>
+    <string name="toolbarCurrentViewButtonContentDescription">Huidige weergave: %1$s. Tik om de weergave te wijzigen.</string>
     <string name="weekTitle">Week</string>
 </resources>

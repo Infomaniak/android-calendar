@@ -19,10 +19,7 @@ package com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.only
-import androidx.compose.material3.DrawerDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -47,13 +44,13 @@ class NavigationDecoratorStrategy<T : NavKey>(
             override val content: @Composable () -> Unit = {
                 when {
                     shouldShowNavigation -> DisplayToolbar()
-                    else -> DisplayContentOnly()
+                    else -> DisplayContentWithNoNavigation()
                 }
             }
 
             @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
             @Composable
-            private fun DisplayContentOnly() {
+            private fun DisplayContentWithNoNavigation() {
                 Scaffold(
                     snackbarHost = {
                         SnackbarHost(
@@ -62,12 +59,7 @@ class NavigationDecoratorStrategy<T : NavKey>(
                         )
                     },
                 ) { _ ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                    ) {
-                        scene.content()
-                    }
+                    Content()
                 }
             }
 
@@ -82,11 +74,15 @@ class NavigationDecoratorStrategy<T : NavKey>(
                             snackbar = { Snackbar(it, modifier = Modifier.sharedElement(SNACKBAR_KEY)) },
                         )
                     },
-                    contentWindowInsets = DrawerDefaults.windowInsets.only(WindowInsetsSides.Bottom),
                 ) { _ ->
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        scene.content()
-                    }
+                    Content()
+                }
+            }
+
+            @Composable
+            private fun Content() {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    scene.content()
                 }
             }
         }

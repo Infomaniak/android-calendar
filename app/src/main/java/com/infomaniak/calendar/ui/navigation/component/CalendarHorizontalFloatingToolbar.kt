@@ -19,30 +19,17 @@ package com.infomaniak.calendar.ui.navigation.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.CalendarToday
-import androidx.compose.material.icons.outlined.ViewAgenda
-import androidx.compose.material.icons.outlined.ViewDay
-import androidx.compose.material.icons.outlined.ViewWeek
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MenuAnchorPosition
-import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.NavigationBarDefaults
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,10 +37,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.PopupProperties
+import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.modifier.sharedElement
 import com.infomaniak.calendar.ui.navigation.NavDestination
@@ -89,9 +75,9 @@ private fun CalendarHorizontalFloatingToolbar(
     onNavigationButtonClicked: (NavDestination.PlageDateDestination) -> Unit,
     onCurrentDayClicked: () -> Unit,
     currentDestination: () -> NavDestination.PlageDateDestination?,
+    isExpanded: () -> Boolean,
     modifier: Modifier = Modifier,
     floatingActionButton: (@Composable () -> Unit)? = null,
-    isExpanded: () -> Boolean,
 ) {
     Row(
         modifier = modifier
@@ -130,7 +116,10 @@ private fun ContentFloatingToolbar(
 ) {
     Row(modifier = modifier) {
         IconButton(onClick = onCurrentDayClicked) {
-            Icon(imageVector = Icons.Outlined.CalendarToday, contentDescription = null)
+            Icon(
+                imageVector = Icons.Outlined.CalendarToday,
+                contentDescription = stringResource(R.string.todayContentDescription),
+            )
         }
         DropdownIconButton(
             onNavigationButtonClicked = onNavigationButtonClicked,
@@ -141,7 +130,7 @@ private fun ContentFloatingToolbar(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun DropdownIconButton(
+private fun DropdownIconButton(
     onNavigationButtonClicked: (NavDestination.PlageDateDestination) -> Unit,
     currentDestination: () -> NavDestination.PlageDateDestination?,
     modifier: Modifier = Modifier,
@@ -150,61 +139,15 @@ fun DropdownIconButton(
     var menuExpanded by remember { mutableStateOf(isExpanded) }
 
     Box(modifier = modifier) {
-        currentDestination()?.let {
-            IconButton(onClick = { menuExpanded = !menuExpanded }) {
-                Icon(imageVector = getSelectedIcon(lastMainNavigationSelected = it), contentDescription = null)
-            }
+        currentDestination()?.let { destination ->
+            CurrentDestinationIcon(currentDestination = destination, onMenuExpanded = { menuExpanded = !menuExpanded })
         }
 
-        DropdownMenuPopup(
-            expanded = menuExpanded,
-            onDismissRequest = { menuExpanded = false },
-            popupPositionProvider = MenuDefaults.rememberDropdownMenuPopupPositionProvider(
-                dropdownMenuAnchorPosition = MenuAnchorPosition.Above,
-            ),
-            modifier = Modifier.padding(bottom = Margin.Medium),
-            properties = PopupProperties(clippingEnabled = false, focusable = true),
-        ) {
-            Surface(
-                shape = RoundedCornerShape(16.dp),
-                color = MenuDefaults.containerColor,
-                tonalElevation = MenuDefaults.TonalElevation,
-            ) {
-                Column(modifier = Modifier) {
-                    DateSelectionItems.entries.forEachIndexed { index, item ->
-                        DropdownMenuItem(
-                            shape = MenuDefaults.itemShape(index, DateSelectionItems.entries.count()).shape,
-                            text = { Text(item.label) },
-                            leadingIcon = { Icon(imageVector = item.icon, contentDescription = null) },
-                            onClick = {
-                                menuExpanded = false
-                                onNavigationButtonClicked(item.destination)
-                            },
-                            modifier = Modifier.widthIn(min = 180.dp),
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-enum class DateSelectionItems(val label: String, val icon: ImageVector, val destination: NavDestination.PlageDateDestination) {
-    Day(label = "Day", icon = Icons.Outlined.ViewDay, destination = NavDestination.PlageDateDestination.Day),
-    ThreeDays(label = "Three days", icon = Icons.Outlined.ViewDay, destination = NavDestination.PlageDateDestination.ThreeDays),
-    Week(label = "Week", icon = Icons.Outlined.ViewWeek, destination = NavDestination.PlageDateDestination.Week),
-    Month(label = "Month", icon = Icons.Outlined.CalendarMonth, destination = NavDestination.PlageDateDestination.Month),
-    Planning(label = "Planning", icon = Icons.Outlined.ViewAgenda, destination = NavDestination.PlageDateDestination.Planning)
-}
-
-@Composable
-private fun getSelectedIcon(lastMainNavigationSelected: NavDestination.PlageDateDestination): ImageVector {
-    return when (lastMainNavigationSelected) {
-        is NavDestination.PlageDateDestination.Day -> Icons.Outlined.ViewDay
-        is NavDestination.PlageDateDestination.ThreeDays -> Icons.Outlined.ViewDay
-        is NavDestination.PlageDateDestination.Week -> Icons.Outlined.ViewWeek
-        is NavDestination.PlageDateDestination.Month -> Icons.Outlined.CalendarMonth
-        is NavDestination.PlageDateDestination.Planning -> Icons.Outlined.ViewAgenda
+        FloatingToolbarDropdownMenu(
+            isExpanded = menuExpanded,
+            onMenuExpanded = { menuExpanded = it },
+            onNavigationButtonClicked = onNavigationButtonClicked,
+        )
     }
 }
 
@@ -213,8 +156,9 @@ private fun getSelectedIcon(lastMainNavigationSelected: NavDestination.PlageDate
 private fun CalendarHorizontalFloatingToolbarPreview() {
     CalendarHorizontalFloatingToolbar(
         onNavigationButtonClicked = { },
+        onCurrentDayClicked = { },
         currentDestination = { NavDestination.PlageDateDestination.Week },
         floatingActionButton = { CalendarFab(onClick = { }) },
-        onCurrentDayClicked = { },
+        isExpanded = { false },
     )
 }

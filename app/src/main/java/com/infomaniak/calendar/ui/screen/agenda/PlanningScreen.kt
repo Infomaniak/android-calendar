@@ -30,15 +30,18 @@ import androidx.compose.ui.tooling.preview.Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlanningScreen(modifier: Modifier = Modifier) {
-    Scaffold(topBar = { TopAppBar(title = { Text("AgendaScreen") }) }, modifier = modifier) { paddingValues ->
+    Scaffold(
+        topBar = { TopAppBar(title = { Text("PlanningScreen") }) },
+        modifier = modifier,
+    ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
-            Text("AgendaScreenContent")
+            Text("PlanningScreenContent")
         }
     }
 }
 
-@Preview
 @Composable
+@Preview
 private fun PlanningScreenPreview() {
     PlanningScreen()
 }

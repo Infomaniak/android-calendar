@@ -36,7 +36,7 @@ import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 fun WeekScreen(modifier: Modifier = Modifier) {
     val snackbarHostState = LocalSharedSnackbarHostState.current
 
-    Scaffold(topBar = { TopAppBar(title = { Text("WeekScreen") }, modifier = modifier) }) { paddingValues ->
+    Scaffold(topBar = { TopAppBar(title = { Text("WeekScreen") }) }, modifier = modifier) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()

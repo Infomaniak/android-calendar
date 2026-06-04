@@ -42,12 +42,11 @@ import com.infomaniak.calendar.ui.navigation.state.ToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableState
 import com.infomaniak.calendar.ui.screen.agenda.PlanningScreen
+import com.infomaniak.calendar.ui.screen.calendarTest.calendarTest
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventCreation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
-import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
-import com.infomaniak.calendar.ui.screen.subDestinationTest.SubDestinationScreen
 import com.infomaniak.calendar.ui.screen.threeDays.ThreeDayScreen
 import com.infomaniak.calendar.ui.screen.week.WeekScreen
 
@@ -72,7 +71,7 @@ fun MainNavHost(navBackStack: NavBackStack<NavKey>) {
     }
 }
 
-private fun baseEntryProvider(): (NavKey) -> NavEntry<NavKey> = entryProvider {
+private fun baseEntryProvider(backStack: () -> NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> = entryProvider {
     entry<NavDestination.PlageDateDestination.Planning>(metadata = metaDataOf(FloatingToolbarWithFab)) {
         PlanningScreen()
     }
@@ -101,6 +100,7 @@ private fun baseEntryProvider(): (NavKey) -> NavEntry<NavKey> = entryProvider {
             onPopBack = { backStack().removeLastOrNull() },
         )
     }
+    calendarTest()
 }
 
 @Composable
@@ -127,7 +127,7 @@ private fun NavBackStack<NavKey>.getPlageDateDestination(): NavDestination.Plage
     return this.filterIsInstance<NavDestination.PlageDateDestination>().lastOrNull()
 }
 
-fun NavBackStack<NavKey>.addOrMoveToTop(destination: NavKey) {
+private fun NavBackStack<NavKey>.addOrMoveToTop(destination: NavKey) {
     if (this.contains(destination)) this.remove(destination)
     this.add(destination)
 }
