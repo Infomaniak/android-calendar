@@ -34,7 +34,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        // TODO: Replace this placeholder with the real Calendar OAuth client id once available.
+        // TODO[login]: Replace this placeholder with the real Calendar OAuth client id once available.
         buildConfigField("String", "CLIENT_ID", "\"17EE3471-9843-4FB9-AD95-CB8C41BAD624\"")
     }
 

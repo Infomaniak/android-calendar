@@ -36,6 +36,6 @@ import dev.zacsweers.metro.binding
 @ContributesIntoMap(AppScope::class, binding = binding<ViewModel>()) // TODO: Do we need this binding?
 @ViewModelKey(CrossAppLoginViewModel::class)
 class CrossAppLoginViewModel : BaseCrossAppLoginViewModel(
-    applicationId = "com.infomaniak.swisstransfer",// TODO: ConfigUtils.safePackage,
+    applicationId = "com.infomaniak.swisstransfer",// TODO[login]: ConfigUtils.safePackage,
     clientId = BuildConfig.CLIENT_ID,
 )

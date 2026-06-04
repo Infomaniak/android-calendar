@@ -70,7 +70,7 @@ import com.infomaniak.lib.login.InfomaniakLogin
 import kotlinx.coroutines.launch
 
 private val host = ApiEnvironment.current.host
-private val CREATE_ACCOUNT_URL = "https://welcome.$host/signup/swisstransfer" // TODO: Use the correct account creation url
+private val CREATE_ACCOUNT_URL = "https://welcome.$host/signup/swisstransfer" // TODO[login]: Use the correct account creation url
 private val CREATE_ACCOUNT_SUCCESS_HOST = "shop.$host"
 private const val CREATE_ACCOUNT_CANCEL_HOST = "" // No cancel host to detect.
 

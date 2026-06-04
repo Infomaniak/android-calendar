@@ -62,7 +62,7 @@ interface AppGraph {
     fun providesInfomaniakLogin(applicationContext: Context): InfomaniakLogin = InfomaniakLogin(
         context = applicationContext,
         loginUrl = "$LOGIN_ENDPOINT_URL/",
-        appUID = "com.infomaniak.swisstransfer",// TODO: ConfigUtils.safePackage,
+        appUID = "com.infomaniak.swisstransfer",// TODO[login]: ConfigUtils.safePackage,
         clientID = BuildConfig.CLIENT_ID,
         accessType = null,
         sentryCallback = null,
