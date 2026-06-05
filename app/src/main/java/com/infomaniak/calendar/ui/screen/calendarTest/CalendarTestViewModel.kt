@@ -80,6 +80,13 @@ class CalendarTestViewModel(
             .collect { uiState.value = CalendarTestUiState.Loaded(it) }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun observeCalendars() = viewModelScope.launch {
+        calendarManager.observeCalendars(accountId)
+            .flatMapLatest { calendars -> calendars.map(::observeCalendarUi).combineToList() }
+            .collect { uiState.value = CalendarTestUiState.Loaded(it) }
+    }
+
     private fun observeCalendarUi(calendar: Calendar): Flow<CalendarUi> =
         calendarManager.observeEvents(calendar.id).map { calendar.toUi(it) }
 
