@@ -46,9 +46,12 @@ android {
     flavorDimensions += "distribution"
     productFlavors {
         create("standard") {
+            dimension = "distribution"
             isDefault = true
         }
-        create("fdroid")
+        create("fdroid") {
+            dimension = "distribution"
+        }
     }
 
     buildTypes {
