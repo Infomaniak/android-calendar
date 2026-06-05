@@ -15,21 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.navigation
+package com.infomaniak.calendar.ui.screen.calendarTest.previewParameter
 
-import androidx.navigation3.runtime.NavKey
-import kotlinx.serialization.Serializable
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestUiState
 
-@Serializable
-sealed interface NavDestination : NavKey {
+internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<CalendarTestUiState> {
+    override val values = sequenceOf(CalendarTestUiState.Loading, Success, Error)
 
-    @Serializable
-    data class Onboarding(val onlyLogin: Boolean = false) : NavDestination
-
-    @Serializable
-    data object Home : NavDestination
-
-    @Serializable
-    data object CalendarTest : NavDestination
-
+    companion object {
+        val Success = CalendarTestUiState.Success("Hello world")
+        val Error = CalendarTestUiState.Error("Something went wrong")
+    }
 }

@@ -23,6 +23,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.infomaniak.calendar.ui.screen.calendarTest.calendarTest
 import com.infomaniak.calendar.ui.screen.home.HomeScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 
@@ -47,4 +48,5 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
     entry<NavDestination.Home> {
         HomeScreen()
     }
+    calendarTest()
 }

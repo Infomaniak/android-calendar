@@ -42,9 +42,10 @@ android-calendar/
     - `multiplatform-calendar/gradle/kmpCalendar.versions.toml` — KMP-side dependencies, exposed in `settings.gradle.kts`
       as the `kmpCalendar` catalog.
 - **Project inclusion**: `settings.gradle.kts` includes `:app` and wires `multiplatform-calendar` as a composite build
-  via `includeBuild("multiplatform-calendar")` with a `dependencySubstitution` block. The app depends on the KMP module
-  via the version-catalog alias `libs.infomaniak.multiplaform.calendar.core`
-  (declared in `gradle/libs.versions.toml`), which Gradle transparently substitutes with the included `:Core` project.
+  via `includeBuild("multiplatform-calendar")` with a `dependencySubstitution` block that maps two Maven coordinates:
+    - `com.infomaniak.multiplaform-calendar:Core` → `:Core` project
+    - `com.infomaniak.multiplaform-calendar:multiplatform-calendar` → `:kmpdav` project (internal bridge module)
+  The app depends on both via `libs.infomaniak.multiplatform.calendar` and `libs.infomaniak.multiplatform.calendar.core`.
 - **Impact**: Editing `multiplatform-calendar/` affects every consumer of that library - changes belong in its own repo
   and PR.
 
@@ -63,12 +64,29 @@ git submodule update --remote multiplatform-calendar
 
 ## Key Integration Points
 
-- **Shared models / business logic**: The app imports from `com.infomaniak.multiplatform_calendar.*` (e.g.,
-  `com.infomaniak.multiplatform_calendar.model.calendar.Color` used in `MainActivity.kt`).
-- **Dependency wiring**: Declared in `app/build.gradle.kts` via `implementation(libs.infomaniak.multiplaform.calendar.core)`;
-  Gradle substitutes this Maven coordinate with the `:Core` project from the composite build.
-- **Plugin aliases**: Root `build.gradle.kts` registers the Android and Kotlin Multiplatform plugins from both catalogs
-  (`libs.plugins.*` and `kmpCalendar.plugins.*`).
+- **Two KMP modules consumed by the app**: The submodule contains two consumable Gradle projects (plus a pure-aggregator
+  root project `:` with no sources):
+    - **kmpdav module** (`:kmpdav`) — internal bridge module: Rust/UniFFI CalDAV bridge, remote CalDAV models/client, `CaldavClientModule`.
+    - **Core module** (`:Core`) — public API module: domain models, Room database, repositories, `AccountManager`, `CalendarManager`, Apple `CalendarSDK`.
+- **Shared models / business logic**: The app imports from `com.infomaniak.multiplatform_calendar.core.*` (e.g.,
+  `com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Color`) and the bridge from
+  `com.infomaniak.multiplatform_calendar.data.remote.caldav.*` (e.g., `DavAccount`).
+- **Dependency wiring**: Declared in `app/build.gradle.kts` via two dependencies:
+    - `implementation(libs.infomaniak.multiplatform.calendar)` — substituted with the `:kmpdav` project.
+    - `implementation(libs.infomaniak.multiplatform.calendar.core)` — substituted with `:Core`.
+- **DI**: The app uses Metro's `@DependencyGraph` (`AppGraph`) which picks up `@ContributesTo` modules from both
+  the `:kmpdav` and Core modules (e.g., `CalendarCoreGraph`, `AndroidDatabaseModule`, `DatabaseModule`, `CaldavClientModule`).
+  `CalendarCoreGraph` (in Core `commonMain`) defines the shared accessors (`accountManager`, `calendarManager`)
+  and is automatically merged into `AppGraph` (Android). On Apple, `CalendarSDK` lives in Core `appleMain` and explicitly
+  inherits `:kmpdav`'s `CaldavClientModule` while also receiving Core's contributed bindings.
+- **Apple artifact**: The public `KmpCalendar.xcframework` is produced by the Core module (`:Core`). `:kmpdav` is a
+  plain `implementation` dependency and is **not** exported: the public Apple API exposes only Core-owned types (e.g.
+  credentials are passed as Core's `DavCredentials`, mapped to `:kmpdav`'s `DavAccount` at the repository boundary).
+  `CalendarSDKProvider.shared.sdk` is the Apple entry point exposed by Core.
+- **Rust/UniFFI**: The Rust crate lives in `multiplatform-calendar/kmpdav/rust/caldav_bridge`; `:kmpdav/build.gradle.kts`
+  wires Gobley (`dev.gobley.cargo` / `dev.gobley.uniffi`) to compile it and generate `uniffi.caldav_bridge.*` bindings.
+- **Plugin aliases**: Module `build.gradle.kts` files register the Android and Kotlin Multiplatform plugins from both
+  catalogs (`libs.plugins.*` and `kmpCalendar.plugins.*`).
 
 ## Quick Commands
 

@@ -20,11 +20,11 @@ plugins {
     alias(core.plugins.compose.compiler)
     alias(core.plugins.kotlin.android)
     alias(core.plugins.kotlin.serialization)
-    alias(libs.plugins.metro)
+    alias(kmpCalendar.plugins.metro)
 }
 
 android {
-    compileSdk { version = release(36) }
+    compileSdk = 36
     namespace = "com.infomaniak.calendar"
 
     defaultConfig {
@@ -62,12 +62,18 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+}
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-XXLanguage:+ExplicitBackingFields")
     }
 }
 
 dependencies {
+    implementation(libs.infomaniak.multiplatform.calendar)
     implementation(libs.infomaniak.multiplatform.calendar.core)
 
     implementation(core.infomaniak.core.auth)
@@ -76,6 +82,8 @@ dependencies {
     implementation(core.infomaniak.core.network)
     implementation(core.infomaniak.core.onboarding)
     implementation(core.infomaniak.core.ui.compose.margin)
+
+    implementation(kmpCalendar.androidx.room.runtime)
 
     implementation(platform(core.compose.bom))
     implementation(core.activity.compose)
