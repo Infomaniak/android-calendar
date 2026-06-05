@@ -93,6 +93,3 @@ class CalendarTestViewModel(
     private inline fun <reified T> List<Flow<T>>.combineToList(): Flow<List<T>> =
         if (isEmpty()) flowOf(emptyList()) else combine(this) { it.toList() }
 }
-
-private inline fun <reified T> List<Flow<T>>.combineToList(): Flow<List<T>> =
-    if (isEmpty()) flowOf(emptyList()) else combine(this) { it.toList() }
