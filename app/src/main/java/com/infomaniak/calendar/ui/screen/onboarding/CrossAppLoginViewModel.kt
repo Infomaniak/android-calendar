@@ -29,8 +29,6 @@ import dev.zacsweers.metro.binding
 /**
  * Cross-app login ViewModel used by the onboarding screen to detect Infomaniak accounts that are
  * already present in other Infomaniak apps on the device.
- *
- * Mirrors `com.infomaniak.swisstransfer.ui.screen.onboarding.CrossAppLoginViewModel`.
  */
 @Inject
 @ContributesIntoMap(AppScope::class, binding = binding<ViewModel>()) // TODO: Do we need this binding?

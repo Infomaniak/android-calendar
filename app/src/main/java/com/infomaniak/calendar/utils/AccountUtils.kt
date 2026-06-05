@@ -24,17 +24,6 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
 
-/**
- * Lightweight account management entry point used by the onboarding flow.
- *
- * The Calendar app does not yet persist users, so this is intentionally a stub:
- *  - [isUserAlreadyPresent] always returns `false` so a freshly logged-in user is never rejected
- *    as a duplicate;
- *  - [addUser] is a TODO that will plug into the real user persistence layer once it lands.
- *
- * The shape of this class mirrors `com.infomaniak.swisstransfer.ui.utils.AccountUtils` so the
- * persistence layer can be slotted in without touching the onboarding code.
- */
 @Inject
 @SingleIn(AppScope::class)
 class AccountUtils(appContext: Context) : PersistedCurrentUserAccountUtils(appContext)

@@ -24,8 +24,6 @@ object ConfigUtils {
     /**
      * Application id with the `.debug` suffix stripped out, so that login / cross-app login can resolve
      * the production package even from a debug build.
-     *
-     * Mirrors `com.infomaniak.swisstransfer.ui.utils.ConfigUtils.safePackage`.
      */
     val safePackage: String by lazy { BuildConfig.APPLICATION_ID.replace(".debug", "") }
 }
