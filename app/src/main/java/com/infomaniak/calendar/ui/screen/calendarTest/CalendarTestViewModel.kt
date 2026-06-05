@@ -32,13 +32,12 @@ import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @Inject
@@ -51,33 +50,40 @@ class CalendarTestViewModel(
 
     private val accountId = AccountId(1)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val uiState: StateFlow<CalendarTestUiState> = calendarManager.observeCalendars(accountId)
-        .flatMapLatest { calendars -> calendars.map(::observeCalendarUi).combineToList() }
-        .map<List<CalendarUi>, CalendarTestUiState>(CalendarTestUiState::Loaded)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), CalendarTestUiState.Loading)
+    val uiState: StateFlow<CalendarTestUiState>
+        field = MutableStateFlow<CalendarTestUiState>(CalendarTestUiState.Loading)
 
     init {
-        viewModelScope.launch {
-            initCalendar()
-            syncFromRemote()
+        observeCalendars()
+        initAndSync()
+    }
+
+    private fun initAndSync() = viewModelScope.launch {
+        runCatching {
+            val credentials = DavCredentials(
+                baseUrl = "https://sync.infomaniak.com",
+                username = "USERNAME",
+                password = "PASSWORD",
+            )
+            accountManager.initAccount(accountId, credentials)
+            accountManager.syncCalendars(accountId)
+        }.onFailure {
+            // Only surface the error if we have nothing to display yet.
+            if (uiState.value is CalendarTestUiState.Loading) {
+                uiState.value = CalendarTestUiState.Error(it.message ?: "Unknown error")
+            }
         }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun observeCalendars() = viewModelScope.launch {
+        calendarManager.observeCalendars(accountId)
+            .flatMapLatest { calendars -> calendars.map(::observeCalendarUi).combineToList() }
+            .collect { uiState.value = CalendarTestUiState.Loaded(it) }
     }
 
     private fun observeCalendarUi(calendar: Calendar): Flow<CalendarUi> =
         calendarManager.observeEvents(calendar.id).map { calendar.toUi(it) }
-
-    private suspend fun initCalendar() {
-        val credentials = DavCredentials(
-            baseUrl = "https://sync.infomaniak.com",
-            username = "USERNAME",
-            password = "PASSWORD",
-        )
-        accountManager.initAccount(accountId, credentials)
-    }
-
-    private fun syncFromRemote() = runCatching { accountManager.syncCalendars(accountId) }
-        .onFailure { uiState.value = CalendarTestUiState.Error(it.message ?: "Error") }
 
     private inline fun <reified T> List<Flow<T>>.combineToList(): Flow<List<T>> =
         if (isEmpty()) flowOf(emptyList()) else combine(this) { it.toList() }
