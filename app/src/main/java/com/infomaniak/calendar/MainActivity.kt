@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CalendarTheme {
                 Surface {
-                    MainNavHost(startDestination = NavDestination.Home)
+                    MainNavHost(NavDestination.CalendarTest)
                 }
             }
         }

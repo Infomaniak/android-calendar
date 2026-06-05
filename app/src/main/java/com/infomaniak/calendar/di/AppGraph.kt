@@ -26,19 +26,22 @@ import dev.zacsweers.metro.Provides
 import kotlin.reflect.KClass
 
 /**
- * Root dependency graph for the application, scoped to [AppScope].
+ * Root dependency graph for the Android application, scoped to [AppScope].
  *
- * The application [Context] is supplied at construction time via the [Factory] and is then
- * available to any injected class that declares a [Context] dependency.
+ * The application [Context] is supplied at construction time via the [Factory].
  *
- * The [viewModelProviders] multibindings map is populated by every [ViewModel] that is
- * contributed with `@ContributesIntoMap(AppScope::class) @ViewModelKey(MyViewModel::class)`.
- * It is consumed by [MetroViewModelFactory] to build ViewModels.
+ * `CalendarCoreGraph` (from multiplatform-calendar) is merged automatically via
+ * `@ContributesTo(AppScope)` and exposes `accountManager` / `calendarManager`.
+ *
+ * ViewModels are auto-discovered via multibinding: any class annotated with
+ * `@Inject @ContributesIntoMap(AppScope::class) @ViewModelKey(…)` is automatically
+ * registered in [viewModelProviders] and resolved by [MetroViewModelFactory].
  */
 @DependencyGraph(AppScope::class)
 interface AppGraph {
     val viewModelFactory: MetroViewModelFactory
-    val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>> // Won't build if no ViewModels are defined
+    val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>>
+
 
     @DependencyGraph.Factory
     fun interface Factory {

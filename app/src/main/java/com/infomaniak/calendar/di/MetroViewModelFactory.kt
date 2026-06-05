@@ -26,12 +26,15 @@ import dev.zacsweers.metro.SingleIn
 import kotlin.reflect.KClass
 
 /**
- * A [ViewModelProvider.Factory] that builds [ViewModel]s using providers contributed to
- * Metro's [AppGraph.viewModelProviders] multibinding map.
+ * A [ViewModelProvider.Factory] that resolves [ViewModel]s from the Metro multibinding map.
  *
  * Wired as the activity's `defaultViewModelProviderFactory` so that the standard
- * `viewModel()` composable (and similar helpers) transparently resolves Metro-built
- * ViewModels.
+ * `viewModel()` composable transparently resolves Metro-built ViewModels.
+ *
+ * Each ViewModel must be annotated with:
+ * - `@Inject`
+ * - `@ContributesIntoMap(AppScope::class)`
+ * - `@ViewModelKey(MyViewModel::class)`
  */
 @Inject
 @SingleIn(AppScope::class)
@@ -40,7 +43,11 @@ class MetroViewModelFactory(
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         val provider = viewModelProviders[modelClass.kotlin]
-            ?: error("No Metro ViewModel binding contributed for ${modelClass.name}")
+            ?: error(
+                "No Metro ViewModel binding for ${modelClass.name}. " +
+                    "Did you add @ContributesIntoMap(AppScope::class) " +
+                    "and @ViewModelKey(${modelClass.simpleName}::class)?",
+            )
 
         @Suppress("UNCHECKED_CAST")
         return provider() as T

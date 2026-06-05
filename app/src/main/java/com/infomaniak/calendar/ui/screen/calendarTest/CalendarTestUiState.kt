@@ -15,19 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.navigation
+package com.infomaniak.calendar.ui.screen.calendarTest
 
+sealed interface CalendarTestUiState {
 
-import androidx.navigation3.runtime.NavKey
-import kotlinx.serialization.Serializable
+    data object Loading : CalendarTestUiState
 
-@Serializable
-sealed interface NavDestination : NavKey {
+    data class Success(val message: String) : CalendarTestUiState
 
-    @Serializable
-    data object Home : NavDestination
-
-    @Serializable
-    data object CalendarTest : NavDestination
-
+    data class Error(val message: String) : CalendarTestUiState
 }

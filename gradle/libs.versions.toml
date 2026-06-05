@@ -6,7 +6,8 @@ metro = "0.6.5"
 [libraries]
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-infomaniak-multiplatform-calendar-core = { module = "com.infomaniak.multiplaform-calendar:core" }
+infomaniak-multiplatform-calendar = { module = "com.infomaniak.multiplaform-calendar:multiplatform-calendar" }
+infomaniak-multiplatform-calendar-core = { module = "com.infomaniak.multiplaform-calendar:Core" }
 
 [plugins]
 metro = { id = "dev.zacsweers.metro", version.ref = "metro" }

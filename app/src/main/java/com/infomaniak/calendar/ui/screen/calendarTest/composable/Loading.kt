@@ -15,20 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.home
+package com.infomaniak.calendar.ui.screen.calendarTest.composable
 
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
-    Scaffold(topBar = { Text("HomeScreen") }, modifier = modifier.windowInsetsPadding(WindowInsets.statusBars)) { paddingValues ->
-        Text("HomeScreenContent", modifier = Modifier.padding(paddingValues))
+internal fun Loading() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator()
     }
 }
