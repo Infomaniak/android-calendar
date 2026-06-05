@@ -35,9 +35,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.R
-import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestUiState
-import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestUiState.Companion.CalendarTestUiStatePreviewProvider
 import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
+import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarTestUiStatePreviewProvider
 
 @Composable
 internal fun CalendarHeader(calendar: CalendarUi) {

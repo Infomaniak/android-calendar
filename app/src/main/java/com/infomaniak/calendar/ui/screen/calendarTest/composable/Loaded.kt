@@ -48,11 +48,6 @@ internal fun Loaded(state: CalendarTestUiState.Loaded) {
                 style = MaterialTheme.typography.headlineSmall,
             )
         }
-
-        if (state.calendars.isEmpty()) {
-            item { Text("⏳ Syncing…") }
-        }
-
         items(state.calendars, key = { it.id }) { calendar ->
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 CalendarHeader(calendar)
