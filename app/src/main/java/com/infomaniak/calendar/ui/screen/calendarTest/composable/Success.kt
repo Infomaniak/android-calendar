@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestUiState
-import com.infomaniak.calendar.ui.screen.calendarTest.ui.previewParameter.CalendarTestUiStatePreviewProvider
+import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarTestUiStatePreviewProvider
 
 @Composable
 internal fun Success(state: CalendarTestUiState.Success) {
@@ -37,7 +37,7 @@ internal fun Success(state: CalendarTestUiState.Success) {
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp)
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState()),
     ) {
         Text(
             text = "CalDAV PoC – Rust Bridge",

@@ -75,8 +75,7 @@ class CalendarTestViewModel(
             username = "USERNAME",
             password = "PASSWORD",
         )
-        runCatching { accountManager.initAccount(accountId, credentials) }
-            .onFailure { uiState.value = CalendarTestUiState.Error(it.message ?: "Error") }
+        accountManager.initAccount(accountId, credentials)
     }
 
     private fun syncFromRemote() = viewModelScope.launch {

@@ -143,7 +143,7 @@ app/
 
 - Classes / Composables / enums: PascalCase (`MainActivity`, `CalendarTheme`, `HomeViewModel`).
 - Functions / properties: camelCase (`enableEdgeToEdge`, `viewModelFactory`).
-- Packages: lowercase (`com.infomaniak.calendar.ui.theme`).
+- Packages: single word if possible  (`com.infomaniak.calendar.ui.theme`) or camelCase if not possible in one word.
 - Enum entries: PascalCase for new enums (`Home`, `Favorites`). Existing entries that are persisted (e.g., to
   `SharedPreferences`) must not be renamed.
 - Resource IDs: snake_case (`ic_home`, `ic_account_box`).
@@ -243,12 +243,14 @@ fun MyComponent(
 **ViewModel DI pattern:**
 
 Every new ViewModel needs three annotations — no changes to `AppGraph` required:
+
 ```kotlin
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey(MyViewModel::class)
 class MyViewModel(...) : ViewModel()
 ```
+
 In Composables, use the standard `viewModel<MyViewModel>()`.
 `MetroViewModelFactory` (set as `defaultViewModelProviderFactory` in `MainActivity`) resolves the VM
 from the multibinding map automatically.
