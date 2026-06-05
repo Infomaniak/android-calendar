@@ -15,21 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.di
+package com.infomaniak.calendar.ui.screen.home
 
-import androidx.lifecycle.ViewModel
-import dev.zacsweers.metro.MapKey
-import kotlin.reflect.KClass
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 
-/** A [MapKey] annotation for binding ViewModels in a multibinding map. */
-@MapKey // TODO: Add `implicitClassKey = true` arg when we use metro 0.12.0+
-@Target(
-    AnnotationTarget.FUNCTION,
-    AnnotationTarget.FIELD,
-    AnnotationTarget.PROPERTY,
-    AnnotationTarget.PROPERTY_GETTER,
-    AnnotationTarget.CLASS,
-    AnnotationTarget.TYPE,
-)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class ViewModelKey(val value: KClass<out ViewModel>) // TODO: Add `= Nothing::class` when we use metro 0.12.0+
+import androidx.compose.ui.Modifier
+
+@Composable
+fun HomeScreen(modifier: Modifier = Modifier) {
+    Scaffold(topBar = { Text("HomeScreen") }, modifier = modifier.windowInsetsPadding(WindowInsets.statusBars)) { paddingValues ->
+        Text("HomeScreenContent", modifier = Modifier.padding(paddingValues))
+    }
+}

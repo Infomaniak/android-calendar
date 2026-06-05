@@ -17,8 +17,6 @@
  */
 package com.infomaniak.calendar.ui.screen.calendarTest
 
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-
 sealed interface CalendarTestUiState {
 
     data object Loading : CalendarTestUiState
@@ -26,17 +24,4 @@ sealed interface CalendarTestUiState {
     data class Success(val message: String) : CalendarTestUiState
 
     data class Error(val message: String) : CalendarTestUiState
-
-    companion object {
-        internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<CalendarTestUiState> {
-            override val values = sequenceOf(Loading, Success, Error)
-
-            companion object {
-                val Success = Success("Hello world")
-                val Error = Error("Something went wrong")
-            }
-        }
-    }
 }
-
-

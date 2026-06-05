@@ -22,12 +22,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import kotlinx.serialization.Serializable
+import com.infomaniak.calendar.ui.navigation.NavDestination
 
-@Serializable
-data object CalendarTest : NavKey
-
-fun EntryProviderScope<NavKey>.calendarTest() = entry<CalendarTest> {
+fun EntryProviderScope<NavKey>.calendarTest() = entry<NavDestination.CalendarTest> {
     val viewModel = viewModel<CalendarTestViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     CalendarTestScreenContent(state = state)

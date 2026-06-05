@@ -21,7 +21,6 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.DependencyGraph
-import dev.zacsweers.metro.Multibinds
 import dev.zacsweers.metro.Provider
 import dev.zacsweers.metro.Provides
 import kotlin.reflect.KClass
@@ -31,12 +30,8 @@ import kotlin.reflect.KClass
  *
  * The application [Context] is supplied at construction time via the [Factory].
  *
- * Inherits shared bindings automatically via `@ContributesTo(AppScope)` modules:
- * - `CalendarCoreGraph` → exposes [accountManager][com.infomaniak.multiplatform_calendar.core.AccountManager]
- *   and [calendarManager][com.infomaniak.multiplatform_calendar.core.CalendarManager]
- * - `DatabaseModule` → DAO providers
- * - `AndroidDatabaseModule` → Android Room database
- * - `CaldavClientModule` → CalDAV client
+ * `CalendarCoreGraph` (from multiplatform-calendar) is merged automatically via
+ * `@ContributesTo(AppScope)` and exposes `accountManager` / `calendarManager`.
  *
  * ViewModels are auto-discovered via multibinding: any class annotated with
  * `@Inject @ContributesIntoMap(AppScope::class) @ViewModelKey(…)` is automatically
@@ -45,8 +40,6 @@ import kotlin.reflect.KClass
 @DependencyGraph(AppScope::class)
 interface AppGraph {
     val viewModelFactory: MetroViewModelFactory
-
-    @Multibinds
     val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>>
 
 

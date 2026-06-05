@@ -28,11 +28,9 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCreden
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Inject
 @ContributesIntoMap(AppScope::class)
@@ -53,24 +51,11 @@ class CalendarTestViewModel(
         syncFromRemote()
     }
 
-    private fun initCalendar() = viewModelScope.launch {
-        val credentials = DavCredentials(
-            baseUrl = "https://sync.infomaniak.com",
-            username = "USERNAME",
-            password = "PASSWORD",
-        )
-        withContext(Dispatchers.IO) {
-            accountManager.initAccount(accountId, credentials)
-        }
-    }
-
-    private fun observeCalendars() {
-        viewModelScope.launch {
-            calendarManager.observeCalendars(accountId).collect { calendars ->
-                Log.d("CalDAV-PoC", "DB updated: ${calendars.size} calendar(s)")
-                val message = if (calendars.isEmpty()) {
-                    "⏳ Syncing…"
-                } else {
+    private fun observeCalendars() = viewModelScope.launch {
+        calendarManager.observeCalendars(accountId).collect { calendars ->
+            Log.d("CalDAV-PoC", "DB updated: ${calendars.size} calendar(s)")
+            if (calendars.isNotEmpty()) {
+                uiState.value = CalendarTestUiState.Success(
                     buildString {
                         appendLine("✅ ${calendars.size} calendar(s) in DB:\n")
                         calendars.forEachIndexed { i, cal ->
@@ -78,16 +63,25 @@ class CalendarTestViewModel(
                             appendLine("    ${cal.id}")
                             appendLine()
                         }
-                    }
-                }
-                uiState.value = CalendarTestUiState.Success(message)
+                    },
+                )
             }
         }
     }
 
-    private fun syncFromRemote() = viewModelScope.launch {
-        withContext(Dispatchers.IO) {
-            accountManager.syncCalendars(accountId)
-        }
+    private fun initCalendar() = viewModelScope.launch {
+        val credentials = DavCredentials(
+            baseUrl = "https://sync.infomaniak.com",
+            username = "USERNAME",
+            password = "PASSWORD",
+        )
+        runCatching { accountManager.initAccount(accountId, credentials) }
+            .onFailure { uiState.value = CalendarTestUiState.Error(it.message ?: "Error") }
     }
+
+    private fun syncFromRemote() = viewModelScope.launch {
+        runCatching { accountManager.syncCalendars(accountId) }
+            .onFailure { uiState.value = CalendarTestUiState.Error(it.message ?: "Error") }
+    }
+
 }

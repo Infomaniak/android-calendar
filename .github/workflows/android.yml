@@ -31,7 +31,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # Stop any stale Gradle daemon so the build picks up the updated PATH (incl. cargo).
+      # Stop any stale Gradle daemon so the build picks up the updated PATH that just got update by the Rust toolchain setup
       - name: Stop stale Gradle daemons
         run: ./gradlew --stop
 

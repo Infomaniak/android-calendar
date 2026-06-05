@@ -15,21 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.di
+package com.infomaniak.calendar.ui.screen.calendarTest.ui.previewParameter
 
-import androidx.lifecycle.ViewModel
-import dev.zacsweers.metro.MapKey
-import kotlin.reflect.KClass
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestUiState
 
-/** A [MapKey] annotation for binding ViewModels in a multibinding map. */
-@MapKey // TODO: Add `implicitClassKey = true` arg when we use metro 0.12.0+
-@Target(
-    AnnotationTarget.FUNCTION,
-    AnnotationTarget.FIELD,
-    AnnotationTarget.PROPERTY,
-    AnnotationTarget.PROPERTY_GETTER,
-    AnnotationTarget.CLASS,
-    AnnotationTarget.TYPE,
-)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class ViewModelKey(val value: KClass<out ViewModel>) // TODO: Add `= Nothing::class` when we use metro 0.12.0+
+internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<CalendarTestUiState> {
+    override val values = sequenceOf(CalendarTestUiState.Loading, Success, Error)
+
+    companion object {
+        val Success = CalendarTestUiState.Success("Hello world")
+        val Error = CalendarTestUiState.Error("Something went wrong")
+    }
+}

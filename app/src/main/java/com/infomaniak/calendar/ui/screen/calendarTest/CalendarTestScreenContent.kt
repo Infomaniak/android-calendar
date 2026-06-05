@@ -28,7 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestUiState.Companion.CalendarTestUiStatePreviewProvider
+import com.infomaniak.calendar.ui.screen.calendarTest.ui.previewParameter.CalendarTestUiStatePreviewProvider
 import com.infomaniak.calendar.ui.screen.calendarTest.composable.Error
 import com.infomaniak.calendar.ui.screen.calendarTest.composable.Loading
 import com.infomaniak.calendar.ui.screen.calendarTest.composable.Success

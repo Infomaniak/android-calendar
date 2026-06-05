@@ -24,6 +24,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
 import androidx.lifecycle.ViewModelProvider
 import com.infomaniak.calendar.ui.navigation.MainNavHost
+import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 
 class MainActivity : ComponentActivity() {
@@ -37,7 +38,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CalendarTheme {
                 Surface {
-                    MainNavHost()
+                    MainNavHost(NavDestination.CalendarTest)
                 }
             }
         }
