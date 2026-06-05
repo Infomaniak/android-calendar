@@ -35,8 +35,8 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.screen.calendarTest.composable.Error
+import com.infomaniak.calendar.ui.screen.calendarTest.composable.Loaded
 import com.infomaniak.calendar.ui.screen.calendarTest.composable.Loading
-import com.infomaniak.calendar.ui.screen.calendarTest.composable.Success
 import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarTestUiStatePreviewProvider
 
 fun EntryProviderScope<NavKey>.calendarTest() = entry<NavDestination.CalendarTest> {
@@ -54,7 +54,7 @@ fun CalendarTestScreenContent(state: CalendarTestUiState, modifier: Modifier = M
         Box(Modifier.padding(paddingValues)) {
             when (state) {
                 CalendarTestUiState.Loading -> Loading()
-                is CalendarTestUiState.Success -> Success(state)
+                is CalendarTestUiState.Loaded -> Loaded(state)
                 is CalendarTestUiState.Error -> Error(state)
             }
         }
