@@ -55,10 +55,7 @@ internal fun Loaded(state: CalendarTestUiState.Loaded) {
 
         items(state.calendars, key = { it.id }) { calendar ->
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text = calendar.header,
-                    style = MaterialTheme.typography.titleMedium,
-                )
+                CalendarHeader(calendar)
                 if (calendar.events.isEmpty()) {
                     Text(
                         text = "No event",
