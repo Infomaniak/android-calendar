@@ -79,8 +79,10 @@ git submodule update --remote multiplatform-calendar
   `CalendarCoreGraph` (in Core `commonMain`) defines the shared accessors (`accountManager`, `calendarManager`)
   and is automatically merged into `AppGraph` (Android). On Apple, `CalendarSDK` lives in Core `appleMain` and explicitly
   inherits `:kmpdav`'s `CaldavClientModule` while also receiving Core's contributed bindings.
-- **Apple artifact**: The public `KmpCalendar.xcframework` is produced by the Core module (`:Core`) and exports the
-  internal `:kmpdav` bridge module. `CalendarSDKProvider.shared.sdk` is the Apple entry point exposed by Core.
+- **Apple artifact**: The public `KmpCalendar.xcframework` is produced by the Core module (`:Core`). `:kmpdav` is a
+  plain `implementation` dependency and is **not** exported: the public Apple API exposes only Core-owned types (e.g.
+  credentials are passed as Core's `DavCredentials`, mapped to `:kmpdav`'s `DavAccount` at the repository boundary).
+  `CalendarSDKProvider.shared.sdk` is the Apple entry point exposed by Core.
 - **Rust/UniFFI**: The Rust crate lives in `multiplatform-calendar/kmpdav/rust/caldav_bridge`; `:kmpdav/build.gradle.kts`
   wires Gobley (`dev.gobley.cargo` / `dev.gobley.uniffi`) to compile it and generate `uniffi.caldav_bridge.*` bindings.
 - **Plugin aliases**: Module `build.gradle.kts` files register the Android and Kotlin Multiplatform plugins from both

@@ -23,8 +23,8 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.multiplatform_calendar.core.AccountManager
 import com.infomaniak.multiplatform_calendar.core.CalendarManager
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.AccountId
-import com.infomaniak.multiplatform_calendar.data.remote.caldav.model.DavAccount
+import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
+import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCredentials
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
@@ -54,7 +54,7 @@ class CalendarTestViewModel(
     }
 
     private fun initCalendar() = viewModelScope.launch {
-        val credentials = DavAccount(
+        val credentials = DavCredentials(
             baseUrl = "https://sync.infomaniak.com",
             username = "USERNAME",
             password = "PASSWORD",
