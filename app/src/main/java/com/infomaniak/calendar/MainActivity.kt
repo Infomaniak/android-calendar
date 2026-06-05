@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar
 
-import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -53,28 +52,27 @@ class MainActivity : ComponentActivity() {
         if (SDK_INT >= 29) window.isNavigationBarContrastEnforced = false
 
         setContent {
-            when (val userLoadState = appGraph.accountUtils.rememberUserLoadState().value) {
-                UserLoadState.Loading -> {
-                    CalendarTheme {
-                        Surface { /* Blank surface while waiting for first result */ }
-                    }
-                }
-                is UserLoadState.Loaded -> {
-                    val startDestination = if (userLoadState.user == null) NavDestination.Onboarding() else NavDestination.Home
-                    val backStack = rememberNavBackStack(startDestination)
-
-                    CompositionLocalProvider(LocalUser provides userLoadState.user) {
-                        NavigateToOnboardingIfLastUserIsDisconnected(backStack, userLoadState.user)
-
-                        CalendarTheme {
-                            Surface {
-                                MainNavHost(backStack = backStack)
-                            }
-                        }
+            CalendarTheme {
+                Surface {
+                    when (val userLoadState = appGraph.accountUtils.rememberUserLoadState().value) {
+                        UserLoadState.Loading -> Unit // Blank surface while waiting for first result
+                        is UserLoadState.Loaded -> Content(userLoadState)
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun Content(userLoadState: UserLoadState.Loaded) {
+    val startDestination = if (userLoadState.user == null) NavDestination.Onboarding() else NavDestination.Home
+    val backStack = rememberNavBackStack(startDestination)
+
+    CompositionLocalProvider(LocalUser provides userLoadState.user) {
+        NavigateToOnboardingIfLastUserIsDisconnected(backStack, userLoadState.user)
+
+        MainNavHost(backStack = backStack)
     }
 }
 
