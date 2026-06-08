@@ -25,12 +25,12 @@ import com.infomaniak.core.auth.models.user.User
 import kotlinx.coroutines.flow.map
 
 sealed interface UserLoadState {
-    object Loading : UserLoadState
+    object Awaiting : UserLoadState
     data class Loaded(val user: User?) : UserLoadState
 }
 
 @Composable
 fun AccountUtils.rememberUserLoadState(): State<UserLoadState> {
     val userLoadStateFlow = remember { currentUserFlow.map(UserLoadState::Loaded) }
-    return userLoadStateFlow.collectAsStateWithLifecycle(initialValue = UserLoadState.Loading)
+    return userLoadStateFlow.collectAsStateWithLifecycle(initialValue = UserLoadState.Awaiting)
 }

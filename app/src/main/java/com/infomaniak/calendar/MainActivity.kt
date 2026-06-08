@@ -55,8 +55,8 @@ class MainActivity : ComponentActivity() {
             CalendarTheme {
                 Surface {
                     when (val userLoadState = appGraph.accountUtils.rememberUserLoadState().value) {
-                        UserLoadState.Loading -> Unit // Blank surface while waiting for first result
-                        is UserLoadState.Loaded -> Content(userLoadState)
+                        UserLoadState.Awaiting -> Unit // Blank surface while waiting for first result
+                        is UserLoadState.Loaded -> MainContent(userLoadState)
                     }
                 }
             }
@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun Content(userLoadState: UserLoadState.Loaded) {
+private fun MainContent(userLoadState: UserLoadState.Loaded) {
     val startDestination = if (userLoadState.user == null) NavDestination.Onboarding() else NavDestination.Home
     val backStack = rememberNavBackStack(startDestination)
 
