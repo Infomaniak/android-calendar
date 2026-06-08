@@ -47,6 +47,7 @@ dependencyResolutionManagement {
             content {
                 includeModule("com.github.lottiefiles", "dotlottie-android")
                 includeModule("com.github.matomo-org", "matomo-sdk-android")
+                includeModule("com.github.AppDevNext.Logcat", "LogcatCoreLib")
             }
         }
     }
