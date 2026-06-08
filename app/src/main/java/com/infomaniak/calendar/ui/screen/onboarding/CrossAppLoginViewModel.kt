@@ -31,7 +31,10 @@ import dev.zacsweers.metro.binding
  * already present in other Infomaniak apps on the device.
  */
 @Inject
-@ContributesIntoMap(AppScope::class, binding = binding<ViewModel>()) // TODO: Do we need this binding?
+@ContributesIntoMap(
+    AppScope::class,
+    binding = binding<ViewModel>(), // binding is required when extending any parent class different from exactly "ViewModel"
+)
 @ViewModelKey(CrossAppLoginViewModel::class)
 class CrossAppLoginViewModel : BaseCrossAppLoginViewModel(
     applicationId = "com.infomaniak.sync",// TODO[login]: ConfigUtils.safePackage,
