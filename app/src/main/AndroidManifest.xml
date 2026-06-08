@@ -15,6 +15,14 @@
         android:theme="@style/Theme.Calendar">
 
         <meta-data
+            android:name="io.sentry.anr.enable"
+            android:value="true" />
+
+        <meta-data
+            android:name="io.sentry.auto-init"
+            android:value="false" />
+
+        <meta-data
             android:name="io.sentry.dsn"
             android:value="https://afcc80384a2911f1a5c6de3982f677f1@sentry-mobile.infomaniak.com/25" />
 
