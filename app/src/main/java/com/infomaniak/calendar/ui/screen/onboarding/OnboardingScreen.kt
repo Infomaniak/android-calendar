@@ -96,7 +96,7 @@ fun OnboardingScreen(
         context = context,
         accountUtils = accountUtils,
         snackbarHostState = snackbarHostState,
-        onlyLogin = onlyLogin,
+        onlyLoginScreen = onlyLogin,
         setButtonsLoading = { areButtonsLoading = it },
         onNavigateToHome = onNavigateToHome,
         onPopBack = onPopBack,
@@ -266,7 +266,7 @@ private fun rememberOnboardingLoginFlowController(
             is UserLoginResult.Success -> scope.launch {
                 loginUsersIntoTheApp(
                     users = listOf(userLoginResult.user),
-                    requiredLogin = dependencies.onlyLogin,
+                    onlyLoginScreen = dependencies.onlyLoginScreen,
                     accountUtils = dependencies.accountUtils,
                     onNavigateToHome = dependencies.onNavigateToHome,
                     onPopBack = dependencies.onPopBack,
@@ -315,7 +315,7 @@ private suspend fun loginUsers(loginResult: CrossAppLoginFacade.LoginResult, dep
     } else {
         loginUsersIntoTheApp(
             users = users,
-            requiredLogin = dependencies.onlyLogin,
+            onlyLoginScreen = dependencies.onlyLoginScreen,
             accountUtils = dependencies.accountUtils,
             onNavigateToHome = dependencies.onNavigateToHome,
             onPopBack = dependencies.onPopBack,
@@ -325,20 +325,20 @@ private suspend fun loginUsers(loginResult: CrossAppLoginFacade.LoginResult, dep
 
 private suspend fun loginUsersIntoTheApp(
     users: List<User>,
-    requiredLogin: Boolean,
+    onlyLoginScreen: Boolean,
     accountUtils: AccountUtils,
     onNavigateToHome: () -> Unit,
     onPopBack: () -> Unit,
 ) {
     users.forEach { user -> accountUtils.addUser(user) }
-    if (requiredLogin) onPopBack() else onNavigateToHome()
+    if (onlyLoginScreen) onPopBack() else onNavigateToHome()
 }
 
 private data class OnboardingLoginDependencies(
     val context: Context,
     val accountUtils: AccountUtils,
     val snackbarHostState: SnackbarHostState,
-    val onlyLogin: Boolean,
+    val onlyLoginScreen: Boolean,
     val setButtonsLoading: (Boolean) -> Unit,
     val onNavigateToHome: () -> Unit,
     val onPopBack: () -> Unit,
