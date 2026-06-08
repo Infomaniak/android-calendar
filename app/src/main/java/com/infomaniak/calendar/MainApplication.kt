@@ -50,9 +50,9 @@ class MainApplication : Application() {
      * - The exception was a NetworkException or a CancellationException, and we don't want to send them to Sentry
      */
     private fun configureSentry() {
-        this.configureSentry(
+        configureSentry(
             isDebug = BuildConfig.DEBUG,
-            isSentryTrackingEnabled = true,
+            isSentryTrackingEnabled = { true }, // TODO[matomo]: Enable or disable based on user settings
         )
     }
 
