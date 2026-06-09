@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestUiState
 import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarTestUiStatePreviewProvider
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
 internal fun Loaded(state: CalendarTestUiState.Loaded) {
@@ -75,6 +76,6 @@ internal fun Loaded(state: CalendarTestUiState.Loaded) {
 
 @Composable
 @Preview
-private fun LoadedPreview() {
+private fun LoadedPreview() = CalendarThemeForPreview {
     Loaded(state = CalendarTestUiStatePreviewProvider.Loaded)
 }

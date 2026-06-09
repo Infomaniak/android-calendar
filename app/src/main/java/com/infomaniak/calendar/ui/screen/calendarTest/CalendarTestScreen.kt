@@ -38,6 +38,7 @@ import com.infomaniak.calendar.ui.screen.calendarTest.composable.Error
 import com.infomaniak.calendar.ui.screen.calendarTest.composable.Loaded
 import com.infomaniak.calendar.ui.screen.calendarTest.composable.Loading
 import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarTestUiStatePreviewProvider
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 fun EntryProviderScope<NavKey>.calendarTest() = entry<NavDestination.CalendarTest> {
     val viewModel = viewModel<CalendarTestViewModel>()
@@ -65,6 +66,6 @@ fun CalendarTestScreenContent(state: CalendarTestUiState, modifier: Modifier = M
 @Preview
 private fun CalendarTestScreenContentPreview(
     @PreviewParameter(CalendarTestUiStatePreviewProvider::class) state: CalendarTestUiState,
-) {
+) = CalendarThemeForPreview{
     CalendarTestScreenContent(state = state)
 }

@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
 internal fun Detail(label: String, value: String) {
@@ -35,6 +36,6 @@ internal fun Detail(label: String, value: String) {
 
 @Composable
 @Preview
-internal fun DetailPreview() {
+internal fun DetailPreview() = CalendarThemeForPreview {
     Detail(label = "Location", value = "Meeting room A")
 }

@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarTestUiStatePreviewProvider
 import com.infomaniak.calendar.ui.screen.calendarTest.model.EventUi
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
 internal fun EventCard(event: EventUi) {
@@ -78,6 +79,6 @@ internal fun EventCard(event: EventUi) {
 
 @Composable
 @Preview
-internal fun EventCardPreview() {
+internal fun EventCardPreview() = CalendarThemeForPreview {
     EventCard(CalendarTestUiStatePreviewProvider.EventUi)
 }
