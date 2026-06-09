@@ -60,10 +60,10 @@ class CalendarTestViewModel(
 
     private fun initAndSync() = viewModelScope.launch {
         runCatching {
+            val password = accountManager.retrieveCaldavPassword("AUTHTOKEN")
             val credentials = DavCredentials(
-                baseUrl = "https://sync.infomaniak.com",
                 username = "USERNAME",
-                password = "PASSWORD",
+                password = password,
             )
             accountManager.initAccount(accountId, credentials)
             accountManager.syncCalendars(accountId)
