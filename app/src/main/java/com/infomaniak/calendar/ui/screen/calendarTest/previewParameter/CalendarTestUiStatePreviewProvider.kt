@@ -39,10 +39,10 @@ internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<Cal
         val CalendarUi = CalendarUi(
             id = "calendar-preview",
             header = "Work · 1 event(s)",
-            events = List(3) { EventUi },
+            events = List(3) { EventUi.copy(id="$it") },
         )
 
-        val Loaded = CalendarTestUiState.Loaded(List(3) { CalendarUi })
+        val Loaded = CalendarTestUiState.Loaded(List(3) { CalendarUi.copy(id="$it") })
         val Error = CalendarTestUiState.Error("Something went wrong")
     }
 }
