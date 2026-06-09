@@ -62,7 +62,7 @@ class CalendarTestViewModel(
     private fun initAndSync() = viewModelScope.launch {
         val credentials = DavCredentials(
             username = "USERNAME",
-            password = "PASSWORD",
+            password = password,
         )
         runCatching {
             accountManager.initAccount(accountId, credentials)
