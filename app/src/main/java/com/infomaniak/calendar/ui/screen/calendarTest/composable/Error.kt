@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestUiState
 import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarTestUiStatePreviewProvider
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
 internal fun Error(state: CalendarTestUiState.Error) {
@@ -50,6 +51,6 @@ internal fun Error(state: CalendarTestUiState.Error) {
 
 @Composable
 @Preview
-private fun ErrorPreview() {
+private fun ErrorPreview() = CalendarThemeForPreview {
     Error(CalendarTestUiStatePreviewProvider.Error)
 }
