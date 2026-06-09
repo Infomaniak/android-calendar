@@ -15,24 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar
+package com.infomaniak.calendar.ui
 
-import android.app.Application
-import com.infomaniak.calendar.di.AppGraph
-import com.infomaniak.calendar.utils.ConfigUtils
-import com.infomaniak.core.network.NetworkConfiguration
-import dev.zacsweers.metro.createGraphFactory
+import androidx.compose.runtime.compositionLocalOf
+import com.infomaniak.core.auth.models.user.User
 
-class MainApplication : Application() {
-    val appGraph by lazy { createGraphFactory<AppGraph.Factory>().create(applicationContext) }
-
-    override fun onCreate() {
-        super.onCreate()
-
-        NetworkConfiguration.init(
-            appId = ConfigUtils.safePackage,
-            appVersionCode = BuildConfig.VERSION_CODE,
-            appVersionName = BuildConfig.VERSION_NAME,
-        )
-    }
-}
+val LocalUser = compositionLocalOf<User?> { null }

@@ -17,18 +17,51 @@
  */
 package com.infomaniak.calendar.ui.screen.home
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.di.ComposeAppGraph
+import com.infomaniak.calendar.ui.LocalUser
+import com.infomaniak.calendar.utils.AccountUtils
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(modifier: Modifier = Modifier, accountUtils: AccountUtils = ComposeAppGraph.accountUtils) {
+    val scope = rememberCoroutineScope()
+
+    HomeScreen(
+        modifier = modifier,
+        onDisconnect = {
+            scope.launch {
+                accountUtils.removeUser(accountUtils.currentUserIdFlow.first() ?: return@launch)
+            }
+        },
+    )
+}
+
+@Composable
+private fun HomeScreen(onDisconnect: () -> Unit, modifier: Modifier = Modifier) {
     Scaffold(topBar = { Text("HomeScreen") }, modifier = modifier.windowInsetsPadding(WindowInsets.statusBars)) { paddingValues ->
-        Text("HomeScreenContent", modifier = Modifier.padding(paddingValues))
+        Column {
+            Text("HomeScreenContent", modifier = Modifier.padding(paddingValues))
+            Text("User: ${LocalUser.current?.displayName}", modifier = Modifier.padding(paddingValues))
+            Button(onClick = onDisconnect) { Text("Disconnect") }
+        }
     }
+}
+
+@Preview
+@Composable
+private fun HomeScreenPreview() {
+    HomeScreen(onDisconnect = {})
 }

@@ -18,12 +18,25 @@
 package com.infomaniak.calendar.di
 
 import android.content.Context
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
+import com.infomaniak.calendar.BuildConfig
+import com.infomaniak.calendar.MainApplication
+import com.infomaniak.calendar.utils.AccountUtils
+import com.infomaniak.core.network.LOGIN_ENDPOINT_URL
+import com.infomaniak.lib.login.InfomaniakLogin
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provider
 import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlin.reflect.KClass
+
+val ComposeAppGraph: AppGraph
+    @Composable get() {
+        return (LocalContext.current.applicationContext as MainApplication).appGraph
+    }
 
 /**
  * Root dependency graph for the Android application, scoped to [AppScope].
@@ -42,6 +55,21 @@ interface AppGraph {
     val viewModelFactory: MetroViewModelFactory
     val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>>
 
+
+    val infomaniakLogin: InfomaniakLogin
+
+    val accountUtils: AccountUtils
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun providesInfomaniakLogin(applicationContext: Context): InfomaniakLogin = InfomaniakLogin(
+        context = applicationContext,
+        loginUrl = "$LOGIN_ENDPOINT_URL/",
+        appUID = "com.infomaniak.sync",// TODO[login]: ConfigUtils.safePackage,
+        clientID = BuildConfig.CLIENT_ID,
+        accessType = null,
+        sentryCallback = null,
+    )
 
     @DependencyGraph.Factory
     fun interface Factory {

@@ -24,6 +24,9 @@ import kotlinx.serialization.Serializable
 sealed interface NavDestination : NavKey {
 
     @Serializable
+    data class Onboarding(val onlyLogin: Boolean = false) : NavDestination
+
+    @Serializable
     data object Home : NavDestination
 
     @Serializable

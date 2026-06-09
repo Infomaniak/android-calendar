@@ -36,10 +36,19 @@ plugins {
 }
 
 dependencyResolutionManagement {
+    @Suppress("UnstableApiUsage")
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    @Suppress("UnstableApiUsage")
     repositories {
         google()
         mavenCentral()
+        maven {
+            url = uri("https://jitpack.io")
+            content {
+                includeModule("com.github.lottiefiles", "dotlottie-android")
+                includeModule("com.github.matomo-org", "matomo-sdk-android")
+            }
+        }
     }
 
     versionCatalogs {

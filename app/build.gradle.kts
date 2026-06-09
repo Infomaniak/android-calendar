@@ -33,10 +33,25 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+
+        // TODO[login]: Replace this placeholder with the real Calendar OAuth client id once available.
+        buildConfigField("String", "CLIENT_ID", "\"CE011334-F75A-4263-9F9F-45FC5A142F59\"")
     }
 
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("standard") {
+            dimension = "distribution"
+            isDefault = true
+        }
+        create("fdroid") {
+            dimension = "distribution"
+        }
     }
 
     buildTypes {
@@ -61,6 +76,13 @@ dependencies {
     implementation(libs.infomaniak.multiplatform.calendar)
     implementation(libs.infomaniak.multiplatform.calendar.core)
 
+    implementation(core.infomaniak.core.auth)
+    implementation(core.infomaniak.core.common)
+    implementation(core.infomaniak.core.crossapplogin.front)
+    implementation(core.infomaniak.core.network)
+    implementation(core.infomaniak.core.onboarding)
+    implementation(core.infomaniak.core.ui.compose.margin)
+
     implementation(kmpCalendar.androidx.room.runtime)
 
     implementation(platform(core.compose.bom))
@@ -73,6 +95,7 @@ dependencies {
     implementation(core.compose.ui.graphics)
     implementation(core.compose.ui.tooling.preview)
     implementation(core.material)
+
     testImplementation(core.junit)
     androidTestImplementation(platform(core.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

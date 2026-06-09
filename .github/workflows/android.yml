@@ -42,5 +42,8 @@ jobs:
         run: ./gradlew build
 
       # Run tests
-      - name: Run Unit tests
-        run: ./gradlew testDebugUnitTest --stacktrace
+      - name: Run standard unit tests
+        run: ./gradlew testStandardDebugUnitTest --stacktrace
+
+      - name: Run fdroid unit tests
+        run: ./gradlew testFdroidDebugUnitTest --stacktrace

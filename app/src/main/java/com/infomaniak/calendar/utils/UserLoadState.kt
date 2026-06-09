@@ -15,24 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar
+package com.infomaniak.calendar.utils
 
-import android.app.Application
-import com.infomaniak.calendar.di.AppGraph
-import com.infomaniak.calendar.utils.ConfigUtils
-import com.infomaniak.core.network.NetworkConfiguration
-import dev.zacsweers.metro.createGraphFactory
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.remember
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.infomaniak.core.auth.models.user.User
+import kotlinx.coroutines.flow.map
 
-class MainApplication : Application() {
-    val appGraph by lazy { createGraphFactory<AppGraph.Factory>().create(applicationContext) }
+sealed interface UserLoadState {
+    object Awaiting : UserLoadState
+    data class Loaded(val user: User?) : UserLoadState
+}
 
-    override fun onCreate() {
-        super.onCreate()
-
-        NetworkConfiguration.init(
-            appId = ConfigUtils.safePackage,
-            appVersionCode = BuildConfig.VERSION_CODE,
-            appVersionName = BuildConfig.VERSION_NAME,
-        )
-    }
+@Composable
+fun AccountUtils.rememberUserLoadState(): State<UserLoadState> {
+    val userLoadStateFlow = remember { currentUserFlow.map(UserLoadState::Loaded) }
+    return userLoadStateFlow.collectAsStateWithLifecycle(initialValue = UserLoadState.Awaiting)
 }
