@@ -71,7 +71,6 @@ class CalendarTestViewModel(
 
     private fun initCalendar() = viewModelScope.launch {
         val credentials = DavCredentials(
-            baseUrl = "https://sync.infomaniak.com",
             username = "USERNAME",
             password = "PASSWORD",
         )
