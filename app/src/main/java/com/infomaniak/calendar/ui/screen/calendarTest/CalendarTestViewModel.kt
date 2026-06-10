@@ -58,7 +58,6 @@ class CalendarTestViewModel(
         field = MutableStateFlow<CalendarTestUiState>(CalendarTestUiState.Loading)
 
     val userFlow = accountUtils.currentUserFlow.filterNotNull()
-    val accountIdFlow = userFlow.mapLatest { AccountId(it.id.toLong()) }
 
     fun processAction(action: CalendarTestAction) = when (action) {
         is CalendarTestAction.OnClickDisconnect -> onClickDisconnect()
@@ -72,7 +71,8 @@ class CalendarTestViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun initAndSync() = viewModelScope.launch {
         userFlow.mapLatest { user ->
-            AccountId(user.id.toLong()) to accountManager.retrieveDavCredential(user.apiToken.accessToken)
+            AccountId(user.id.toLong()) to
+                    accountManager.retrieveDavCredential(user.apiToken.accessToken, user.login)
         }.collect { (accountId, credentials) ->
             runCatching {
                 accountManager.initAccount(accountId, credentials)
@@ -86,7 +86,7 @@ class CalendarTestViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeCalendars() = viewModelScope.launch {
-        accountIdFlow.flatMapLatest(calendarManager::observeCalendars)
+        calendarManager.observeCalendars()
             .flatMapLatest { calendars -> calendars.map(::observeCalendarUi).combineToList() }
             .collect { uiState.value = CalendarTestUiState.Loaded(it) }
     }
