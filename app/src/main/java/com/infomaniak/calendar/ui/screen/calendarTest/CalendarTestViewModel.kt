@@ -52,7 +52,7 @@ class CalendarTestViewModel(
     }
 
     private fun observeCalendars() = viewModelScope.launch {
-        calendarManager.observeCalendars(accountId).collect { calendars ->
+        calendarManager.observeCalendars().collect { calendars ->
             Log.d("CalDAV-PoC", "DB updated: ${calendars.size} calendar(s)")
             if (calendars.isNotEmpty()) {
                 uiState.value = CalendarTestUiState.Success(
