@@ -21,10 +21,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
-import com.infomaniak.multiplatform_calendar.core.AccountManager
-import com.infomaniak.multiplatform_calendar.core.CalendarManager
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCredentials
+import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
+import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
@@ -52,7 +52,7 @@ class CalendarTestViewModel(
     }
 
     private fun observeCalendars() = viewModelScope.launch {
-        calendarManager.observeCalendars(accountId).collect { calendars ->
+        calendarManager.observeCalendars().collect { calendars ->
             Log.d("CalDAV-PoC", "DB updated: ${calendars.size} calendar(s)")
             if (calendars.isNotEmpty()) {
                 uiState.value = CalendarTestUiState.Success(
@@ -71,7 +71,6 @@ class CalendarTestViewModel(
 
     private fun initCalendar() = viewModelScope.launch {
         val credentials = DavCredentials(
-            baseUrl = "https://sync.infomaniak.com",
             username = "USERNAME",
             password = "PASSWORD",
         )
@@ -79,7 +78,7 @@ class CalendarTestViewModel(
     }
 
     private fun syncFromRemote() = viewModelScope.launch {
-        runCatching { accountManager.syncCalendars(accountId) }
+        runCatching { calendarManager.syncCalendars(accountId) }
             .onFailure { uiState.value = CalendarTestUiState.Error(it.message ?: "Error") }
     }
 

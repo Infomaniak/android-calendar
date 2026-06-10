@@ -61,12 +61,12 @@ import com.infomaniak.core.crossapplogin.back.CrossAppLoginFacade.AccountsChecki
 import com.infomaniak.core.crossapplogin.back.ExternalAccount
 import com.infomaniak.core.crossapplogin.front.components.CrossLoginBottomContent
 import com.infomaniak.core.crossapplogin.front.components.NoCrossAppLoginAccountsContent
+import com.infomaniak.core.login.InfomaniakLogin
 import com.infomaniak.core.network.ApiEnvironment
 import com.infomaniak.core.onboarding.OnboardingPage
 import com.infomaniak.core.onboarding.OnboardingScaffold
 import com.infomaniak.core.onboarding.components.OnboardingComponents
 import com.infomaniak.core.onboarding.components.OnboardingComponents.DefaultTitleAndDescription
-import com.infomaniak.lib.login.InfomaniakLogin
 import kotlinx.coroutines.launch
 
 private val host = ApiEnvironment.current.host
