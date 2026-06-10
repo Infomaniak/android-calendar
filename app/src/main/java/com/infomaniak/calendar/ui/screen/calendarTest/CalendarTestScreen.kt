@@ -18,14 +18,18 @@
 package com.infomaniak.calendar.ui.screen.calendarTest
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -43,13 +47,25 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 fun EntryProviderScope<NavKey>.calendarTest() = entry<NavDestination.CalendarTest> {
     val viewModel = viewModel<CalendarTestViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    CalendarTestScreenContent(state = state)
+    CalendarTestScreenContent(state = state, processAction = viewModel::processAction)
 }
 
 @Composable
-fun CalendarTestScreenContent(state: CalendarTestUiState, modifier: Modifier = Modifier) {
+fun CalendarTestScreenContent(
+    state: CalendarTestUiState,
+    modifier: Modifier = Modifier,
+    processAction: (CalendarTestAction) -> Unit = {},
+) {
     Scaffold(
-        topBar = { Text("CalendarTestScreen") },
+        topBar = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("CalendarTestScreen")
+                Spacer(Modifier.weight(1f))
+                Button(onClick = { processAction(CalendarTestAction.OnClickDisconnect) }) {
+                    Text("Disconnect")
+                }
+            }
+        },
         modifier = modifier.windowInsetsPadding(WindowInsets.statusBars),
     ) { paddingValues ->
         Box(Modifier.padding(paddingValues)) {
@@ -66,6 +82,6 @@ fun CalendarTestScreenContent(state: CalendarTestUiState, modifier: Modifier = M
 @Preview
 private fun CalendarTestScreenContentPreview(
     @PreviewParameter(CalendarTestUiStatePreviewProvider::class) state: CalendarTestUiState,
-) = CalendarThemeForPreview{
+) = CalendarThemeForPreview {
     CalendarTestScreenContent(state = state)
 }
