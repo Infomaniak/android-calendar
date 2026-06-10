@@ -3,6 +3,9 @@ name: Android CI
 on:
   pull_request:
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -47,3 +50,6 @@ jobs:
 
       - name: Run fdroid unit tests
         run: ./gradlew testFdroidDebugUnitTest --stacktrace
+
+  lint:
+    uses: infomaniak/.github/.github/workflows/android-lint.yml@v2
