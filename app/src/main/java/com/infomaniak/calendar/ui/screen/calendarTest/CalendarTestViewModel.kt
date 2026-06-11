@@ -69,15 +69,13 @@ class CalendarTestViewModel(
             calendarManager.syncCalendars(accountId)
         }.cancellable()
             .onFailure {
-               uiState.value = CalendarTestUiState.Error(it.message ?: "Unknown error")
+                uiState.value = CalendarTestUiState.Error(it.message ?: "Unknown error")
             }
-    }
-
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeCalendars() = viewModelScope.launch {
-        calendarManager.observeCalendars(accountId)
+        calendarManager.observeCalendars()
             .flatMapLatest { calendars -> calendars.map(::observeCalendarUi).combineToList() }
             .collect { uiState.value = CalendarTestUiState.Loaded(it) }
     }
