@@ -18,6 +18,7 @@
 package com.infomaniak.calendar
 
 import android.app.Application
+import android.os.StrictMode
 import com.infomaniak.calendar.di.AppGraph
 import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.core.network.NetworkConfiguration
@@ -29,10 +30,30 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        setupStrictModePolicies()
+
         NetworkConfiguration.init(
             appId = ConfigUtils.safePackage,
             appVersionCode = BuildConfig.VERSION_CODE,
             appVersionName = BuildConfig.VERSION_NAME,
         )
+    }
+
+    private fun setupStrictModePolicies() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(
+                StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .penaltyFlashScreen()
+                    .build(),
+            )
+            StrictMode.setVmPolicy(
+                StrictMode.VmPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build(),
+            )
+        }
     }
 }
