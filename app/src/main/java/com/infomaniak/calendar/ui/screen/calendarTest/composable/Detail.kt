@@ -36,6 +36,6 @@ internal fun Detail(label: String, value: String) {
 
 @Composable
 @Preview
-internal fun DetailPreview() = CalendarThemeForPreview {
+private fun DetailPreview() = CalendarThemeForPreview {
     Detail(label = "Location", value = "Meeting room A")
 }

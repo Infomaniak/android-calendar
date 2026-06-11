@@ -20,6 +20,10 @@ package com.infomaniak.calendar.ui.screen.calendarTest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
+import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
+import com.infomaniak.calendar.ui.screen.calendarTest.utils.toUi
+import com.infomaniak.multiplatform_calendar.core.AccountManager
+import com.infomaniak.multiplatform_calendar.core.CalendarManager
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCredentials
 import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
@@ -59,12 +63,12 @@ class CalendarTestViewModel(
     }
 
     private fun initAndSync() = viewModelScope.launch {
+        val credentials = DavCredentials(
+            baseUrl = "https://sync.infomaniak.com",
+            username = "USERNAME",
+            password = "PASSWORD",
+        )
         runCatching {
-            val credentials = DavCredentials(
-                baseUrl = "https://sync.infomaniak.com",
-                username = "USERNAME",
-                password = "PASSWORD",
-            )
             accountManager.initAccount(accountId, credentials)
             accountManager.syncCalendars(accountId)
         }.onFailure {
