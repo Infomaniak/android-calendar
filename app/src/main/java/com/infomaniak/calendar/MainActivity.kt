@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun MainContent(userLoadState: UserLoadState.Loaded) {
-    val startDestination = if (userLoadState.user == null) NavDestination.Onboarding() else NavDestination.Home
+    val startDestination = if (userLoadState.user == null) NavDestination.Onboarding() else NavDestination.CalendarTest
     val backStack = rememberNavBackStack(startDestination)
 
     CompositionLocalProvider(LocalUser provides userLoadState.user) {

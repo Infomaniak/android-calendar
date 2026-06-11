@@ -40,7 +40,7 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
             onlyLogin = destination.onlyLogin,
             onNavigateToHome = {
                 backStack.clear()
-                backStack.add(NavDestination.Home)
+                backStack.add(NavDestination.CalendarTest)
             },
             onPopBack = { backStack.removeLastOrNull() },
         )

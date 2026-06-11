@@ -22,9 +22,9 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
 import com.infomaniak.calendar.ui.screen.calendarTest.utils.toUi
+import com.infomaniak.calendar.utils.AccountUtils
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
-import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCredentials
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
@@ -36,41 +36,52 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey(CalendarTestViewModel::class)
 class CalendarTestViewModel(
     private val accountManager: AccountManager,
+    private val accountUtils: AccountUtils,
     private val calendarManager: CalendarManager,
 ) : ViewModel() {
-
-    private val accountId = AccountId(1)
 
     val uiState: StateFlow<CalendarTestUiState>
         field = MutableStateFlow<CalendarTestUiState>(CalendarTestUiState.Loading)
 
-    init {
-        observeCalendars()
-        initAndSync()
+    val userFlow = accountUtils.currentUserFlow.filterNotNull()
+
+    fun processAction(action: CalendarTestAction) = when (action) {
+        is CalendarTestAction.OnClickDisconnect -> onClickDisconnect()
     }
 
+    init {
+        initAndSync()
+        observeCalendars()
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun initAndSync() = viewModelScope.launch {
-        val credentials = DavCredentials(
-            username = "USERNAME",
-            password = "PASSWORD",
-        )
-        runCatching {
-            accountManager.initAccount(accountId, credentials)
-            calendarManager.syncCalendars(accountId)
-        }.cancellable()
-            .onFailure {
-                uiState.value = CalendarTestUiState.Error(it.message ?: "Unknown error")
-            }
+        userFlow.mapLatest { user ->
+            AccountId(user.id.toLong()) to
+                    accountManager.retrieveDavCredential(user.apiToken.accessToken, user.login)
+        }.collect { (accountId, credentials) ->
+            runCatching {
+                accountManager.initAccount(accountId, credentials)
+                calendarManager.syncCalendars(accountId)
+            }.cancellable()
+                .onFailure {
+                    uiState.value = CalendarTestUiState.Error(it.message ?: "Unknown error")
+                }
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -85,4 +96,12 @@ class CalendarTestViewModel(
 
     private inline fun <reified T> List<Flow<T>>.combineToList(): Flow<List<T>> =
         if (isEmpty()) flowOf(emptyList()) else combine(this) { it.toList() }
+
+    private fun onClickDisconnect() {
+        viewModelScope.launch {
+            val userId = userFlow.map { it.id }.first()
+            accountUtils.removeUser(userId)
+            accountManager.removeAccount(AccountId(userId.toLong()))
+        }
+    }
 }
