@@ -20,10 +20,10 @@ package com.infomaniak.calendar.ui.screen.calendarTest.composable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,12 +31,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
 import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarTestUiStatePreviewProvider
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
 internal fun CalendarHeader(calendar: CalendarUi) {
@@ -55,18 +54,15 @@ internal fun CalendarHeader(calendar: CalendarUi) {
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.weight(1f),
         )
-        Icon(
-            painter = painterResource(
-                if (calendar.isReadOnly) R.drawable.ic_lock else R.drawable.ic_lock_open,
-            ),
-            contentDescription = if (calendar.isReadOnly) "Read-only calendar" else "Writable calendar",
-            modifier = Modifier.size(18.dp),
-        )
+        Text(text = if (calendar.isReadOnly) "\uD83D\uDD13" else "\uD83D\uDD12")
     }
 }
 
 @Composable
 @Preview
-private fun CalendarHeaderPreview() {
-    CalendarHeader(CalendarTestUiStatePreviewProvider.CalendarUi)
+private fun CalendarHeaderPreview() = CalendarThemeForPreview {
+    Column {
+        CalendarHeader(CalendarTestUiStatePreviewProvider.CalendarUi)
+        CalendarHeader(CalendarTestUiStatePreviewProvider.CalendarUi.copy(color = 0xFF4CAF50.toInt(), isReadOnly = true))
+    }
 }

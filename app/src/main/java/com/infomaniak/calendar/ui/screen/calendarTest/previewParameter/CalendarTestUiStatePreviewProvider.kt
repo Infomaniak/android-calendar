@@ -42,7 +42,7 @@ internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<Cal
             header = "Work · 1 event(s)",
             color = 0xFF2196F3.toInt(),
             isReadOnly = false,
-            events = List(3) { EventUi.copy(id="$it") },
+            events = List(3) { EventUi.copy(id = "$it") },
         )
 
         val Loaded = CalendarTestUiState.Loaded(
