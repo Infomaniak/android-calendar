@@ -17,19 +17,28 @@
  */
 package com.infomaniak.calendar.ui.screen.calendarTest
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
+import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
+import com.infomaniak.calendar.ui.screen.calendarTest.utils.toUi
+import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCredentials
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @Inject
@@ -40,46 +49,43 @@ class CalendarTestViewModel(
     private val calendarManager: CalendarManager,
 ) : ViewModel() {
 
+    private val accountId = AccountId(1)
+
     val uiState: StateFlow<CalendarTestUiState>
         field = MutableStateFlow<CalendarTestUiState>(CalendarTestUiState.Loading)
 
-    private val accountId = AccountId(1)
-
     init {
         observeCalendars()
-        initCalendar()
-        syncFromRemote()
+        initAndSync()
     }
 
-    private fun observeCalendars() = viewModelScope.launch {
-        calendarManager.observeCalendars().collect { calendars ->
-            Log.d("CalDAV-PoC", "DB updated: ${calendars.size} calendar(s)")
-            if (calendars.isNotEmpty()) {
-                uiState.value = CalendarTestUiState.Success(
-                    buildString {
-                        appendLine("✅ ${calendars.size} calendar(s) in DB:\n")
-                        calendars.forEachIndexed { i, cal ->
-                            appendLine("[$i] ${cal.displayName}")
-                            appendLine("    ${cal.id}")
-                            appendLine()
-                        }
-                    },
-                )
-            }
-        }
-    }
-
-    private fun initCalendar() = viewModelScope.launch {
+    private fun initAndSync() = viewModelScope.launch {
         val credentials = DavCredentials(
             username = "USERNAME",
             password = "PASSWORD",
         )
-        accountManager.initAccount(accountId, credentials)
+        runCatching {
+            accountManager.initAccount(accountId, credentials)
+            calendarManager.syncCalendars(accountId)
+        }.cancellable()
+            .onFailure {
+                // Only surface the error if we have nothing to display yet.
+                if (uiState.value is CalendarTestUiState.Loading) {
+                    uiState.value = CalendarTestUiState.Error(it.message ?: "Unknown error")
+                }
+            }
     }
 
-    private fun syncFromRemote() = viewModelScope.launch {
-        runCatching { calendarManager.syncCalendars(accountId) }
-            .onFailure { uiState.value = CalendarTestUiState.Error(it.message ?: "Error") }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun observeCalendars() = viewModelScope.launch {
+        calendarManager.observeCalendars()
+            .flatMapLatest { calendars -> calendars.map(::observeCalendarUi).combineToList() }
+            .collect { uiState.value = CalendarTestUiState.Loaded(it) }
     }
 
+    private fun observeCalendarUi(calendar: Calendar): Flow<CalendarUi> =
+        calendarManager.observeEvents(calendar.id).map { calendar.toUi(it) }
+
+    private inline fun <reified T> List<Flow<T>>.combineToList(): Flow<List<T>> =
+        if (isEmpty()) flowOf(emptyList()) else combine(this) { it.toList() }
 }

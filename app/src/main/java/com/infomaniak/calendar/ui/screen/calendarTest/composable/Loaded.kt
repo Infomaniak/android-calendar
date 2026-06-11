@@ -21,10 +21,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,24 +35,47 @@ import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarT
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
-internal fun Error(state: CalendarTestUiState.Error) {
-    Column(
+internal fun Loaded(state: CalendarTestUiState.Loaded) {
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Text(
-            text = state.message,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.error,
-        )
+        item {
+            Text(
+                text = "CalDAV PoC – Rust Bridge",
+                style = MaterialTheme.typography.headlineSmall,
+            )
+        }
+
+        if (state.calendars.isEmpty()) {
+            item { Text("⏳ Syncing…") }
+        }
+
+        items(state.calendars, key = { it.id }) { calendar ->
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = calendar.header,
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                if (calendar.events.isEmpty()) {
+                    Text(
+                        text = "No event",
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                } else {
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(calendar.events, key = { it.id }) { event -> EventCard(event) }
+                    }
+                }
+            }
+        }
     }
 }
 
 @Composable
 @Preview
-private fun ErrorPreview() = CalendarThemeForPreview {
-    Error(CalendarTestUiStatePreviewProvider.Error)
+private fun LoadedPreview() = CalendarThemeForPreview {
+    Loaded(state = CalendarTestUiStatePreviewProvider.Loaded)
 }

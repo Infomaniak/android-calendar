@@ -19,12 +19,30 @@ package com.infomaniak.calendar.ui.screen.calendarTest.previewParameter
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestUiState
+import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
+import com.infomaniak.calendar.ui.screen.calendarTest.model.EventUi
 
 internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<CalendarTestUiState> {
-    override val values = sequenceOf(CalendarTestUiState.Loading, Success, Error)
+    override val values = sequenceOf(CalendarTestUiState.Loading, Loaded, Error)
 
     companion object {
-        val Success = CalendarTestUiState.Success("Hello world")
+        val EventUi = EventUi(
+            id = "event-preview",
+            title = "Weekly sync",
+            timeRange = "03/01/2026 10:00 → 03/01/2026 11:00",
+            location = "Meeting room A",
+            status = "CONFIRMED",
+            categories = "Work",
+            description = "Standup and planning",
+            lastModified = "03/01/2026 09:55",
+        )
+        val CalendarUi = CalendarUi(
+            id = "calendar-preview",
+            header = "Work · 1 event(s)",
+            events = List(3) { EventUi.copy(id="$it") },
+        )
+
+        val Loaded = CalendarTestUiState.Loaded(List(3) { CalendarUi.copy(id="$it") })
         val Error = CalendarTestUiState.Error("Something went wrong")
     }
 }

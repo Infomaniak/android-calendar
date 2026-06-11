@@ -103,6 +103,7 @@ dependencies {
     androidTestImplementation(core.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(core.compose.ui.tooling)
+    implementation(kmpCalendar.kotlinx.datetime)
 
     // Navigation 3
     implementation(core.androidx.lifecycle.viewmodel.navigation3)
