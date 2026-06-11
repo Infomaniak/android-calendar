@@ -23,14 +23,18 @@ plugins {
     alias(kmpCalendar.plugins.metro)
 }
 
+val appCompileSdk: Int by rootProject.extra
+val appMinSdk: Int by rootProject.extra
+val javaVersion: JavaVersion by rootProject.extra
+
 android {
-    compileSdk = 36
+    compileSdk = appCompileSdk
     namespace = "com.infomaniak.calendar"
 
     defaultConfig {
         applicationId = "com.infomaniak.calendar"
-        minSdk = 27
-        targetSdk = 36
+        minSdk = appMinSdk
+        targetSdk = appCompileSdk
         versionCode = 1
         versionName = "1.0"
 
@@ -62,8 +66,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
     }
 }
 kotlin {
