@@ -22,8 +22,8 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
 import com.infomaniak.calendar.ui.screen.calendarTest.utils.toUi
-import com.infomaniak.core.common.cancellable
 import com.infomaniak.calendar.utils.AccountUtils
+import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
@@ -76,11 +76,11 @@ class CalendarTestViewModel(
         }.collect { (accountId, credentials) ->
             runCatching {
                 accountManager.initAccount(accountId, credentials)
-                accountManager.syncCalendars(accountId)
-        }.cancellable()
-            .onFailure {
-                uiState.value = CalendarTestUiState.Error(it.message ?: "Unknown error")
-            }
+                calendarManager.syncCalendars(accountId)
+            }.cancellable()
+                .onFailure {
+                    uiState.value = CalendarTestUiState.Error(it.message ?: "Unknown error")
+                }
         }
     }
 
