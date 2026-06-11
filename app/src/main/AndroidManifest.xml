@@ -29,12 +29,12 @@
         </activity>
 
         <activity
-            android:name="com.infomaniak.lib.login.WebViewLoginActivity"
+            android:name="com.infomaniak.core.login.WebViewLoginActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/LoginWebViewTheme" />
 
         <activity
-            android:name="com.infomaniak.lib.login.WebViewCreateAccountActivity"
+            android:name="com.infomaniak.core.login.WebViewCreateAccountActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/LoginWebViewTheme" />
     </application>

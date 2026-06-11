@@ -22,7 +22,7 @@ import dev.zacsweers.metro.MapKey
 import kotlin.reflect.KClass
 
 /** A [MapKey] annotation for binding ViewModels in a multibinding map. */
-@MapKey // TODO: Add `implicitClassKey = true` arg when we use metro 0.12.0+
+@MapKey(implicitClassKey = true)
 @Target(
     AnnotationTarget.FUNCTION,
     AnnotationTarget.FIELD,
@@ -32,4 +32,4 @@ import kotlin.reflect.KClass
     AnnotationTarget.TYPE,
 )
 @Retention(AnnotationRetention.RUNTIME)
-annotation class ViewModelKey(val value: KClass<out ViewModel>) // TODO: Add `= Nothing::class` when we use metro 0.12.0+
+annotation class ViewModelKey(val value: KClass<out ViewModel> = Nothing::class)

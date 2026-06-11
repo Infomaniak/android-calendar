@@ -24,8 +24,8 @@ import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.BuildConfig
 import com.infomaniak.calendar.MainApplication
 import com.infomaniak.calendar.utils.AccountUtils
+import com.infomaniak.core.login.InfomaniakLogin
 import com.infomaniak.core.network.LOGIN_ENDPOINT_URL
-import com.infomaniak.lib.login.InfomaniakLogin
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provider

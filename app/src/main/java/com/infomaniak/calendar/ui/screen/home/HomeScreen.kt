@@ -52,9 +52,9 @@ fun HomeScreen(modifier: Modifier = Modifier, accountUtils: AccountUtils = Compo
 @Composable
 private fun HomeScreen(onDisconnect: () -> Unit, modifier: Modifier = Modifier) {
     Scaffold(topBar = { Text("HomeScreen") }, modifier = modifier.windowInsetsPadding(WindowInsets.statusBars)) { paddingValues ->
-        Column {
-            Text("HomeScreenContent", modifier = Modifier.padding(paddingValues))
-            Text("User: ${LocalUser.current?.displayName}", modifier = Modifier.padding(paddingValues))
+        Column(modifier = Modifier.padding(paddingValues)) {
+            Text("HomeScreenContent")
+            Text("User: ${LocalUser.current?.displayName}")
             Button(onClick = onDisconnect) { Text("Disconnect") }
         }
     }
