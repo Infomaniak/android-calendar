@@ -23,15 +23,11 @@ import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
 import com.infomaniak.calendar.ui.screen.calendarTest.utils.toUi
 import com.infomaniak.core.common.cancellable
-import com.infomaniak.multiplatform_calendar.core.AccountManager
-import com.infomaniak.multiplatform_calendar.core.CalendarManager
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCredentials
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
-import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
-import com.infomaniak.calendar.ui.screen.calendarTest.model.toUi
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
@@ -65,13 +61,12 @@ class CalendarTestViewModel(
 
     private fun initAndSync() = viewModelScope.launch {
         val credentials = DavCredentials(
-            baseUrl = "https://sync.infomaniak.com",
             username = "USERNAME",
             password = "PASSWORD",
         )
         runCatching {
             accountManager.initAccount(accountId, credentials)
-            accountManager.syncCalendars(accountId)
+            calendarManager.syncCalendars(accountId)
         }.cancellable()
             .onFailure {
                 // Only surface the error if we have nothing to display yet.
@@ -83,7 +78,7 @@ class CalendarTestViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeCalendars() = viewModelScope.launch {
-        calendarManager.observeCalendars(accountId)
+        calendarManager.observeCalendars()
             .flatMapLatest { calendars -> calendars.map(::observeCalendarUi).combineToList() }
             .collect { uiState.value = CalendarTestUiState.Loaded(it) }
     }
