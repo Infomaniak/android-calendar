@@ -22,6 +22,7 @@ import android.os.StrictMode
 import com.infomaniak.calendar.di.AppGraph
 import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.core.network.NetworkConfiguration
+import com.infomaniak.core.sentry.SentryConfig.configureSentry
 import dev.zacsweers.metro.createGraphFactory
 
 class MainApplication : Application() {
@@ -36,6 +37,22 @@ class MainApplication : Application() {
             appId = ConfigUtils.safePackage,
             appVersionCode = BuildConfig.VERSION_CODE,
             appVersionName = BuildConfig.VERSION_NAME,
+        )
+
+        configureSentry()
+
+        MatomoCalendar.addTrackingCallbackForDebugLog()
+    }
+
+    /**
+     * Reasons to discard Sentry events :
+     * - Application is in Debug mode
+     * - The exception was a NetworkException or a CancellationException, and we don't want to send them to Sentry
+     */
+    private fun configureSentry() {
+        configureSentry(
+            isDebug = BuildConfig.DEBUG,
+            isSentryTrackingEnabled = { true }, // TODO[matomo]: Enable or disable based on user settings
         )
     }
 
