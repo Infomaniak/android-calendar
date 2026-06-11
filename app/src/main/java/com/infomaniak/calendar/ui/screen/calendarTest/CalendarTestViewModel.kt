@@ -69,10 +69,7 @@ class CalendarTestViewModel(
             calendarManager.syncCalendars(accountId)
         }.cancellable()
             .onFailure {
-                // Only surface the error if we have nothing to display yet.
-                if (uiState.value is CalendarTestUiState.Loading) {
-                    uiState.value = CalendarTestUiState.Error(it.message ?: "Unknown error")
-                }
+                uiState.value = CalendarTestUiState.Error(it.message ?: "Unknown error")
             }
     }
 

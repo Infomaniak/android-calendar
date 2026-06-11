@@ -36,13 +36,33 @@ internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<Cal
             description = "Standup and planning",
             lastModified = "03/01/2026 09:55",
         )
+
         val CalendarUi = CalendarUi(
             id = "calendar-preview",
             header = "Work · 1 event(s)",
-            events = List(3) { EventUi.copy(id="$it") },
+            color = 0xFF2196F3.toInt(),
+            isReadOnly = false,
+            events = List(3) { EventUi.copy(id = "$it") },
         )
 
-        val Loaded = CalendarTestUiState.Loaded(List(3) { CalendarUi.copy(id="$it") })
+        val Loaded = CalendarTestUiState.Loaded(
+            listOf(
+                CalendarUi,
+                CalendarUi.copy(
+                    id = "calendar-preview-ro",
+                    header = "Team (shared) · 2 event(s)",
+                    color = 0xFFE91E63.toInt(),
+                    isReadOnly = true,
+                ),
+                CalendarUi.copy(
+                    id = "calendar-preview-empty",
+                    header = "Holidays · 0 event(s)",
+                    color = 0xFF4CAF50.toInt(),
+                    events = emptyList(),
+                ),
+            ),
+        )
+
         val Error = CalendarTestUiState.Error("Something went wrong")
     }
 }

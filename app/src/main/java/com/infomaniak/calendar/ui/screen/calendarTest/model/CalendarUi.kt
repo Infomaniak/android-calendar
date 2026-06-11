@@ -19,10 +19,12 @@ package com.infomaniak.calendar.ui.screen.calendarTest.model
 
 /**
  * UI model for a calendar shown in the CalDAV test screen: everything is already formatted/derived
- * so the composables only have to render plain strings (no date formatting, no business logic).
+ * so the composables only have to render plain values (no date formatting, no business logic).
  */
 data class CalendarUi(
     val id: String,
     val header: String,
+    val color: Int,
+    val isReadOnly: Boolean,
     val events: List<EventUi>,
 )
