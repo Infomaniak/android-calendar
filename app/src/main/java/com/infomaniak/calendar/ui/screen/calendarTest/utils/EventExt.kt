@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.calendarTest.utils
 
+import com.infomaniak.calendar.ui.screen.calendarTest.model.EventUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -32,17 +33,16 @@ private val dateTimeFormatter = LocalDateTime.Format {
 }
 
 @OptIn(ExperimentalTime::class)
-internal fun Event.toUi(): com.infomaniak.calendar.ui.screen.calendarTest.model.EventUi =
-    _root_ide_package_.com.infomaniak.calendar.ui.screen.calendarTest.model.EventUi(
-        id = id.url,
-        title = title.ifBlank { "(no title)" },
-        timeRange = timeRange(isAllDay, start, end),
-        location = location?.takeIf { it.isNotBlank() },
-        status = status?.takeIf { it.isNotBlank() },
-        categories = categories?.takeIf { it.isNotBlank() },
-        description = description?.takeIf { it.isNotBlank() },
-        lastModified = lastModified?.format(dateTimeFormatter),
-    )
+internal fun Event.toUi(): EventUi = EventUi(
+    id = id.url,
+    title = title.ifBlank { "(no title)" },
+    timeRange = timeRange(isAllDay, start, end),
+    location = location?.takeIf { it.isNotBlank() },
+    status = status?.takeIf { it.isNotBlank() },
+    categories = categories?.takeIf { it.isNotBlank() },
+    description = description?.takeIf { it.isNotBlank() },
+    lastModified = lastModified?.format(dateTimeFormatter),
+)
 
 private fun timeRange(
     isAllDay: Boolean,

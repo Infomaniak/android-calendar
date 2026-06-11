@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
 import com.infomaniak.calendar.ui.screen.calendarTest.utils.toUi
+import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.AccountManager
 import com.infomaniak.multiplatform_calendar.core.CalendarManager
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
@@ -71,12 +72,13 @@ class CalendarTestViewModel(
         runCatching {
             accountManager.initAccount(accountId, credentials)
             accountManager.syncCalendars(accountId)
-        }.onFailure {
-            // Only surface the error if we have nothing to display yet.
-            if (uiState.value is CalendarTestUiState.Loading) {
-                uiState.value = CalendarTestUiState.Error(it.message ?: "Unknown error")
+        }.cancellable()
+            .onFailure {
+                // Only surface the error if we have nothing to display yet.
+                if (uiState.value is CalendarTestUiState.Loading) {
+                    uiState.value = CalendarTestUiState.Error(it.message ?: "Unknown error")
+                }
             }
-        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
