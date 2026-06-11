@@ -54,7 +54,7 @@ internal fun CalendarHeader(calendar: CalendarUi) {
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.weight(1f),
         )
-        Text(text = if (calendar.isReadOnly) "\uD83D\uDD13" else "\uD83D\uDD12")
+        Text(text = if (calendar.isReadOnly) "\uD83D\uDD12" else "\uD83D\uDD13")
     }
 }
 
