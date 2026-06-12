@@ -1,0 +1,96 @@
+/*
+ * Infomaniak Calendar - Android
+ * Copyright (C) 2026 Infomaniak Network SA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.infomaniak.calendar.ui.component.drawer
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.infomaniak.calendar.di.ViewModelKey
+import com.infomaniak.calendar.utils.AccountUtils
+import com.infomaniak.core.auth.models.user.User
+import com.infomaniak.core.common.cancellable
+import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
+import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
+import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+
+data class UserCalendarsUiModel(
+    val user: User,
+    val calendars: List<Calendar>,
+)
+
+sealed interface DrawerUiState {
+    data object Loading : DrawerUiState
+    data class Success(val data: List<UserCalendarsUiModel>) : DrawerUiState
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+@Inject
+@ContributesIntoMap(AppScope::class)
+@ViewModelKey(DrawerViewModel::class)
+class DrawerViewModel(
+    private val accountManager: AccountManager,
+    private val accountUtils: AccountUtils,
+    private val calendarManager: CalendarManager,
+) : ViewModel() {
+
+    val uiState: StateFlow<DrawerUiState> = combine(
+        accountUtils.users,
+        calendarManager.observeCalendars(),
+    ) { users, calendars ->
+        val mappedData = users.map { user ->
+            val userCalendars = calendars.filter { it.accountId == AccountId(user.id.toLong()) }
+            UserCalendarsUiModel(user, userCalendars)
+        }
+        DrawerUiState.Success(mappedData)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = DrawerUiState.Loading,
+    )
+
+    init {
+        initAndSync()
+    }
+
+    private fun initAndSync() {
+        viewModelScope.launch {
+            accountUtils.users.collect { users ->
+                users.forEach { user ->
+                    launch {
+                        val accountId = AccountId(user.id.toLong())
+                        val credentials = accountManager.retrieveDavCredential(user.apiToken.accessToken, user.login)
+
+                        runCatching {
+                            accountManager.initAccount(accountId, credentials)
+                            calendarManager.syncCalendars(accountId)
+                        }.cancellable()
+                    }
+                }
+            }
+        }
+    }
+}

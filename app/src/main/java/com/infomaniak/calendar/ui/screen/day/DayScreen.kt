@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.di.ComposeAppGraph
 import com.infomaniak.calendar.ui.LocalUser
-import com.infomaniak.calendar.ui.component.CalendarDrawerIcon
+import com.infomaniak.calendar.ui.component.drawer.CalendarDrawerIcon
 import com.infomaniak.calendar.utils.account.AccountUtils
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch

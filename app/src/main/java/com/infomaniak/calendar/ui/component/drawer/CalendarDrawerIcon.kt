@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.component
+package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton

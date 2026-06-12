@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
-import com.infomaniak.calendar.ui.component.CalendarDrawerIcon
+import com.infomaniak.calendar.ui.component.drawer.CalendarDrawerIcon
 
 @Composable
 fun MonthScreen(modifier: Modifier = Modifier, monthViewModel: MonthViewModel = viewModel()) {
