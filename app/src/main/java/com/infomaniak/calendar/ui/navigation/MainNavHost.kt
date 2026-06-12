@@ -29,16 +29,21 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.ui.NavDisplay
+import com.infomaniak.calendar.ui.component.CalendarDrawer
 import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.component.CalendarHorizontalFloatingToolbar
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.DrawerDecoratorStrategy
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.Drawer
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
+import com.infomaniak.calendar.ui.navigation.state.LocalSharedDrawerSatte
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.state.SharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.ToolbarScrollableState
+import com.infomaniak.calendar.ui.navigation.state.rememberCalendarDrawerState
 import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableState
 import com.infomaniak.calendar.ui.screen.calendarTest.calendarTest
@@ -54,12 +59,14 @@ import com.infomaniak.calendar.ui.screen.week.WeekScreen
 fun MainNavHost(backStack: NavBackStack<NavKey>) {
     val snackbarHostState: SharedSnackbarHostState = rememberCustomSnackbarHostState()
     val toolbarScrollableState: ToolbarScrollableState = rememberToolbarScrollableState()
+    val calendarDrawerState = rememberCalendarDrawerState()
 
     SharedTransitionLayout {
         CompositionLocalProvider(
             LocalSharedTransitionScope provides this@SharedTransitionLayout,
             LocalSharedSnackbarHostState provides snackbarHostState,
             LocalToolbarScrollableState provides toolbarScrollableState,
+            LocalSharedDrawerSatte provides calendarDrawerState,
         ) {
             NavDisplay(
                 backStack = backStack,
@@ -72,10 +79,10 @@ fun MainNavHost(backStack: NavBackStack<NavKey>) {
 }
 
 private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> = entryProvider {
-    entry<NavDestination.CalendarView.Planning>(metadata = metaDataOf(FloatingToolbarWithFab)) {
+    entry<NavDestination.CalendarView.Planning>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         PlanningScreen()
     }
-    entry<NavDestination.CalendarView.Day>(metadata = metaDataOf(FloatingToolbarWithFab)) {
+    entry<NavDestination.CalendarView.Day>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         DayScreen(goToTestScreen = { backStack.add(NavDestination.CalendarTest) })
     }
     entry<NavDestination.CalendarView.ThreeDays>(metadata = metaDataOf(FloatingToolbarWithFab)) {
@@ -123,7 +130,13 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
         )
     }
 
-    return listOf(navigationStrategy)
+    val drawerStrategy = DrawerDecoratorStrategy<NavKey>(
+        drawer = { content ->
+            CalendarDrawer(content)
+        },
+    )
+
+    return listOf(navigationStrategy, drawerStrategy)
 }
 
 private fun NavBackStack<NavKey>.getLastCalendarView(): NavDestination.CalendarView? {
