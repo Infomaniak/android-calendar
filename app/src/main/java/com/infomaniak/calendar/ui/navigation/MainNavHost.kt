@@ -38,7 +38,7 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Metada
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
-import com.infomaniak.calendar.ui.navigation.state.LocalSharedDrawerSatte
+import com.infomaniak.calendar.ui.navigation.state.LocalSharedDrawerState
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.state.SharedSnackbarHostState
@@ -66,7 +66,7 @@ fun MainNavHost(backStack: NavBackStack<NavKey>) {
             LocalSharedTransitionScope provides this@SharedTransitionLayout,
             LocalSharedSnackbarHostState provides snackbarHostState,
             LocalToolbarScrollableState provides toolbarScrollableState,
-            LocalSharedDrawerSatte provides calendarDrawerState,
+            LocalSharedDrawerState provides calendarDrawerState,
         ) {
             NavDisplay(
                 backStack = backStack,
@@ -85,13 +85,13 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
     entry<NavDestination.CalendarView.Day>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         DayScreen(goToTestScreen = { backStack.add(NavDestination.CalendarTest) })
     }
-    entry<NavDestination.CalendarView.ThreeDays>(metadata = metaDataOf(FloatingToolbarWithFab)) {
+    entry<NavDestination.CalendarView.ThreeDays>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         ThreeDayScreen()
     }
-    entry<NavDestination.CalendarView.Week>(metadata = metaDataOf(FloatingToolbarWithFab)) {
+    entry<NavDestination.CalendarView.Week>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         WeekScreen()
     }
-    entry<NavDestination.CalendarView.Month>(metadata = metaDataOf(FloatingToolbarWithFab)) {
+    entry<NavDestination.CalendarView.Month>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         MonthScreen()
     }
     entry<NavDestination.EventCreation> {

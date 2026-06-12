@@ -28,7 +28,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-val LocalSharedDrawerSatte = staticCompositionLocalOf<CalendarDrawerState?> { null }
+val LocalSharedDrawerState = staticCompositionLocalOf<CalendarDrawerState?> { null }
 
 @Composable
 fun rememberCalendarDrawerState(): CalendarDrawerState {

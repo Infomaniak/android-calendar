@@ -25,14 +25,14 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.ui.navigation.state.LocalSharedDrawerSatte
+import com.infomaniak.calendar.ui.navigation.state.LocalSharedDrawerState
 
 @Composable
 fun CalendarDrawer(
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val calendarDrawerState = LocalSharedDrawerSatte.current ?: return
+    val calendarDrawerState = LocalSharedDrawerState.current ?: return
     CalendarDrawer(drawerState = calendarDrawerState.drawerState, content = content, modifier = modifier)
 }
 
