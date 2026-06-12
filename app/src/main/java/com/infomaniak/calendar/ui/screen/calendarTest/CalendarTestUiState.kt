@@ -17,13 +17,13 @@
  */
 package com.infomaniak.calendar.ui.screen.calendarTest
 
-import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
+import com.infomaniak.calendar.ui.screen.calendarTest.model.PlanningWeekUi
 
 sealed interface CalendarTestUiState {
 
     data object Loading : CalendarTestUiState
 
-    data class Loaded(val calendars: List<CalendarUi>) : CalendarTestUiState
+    data class Loaded(val weeks: List<PlanningWeekUi>) : CalendarTestUiState
 
     data class Error(val message: String) : CalendarTestUiState
 }

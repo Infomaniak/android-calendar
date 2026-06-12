@@ -19,8 +19,9 @@ package com.infomaniak.calendar.ui.screen.calendarTest.previewParameter
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestUiState
-import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
 import com.infomaniak.calendar.ui.screen.calendarTest.model.EventUi
+import com.infomaniak.calendar.ui.screen.calendarTest.model.PlanningDayUi
+import com.infomaniak.calendar.ui.screen.calendarTest.model.PlanningWeekUi
 
 internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<CalendarTestUiState> {
     override val values = sequenceOf(CalendarTestUiState.Loading, Loaded, Error)
@@ -29,7 +30,7 @@ internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<Cal
         val EventUi = EventUi(
             id = "event-preview",
             title = "Weekly sync",
-            timeRange = "03/01/2026 10:00 → 03/01/2026 11:00",
+            timeRange = "10:00 → 11:00",
             location = "Meeting room A",
             status = "CONFIRMED",
             categories = "Work",
@@ -39,28 +40,50 @@ internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<Cal
             canEdit = true,
         )
 
-        val CalendarUi = CalendarUi(
-            id = "calendar-preview",
-            header = "Work · 1 event(s)",
-            color = 0xFF2196F3.toInt(),
-            isReadOnly = false,
-            events = List(3) { EventUi.copy(id = "$it") },
+        private val dayWithEvents = PlanningDayUi(
+            id = "2026-01-02",
+            header = "Vendredi 2 janvier",
+            events = listOf(
+                EventUi,
+                EventUi.copy(
+                    id = "event-preview-2",
+                    title = "Lunch with team",
+                    timeRange = "12:30 → 13:30",
+                    color = 0xFFE91E63.toInt(),
+                    canEdit = false,
+                ),
+            ),
         )
 
         val Loaded = CalendarTestUiState.Loaded(
-            listOf(
-                CalendarUi,
-                CalendarUi.copy(
-                    id = "calendar-preview-ro",
-                    header = "Team (shared) · 2 event(s)",
-                    color = 0xFFE91E63.toInt(),
-                    isReadOnly = true,
+            weeks = listOf(
+                PlanningWeekUi(
+                    id = "2025-12-29",
+                    header = "S1 2026 · 29 déc. - 4 janv.",
+                    days = listOf(dayWithEvents),
                 ),
-                CalendarUi.copy(
-                    id = "calendar-preview-empty",
-                    header = "Holidays · 0 event(s)",
-                    color = 0xFF4CAF50.toInt(),
-                    events = emptyList(),
+                PlanningWeekUi(
+                    id = "2026-01-05",
+                    header = "S2 2026 · 5 janv. - 11 janv.",
+                    days = emptyList(),
+                ),
+                PlanningWeekUi(
+                    id = "2026-01-12",
+                    header = "S3 2026 · 12 janv. - 18 janv.",
+                    days = listOf(
+                        PlanningDayUi(
+                            id = "2026-01-14",
+                            header = "Mercredi 14 janvier",
+                            events = listOf(
+                                EventUi.copy(
+                                    id = "event-preview-3",
+                                    title = "Hiking",
+                                    timeRange = "All day",
+                                    color = 0xFF4CAF50.toInt(),
+                                ),
+                            ),
+                        ),
+                    ),
                 ),
             ),
         )

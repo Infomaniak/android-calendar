@@ -22,6 +22,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.char
@@ -36,10 +37,16 @@ private val dateTimeFormatter = LocalDateTime.Format {
     hour(); char(':'); minute()
 }
 
-// TODO: Timezones are not handled yet — we render Instants in UTC.
+private val timeFormatter = LocalTime.Format {
+    hour(); char(':'); minute()
+}
+
+// TODO: Timezones are not handled yet — Instants are rendered in UTC.
 @OptIn(ExperimentalTime::class)
-private fun Instant.formatUtc(): String =
-    toLocalDateTime(TimeZone.UTC).format(dateTimeFormatter)
+private fun Instant.formatTimeUtc(): String = toLocalDateTime(TimeZone.UTC).time.format(timeFormatter)
+
+@OptIn(ExperimentalTime::class)
+private fun Instant.formatDateTimeUtc(): String = toLocalDateTime(TimeZone.UTC).format(dateTimeFormatter)
 
 @OptIn(ExperimentalTime::class)
 fun Event.toUi(): EventUi = EventUi(
@@ -50,7 +57,7 @@ fun Event.toUi(): EventUi = EventUi(
     status = status?.takeIf { it.isNotBlank() },
     categories = categories?.takeIf { it.isNotBlank() },
     description = description?.takeIf { it.isNotBlank() },
-    lastModified = lastModified?.formatUtc(),
+    lastModified = lastModified?.formatDateTimeUtc(),
     color = color,
     canEdit = canEdit,
 )

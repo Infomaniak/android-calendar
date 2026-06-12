@@ -19,4 +19,6 @@ package com.infomaniak.calendar.ui.screen.calendarTest
 
 sealed interface CalendarTestAction {
     data object OnClickDisconnect : CalendarTestAction
+    data object LoadMorePast : CalendarTestAction
+    data object LoadMoreFuture : CalendarTestAction
 }

@@ -17,39 +17,36 @@
  */
 package com.infomaniak.calendar.ui.screen.calendarTest.composable
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
-import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarTestUiStatePreviewProvider
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
-fun CalendarHeader(calendar: CalendarUi, modifier: Modifier = Modifier) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier,
-    ) {
-        Text(
-            text = calendar.header,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.weight(1f),
-        )
-    }
+internal fun PlanningDayHeader(
+    title: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(vertical = 8.dp),
+    )
 }
 
 @Composable
 @Preview
-private fun CalendarHeaderPreview() = CalendarThemeForPreview {
-    Column {
-        CalendarHeader(CalendarTestUiStatePreviewProvider.CalendarUi)
-    }
+private fun PlanningDayHeaderPreview() = CalendarThemeForPreview {
+    PlanningDayHeader(title = "Vendredi 12 juin")
 }
+

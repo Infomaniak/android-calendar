@@ -15,17 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.calendarTest.utils
+package com.infomaniak.calendar.ui.screen.calendarTest.model
 
-import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
-
-
-fun Calendar.toUi(events: List<Event>): CalendarUi = CalendarUi(
-    id = id.url,
-    header = "$displayName · ${events.size} event(s)",
-    color = color,
-    isReadOnly = accessLevel.isReadOnly,
-    events = events.map(Event::toUi),
+/**
+ * A day section of the planning view: a formatted day header plus the events of that day,
+ * already mapped to [EventUi] and sorted chronologically.
+ */
+data class PlanningDayUi(
+    val id: String,
+    val header: String,
+    val events: List<EventUi>,
 )
+

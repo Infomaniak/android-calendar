@@ -39,8 +39,8 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.screen.calendarTest.composable.Error
-import com.infomaniak.calendar.ui.screen.calendarTest.composable.Loaded
 import com.infomaniak.calendar.ui.screen.calendarTest.composable.Loading
+import com.infomaniak.calendar.ui.screen.calendarTest.composable.Planning
 import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarTestUiStatePreviewProvider
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
@@ -71,7 +71,11 @@ fun CalendarTestScreenContent(
         Box(Modifier.padding(paddingValues)) {
             when (state) {
                 CalendarTestUiState.Loading -> Loading()
-                is CalendarTestUiState.Loaded -> Loaded(state)
+                is CalendarTestUiState.Loaded -> Planning(
+                    state = state,
+                    onLoadPast = { processAction(CalendarTestAction.LoadMorePast) },
+                    onLoadFuture = { processAction(CalendarTestAction.LoadMoreFuture) },
+                )
                 is CalendarTestUiState.Error -> Error(state)
             }
         }

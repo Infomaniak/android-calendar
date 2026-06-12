@@ -18,13 +18,13 @@
 package com.infomaniak.calendar.ui.screen.calendarTest.model
 
 /**
- * UI model for a calendar shown in the CalDAV test screen: everything is already formatted/derived
- * so the composables only have to render plain values (no date formatting, no business logic).
+ * A week section of the planning view: a separator (week number + date span + year) and the days
+ * of that week that contain events. Empty weeks are kept (with no [days]) so the timeline stays
+ * continuous.
  */
-data class CalendarUi(
+data class PlanningWeekUi(
     val id: String,
     val header: String,
-    val color: Int,
-    val isReadOnly: Boolean,
-    val events: List<EventUi>,
+    val days: List<PlanningDayUi>,
 )
+
