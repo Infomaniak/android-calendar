@@ -21,9 +21,12 @@ import com.infomaniak.calendar.ui.screen.calendarTest.model.EventUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.char
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 
 private val dateTimeFormatter = LocalDateTime.Format {
@@ -31,6 +34,11 @@ private val dateTimeFormatter = LocalDateTime.Format {
     char(' ')
     hour(); char(':'); minute()
 }
+
+// TODO: Timezones are not handled yet — we render Instants in UTC.
+@OptIn(ExperimentalTime::class)
+private fun Instant.formatUtc(): String =
+    toLocalDateTime(TimeZone.UTC).format(dateTimeFormatter)
 
 @OptIn(ExperimentalTime::class)
 fun Event.toUi(): EventUi = EventUi(
@@ -41,17 +49,18 @@ fun Event.toUi(): EventUi = EventUi(
     status = status?.takeIf { it.isNotBlank() },
     categories = categories?.takeIf { it.isNotBlank() },
     description = description?.takeIf { it.isNotBlank() },
-    lastModified = lastModified?.format(dateTimeFormatter),
+    lastModified = lastModified?.formatUtc(),
     color = color,
     canEdit = canEdit,
 )
 
+@OptIn(ExperimentalTime::class)
 private fun timeRange(
     isAllDay: Boolean,
-    start: LocalDateTime?,
-    end: LocalDateTime?,
+    start: Instant?,
+    end: Instant?,
 ): String? = when {
     isAllDay -> "All day"
-    start != null && end != null -> "${start.format(dateTimeFormatter)} → ${end.format(dateTimeFormatter)}"
+    start != null && end != null -> "${start.formatUtc()} → ${end.formatUtc()}"
     else -> null
 }
