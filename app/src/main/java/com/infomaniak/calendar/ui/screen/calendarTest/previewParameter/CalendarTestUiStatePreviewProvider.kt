@@ -35,6 +35,8 @@ internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<Cal
             categories = "Work",
             description = "Standup and planning",
             lastModified = "03/01/2026 09:55",
+            color = 0xFF2196F3.toInt(),
+            canEdit = true,
         )
 
         val CalendarUi = CalendarUi(

@@ -36,12 +36,14 @@ private val dateTimeFormatter = LocalDateTime.Format {
 fun Event.toUi(): EventUi = EventUi(
     id = id.url,
     title = title.ifBlank { "(no title)" },
-    timeRange = timeRange(isAllDay, start, end),
+    timeRange = timeRange(timing.isAllDay, timing.start, timing.end),
     location = location?.takeIf { it.isNotBlank() },
     status = status?.takeIf { it.isNotBlank() },
     categories = categories?.takeIf { it.isNotBlank() },
     description = description?.takeIf { it.isNotBlank() },
     lastModified = lastModified?.format(dateTimeFormatter),
+    color = color,
+    canEdit = canEdit,
 )
 
 private fun timeRange(
