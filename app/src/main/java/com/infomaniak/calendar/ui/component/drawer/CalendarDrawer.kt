@@ -17,17 +17,27 @@
  */
 package com.infomaniak.calendar.ui.component.drawer
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -36,11 +46,24 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
+import com.infomaniak.core.auth.models.user.User
+import com.infomaniak.core.avatar.components.Avatar
+import com.infomaniak.core.avatar.models.AvatarType
+import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 
 @Composable
 fun CalendarDrawer(
@@ -80,24 +103,7 @@ private fun CalendarDrawer(
                                 )
                             }
                             is DrawerUiState.Success -> {
-                                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                                    items(state.data) { userCalendars ->
-                                        Column(modifier = Modifier.padding(16.dp)) {
-                                            Text(
-                                                text = userCalendars.user.email,
-                                                style = MaterialTheme.typography.titleMedium,
-                                                color = MaterialTheme.colorScheme.primary,
-                                            )
-                                            userCalendars.calendars.forEach { calendar ->
-                                                Text(
-                                                    text = calendar.displayName,
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    modifier = Modifier.padding(start = 16.dp, top = 8.dp),
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
+                                DrawerCalendarList(usersCalendars = state.userCalendars)
                             }
                         }
                     }
@@ -117,6 +123,88 @@ private fun CalendarDrawer(
         modifier = modifier,
     ) {
         content()
+    }
+}
+
+@Composable
+private fun DrawerCalendarList(usersCalendars: List<UserCalendarsUiModel>) {
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(usersCalendars) { userCalendars ->
+            Column {
+                AccountItem(userCalendars.user)
+                userCalendars.calendars.forEach { calendar ->
+                    CalendarItem(calendar)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CalendarItem(calendar: Calendar, modifier: Modifier = Modifier) {
+    var isChecked by remember { mutableStateOf(true) }
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .toggleable(
+                value = isChecked,
+                onValueChange = { isChecked = it },
+                role = Role.Checkbox
+            )
+            .padding(horizontal = Margin.Medium, vertical = Margin.Small),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Checkbox(
+            checked = isChecked,
+            onCheckedChange = null,
+            colors = CheckboxDefaults.colors(
+                checkedColor = Color(calendar.color),
+                checkmarkColor = Color.White,
+            ),
+        )
+
+        Text(
+            text = calendar.displayName,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(start = Margin.Mini),
+        )
+    }
+}
+
+@Composable
+fun AccountItem(
+    user: User,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = Margin.Medium, horizontal = Margin.Medium),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Margin.Medium),
+    ) {
+        Avatar(avatarType = AvatarType.fromUser(user), Modifier.size(32.dp))
+        Column(
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = user.displayName.toString(),
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = user.email,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Icon(
+            modifier = Modifier.size(20.dp),
+            imageVector = Icons.Filled.ChevronRight,
+            contentDescription = null,
+        )
     }
 }
 

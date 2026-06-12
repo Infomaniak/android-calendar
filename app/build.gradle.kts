@@ -140,6 +140,7 @@ dependencies {
     implementation(libs.infomaniak.multiplatform.calendar.core)
 
     implementation(core.infomaniak.core.auth)
+    implementation(core.infomaniak.core.avatar)
     implementation(core.infomaniak.core.common)
     implementation(core.infomaniak.core.crossapplogin.front)
     implementation(core.infomaniak.core.matomo)

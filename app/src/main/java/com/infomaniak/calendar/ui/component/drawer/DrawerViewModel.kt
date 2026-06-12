@@ -44,7 +44,7 @@ data class UserCalendarsUiModel(
 
 sealed interface DrawerUiState {
     data object Loading : DrawerUiState
-    data class Success(val data: List<UserCalendarsUiModel>) : DrawerUiState
+    data class Success(val userCalendars: List<UserCalendarsUiModel>) : DrawerUiState
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
