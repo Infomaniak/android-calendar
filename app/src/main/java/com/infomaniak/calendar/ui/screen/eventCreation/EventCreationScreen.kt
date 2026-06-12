@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun EventCreationScreen(modifier: Modifier = Modifier) {
     Scaffold(
-        topBar = { TopAppBar(title = { Text("EventCreationScreen") }, modifier = modifier) },
+        topBar = { TopAppBar(title = { Text("EventCreationScreen") }) }, modifier = modifier,
     ) { paddingValues ->
         Text("EventCreationScreenContent", modifier = Modifier.padding(paddingValues))
     }

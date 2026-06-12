@@ -48,7 +48,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         enableEdgeToEdge()
         if (SDK_INT >= 29) window.isNavigationBarContrastEnforced = false
 

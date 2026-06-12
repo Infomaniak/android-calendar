@@ -105,7 +105,7 @@ private fun baseEntryProvider(backStack: () -> NavBackStack<NavKey>): (NavKey) -
 
 @Composable
 private fun sceneDecoratorStrategies(backStack: () -> NavBackStack<NavKey>): List<SceneDecoratorStrategy<NavKey>> {
-    val navigationStrategy: NavigationDecoratorStrategy<NavKey> = remember(backStack) {
+    val navigationStrategy: NavigationDecoratorStrategy<NavKey> = remember {
         NavigationDecoratorStrategy(
             floatingToolbar = {
                 CalendarHorizontalFloatingToolbar(
@@ -128,6 +128,6 @@ private fun NavBackStack<NavKey>.getPlageDateDestination(): NavDestination.Plage
 }
 
 private fun NavBackStack<NavKey>.addOrMoveToTop(destination: NavKey) {
-    if (this.contains(destination)) this.remove(destination)
+    this.removeAll { it == destination }
     this.add(destination)
 }

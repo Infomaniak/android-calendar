@@ -142,7 +142,7 @@ dependencies {
     implementation(core.androidx.core.ktx)
     implementation(core.androidx.lifecycle.runtime.ktx)
     implementation(core.appcompat)
-    implementation(core.compose.material3)
+    implementation(libs.compose.material3)
     implementation(core.compose.ui)
     implementation(core.compose.ui.graphics)
     implementation(core.compose.ui.tooling.preview)
