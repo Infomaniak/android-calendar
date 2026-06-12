@@ -17,11 +17,13 @@
  */
 package com.infomaniak.calendar.ui.component.drawer
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -51,7 +53,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -62,8 +66,10 @@ import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
+import com.infomaniak.core.ui.compose.accountbottomsheet.R
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 
 @Composable
 fun CalendarDrawer(
@@ -84,28 +90,23 @@ fun CalendarDrawer(
 private fun CalendarDrawer(
     drawerState: DrawerState,
     content: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: DrawerViewModel = viewModel(),
     addAnAccount: () -> Unit,
+    modifier: Modifier = Modifier,
+    drawerViewModel: DrawerViewModel = viewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val calendarsUsers by drawerViewModel.calendarsUsers.collectAsState()
 
     ModalNavigationDrawer(
         drawerContent = {
             ModalDrawerSheet {
                 Column(modifier = Modifier.fillMaxHeight()) {
                     Box(modifier = Modifier.weight(1f)) {
-                        when (val state = uiState) {
-                            is DrawerUiState.Loading -> {
-                                Text(
-                                    text = "Chargement...",
-                                    modifier = Modifier.padding(16.dp),
-                                )
-                            }
-                            is DrawerUiState.Success -> {
-                                DrawerCalendarList(usersCalendars = state.userCalendars)
-                            }
-                        }
+                        DrawerCalendarList(
+                            usersCalendars = calendarsUsers,
+                            onCalendarVisibilityChange = { calendarId, isVisible ->
+                                drawerViewModel.changeCalendarVisibility(calendarId, isVisible)
+                            },
+                        )
                     }
                     Button(
                         onClick = addAnAccount,
@@ -113,7 +114,8 @@ private fun CalendarDrawer(
                             .fillMaxWidth()
                             .padding(16.dp),
                     ) {
-                        Text(text = "Ajouter un compte")
+
+                        Text(text = stringResource(R.string.buttonAddAccount))
                     }
                 }
             }
@@ -127,13 +129,26 @@ private fun CalendarDrawer(
 }
 
 @Composable
-private fun DrawerCalendarList(usersCalendars: List<UserCalendarsUiModel>) {
+private fun DrawerCalendarList(
+    usersCalendars: List<UserCalendarsUiModel>,
+    onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
+) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(usersCalendars) { userCalendars ->
+            var isExpanded by remember { mutableStateOf(true) }
+
             Column {
-                AccountItem(userCalendars.user)
-                userCalendars.calendars.forEach { calendar ->
-                    CalendarItem(calendar)
+                AccountItem(
+                    user = userCalendars.user,
+                    isExpanded = isExpanded,
+                    onClick = { isExpanded = !isExpanded },
+                )
+                AnimatedVisibility(visible = isExpanded) {
+                    Column {
+                        userCalendars.calendars.forEach { calendar ->
+                            CalendarItem(calendar, onCalendarVisibilityChange)
+                        }
+                    }
                 }
             }
         }
@@ -141,16 +156,19 @@ private fun DrawerCalendarList(usersCalendars: List<UserCalendarsUiModel>) {
 }
 
 @Composable
-fun CalendarItem(calendar: Calendar, modifier: Modifier = Modifier) {
-    var isChecked by remember { mutableStateOf(true) }
+fun CalendarItem(calendar: Calendar, onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit, modifier: Modifier = Modifier) {
+    var isChecked by remember { mutableStateOf(calendar.isVisible) }
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .toggleable(
                 value = isChecked,
-                onValueChange = { isChecked = it },
-                role = Role.Checkbox
+                onValueChange = {
+                    isChecked = it
+                    onCalendarVisibilityChange(calendar.id, it)
+                },
+                role = Role.Checkbox,
             )
             .padding(horizontal = Margin.Medium, vertical = Margin.Small),
         verticalAlignment = Alignment.CenterVertically,
@@ -175,11 +193,19 @@ fun CalendarItem(calendar: Calendar, modifier: Modifier = Modifier) {
 @Composable
 fun AccountItem(
     user: User,
+    isExpanded: Boolean,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val rotation by animateFloatAsState(
+        targetValue = if (isExpanded) 90f else 0f,
+        label = "chevron_rotation",
+    )
+
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clickable(onClick = onClick)
             .padding(vertical = Margin.Medium, horizontal = Margin.Medium),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Margin.Medium),
@@ -201,7 +227,9 @@ fun AccountItem(
             )
         }
         Icon(
-            modifier = Modifier.size(20.dp),
+            modifier = Modifier
+                .size(20.dp)
+                .rotate(rotation),
             imageVector = Icons.Filled.ChevronRight,
             contentDescription = null,
         )

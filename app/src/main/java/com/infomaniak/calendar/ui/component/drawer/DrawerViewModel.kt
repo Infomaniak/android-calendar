@@ -25,6 +25,7 @@ import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
@@ -42,11 +43,6 @@ data class UserCalendarsUiModel(
     val calendars: List<Calendar>,
 )
 
-sealed interface DrawerUiState {
-    data object Loading : DrawerUiState
-    data class Success(val userCalendars: List<UserCalendarsUiModel>) : DrawerUiState
-}
-
 @OptIn(ExperimentalCoroutinesApi::class)
 @Inject
 @ContributesIntoMap(AppScope::class)
@@ -57,7 +53,7 @@ class DrawerViewModel(
     private val calendarManager: CalendarManager,
 ) : ViewModel() {
 
-    val uiState: StateFlow<DrawerUiState> = combine(
+    val calendarsUsers: StateFlow<List<UserCalendarsUiModel>> = combine(
         accountUtils.users,
         calendarManager.observeCalendars(),
     ) { users, calendars ->
@@ -65,12 +61,16 @@ class DrawerViewModel(
             val userCalendars = calendars.filter { it.accountId == AccountId(user.id.toLong()) }
             UserCalendarsUiModel(user, userCalendars)
         }
-        DrawerUiState.Success(mappedData)
+        mappedData
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = DrawerUiState.Loading,
+        initialValue = emptyList(),
     )
+
+    fun changeCalendarVisibility(calendarId: CalendarId, isVisible: Boolean) {
+        //TODO
+    }
 
     init {
         initAndSync()
