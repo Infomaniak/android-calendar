@@ -22,10 +22,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,26 +36,20 @@ import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarT
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
-fun EventCard(event: EventUi) {
-    Card(modifier = Modifier.width(200.dp)) {
+internal fun EventCard(event: EventUi) {
+    Card(
+        modifier = Modifier.width(200.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(event.color)),
+    ) {
         Column(
             modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Text(
-                text = event.title,
-                style = MaterialTheme.typography.titleSmall,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+            EventHeader(
+                title = event.title,
+                canEdit = event.canEdit,
             )
-            event.timeRange?.let { timeRange ->
-                Text(
-                    text = timeRange,
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
+            event.timeRange?.let { EventTimeRange(timeRange = it) }
             event.location?.let { Detail(label = "Location", value = it) }
             event.status?.let { Detail(label = "Status", value = it) }
             event.categories?.let { Detail(label = "Categories", value = it) }
