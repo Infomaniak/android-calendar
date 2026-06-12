@@ -33,20 +33,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestUiState
+import com.infomaniak.calendar.ui.screen.calendarTest.paging.ScrollInfo
+import com.infomaniak.calendar.ui.screen.calendarTest.paging.ScrollPositionEffect
 import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarTestUiStatePreviewProvider
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-
-// Items from either edge at which we prefetch more dates (loaded before reaching the edge to keep
-// the scroll fluid). Must stay SMALLER than the number of week separators a single range chunk adds
-// (see RANGE_CHUNK), otherwise scrolling over event-less periods would stall.
-private const val LOAD_MORE_BUFFER = 12
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun Planning(
     state: CalendarTestUiState.Loaded,
-    onLoadPast: () -> Unit = {},
-    onLoadFuture: () -> Unit = {},
+    onScroll: (ScrollInfo) -> Unit = {},
 ) {
     if (state.weeks.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -73,12 +69,7 @@ internal fun Planning(
         }
     }
 
-    InfiniteScrollEffect(
-        listState = listState,
-        buffer = LOAD_MORE_BUFFER,
-        onReachStart = onLoadPast,
-        onReachEnd = onLoadFuture,
-    )
+    ScrollPositionEffect(listState = listState, onScroll = onScroll)
 }
 
 @Composable

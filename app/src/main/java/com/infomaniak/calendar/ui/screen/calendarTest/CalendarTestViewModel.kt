@@ -20,6 +20,7 @@ package com.infomaniak.calendar.ui.screen.calendarTest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
+import com.infomaniak.calendar.ui.screen.calendarTest.paging.PlanningPager
 import com.infomaniak.calendar.ui.screen.calendarTest.utils.toPlanningWeeks
 import com.infomaniak.calendar.utils.AccountUtils
 import com.infomaniak.core.common.cancellable
@@ -37,15 +38,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Clock
-import kotlin.time.Duration.Companion.days
 import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Inject
@@ -62,13 +56,11 @@ class CalendarTestViewModel(
 
     val userFlow = accountUtils.currentUserFlow.filterNotNull()
 
-    @OptIn(ExperimentalTime::class)
-    private val rangeFlow = MutableStateFlow(initialRange())
+    private val pager = PlanningPager()
 
     fun processAction(action: CalendarTestAction) = when (action) {
         is CalendarTestAction.OnClickDisconnect -> onClickDisconnect()
-        is CalendarTestAction.LoadMorePast -> loadMorePast()
-        is CalendarTestAction.LoadMoreFuture -> loadMoreFuture()
+        is CalendarTestAction.OnScroll -> pager.onScroll(action.info)
     }
 
     init {
@@ -94,20 +86,15 @@ class CalendarTestViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
     private fun observePlanning() = viewModelScope.launch {
-        rangeFlow.flatMapLatest { range ->
+        pager.range.flatMapLatest { range ->
             calendarManager.observeEvents(range.start, range.end).map { events ->
                 events.toPlanningWeeks(range.start, range.end)
             }
         }.collect { weeks ->
             uiState.value = CalendarTestUiState.Loaded(weeks)
+            pager.onContentLoaded()
         }
     }
-
-    @OptIn(ExperimentalTime::class)
-    private fun loadMorePast() = rangeFlow.update { range -> range.copy(start = range.start - RANGE_CHUNK) }
-
-    @OptIn(ExperimentalTime::class)
-    private fun loadMoreFuture() = rangeFlow.update { range -> range.copy(end = range.end + RANGE_CHUNK) }
 
     private fun onClickDisconnect() {
         viewModelScope.launch {
@@ -115,22 +102,5 @@ class CalendarTestViewModel(
             accountUtils.removeUser(userId)
             accountManager.removeAccount(AccountId(userId.toLong()))
         }
-    }
-
-    @OptIn(ExperimentalTime::class)
-    private fun initialRange(): PlanningRange {
-        // TODO: Timezones are not handled yet — the planning range is computed in UTC.
-        val today = Clock.System.now().toLocalDateTime(TimeZone.UTC).date
-        val start = today.atStartOfDayIn(TimeZone.UTC)
-        return PlanningRange(start = start, end = start + RANGE_CHUNK)
-    }
-
-    @OptIn(ExperimentalTime::class)
-    private data class PlanningRange(val start: Instant, val end: Instant)
-
-    private companion object {
-        // Must stay large enough that even an empty chunk adds more week separators than
-        // Planning's LOAD_MORE_BUFFER, otherwise infinite scroll stalls over event-less periods.
-        val RANGE_CHUNK = 120.days
     }
 }

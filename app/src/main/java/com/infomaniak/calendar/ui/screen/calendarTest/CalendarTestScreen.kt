@@ -73,8 +73,7 @@ fun CalendarTestScreenContent(
                 CalendarTestUiState.Loading -> Loading()
                 is CalendarTestUiState.Loaded -> Planning(
                     state = state,
-                    onLoadPast = { processAction(CalendarTestAction.LoadMorePast) },
-                    onLoadFuture = { processAction(CalendarTestAction.LoadMoreFuture) },
+                    onScroll = { scrollInfo -> processAction(CalendarTestAction.OnScroll(scrollInfo)) },
                 )
                 is CalendarTestUiState.Error -> Error(state)
             }

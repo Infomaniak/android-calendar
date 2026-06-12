@@ -15,11 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.calendarTest
+package com.infomaniak.calendar.ui.screen.calendarTest.paging
 
-import com.infomaniak.calendar.ui.screen.calendarTest.paging.ScrollInfo
+/** Raw scroll position reported by the list UI, consumed by the ViewModel to drive paging. */
+data class ScrollInfo(
+    val firstVisibleIndex: Int,
+    val lastVisibleIndex: Int,
+    val totalItemsCount: Int,
+)
 
-sealed interface CalendarTestAction {
-    data object OnClickDisconnect : CalendarTestAction
-    data class OnScroll(val info: ScrollInfo) : CalendarTestAction
-}
