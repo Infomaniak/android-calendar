@@ -36,6 +36,11 @@ private val dateTimeFormatter = LocalDateTime.Format {
     hour(); char(':'); minute()
 }
 
+// TODO: Timezones are not handled yet — we render Instants in UTC.
+@OptIn(ExperimentalTime::class)
+private fun Instant.formatUtc(): String =
+    toLocalDateTime(TimeZone.UTC).format(dateTimeFormatter)
+
 @OptIn(ExperimentalTime::class)
 private fun Instant.formatUtc(): String = toLocalDateTime(TimeZone.UTC).format(dateTimeFormatter)
 
