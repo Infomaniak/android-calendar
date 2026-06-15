@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.component.drawer.CalendarDrawerIcon
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
 fun ThreeDayScreen(modifier: Modifier = Modifier) {
@@ -57,5 +58,7 @@ fun ThreeDayScreen(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun ThreeDayScreenPreview() {
-    ThreeDayScreen()
+    CalendarThemeForPreview {
+        ThreeDayScreen()
+    }
 }

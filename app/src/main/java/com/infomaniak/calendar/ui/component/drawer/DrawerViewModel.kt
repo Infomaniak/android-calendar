@@ -21,10 +21,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.utils.AccountUtils
-import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
@@ -37,11 +35,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-
-data class UserCalendarsUiModel(
-    val user: User,
-    val calendars: List<Calendar>,
-)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Inject
@@ -57,14 +50,13 @@ class DrawerViewModel(
         accountUtils.users,
         calendarManager.observeCalendars(),
     ) { users, calendars ->
-        val mappedData = users.map { user ->
+        return@combine users.map { user ->
             val userCalendars = calendars.filter { it.accountId == AccountId(user.id.toLong()) }
             UserCalendarsUiModel(user, userCalendars)
         }
-        mappedData
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
+        started = SharingStarted.WhileSubscribed(),
         initialValue = emptyList(),
     )
 

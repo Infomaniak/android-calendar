@@ -17,30 +17,14 @@
  */
 package com.infomaniak.calendar.ui.component.drawer
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
@@ -48,19 +32,10 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.core.auth.models.user.User
@@ -68,53 +43,56 @@ import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.ui.compose.accountbottomsheet.R
 import com.infomaniak.core.ui.compose.margin.Margin
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 
 @Composable
 fun CalendarDrawer(
     content: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
     addAnAccount: () -> Unit,
+    modifier: Modifier = Modifier,
+    drawerViewModel: DrawerViewModel = viewModel(),
 ) {
-    val calendarDrawerState = LocalDrawerState.current ?: return
-    CalendarDrawer(
+    val calendarDrawerState = LocalSharedDrawerState.current ?: return
+    val calendarsUsers by drawerViewModel.calendarsUsers.collectAsState()
+
+    CalendarDrawerContent(
         drawerState = calendarDrawerState,
-        content = content,
+        drawerState = calendarDrawerState.drawerState,
+        calendarsUsers = calendarsUsers,
+        onCalendarVisibilityChange = { calendarId, isVisible ->
+            drawerViewModel.changeCalendarVisibility(calendarId, isVisible)
+        },
         addAnAccount = addAnAccount,
+        content = content,
         modifier = modifier,
     )
 }
 
 @Composable
-private fun CalendarDrawer(
+private fun CalendarDrawerContent(
     drawerState: DrawerState,
-    content: @Composable () -> Unit,
+    calendarsUsers: List<UserCalendarsUiModel>,
+    onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
     addAnAccount: () -> Unit,
+    content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    drawerViewModel: DrawerViewModel = viewModel(),
 ) {
-    val calendarsUsers by drawerViewModel.calendarsUsers.collectAsState()
-
     ModalNavigationDrawer(
         drawerContent = {
             ModalDrawerSheet {
                 Column(modifier = Modifier.fillMaxHeight()) {
                     Box(modifier = Modifier.weight(1f)) {
-                        DrawerCalendarList(
+                        DrawerList(
                             usersCalendars = calendarsUsers,
-                            onCalendarVisibilityChange = { calendarId, isVisible ->
-                                drawerViewModel.changeCalendarVisibility(calendarId, isVisible)
-                            },
+                            onCalendarVisibilityChange = onCalendarVisibilityChange,
                         )
                     }
                     Button(
                         onClick = addAnAccount,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(horizontal = Margin.Medium, vertical = Margin.Micro),
                     ) {
-
                         Text(text = stringResource(R.string.buttonAddAccount))
                     }
                 }
@@ -128,116 +106,18 @@ private fun CalendarDrawer(
     }
 }
 
+@PreviewLightDark
 @Composable
-private fun DrawerCalendarList(
-    usersCalendars: List<UserCalendarsUiModel>,
-    onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
+private fun CalendarDrawerPreview(
+    @PreviewParameter(CalendarDrawerPreviewProvider::class) calendarsUsers: List<UserCalendarsUiModel>,
 ) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(usersCalendars) { userCalendars ->
-            var isExpanded by remember { mutableStateOf(true) }
-
-            Column {
-                AccountItem(
-                    user = userCalendars.user,
-                    isExpanded = isExpanded,
-                    onClick = { isExpanded = !isExpanded },
-                )
-                AnimatedVisibility(visible = isExpanded) {
-                    Column {
-                        userCalendars.calendars.forEach { calendar ->
-                            CalendarItem(calendar, onCalendarVisibilityChange)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun CalendarItem(calendar: Calendar, onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit, modifier: Modifier = Modifier) {
-    var isChecked by remember { mutableStateOf(calendar.isVisible) }
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .toggleable(
-                value = isChecked,
-                onValueChange = {
-                    isChecked = it
-                    onCalendarVisibilityChange(calendar.id, it)
-                },
-                role = Role.Checkbox,
-            )
-            .padding(horizontal = Margin.Medium, vertical = Margin.Small),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Checkbox(
-            checked = isChecked,
-            onCheckedChange = null,
-            colors = CheckboxDefaults.colors(
-                checkedColor = Color(calendar.color),
-                checkmarkColor = Color.White,
-            ),
-        )
-
-        Text(
-            text = calendar.displayName,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(start = Margin.Mini),
+    CalendarThemeForPreview {
+        CalendarDrawerContent(
+            drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
+            calendarsUsers = calendarsUsers,
+            onCalendarVisibilityChange = { _, _ -> },
+            addAnAccount = { },
+            content = { },
         )
     }
-}
-
-@Composable
-fun AccountItem(
-    user: User,
-    isExpanded: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val rotation by animateFloatAsState(
-        targetValue = if (isExpanded) 90f else 0f,
-        label = "chevron_rotation",
-    )
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = Margin.Medium, horizontal = Margin.Medium),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Margin.Medium),
-    ) {
-        Avatar(avatarType = AvatarType.fromUser(user), Modifier.size(32.dp))
-        Column(
-            modifier = Modifier.weight(1f),
-        ) {
-            Text(
-                text = user.displayName.toString(),
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = user.email,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-        Icon(
-            modifier = Modifier
-                .size(20.dp)
-                .rotate(rotation),
-            imageVector = Icons.Filled.ChevronRight,
-            contentDescription = null,
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun CalendarDrawerPreview() {
-    CalendarDrawer(content = { }, drawerState = rememberDrawerState(initialValue = DrawerValue.Open), addAnAccount = { })
 }

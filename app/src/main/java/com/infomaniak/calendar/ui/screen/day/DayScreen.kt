@@ -31,6 +31,7 @@ import com.infomaniak.calendar.di.ComposeAppGraph
 import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.ui.component.drawer.CalendarDrawerIcon
 import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -75,5 +76,7 @@ private fun DayScreen(
 @Preview
 @Composable
 private fun DayScreenPreview() {
-    DayScreen(onDisconnect = { }, goToTestScreen = { })
+    CalendarThemeForPreview {
+        DayScreen(onDisconnect = { })
+    }
 }

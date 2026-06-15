@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.component.drawer.CalendarDrawerIcon
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
 fun WeekScreen(modifier: Modifier = Modifier) {
@@ -61,5 +62,7 @@ fun WeekScreen(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun WeekScreenPreview() {
-    WeekScreen()
+    CalendarThemeForPreview {
+        WeekScreen()
+    }
 }

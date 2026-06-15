@@ -80,7 +80,7 @@ fun MainNavHost(backStack: NavBackStack<NavKey>) {
 
 private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> = entryProvider {
     entry<NavDestination.CalendarView.Planning>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-        PlanningScreen()
+        PlanningScreen(goToTestScreen = { backStack.addOrMoveToTop(NavDestination.CalendarTest) })
     }
     entry<NavDestination.CalendarView.Day>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         DayScreen(goToTestScreen = { backStack.add(NavDestination.CalendarTest) })
@@ -133,7 +133,7 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
             CalendarDrawer(
                 content = content,
                 addAnAccount = {
-                    backStack().addOrMoveToTop(NavDestination.Onboarding(onlyLogin = true))
+                    backStack.addOrMoveToTop(NavDestination.Onboarding(onlyLogin = true))
                 },
             )
         },
