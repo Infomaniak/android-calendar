@@ -21,6 +21,7 @@ plugins {
     alias(core.plugins.android.application)
     alias(core.plugins.compose.compiler)
     alias(core.plugins.kotlin.android)
+    alias(core.plugins.kotlin.parcelize)
     alias(core.plugins.kotlin.serialization)
     alias(core.plugins.sentry.plugin)
     alias(kmpCalendar.plugins.metro)
