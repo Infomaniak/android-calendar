@@ -15,29 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.calendarTest.composable
+package com.infomaniak.calendar.ui.screen.eventCreation
 
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
-fun Detail(label: String, value: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "$label: $value",
-        style = MaterialTheme.typography.bodySmall,
-        maxLines = 2,
-        overflow = TextOverflow.Ellipsis,
+fun EventCreationScreen(modifier: Modifier = Modifier) {
+    Scaffold(
+        topBar = { TopAppBar(title = { Text("EventCreationScreen") }) },
         modifier = modifier,
-    )
+    ) { paddingValues ->
+        Text("EventCreationScreenContent", modifier = Modifier.padding(paddingValues))
+    }
 }
 
-@Composable
 @Preview
-private fun DetailPreview() = CalendarThemeForPreview {
-    Detail(label = "Location", value = "Meeting room A")
+@Composable
+private fun EventCreationScreenPreview() {
+    EventCreationScreen()
 }

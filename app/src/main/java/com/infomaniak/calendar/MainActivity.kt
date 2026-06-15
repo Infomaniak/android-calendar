@@ -66,13 +66,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun MainContent(userLoadState: UserLoadState.Loaded) {
-    val startDestination = if (userLoadState.user == null) NavDestination.Onboarding() else NavDestination.CalendarTest
+    val startDestination = if (userLoadState.user == null) NavDestination.Onboarding() else NavDestination.CalendarView.Planning
     val backStack = rememberNavBackStack(startDestination)
 
     CompositionLocalProvider(LocalUser provides userLoadState.user) {
         NavigateToOnboardingIfLastUserIsDisconnected(backStack, userLoadState.user)
-
-        MainNavHost(backStack = backStack)
+        MainNavHost(backStack)
     }
 }
 

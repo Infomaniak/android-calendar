@@ -15,17 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.calendarTest.utils
+package com.infomaniak.calendar.ui.screen.month
 
-import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
+import androidx.lifecycle.ViewModel
+import com.infomaniak.calendar.di.ViewModelKey
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
 
-
-fun Calendar.toUi(events: List<Event>): CalendarUi = CalendarUi(
-    id = id.url,
-    header = "$displayName · ${events.size} event(s)",
-    color = color,
-    isReadOnly = accessLevel.isReadOnly,
-    events = events.map(Event::toUi),
-)
+@Inject
+@ContributesIntoMap(AppScope::class)
+@ViewModelKey(MonthViewModel::class)
+class MonthViewModel : ViewModel()

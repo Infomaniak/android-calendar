@@ -33,7 +33,7 @@ private val dateTimeFormatter = LocalDateTime.Format {
 }
 
 @OptIn(ExperimentalTime::class)
-internal fun Event.toUi(): EventUi = EventUi(
+fun Event.toUi(): EventUi = EventUi(
     id = id.url,
     title = title.ifBlank { "(no title)" },
     timeRange = timeRange(isAllDay, start, end),

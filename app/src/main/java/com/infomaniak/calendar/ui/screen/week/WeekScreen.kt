@@ -15,42 +15,45 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.calendarTest.composable
+package com.infomaniak.calendar.ui.screen.week
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestUiState
-import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarTestUiStatePreviewProvider
-import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 
 @Composable
-fun Error(state: CalendarTestUiState.Error, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = state.message,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.error,
-        )
+fun WeekScreen(modifier: Modifier = Modifier) {
+    val snackbarHostState = LocalSharedSnackbarHostState.current
+
+    Scaffold(topBar = { TopAppBar(title = { Text("WeekScreen") }) }, modifier = modifier) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center,
+        ) {
+            Button(
+                onClick = {
+                    snackbarHostState?.showSnackbar("Snackbar message")
+                },
+            ) {
+                Text("Show snackbar")
+            }
+        }
     }
 }
 
-@Composable
 @Preview
-private fun ErrorPreview() = CalendarThemeForPreview {
-    Error(CalendarTestUiStatePreviewProvider.Error)
+@Composable
+private fun WeekScreenPreview() {
+    WeekScreen()
 }

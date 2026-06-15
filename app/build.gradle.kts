@@ -142,10 +142,11 @@ dependencies {
     implementation(core.androidx.core.ktx)
     implementation(core.androidx.lifecycle.runtime.ktx)
     implementation(core.appcompat)
-    implementation(core.compose.material3)
+    implementation(libs.compose.material3)
     implementation(core.compose.ui)
     implementation(core.compose.ui.graphics)
     implementation(core.compose.ui.tooling.preview)
+    implementation(core.androidx.adaptive)
     implementation(core.material)
 
     testImplementation(core.junit)
@@ -161,4 +162,7 @@ dependencies {
     implementation(core.androidx.lifecycle.viewmodel.navigation3)
     implementation(core.androidx.navigation3.runtime)
     implementation(core.androidx.navigation3.ui)
+
+    implementation(libs.androidx.compose.material.icons.core) //TODO: Remove when toolbar icons are imported
+    implementation(libs.androidx.compose.material.icons.extended) //TODO: Remove when toolbar icons are imported
 }

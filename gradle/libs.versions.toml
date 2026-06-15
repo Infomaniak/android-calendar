@@ -1,5 +1,11 @@
+[versions]
+material3 = "1.5.0-alpha18" # Remove when composeBom use same version or higher
+
 [libraries]
+androidx-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
+androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 infomaniak-multiplatform-calendar = { module = "com.infomaniak.multiplaform-calendar:multiplatform-calendar" }
 infomaniak-multiplatform-calendar-core = { module = "com.infomaniak.multiplaform-calendar:Core" }

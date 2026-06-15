@@ -15,16 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.home
+package com.infomaniak.calendar.ui.screen.day
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -36,10 +34,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, accountUtils: AccountUtils = ComposeAppGraph.accountUtils) {
+fun DayScreen(modifier: Modifier = Modifier, accountUtils: AccountUtils = ComposeAppGraph.accountUtils) {
     val scope = rememberCoroutineScope()
 
-    HomeScreen(
+    DayScreen(
         modifier = modifier,
         onDisconnect = {
             scope.launch {
@@ -50,10 +48,13 @@ fun HomeScreen(modifier: Modifier = Modifier, accountUtils: AccountUtils = Compo
 }
 
 @Composable
-private fun HomeScreen(onDisconnect: () -> Unit, modifier: Modifier = Modifier) {
-    Scaffold(topBar = { Text("HomeScreen") }, modifier = modifier.windowInsetsPadding(WindowInsets.statusBars)) { paddingValues ->
+private fun DayScreen(onDisconnect: () -> Unit, modifier: Modifier = Modifier) {
+    Scaffold(
+        topBar = { TopAppBar(title = { Text("DayScreen") }) },
+        modifier = modifier,
+    ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
-            Text("HomeScreenContent")
+            Text("DayScreenContent")
             Text("User: ${LocalUser.current?.displayName}")
             Button(onClick = onDisconnect) { Text("Disconnect") }
         }
@@ -62,6 +63,6 @@ private fun HomeScreen(onDisconnect: () -> Unit, modifier: Modifier = Modifier) 
 
 @Preview
 @Composable
-private fun HomeScreenPreview() {
-    HomeScreen(onDisconnect = {})
+private fun DayScreenPreview() {
+    DayScreen(onDisconnect = { })
 }

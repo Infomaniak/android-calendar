@@ -15,17 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.calendarTest.utils
+package com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation
 
-import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
+enum class MetadataSceneStrategy(val metadata: Map<String, Any>) {
+    FloatingToolbarWithFab(metadata = mapOf(SHOULD_SHOW_FLOATING_TOOLBAR_WITH_FAB to true)),
+}
 
+fun metaDataOf(vararg strategies: MetadataSceneStrategy): Map<String, Any> {
+    return buildMap { strategies.forEach { putAll(it.metadata) } }
+}
 
-fun Calendar.toUi(events: List<Event>): CalendarUi = CalendarUi(
-    id = id.url,
-    header = "$displayName · ${events.size} event(s)",
-    color = color,
-    isReadOnly = accessLevel.isReadOnly,
-    events = events.map(Event::toUi),
-)
+const val SHOULD_SHOW_FLOATING_TOOLBAR_WITH_FAB = "ShouldShowNavigationWithFabKey"

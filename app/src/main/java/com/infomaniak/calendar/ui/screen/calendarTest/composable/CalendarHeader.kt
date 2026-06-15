@@ -38,10 +38,11 @@ import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarT
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
-internal fun CalendarHeader(calendar: CalendarUi) {
+fun CalendarHeader(calendar: CalendarUi, modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier,
     ) {
         Box(
             modifier = Modifier

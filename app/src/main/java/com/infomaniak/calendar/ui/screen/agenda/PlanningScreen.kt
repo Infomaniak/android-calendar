@@ -15,29 +15,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.calendarTest.composable
+package com.infomaniak.calendar.ui.screen.agenda
 
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Detail(label: String, value: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "$label: $value",
-        style = MaterialTheme.typography.bodySmall,
-        maxLines = 2,
-        overflow = TextOverflow.Ellipsis,
+fun PlanningScreen(modifier: Modifier = Modifier) {
+    Scaffold(
+        topBar = { TopAppBar(title = { Text("PlanningScreen") }) },
         modifier = modifier,
-    )
+    ) { paddingValues ->
+        Column(modifier = Modifier.padding(paddingValues)) {
+            Text("PlanningScreenContent")
+        }
+    }
 }
 
 @Composable
 @Preview
-private fun DetailPreview() = CalendarThemeForPreview {
-    Detail(label = "Location", value = "Meeting room A")
+private fun PlanningScreenPreview() {
+    PlanningScreen()
 }
