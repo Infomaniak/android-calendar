@@ -19,6 +19,7 @@ package com.infomaniak.calendar.ui.screen.calendarTest.utils
 
 import com.infomaniak.calendar.ui.screen.calendarTest.model.EventUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -44,7 +45,7 @@ private fun Instant.formatUtc(): String =
 fun Event.toUi(): EventUi = EventUi(
     id = id.url,
     title = title.ifBlank { "(no title)" },
-    timeRange = timeRange(timing.isAllDay, timing.start, timing.end),
+    timeRange = timing.toTimeRange(),
     location = location?.takeIf { it.isNotBlank() },
     status = status?.takeIf { it.isNotBlank() },
     categories = categories?.takeIf { it.isNotBlank() },
@@ -55,12 +56,7 @@ fun Event.toUi(): EventUi = EventUi(
 )
 
 @OptIn(ExperimentalTime::class)
-private fun timeRange(
-    isAllDay: Boolean,
-    start: Instant?,
-    end: Instant?,
-): String? = when {
-    isAllDay -> "All day"
-    start != null && end != null -> "${start.formatUtc()} → ${end.formatUtc()}"
-    else -> null
+private fun EventTiming.toTimeRange(): String = when (this) {
+    is EventTiming.AllDay -> "All day"
+    is EventTiming.Timed -> "${start.formatUtc()} → ${resolvedEnd().formatUtc()}"
 }
