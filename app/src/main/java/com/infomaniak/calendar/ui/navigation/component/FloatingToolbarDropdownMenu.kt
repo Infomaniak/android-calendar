@@ -60,7 +60,7 @@ fun FloatingToolbarDropdownMenu(
         modifier = modifier.padding(bottom = Margin.Medium),
         properties = PopupProperties(clippingEnabled = false, focusable = true),
     ) {
-        DropdownMenuGroup(shapes = MenuDefaults.groupShape(index = 1, count = 1)) {
+        DropdownMenuGroup(shapes = MenuDefaults.groupShape(index = 0, count = 1)) {
             DateSelectionItems.entries.forEachIndexed { index, item ->
                 DropdownMenuItem(
                     shape = MenuDefaults.itemShape(index, DateSelectionItems.entries.count()).shape,
