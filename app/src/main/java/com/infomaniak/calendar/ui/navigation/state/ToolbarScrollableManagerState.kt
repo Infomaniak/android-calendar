@@ -25,6 +25,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 
@@ -32,7 +33,7 @@ val LocalToolbarScrollableState = staticCompositionLocalOf<ToolbarScrollableStat
 
 @Composable
 fun rememberToolbarScrollableState(): ToolbarScrollableState {
-    val isExpanded = remember { mutableStateOf(true) }
+    val isExpanded = rememberSaveable { mutableStateOf(true) }
     return remember { ToolbarScrollableState(isExpanded) }
 }
 

@@ -35,7 +35,7 @@ import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarT
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
-internal fun Loaded(state: CalendarTestUiState.Loaded) {
+fun Loaded(state: CalendarTestUiState.Loaded) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()

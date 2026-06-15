@@ -16,12 +16,12 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <string name="createEventContentDescription">Skapa ett evenemang</string>
-    <string name="dayTitles">Dag</string>
+    <string name="contentDescriptionCreateEvent">Skapa ett evenemang</string>
+    <string name="contentDescriptionToday">Idag</string>
+    <string name="contentDescriptionToolbarCurrentViewButton">Aktuell vy: %1$s. Tryck för att ändra vy.</string>
+    <string name="dayTitle">Dag</string>
     <string name="monthTitle">Månad</string>
     <string name="planningTitle">Planering</string>
     <string name="threeDaysTitle">Tre dagar</string>
-    <string name="todayContentDescription">Idag</string>
-    <string name="toolbarCurrentViewButtonContentDescription">Aktuell vy: %1$s. Tryck för att ändra vy.</string>
     <string name="weekTitle">Vecka</string>
 </resources>

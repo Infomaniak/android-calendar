@@ -22,7 +22,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 
 
-internal fun Calendar.toUi(events: List<Event>): CalendarUi = CalendarUi(
+fun Calendar.toUi(events: List<Event>): CalendarUi = CalendarUi(
     id = id.url,
     header = "$displayName · ${events.size} event(s)",
     color = color,

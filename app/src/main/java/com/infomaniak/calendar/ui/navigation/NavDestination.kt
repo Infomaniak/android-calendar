@@ -25,21 +25,21 @@ sealed interface NavDestination : NavKey {
     @Serializable
     data class Onboarding(val onlyLogin: Boolean = false) : NavDestination
 
-    sealed interface PlageDateDestination : NavDestination {
+    sealed interface CalendarView : NavDestination {
         @Serializable
-        data object Planning : PlageDateDestination
+        data object Planning : CalendarView
 
         @Serializable
-        data object Day : PlageDateDestination
+        data object Day : CalendarView
 
         @Serializable
-        data object ThreeDays : PlageDateDestination
+        data object ThreeDays : CalendarView
 
         @Serializable
-        data object Week : PlageDateDestination
+        data object Week : CalendarView
 
         @Serializable
-        data object Month : PlageDateDestination
+        data object Month : CalendarView
     }
 
     @Serializable

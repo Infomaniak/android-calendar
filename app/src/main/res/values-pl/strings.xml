@@ -16,12 +16,12 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <string name="createEventContentDescription">Utwórz wydarzenie</string>
-    <string name="dayTitles">Dzień</string>
+    <string name="contentDescriptionCreateEvent">Utwórz wydarzenie</string>
+    <string name="contentDescriptionToday">Dziś</string>
+    <string name="contentDescriptionToolbarCurrentViewButton">Aktualny widok: %1$s. Stuknij, aby zmienić widok.</string>
+    <string name="dayTitle">Dzień</string>
     <string name="monthTitle">Miesiąc</string>
     <string name="planningTitle">Planowanie</string>
     <string name="threeDaysTitle">Trzy dni</string>
-    <string name="todayContentDescription">Dziś</string>
-    <string name="toolbarCurrentViewButtonContentDescription">Aktualny widok: %1$s. Stuknij, aby zmienić widok.</string>
     <string name="weekTitle">Tydzień</string>
 </resources>

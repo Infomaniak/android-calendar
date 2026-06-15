@@ -18,22 +18,20 @@
 package com.infomaniak.calendar.ui.navigation.component
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.ViewAgenda
 import androidx.compose.material.icons.outlined.ViewDay
 import androidx.compose.material.icons.outlined.ViewWeek
+import androidx.compose.material3.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MenuAnchorPosition
 import androidx.compose.material3.MenuDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -50,7 +48,7 @@ import com.infomaniak.core.ui.compose.margin.Margin
 fun FloatingToolbarDropdownMenu(
     isExpanded: Boolean,
     onMenuExpanded: (Boolean) -> Unit,
-    onNavigationButtonClicked: (NavDestination.PlageDateDestination) -> Unit,
+    onNavigationButtonClicked: (NavDestination.CalendarView) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     DropdownMenuPopup(
@@ -62,24 +60,18 @@ fun FloatingToolbarDropdownMenu(
         modifier = modifier.padding(bottom = Margin.Medium),
         properties = PopupProperties(clippingEnabled = false, focusable = true),
     ) {
-        Surface(
-            shape = RoundedCornerShape(16.dp),
-            color = MenuDefaults.containerColor,
-            tonalElevation = MenuDefaults.TonalElevation,
-        ) {
-            Column(modifier = Modifier) {
-                DateSelectionItems.entries.forEachIndexed { index, item ->
-                    DropdownMenuItem(
-                        shape = MenuDefaults.itemShape(index, DateSelectionItems.entries.count()).shape,
-                        text = { Text(stringResource(item.labelRessourceId)) },
-                        leadingIcon = { Icon(imageVector = item.icon, contentDescription = null) },
-                        onClick = {
-                            onMenuExpanded(false)
-                            onNavigationButtonClicked(item.destination)
-                        },
-                        modifier = Modifier.widthIn(min = 180.dp),
-                    )
-                }
+        DropdownMenuGroup(shapes = MenuDefaults.groupShape(index = 1, count = 1)) {
+            DateSelectionItems.entries.forEachIndexed { index, item ->
+                DropdownMenuItem(
+                    shape = MenuDefaults.itemShape(index, DateSelectionItems.entries.count()).shape,
+                    text = { Text(stringResource(item.labelRessourceId)) },
+                    leadingIcon = { Icon(imageVector = item.icon, contentDescription = null) },
+                    onClick = {
+                        onMenuExpanded(false)
+                        onNavigationButtonClicked(item.destination)
+                    },
+                    modifier = Modifier.widthIn(min = 180.dp),
+                )
             }
         }
     }
@@ -88,31 +80,31 @@ fun FloatingToolbarDropdownMenu(
 private enum class DateSelectionItems(
     @param:StringRes val labelRessourceId: Int,
     val icon: ImageVector,
-    val destination: NavDestination.PlageDateDestination,
+    val destination: NavDestination.CalendarView,
 ) {
     Day(
-        labelRessourceId = R.string.dayTitles,
+        labelRessourceId = R.string.dayTitle,
         icon = Icons.Outlined.ViewDay,
-        destination = NavDestination.PlageDateDestination.Day,
+        destination = NavDestination.CalendarView.Day,
     ),
     ThreeDays(
         labelRessourceId = R.string.threeDaysTitle,
         icon = Icons.Outlined.ViewDay,
-        destination = NavDestination.PlageDateDestination.ThreeDays,
+        destination = NavDestination.CalendarView.ThreeDays,
     ),
     Week(
         labelRessourceId = R.string.weekTitle,
         icon = Icons.Outlined.ViewWeek,
-        destination = NavDestination.PlageDateDestination.Week,
+        destination = NavDestination.CalendarView.Week,
     ),
     Month(
         labelRessourceId = R.string.monthTitle,
         icon = Icons.Outlined.CalendarMonth,
-        destination = NavDestination.PlageDateDestination.Month,
+        destination = NavDestination.CalendarView.Month,
     ),
     Planning(
         labelRessourceId = R.string.planningTitle,
         icon = Icons.Outlined.ViewAgenda,
-        destination = NavDestination.PlageDateDestination.Planning,
+        destination = NavDestination.CalendarView.Planning,
     )
 }

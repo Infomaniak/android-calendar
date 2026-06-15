@@ -43,7 +43,7 @@ class SharedSnackbarHostState(private val coroutineScope: CoroutineScope, val sn
         message: String,
         actionLabel: String? = null,
         withDismissAction: Boolean = false,
-        duration: SnackbarDuration = SnackbarDuration.Short,
+        duration: SnackbarDuration = if (actionLabel == null) SnackbarDuration.Short else SnackbarDuration.Indefinite,
     ) {
         coroutineScope.launch {
             snackbarHostState.showSnackbar(

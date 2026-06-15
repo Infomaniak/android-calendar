@@ -20,17 +20,19 @@ package com.infomaniak.calendar.ui.screen.calendarTest.composable
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
-internal fun Detail(label: String, value: String) {
+fun Detail(label: String, value: String, modifier: Modifier = Modifier) {
     Text(
         text = "$label: $value",
         style = MaterialTheme.typography.bodySmall,
         maxLines = 2,
         overflow = TextOverflow.Ellipsis,
+        modifier = modifier,
     )
 }
 

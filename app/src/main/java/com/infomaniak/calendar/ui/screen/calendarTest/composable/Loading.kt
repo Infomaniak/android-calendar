@@ -29,8 +29,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
-internal fun Loading() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+fun Loading(modifier: Modifier = Modifier) {
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column {
             Text("⏳ Syncing…")
             CircularProgressIndicator()

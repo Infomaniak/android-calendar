@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,6 +48,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.di.ComposeAppGraph
+import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
+import com.infomaniak.calendar.ui.navigation.state.SharedSnackbarHostState
+import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostState
 import com.infomaniak.calendar.utils.AccountUtils
 import com.infomaniak.core.auth.models.UserLoginResult
 import com.infomaniak.core.auth.models.user.User
@@ -77,7 +79,7 @@ private const val CREATE_ACCOUNT_CANCEL_HOST = "" // No cancel host to detect.
 @Composable
 fun OnboardingScreen(
     onlyLogin: Boolean,
-    onNavigateToHome: () -> Unit,
+    goToCalendarView: () -> Unit,
     onPopBack: () -> Unit,
     crossAppLoginViewModel: CrossAppLoginViewModel = viewModel(),
     accountUtils: AccountUtils = ComposeAppGraph.accountUtils,
@@ -86,7 +88,7 @@ fun OnboardingScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val hostActivity = LocalActivity.current
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = LocalSharedSnackbarHostState.current
     var areButtonsLoading by remember { mutableStateOf(false) }
 
     val accountsCheckingState by crossAppLoginViewModel.accountsCheckingState.collectAsStateWithLifecycle()
@@ -95,10 +97,10 @@ fun OnboardingScreen(
     val loginDependencies = OnboardingLoginDependencies(
         context = context,
         accountUtils = accountUtils,
-        snackbarHostState = snackbarHostState,
+        snackbarHostState = snackbarHostState!!,
         onlyLoginScreen = onlyLogin,
         setButtonsLoading = { areButtonsLoading = it },
-        onNavigateToHome = onNavigateToHome,
+        onNavigateToHome = goToCalendarView,
         onPopBack = onPopBack,
     )
     val loginFlowController = rememberOnboardingLoginFlowController(
@@ -162,7 +164,7 @@ private fun OnboardingScreen(
     onLoginRequest: (accounts: List<ExternalAccount>) -> Unit,
     onCreateAccount: () -> Unit,
     onSaveSkippedAccounts: (Set<Long>) -> Unit,
-    snackbarHostState: SnackbarHostState,
+    snackbarHostState: SharedSnackbarHostState,
 ) {
     val pages: List<Page> = if (onlyLogin) listOf(Page.entries.last()) else Page.entries
 
@@ -192,7 +194,7 @@ private fun OnboardingScreen(
                 ),
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { SnackbarHost(snackbarHostState.snackbarHostState) },
     )
 }
 
@@ -272,7 +274,7 @@ private fun rememberOnboardingLoginFlowController(
                     onPopBack = dependencies.onPopBack,
                 )
             }
-            is UserLoginResult.Failure -> scope.launch {
+            is UserLoginResult.Failure -> {
                 dependencies.snackbarHostState.showSnackbar(userLoginResult.errorMessage)
             }
             null -> Unit // The user canceled the WebView.
@@ -337,7 +339,7 @@ private suspend fun loginUsersIntoTheApp(
 private data class OnboardingLoginDependencies(
     val context: Context,
     val accountUtils: AccountUtils,
-    val snackbarHostState: SnackbarHostState,
+    val snackbarHostState: SharedSnackbarHostState,
     val onlyLoginScreen: Boolean,
     val setButtonsLoading: (Boolean) -> Unit,
     val onNavigateToHome: () -> Unit,
@@ -357,7 +359,7 @@ private fun OnboardingScreenPreview() {
                 onLoginRequest = {},
                 onCreateAccount = {},
                 onSaveSkippedAccounts = {},
-                snackbarHostState = remember { SnackbarHostState() },
+                snackbarHostState = rememberCustomSnackbarHostState(),
             )
         }
     }

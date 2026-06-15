@@ -42,7 +42,7 @@ fun MonthScreen(modifier: Modifier = Modifier, monthViewModel: MonthViewModel = 
         ) {
             items(50) { index ->
                 Text(
-                    text = "Événement du mois n°$index",
+                    text = "Event of the month n°$index",
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 12.dp),

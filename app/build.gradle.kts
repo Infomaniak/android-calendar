@@ -163,6 +163,6 @@ dependencies {
     implementation(core.androidx.navigation3.runtime)
     implementation(core.androidx.navigation3.ui)
 
-    implementation(libs.androidx.compose.material.icons.core)
-    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.compose.material.icons.core) //TODO: Remove when toolbar icons are imported
+    implementation(libs.androidx.compose.material.icons.extended) //TODO: Remove when toolbar icons are imported
 }

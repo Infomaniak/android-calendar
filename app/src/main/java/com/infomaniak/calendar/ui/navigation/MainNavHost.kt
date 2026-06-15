@@ -51,40 +51,40 @@ import com.infomaniak.calendar.ui.screen.threeDays.ThreeDayScreen
 import com.infomaniak.calendar.ui.screen.week.WeekScreen
 
 @Composable
-fun MainNavHost(navBackStack: NavBackStack<NavKey>) {
-    val toolbarPermissionState: ToolbarScrollableState = rememberToolbarScrollableState()
+fun MainNavHost(backStack: NavBackStack<NavKey>) {
     val snackbarHostState: SharedSnackbarHostState = rememberCustomSnackbarHostState()
+    val toolbarScrollableState: ToolbarScrollableState = rememberToolbarScrollableState()
 
     SharedTransitionLayout {
         CompositionLocalProvider(
             LocalSharedTransitionScope provides this@SharedTransitionLayout,
             LocalSharedSnackbarHostState provides snackbarHostState,
-            LocalToolbarScrollableState provides toolbarPermissionState,
+            LocalToolbarScrollableState provides toolbarScrollableState,
         ) {
             NavDisplay(
-                backStack = navBackStack,
-                entryProvider = baseEntryProvider(backStack = { navBackStack }),
-                sceneDecoratorStrategies = sceneDecoratorStrategies(backStack = { navBackStack }),
+                backStack = backStack,
+                entryProvider = baseEntryProvider(backStack = backStack),
+                sceneDecoratorStrategies = sceneDecoratorStrategies(backStack = backStack),
                 sharedTransitionScope = this@SharedTransitionLayout,
             )
         }
     }
 }
 
-private fun baseEntryProvider(backStack: () -> NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> = entryProvider {
-    entry<NavDestination.PlageDateDestination.Planning>(metadata = metaDataOf(FloatingToolbarWithFab)) {
+private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> = entryProvider {
+    entry<NavDestination.CalendarView.Planning>(metadata = metaDataOf(FloatingToolbarWithFab)) {
         PlanningScreen()
     }
-    entry<NavDestination.PlageDateDestination.Day>(metadata = metaDataOf(FloatingToolbarWithFab)) {
+    entry<NavDestination.CalendarView.Day>(metadata = metaDataOf(FloatingToolbarWithFab)) {
         DayScreen()
     }
-    entry<NavDestination.PlageDateDestination.ThreeDays>(metadata = metaDataOf(FloatingToolbarWithFab)) {
+    entry<NavDestination.CalendarView.ThreeDays>(metadata = metaDataOf(FloatingToolbarWithFab)) {
         ThreeDayScreen()
     }
-    entry<NavDestination.PlageDateDestination.Week>(metadata = metaDataOf(FloatingToolbarWithFab)) {
+    entry<NavDestination.CalendarView.Week>(metadata = metaDataOf(FloatingToolbarWithFab)) {
         WeekScreen()
     }
-    entry<NavDestination.PlageDateDestination.Month>(metadata = metaDataOf(FloatingToolbarWithFab)) {
+    entry<NavDestination.CalendarView.Month>(metadata = metaDataOf(FloatingToolbarWithFab)) {
         MonthScreen()
     }
     entry<NavDestination.EventCreation> {
@@ -93,27 +93,30 @@ private fun baseEntryProvider(backStack: () -> NavBackStack<NavKey>): (NavKey) -
     entry<NavDestination.Onboarding> { destination ->
         OnboardingScreen(
             onlyLogin = destination.onlyLogin,
-            onNavigateToHome = {
-                backStack().clear()
-                backStack().add(NavDestination.PlageDateDestination.Day)
+            goToCalendarView = {
+                backStack.clear()
+                backStack.add(NavDestination.CalendarView.Day)
             },
-            onPopBack = { backStack().removeLastOrNull() },
+            onPopBack = { backStack.removeLastOrNull() },
         )
     }
     calendarTest()
 }
 
 @Composable
-private fun sceneDecoratorStrategies(backStack: () -> NavBackStack<NavKey>): List<SceneDecoratorStrategy<NavKey>> {
+private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<SceneDecoratorStrategy<NavKey>> {
     val navigationStrategy: NavigationDecoratorStrategy<NavKey> = remember {
         NavigationDecoratorStrategy(
             floatingToolbar = {
                 CalendarHorizontalFloatingToolbar(
-                    onNavigationButtonClicked = { backStack().addOrMoveToTop(it) },
+                    onNavigationButtonClicked = { backStack.addOrMoveToTop(it) },
                     onCurrentDayClicked = { },
-                    currentDestination = { backStack().getPlageDateDestination() },
+                    currentDestination = { backStack.getLastCalendarView() },
                     floatingActionButton = {
-                        CalendarFab(modifier = Modifier.fillMaxSize()) { backStack().addOrMoveToTop(NavDestination.EventCreation) }
+                        CalendarFab(
+                            onClick = { backStack.addOrMoveToTop(NavDestination.EventCreation) },
+                            modifier = Modifier.fillMaxSize(),
+                        )
                     },
                 )
             },
@@ -123,8 +126,8 @@ private fun sceneDecoratorStrategies(backStack: () -> NavBackStack<NavKey>): Lis
     return listOf(navigationStrategy)
 }
 
-private fun NavBackStack<NavKey>.getPlageDateDestination(): NavDestination.PlageDateDestination? {
-    return this.filterIsInstance<NavDestination.PlageDateDestination>().lastOrNull()
+private fun NavBackStack<NavKey>.getLastCalendarView(): NavDestination.CalendarView? {
+    return this.filterIsInstance<NavDestination.CalendarView>().lastOrNull()
 }
 
 private fun NavBackStack<NavKey>.addOrMoveToTop(destination: NavKey) {

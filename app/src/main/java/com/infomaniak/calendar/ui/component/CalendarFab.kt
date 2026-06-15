@@ -32,14 +32,14 @@ import com.infomaniak.calendar.ui.theme.CalendarTheme
 private const val FAB_KEY = "FAB"
 
 @Composable
-fun CalendarFab(modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun CalendarFab(onClick: () -> Unit, modifier: Modifier = Modifier) {
     FloatingActionButton(
         modifier = modifier.sharedElement(FAB_KEY),
         onClick = onClick,
     ) {
         Icon(
             imageVector = Icons.Filled.Add,
-            contentDescription = stringResource(R.string.createEventContentDescription),
+            contentDescription = stringResource(R.string.contentDescriptionCreateEvent),
         )
     }
 }

@@ -34,7 +34,7 @@ import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarT
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
-internal fun EventCard(event: EventUi) {
+fun EventCard(event: EventUi) {
     Card(modifier = Modifier.width(200.dp)) {
         Column(
             modifier = Modifier.padding(12.dp),

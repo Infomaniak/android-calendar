@@ -18,10 +18,9 @@
 package com.infomaniak.calendar.ui.theme
 
 import android.os.Build
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -76,9 +75,8 @@ fun CalendarTheme(
 }
 
 @Composable
-internal fun CalendarThemeForPreview(content: @Composable () -> Unit) =
-    CalendarTheme(darkTheme = false, dynamicColor = false){
-        Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-            content()
-        }
+fun CalendarThemeForPreview(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    CalendarTheme {
+        Surface(content = content, modifier = modifier)
     }
+}

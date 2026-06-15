@@ -44,6 +44,7 @@ import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.modifier.sharedElement
 import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
 
 private const val FLOATING_TOOLBARBAR_KEY = "FloatingToolbar"
@@ -51,9 +52,9 @@ private const val FLOATING_TOOLBARBAR_KEY = "FloatingToolbar"
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CalendarHorizontalFloatingToolbar(
-    onNavigationButtonClicked: (NavDestination.PlageDateDestination) -> Unit,
+    onNavigationButtonClicked: (NavDestination.CalendarView) -> Unit,
     onCurrentDayClicked: () -> Unit,
-    currentDestination: () -> NavDestination.PlageDateDestination?,
+    currentDestination: () -> NavDestination.CalendarView?,
     modifier: Modifier = Modifier,
     floatingActionButton: (@Composable () -> Unit)? = null,
 ) {
@@ -72,9 +73,9 @@ fun CalendarHorizontalFloatingToolbar(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun CalendarHorizontalFloatingToolbar(
-    onNavigationButtonClicked: (NavDestination.PlageDateDestination) -> Unit,
+    onNavigationButtonClicked: (NavDestination.CalendarView) -> Unit,
     onCurrentDayClicked: () -> Unit,
-    currentDestination: () -> NavDestination.PlageDateDestination?,
+    currentDestination: () -> NavDestination.CalendarView?,
     isExpanded: () -> Boolean,
     modifier: Modifier = Modifier,
     floatingActionButton: (@Composable () -> Unit)? = null,
@@ -110,15 +111,15 @@ private fun CalendarHorizontalFloatingToolbar(
 @Composable
 private fun ContentFloatingToolbar(
     onCurrentDayClicked: () -> Unit,
-    onNavigationButtonClicked: (NavDestination.PlageDateDestination) -> Unit,
-    currentDestination: () -> NavDestination.PlageDateDestination?,
+    onNavigationButtonClicked: (NavDestination.CalendarView) -> Unit,
+    currentDestination: () -> NavDestination.CalendarView?,
     modifier: Modifier = Modifier,
 ) {
     Row(modifier = modifier) {
         IconButton(onClick = onCurrentDayClicked) {
             Icon(
                 imageVector = Icons.Outlined.CalendarToday,
-                contentDescription = stringResource(R.string.todayContentDescription),
+                contentDescription = stringResource(R.string.contentDescriptionToday),
             )
         }
         DropdownIconButton(
@@ -131,8 +132,8 @@ private fun ContentFloatingToolbar(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun DropdownIconButton(
-    onNavigationButtonClicked: (NavDestination.PlageDateDestination) -> Unit,
-    currentDestination: () -> NavDestination.PlageDateDestination?,
+    onNavigationButtonClicked: (NavDestination.CalendarView) -> Unit,
+    currentDestination: () -> NavDestination.CalendarView?,
     modifier: Modifier = Modifier,
     isExpanded: Boolean = false,
 ) {
@@ -153,12 +154,12 @@ private fun DropdownIconButton(
 
 @Preview
 @Composable
-private fun CalendarHorizontalFloatingToolbarPreview() {
+private fun CalendarHorizontalFloatingToolbarPreview() = CalendarThemeForPreview {
     CalendarHorizontalFloatingToolbar(
         onNavigationButtonClicked = { },
         onCurrentDayClicked = { },
-        currentDestination = { NavDestination.PlageDateDestination.Week },
+        currentDestination = { NavDestination.CalendarView.Week },
         floatingActionButton = { CalendarFab(onClick = { }) },
-        isExpanded = { false },
+        isExpanded = { true },
     )
 }
