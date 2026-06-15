@@ -142,12 +142,12 @@ dependencies {
     implementation(core.androidx.core.ktx)
     implementation(core.androidx.lifecycle.runtime.ktx)
     implementation(core.appcompat)
-    implementation(libs.compose.material3)
     implementation(core.compose.ui)
     implementation(core.compose.ui.graphics)
     implementation(core.compose.ui.tooling.preview)
     implementation(core.androidx.adaptive)
     implementation(core.material)
+    implementation(libs.compose.material3)
 
     testImplementation(core.junit)
     androidTestImplementation(platform(core.compose.bom))
