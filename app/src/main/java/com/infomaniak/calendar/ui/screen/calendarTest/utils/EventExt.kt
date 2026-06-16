@@ -19,11 +19,15 @@ package com.infomaniak.calendar.ui.screen.calendarTest.utils
 
 import com.infomaniak.calendar.ui.screen.calendarTest.model.EventUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.char
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 
 private val dateTimeFormatter = LocalDateTime.Format {
@@ -32,24 +36,27 @@ private val dateTimeFormatter = LocalDateTime.Format {
     hour(); char(':'); minute()
 }
 
+// TODO: Timezones are not handled yet — we render Instants in UTC.
+@OptIn(ExperimentalTime::class)
+private fun Instant.formatUtc(): String =
+    toLocalDateTime(TimeZone.UTC).format(dateTimeFormatter)
+
 @OptIn(ExperimentalTime::class)
 fun Event.toUi(): EventUi = EventUi(
     id = id.url,
     title = title.ifBlank { "(no title)" },
-    timeRange = timeRange(isAllDay, start, end),
+    timeRange = timing.toTimeRange(),
     location = location?.takeIf { it.isNotBlank() },
     status = status?.takeIf { it.isNotBlank() },
     categories = categories?.takeIf { it.isNotBlank() },
     description = description?.takeIf { it.isNotBlank() },
-    lastModified = lastModified?.format(dateTimeFormatter),
+    lastModified = lastModified?.formatUtc(),
+    color = color,
+    canEdit = canEdit,
 )
 
-private fun timeRange(
-    isAllDay: Boolean,
-    start: LocalDateTime?,
-    end: LocalDateTime?,
-): String? = when {
-    isAllDay -> "All day"
-    start != null && end != null -> "${start.format(dateTimeFormatter)} → ${end.format(dateTimeFormatter)}"
-    else -> null
+@OptIn(ExperimentalTime::class)
+private fun EventTiming.toTimeRange(): String = when (this) {
+    is EventTiming.AllDay -> "All day"
+    is EventTiming.Timed -> "${start.formatUtc()} → ${resolvedEnd().formatUtc()}"
 }

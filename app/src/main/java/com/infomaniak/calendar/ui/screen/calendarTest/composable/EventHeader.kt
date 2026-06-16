@@ -18,38 +18,53 @@
 package com.infomaniak.calendar.ui.screen.calendarTest.composable
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
-import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarTestUiStatePreviewProvider
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
-fun CalendarHeader(calendar: CalendarUi, modifier: Modifier = Modifier) {
+internal fun EventHeader(
+    title: String,
+    canEdit: Boolean,
+    modifier: Modifier = Modifier,
+) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = calendar.header,
-            style = MaterialTheme.typography.titleMedium,
+            text = title,
+            style = MaterialTheme.typography.titleSmall,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f),
         )
+        if (canEdit) {
+            Text(
+                text = "✏️",
+                style = MaterialTheme.typography.labelSmall,
+            )
+        }
     }
 }
 
 @Composable
 @Preview
-private fun CalendarHeaderPreview() = CalendarThemeForPreview {
-    Column {
-        CalendarHeader(CalendarTestUiStatePreviewProvider.CalendarUi)
-    }
+private fun EventHeaderPreview() = CalendarThemeForPreview {
+    EventHeader(title = "Weekly sync", canEdit = true)
 }
+
+@Composable
+@Preview
+private fun EventHeaderReadOnlyPreview() = CalendarThemeForPreview {
+    EventHeader(title = "Shared calendar event", canEdit = false)
+}
+

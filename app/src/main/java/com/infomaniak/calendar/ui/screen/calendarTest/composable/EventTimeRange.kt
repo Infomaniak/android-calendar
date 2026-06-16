@@ -17,39 +17,37 @@
  */
 package com.infomaniak.calendar.ui.screen.calendarTest.composable
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
-import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarTestUiStatePreviewProvider
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
-fun CalendarHeader(calendar: CalendarUi, modifier: Modifier = Modifier) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+internal fun EventTimeRange(
+    timeRange: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = timeRange,
+        style = MaterialTheme.typography.bodySmall,
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis,
         modifier = modifier,
-    ) {
-        Text(
-            text = calendar.header,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.weight(1f),
-        )
-    }
+    )
 }
 
 @Composable
 @Preview
-private fun CalendarHeaderPreview() = CalendarThemeForPreview {
-    Column {
-        CalendarHeader(CalendarTestUiStatePreviewProvider.CalendarUi)
-    }
+private fun EventTimeRangePreview() = CalendarThemeForPreview {
+    EventTimeRange(timeRange = "03/01/2026 10:00 → 03/01/2026 11:00")
 }
+
+@Composable
+@Preview
+private fun EventTimeRangeAllDayPreview() = CalendarThemeForPreview {
+    EventTimeRange(timeRange = "All day")
+}
+
