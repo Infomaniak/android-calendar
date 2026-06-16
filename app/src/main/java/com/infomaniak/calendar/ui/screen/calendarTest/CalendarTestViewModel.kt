@@ -92,7 +92,6 @@ class CalendarTestViewModel(
             }
         }.collect { weeks ->
             uiState.value = CalendarTestUiState.Loaded(weeks)
-            pager.onContentLoaded()
         }
     }
 

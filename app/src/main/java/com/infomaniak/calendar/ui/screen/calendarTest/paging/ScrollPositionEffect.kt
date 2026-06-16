@@ -21,11 +21,10 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 
-/**
- * Bridges the [listState] scroll position to [onScroll] whenever it changes. Pure plumbing: it holds
- * no paging logic (thresholds/decisions live in the ViewModel), it only reports raw positions.
- */
+/** Reports the [listState] scroll position to [onScroll], deduped and skipping empty layouts. */
 @Composable
 internal fun ScrollPositionEffect(
     listState: LazyListState,
@@ -33,12 +32,18 @@ internal fun ScrollPositionEffect(
 ) {
     LaunchedEffect(listState) {
         snapshotFlow {
-            ScrollInfo(
-                firstVisibleIndex = listState.firstVisibleItemIndex,
-                lastVisibleIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0,
-                totalItemsCount = listState.layoutInfo.totalItemsCount,
-            )
-        }.collect(onScroll)
+            val visibleItems = listState.layoutInfo.visibleItemsInfo
+            visibleItems.firstOrNull()?.let { firstVisibleItem ->
+                ScrollInfo(
+                    firstVisibleIndex = firstVisibleItem.index,
+                    lastVisibleIndex = visibleItems.last().index,
+                    totalItemsCount = listState.layoutInfo.totalItemsCount,
+                )
+            }
+        }
+            .filterNotNull()
+            .distinctUntilChanged()
+            .collect(onScroll)
     }
 }
 

@@ -97,10 +97,12 @@ private fun EventTiming.sortKey(timeZone: TimeZone): Instant = when (this) {
 
 /** e.g. "S12 2026 · 24 févr. - 2 mars" */
 private fun weekHeader(weekStart: LocalDate, weekEnd: LocalDate, dayLabelFormatter: DateTimeFormatter): String {
-    val weekNumber = weekStart.toJavaLocalDate().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
-    val from = weekStart.toJavaLocalDate().format(dayLabelFormatter)
+    val javaWeekStart = weekStart.toJavaLocalDate()
+    val weekNumber = javaWeekStart.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
+    val weekBasedYear = javaWeekStart.get(IsoFields.WEEK_BASED_YEAR)
+    val from = javaWeekStart.format(dayLabelFormatter)
     val to = weekEnd.toJavaLocalDate().format(dayLabelFormatter)
-    return "S$weekNumber ${weekStart.year} · $from - $to"
+    return "S$weekNumber $weekBasedYear · $from - $to"
 }
 
 /** Monday of the week containing this date (ISO week starts on Monday). */

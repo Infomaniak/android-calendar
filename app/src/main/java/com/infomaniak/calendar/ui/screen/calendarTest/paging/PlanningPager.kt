@@ -34,16 +34,12 @@ import kotlin.time.Instant
 internal data class PlanningRange(val start: Instant, val end: Instant)
 
 /**
- * Owns the visible time [range] and grows it for infinite scroll, based on scroll position.
+ * Owns the visible time [range] and grows it for infinite scroll.
  *
- * Pure logic (no coroutines): callers observe [range] and call [onScroll] / [onContentLoaded].
- *
- * Anti-stall design: [onScroll] re-evaluates on every update (no transition filtering), so paging
- * always makes progress even if a chunk doesn't leave the prefetch zone; a per-direction guard
- * (released by [onContentLoaded]) prevents spamming while a chunk is in flight.
- *
- * Invariant: [chunk] must add more week separators than [prefetch] can reach (120 days ≈ 17 weeks
- * > a typical viewport / [minPrefetchItems]), otherwise paging over event-less periods could stall.
+ * Each direction is gated by an armed latch that re-arms only once the viewport leaves the edge's
+ * prefetch zone, so paging reacts to scrolling rather than to dataset updates re-emitting a parked
+ * position. A [chunk] always adds more items than [ScrollInfo.prefetch] spans, so a page leaves the
+ * zone and re-arms the next one.
  */
 @OptIn(ExperimentalTime::class)
 internal class PlanningPager(
@@ -55,9 +51,8 @@ internal class PlanningPager(
     private val _range = MutableStateFlow(initialRange())
     val range: StateFlow<PlanningRange> = _range.asStateFlow()
 
-    // One paging step per direction in flight at a time; released by onContentLoaded().
-    private var isLoadingPast = false
-    private var isLoadingFuture = false
+    private var pastArmed = true
+    private var futureArmed = true
 
     fun onScroll(info: ScrollInfo) {
         if (info.totalItemsCount <= 0) return
@@ -66,26 +61,19 @@ internal class PlanningPager(
         val reachedStart = info.firstVisibleIndex <= prefetch
         val reachedEnd = info.lastVisibleIndex >= info.totalItemsCount - 1 - prefetch
 
-        if (reachedStart && !isLoadingPast) {
-            isLoadingPast = true
+        if (!reachedStart) pastArmed = true
+        if (!reachedEnd) futureArmed = true
+
+        if (reachedStart && pastArmed) {
+            pastArmed = false
             _range.update { current -> current.copy(start = current.start - chunk) }
         }
-        if (reachedEnd && !isLoadingFuture) {
-            isLoadingFuture = true
+        if (reachedEnd && futureArmed) {
+            futureArmed = false
             _range.update { current -> current.copy(end = current.end + chunk) }
         }
     }
 
-    /** A new page finished loading: allow the next paging step in each direction. */
-    fun onContentLoaded() {
-        isLoadingPast = false
-        isLoadingFuture = false
-    }
-
-    // We can only reason in item counts (not-yet-composed items aren't measured, so an anticipatory
-    // pixel distance is impossible — same reason paging libs use an item-based prefetchDistance).
-    // To stay robust to screen size AND items of varying heights, prefetch the larger of the current
-    // viewport (adapts now) and a fixed floor (covers many small items coming next).
     private fun ScrollInfo.prefetch(): Int = maxOf(lastVisibleIndex - firstVisibleIndex + 1, minPrefetchItems)
 
     private fun initialRange(): PlanningRange {
