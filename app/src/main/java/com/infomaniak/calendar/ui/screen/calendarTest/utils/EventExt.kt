@@ -22,7 +22,6 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.char
@@ -30,20 +29,11 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-
 private val dateTimeFormatter = LocalDateTime.Format {
     date(LocalDate.Formats.ISO)
     char(' ')
     hour(); char(':'); minute()
 }
-
-private val timeFormatter = LocalTime.Format {
-    hour(); char(':'); minute()
-}
-
-// TODO: Timezones are not handled yet — Instants are rendered in UTC.
-@OptIn(ExperimentalTime::class)
-private fun Instant.formatTimeUtc(): String = toLocalDateTime(TimeZone.UTC).time.format(timeFormatter)
 
 @OptIn(ExperimentalTime::class)
 private fun Instant.formatDateTimeUtc(): String = toLocalDateTime(TimeZone.UTC).format(dateTimeFormatter)
