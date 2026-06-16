@@ -45,9 +45,8 @@ import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
 import com.infomaniak.calendar.ui.screen.calendarTest.calendarTest
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventCreation.EventCreationScreen
-import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.eventDetail
-import com.infomaniak.calendar.ui.screen.home.HomeScreen
+import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 import com.infomaniak.calendar.ui.screen.threeDays.ThreeDayScreen
 import com.infomaniak.calendar.ui.screen.week.WeekScreen
@@ -102,9 +101,7 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
             onPopBack = { backStack.removeLastOrNull() },
         )
     }
-    entry<NavDestination.Home> {
-        HomeScreen()
-    }
+
     calendarTest(
         onNavigateToEventDetail = { eventId -> backStack.add(NavDestination.EventDetail(eventId)) },
         onNavigateToOnboarding = {

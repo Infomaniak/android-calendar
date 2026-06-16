@@ -39,7 +39,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
@@ -125,22 +124,6 @@ class CalendarTestViewModel(
         accountUtils.removeUser(accountId.value.toInt())
         accountManager.removeAccount(accountId)
         _events.send(CalendarTestUiEvent.NavigateToOnboarding)
-	}
-
-    @OptIn(ExperimentalTime::class)
-    private fun initialRange(): PlanningRange {
-        // TODO: Timezones are not handled yet — the planning range is computed in UTC.
-        val today = Clock.System.now().toLocalDateTime(TimeZone.UTC).date
-        val start = today.atStartOfDayIn(TimeZone.UTC)
-        return PlanningRange(start = start, end = start + RANGE_CHUNK)
     }
 
-    @OptIn(ExperimentalTime::class)
-    private data class PlanningRange(val start: Instant, val end: Instant)
-
-    private companion object {
-        // Must stay large enough that even an empty chunk adds more week separators than
-        // Planning's LOAD_MORE_BUFFER, otherwise infinite scroll stalls over event-less periods.
-        val RANGE_CHUNK = 120.days
-    }
 }
