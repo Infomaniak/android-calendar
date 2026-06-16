@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -45,6 +46,7 @@ import com.infomaniak.calendar.di.ComposeAppGraph
 import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.utils.AccountUtils
+import com.infomaniak.calendar.utils.stickyWithinItem
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -87,7 +89,10 @@ private fun HomeScreen(
             Text("User: ${LocalUser.current?.displayName}")
             Button(onClick = onDisconnect) { Text("Disconnect") }
 
+            val lazyListState = rememberLazyListState()
+
             LazyColumn(
+                state = lazyListState,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
@@ -96,9 +101,13 @@ private fun HomeScreen(
                     item(key = yearMonth) { Text("YearMonth: $yearMonth") }
 
                     days.forEach { (day, events) ->
-                        item(key = DayKey(day, yearMonth)) {
+                        val dayKey = DayKey(day, yearMonth)
+                        item(key = dayKey) {
                             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                                DayIndicator(day)
+                                DayIndicator(
+                                    day = day,
+                                    modifier = Modifier.stickyWithinItem(lazyListState, dayKey),
+                                )
                                 EventList(events, Modifier.weight(1f))
                             }
                         }
@@ -110,8 +119,8 @@ private fun HomeScreen(
 }
 
 @Composable
-private fun DayIndicator(day: Int?) {
-    Text("Day: $day")
+private fun DayIndicator(day: Int?, modifier: Modifier = Modifier) {
+    Text("Day: $day", modifier = modifier)
 }
 
 @Composable
