@@ -22,13 +22,14 @@ import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestUiState
 import com.infomaniak.calendar.ui.screen.calendarTest.model.EventUi
 import com.infomaniak.calendar.ui.screen.calendarTest.model.PlanningDayUi
 import com.infomaniak.calendar.ui.screen.calendarTest.model.PlanningWeekUi
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
 
 internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<CalendarTestUiState> {
     override val values = sequenceOf(CalendarTestUiState.Loading, Loaded, Error)
 
     companion object {
         val EventUi = EventUi(
-            id = "event-preview",
+            id = EventId("event-preview"),
             title = "Weekly sync",
             timeRange = "10:00 → 11:00",
             location = "Meeting room A",
@@ -46,7 +47,7 @@ internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<Cal
             events = listOf(
                 EventUi,
                 EventUi.copy(
-                    id = "event-preview-2",
+                    id = EventId("event-preview-2"),
                     title = "Lunch with team",
                     timeRange = "12:30 → 13:30",
                     color = 0xFFE91E63.toInt(),
@@ -76,7 +77,7 @@ internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<Cal
                             header = "Mercredi 14 janvier",
                             events = listOf(
                                 EventUi.copy(
-                                    id = "event-preview-3",
+                                    id = EventId("event-preview-3"),
                                     title = "Hiking",
                                     timeRange = "All day",
                                     color = 0xFF4CAF50.toInt(),

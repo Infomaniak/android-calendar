@@ -17,12 +17,14 @@
  */
 package com.infomaniak.calendar.ui.screen.calendarTest.model
 
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
+
 /**
  * UI model for an event shown in the CalDAV test screen: everything is already formatted/derived
  * so the composables only have to render plain strings (no date formatting, no business logic).
  */
 data class EventUi(
-    val id: String,
+    val id: EventId,
     val title: String,
     val timeRange: String?,
     val location: String?,

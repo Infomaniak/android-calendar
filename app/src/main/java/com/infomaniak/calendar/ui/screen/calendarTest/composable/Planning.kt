@@ -32,8 +32,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestAction
+import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestAction.OnClickEvent
+import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestAction.OnScroll
 import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestUiState
-import com.infomaniak.calendar.ui.screen.calendarTest.paging.ScrollInfo
 import com.infomaniak.calendar.ui.screen.calendarTest.paging.ScrollPositionEffect
 import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarTestUiStatePreviewProvider
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -42,7 +44,7 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 @Composable
 internal fun Planning(
     state: CalendarTestUiState.Loaded,
-    onScroll: (ScrollInfo) -> Unit = {},
+    processAction: (CalendarTestAction) -> Unit = {},
 ) {
     if (state.weeks.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -64,12 +66,17 @@ internal fun Planning(
             stickyHeader(key = "week-${week.id}") { PlanningWeekHeader(title = week.header) }
             week.days.forEach { day ->
                 item(key = "day-${day.id}") { PlanningDayHeader(title = day.header) }
-                items(day.events, key = { event -> "event-${event.id}" }) { event -> EventCard(event) }
+                items(day.events, key = { event -> event.id.url }) { event ->
+                    EventCard(event = event, onClick = { processAction(OnClickEvent(event)) })
+                }
             }
         }
     }
 
-    ScrollPositionEffect(listState = listState, onScroll = onScroll)
+    ScrollPositionEffect(
+        listState = listState,
+        onScroll = { scrollInfo -> processAction(OnScroll(scrollInfo)) },
+    )
 }
 
 @Composable

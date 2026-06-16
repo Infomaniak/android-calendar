@@ -36,9 +36,14 @@ import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarT
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
-internal fun EventCard(event: EventUi) {
+internal fun EventCard(
+    event: EventUi,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color(event.color)),
     ) {
         Column(
