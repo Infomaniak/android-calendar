@@ -28,6 +28,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,11 +44,28 @@ import com.infomaniak.calendar.ui.screen.calendarTest.composable.Loading
 import com.infomaniak.calendar.ui.screen.calendarTest.composable.Planning
 import com.infomaniak.calendar.ui.screen.calendarTest.previewParameter.CalendarTestUiStatePreviewProvider
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
 
-fun EntryProviderScope<NavKey>.calendarTest() = entry<NavDestination.CalendarTest> {
+fun EntryProviderScope<NavKey>.calendarTest(
+    onNavigateToEventDetail: (eventId: EventId) -> Unit,
+    onNavigateToOnboarding: () -> Unit,
+) = entry<NavDestination.CalendarTest> {
     val viewModel = viewModel<CalendarTestViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    CalendarTestScreenContent(state = state, processAction = viewModel::processAction)
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is CalendarTestUiEvent.NavigateToEventDetail -> onNavigateToEventDetail(event.eventId)
+                CalendarTestUiEvent.NavigateToOnboarding -> onNavigateToOnboarding()
+            }
+        }
+    }
+
+    CalendarTestScreenContent(
+        state = state,
+        processAction = viewModel::processAction,
+    )
 }
 
 @Composable
@@ -73,7 +91,7 @@ fun CalendarTestScreenContent(
                 CalendarTestUiState.Loading -> Loading()
                 is CalendarTestUiState.Loaded -> Planning(
                     state = state,
-                    onScroll = { scrollInfo -> processAction(CalendarTestAction.OnScroll(scrollInfo)) },
+                    processAction = processAction,
                 )
                 is CalendarTestUiState.Error -> Error(state)
             }

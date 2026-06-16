@@ -17,11 +17,10 @@
  */
 package com.infomaniak.calendar.ui.screen.calendarTest
 
-import com.infomaniak.calendar.ui.screen.calendarTest.model.EventUi
-import com.infomaniak.calendar.ui.screen.calendarTest.paging.ScrollInfo
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
 
-sealed interface CalendarTestAction {
-    data object OnClickDisconnect : CalendarTestAction
-    data class OnScroll(val info: ScrollInfo) : CalendarTestAction
-    data class OnClickEvent(val event: EventUi) : CalendarTestAction
+sealed interface CalendarTestUiEvent {
+    data class NavigateToEventDetail(val eventId: EventId) : CalendarTestUiEvent
+    data object NavigateToOnboarding : CalendarTestUiEvent
 }
+

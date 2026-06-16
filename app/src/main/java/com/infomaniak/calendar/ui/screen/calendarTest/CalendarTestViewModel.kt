@@ -31,6 +31,7 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -39,6 +40,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
 
@@ -55,6 +57,9 @@ class CalendarTestViewModel(
     val uiState: StateFlow<CalendarTestUiState>
         field = MutableStateFlow<CalendarTestUiState>(CalendarTestUiState.Loading)
 
+    private val _events = Channel<CalendarTestUiEvent>(Channel.BUFFERED)
+    val events = _events.receiveAsFlow()
+
     val userFlow = accountUtils.currentUserFlow.filterNotNull()
 
     private val pager = PlanningPager()
@@ -62,6 +67,7 @@ class CalendarTestViewModel(
     fun processAction(action: CalendarTestAction) = when (action) {
         is CalendarTestAction.OnClickDisconnect -> onClickDisconnect()
         is CalendarTestAction.OnScroll -> pager.onScroll(action.info)
+        is CalendarTestAction.OnClickEvent -> onClickEvent(action)
     }
 
     init {
@@ -72,17 +78,23 @@ class CalendarTestViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun initAndSync() = viewModelScope.launch {
         userFlow.mapLatest { user ->
-            AccountId(user.id.toLong()) to
-                    accountManager.retrieveDavCredential(user.apiToken.accessToken, user.login)
-        }.collect { (accountId, credentials) ->
-            runCatching {
-                accountManager.initAccount(accountId, credentials)
-                calendarManager.syncCalendars(accountId)
-            }.cancellable()
-                .onFailure {
-                    uiState.value = CalendarTestUiState.Error(it.message ?: "Unknown error")
-                }
-        }
+            val accountId = AccountId(user.id.toLong())
+            val credentials = runCatching { accountManager.retrieveDavCredential(user.apiToken.accessToken, user.login) }
+                .onFailure { disconnectUser(accountId = accountId) }
+                .getOrNull()
+            credentials?.let {
+                accountId to credentials
+            }
+        }.filterNotNull()
+            .collect { (accountId, credentials) ->
+                runCatching {
+                    accountManager.initAccount(accountId, credentials)
+                    calendarManager.syncCalendars(accountId)
+                }.cancellable()
+                    .onFailure {
+                        uiState.value = CalendarTestUiState.Error(it.message ?: "Unknown error")
+                    }
+            }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
@@ -96,13 +108,24 @@ class CalendarTestViewModel(
         }
     }
 
-    private fun onClickDisconnect() {
+    private fun onClickEvent(action: CalendarTestAction.OnClickEvent) {
         viewModelScope.launch {
-            val userId = userFlow.map { it.id }.first()
-            accountUtils.removeUser(userId)
-            accountManager.removeAccount(AccountId(userId.toLong()))
+            _events.send(CalendarTestUiEvent.NavigateToEventDetail(action.event.id))
         }
     }
+
+    private fun onClickDisconnect() {
+        viewModelScope.launch {
+            val accountId = userFlow.map { AccountId(it.id.toLong()) }.first()
+            disconnectUser(accountId)
+        }
+    }
+
+    private suspend fun disconnectUser(accountId: AccountId) {
+        accountUtils.removeUser(accountId.value.toInt())
+        accountManager.removeAccount(accountId)
+        _events.send(CalendarTestUiEvent.NavigateToOnboarding)
+	}
 
     @OptIn(ExperimentalTime::class)
     private fun initialRange(): PlanningRange {

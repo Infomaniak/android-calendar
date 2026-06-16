@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.ui.navigation
 
 import androidx.navigation3.runtime.NavKey
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -47,4 +48,7 @@ sealed interface NavDestination : NavKey {
 
     @Serializable
     data object CalendarTest : NavDestination
+
+    @Serializable
+    data class EventDetail(val eventId: EventId) : NavDestination
 }
