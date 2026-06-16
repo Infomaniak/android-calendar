@@ -19,6 +19,7 @@ package com.infomaniak.calendar.di
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.Provider
@@ -31,17 +32,21 @@ import kotlin.reflect.KClass
  * Wired as the activity's `defaultViewModelProviderFactory` so that the standard
  * `viewModel()` composable transparently resolves Metro-built ViewModels.
  *
- * Each ViewModel must be annotated with:
+ * Register a ViewModel by annotating it with:
  * - `@Inject`
  * - `@ContributesIntoMap(AppScope::class)`
  * - `@ViewModelKey(MyViewModel::class)`
+ *
+ * ViewModels that need a constructor argument (e.g. a nav arg) are not registered here; build them
+ * directly with the `viewModel(key = ...) { MyViewModel(arg, ...) }` initializer overload instead.
  */
 @Inject
 @SingleIn(AppScope::class)
 class MetroViewModelFactory(
     private val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>>,
 ) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+
         val provider = viewModelProviders[modelClass.kotlin]
             ?: error(
                 "No Metro ViewModel binding for ${modelClass.name}. " +

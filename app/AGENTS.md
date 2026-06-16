@@ -28,21 +28,37 @@ app/src/main/java/com/infomaniak/calendar/
 ├── MatomoCalendar.kt               # Matomo tracker (implements Core's Matomo interface)
 ├── di/
 │   ├── AppGraph.kt                 # Metro @DependencyGraph (AppScope) — inherits CalendarCoreGraph + multibinding
-│   ├── MetroViewModelFactory.kt    # ViewModelProvider.Factory backed by multibinding map
+│   ├── MetroViewModelFactory.kt    # ViewModelProvider.Factory backed by the ViewModel multibinding map
 │   └── ViewModelKey.kt             # @MapKey annotation for ViewModel multibinding
 └── ui/
     ├── navigation/
-    │   └── MainNavHost.kt          # Top-level NavDisplay with entryProvider
+    │   ├── MainNavHost.kt          # Top-level NavDisplay with entryProvider
+    │   └── NavDestination.kt       # Sealed NavKey hierarchy (Onboarding, Home, CalendarTest, EventDetail)
     ├── screen/
-    │   └── calendarTest/
-    │       ├── CalendarTestScreen.kt       # CalendarTest NavKey + entry function
-    │       ├── CalendarTestScreenContent.kt# Stateless Composable rendering CalendarTestUiState
-    │       ├── CalendarTestUiState.kt      # Sealed interface (Loading / Success / Error)
-    │       ├── CalendarTestViewModel.kt    # ViewModel: observes calendars, triggers CalDAV sync
-    │       └── composable/
-    │           ├── Error.kt        # Error state Composable
-    │           ├── Loading.kt      # Loading state Composable
-    │           └── Success.kt      # Success state Composable
+    │   ├── calendarTest/
+    │   │   ├── CalendarTestScreen.kt       # CalendarTest entry (exposes onNavigateToEventDetail callback)
+    │   │   ├── CalendarTestUiState.kt      # Sealed interface (Loading / Loaded / Error)
+    │   │   ├── CalendarTestAction.kt       # User actions (OnClickDisconnect, OnScroll)
+    │   │   ├── CalendarTestViewModel.kt    # ViewModel: observes planning, triggers CalDAV sync
+    │   │   ├── composable/
+    │   │   │   ├── Planning.kt             # Loaded state — lazy planning list (exposes onEventClick)
+    │   │   │   ├── EventCard.kt            # Single event card (clickable)
+    │   │   │   ├── Error.kt / Loading.kt / Detail.kt / EventHeader.kt / ...
+    │   │   ├── model/                      # EventUi, PlanningDayUi, PlanningWeekUi
+    │   │   ├── paging/                     # PlanningPager + ScrollInfo
+    │   │   ├── previewParameter/
+    │   │   └── utils/                      # EventExt.kt, toPlanningWeeks.kt
+    │   └── eventDetail/
+    │       ├── EventDetailScreen.kt        # EventDetail NavKey + entry (receives onNavigateBack)
+    │       ├── EventDetailUiState.kt       # Sealed interface (Loading / Loaded / Error)
+    │       ├── EventDetailAction.kt        # User actions (OnClickDelete)
+    │       ├── EventDetailViewModel.kt     # ViewModel: loads event from NavKey, handles delete
+    │       ├── composable/
+    │       │   ├── Content.kt              # Loaded state — full detail view + delete button
+    │       │   ├── Loading.kt              # Loading state Composable
+    │       │   └── Error.kt               # Error state Composable
+    │       └── previewParameter/
+    │           └── EventDetailUiStatePreviewProvider.kt
     └── theme/
         ├── Theme.kt                # CalendarTheme Composable (Material 3 color schemes)
         ├── Color.kt                # Color tokens
@@ -73,10 +89,16 @@ app/
 - **Compose-only UI**: No XML layouts / ViewBinding; use Material 3 components.
 - **Navigation**: Uses Jetpack Navigation 3 (`NavDisplay` + `entryProvider`). Each screen defines its own `NavKey`
   data object and an `EntryProviderScope<NavKey>` extension (e.g., `home()`). Top-level wiring lives in `MainNavHost`.
+- **MVI**: Test screens follow an MVI loop. The UI sends `…Action`s to the ViewModel via a single
+  `processAction(action)` entry point. The ViewModel mutates a `StateFlow<…UiState>` for rendering and emits one-shot
+  `…UiEvent`s (navigation, etc.) through a `Channel(BUFFERED).receiveAsFlow()` — collected once in the screen's entry
+  via `LaunchedEffect`. Use a `Channel` (not a `SharedFlow`) so each event is consumed exactly once with no replay.
 - **DI**: Metro `@DependencyGraph` (`AppGraph`) scoped to `AppScope`. ViewModels are auto-registered
   via multibinding (`@ContributesIntoMap` + `@ViewModelKey`) and resolved through `MetroViewModelFactory`,
   set as `defaultViewModelProviderFactory` in `MainActivity`. In Composables, use the standard
-  `viewModel<MyViewModel>()` from `androidx.lifecycle.viewmodel.compose`.
+  `viewModel<MyViewModel>()` from `androidx.lifecycle.viewmodel.compose`. When several instances of the same screen can
+  coexist (e.g. multiple `EventDetail` entries), pass a distinct `viewModel(key = …)` so each one gets its own instance
+  instead of sharing the Activity-scoped ViewModel.
 - **Edge-to-edge**: Call `enableEdgeToEdge()` in `onCreate` before `setContent` (already wired in `MainActivity`).
 - **Shared logic**: Prefer reusing models / logic from `com.infomaniak.multiplatform_calendar.*` instead of duplicating
   Android-only equivalents.
@@ -262,7 +284,38 @@ class MyViewModel(...) : ViewModel()
 
 In Composables, use the standard `viewModel<MyViewModel>()`.
 `MetroViewModelFactory` (set as `defaultViewModelProviderFactory` in `MainActivity`) resolves the VM
-from the multibinding map automatically.
+from the multibinding map automatically. Because the current `LocalViewModelStoreOwner` is the Activity
+(no per-`NavEntry` ViewModelStore decorator is installed), the Metro factory is picked up without passing it
+explicitly. To get a distinct instance per screen occurrence, pass `viewModel(key = …)`.
+
+**ViewModel with a constructor argument (navigation args):**
+
+When a ViewModel needs a navigation arg **and** Metro-injected dependencies, use Metro **assisted injection**:
+the arg is `@Assisted`, the dependencies are injected normally. Expose an `@AssistedFactory` and build the VM
+with the standard Compose `viewModel(key = ...) { factory.create(arg) }` initializer overload (no
+`SavedStateHandle`/`CreationExtras` plumbing). The composable pulls the *factory* from the graph — never the
+injected dependencies themselves.
+
+```kotlin
+@AssistedInject
+class MyViewModel(
+  @Assisted private val id: SomeId,
+  private val repo: SomeRepo, // injected by Metro
+) : ViewModel() {
+  // ...
+  @AssistedFactory
+  fun interface Factory {
+    fun create(id: SomeId): MyViewModel
+  }
+}
+
+// Expose the factory on AppGraph: `val myViewModelFactory: MyViewModel.Factory`
+// In the screen entry:
+val factory = ComposeAppGraph.myViewModelFactory
+val viewModel = viewModel(key = destination.id.value) { factory.create(destination.id) }
+```
+
+The distinct `key` gives each occurrence its own instance (fixes "wrong detail shown" bugs).
 
 > **Future simplification**: When upgrading to Metro 0.12.0+ (requires Kotlin 2.3.20+),
 > `@ViewModelKey` will support `implicitClassKey` (no need to repeat the class name), and the
@@ -283,6 +336,22 @@ from the multibinding map automatically.
 
 - Strip Figma-generated `fillColor="#00000000"` attributes.
 - Reformat drawables with Android Studio before committing.
+
+**Navigation with screen data (EventDetail pattern):**
+
+When a detail screen needs data from the previous screen (e.g., EventDetail), encode all pre-formatted fields
+directly in the `NavDestination` data class as primitive/nullable-String fields (no cross-screen model imports).
+The entry screen's extension function accepts a navigation callback (e.g., `onNavigateToEventDetail`) and the
+ViewModel is initialized via `LaunchedEffect(destination) { viewModel.load(destination) }`.
+The ViewModel guards re-initialization with `if (uiState.value !is Loading) return`.
+Post-action navigation (e.g., after delete) is signalled by an `isDeleted: Boolean` flag in `Loaded` state,
+collected via `LaunchedEffect(state)` in the composable.
+
+**Material Icons dependency:**
+
+`androidx.compose.material:material-icons-core` is a separate dependency from Material 3.
+It is declared as `core.compose.material.icons` in the Core catalog and must be added to
+`app/build.gradle.kts` to use `Icons.Default.*` in Composables.
 
 ## Self-correction
 
