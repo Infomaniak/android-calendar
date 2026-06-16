@@ -17,6 +17,7 @@
   -->
 <resources>
     <string name="contentDescriptionCreateEvent">Een evenement maken</string>
+    <string name="contentDescriptionMenuDrawer">Menu openen</string>
     <string name="contentDescriptionToday">Vandaag</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Huidige weergave: %1$s. Tik om de weergave te wijzigen.</string>
     <string name="dayTitle">Dag</string>

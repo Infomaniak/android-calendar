@@ -17,6 +17,7 @@
   -->
 <resources>
     <string name="contentDescriptionCreateEvent">Δημιουργία εκδήλωσης</string>
+    <string name="contentDescriptionMenuDrawer">Άνοιγμα μενού</string>
     <string name="contentDescriptionToday">Σήμερα</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Τρέχουσα προβολή: %1$s. Πατήστε για να αλλάξετε την προβολή.</string>
     <string name="dayTitle">Ημέρα</string>

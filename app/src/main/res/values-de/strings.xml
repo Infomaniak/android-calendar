@@ -17,6 +17,7 @@
   -->
 <resources>
     <string name="contentDescriptionCreateEvent">Anlass erstellen</string>
+    <string name="contentDescriptionMenuDrawer">Menü öffnen</string>
     <string name="contentDescriptionToday">Heute</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Aktuelle Ansicht: %1$s. Tippen, um die Ansicht zu wechseln.</string>
     <string name="dayTitle">Tag</string>
