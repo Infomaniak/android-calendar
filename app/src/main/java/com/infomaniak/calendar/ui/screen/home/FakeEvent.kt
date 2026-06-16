@@ -162,4 +162,4 @@ internal val fakeEventList: List<Event> = listOf(
 )
 
 @OptIn(ExperimentalTime::class)
-internal val fakeEvents: EventsByMonthAndDay = fakeEventList.groupByMonthAndDay()
+internal val fakeEvents: EventsByWeekAndDay = fakeEventList.groupByWeekAndDay()

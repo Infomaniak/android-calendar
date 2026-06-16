@@ -50,8 +50,9 @@ import com.infomaniak.calendar.utils.stickyWithinItem
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 import kotlinx.parcelize.Parcelize
-import java.util.SortedMap
+import kotlinx.parcelize.TypeParceler
 
 @Composable
 fun HomeScreen(
@@ -62,7 +63,7 @@ fun HomeScreen(
     val scope = rememberCoroutineScope()
 
     // TODO: Expose a SnapshotStateMap to avoid recomposing everything each time any value is updated in the list of all events
-    val events: SortedMap<YearMonth, SortedMap<Int, List<Event>>> by viewModel.events.collectAsStateWithLifecycle()
+    val events: EventsByWeekAndDay by viewModel.events.collectAsStateWithLifecycle()
 
     HomeScreen(
         modifier = modifier,
@@ -77,7 +78,7 @@ fun HomeScreen(
 
 @Composable
 private fun HomeScreen(
-    events: () -> SortedMap<YearMonth, SortedMap<Int, List<Event>>>,
+    events: () -> EventsByWeekAndDay,
     onDisconnect: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -97,15 +98,15 @@ private fun HomeScreen(
                     .weight(1f)
                     .fillMaxWidth(),
             ) {
-                events().forEach { (yearMonth, days) ->
-                    item(key = yearMonth) { Text("YearMonth: $yearMonth") }
+                events().forEach { (week, days) ->
+                    item(key = week) { Text(week.label) }
 
-                    days.forEach { (day, events) ->
-                        val dayKey = DayKey(day, yearMonth)
+                    days.forEach { (date, events) ->
+                        val dayKey = DayKey(date)
                         item(key = dayKey) {
                             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                                 DayIndicator(
-                                    day = day,
+                                    day = date.day,
                                     modifier = Modifier.stickyWithinItem(lazyListState, dayKey),
                                 )
                                 EventList(events, Modifier.weight(1f))
@@ -146,17 +147,15 @@ private fun Event(event: Event) {
 }
 
 @Parcelize
-private data class DayKey(val day: Int, val yearMonth: YearMonth) : Parcelable
+@TypeParceler<LocalDate, LocalDateParceler>
+private data class DayKey(val date: LocalDate) : Parcelable
 
-@Parcelize
-data class YearMonth(val year: Int, val month: Int) : Parcelable, Comparable<YearMonth> {
-    override fun compareTo(other: YearMonth): Int {
-        return when {
-            year != other.year -> year - other.year
-            else -> month - other.month
-        }
+/** e.g. "Week 15 - 20 - 26 December 2029". */
+private val YearWeek.label: String
+    get() {
+        val monthName = month.name.lowercase().replaceFirstChar { it.uppercase() }
+        return "Week $weekNumber - ${firstDay.day} - ${lastDay.day} $monthName $year"
     }
-}
 
 @Preview
 @Composable
