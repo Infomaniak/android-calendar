@@ -12,7 +12,7 @@ val appMinSdk: Int by rootProject.extra
 val javaVersion: JavaVersion by rootProject.extra
 
 android {
-    namespace = "com.infomaniak.calendar.components.event"
+    namespace = "com.infomaniak.calendar.components.foundation"
     compileSdk = appCompileSdk
 
     defaultConfig {

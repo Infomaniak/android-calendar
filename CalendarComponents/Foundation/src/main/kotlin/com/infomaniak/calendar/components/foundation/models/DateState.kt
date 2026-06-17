@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.models
+package com.infomaniak.calendar.components.foundation.models
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable

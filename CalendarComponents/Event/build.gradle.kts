@@ -52,8 +52,8 @@ android {
 }
 
 dependencies {
-    api(project(":CalendarComponents:Models"))
 
+    api(project(":CalendarComponents:Foundation"))
     implementation(platform(core.compose.bom))
     implementation(core.compose.foundation)
     implementation(core.compose.ui.android)

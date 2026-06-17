@@ -17,9 +17,9 @@
  */
 package com.infomaniak.calendar.ui.screen.home
 
-import com.infomaniak.calendar.components.models.EventUi
-import com.infomaniak.calendar.components.models.WeekNumbering
-import com.infomaniak.calendar.components.models.YearWeek
+import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import kotlinx.datetime.LocalDate

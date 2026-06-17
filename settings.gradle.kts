@@ -61,7 +61,7 @@ dependencyResolutionManagement {
 rootProject.name = "Calendar"
 include(":app")
 include(":CalendarComponents:Event")
-include(":CalendarComponents:Models")
+include(":CalendarComponents:Foundation")
 include(":CalendarComponents:Planning")
 
 includeBuild("multiplatform-calendar") {

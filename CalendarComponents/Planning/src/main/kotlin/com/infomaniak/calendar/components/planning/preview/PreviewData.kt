@@ -17,9 +17,9 @@
  */
 package com.infomaniak.calendar.components.planning.preview
 
-import com.infomaniak.calendar.components.models.EventUi
-import com.infomaniak.calendar.components.models.WeekNumbering
-import com.infomaniak.calendar.components.models.YearWeek
+import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.calendar.components.foundation.models.YearWeek
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime

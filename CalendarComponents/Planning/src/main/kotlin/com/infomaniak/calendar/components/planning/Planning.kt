@@ -32,10 +32,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.event.EventItem
-import com.infomaniak.calendar.components.models.DateState
-import com.infomaniak.calendar.components.models.EventUi
-import com.infomaniak.calendar.components.models.LocalDateParceler
-import com.infomaniak.calendar.components.models.YearWeek
+import com.infomaniak.calendar.components.foundation.models.DateState
+import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.LocalDateParceler
+import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.planning.component.DayIndicator
 import com.infomaniak.calendar.components.planning.preview.previewWeekEvents
 import com.infomaniak.core.ui.compose.margin.Margin
