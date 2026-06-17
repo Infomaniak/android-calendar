@@ -41,5 +41,7 @@ dependencies {
     implementation(platform(core.compose.bom))
     implementation(core.compose.foundation)
     implementation(core.compose.ui.android)
+    implementation(core.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
+    debugImplementation(core.compose.ui.tooling)
 }
