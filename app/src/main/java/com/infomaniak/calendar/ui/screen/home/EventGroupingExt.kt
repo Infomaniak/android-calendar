@@ -69,8 +69,8 @@ fun List<Event>.groupByWeekAndDay(
 }
 
 private fun Event.toEventUi(): EventUi? {
-    val start = timing.start ?: return null
-    val end = timing.end ?: return null
+    val start = (timing as? EventTiming.Timed)?.start ?: return null // TODO: Handle AllDay
+    val end = (timing as? EventTiming.Timed)?.resolvedEnd() ?: return null // TODO: Handle AllDay
     return EventUi(
         id = id.url,
         title = title,
