@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
@@ -97,7 +98,6 @@ private fun HomeScreen(
     onDisconnect: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val today = remember { Clock.System.todayIn(TimeZone.currentSystemDefault()) }
 
     Scaffold(
         topBar = { Text("HomeScreen") },
@@ -107,32 +107,44 @@ private fun HomeScreen(
             Text("User: ${LocalUser.current?.displayName}")
             Button(onClick = onDisconnect) { Text("Disconnect") }
 
-            val lazyListState = rememberLazyListState()
-
-            LazyColumn(
-                state = lazyListState,
+            Planning(
+                weekEvents = weekEvents,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
-            ) {
-                weekEvents().forEach { (week, days) ->
-                    item(key = week) { Text(week.label) }
+            )
+        }
+    }
+}
 
-                    days.forEach { (date, events) ->
-                        val dayKey = DayKey(date)
-                        item(key = dayKey) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(Margin.Small)) {
-                                DayIndicator(
-                                    dayName = date.toJavaLocalDate().format(shortDayNameFormatter),
-                                    dayNumber = date.day,
-                                    state = if (date == today) DateState.Today else DateState.None,
-                                    modifier = Modifier
-                                        .padding(start = Margin.Medium)
-                                        .stickyWithinItem(lazyListState, dayKey),
-                                )
-                                EventList(events, Modifier.weight(1f))
-                            }
-                        }
+@Composable
+fun Planning(
+    weekEvents: () -> EventsByWeekAndDay,
+    modifier: Modifier = Modifier,
+    lazyListState: LazyListState = rememberLazyListState(),
+) {
+    val today = remember { Clock.System.todayIn(TimeZone.currentSystemDefault()) }
+
+    LazyColumn(
+        state = lazyListState,
+        modifier = modifier,
+    ) {
+        weekEvents().forEach { (week, days) ->
+            item(key = week) { Text(week.label) }
+
+            days.forEach { (date, events) ->
+                val dayKey = DayKey(date)
+                item(key = dayKey) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(Margin.Small)) {
+                        DayIndicator(
+                            dayName = date.toJavaLocalDate().format(shortDayNameFormatter),
+                            dayNumber = date.day,
+                            state = if (date == today) DateState.Today else DateState.None,
+                            modifier = Modifier
+                                .padding(start = Margin.Medium)
+                                .stickyWithinItem(lazyListState, dayKey),
+                        )
+                        EventList(events, Modifier.weight(1f))
                     }
                 }
             }
@@ -169,13 +181,13 @@ private fun DayIndicator(dayName: String, dayNumber: Int, state: DateState, modi
 private fun EventList(events: List<Event>, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         events.forEach { event ->
-            Event(event)
+            EventItem(event)
         }
     }
 }
 
 @Composable
-private fun Event(event: Event) {
+private fun EventItem(event: Event) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
