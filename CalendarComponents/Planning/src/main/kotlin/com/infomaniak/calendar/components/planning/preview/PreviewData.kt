@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.planning
+package com.infomaniak.calendar.components.planning.preview
 
 import com.infomaniak.calendar.components.models.EventUi
 import com.infomaniak.calendar.components.models.WeekNumbering
@@ -55,11 +55,11 @@ internal val previewWeekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>> by 
             event(pastDay, 10, "Team retrospective", "Conference room B"),
         ),
         today to listOf(
-            event(today, 9, "Morning standup", "Google Meet", 0xFF0F9D58.toInt()),
-            event(today, 14, "Design review", "Office 3.12", 0xFFDB4437.toInt()),
+            event(today, 9, "Morning standup", "kMeet", 0xFF0F9D58.toInt()),
+            event(today, 14, "Design review", "Japan room", 0xFFDB4437.toInt()),
         ),
         futureDay to listOf(
-            event(futureDay, 11, "Sprint planning", "Zoom"),
+            event(futureDay, 11, "Sprint planning", "Hard rock room"),
         ),
     )
         .groupBy { (date, _) -> WeekNumbering.ISO_8601.weekOf(date) }

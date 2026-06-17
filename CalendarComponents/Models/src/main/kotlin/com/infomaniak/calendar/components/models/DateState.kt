@@ -27,14 +27,14 @@ enum class DateState(
     val borderColor: @Composable () -> Color,
 ) {
     Today(
-        containerColor = { MaterialTheme.colorScheme.primary },
-        contentColor = { MaterialTheme.colorScheme.onPrimary },
-        borderColor = { Color.Transparent },
-    ),
-    Selected(
         containerColor = { Color.Transparent },
         contentColor = { MaterialTheme.colorScheme.primary },
         borderColor = { MaterialTheme.colorScheme.primary },
+    ),
+    Selected(
+        containerColor = { MaterialTheme.colorScheme.primary },
+        contentColor = { MaterialTheme.colorScheme.onPrimary },
+        borderColor = { Color.Transparent },
     ),
     None(
         containerColor = { Color.Transparent },

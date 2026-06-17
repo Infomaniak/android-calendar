@@ -18,33 +18,26 @@
 package com.infomaniak.calendar.components.planning
 
 import android.os.Parcelable
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.EventItem
 import com.infomaniak.calendar.components.models.DateState
 import com.infomaniak.calendar.components.models.EventUi
 import com.infomaniak.calendar.components.models.LocalDateParceler
 import com.infomaniak.calendar.components.models.YearWeek
+import com.infomaniak.calendar.components.planning.component.DayIndicator
+import com.infomaniak.calendar.components.planning.preview.previewWeekEvents
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -88,31 +81,6 @@ fun Planning(
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun DayIndicator(dayName: String, dayNumber: Int, state: DateState, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier.width(48.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(dayName, style = MaterialTheme.typography.bodyMedium)
-
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .padding(Margin.Micro)
-                .background(state.containerColor(), CircleShape),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = dayNumber.toString(),
-                color = state.contentColor(),
-                style = MaterialTheme.typography.titleLargeEmphasized,
-                fontWeight = FontWeight.Medium,
-            )
         }
     }
 }
