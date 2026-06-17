@@ -53,7 +53,6 @@ fun HomeScreen(
 ) {
     val scope = rememberCoroutineScope()
 
-    // TODO: Expose a SnapshotStateMap to avoid recomposing everything each time any value is updated in the list of all events
     val weekEvents: EventsByWeekAndDay by viewModel.weekEvents.collectAsStateWithLifecycle()
 
     HomeScreen(
