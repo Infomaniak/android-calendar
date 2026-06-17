@@ -49,16 +49,24 @@ app/src/main/java/com/infomaniak/calendar/
     │   │   ├── previewParameter/
     │   │   └── utils/                      # EventExt.kt, toPlanningWeeks.kt
     │   └── eventDetail/
-    │       ├── EventDetailScreen.kt        # EventDetail NavKey + entry (receives onNavigateBack)
+    │       ├── EventDetailScreen.kt        # EventDetail NavKey + entry (onNavigateBack, onNavigateToEdit)
     │       ├── EventDetailUiState.kt       # Sealed interface (Loading / Loaded / Error)
-    │       ├── EventDetailAction.kt        # User actions (OnClickDelete)
-    │       ├── EventDetailViewModel.kt     # ViewModel: loads event from NavKey, handles delete
+    │       ├── EventDetailAction.kt        # User actions (OnClickEdit / OnClickDelete / OnClickBack)
+    │       ├── EventDetailViewModel.kt     # ViewModel: loads event from NavKey, handles edit/delete
     │       ├── composable/
     │       │   ├── Content.kt              # Loaded state — full detail view + delete button
     │       │   ├── Loading.kt              # Loading state Composable
     │       │   └── Error.kt               # Error state Composable
     │       └── previewParameter/
     │           └── EventDetailUiStatePreviewProvider.kt
+    │   └── eventFormTest/                  # Test screen: edit (eventId set) / create (eventId null) — MVI
+    │       ├── EventFormTestScreen.kt      # EventFormTest NavKey + entry (onNavigateBack); TopAppBar save
+    │       ├── EventFormUiState.kt         # Sealed (Loading / Editing(form, calendars, isSaving) / Error)
+    │       ├── EventFormAction.kt          # Field changes + OnClickSave / OnClickBack
+    │       ├── EventFormTestViewModel.kt   # Assisted on eventId?; prefill via observeEvent/observeCalendars; updateEvent
+    │       ├── composable/                 # EventFormFields (text fields, all-day, calendar dropdown), DateTimeField (pickers)
+    │       ├── model/                      # EventFormData, CalendarChoice
+    │       └── utils/                      # EventFormMapper (Event ↔ form ↔ EventEditData)
     └── theme/
         ├── Theme.kt                # CalendarTheme Composable (Material 3 color schemes)
         ├── Color.kt                # Color tokens

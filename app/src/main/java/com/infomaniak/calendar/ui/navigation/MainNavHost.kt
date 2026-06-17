@@ -46,6 +46,7 @@ import com.infomaniak.calendar.ui.screen.calendarTest.calendarTest
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventCreation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.eventDetail
+import com.infomaniak.calendar.ui.screen.eventFormTest.eventFormTest
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 import com.infomaniak.calendar.ui.screen.threeDays.ThreeDayScreen
@@ -110,6 +111,10 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
         },
     )
     eventDetail(
+        onNavigateBack = { backStack.removeLastOrNull() },
+        onNavigateToEdit = { eventId -> backStack.add(NavDestination.EventFormTest(eventId)) },
+    )
+    eventFormTest(
         onNavigateBack = { backStack.removeLastOrNull() },
     )
 }

@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.BuildConfig
 import com.infomaniak.calendar.MainApplication
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailViewModel
+import com.infomaniak.calendar.ui.screen.eventFormTest.EventFormTestViewModel
 import com.infomaniak.calendar.utils.AccountUtils
 import com.infomaniak.core.login.InfomaniakLogin
 import com.infomaniak.core.network.LOGIN_ENDPOINT_URL
@@ -62,6 +63,8 @@ interface AppGraph {
     val accountUtils: AccountUtils
 
     val eventDetailViewModelFactory: EventDetailViewModel.Factory
+
+    val eventFormTestViewModelFactory: EventFormTestViewModel.Factory
 
     @Provides
     @SingleIn(AppScope::class)

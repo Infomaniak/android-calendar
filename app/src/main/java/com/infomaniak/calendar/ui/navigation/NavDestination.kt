@@ -51,4 +51,7 @@ sealed interface NavDestination : NavKey {
 
     @Serializable
     data class EventDetail(val eventId: EventId) : NavDestination
+
+    @Serializable
+    data class EventFormTest(val eventId: EventId? = null) : NavDestination
 }
