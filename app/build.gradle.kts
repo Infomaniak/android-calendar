@@ -68,6 +68,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Keep the heavy Rust .so out of the debug APK for ABIs we never run on (saves ~150 MB).
+            // arm64-v8a covers physical devices and Apple-Silicon emulators; x86_64 covers PC emulators.
+            ndk { abiFilters += setOf("arm64-v8a", "x86_64") }
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")

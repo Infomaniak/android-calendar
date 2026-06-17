@@ -22,6 +22,7 @@ import com.infomaniak.calendar.ui.screen.calendarTest.paging.ScrollInfo
 
 sealed interface CalendarTestAction {
     data object OnClickDisconnect : CalendarTestAction
+    data object OnClickCreateEvent : CalendarTestAction
     data class OnScroll(val info: ScrollInfo) : CalendarTestAction
     data class OnClickEvent(val event: EventUi) : CalendarTestAction
 }

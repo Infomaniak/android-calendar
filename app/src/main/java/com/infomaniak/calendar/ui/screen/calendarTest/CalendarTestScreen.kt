@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Button
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,6 +49,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
 
 fun EntryProviderScope<NavKey>.calendarTest(
     onNavigateToEventDetail: (eventId: EventId) -> Unit,
+    onNavigateToEventCreation: () -> Unit,
     onNavigateToOnboarding: () -> Unit,
 ) = entry<NavDestination.CalendarTest> {
     val viewModel = viewModel<CalendarTestViewModel>()
@@ -57,6 +59,7 @@ fun EntryProviderScope<NavKey>.calendarTest(
         viewModel.events.collect { event ->
             when (event) {
                 is CalendarTestUiEvent.NavigateToEventDetail -> onNavigateToEventDetail(event.eventId)
+                CalendarTestUiEvent.NavigateToEventCreation -> onNavigateToEventCreation()
                 CalendarTestUiEvent.NavigateToOnboarding -> onNavigateToOnboarding()
             }
         }
@@ -82,6 +85,11 @@ fun CalendarTestScreenContent(
                 Button(onClick = { processAction(CalendarTestAction.OnClickDisconnect) }) {
                     Text("Disconnect")
                 }
+            }
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { processAction(CalendarTestAction.OnClickCreateEvent) }) {
+                Text("+")
             }
         },
         modifier = modifier.windowInsetsPadding(WindowInsets.statusBars),

@@ -63,7 +63,7 @@ app/src/main/java/com/infomaniak/calendar/
     │       ├── EventFormTestScreen.kt      # EventFormTest NavKey + entry (onNavigateBack); TopAppBar save
     │       ├── EventFormUiState.kt         # Sealed (Loading / Editing(form, calendars, isSaving) / Error)
     │       ├── EventFormAction.kt          # Field changes + OnClickSave / OnClickBack
-    │       ├── EventFormTestViewModel.kt   # Assisted on eventId?; prefill via observeEvent/observeCalendars; updateEvent
+    │       ├── EventFormTestViewModel.kt   # Assisted on eventId?; prefill via observeEvent/observeCalendars; updateEvent or createEvent
     │       ├── composable/                 # EventFormFields (text fields, all-day, calendar dropdown), DateTimeField (pickers)
     │       ├── model/                      # EventFormData, CalendarChoice
     │       └── utils/                      # EventFormMapper (Event ↔ form ↔ EventEditData)

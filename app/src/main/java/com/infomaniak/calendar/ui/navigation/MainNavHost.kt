@@ -105,6 +105,7 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
 
     calendarTest(
         onNavigateToEventDetail = { eventId -> backStack.add(NavDestination.EventDetail(eventId)) },
+        onNavigateToEventCreation = { backStack.add(NavDestination.EventFormTest()) },
         onNavigateToOnboarding = {
             backStack.clear()
             backStack.add(NavDestination.Onboarding(onlyLogin = true))

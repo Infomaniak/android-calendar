@@ -85,12 +85,12 @@ class EventFormTestViewModel(
 
     private fun onClickSave() {
         val state = uiState.value as? EventFormUiState.Editing ?: return
-        // TODO: creation (eventId == null) is wired once CalendarManager.createEvent lands.
-        val eventId = eventId ?: return
         uiState.value = state.copy(isSaving = true)
         viewModelScope.launch {
             runCatching {
-                calendarManager.updateEvent(eventId, state.form.toEditData())
+                val data = state.form.toEditData()
+                if (eventId != null) calendarManager.updateEvent(eventId, data)
+                else calendarManager.createEvent(data)
             }.onSuccess {
                 _events.send(EventFormUiEvent.NavigateBack)
             }.onFailure {

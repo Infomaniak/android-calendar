@@ -21,6 +21,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
 
 sealed interface CalendarTestUiEvent {
     data class NavigateToEventDetail(val eventId: EventId) : CalendarTestUiEvent
+    data object NavigateToEventCreation : CalendarTestUiEvent
     data object NavigateToOnboarding : CalendarTestUiEvent
 }
 

@@ -65,6 +65,7 @@ class CalendarTestViewModel(
 
     fun processAction(action: CalendarTestAction) = when (action) {
         is CalendarTestAction.OnClickDisconnect -> onClickDisconnect()
+        is CalendarTestAction.OnClickCreateEvent -> onClickCreateEvent()
         is CalendarTestAction.OnScroll -> pager.onScroll(action.info)
         is CalendarTestAction.OnClickEvent -> onClickEvent(action)
     }
@@ -110,6 +111,12 @@ class CalendarTestViewModel(
     private fun onClickEvent(action: CalendarTestAction.OnClickEvent) {
         viewModelScope.launch {
             _events.send(CalendarTestUiEvent.NavigateToEventDetail(action.event.id))
+        }
+    }
+
+    private fun onClickCreateEvent() {
+        viewModelScope.launch {
+            _events.send(CalendarTestUiEvent.NavigateToEventCreation)
         }
     }
 
