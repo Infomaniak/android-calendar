@@ -42,9 +42,11 @@ import com.infomaniak.calendar.ui.screen.eventDetail.composable.EventScreenHeade
 import com.infomaniak.calendar.ui.screen.eventDetail.composable.Loading
 import com.infomaniak.calendar.ui.screen.eventDetail.previewParameter.EventDetailUiStatePreviewProvider
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
 
 fun EntryProviderScope<NavKey>.eventDetail(
     onNavigateBack: () -> Unit,
+    onNavigateToEdit: (EventId) -> Unit,
 ) = entry<NavDestination.EventDetail> { destination ->
     val factory = ComposeAppGraph.eventDetailViewModelFactory
     val viewModel = viewModel(key = destination.eventId.url) {
@@ -56,6 +58,7 @@ fun EntryProviderScope<NavKey>.eventDetail(
         viewModel.events.collect { event ->
             when (event) {
                 EventDetailUiEvent.NavigateBack -> onNavigateBack()
+                is EventDetailUiEvent.NavigateToEdit -> onNavigateToEdit(event.eventId)
             }
         }
     }

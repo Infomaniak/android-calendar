@@ -24,6 +24,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailAction
+import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailAction.OnClickBack
+import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailAction.OnClickEdit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,13 +36,17 @@ internal fun EventScreenHeader(
     TopAppBar(
         title = { Text(text = title) },
         navigationIcon = {
-            IconButton(onClick = { processAction(EventDetailAction.OnClickBack) }) {
+            IconButton(onClick = { processAction(OnClickBack) }) {
                 Text(text = "←")
+            }
+        },
+        actions = {
+            IconButton(onClick = { processAction(OnClickEdit) }) {
+                Text(text = "✎")
             }
         },
     )
 }
-
 @Composable
 @Preview
 private fun EventScreenHeaderPreview() = EventScreenHeader(

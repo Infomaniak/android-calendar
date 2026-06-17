@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.ui.screen.eventDetail
 
 sealed interface EventDetailAction {
+    data object OnClickEdit : EventDetailAction
     data object OnClickDelete : EventDetailAction
     data object OnClickBack : EventDetailAction
 }

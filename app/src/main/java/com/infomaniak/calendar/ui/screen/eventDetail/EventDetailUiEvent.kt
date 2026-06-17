@@ -17,7 +17,10 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
+
 sealed interface EventDetailUiEvent {
     data object NavigateBack : EventDetailUiEvent
+    data class NavigateToEdit(val eventId: EventId) : EventDetailUiEvent
 }
 

@@ -38,16 +38,14 @@ class EventDetailViewModel(
     @Assisted private val eventId: EventId,
     private val calendarManager: CalendarManager,
 ) : ViewModel() {
-
     val uiState: StateFlow<EventDetailUiState>
         field = MutableStateFlow<EventDetailUiState>(EventDetailUiState.Loading)
-
     private val _events = Channel<EventDetailUiEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
-
     private var observeJob: Job? = observeEvent(eventId)
 
     fun processAction(action: EventDetailAction) = when (action) {
+        is EventDetailAction.OnClickEdit -> onClickEdit()
         is EventDetailAction.OnClickDelete -> onClickDelete()
         is EventDetailAction.OnClickBack -> onClickBack()
     }
@@ -78,6 +76,13 @@ class EventDetailViewModel(
 
     private fun onClickBack() = viewModelScope.launch {
         _events.send(EventDetailUiEvent.NavigateBack)
+    }
+
+    private fun onClickEdit() {
+        val current = uiState.value as? EventDetailUiState.Loaded ?: return
+        viewModelScope.launch {
+            _events.send(EventDetailUiEvent.NavigateToEdit(current.eventId))
+        }
     }
 
     @AssistedFactory
