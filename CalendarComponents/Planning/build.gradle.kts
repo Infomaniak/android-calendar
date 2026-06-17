@@ -19,8 +19,9 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(core.plugins.android.library)
-    alias(core.plugins.kotlin.android)
     alias(core.plugins.compose.compiler)
+    alias(core.plugins.kotlin.android)
+    alias(core.plugins.kotlin.parcelize)
 }
 
 val appCompileSdk: Int by rootProject.extra
@@ -52,6 +53,17 @@ android {
 }
 
 dependencies {
+    api(project(":CalendarComponents:Event"))
+    api(project(":CalendarComponents:Models"))
+
+    implementation(core.infomaniak.core.ui.compose.margin)
+
     implementation(platform(core.compose.bom))
-    implementation(core.compose.ui)
+    implementation(core.compose.foundation)
+    implementation(core.compose.ui.android)
+    implementation(core.compose.ui.tooling.preview)
+    implementation(libs.compose.material3)
+    debugImplementation(core.compose.ui.tooling)
+
+    implementation(kmpCalendar.kotlinx.datetime)
 }

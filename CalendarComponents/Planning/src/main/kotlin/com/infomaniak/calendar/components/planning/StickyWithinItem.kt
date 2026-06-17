@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.utils
+package com.infomaniak.calendar.components.planning
 
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable

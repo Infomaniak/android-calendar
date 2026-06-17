@@ -15,8 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.planning
+package com.infomaniak.calendar.components.models
 
-class Example {
-    
-}
+import kotlin.time.Instant
+
+data class EventUi(
+    val id: String,
+    val title: String,
+    val location: String?,
+    val categories: String?,
+    val start: Instant,
+    val end: Instant,
+    val color: Int,
+)

@@ -17,6 +17,9 @@
  */
 package com.infomaniak.calendar.ui.screen.home
 
+import com.infomaniak.calendar.components.models.EventUi
+import com.infomaniak.calendar.components.models.WeekNumbering
+import com.infomaniak.calendar.components.models.YearWeek
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import kotlinx.datetime.LocalDate
@@ -32,7 +35,7 @@ import kotlin.time.ExperimentalTime
  * ascending so the result can be consumed directly by a calendar UI. Days are keyed by full date
  * (not day-of-month) so a week that straddles two months stays in chronological order.
  */
-typealias EventsByWeekAndDay = SortedMap<YearWeek, SortedMap<LocalDate, List<Event>>>
+typealias EventsByWeekAndDay = SortedMap<YearWeek, SortedMap<LocalDate, List<EventUi>>>
 
 /**
  * Groups events by the [week][YearWeek] they fall in and then by their day.
@@ -51,16 +54,30 @@ fun List<Event>.groupByWeekAndDay(
     weekNumbering: WeekNumbering = WeekNumbering.ISO_8601,
     timeZone: TimeZone = TimeZone.currentSystemDefault(),
 ): EventsByWeekAndDay {
-    val result = sortedMapOf<YearWeek, SortedMap<LocalDate, MutableList<Event>>>()
+    val result = sortedMapOf<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>()
 
     for (event in this) {
         val date = (event.timing as? EventTiming.Timed)?.start?.toLocalDateTime(timeZone)?.date ?: continue // TODO: Handle AllDay
         result
             .getOrPut(weekNumbering.weekOf(date)) { sortedMapOf() }
             .getOrPut(date) { mutableListOf() }
-            .add(event)
+            .add(event.toEventUi() ?: continue)
     }
 
     @Suppress("UNCHECKED_CAST") // Makes the exposed list non-mutable
     return result as EventsByWeekAndDay
+}
+
+private fun Event.toEventUi(): EventUi? {
+    val start = timing.start ?: return null
+    val end = timing.end ?: return null
+    return EventUi(
+        id = id.url,
+        title = title,
+        location = location,
+        categories = categories,
+        start = start,
+        end = end,
+        color = color,
+    )
 }
