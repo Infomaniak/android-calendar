@@ -94,8 +94,8 @@ internal val fakeEventList: List<Event> = listOf(
         location = "Ristorante Bella Italia",
         categories = "Social",
         timing = EventTiming.Timed(
-            start = Instant.parse("2026-06-16T12:30:00Z"),
-            end = EventEnd.At(Instant.parse("2026-06-16T13:30:00Z")),
+            start = Instant.parse("2026-06-17T12:30:00Z"),
+            end = EventEnd.At(Instant.parse("2026-06-17T13:30:00Z")),
         ),
         lastModified = Instant.parse("2026-06-11T09:00:00Z"),
         color = 0xFFE91E63.toInt(),

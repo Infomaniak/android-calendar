@@ -26,18 +26,25 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -47,12 +54,20 @@ import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.utils.AccountUtils
 import com.infomaniak.calendar.utils.stickyWithinItem
+import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toJavaLocalDate
+import kotlinx.datetime.todayIn
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
+import java.time.format.DateTimeFormatter
+import kotlin.time.Clock
+
+private val shortDayNameFormatter = DateTimeFormatter.ofPattern("EEE")
 
 @Composable
 fun HomeScreen(
@@ -82,6 +97,8 @@ private fun HomeScreen(
     onDisconnect: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val today = remember { Clock.System.todayIn(TimeZone.currentSystemDefault()) }
+
     Scaffold(
         topBar = { Text("HomeScreen") },
         modifier = modifier.windowInsetsPadding(WindowInsets.statusBars),
@@ -104,10 +121,14 @@ private fun HomeScreen(
                     days.forEach { (date, events) ->
                         val dayKey = DayKey(date)
                         item(key = dayKey) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(Margin.Small)) {
                                 DayIndicator(
-                                    day = date.day,
-                                    modifier = Modifier.stickyWithinItem(lazyListState, dayKey),
+                                    dayName = date.toJavaLocalDate().format(shortDayNameFormatter),
+                                    dayNumber = date.day,
+                                    state = if (date == today) DateState.Today else DateState.None,
+                                    modifier = Modifier
+                                        .padding(start = Margin.Medium)
+                                        .stickyWithinItem(lazyListState, dayKey),
                                 )
                                 EventList(events, Modifier.weight(1f))
                             }
@@ -120,8 +141,28 @@ private fun HomeScreen(
 }
 
 @Composable
-private fun DayIndicator(day: Int?, modifier: Modifier = Modifier) {
-    Text("Day: $day", modifier = modifier)
+private fun DayIndicator(dayName: String, dayNumber: Int, state: DateState, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.width(48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(dayName, style = MaterialTheme.typography.bodyMedium)
+
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .padding(Margin.Micro)
+                .background(state.containerColor(), CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = dayNumber.toString(),
+                color = state.contentColor(),
+                style = MaterialTheme.typography.titleLargeEmphasized,
+                fontWeight = FontWeight.Medium,
+            )
+        }
+    }
 }
 
 @Composable
