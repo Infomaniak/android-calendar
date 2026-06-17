@@ -63,11 +63,11 @@ fun HomeScreen(
     val scope = rememberCoroutineScope()
 
     // TODO: Expose a SnapshotStateMap to avoid recomposing everything each time any value is updated in the list of all events
-    val events: EventsByWeekAndDay by viewModel.events.collectAsStateWithLifecycle()
+    val weekEvents: EventsByWeekAndDay by viewModel.weekEvents.collectAsStateWithLifecycle()
 
     HomeScreen(
         modifier = modifier,
-        events = { events },
+        weekEvents = { weekEvents },
         onDisconnect = {
             scope.launch {
                 accountUtils.removeUser(accountUtils.currentUserIdFlow.first() ?: return@launch)
@@ -78,7 +78,7 @@ fun HomeScreen(
 
 @Composable
 private fun HomeScreen(
-    events: () -> EventsByWeekAndDay,
+    weekEvents: () -> EventsByWeekAndDay,
     onDisconnect: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -98,7 +98,7 @@ private fun HomeScreen(
                     .weight(1f)
                     .fillMaxWidth(),
             ) {
-                events().forEach { (week, days) ->
+                weekEvents().forEach { (week, days) ->
                     item(key = week) { Text(week.label) }
 
                     days.forEach { (date, events) ->
@@ -160,5 +160,5 @@ private val YearWeek.label: String
 @Preview
 @Composable
 private fun HomeScreenPreview() = CalendarThemeForPreview {
-    HomeScreen(events = { fakeEvents }, onDisconnect = {})
+    HomeScreen(weekEvents = { fakeEvents }, onDisconnect = {})
 }

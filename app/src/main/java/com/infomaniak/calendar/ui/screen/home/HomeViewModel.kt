@@ -17,7 +17,7 @@ import kotlin.time.Instant
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey(HomeViewModel::class)
 class HomeViewModel(calendarManager: CalendarManager) : ViewModel() {
-    val events: StateFlow<EventsByWeekAndDay> = calendarManager
+    val weekEvents: StateFlow<EventsByWeekAndDay> = calendarManager
         .observeEvents(Instant.DISTANT_PAST, Instant.DISTANT_FUTURE)
         .map { it.groupByWeekAndDay() }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = sortedMapOf())
