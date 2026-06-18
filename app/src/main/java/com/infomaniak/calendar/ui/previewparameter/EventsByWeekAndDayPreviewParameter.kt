@@ -35,23 +35,6 @@ class EventsByWeekAndDayPreviewParameter : PreviewParameterProvider<EventsByWeek
     override val values: Sequence<EventsByWeekAndDay> = sequenceOf(fakeEventList.groupByWeekAndDay())
 }
 
-@OptIn(ExperimentalTime::class)
-private data class FakeEvent(
-    override val id: EventId,
-    override val calendarId: CalendarId,
-    override val title: String,
-    override val description: String? = null,
-    override val location: String? = null,
-    override val status: String? = "CONFIRMED",
-    override val categories: String? = null,
-    override val timing: EventTiming,
-    override val lastModified: Instant? = null,
-    override val attendees: List<Attendee> = emptyList(),
-    override val organizer: Attendee? = null,
-    override val color: Int = 0xFF2196F3.toInt(),
-    override val canEdit: Boolean = true,
-) : Event
-
 private val fakeCalendarId = CalendarId("https://caldav.example.com/calendars/user/personal/")
 
 @OptIn(ExperimentalTime::class)
@@ -129,3 +112,20 @@ private val fakeEventList: List<Event> = listOf(
         color = 0xFFFF9800.toInt(),
     ),
 )
+
+@OptIn(ExperimentalTime::class)
+private data class FakeEvent(
+    override val id: EventId,
+    override val calendarId: CalendarId,
+    override val title: String,
+    override val description: String? = null,
+    override val location: String? = null,
+    override val status: String? = "CONFIRMED",
+    override val categories: String? = null,
+    override val timing: EventTiming,
+    override val lastModified: Instant? = null,
+    override val attendees: List<Attendee> = emptyList(),
+    override val organizer: Attendee? = null,
+    override val color: Int = 0xFF2196F3.toInt(),
+    override val canEdit: Boolean = true,
+) : Event
