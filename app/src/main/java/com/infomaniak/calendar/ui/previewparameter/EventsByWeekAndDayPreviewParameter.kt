@@ -52,118 +52,80 @@ private data class FakeEvent(
     override val canEdit: Boolean = true,
 ) : Event
 
-@OptIn(ExperimentalTime::class)
 private val fakeCalendarId = CalendarId("https://caldav.example.com/calendars/user/personal/")
+
+@OptIn(ExperimentalTime::class)
+private fun eventId(slug: String) = EventId("https://caldav.example.com/calendars/user/personal/$slug.ics")
+
+@OptIn(ExperimentalTime::class)
+private fun timed(start: String, end: String) = EventTiming.Timed(
+    start = Instant.parse(start),
+    end = EventEnd.At(Instant.parse(end)),
+)
+
+private val alice = Attendee(
+    email = "alice@example.com",
+    displayName = "Alice Martin",
+    status = ParticipationStatus.Accepted,
+    role = AttendeeRole.Organizer,
+    isOrganizer = true,
+)
+
+private val bob = Attendee(
+    email = "bob@example.com",
+    displayName = "Bob Dupont",
+    status = ParticipationStatus.Accepted,
+    role = AttendeeRole.Requested,
+)
 
 @OptIn(ExperimentalTime::class)
 private val fakeEventList: List<Event> = listOf(
     FakeEvent(
-        id = EventId("https://caldav.example.com/calendars/user/personal/weekly-sync.ics"),
+        id = eventId("weekly-sync"),
         calendarId = fakeCalendarId,
         title = "Weekly Sync",
         description = "Team standup and weekly planning session.",
         location = "Meeting Room A",
-        categories = "Work",
-        timing = EventTiming.Timed(
-            start = Instant.parse("2026-06-15T10:00:00Z"),
-            end = EventEnd.At(Instant.parse("2026-06-15T11:00:00Z")),
-        ),
-        lastModified = Instant.parse("2026-06-10T08:30:00Z"),
-        attendees = listOf(
-            Attendee(
-                email = "alice@example.com",
-                displayName = "Alice Martin",
-                status = ParticipationStatus.Accepted,
-                role = AttendeeRole.Organizer,
-                isOrganizer = true,
-            ),
-            Attendee(
-                email = "bob@example.com",
-                displayName = "Bob Dupont",
-                status = ParticipationStatus.Accepted,
-                role = AttendeeRole.Requested,
-            ),
-        ),
-        organizer = Attendee(
-            email = "alice@example.com",
-            displayName = "Alice Martin",
-            status = ParticipationStatus.Accepted,
-            role = AttendeeRole.Organizer,
-            isOrganizer = true,
-        ),
-        color = 0xFF2196F3.toInt(),
+        timing = timed("2026-06-15T10:00:00Z", "2026-06-15T11:00:00Z"),
+        attendees = listOf(alice, bob),
+        organizer = alice,
     ),
     FakeEvent(
-        id = EventId("https://caldav.example.com/calendars/user/personal/team-lunch.ics"),
+        id = eventId("team-lunch"),
         calendarId = fakeCalendarId,
         title = "Team Lunch",
         description = "Monthly team lunch at the Italian place around the corner.",
         location = "Ristorante Bella Italia",
-        categories = "Social",
-        timing = EventTiming.Timed(
-            start = Instant.parse("2026-06-17T12:30:00Z"),
-            end = EventEnd.At(Instant.parse("2026-06-17T13:30:00Z")),
-        ),
-        lastModified = Instant.parse("2026-06-11T09:00:00Z"),
+        timing = timed("2026-06-17T12:30:00Z", "2026-06-17T13:30:00Z"),
         color = 0xFFE91E63.toInt(),
         canEdit = false,
     ),
     FakeEvent(
-        id = EventId("https://caldav.example.com/calendars/user/personal/design-review.ics"),
+        id = eventId("design-review"),
         calendarId = fakeCalendarId,
         title = "Design Review",
         description = "Review new UI mockups with the design team.",
         location = "Meeting Room B",
-        categories = "Work",
-        timing = EventTiming.Timed(
-            start = Instant.parse("2026-06-16T15:00:00Z"),
-            end = EventEnd.At(Instant.parse("2026-06-16T16:00:00Z")),
-        ),
-        lastModified = Instant.parse("2026-06-13T11:00:00Z"),
+        timing = timed("2026-06-16T15:00:00Z", "2026-06-16T16:00:00Z"),
         color = 0xFF9C27B0.toInt(),
     ),
     FakeEvent(
-        id = EventId("https://caldav.example.com/calendars/user/personal/hiking-day.ics"),
+        id = eventId("hiking-day"),
         calendarId = fakeCalendarId,
         title = "Hiking Day",
         description = "Annual company hiking trip.",
         location = "Salève, France",
-        categories = "Sport",
-        timing = EventTiming.Timed(
-            start = Instant.parse("2026-06-20T00:00:00Z"),
-            end = EventEnd.At(Instant.parse("2026-06-20T00:30:00Z")),
-        ),
-        lastModified = Instant.parse("2026-06-05T14:00:00Z"),
+        timing = timed("2026-06-20T00:00:00Z", "2026-06-20T00:30:00Z"),
         color = 0xFF4CAF50.toInt(),
     ),
     FakeEvent(
-        id = EventId("https://caldav.example.com/calendars/user/personal/product-review.ics"),
+        id = eventId("product-review"),
         calendarId = fakeCalendarId,
         title = "Product Review",
         description = "Quarterly product roadmap review with the PM and engineering leads.",
-        location = "Conf Room B / Zoom",
-        categories = "Work",
-        timing = EventTiming.Timed(
-            start = Instant.parse("2026-06-22T14:00:00Z"),
-            end = EventEnd.At(Instant.parse("2026-06-22T15:30:00Z")),
-        ),
-        lastModified = Instant.parse("2026-06-12T10:00:00Z"),
-        attendees = listOf(
-            Attendee(
-                email = "carol@example.com",
-                displayName = "Carol Schmidt",
-                status = ParticipationStatus.Accepted,
-                role = AttendeeRole.Organizer,
-                isOrganizer = true,
-            ),
-            Attendee(
-                email = "dave@example.com",
-                displayName = "Dave Leroy",
-                status = ParticipationStatus.Tentative,
-                role = AttendeeRole.Requested,
-                responseNeeded = true,
-            ),
-        ),
+        location = "Conf Room B / kMeet",
+        timing = timed("2026-06-22T14:00:00Z", "2026-06-22T15:30:00Z"),
+        attendees = listOf(alice, bob),
         color = 0xFFFF9800.toInt(),
     ),
 )
