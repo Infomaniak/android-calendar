@@ -34,7 +34,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @Composable
-fun DayScreen(modifier: Modifier = Modifier, accountUtils: AccountUtils = ComposeAppGraph.accountUtils) {
+fun DayScreen(
+    onTestScreen: () -> Unit,
+    modifier: Modifier = Modifier,
+    accountUtils: AccountUtils = ComposeAppGraph.accountUtils,
+) {
     val scope = rememberCoroutineScope()
 
     DayScreen(
@@ -44,11 +48,12 @@ fun DayScreen(modifier: Modifier = Modifier, accountUtils: AccountUtils = Compos
                 accountUtils.removeUser(accountUtils.currentUserIdFlow.first() ?: return@launch)
             }
         },
+        onTestScreen = onTestScreen,
     )
 }
 
 @Composable
-private fun DayScreen(onDisconnect: () -> Unit, modifier: Modifier = Modifier) {
+private fun DayScreen(onDisconnect: () -> Unit, onTestScreen: () -> Unit, modifier: Modifier = Modifier) {
     Scaffold(
         topBar = { TopAppBar(title = { Text("DayScreen") }) },
         modifier = modifier,
@@ -57,6 +62,7 @@ private fun DayScreen(onDisconnect: () -> Unit, modifier: Modifier = Modifier) {
             Text("DayScreenContent")
             Text("User: ${LocalUser.current?.displayName}")
             Button(onClick = onDisconnect) { Text("Disconnect") }
+            Button(onClick = onTestScreen) { Text("Test Calendar") }
         }
     }
 }
@@ -64,5 +70,5 @@ private fun DayScreen(onDisconnect: () -> Unit, modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun DayScreenPreview() {
-    DayScreen(onDisconnect = { })
+    DayScreen(onDisconnect = { }, onTestScreen = { })
 }

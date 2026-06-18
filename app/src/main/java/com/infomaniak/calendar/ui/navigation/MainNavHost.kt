@@ -76,7 +76,7 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
         PlanningScreen()
     }
     entry<NavDestination.CalendarView.Day>(metadata = metaDataOf(FloatingToolbarWithFab)) {
-        DayScreen()
+        DayScreen(onTestScreen = { backStack.add(NavDestination.CalendarTest) })
     }
     entry<NavDestination.CalendarView.ThreeDays>(metadata = metaDataOf(FloatingToolbarWithFab)) {
         ThreeDayScreen()

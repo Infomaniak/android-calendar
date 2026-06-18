@@ -27,9 +27,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
+import com.infomaniak.calendar.secured.CredentialViewModel
 import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.ui.navigation.MainNavHost
 import com.infomaniak.calendar.ui.navigation.NavDestination
@@ -54,6 +56,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             CalendarTheme {
                 Surface {
+                    val credentialViewModel = viewModel<CredentialViewModel>()
+                    LaunchedEffect(Unit) { credentialViewModel.loadDavCredential() }
+
                     when (val userLoadState = appGraph.accountUtils.rememberUserLoadState().value) {
                         UserLoadState.Awaiting -> Unit // Blank surface while waiting for first result
                         is UserLoadState.Loaded -> MainContent(userLoadState)
