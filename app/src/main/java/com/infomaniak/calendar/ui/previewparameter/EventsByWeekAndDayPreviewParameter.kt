@@ -15,8 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.home
+package com.infomaniak.calendar.ui.previewparameter
 
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import com.infomaniak.calendar.ui.screen.home.EventsByWeekAndDay
+import com.infomaniak.calendar.ui.screen.home.groupByWeekAndDay
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.AttendeeRole
@@ -28,8 +31,12 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.Participati
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
+class EventsByWeekAndDayPreviewParameter : PreviewParameterProvider<EventsByWeekAndDay> {
+    override val values: Sequence<EventsByWeekAndDay> = sequenceOf(fakeEventList.groupByWeekAndDay())
+}
+
 @OptIn(ExperimentalTime::class)
-internal data class FakeEvent(
+private data class FakeEvent(
     override val id: EventId,
     override val calendarId: CalendarId,
     override val title: String,
@@ -46,10 +53,10 @@ internal data class FakeEvent(
 ) : Event
 
 @OptIn(ExperimentalTime::class)
-internal val fakeCalendarId = CalendarId("https://caldav.example.com/calendars/user/personal/")
+private val fakeCalendarId = CalendarId("https://caldav.example.com/calendars/user/personal/")
 
 @OptIn(ExperimentalTime::class)
-internal val fakeEventList: List<Event> = listOf(
+private val fakeEventList: List<Event> = listOf(
     FakeEvent(
         id = EventId("https://caldav.example.com/calendars/user/personal/weekly-sync.ics"),
         calendarId = fakeCalendarId,
@@ -160,6 +167,3 @@ internal val fakeEventList: List<Event> = listOf(
         color = 0xFFFF9800.toInt(),
     ),
 )
-
-@OptIn(ExperimentalTime::class)
-internal val fakeEvents: EventsByWeekAndDay = fakeEventList.groupByWeekAndDay()

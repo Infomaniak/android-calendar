@@ -31,18 +31,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.planning.Planning
 import com.infomaniak.calendar.di.ComposeAppGraph
 import com.infomaniak.calendar.ui.LocalUser
+import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewParameter
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.utils.AccountUtils
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
-import java.time.format.DateTimeFormatter
 import kotlin.time.Clock
 
 @Composable
@@ -95,6 +96,8 @@ private fun HomeScreen(
 
 @Preview
 @Composable
-private fun HomeScreenPreview() = CalendarThemeForPreview {
-    HomeScreen(weekEvents = { fakeEvents }, onDisconnect = {})
+private fun HomeScreenPreview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class) weekEvents: EventsByWeekAndDay) {
+    CalendarThemeForPreview {
+        HomeScreen(weekEvents = { weekEvents }, onDisconnect = {})
+    }
 }
