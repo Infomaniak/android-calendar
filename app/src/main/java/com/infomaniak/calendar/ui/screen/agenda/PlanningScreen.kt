@@ -18,30 +18,59 @@
 package com.infomaniak.calendar.ui.screen.agenda
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.infomaniak.calendar.components.planning.Planning
+import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewParameter
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlanningScreen(modifier: Modifier = Modifier) {
+fun PlanningScreen(
+    modifier: Modifier = Modifier,
+    viewModel: PlanningViewModel = viewModel(),
+) {
+    val weekEvents: EventsByWeekAndDay by viewModel.weekEvents.collectAsStateWithLifecycle()
+
+    PlanningScreen(
+        modifier = modifier,
+        weekEvents = { weekEvents },
+    )
+}
+
+@Composable
+private fun PlanningScreen(
+    weekEvents: () -> EventsByWeekAndDay,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         topBar = { TopAppBar(title = { Text("PlanningScreen") }) },
         modifier = modifier,
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
-            Text("PlanningScreenContent")
+            Planning(
+                weekEvents = weekEvents,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+            )
         }
     }
 }
 
-@Composable
 @Preview
-private fun PlanningScreenPreview() {
-    PlanningScreen()
+@Composable
+private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class) weekEvents: EventsByWeekAndDay) {
+    CalendarThemeForPreview {
+        PlanningScreen(weekEvents = { weekEvents })
+    }
 }

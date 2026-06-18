@@ -18,8 +18,8 @@
 package com.infomaniak.calendar.ui.previewparameter
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.infomaniak.calendar.ui.screen.home.EventsByWeekAndDay
-import com.infomaniak.calendar.ui.screen.home.groupByWeekAndDay
+import com.infomaniak.calendar.ui.screen.agenda.EventsByWeekAndDay
+import com.infomaniak.calendar.ui.screen.agenda.groupByWeekAndDay
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.AttendeeRole

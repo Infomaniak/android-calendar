@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.home
+package com.infomaniak.calendar.ui.screen.agenda
 
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
@@ -40,7 +40,7 @@ typealias EventsByWeekAndDay = SortedMap<YearWeek, SortedMap<LocalDate, List<Eve
 /**
  * Groups events by the [week][YearWeek] they fall in and then by their day.
  *
- * Events without a [start][com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming.start]
+ * Events without a [start][EventTiming.start]
  * instant are ignored since they cannot be placed on a calendar day.
  *
  * Instants are bucketed using [timeZone] (the device's current timezone by default), and weeks are
