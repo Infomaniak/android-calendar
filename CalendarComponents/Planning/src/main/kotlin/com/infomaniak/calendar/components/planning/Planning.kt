@@ -30,14 +30,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.event.EventItem
-import com.infomaniak.calendar.components.foundation.models.DateState
+import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.LocalDateParceler
 import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.planning.component.DayIndicator
 import com.infomaniak.calendar.components.planning.preview.previewWeekEvents
+import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -99,9 +101,10 @@ private fun EventList(events: List<EventUi>, modifier: Modifier = Modifier) {
 private data class DayKey(val date: LocalDate) : Parcelable
 
 private val YearWeek.label: String
-    get() {
-        val monthName = month.name.lowercase().replaceFirstChar { it.uppercase() }
-        return "Week $weekNumber - ${firstDay.day} - ${lastDay.day} $monthName $year"
+    @Composable get() {
+        val week = stringResource(R.string.weekHeaderWeekNumber, weekNumber)
+        val dateRange = stringResource(R.string.weekHeaderDateRange, firstDay.day, lastDay.day, monthDisplayName, year)
+        return "$week - $dateRange"
     }
 
 

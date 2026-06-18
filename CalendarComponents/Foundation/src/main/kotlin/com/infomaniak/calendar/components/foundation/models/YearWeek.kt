@@ -19,15 +19,17 @@ package com.infomaniak.calendar.components.foundation.models
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.Month
 import kotlinx.datetime.plus
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toKotlinLocalDate
 import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
+import java.time.format.TextStyle
 import java.time.temporal.WeekFields
+import java.util.Locale
 
 private const val DAYS_IN_WEEK = 7
 
@@ -37,21 +39,22 @@ private const val DAYS_IN_WEEK = 7
  *
  * The class exposes everything needed to render a week header such as
  * `"Week 15 - 20 - 26 December 2029"`: the [weekNumber], the [firstDay] and [lastDay] of the week, and
- * the [month]/[year] the week falls in. A week may straddle two months; [firstDay] and [lastDay] then
- * carry each end while [month]/[year] follow the [firstDay].
+ * the [monthDisplayName]/[year] the week falls in. A week may straddle two months; [firstDay] and [lastDay] then
+ * carry each end while [monthDisplayName]/[year] follow the [firstDay].
  *
  * Identity (equality and ordering) is based on [firstDay], so two [YearWeek] instances produced by the
  * same [WeekNumbering] for the same week are interchangeable as map keys. Build instances via
  * [WeekNumbering.weekOf] rather than the constructor.
  */
 @Parcelize
+@Immutable
 data class YearWeek(val firstDay: LocalDate, val weekNumber: Int) : Parcelable, Comparable<YearWeek> {
 
     /** Last day of the week, six days after [firstDay]. */
-    val lastDay: LocalDate get() = firstDay.plus(DatePeriod(days = DAYS_IN_WEEK - 1))
+    val lastDay: LocalDate = firstDay.plus(DatePeriod(days = DAYS_IN_WEEK - 1))
 
     /** Month the week starts in. See [lastDay] for the other end when the week spans two months. */
-    val month: Month get() = firstDay.month
+    val monthDisplayName: String = firstDay.toJavaLocalDate().month.getDisplayName(TextStyle.FULL, Locale.getDefault())
 
     /** Calendar year the week starts in. */
     val year: Int get() = firstDay.year
