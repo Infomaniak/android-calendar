@@ -41,7 +41,7 @@ import com.infomaniak.calendar.ui.navigation.state.SharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.ToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableState
-import com.infomaniak.calendar.ui.screen.agenda.PlanningScreen
+import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
 import com.infomaniak.calendar.ui.screen.calendarTest.calendarTest
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventCreation.EventCreationScreen
