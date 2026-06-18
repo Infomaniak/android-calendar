@@ -32,12 +32,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.foundation.component.DayCircle
 import com.infomaniak.calendar.components.foundation.component.DateState
+import com.infomaniak.calendar.components.foundation.component.DayCircle
 import com.infomaniak.core.ui.compose.margin.Margin
 
 @Composable
-internal fun DayIndicator(dayName: String, dayNumber: Int, state: DateState, modifier: Modifier = Modifier.Companion) {
+internal fun DayIndicator(dayName: String, dayNumber: Int, state: DateState, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.width(48.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
