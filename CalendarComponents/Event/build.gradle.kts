@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-    
+
 plugins {
     alias(core.plugins.android.library)
     alias(core.plugins.kotlin.android)
@@ -52,8 +52,8 @@ android {
 }
 
 dependencies {
-
     api(project(":CalendarComponents:Foundation"))
+
     implementation(platform(core.compose.bom))
     implementation(core.compose.foundation)
     implementation(core.compose.ui.android)

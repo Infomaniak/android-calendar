@@ -124,7 +124,6 @@ sentry {
 }
 
 dependencies {
-    implementation(project(":CalendarComponents:Event"))
     implementation(project(":CalendarComponents:Planning"))
 
     implementation(libs.infomaniak.multiplatform.calendar)
