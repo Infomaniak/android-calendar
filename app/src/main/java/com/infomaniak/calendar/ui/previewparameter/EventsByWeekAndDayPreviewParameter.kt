@@ -28,7 +28,6 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventEnd
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationStatus
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 class EventsByWeekAndDayPreviewParameter : PreviewParameterProvider<EventsByWeekAndDay> {
@@ -37,10 +36,8 @@ class EventsByWeekAndDayPreviewParameter : PreviewParameterProvider<EventsByWeek
 
 private val fakeCalendarId = CalendarId("https://caldav.example.com/calendars/user/personal/")
 
-@OptIn(ExperimentalTime::class)
 private fun eventId(slug: String) = EventId("https://caldav.example.com/calendars/user/personal/$slug.ics")
 
-@OptIn(ExperimentalTime::class)
 private fun timed(start: String, end: String) = EventTiming.Timed(
     start = Instant.parse(start),
     end = EventEnd.At(Instant.parse(end)),
@@ -61,7 +58,6 @@ private val bob = Attendee(
     role = AttendeeRole.Requested,
 )
 
-@OptIn(ExperimentalTime::class)
 private val fakeEventList: List<Event> = listOf(
     FakeEvent(
         id = eventId("weekly-sync"),
@@ -113,7 +109,6 @@ private val fakeEventList: List<Event> = listOf(
     ),
 )
 
-@OptIn(ExperimentalTime::class)
 private data class FakeEvent(
     override val id: EventId,
     override val calendarId: CalendarId,
