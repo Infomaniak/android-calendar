@@ -27,7 +27,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,7 +53,7 @@ fun Planning(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
-    val today = remember { Clock.System.todayIn(TimeZone.currentSystemDefault()) }
+    val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
 
     LazyColumn(
         state = lazyListState,
