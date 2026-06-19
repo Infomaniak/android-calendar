@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.components.planning
 
-import android.os.Parcelable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,7 +34,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.event.EventItem
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.EventUi
-import com.infomaniak.calendar.components.foundation.models.LocalDateParceler
 import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.planning.component.DayIndicator
 import com.infomaniak.calendar.components.planning.preview.previewWeekEvents
@@ -45,8 +43,6 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.todayIn
-import kotlinx.parcelize.Parcelize
-import kotlinx.parcelize.TypeParceler
 import java.time.format.DateTimeFormatter
 import kotlin.time.Clock
 
@@ -68,7 +64,7 @@ fun Planning(
             item(key = week) { Text(week.label) }
 
             days.forEach { (date, events) ->
-                val dayKey = DayKey(date)
+                val dayKey = date
                 item(key = dayKey) {
                     Row(horizontalArrangement = Arrangement.spacedBy(Margin.Small)) {
                         DayIndicator(
@@ -95,10 +91,6 @@ private fun EventList(events: List<EventUi>, modifier: Modifier = Modifier) {
         }
     }
 }
-
-@Parcelize
-@TypeParceler<LocalDate, LocalDateParceler>
-private data class DayKey(val date: LocalDate) : Parcelable
 
 private val YearWeek.label: String
     @Composable get() {

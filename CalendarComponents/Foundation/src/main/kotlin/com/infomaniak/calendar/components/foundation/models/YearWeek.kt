@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.components.foundation.models
 
-import android.os.Parcel
 import android.os.Parcelable
 import androidx.compose.runtime.Immutable
 import kotlinx.datetime.DatePeriod
@@ -25,7 +24,6 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toKotlinLocalDate
-import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
 import java.time.format.TextStyle
 import java.time.temporal.WeekFields
@@ -87,9 +85,4 @@ class WeekNumbering private constructor(internal val weekFields: WeekFields) {
          */
         val ISO_8601: WeekNumbering = WeekNumbering(WeekFields.ISO)
     }
-}
-
-object LocalDateParceler : Parceler<LocalDate> {
-    override fun create(parcel: Parcel): LocalDate = LocalDate.parse(parcel.readString()!!)
-    override fun LocalDate.write(parcel: Parcel, flags: Int) = parcel.writeString(toString())
 }
