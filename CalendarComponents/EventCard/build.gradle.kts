@@ -43,6 +43,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":CalendarComponents:Foundation"))
     implementation(project(":CalendarComponents:Resources"))
 
     implementation(core.infomaniak.core.avatar)
