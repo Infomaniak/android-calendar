@@ -18,24 +18,35 @@
 package com.infomaniak.calendar.components.planning
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.EventItem
+import com.infomaniak.calendar.components.eventcard.EventCard
+import com.infomaniak.calendar.components.eventcard.EventCardAction
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.YearWeek
@@ -44,9 +55,14 @@ import com.infomaniak.calendar.components.planning.component.DayIndicator
 import com.infomaniak.calendar.components.planning.component.TodayEmptyState
 import com.infomaniak.calendar.components.planning.preview.WeekEventsPreviewParameter
 import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.core.avatar.models.AvatarColors
+import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
+import java.time.LocalDateTime
 import kotlin.time.Clock
 
 @Composable
@@ -57,6 +73,43 @@ fun Planning(
     lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(),
 ) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(Margin.Large),
+    ) {
+        val horizontalContentPadding = PaddingValues(
+            start = contentPadding.calculateStartPadding(LocalLayoutDirection.current),
+            end = contentPadding.calculateEndPadding(LocalLayoutDirection.current),
+        )
+
+        HorizontalPager(
+            rememberPagerState { 3 },
+            contentPadding = PaddingValues(horizontal = Margin.Medium) + horizontalContentPadding,
+            pageSpacing = Margin.Small,
+        ) {
+            EventCard(
+                timeUntilEvent = "In $it minutes",
+                title = "Calendar meeting",
+                startDate = LocalDateTime.of(2026, 6, 19, 8, 0),
+                endDate = LocalDateTime.of(2026, 6, 19, 16, 0),
+                location = "Japan room",
+                attendees = List(9) { AvatarType.WithInitials.Initials("AB", AvatarColors(Color.Gray, Color.White)) },
+                action = EventCardAction.Button.JoinMeeting {},
+            )
+        }
+
+        Timeline(lazyListState, weekEvents, goToEventCreation, contentPadding, Modifier.weight(1f))
+    }
+}
+
+@Composable
+private fun Timeline(
+    lazyListState: LazyListState,
+    weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
+    goToEventCreation: () -> Unit,
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier,
+) {
     val today = Clock.today()
     val events = weekEvents()
     val sectionSizing = remember { SectionSizing() }
@@ -64,7 +117,7 @@ fun Planning(
     LazyColumn(
         state = lazyListState,
         modifier = modifier,
-        contentPadding = contentPadding,
+        contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
         verticalArrangement = Arrangement.spacedBy(Margin.Mini),
     ) {
         events.forEach { (week, days) ->

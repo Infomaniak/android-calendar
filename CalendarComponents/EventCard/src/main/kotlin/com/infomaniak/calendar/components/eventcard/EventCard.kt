@@ -1,6 +1,5 @@
 package com.infomaniak.calendar.components.eventcard
 
-import android.icu.text.DateFormat
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,13 +28,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.HourFormatter.formatHours
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarColors
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.ui.compose.margin.Margin
 import java.time.LocalDateTime
-import java.time.LocalTime
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -87,7 +86,7 @@ fun EventCardContent(
 
         Row(verticalAlignment = Alignment.Bottom) {
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Margin.Mini)) {
-                IconItem(painterResource(R.drawable.ic_clock), null, startDate.toLocalTime().formatRangeTo(endDate.toLocalTime()))
+                IconItem(painterResource(R.drawable.ic_clock), null, startDate.formatRangeTo(endDate))
                 if (location != null) {
                     IconItem(painterResource(R.drawable.ic_door_open), null, location)
                 }
@@ -134,10 +133,7 @@ private fun IconItem(painter: Painter, contentDescription: String?, text: String
 }
 
 @Composable
-private fun LocalTime.formatRangeTo(end: LocalTime): String {
-    val format = DateFormat.getTimeInstance(DateFormat.SHORT)
-    return "${format.format(this)} - ${format.format(end)}"
-}
+private fun LocalDateTime.formatRangeTo(end: LocalDateTime): String = "${formatHours()} - ${end.formatHours()}"
 
 sealed interface EventCardAction {
     data object None : EventCardAction
