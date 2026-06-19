@@ -29,6 +29,7 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
+import kotlin.time.Instant
 
 internal val previewWeekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>> by lazy {
     val timeZone = TimeZone.currentSystemDefault()
@@ -36,11 +37,12 @@ internal val previewWeekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>> by 
     val pastDay = today.minus(5, DateTimeUnit.DAY)
     val futureDay = today.plus(5, DateTimeUnit.DAY)
 
-    fun instantAt(date: LocalDate, hour: Int) =
-        LocalDateTime(date.year, date.month.ordinal, date.day, hour, 0).toInstant(timeZone)
+    fun instantAt(date: LocalDate, hour: Int): Instant {
+        return LocalDateTime(date.year, date.month.ordinal, date.day, hour, 0).toInstant(timeZone)
+    }
 
-    fun event(date: LocalDate, hour: Int, title: String, location: String? = null, color: Int = 0xFF4285F4.toInt()) =
-        EventUi(
+    fun event(date: LocalDate, hour: Int, title: String, location: String? = null, color: Int = 0xFF4285F4.toInt()): EventUi {
+        return EventUi(
             id = "$date-$hour",
             title = title,
             location = location,
@@ -49,6 +51,7 @@ internal val previewWeekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>> by 
             end = instantAt(date, hour + 1),
             color = color,
         )
+    }
 
     listOf(
         pastDay to listOf(
@@ -61,7 +64,9 @@ internal val previewWeekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>> by 
         futureDay to listOf(
             event(futureDay, 11, "Sprint planning", "Hard rock room"),
         ),
-    )
-        .groupBy { (date, _) -> WeekNumbering.ISO_8601.weekOf(date) }
-        .mapValues { (_, pairs) -> pairs.associate { (date, events) -> date to events } }
+    ).groupForPlanning()
 }
+
+private fun List<Pair<LocalDate, List<EventUi>>>.groupForPlanning(): Map<YearWeek, Map<LocalDate, List<EventUi>>> =
+    groupBy { (date, _) -> WeekNumbering.ISO_8601.weekOf(date) }
+        .mapValues { (_, pairs) -> pairs.associate { (date, events) -> date to events } }
