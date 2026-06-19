@@ -63,7 +63,7 @@ data class YearWeek(val firstDay: LocalDate, val weekNumber: Int) : Parcelable, 
 /**
  * Describes how calendar weeks are numbered and which weekday a week starts on.
  *
- * Only supports ISO_8601 for now, but news week numbering can be instantiated by defining other [WeekFields] as needed.
+ * Only supports ISO_8601 for now, but new week numbering can be instantiated by defining other [WeekFields] as needed.
  *
  * The Java [LocalDate] is needed to provide this [WeekFields] customization.
  */
