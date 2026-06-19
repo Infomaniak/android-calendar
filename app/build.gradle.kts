@@ -123,7 +123,6 @@ sentry {
 }
 
 dependencies {
-    implementation(libs.infomaniak.multiplatform.calendar)
     implementation(libs.infomaniak.multiplatform.calendar.core)
 
     implementation(core.infomaniak.core.auth)

@@ -26,11 +26,11 @@ android-calendar/
 
 ## Quick Summary
 
-| Component                    | Location                  | AGENTS.md                          | Purpose                                                          |
-|------------------------------|---------------------------|------------------------------------|------------------------------------------------------------------|
-| **App**                      | `app/`                    | `app/AGENTS.md`                    | Android Calendar app (Jetpack Compose UI, navigation, lifecycle) |
-| **Multiplatform Calendar**   | `multiplatform-calendar/` | submodule repo (separate)          | Shared KMP business/data logic (models, networking, etc.)        |
-| **Root**                     | `./`                      | `AGENTS.md`                        | This file - multi-module build overview                          |
+| Component                  | Location                  | AGENTS.md                 | Purpose                                                          |
+|----------------------------|---------------------------|---------------------------|------------------------------------------------------------------|
+| **App**                    | `app/`                    | `app/AGENTS.md`           | Android Calendar app (Jetpack Compose UI, navigation, lifecycle) |
+| **Multiplatform Calendar** | `multiplatform-calendar/` | submodule repo (separate) | Shared KMP business/data logic (models, networking, etc.)        |
+| **Root**                   | `./`                      | `AGENTS.md`               | This file - multi-module build overview                          |
 
 ## Build Layout Explained
 
@@ -45,7 +45,7 @@ android-calendar/
   via `includeBuild("multiplatform-calendar")` with a `dependencySubstitution` block that maps two Maven coordinates:
     - `com.infomaniak.multiplaform-calendar:Core` → `:Core` project
     - `com.infomaniak.multiplaform-calendar:multiplatform-calendar` → `:kmpdav` project (internal bridge module)
-  The app depends on both via `libs.infomaniak.multiplatform.calendar` and `libs.infomaniak.multiplatform.calendar.core`.
+      The app depends on both via `libs.infomaniak.multiplatform.calendar` and `libs.infomaniak.multiplatform.calendar.core`.
 - **Impact**: Editing `multiplatform-calendar/` affects every consumer of that library - changes belong in its own repo
   and PR.
 
@@ -64,21 +64,32 @@ git submodule update --remote multiplatform-calendar
 
 ## Key Integration Points
 
-- **Two KMP modules consumed by the app**: The submodule contains two consumable Gradle projects (plus a pure-aggregator
-  root project `:` with no sources):
-    - **kmpdav module** (`:kmpdav`) — internal bridge module: Rust/UniFFI CalDAV bridge, remote CalDAV models/client, `CaldavClientModule`.
-    - **Core module** (`:Core`) — public API module: domain models, Room database, repositories, `AccountManager`, `CalendarManager`, Apple `CalendarSDK`.
+- **Two consumable KMP modules**: The submodule contains two consumable Gradle projects (plus a pure-aggregator
+  root project `:` with no sources). The app depends **directly only on `:Core`**; `:kmpdav` is consumed transitively
+  through `:Core`:
+    - **kmpdav module** (`:kmpdav`) — internal bridge module: Rust/UniFFI CalDAV bridge, remote CalDAV models/client,
+      `CaldavClientModule`.
+    - **Core module** (`:Core`) — public API module: domain models, Room database, repositories, `AccountManager`,
+      `CalendarManager`, Apple `CalendarSDK`.
 - **Shared models / business logic**: The app imports from `com.infomaniak.multiplatform_calendar.core.*` (e.g.,
-  `com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Color`) and the bridge from
-  `com.infomaniak.multiplatform_calendar.data.remote.caldav.*` (e.g., `DavAccount`).
-- **Dependency wiring**: Declared in `app/build.gradle.kts` via two dependencies:
-    - `implementation(libs.infomaniak.multiplatform.calendar)` — substituted with the `:kmpdav` project.
+  `com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Color`). It does **not** import `:kmpdav` types
+  directly (the bridge, e.g. `DavAccount` / `CaldavBridgeException`, stays encapsulated inside `:Core`).
+- **Dependency wiring**: `app/build.gradle.kts` declares a **single** calendar dependency:
     - `implementation(libs.infomaniak.multiplatform.calendar.core)` — substituted with `:Core`.
-- **DI**: The app uses Metro's `@DependencyGraph` (`AppGraph`) which picks up `@ContributesTo` modules from both
-  the `:kmpdav` and Core modules (e.g., `CalendarCoreGraph`, `AndroidDatabaseModule`, `DatabaseModule`, `CaldavClientModule`).
-  `CalendarCoreGraph` (in Core `commonMain`) defines the shared accessors (`accountManager`, `calendarManager`)
-  and is automatically merged into `AppGraph` (Android). On Apple, `CalendarSDK` lives in Core `appleMain` and explicitly
-  inherits `:kmpdav`'s `CaldavClientModule` while also receiving Core's contributed bindings.
+    - `:kmpdav` is **not** a direct app dependency; it is pulled in transitively (at runtime, incl. the Rust `.so`) by
+      `:Core`'s `implementation(project(":kmpdav"))`, so kmpdav types stay off the app's **compile** classpath.
+- **DI (two-graph architecture)**: `:Core` owns a self-contained `@DependencyGraph` scoped to `CalendarScope`
+  (`com.infomaniak.multiplatform_calendar.core.di.CalendarScope`): `AndroidCalendarGraph` (Core `androidMain`) on Android,
+  `CalendarSDK` (Core `appleMain`) on Apple. Both inherit `CalendarCoreGraph` (the public accessor contract exposing
+  `accountManager` / `calendarManager`) and `:kmpdav`'s `CaldavClientModule`, and auto-merge Core's
+  `@ContributesTo(CalendarScope)`
+  modules (`DatabaseModule`, `KtorClientProvider`, …). All managers/repositories/DAOs/CalDAV bindings are
+  `@SingleIn(CalendarScope)`
+  and stay **inside** this Core graph — none leak to consumers.
+    - **Android**: the app's `AppGraph` (`@DependencyGraph(AppScope::class)`) receives the Core graph as a **graph dependency**
+      via `@Includes calendarGraph: CalendarCoreGraph` in its factory (built in `MainApplication` through
+      `CalendarGraphProvider.create(context)`). The app thus sees only the managers — never `:kmpdav`.
+    - **Apple**: `CalendarSDKProvider.shared.sdk` exposes `CalendarCoreGraph` (managers only).
 - **Apple artifact**: The public `KmpCalendar.xcframework` is produced by the Core module (`:Core`). `:kmpdav` is a
   plain `implementation` dependency and is **not** exported: the public Apple API exposes only Core-owned types (e.g.
   credentials are passed as Core's `DavCredentials`, mapped to `:kmpdav`'s `DavAccount` at the repository boundary).

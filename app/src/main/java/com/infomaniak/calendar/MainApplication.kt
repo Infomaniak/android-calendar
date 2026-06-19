@@ -23,10 +23,14 @@ import com.infomaniak.calendar.di.AppGraph
 import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.core.network.NetworkConfiguration
 import com.infomaniak.core.sentry.SentryConfig.configureSentry
+import com.infomaniak.multiplatform_calendar.di.CalendarSdkGraphProvider
 import dev.zacsweers.metro.createGraphFactory
 
 class MainApplication : Application() {
-    val appGraph by lazy { createGraphFactory<AppGraph.Factory>().create(applicationContext) }
+    val appGraph by lazy {
+        val calendarGraph = CalendarSdkGraphProvider.create(applicationContext)
+        createGraphFactory<AppGraph.Factory>().create(applicationContext, calendarGraph)
+    }
 
     override fun onCreate() {
         super.onCreate()

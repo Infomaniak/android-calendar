@@ -27,7 +27,7 @@ app/src/main/java/com/infomaniak/calendar/
 ├── MainActivity.kt                 # Single Activity, hosts Compose content
 ├── MatomoCalendar.kt               # Matomo tracker (implements Core's Matomo interface)
 ├── di/
-│   ├── AppGraph.kt                 # Metro @DependencyGraph (AppScope) — inherits CalendarCoreGraph + multibinding
+│   ├── AppGraph.kt                 # Metro @DependencyGraph (AppScope) — @Includes CalendarCoreGraph + ViewModel multibinding
 │   ├── MetroViewModelFactory.kt    # ViewModelProvider.Factory backed by multibinding map
 │   └── ViewModelKey.kt             # @MapKey annotation for ViewModel multibinding
 └── ui/
@@ -72,7 +72,10 @@ app/
 - **Compose-only UI**: No XML layouts / ViewBinding; use Material 3 components.
 - **Navigation**: Uses Jetpack Navigation 3 (`NavDisplay` + `entryProvider`). Each screen defines its own `NavKey`
   data object and an `EntryProviderScope<NavKey>` extension (e.g., `home()`). Top-level wiring lives in `MainNavHost`.
-- **DI**: Metro `@DependencyGraph` (`AppGraph`) scoped to `AppScope`. ViewModels are auto-registered
+- **DI**: Metro `@DependencyGraph` (`AppGraph`) scoped to `AppScope`. The Core dependency graph is supplied as a
+  **graph dependency** via `@Includes calendarGraph: CalendarCoreGraph` in `AppGraph.Factory` (created in
+  `MainApplication` through `CalendarGraphProvider.create(context)`), exposing `accountManager` / `calendarManager`
+  without pulling Core/`:kmpdav` internals into the app graph. ViewModels are auto-registered
   via multibinding (`@ContributesIntoMap` + `@ViewModelKey`) and resolved through `MetroViewModelFactory`,
   set as `defaultViewModelProviderFactory` in `MainActivity`. In Composables, use the standard
   `viewModel<MyViewModel>()` from `androidx.lifecycle.viewmodel.compose`.
@@ -223,6 +226,10 @@ fun MyComponent(
   `com.infomaniak.multiplaform-calendar:multiplatform-calendar` coordinate (declared in `gradle/libs.versions.toml`
   as `infomaniak-multiplaform-calendar-core` / `infomaniak-multiplaform-calendar` and referenced via
   `libs.infomaniak.multiplaform.calendar.core` / `libs.infomaniak.multiplaform.calendar`).
+- The app depends **only on `:Core`** (`libs.infomaniak.multiplatform.calendar.core`). `:kmpdav` is **not** a direct
+  app dependency — it is encapsulated by `:Core`'s own DI graph and only reaches the app transitively at runtime.
+  Do not re-add a direct `:kmpdav` dependency: it would put bridge types (e.g. `CaldavBridgeException`) back on the
+  app's compile classpath.
 - When adding a dependency:
     1. Add the version to `[versions]`, the coordinate to `[libraries]` (or `[plugins]`), in `libs.versions.toml`.
     2. Reference it as `libs.<group>.<name>` in `app/build.gradle.kts`.

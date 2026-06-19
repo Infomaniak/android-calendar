@@ -26,8 +26,10 @@ import com.infomaniak.calendar.MainApplication
 import com.infomaniak.calendar.utils.AccountUtils
 import com.infomaniak.core.login.InfomaniakLogin
 import com.infomaniak.core.network.LOGIN_ENDPOINT_URL
+import com.infomaniak.multiplatform_calendar.core.di.CalendarCoreGraph
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.DependencyGraph
+import dev.zacsweers.metro.Includes
 import dev.zacsweers.metro.Provider
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
@@ -43,8 +45,8 @@ val ComposeAppGraph: AppGraph
  *
  * The application [Context] is supplied at construction time via the [Factory].
  *
- * `CalendarCoreGraph` (from multiplatform-calendar) is merged automatically via
- * `@ContributesTo(AppScope)` and exposes `accountManager` / `calendarManager`.
+ * The Core dependency graph (`CalendarCoreGraph`, built in `:Core`) is supplied as a graph dependency
+ * via `@Includes`, exposing `accountManager` / `calendarManager` without leaking Core/`:kmpdav` internals.
  *
  * ViewModels are auto-discovered via multibinding: any class annotated with
  * `@Inject @ContributesIntoMap(AppScope::class) @ViewModelKey(…)` is automatically
@@ -73,6 +75,9 @@ interface AppGraph {
 
     @DependencyGraph.Factory
     fun interface Factory {
-        fun create(@Provides appContext: Context): AppGraph
+        fun create(
+            @Provides appContext: Context,
+            @Includes calendarGraph: CalendarCoreGraph,
+        ): AppGraph
     }
 }
