@@ -17,8 +17,10 @@
  */
 package com.infomaniak.calendar.components.foundation.models
 
+import androidx.compose.runtime.Immutable
 import kotlin.time.Instant
 
+@Immutable
 data class EventUi(
     val id: String,
     val title: String,
