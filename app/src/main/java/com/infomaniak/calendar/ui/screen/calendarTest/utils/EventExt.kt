@@ -21,9 +21,7 @@ import com.infomaniak.calendar.ui.screen.calendarTest.model.EventUi
 import com.infomaniak.calendar.ui.utils.formatUtc
 import com.infomaniak.calendar.ui.utils.toTimeRange
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
-import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class)
 internal fun Event.toUi(): EventUi = EventUi(
     id = id,
     title = title.ifBlank { "(no title)" },
@@ -36,9 +34,3 @@ internal fun Event.toUi(): EventUi = EventUi(
     color = color,
     canEdit = canEdit,
 )
-
-@OptIn(ExperimentalTime::class)
-private fun EventTiming.toTimeRange(): String = when (this) {
-    is EventTiming.AllDay -> "All day"
-    is EventTiming.Timed -> "${start.formatUtc()} → ${end.formatUtc()}"
-}
