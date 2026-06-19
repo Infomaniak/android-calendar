@@ -38,7 +38,7 @@ internal val previewWeekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>> by 
     val futureDay = today.plus(5, DateTimeUnit.DAY)
 
     fun instantAt(date: LocalDate, hour: Int): Instant {
-        return LocalDateTime(date.year, date.month.ordinal, date.day, hour, 0).toInstant(timeZone)
+        return LocalDateTime(date.year, date.month.ordinal + 1, date.day, hour, 0).toInstant(timeZone)
     }
 
     fun event(date: LocalDate, hour: Int, title: String, location: String? = null, color: Int = 0xFF4285F4.toInt()): EventUi {
