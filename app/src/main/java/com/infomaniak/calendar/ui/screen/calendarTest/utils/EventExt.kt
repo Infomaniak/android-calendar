@@ -58,5 +58,5 @@ fun Event.toUi(): EventUi = EventUi(
 @OptIn(ExperimentalTime::class)
 private fun EventTiming.toTimeRange(): String = when (this) {
     is EventTiming.AllDay -> "All day"
-    is EventTiming.Timed -> "${start.formatUtc()} → ${resolvedEnd().formatUtc()}"
+    is EventTiming.Timed -> "${start.formatUtc()} → ${end.formatUtc()}"
 }
