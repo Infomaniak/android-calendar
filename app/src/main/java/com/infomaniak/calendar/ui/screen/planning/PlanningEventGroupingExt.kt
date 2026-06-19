@@ -64,7 +64,7 @@ fun List<Event>.groupByWeekAndDay(
             .add(event.toEventUi() ?: continue)
     }
 
-    @Suppress("UNCHECKED_CAST") // Makes the exposed list non-mutable
+    @Suppress("UNCHECKED_CAST") // Shows the exposed list as non-mutable
     return result as EventsByWeekAndDay
 }
 
