@@ -22,7 +22,6 @@ import com.infomaniak.calendar.ui.screen.eventFormTest.model.EventFormData
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventEditData
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventEnd
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
@@ -55,7 +54,7 @@ internal fun EventFormData.toEditData(): EventEditData = EventEditData(
     } else {
         EventTiming.Timed(
             start = start.toInstant(TimeZone.UTC),
-            end = EventEnd.At(end.toInstant(TimeZone.UTC)),
+            end = end.toInstant(TimeZone.UTC),
         )
     },
     location = location.ifBlank { null },
@@ -70,6 +69,6 @@ private fun EventTiming.formStart(): LocalDateTime = when (this) {
 @OptIn(ExperimentalTime::class)
 private fun EventTiming.formEnd(): LocalDateTime = when (this) {
     is EventTiming.AllDay -> LocalDateTime(endDate, LocalTime(0, 0))
-    is EventTiming.Timed -> resolvedEnd().toLocalDateTime(TimeZone.UTC)
+    is EventTiming.Timed -> end.toLocalDateTime(TimeZone.UTC)
 }
 
