@@ -15,15 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.utils
+package com.infomaniak.calendar.crossAppLogin
 
-import android.content.Context
 import com.infomaniak.calendar.MainApplication
-import com.infomaniak.core.auth.PersistedCurrentUserAccountUtils
-import dev.zacsweers.metro.AppScope
+import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginService
 import dev.zacsweers.metro.Inject
-import dev.zacsweers.metro.SingleIn
 
 @Inject
-@SingleIn(AppScope::class)
-class AccountUtils(appContext: Context) : PersistedCurrentUserAccountUtils(appContext, MainApplication.userDataCleanableList)
+class CrossAppLoginService : BaseCrossAppLoginService() {
+    private val appGraph by lazy { (application as MainApplication).appGraph }
+    override val selectedUserIdFlow by lazy { appGraph.accountUtils.currentUserIdFlow }
+}

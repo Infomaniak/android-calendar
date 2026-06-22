@@ -15,15 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.utils
+package com.infomaniak.calendar.crossAppLogin
 
 import android.content.Context
+import androidx.work.WorkerParameters
 import com.infomaniak.calendar.MainApplication
-import com.infomaniak.core.auth.PersistedCurrentUserAccountUtils
-import dev.zacsweers.metro.AppScope
+import com.infomaniak.core.crossapplogin.back.internal.deviceinfo.AbstractDeviceInfoUpdateWorker
 import dev.zacsweers.metro.Inject
-import dev.zacsweers.metro.SingleIn
+import okhttp3.OkHttpClient
 
 @Inject
-@SingleIn(AppScope::class)
-class AccountUtils(appContext: Context) : PersistedCurrentUserAccountUtils(appContext, MainApplication.userDataCleanableList)
+class DeviceInfoUpdateWorker(
+    appContext: Context,
+    params: WorkerParameters,
+) : AbstractDeviceInfoUpdateWorker(appContext, params) {
+    private val appGraph by lazy { (appContext as MainApplication).appGraph }
+    override suspend fun getConnectedHttpClient(userId: Int): OkHttpClient = appGraph.accountUtils.getHttpClient(userId)
+}
