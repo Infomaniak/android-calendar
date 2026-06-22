@@ -20,7 +20,7 @@ package com.infomaniak.calendar.ui.component.drawer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
-import com.infomaniak.calendar.utils.AccountUtils
+import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId

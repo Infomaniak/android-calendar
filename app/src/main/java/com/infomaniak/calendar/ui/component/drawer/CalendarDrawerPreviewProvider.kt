@@ -23,6 +23,7 @@ import com.infomaniak.core.auth.models.user.preferences.OrganizationPreference
 import com.infomaniak.core.auth.models.user.preferences.Preferences
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColor
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 
 class CalendarDrawerPreviewProvider : PreviewParameterProvider<UsersCalendarsList> {
@@ -48,14 +49,14 @@ class CalendarDrawerPreviewProvider : PreviewParameterProvider<UsersCalendarsLis
                             id = CalendarId("1"),
                             accountId = AccountId(1),
                             displayName = "Personnel",
-                            color = 0xFF2196F3.toInt(),
+                            color = CalendarColor(0xFF2196F3.toInt()),
                             isVisible = true,
                         ),
                         Calendar(
                             id = CalendarId("2"),
                             accountId = AccountId(1),
                             displayName = "Travail",
-                            color = 0xFFE91E63.toInt(),
+                            color = CalendarColor(0xFFE91E63.toInt()),
                             isVisible = false,
                         ),
                     ),
@@ -77,7 +78,7 @@ class CalendarDrawerPreviewProvider : PreviewParameterProvider<UsersCalendarsLis
                             id = CalendarId("3"),
                             accountId = AccountId(2),
                             displayName = "Équipe",
-                            color = 0xFF4CAF50.toInt(),
+                            color = CalendarColor(0xFF4CAF50.toInt()),
                             isVisible = true,
                         ),
                     ),

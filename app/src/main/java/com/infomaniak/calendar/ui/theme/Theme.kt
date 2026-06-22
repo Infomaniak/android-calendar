@@ -58,7 +58,7 @@ fun CalendarTheme(
 
     CompositionLocalProvider(
         LocalEventColorsUiFactory provides EventColorsUiFactory { EventColors.from(it).toEventColorsUi() },
-        LocalIsThemeDarkMode provides darkTheme,
+        LocalIsThemeDarkMode provides isDarkTheme,
         LocalAvatarColors provides AvatarColors(avatarColors.colorList, customColors.avatarInitialsColor),
     ) {
         MaterialTheme(

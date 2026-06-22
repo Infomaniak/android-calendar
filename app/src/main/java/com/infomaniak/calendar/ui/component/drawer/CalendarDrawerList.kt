@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.ui.component.drawer
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,7 +27,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
@@ -39,9 +37,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -63,21 +66,32 @@ fun CalendarDrawerList(
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(modifier = modifier.fillMaxSize()) {
-        items(usersCalendars.items, key = { it.user.id }) { userCalendars ->
-            var isExpanded by remember { mutableStateOf(true) }
+    val expandedAccountIds = rememberExpandedStates()
 
-            Column {
+    LazyColumn(modifier = modifier.fillMaxSize()) {
+        usersCalendars.items.forEach { userCalendars ->
+            val userId = userCalendars.user.id
+            val isExpanded = expandedAccountIds.contains(userId)
+
+            item(key = userId) {
                 DrawerAccountItem(
+                    modifier = Modifier.animateItem(),
                     user = userCalendars.user,
-                    isExpanded = { isExpanded },
-                    onClick = { isExpanded = !isExpanded },
+                    isExpanded = isExpanded,
+                    onClick = {
+                        if (isExpanded) expandedAccountIds.remove(userId) else expandedAccountIds.add(userId)
+                    },
                 )
-                AnimatedVisibility(visible = isExpanded) {
-                    Column {
-                        userCalendars.calendars.forEach { calendar ->
-                            DrawerCalendarItem(calendar, onCalendarVisibilityChange)
-                        }
+            }
+
+            userCalendars.calendars.forEach { calendar ->
+                if (isExpanded) {
+                    item(key = calendar.id.url) {
+                        DrawerCalendarItem(
+                            modifier = Modifier.animateItem(),
+                            calendar = calendar,
+                            onCalendarVisibilityChange = onCalendarVisibilityChange,
+                        )
                     }
                 }
             }
@@ -86,13 +100,25 @@ fun CalendarDrawerList(
 }
 
 @Composable
+fun rememberExpandedStates(): SnapshotStateList<Int> {
+    return rememberSaveable(
+        saver = Saver(
+            save = { it.toIntArray() },
+            restore = { it.toList().toMutableStateList() },
+        ),
+    ) {
+        mutableStateListOf()
+    }
+}
+
+@Composable
 private fun DrawerAccountItem(
     user: User,
-    isExpanded: () -> Boolean,
+    isExpanded: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val rotation by animateFloatAsState(targetValue = if (isExpanded()) 90f else 0f)
+    val rotation by animateFloatAsState(targetValue = if (isExpanded) 90f else 0f)
 
     Row(
         modifier = modifier
@@ -154,7 +180,7 @@ private fun DrawerCalendarItem(
             checked = isChecked,
             onCheckedChange = null,
             colors = CheckboxDefaults.colors(
-                checkedColor = Color(calendar.color),
+                checkedColor = Color(calendar.color.argb),
                 checkmarkColor = Color.White,
             ),
         )

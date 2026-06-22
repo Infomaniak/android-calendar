@@ -37,10 +37,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
-import com.infomaniak.core.auth.models.user.User
-import com.infomaniak.core.avatar.components.Avatar
-import com.infomaniak.core.avatar.models.AvatarType
-import com.infomaniak.core.ui.compose.accountbottomsheet.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
@@ -52,7 +48,7 @@ fun CalendarDrawer(
     modifier: Modifier = Modifier,
     drawerViewModel: DrawerViewModel = viewModel(),
 ) {
-    val calendarDrawerState = LocalSharedDrawerState.current ?: return
+    val calendarDrawerState = LocalDrawerState.current ?: return
     val calendarsUsers by drawerViewModel.calendarsUsers.collectAsStateWithLifecycle()
 
     CalendarDrawerContent(
@@ -97,9 +93,8 @@ private fun CalendarDrawerContent(
         drawerState = drawerState,
         gesturesEnabled = drawerState.isOpen,
         modifier = modifier,
-    ) {
-        content()
-    }
+        content = content,
+    )
 }
 
 @PreviewLightDark
