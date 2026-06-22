@@ -43,6 +43,11 @@ android {
 
         // TODO[login]: Replace this placeholder with the real Calendar OAuth client id once available.
         buildConfigField("String", "CLIENT_ID", "\"CE011334-F75A-4263-9F9F-45FC5A142F59\"")
+
+        androidResources {
+            localeFilters += listOf("en", "de", "es", "fr", "it", "da", "el", "fi", "nb", "nl", "pl", "pt", "sv")
+            generateLocaleConfig = true
+        }
     }
 
     buildFeatures {

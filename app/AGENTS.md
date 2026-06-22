@@ -51,8 +51,9 @@ app/src/main/java/com/infomaniak/calendar/
 app/src/main/res/
 ├── drawable/                       # Vector drawables (icons, launcher)
 ├── mipmap-*/                       # Launcher icons (per density + adaptive)
-├── values/                         # colors.xml, strings.xml, themes.xml
+├── values/                         # colors.xml, strings.xml, themes.xml (default, English)
 ├── values-night/                   # Dark theme overrides
+├── values-<lang>/                  # Per-language string translations (da, de, el, es, fi, fr, it, nb, nl, pl, pt, sv)
 └── xml/                            # backup_rules.xml, data_extraction_rules.xml
 
 app/src/test/                       # JUnit unit tests (e.g., ExampleUnitTest.kt)
@@ -194,6 +195,9 @@ fun MyComponent(
 - Remove `fillColor="#00000000"` entries (invisible colors auto-added by Figma exports).
 - Run Android Studio's "Reformat Code" on `res/drawable/` before committing icon changes.
 - Keep `values/` and `values-night/` in sync for any new color / theme attribute.
+- Localization: supported app languages are limited via `androidResources.localeFilters` in `app/build.gradle.kts`, and
+  `generateLocaleConfig = true` produces the locale config so users can pick a per-app language (Android 13+ system
+  setting). When adding or removing a `values-<lang>/` folder, update `localeFilters` accordingly.
 
 ### UI Development
 
