@@ -36,7 +36,7 @@ private val dateTimeFormatter = LocalDateTime.Format {
 }
 
 @OptIn(ExperimentalTime::class)
-private fun Instant.formatDateTimeUtc(): String = toLocalDateTime(TimeZone.UTC).format(dateTimeFormatter)
+private fun Instant.formatUtc(): String = toLocalDateTime(TimeZone.UTC).format(dateTimeFormatter)
 
 @OptIn(ExperimentalTime::class)
 fun Event.toUi(): EventUi = EventUi(
@@ -47,7 +47,7 @@ fun Event.toUi(): EventUi = EventUi(
     status = status?.takeIf { it.isNotBlank() },
     categories = categories?.takeIf { it.isNotBlank() },
     description = description?.takeIf { it.isNotBlank() },
-    lastModified = lastModified?.formatDateTimeUtc(),
+    lastModified = lastModified?.formatUtc(),
     color = color,
     canEdit = canEdit,
 )
