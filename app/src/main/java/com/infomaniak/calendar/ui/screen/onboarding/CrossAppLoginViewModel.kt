@@ -37,6 +37,6 @@ import dev.zacsweers.metro.binding
 )
 @ViewModelKey(CrossAppLoginViewModel::class)
 class CrossAppLoginViewModel : BaseCrossAppLoginViewModel(
-    applicationId = "com.infomaniak.sync",// TODO[login]: ConfigUtils.safePackage,
+    applicationId = "com.infomaniak.mail",// TODO[login]: ConfigUtils.safePackage,
     clientId = BuildConfig.CLIENT_ID,
 )
