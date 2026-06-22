@@ -80,7 +80,7 @@ fun MainNavHost(backStack: NavBackStack<NavKey>) {
 
 private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> = entryProvider {
     entry<NavDestination.CalendarView.Planning>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-        PlanningScreen(goToTestScreen = { backStack.addOrMoveToTop(NavDestination.CalendarTest) })
+        PlanningScreen()
     }
     entry<NavDestination.CalendarView.Day>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         DayScreen(goToTestScreen = { backStack.add(NavDestination.CalendarTest) })

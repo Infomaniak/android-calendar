@@ -30,18 +30,18 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.ui.compose.accountbottomsheet.R
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 
@@ -53,15 +53,12 @@ fun CalendarDrawer(
     drawerViewModel: DrawerViewModel = viewModel(),
 ) {
     val calendarDrawerState = LocalSharedDrawerState.current ?: return
-    val calendarsUsers by drawerViewModel.calendarsUsers.collectAsState()
+    val calendarsUsers by drawerViewModel.calendarsUsers.collectAsStateWithLifecycle()
 
     CalendarDrawerContent(
         drawerState = calendarDrawerState,
-        drawerState = calendarDrawerState.drawerState,
         calendarsUsers = calendarsUsers,
-        onCalendarVisibilityChange = { calendarId, isVisible ->
-            drawerViewModel.changeCalendarVisibility(calendarId, isVisible)
-        },
+        onCalendarVisibilityChanged = drawerViewModel::onCalendarVisibilityChanged,
         addAnAccount = addAnAccount,
         content = content,
         modifier = modifier,
@@ -71,8 +68,8 @@ fun CalendarDrawer(
 @Composable
 private fun CalendarDrawerContent(
     drawerState: DrawerState,
-    calendarsUsers: List<UserCalendarsUiModel>,
-    onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
+    calendarsUsers: UsersCalendarsList?,
+    onCalendarVisibilityChanged: (CalendarId, Boolean) -> Unit,
     addAnAccount: () -> Unit,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -82,10 +79,9 @@ private fun CalendarDrawerContent(
             ModalDrawerSheet {
                 Column(modifier = Modifier.fillMaxHeight()) {
                     Box(modifier = Modifier.weight(1f)) {
-                        DrawerList(
-                            usersCalendars = calendarsUsers,
-                            onCalendarVisibilityChange = onCalendarVisibilityChange,
-                        )
+                        calendarsUsers?.let {
+                            CalendarDrawerList(usersCalendars = it, onCalendarVisibilityChange = onCalendarVisibilityChanged)
+                        }
                     }
                     Button(
                         onClick = addAnAccount,
@@ -93,7 +89,7 @@ private fun CalendarDrawerContent(
                             .fillMaxWidth()
                             .padding(horizontal = Margin.Medium, vertical = Margin.Micro),
                     ) {
-                        Text(text = stringResource(R.string.buttonAddAccount))
+                        Text(text = "Add an account")
                     }
                 }
             }
@@ -109,13 +105,13 @@ private fun CalendarDrawerContent(
 @PreviewLightDark
 @Composable
 private fun CalendarDrawerPreview(
-    @PreviewParameter(CalendarDrawerPreviewProvider::class) calendarsUsers: List<UserCalendarsUiModel>,
+    @PreviewParameter(CalendarDrawerPreviewProvider::class) calendarsUsers: UsersCalendarsList,
 ) {
     CalendarThemeForPreview {
         CalendarDrawerContent(
             drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
             calendarsUsers = calendarsUsers,
-            onCalendarVisibilityChange = { _, _ -> },
+            onCalendarVisibilityChanged = { _, _ -> },
             addAnAccount = { },
             content = { },
         )

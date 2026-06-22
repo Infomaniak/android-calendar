@@ -25,59 +25,61 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 
-internal class CalendarDrawerPreviewProvider : PreviewParameterProvider<List<UserCalendarsUiModel>> {
+class CalendarDrawerPreviewProvider : PreviewParameterProvider<UsersCalendarsList> {
     override val values = sequenceOf(Loaded)
 
     companion object {
-        val Loaded = listOf(
-            UserCalendarsUiModel(
-                user = User(
-                    id = 1,
-                    displayName = "John Doe",
-                    firstname = "John",
-                    lastname = "Doe",
-                    email = "john.doe@infomaniak.com",
-                    avatar = null,
-                    login = "johndoe",
-                    isStaff = false,
-                    preferences = Preferences(organizationPreference = OrganizationPreference(currentOrganizationId = 1)),
-                ),
-                calendars = listOf(
-                    Calendar(
-                        id = CalendarId("1"),
-                        accountId = AccountId(1),
-                        displayName = "Personnel",
-                        color = 0xFF2196F3.toInt(),
-                        isVisible = true,
+        val Loaded = UsersCalendarsList(
+            listOf(
+                UserCalendarsUi(
+                    user = User(
+                        id = 1,
+                        displayName = "John Doe",
+                        firstname = "John",
+                        lastname = "Doe",
+                        email = "john.doe@infomaniak.com",
+                        avatar = null,
+                        login = "johndoe",
+                        isStaff = false,
+                        preferences = Preferences(organizationPreference = OrganizationPreference(currentOrganizationId = 1)),
                     ),
-                    Calendar(
-                        id = CalendarId("2"),
-                        accountId = AccountId(1),
-                        displayName = "Travail",
-                        color = 0xFFE91E63.toInt(),
-                        isVisible = false,
+                    calendars = listOf(
+                        Calendar(
+                            id = CalendarId("1"),
+                            accountId = AccountId(1),
+                            displayName = "Personnel",
+                            color = 0xFF2196F3.toInt(),
+                            isVisible = true,
+                        ),
+                        Calendar(
+                            id = CalendarId("2"),
+                            accountId = AccountId(1),
+                            displayName = "Travail",
+                            color = 0xFFE91E63.toInt(),
+                            isVisible = false,
+                        ),
                     ),
                 ),
-            ),
-            UserCalendarsUiModel(
-                user = User(
-                    id = 2,
-                    displayName = "Jane Smith",
-                    firstname = "Jane",
-                    lastname = "Smith",
-                    email = "jane.smith@infomaniak.com",
-                    avatar = null,
-                    login = "janesmith",
-                    isStaff = false,
-                    preferences = Preferences(organizationPreference = OrganizationPreference(currentOrganizationId = 1)),
-                ),
-                calendars = listOf(
-                    Calendar(
-                        id = CalendarId("3"),
-                        accountId = AccountId(2),
-                        displayName = "Équipe",
-                        color = 0xFF4CAF50.toInt(),
-                        isVisible = true,
+                UserCalendarsUi(
+                    user = User(
+                        id = 2,
+                        displayName = "Jane Smith",
+                        firstname = "Jane",
+                        lastname = "Smith",
+                        email = "jane.smith@infomaniak.com",
+                        avatar = null,
+                        login = "janesmith",
+                        isStaff = false,
+                        preferences = Preferences(organizationPreference = OrganizationPreference(currentOrganizationId = 1)),
+                    ),
+                    calendars = listOf(
+                        Calendar(
+                            id = CalendarId("3"),
+                            accountId = AccountId(2),
+                            displayName = "Équipe",
+                            color = 0xFF4CAF50.toInt(),
+                            isVisible = true,
+                        ),
                     ),
                 ),
             ),

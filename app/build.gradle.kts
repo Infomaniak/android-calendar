@@ -148,7 +148,6 @@ dependencies {
     implementation(core.infomaniak.core.onboarding)
     implementation(core.infomaniak.core.datavalue)
     implementation(core.infomaniak.core.sentry)
-    implementation(core.infomaniak.core.ui.compose.accountbottomsheet)
     implementation(core.infomaniak.core.ui.compose.margin)
     implementation(core.infomaniak.core.ui.compose.theme)
 

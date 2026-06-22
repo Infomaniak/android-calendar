@@ -15,21 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.theme
+package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.graphics.Color
+import com.infomaniak.core.auth.models.user.User
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+@Immutable data class UsersCalendarsList(val items: List<UserCalendarsUi>)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
-
-val Bat = Color(0xFF1A1A1A)
-val White = Color(0xFFFFFFFF)
-
-@Immutable
-data class CustomColorScheme(val avatarInitialsColor: Color = Color.Unspecified)
+data class UserCalendarsUi(
+    val user: User,
+    val calendars: List<Calendar>,
+)

@@ -58,19 +58,19 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 
 @Composable
-fun DrawerList(
-    usersCalendars: List<UserCalendarsUiModel>,
+fun CalendarDrawerList(
+    usersCalendars: UsersCalendarsList,
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
-        items(usersCalendars, key = { it.user.id }) { userCalendars ->
+        items(usersCalendars.items, key = { it.user.id }) { userCalendars ->
             var isExpanded by remember { mutableStateOf(true) }
 
             Column {
                 DrawerAccountItem(
                     user = userCalendars.user,
-                    isExpanded = isExpanded,
+                    isExpanded = { isExpanded },
                     onClick = { isExpanded = !isExpanded },
                 )
                 AnimatedVisibility(visible = isExpanded) {
@@ -88,17 +88,17 @@ fun DrawerList(
 @Composable
 private fun DrawerAccountItem(
     user: User,
-    isExpanded: Boolean,
+    isExpanded: () -> Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val rotation by animateFloatAsState(targetValue = if (isExpanded) 90f else 0f)
+    val rotation by animateFloatAsState(targetValue = if (isExpanded()) 90f else 0f)
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clickable(role = Role.Button, onClick = onClick)
-            .padding(vertical = Margin.Medium, horizontal = Margin.Medium),
+            .padding(all = Margin.Medium),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Margin.Medium),
     ) {
@@ -108,7 +108,8 @@ private fun DrawerAccountItem(
         ) {
             Text(
                 text = user.displayName.toString(),
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -119,9 +120,7 @@ private fun DrawerAccountItem(
             )
         }
         Icon(
-            modifier = Modifier
-                .size(20.dp)
-                .rotate(rotation),
+            modifier = Modifier.rotate(rotation),
             imageVector = Icons.Filled.ChevronRight,
             contentDescription = null,
         )
@@ -148,6 +147,7 @@ private fun DrawerCalendarItem(
                 role = Role.Checkbox,
             )
             .padding(horizontal = Margin.Medium, vertical = Margin.Small),
+        horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Checkbox(
@@ -159,10 +159,6 @@ private fun DrawerCalendarItem(
             ),
         )
 
-        Text(
-            text = calendar.displayName,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(start = Margin.Mini),
-        )
+        Text(text = calendar.displayName, style = MaterialTheme.typography.bodyMedium)
     }
 }

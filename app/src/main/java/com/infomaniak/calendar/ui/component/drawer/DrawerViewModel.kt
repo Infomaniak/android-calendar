@@ -29,38 +29,38 @@ import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @Inject
 @ContributesIntoMap(AppScope::class)
-@ViewModelKey(DrawerViewModel::class)
+@ViewModelKey
 class DrawerViewModel(
     private val accountManager: AccountManager,
     private val accountUtils: AccountUtils,
     private val calendarManager: CalendarManager,
 ) : ViewModel() {
 
-    val calendarsUsers: StateFlow<List<UserCalendarsUiModel>> = combine(
+    val calendarsUsers: StateFlow<UsersCalendarsList?> = combine(
         accountUtils.users,
         calendarManager.observeCalendars(),
     ) { users, calendars ->
-        return@combine users.map { user ->
-            val userCalendars = calendars.filter { it.accountId == AccountId(user.id.toLong()) }
-            UserCalendarsUiModel(user, userCalendars)
-        }
+        return@combine UsersCalendarsList(
+            users.map { user ->
+                val userCalendars = calendars.filter { it.accountId == AccountId(user.id.toLong()) }
+                UserCalendarsUi(user, userCalendars)
+            },
+        )
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
-        initialValue = emptyList(),
+        started = SharingStarted.Lazily,
+        initialValue = null,
     )
 
-    fun changeCalendarVisibility(calendarId: CalendarId, isVisible: Boolean) {
+    fun onCalendarVisibilityChanged(calendarId: CalendarId, isVisible: Boolean) {
         //TODO
     }
 

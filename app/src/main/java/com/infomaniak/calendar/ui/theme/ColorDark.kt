@@ -1,6 +1,6 @@
 /*
  * Infomaniak Calendar - Android
- * Copyright (C) 2026 Infomaniak Network SA
+ * Copyright (C) 2024-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,12 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.component.drawer
+package com.infomaniak.calendar.ui.theme
 
-import com.infomaniak.core.auth.models.user.User
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
+import androidx.compose.material3.darkColorScheme
 
-data class UserCalendarsUiModel(
-    val user: User,
-    val calendars: List<Calendar>,
+val DarkColorScheme = darkColorScheme(
+    primary = Purple80,
+    secondary = PurpleGrey80,
+    tertiary = Pink80,
+)
+
+val CustomDarkColorScheme = CustomColorScheme(
+    avatarInitialsColor = Bat,
 )
