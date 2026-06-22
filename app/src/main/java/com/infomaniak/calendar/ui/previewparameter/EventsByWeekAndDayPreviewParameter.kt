@@ -24,7 +24,6 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.AttendeeRole
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventEnd
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationStatus
@@ -40,7 +39,7 @@ private fun eventId(slug: String) = EventId("https://caldav.example.com/calendar
 
 private fun timed(start: String, end: String) = EventTiming.Timed(
     start = Instant.parse(start),
-    end = EventEnd.At(Instant.parse(end)),
+    end = Instant.parse(end),
 )
 
 private val alice = Attendee(
