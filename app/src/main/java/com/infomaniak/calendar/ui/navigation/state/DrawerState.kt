@@ -28,21 +28,4 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-val LocalSharedDrawerState = staticCompositionLocalOf<CalendarDrawerState?> { null }
-
-@Composable
-fun rememberCalendarDrawerState(): CalendarDrawerState {
-    val coroutineScope = rememberCoroutineScope()
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-
-    return remember { CalendarDrawerState(coroutineScope, drawerState) }
-}
-
-@Stable
-class CalendarDrawerState(private val coroutineScope: CoroutineScope, val drawerState: DrawerState) {
-    fun openDrawer() {
-        coroutineScope.launch {
-            drawerState.open()
-        }
-    }
-}
+val LocalSharedDrawerState = staticCompositionLocalOf<DrawerState?> { null }

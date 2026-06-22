@@ -32,7 +32,10 @@ import com.infomaniak.calendar.ui.component.CalendarScaffoldWithMenuIcon
 
 @Composable
 fun ThreeDayScreen(modifier: Modifier = Modifier) {
-    CalendarScaffoldWithMenuIcon(title = stringResource(R.string.threeDaysTitle), modifier = modifier) { paddingValues ->
+    CalendarScaffoldWithMenuIcon(
+        title = { Text(stringResource(R.string.threeDaysTitle)) },
+        modifier = modifier,
+    ) { paddingValues ->
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = paddingValues,

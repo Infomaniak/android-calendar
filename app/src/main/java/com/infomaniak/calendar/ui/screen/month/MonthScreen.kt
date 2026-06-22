@@ -33,7 +33,7 @@ import com.infomaniak.calendar.ui.component.CalendarScaffoldWithMenuIcon
 
 @Composable
 fun MonthScreen(modifier: Modifier = Modifier, monthViewModel: MonthViewModel = viewModel()) {
-    CalendarScaffoldWithMenuIcon(title = stringResource(R.string.monthTitle), modifier = modifier) { paddingValues ->
+    CalendarScaffoldWithMenuIcon(title = { Text(stringResource(R.string.monthTitle)) }, modifier = modifier) { paddingValues ->
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = paddingValues,

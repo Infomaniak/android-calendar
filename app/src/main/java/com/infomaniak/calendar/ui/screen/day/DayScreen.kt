@@ -30,7 +30,7 @@ import com.infomaniak.calendar.R
 import com.infomaniak.calendar.di.ComposeAppGraph
 import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.ui.component.CalendarScaffoldWithMenuIcon
-import com.infomaniak.calendar.utils.AccountUtils
+import com.infomaniak.calendar.utils.account.AccountUtils
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -59,7 +59,7 @@ private fun DayScreen(
     goToTestScreen: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CalendarScaffoldWithMenuIcon(title = stringResource(R.string.dayTitle), modifier = modifier) { paddingValues ->
+    CalendarScaffoldWithMenuIcon(title = { Text(stringResource(R.string.dayTitle)) }, modifier = modifier) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             Text("DayScreenContent")
             Text("Current user: ${LocalUser.current?.displayName}")

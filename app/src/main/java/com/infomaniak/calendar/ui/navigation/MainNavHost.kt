@@ -19,9 +19,10 @@ package com.infomaniak.calendar.ui.navigation
 
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
@@ -43,7 +44,6 @@ import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.state.SharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.ToolbarScrollableState
-import com.infomaniak.calendar.ui.navigation.state.rememberCalendarDrawerState
 import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableState
 import com.infomaniak.calendar.ui.screen.calendarTest.calendarTest
@@ -59,7 +59,7 @@ import com.infomaniak.calendar.ui.screen.week.WeekScreen
 fun MainNavHost(backStack: NavBackStack<NavKey>) {
     val snackbarHostState: SharedSnackbarHostState = rememberCustomSnackbarHostState()
     val toolbarScrollableState: ToolbarScrollableState = rememberToolbarScrollableState()
-    val calendarDrawerState = rememberCalendarDrawerState()
+    val calendarDrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     SharedTransitionLayout {
         CompositionLocalProvider(
@@ -110,9 +110,8 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
     calendarTest()
 }
 
-@Composable
 private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<SceneDecoratorStrategy<NavKey>> {
-    val navigationStrategy: NavigationDecoratorStrategy<NavKey> = remember {
+    val navigationStrategy: NavigationDecoratorStrategy<NavKey> =
         NavigationDecoratorStrategy(
             floatingToolbar = {
                 CalendarHorizontalFloatingToolbar(
@@ -128,7 +127,6 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
                 )
             },
         )
-    }
 
     val drawerStrategy = DrawerDecoratorStrategy<NavKey>(
         drawer = { content ->

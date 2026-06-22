@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.ui.component
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
@@ -26,27 +27,35 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedDrawerState
+import kotlinx.coroutines.launch
 
 @Composable
 fun CalendarScaffoldWithMenuIcon(
-    title: String,
+    title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
+    topBarActions: @Composable RowScope.() -> Unit = {},
     content: @Composable (PaddingValues) -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(title) },
+                title = title,
+                actions = topBarActions,
                 navigationIcon = {
                     val calendarDrawerState = LocalSharedDrawerState.current
                     IconButton(
                         onClick = {
-                            calendarDrawerState?.openDrawer()
+                            scope.launch {
+                                calendarDrawerState?.open()
+                            }
                         },
                     ) {
                         Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.contentDescriptionMenuDrawer))
@@ -55,13 +64,12 @@ fun CalendarScaffoldWithMenuIcon(
             )
         },
         modifier = modifier,
-    ) { paddingValues ->
-        content(paddingValues)
-    }
+        content = content,
+    )
 }
 
 @Preview
 @Composable
 private fun CalendarScaffoldWithMenuIconPreview() {
-    CalendarScaffoldWithMenuIcon(title = stringResource(R.string.planningTitle), content = { })
+    CalendarScaffoldWithMenuIcon(title = { Text(stringResource(R.string.planningTitle)) }, content = { })
 }

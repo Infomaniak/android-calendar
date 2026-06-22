@@ -33,7 +33,7 @@ fun CalendarDrawer(
     modifier: Modifier = Modifier,
 ) {
     val calendarDrawerState = LocalSharedDrawerState.current ?: return
-    CalendarDrawer(drawerState = calendarDrawerState.drawerState, content = content, modifier = modifier)
+    CalendarDrawer(drawerState = calendarDrawerState, content = content, modifier = modifier)
 }
 
 @Composable
@@ -49,9 +49,8 @@ private fun CalendarDrawer(
         },
         drawerState = drawerState,
         modifier = modifier,
-    ) {
-        content()
-    }
+        content = content,
+    )
 }
 
 @Preview
