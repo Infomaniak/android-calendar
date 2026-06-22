@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.planning.preview
 
+import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
@@ -41,7 +42,7 @@ internal val previewWeekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>> by 
         return LocalDateTime(date.year, date.month.ordinal + 1, date.day, hour, 0).toInstant(timeZone)
     }
 
-    fun event(date: LocalDate, hour: Int, title: String, location: String? = null, color: Int = 0xFF4285F4.toInt()): EventUi {
+    fun event(date: LocalDate, hour: Int, title: String, location: String? = null, color: Color = Color(0xFF4285F4)): EventUi {
         return EventUi(
             id = "$date-$hour",
             title = title,
@@ -58,8 +59,8 @@ internal val previewWeekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>> by 
             event(pastDay, 10, "Team retrospective", "Conference room B"),
         ),
         today to listOf(
-            event(today, 9, "Morning standup", "kMeet", 0xFF0F9D58.toInt()),
-            event(today, 14, "Design review", "Japan room", 0xFFDB4437.toInt()),
+            event(today, 9, "Morning standup", "kMeet", Color(0xFF0F9D58)),
+            event(today, 14, "Design review", "Japan room", Color(0xFFDB4437)),
         ),
         futureDay to listOf(
             event(futureDay, 11, "Sprint planning", "Hard rock room"),

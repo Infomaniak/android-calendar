@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.planning
 
+import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
@@ -78,6 +79,6 @@ private fun Event.toEventUi(): EventUi? {
         categories = categories,
         start = start,
         end = end,
-        color = color,
+        color = Color(color),
     )
 }

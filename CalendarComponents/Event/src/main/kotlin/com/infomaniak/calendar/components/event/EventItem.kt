@@ -58,7 +58,7 @@ private fun Preview() {
                     categories = "Event categories",
                     start = Clock.System.now(),
                     end = Clock.System.now(),
-                    color = Color.Red.hashCode(),
+                    color = Color.Red,
                 ),
             )
         }

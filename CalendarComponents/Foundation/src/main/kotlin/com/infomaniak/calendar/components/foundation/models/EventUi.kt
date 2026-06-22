@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.foundation.models
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.graphics.Color
 import kotlin.time.Instant
 
 @Immutable
@@ -28,5 +29,5 @@ data class EventUi(
     val categories: String?,
     val start: Instant,
     val end: Instant,
-    val color: Int,
+    val color: Color,
 )
