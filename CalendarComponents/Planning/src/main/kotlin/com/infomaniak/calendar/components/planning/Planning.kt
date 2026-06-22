@@ -36,9 +36,17 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -65,6 +73,9 @@ import kotlinx.datetime.todayIn
 import java.time.LocalDateTime
 import kotlin.time.Clock
 
+private val maxCardSize = 150.dp
+private val minCardSize = 72.dp
+
 @Composable
 fun Planning(
     weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
@@ -73,8 +84,29 @@ fun Planning(
     lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(),
 ) {
+    var currentCardSize by remember { mutableStateOf(maxCardSize) }
+    val density = LocalDensity.current
+
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                // Calculate the change in card size based on scroll delta
+                val availableYDp = with(density) { available.y.toDp() }
+                val newCardSize = currentCardSize + availableYDp
+                val previousCardSize = currentCardSize
+
+                // Constrain the card size within the allowed bounds
+                currentCardSize = newCardSize.coerceIn(minCardSize, maxCardSize)
+                val consumed = currentCardSize - previousCardSize
+
+                // Return the consumed scroll amount
+                return Offset(0f, with(density) { consumed.toPx() })
+            }
+        }
+    }
+
     Column(
-        modifier = modifier,
+        modifier = modifier.nestedScroll(nestedScrollConnection),
         verticalArrangement = Arrangement.spacedBy(Margin.Large),
     ) {
         val horizontalContentPadding = PaddingValues(
@@ -90,6 +122,7 @@ fun Planning(
             pageSpacing = Margin.Small,
         ) {
             EventCard(
+                modifier = Modifier.height(currentCardSize),
                 timeUntilEvent = "In $it minutes",
                 title = "Calendar meeting",
                 startDate = LocalDateTime.of(2026, 6, 19, 8, 0),
