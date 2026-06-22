@@ -19,6 +19,7 @@ package com.infomaniak.calendar.components.planning
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -52,12 +53,14 @@ fun Planning(
     weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
 
     LazyColumn(
         state = lazyListState,
         modifier = modifier,
+        contentPadding = contentPadding,
     ) {
         weekEvents().forEach { (week, days) ->
             item(key = week) { Text(week.label) }

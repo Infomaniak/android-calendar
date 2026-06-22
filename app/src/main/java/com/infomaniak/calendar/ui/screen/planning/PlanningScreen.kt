@@ -19,7 +19,6 @@ package com.infomaniak.calendar.ui.screen.planning
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -56,12 +55,13 @@ private fun PlanningScreen(
         topBar = { TopAppBar(title = { Text("PlanningScreen") }) },
         modifier = modifier,
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
+        Column {
             Planning(
                 weekEvents = weekEvents,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
+                contentPadding = paddingValues,
             )
         }
     }
