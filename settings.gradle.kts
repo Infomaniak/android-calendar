@@ -24,6 +24,7 @@ pluginManagement {
                 includeGroupByRegex("androidx.*")
             }
         }
+        mavenLocal()
         mavenCentral()
         gradlePluginPortal()
     }
@@ -42,6 +43,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        mavenLocal()
         maven {
             url = uri("https://jitpack.io")
             content {
@@ -61,9 +63,22 @@ dependencyResolutionManagement {
 rootProject.name = "Calendar"
 include(":app")
 
-includeBuild("multiplatform-calendar") {
-    dependencySubstitution {
-        substitute(module("com.infomaniak.multiplaform-calendar:Core")).using(project(":Core"))
-        substitute(module("com.infomaniak.multiplaform-calendar:multiplatform-calendar")).using(project(":kmpdav"))
+// Read local.properties first (git-ignored), then fall back to gradle.properties.
+// Set useCalendarCoreCompositeBuild=true in local.properties to use the local submodule source
+// instead of the published AAR artifacts from Maven Local / Maven Central.
+val localProperties = java.util.Properties().also { props ->
+    val localPropertiesFile = file("local.properties")
+    if (localPropertiesFile.exists()) localPropertiesFile.inputStream().use { props.load(it) }
+}
+val useCalendarCoreCompositeBuild = (localProperties.getProperty("useCalendarCoreCompositeBuild")
+    ?: providers.gradleProperty("useCalendarCoreCompositeBuild").orNull)
+    ?.toBoolean() ?: false
+
+if (useCalendarCoreCompositeBuild) {
+    includeBuild("multiplatform-calendar") {
+        dependencySubstitution {
+            substitute(module("com.infomaniak.multiplaform-calendar:Core")).using(project(":Core"))
+            substitute(module("com.infomaniak.multiplaform-calendar:multiplatform-calendar")).using(project(":kmpdav"))
+        }
     }
 }

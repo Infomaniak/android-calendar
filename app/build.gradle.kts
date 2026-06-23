@@ -90,6 +90,14 @@ val envProperties = rootProject.file("env.properties")
     .takeIf { it.exists() }
     ?.let { file -> Properties().also { props -> file.reader().use(props::load) } }
 
+val localProperties = rootProject.file("local.properties")
+    .takeIf { it.exists() }
+    ?.let { file -> Properties().also { props -> file.reader().use(props::load) } }
+
+val useCalendarCoreCompositeBuild = (localProperties?.getProperty("useCalendarCoreCompositeBuild")
+    ?: providers.gradleProperty("useCalendarCoreCompositeBuild").orNull)
+    ?.toBoolean() ?: false
+
 val sentryAuthToken = envProperties?.getProperty("sentryAuthToken")
     .takeUnless { it.isNullOrBlank() }
     ?: if (isRelease) error("The `sentryAuthToken` property in `env.properties` must be specified (see `env.example.properties`).") else ""
@@ -128,8 +136,12 @@ sentry {
 }
 
 dependencies {
-    implementation(libs.infomaniak.multiplatform.calendar)
-    implementation(libs.infomaniak.multiplatform.calendar.core)
+    if (useCalendarCoreCompositeBuild) {
+        implementation(libs.infomaniak.multiplatform.calendar)
+        implementation(libs.infomaniak.multiplatform.calendar.core)
+    } else {
+        implementation("com.infomaniak.multiplatform_calendar:Core:0.0.1-local")
+    }
 
     implementation(core.infomaniak.core.auth)
     implementation(core.infomaniak.core.common)
