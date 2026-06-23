@@ -8,19 +8,16 @@ Infomaniak Calendar for Android. Pure Jetpack Compose + Navigation 3, Metro DI (
 ## ⚠️ Critical: Rust Toolchain Required
 The `multiplatform-calendar` submodule includes a Rust/UniFFI module (`:kmpdav`). Without the Rust toolchain and Android targets, the build fails:
 ```bash
-# Install Rust + Android targets (once per machine)
 rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
 ```
 
 ## One-Time Environment Setup
 ```bash
 git submodule update --init --recursive   # Core + multiplatform-calendar submodules
-# Stop stale daemon after Rust toolchain setup so it picks up updated PATH:
-./gradlew --stop
+./gradlew --stop   # stop stale daemon after Rust toolchain setup
 ```
 
 ## Build & Test (CI: `.github/workflows/android.yml`)
-CI runs on every non-draft PR:
 ```bash
 ./gradlew clean
 ./gradlew build
@@ -31,17 +28,17 @@ CI also runs Android Lint via the shared `infomaniak/.github` reusable workflow.
 
 ## Project Layout
 ```
-app/                       # Main Android Calendar app (see app/AGENTS.md)
+app/                       # Main Android Calendar app
 CalendarComponents/        # Portable Compose UI library (Foundation, Event, Planning, Resources)
-Core/                      # Git submodule — Infomaniak Core library
+Core/                      # Git submodule — Infomaniak Core
 multiplatform-calendar/    # Git submodule — KMP business logic (includes Rust/UniFFI :kmpdav)
-gradle/libs.versions.toml  # Repo-level version catalog
-settings.gradle.kts        # Composite build config
+gradle/libs.versions.toml
 ```
 
-## Key Conventions
-- DI is **Metro** (not Hilt): `@Inject`, `@Component`, `@Module` from `dev.zacsweers.metro`.
-- Navigation uses **AndroidX Navigation 3** (beta API — may change).
-- `standard` flavor only: Firebase, Google Play services (never reference in `fdroid` code paths).
-- All strings in `res/values/strings.xml`.
+## PR Review Instructions
+
+- Ensure strings are localized via `strings.xml` resources.
+- Ensure UI is written in Jetpack Compose using Material3 components.
+- DI is **Metro** (not Hilt): use `@Inject`, `@Component`, `@Module` from `dev.zacsweers.metro` — do not introduce Hilt.
+- `standard` flavor only: Firebase, Google services — fdroid builds must compile without them.
 - When adding/removing a runtime dependency, update `LICENSES.md` at the repo root.
