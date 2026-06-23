@@ -60,6 +60,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "Calendar"
 include(":app")
+include(":CalendarComponents:Event")
+include(":CalendarComponents:Foundation")
+include(":CalendarComponents:Planning")
+include(":CalendarComponents:Resources")
 
 includeBuild("multiplatform-calendar") {
     dependencySubstitution {
