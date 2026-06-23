@@ -37,8 +37,8 @@ gradle/libs.versions.toml
 
 ## PR Review Instructions
 
-- Ensure strings are localized via `strings.xml` resources.
+- Ensure strings are localized via `strings.xml` resources. Note: string resources in this repo are spread across multiple `values*/` folders (for translations) and the dedicated `CalendarComponents/Resources` module — place new strings in the appropriate module's resource directory.
 - Ensure UI is written in Jetpack Compose using Material3 components.
-- DI is **Metro** (not Hilt): use `@Inject`, `@Component`, `@Module` from `dev.zacsweers.metro` — do not introduce Hilt.
+- DI is **Metro** (not Hilt): use `@Inject`, `@DependencyGraph`, `@Provides` from `dev.zacsweers.metro` — do not introduce Hilt.
 - `standard` flavor only: Firebase, Google services — fdroid builds must compile without them.
 - When adding/removing a runtime dependency, update `LICENSES.md` at the repo root.
