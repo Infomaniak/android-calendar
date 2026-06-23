@@ -40,7 +40,7 @@ fun EventItem(event: EventUi, modifier: Modifier = Modifier) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = event.color,
-            contentColor = Color.White, // TODO
+            contentColor = Color.White, // TODO: Waiting for KMP event HCT colors
         ),
         modifier = modifier,
     ) {
