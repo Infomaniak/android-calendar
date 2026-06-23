@@ -57,7 +57,6 @@ class MainActivity : ComponentActivity() {
             CalendarTheme {
                 Surface {
                     val credentialViewModel = viewModel<CredentialViewModel>()
-                    LaunchedEffect(Unit) { credentialViewModel.loadDavCredential() }
 
                     when (val userLoadState = appGraph.accountUtils.rememberUserLoadState().value) {
                         UserLoadState.Awaiting -> Unit // Blank surface while waiting for first result

@@ -36,10 +36,18 @@ class SecuredDavCredentialsRepository @Inject constructor(
     }
 
     suspend fun save(userId: Long, credential: DavCredentials) {
-        val (usernameIv, encryptedUsername) = keystoreCipher.encrypt(credential.username)
-        val (passwordIv, encryptedPassword) = keystoreCipher.encrypt(credential.password)
+        val encryptedUsername: EncryptionResult = keystoreCipher.encrypt(credential.username)
+        val encryptedPassword: EncryptionResult = keystoreCipher.encrypt(credential.password)
+
         dataValues.securedDavCredential.update { current ->
-            current + (userId to SecuredDavCredential(encryptedUsername, usernameIv, encryptedPassword, passwordIv))
+            val securedDavCredential = SecuredDavCredential(
+                encryptedUsernameBase64 = encryptedUsername.encryptedData,
+                usernameIvBase64 = encryptedUsername.initializationVector,
+                encryptedPasswordBase64 = encryptedPassword.encryptedData,
+                initializationVectorBase64 = encryptedPassword.initializationVector,
+            )
+
+            current + (userId to securedDavCredential)
         }
     }
 

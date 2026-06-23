@@ -35,6 +35,8 @@ private const val CIPHER_TRANSFORMATION = "AES/GCM/NoPadding"
 private const val GCM_TAG_LENGTH = 128
 private const val AES_KEY_SIZE = 256
 
+data class EncryptionResult(val initializationVector: String, val encryptedData: String)
+
 class KeystoreCipher @Inject constructor() {
     private val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
 
@@ -54,12 +56,12 @@ class KeystoreCipher @Inject constructor() {
         }.generateKey()
     }
 
-    suspend fun encrypt(password: String): Pair<String, String> = withContext(Dispatchers.IO) {
+    suspend fun encrypt(value: String): EncryptionResult = withContext(Dispatchers.IO) {
         val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION)
         cipher.init(Cipher.ENCRYPT_MODE, secretKey)
         val initializationVector = cipher.iv.encodeToBase64()
-        val encryptedData = cipher.doFinal(password.toByteArray(Charsets.UTF_8)).encodeToBase64()
-        initializationVector to encryptedData
+        val encryptedData = cipher.doFinal(value.toByteArray(Charsets.UTF_8)).encodeToBase64()
+        EncryptionResult(initializationVector, encryptedData)
     }
 
     suspend fun decrypt(encryptedPasswordBase64: String, initializationVectorBase64: String): String {

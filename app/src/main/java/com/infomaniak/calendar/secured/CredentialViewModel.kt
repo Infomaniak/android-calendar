@@ -41,16 +41,20 @@ class CredentialViewModel(
     private val accountManager: AccountManager,
     private val calendarManager: CalendarManager,
     private val securedDavCredentialsRepository: SecuredDavCredentialsRepository,
-    accountUtils: AccountUtils,
+    private val accountUtils: AccountUtils,
 ) : ViewModel() {
-    val users = accountUtils.users
+
+    init {
+        loadDavCredential()
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun loadDavCredential() {
+    private fun loadDavCredential() {
         viewModelScope.launch {
-            users.mapLatest { userList ->
+            accountUtils.users.mapLatest { userList ->
                 userList.map { user ->
-                    val credentials = securedDavCredentialsRepository.get(user.id.toLong()) ?: user.createAndStoreCredential()
+                    val userId = user.id.toLong()
+                    val credentials = securedDavCredentialsRepository.get(userId) ?: user.createAndStoreCredential()
                     AccountId(user.id.toLong()) to credentials
                 }
             }.collect { credentialsList ->
@@ -65,8 +69,8 @@ class CredentialViewModel(
     }
 
     private suspend fun User.createAndStoreCredential(): DavCredentials {
-        val credentials = accountManager.retrieveDavCredential(apiToken.accessToken, login)
-        securedDavCredentialsRepository.save(id.toLong(), credentials)
+        val credentials = accountManager.retrieveDavCredential(authToken = apiToken.accessToken, login = login)
+        securedDavCredentialsRepository.save(userId = id.toLong(), credential = credentials)
         return credentials
     }
 }
