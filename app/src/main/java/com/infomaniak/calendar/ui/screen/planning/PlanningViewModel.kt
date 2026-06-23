@@ -35,7 +35,7 @@ import kotlin.time.Instant
 @ViewModelKey(PlanningViewModel::class)
 class PlanningViewModel(calendarManager: CalendarManager) : ViewModel() {
     val weekEvents: StateFlow<EventsByWeekAndDay> = calendarManager
-        .observeEvents(Instant.DISTANT_PAST, Instant.DISTANT_FUTURE)
+        .observeEvents(Instant.DISTANT_PAST, Instant.DISTANT_FUTURE) // TODO: Add some pagination logic
         .map { it.groupByWeekAndDay() }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = sortedMapOf())
 }

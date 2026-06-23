@@ -34,23 +34,13 @@ import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewPara
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
-fun PlanningScreen(
-    modifier: Modifier = Modifier,
-    viewModel: PlanningViewModel = viewModel(),
-) {
+fun PlanningScreen(modifier: Modifier = Modifier, viewModel: PlanningViewModel = viewModel()) {
     val weekEvents: EventsByWeekAndDay by viewModel.weekEvents.collectAsStateWithLifecycle()
-
-    PlanningScreen(
-        modifier = modifier,
-        weekEvents = { weekEvents },
-    )
+    PlanningScreen(weekEvents = { weekEvents }, modifier = modifier)
 }
 
 @Composable
-private fun PlanningScreen(
-    weekEvents: () -> EventsByWeekAndDay,
-    modifier: Modifier = Modifier,
-) {
+private fun PlanningScreen(weekEvents: () -> EventsByWeekAndDay, modifier: Modifier = Modifier) {
     Scaffold(
         topBar = { TopAppBar(title = { Text("PlanningScreen") }) },
         modifier = modifier,

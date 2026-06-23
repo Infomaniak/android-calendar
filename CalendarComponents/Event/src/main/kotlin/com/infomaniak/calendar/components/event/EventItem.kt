@@ -33,9 +33,9 @@ import com.infomaniak.calendar.components.foundation.models.EventUi
 import kotlin.time.Clock
 
 @Composable
-fun EventItem(event: EventUi) {
+fun EventItem(event: EventUi, modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(4.dp)
             .background(Color.Gray)

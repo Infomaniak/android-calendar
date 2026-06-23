@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.planning.preview
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
@@ -32,11 +33,28 @@ import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 import kotlin.time.Instant
 
-internal val previewWeekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>> by lazy {
+class WeekEventsPreviewParameter : PreviewParameterProvider<Map<YearWeek, Map<LocalDate, List<EventUi>>>> {
+    override val values: Sequence<Map<YearWeek, Map<LocalDate, List<EventUi>>>> = sequenceOf(
+        todayPreviewWeekEvents,
+        passingYearPreviewWeekEvents,
+    )
+
+    companion object {
+        internal val todayPreviewWeekEvents by lazy {
+            generateEventsAround(Clock.System.todayIn(TimeZone.currentSystemDefault()))
+        }
+
+        internal val passingYearPreviewWeekEvents by lazy {
+            generateEventsAround(LocalDate(2026, 1, 1))
+        }
+    }
+}
+
+private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalDate, List<EventUi>>> {
     val timeZone = TimeZone.currentSystemDefault()
-    val today = Clock.System.todayIn(timeZone)
-    val pastDay = today.minus(5, DateTimeUnit.DAY)
-    val futureDay = today.plus(5, DateTimeUnit.DAY)
+
+    val pastDay = targetDay.minus(5, DateTimeUnit.DAY)
+    val futureDay = targetDay.plus(5, DateTimeUnit.DAY)
 
     fun instantAt(date: LocalDate, hour: Int): Instant {
         return LocalDateTime(date.year, date.month.ordinal + 1, date.day, hour, 0).toInstant(timeZone)
@@ -54,13 +72,13 @@ internal val previewWeekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>> by 
         )
     }
 
-    listOf(
+    return listOf(
         pastDay to listOf(
             event(pastDay, 10, "Team retrospective", "Conference room B"),
         ),
-        today to listOf(
-            event(today, 9, "Morning standup", "kMeet", Color(0xFF0F9D58)),
-            event(today, 14, "Design review", "Japan room", Color(0xFFDB4437)),
+        targetDay to listOf(
+            event(targetDay, 9, "Morning standup", "kMeet", Color(0xFF0F9D58)),
+            event(targetDay, 14, "Design review", "Japan room", Color(0xFFDB4437)),
         ),
         futureDay to listOf(
             event(futureDay, 11, "Sprint planning", "Hard rock room"),

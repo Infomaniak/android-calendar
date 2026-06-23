@@ -31,12 +31,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.infomaniak.calendar.components.event.EventItem
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.planning.component.DayIndicator
-import com.infomaniak.calendar.components.planning.preview.previewWeekEvents
+import com.infomaniak.calendar.components.planning.preview.WeekEventsPreviewParameter
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate
@@ -104,8 +105,8 @@ private val YearWeek.label: String
 
 @Preview
 @Composable
-private fun PreviewPlanning() {
+private fun PreviewPlanning(@PreviewParameter(WeekEventsPreviewParameter::class) weekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>>) {
     Surface {
-        Planning(weekEvents = { previewWeekEvents })
+        Planning(weekEvents = { weekEvents })
     }
 }

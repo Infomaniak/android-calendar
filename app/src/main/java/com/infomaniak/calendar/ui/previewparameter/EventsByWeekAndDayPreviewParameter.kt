@@ -99,7 +99,6 @@ private val fakeEventsByWeekAndDay: EventsByWeekAndDay = sortedMapOf(
                 start = "2026-06-22T14:00:00Z",
                 end = "2026-06-22T15:30:00Z",
                 location = "Conf Room B / kMeet",
-                color = Color(0xFFFF9800),
             ),
         ),
     ),
