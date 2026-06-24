@@ -1,37 +1,16 @@
-/*
- * Infomaniak Calendar - Android
- * Copyright (C) 2026 Infomaniak Network SA
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package com.infomaniak.calendar.secured
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.utils.AccountUtils
-import com.infomaniak.core.auth.models.user.User
-import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
-import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCredentials
 import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 
 @Inject
@@ -44,33 +23,36 @@ class CredentialViewModel(
     private val accountUtils: AccountUtils,
 ) : ViewModel() {
 
+    /**
+     * Tracks user IDs that have already been initialized during this session,
+     * preventing redundant init and sync calls when the user list changes.
+     */
+    private val initializedUserIds = mutableSetOf<Long>()
+
     init {
         loadDavCredential()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun loadDavCredential() {
         viewModelScope.launch {
-            accountUtils.users.mapLatest { userList ->
-                userList.map { user ->
-                    val userId = user.id.toLong()
-                    val credentials = securedDavCredentialsRepository.get(userId) ?: user.createAndStoreCredential()
-                    AccountId(user.id.toLong()) to credentials
-                }
-            }.collect { credentialsList ->
-                credentialsList.forEach { (accountId, credentials) ->
-                    runCatching {
+            accountUtils.users.collect { userList ->
+                val currentUserIds = userList.map { it.id.toLong() }.toSet()
+                initializedUserIds.retainAll(currentUserIds)
+
+                userList
+                    .filter { user -> user.id.toLong() !in initializedUserIds }
+                    .forEach { user ->
+                        Log.e("nicolas", "loadDavCredential - user: ${user}")
+                        val userId = user.id.toLong()
+                        val credentials = securedDavCredentialsRepository.get(userId)
+                        val accountId = AccountId(userId)
+
                         accountManager.initAccount(accountId, credentials)
                         calendarManager.syncCalendars(accountId)
-                    }.cancellable()
-                }
+
+                        initializedUserIds.add(userId)
+                    }
             }
         }
-    }
-
-    private suspend fun User.createAndStoreCredential(): DavCredentials {
-        val credentials = accountManager.retrieveDavCredential(authToken = apiToken.accessToken, login = login)
-        securedDavCredentialsRepository.save(userId = id.toLong(), credential = credentials)
-        return credentials
     }
 }

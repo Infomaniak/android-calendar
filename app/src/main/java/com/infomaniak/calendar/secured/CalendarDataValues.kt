@@ -19,8 +19,11 @@ package com.infomaniak.calendar.secured
 
 import android.content.Context
 import com.infomaniak.core.datavalue.DataValues
+import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.SingleIn
 
+@SingleIn(AppScope::class)
 class CalendarDataValues @Inject constructor(appContext: Context) : DataValues(appContext, name = "calendarData") {
     val securedDavCredential = dataValue<Map<Long, SecuredDavCredential>>("securedDavCredential", emptyMap())
 }
