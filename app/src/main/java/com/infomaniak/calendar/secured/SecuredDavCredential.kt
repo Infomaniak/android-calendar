@@ -19,10 +19,25 @@ package com.infomaniak.calendar.secured
 
 import kotlinx.serialization.Serializable
 
+/**
+ * Serializable representation of a user's DAV credentials stored in encrypted form.
+ *
+ * Each sensitive field (username and password) is encrypted independently using AES/GCM
+ * and encoded as Base64. Each encryption produces its own ciphertext and a unique
+ * initialization vector (IV), both required for decryption.
+ *
+ * @property encryptedUsername Encrypted username, Base64-encoded.
+ * @property usernameIV Initialization vector used to encrypt the username, Base64-encoded.
+ * @property encryptedPassword Encrypted password, Base64-encoded.
+ * @property passwordIV Initialization vector used to encrypt the password, Base64-encoded.
+ *
+ * @see KeystoreCipher for the encryption/decryption logic.
+ * @see SecuredDavCredentialsRepository for persistence and retrieval.
+ */
 @Serializable
 data class SecuredDavCredential(
-    val encryptedUsernameBase64: String,
-    val usernameIvBase64: String,
-    val encryptedPasswordBase64: String,
-    val initializationVectorBase64: String,
+    val encryptedUsername: String,
+    val usernameIV: String,
+    val encryptedPassword: String,
+    val passwordIV: String,
 )
