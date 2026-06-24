@@ -20,6 +20,7 @@ package com.infomaniak.calendar.ui.previewparameter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.ui.screen.planning.EventsByWeekAndDay
@@ -43,6 +44,7 @@ private fun eventUi(
     id = id,
     title = title,
     location = location,
+    status = EventStatus.Confirmed,
     categories = null,
     start = Instant.parse(start),
     end = Instant.parse(end),

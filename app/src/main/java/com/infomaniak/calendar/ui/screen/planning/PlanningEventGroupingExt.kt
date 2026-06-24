@@ -19,6 +19,7 @@ package com.infomaniak.calendar.ui.screen.planning
 
 import com.infomaniak.calendar.components.foundation.models.EventColorUi
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
+import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
@@ -81,11 +82,20 @@ private fun Event.toEventUi(): EventUi {
         id = id.url,
         title = title,
         location = location,
+        status = status.toEventStatus(),
         categories = categories,
         start = timing.startInstantLocal(),
         end = timing.endInstantLocal(),
         colors = colors.toEventColorsUi(),
     )
+}
+
+private fun String?.toEventStatus(): EventStatus {
+    return when (this) {
+        "TENTATIVE" -> EventStatus.Tentative
+        "CANCELLED" -> EventStatus.Cancelled
+        else -> EventStatus.Confirmed
+    }
 }
 
 fun EventColors.toEventColorsUi(): EventColorsUi = EventColorsUi(

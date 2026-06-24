@@ -25,8 +25,15 @@ data class EventUi(
     val id: String,
     val title: String,
     val location: String?,
+    val status: EventStatus,
     val categories: String?,
     val start: Instant,
     val end: Instant,
     val colors: EventColorsUi,
 )
+
+enum class EventStatus {
+    Confirmed,
+    Tentative,
+    Cancelled,
+}

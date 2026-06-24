@@ -20,6 +20,7 @@ package com.infomaniak.calendar.components.planning.preview
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
@@ -67,6 +68,7 @@ private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalD
             id = "$date-$hour",
             title = title,
             location = location,
+            status = EventStatus.Confirmed,
             categories = null,
             start = instantAt(date, hour),
             end = instantAt(date, hour + 1),
