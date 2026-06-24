@@ -41,12 +41,12 @@ import com.infomaniak.calendar.ui.navigation.state.SharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.ToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableState
-import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
 import com.infomaniak.calendar.ui.screen.calendarTest.calendarTest
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventCreation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
+import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
 import com.infomaniak.calendar.ui.screen.threeDays.ThreeDayScreen
 import com.infomaniak.calendar.ui.screen.week.WeekScreen
 
@@ -76,7 +76,10 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
         PlanningScreen()
     }
     entry<NavDestination.CalendarView.Day>(metadata = metaDataOf(FloatingToolbarWithFab)) {
-        DayScreen(onTestScreen = { backStack.add(NavDestination.CalendarTest) })
+        DayScreen(
+            onTestScreen = { backStack.add(NavDestination.CalendarTest) },
+            addAddAccount = { backStack.add(NavDestination.Onboarding(onlyLogin = false)) },
+        )
     }
     entry<NavDestination.CalendarView.ThreeDays>(metadata = metaDataOf(FloatingToolbarWithFab)) {
         ThreeDayScreen()
