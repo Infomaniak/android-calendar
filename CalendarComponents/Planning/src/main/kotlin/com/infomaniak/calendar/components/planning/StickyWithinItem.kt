@@ -43,10 +43,10 @@ fun Modifier.stickyWithinItem(lazyListState: LazyListState, key: Any): Modifier 
     return this
         .onSizeChanged { contentHeight = it.height }
         .graphicsLayer {
-            val itemInfo = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == key }
-                ?: return@graphicsLayer
+            val layoutInfo = lazyListState.layoutInfo
+            val itemInfo = layoutInfo.visibleItemsInfo.firstOrNull { it.key == key } ?: return@graphicsLayer
+            val itemTop = itemInfo.offset - layoutInfo.viewportStartOffset - layoutInfo.beforeContentPadding
 
-            val itemTop = itemInfo.offset - lazyListState.layoutInfo.viewportStartOffset
             val maxOffset = (itemInfo.size - contentHeight).toFloat().coerceAtLeast(0f)
             translationY = (-itemTop).toFloat().coerceIn(0f, maxOffset)
         }
