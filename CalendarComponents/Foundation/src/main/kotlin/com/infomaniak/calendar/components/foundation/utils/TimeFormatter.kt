@@ -17,10 +17,10 @@
  */
 package com.infomaniak.calendar.components.foundation.utils
 
-import android.content.Context
 import android.text.format.DateFormat
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLocale
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
@@ -36,12 +36,12 @@ object TimeFormatter {
     @Composable
     fun Instant.formatHours(): String = toJavaInstant()
         .atZone(ZoneId.systemDefault())
-        .format(LocalContext.current.getHourMinuteFormatter())
+        .format(getHourMinuteFormatter())
     //endregion
 
     //region Java
     @Composable
-    fun LocalTime.formatHours(): String = LocalContext.current.getHourMinuteFormatter().format(this)
+    fun LocalTime.formatHours(): String = getHourMinuteFormatter().format(this)
 
     @Composable
     fun LocalDateTime.formatHours(): String = toLocalTime().formatHours()
@@ -50,9 +50,14 @@ object TimeFormatter {
     /**
      * Formats a date according to the user settings for 24 hours format.
      */
-    private fun Context.getHourMinuteFormatter(): DateTimeFormatter = if (DateFormat.is24HourFormat(this)) {
-        format24Hours
-    } else {
-        format12Hours
+    @Composable
+    private fun getHourMinuteFormatter(): DateTimeFormatter {
+        val currentLocale = LocalLocale.current.platformLocale
+
+        return if (DateFormat.is24HourFormat(LocalContext.current)) {
+            format24Hours.withLocale(currentLocale)
+        } else {
+            format12Hours.withLocale(currentLocale)
+        }
     }
 }
