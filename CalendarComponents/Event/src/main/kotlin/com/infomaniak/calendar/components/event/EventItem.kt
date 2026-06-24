@@ -17,10 +17,11 @@
  */
 package com.infomaniak.calendar.components.event
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,20 +29,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.utils.TimeFormatter.formatHours
+import com.infomaniak.core.ui.compose.margin.Margin
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.hours
 
 @Composable
 fun EventItem(event: EventUi, modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(4.dp)
-            .background(Color.Gray)
-            .padding(vertical = 150.dp, horizontal = 40.dp),
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = event.color,
+            contentColor = Color.White, // TODO: Waiting for KMP event HCT colors
+        ),
+        modifier = modifier,
     ) {
-        Text(event.title)
+        Column(Modifier.padding(Margin.Mini), verticalArrangement = Arrangement.spacedBy(Margin.Micro)) {
+            Text("${event.start.formatHours()} - ${event.end.formatHours()}")
+            Text(event.title)
+        }
     }
 }
 
@@ -57,7 +63,7 @@ private fun Preview() {
                     location = "Event location",
                     categories = "Event categories",
                     start = Clock.System.now(),
-                    end = Clock.System.now(),
+                    end = Clock.System.now().plus(3.hours),
                     color = Color.Red,
                 ),
             )

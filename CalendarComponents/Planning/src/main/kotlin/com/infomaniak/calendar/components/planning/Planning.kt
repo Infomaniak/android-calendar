@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -62,9 +62,12 @@ fun Planning(
         state = lazyListState,
         modifier = modifier,
         contentPadding = contentPadding,
+        verticalArrangement = Arrangement.spacedBy(Margin.Large),
     ) {
         weekEvents().forEach { (week, days) ->
-            item(key = week) { Text(week.label) }
+            item(key = week) {
+                Text(week.label)
+            }
 
             days.forEach { (date, events) ->
                 val dayKey = date
@@ -74,9 +77,7 @@ fun Planning(
                             dayName = date.toJavaLocalDate().format(shortDayNameFormatter),
                             dayNumber = date.day,
                             state = if (date == today) DateState.Today else DateState.None,
-                            modifier = Modifier
-                                .padding(start = Margin.Medium)
-                                .stickyWithinItem(lazyListState, dayKey),
+                            modifier = Modifier.stickyWithinItem(lazyListState, dayKey),
                         )
                         EventList(events, Modifier.weight(1f))
                     }
@@ -88,9 +89,9 @@ fun Planning(
 
 @Composable
 private fun EventList(events: List<EventUi>, modifier: Modifier = Modifier) {
-    Column(modifier = modifier) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Margin.Mini)) {
         events.forEach { event ->
-            EventItem(event)
+            EventItem(event, modifier = Modifier.fillMaxWidth())
         }
     }
 }
