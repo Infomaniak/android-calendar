@@ -1,3 +1,20 @@
+/*
+ * Infomaniak Calendar - Android
+ * Copyright (C) 2026 Infomaniak Network SA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.infomaniak.calendar.secured
 
 import com.infomaniak.core.auth.models.user.User
@@ -10,9 +27,8 @@ import kotlinx.coroutines.flow.first
 /**
  * Repository responsible for the secure persistence of DAV credentials, keyed by user ID.
  *
- * Credentials are transparently encrypted and decrypted by [CalendarDataValues] via its serializer
- * DAV credentials are fetched from the server through [AccountManager] during [saveAndInitDavCredentials],
- * which also triggers account initialization.
+ * Credentials are transparently encrypted and decrypted by [CalendarDataValues] via its serializer.
+ * Accounts are initialized via [AccountManager] when credentials are saved or loaded at startup.
  */
 class SecuredDavCredentialsRepository @Inject constructor(
     private val dataValues: CalendarDataValues,
@@ -31,19 +47,18 @@ class SecuredDavCredentialsRepository @Inject constructor(
     }
 
     /**
-     * Fetches DAV credentials from the server, persists them locally (encrypted transparently),
-     * then initializes the account.
+     * Persists the given DAV credentials locally (encrypted transparently) and initializes the account.
      *
      * Operations are performed sequentially:
-     * 1. Retrieve plain-text credentials from the server via [AccountManager].
-     * 2. Persist the credentials in [CalendarDataValues].
-     * 3. Initialize the account via [initAndLoadDavCredential].
+     * 1. Persist the credentials in [CalendarDataValues].
+     * 2. Initialize the account via [initAndLoadDavCredential].
      *
      * Any existing credentials for this user are replaced.
      *
-     * @param user The authenticated user whose DAV credentials should be fetched and stored.
+     * @param user The authenticated user whose DAV credentials should be stored.
+     * @param davCredentials Plain-text credentials to persist and pass to [AccountManager].
      */
-    suspend fun saveAndInitDavCredentials(user: User, davCredentials: DavCredentials) {
+    suspend fun persistAndInitDavCredentials(user: User, davCredentials: DavCredentials) {
         val userId = user.id.toLong()
         dataValues.davCredentials.update { current -> current + (userId to davCredentials) }
         initAndLoadDavCredential(AccountId(userId), davCredentials)
@@ -53,7 +68,7 @@ class SecuredDavCredentialsRepository @Inject constructor(
      * Initializes a DAV account.
      *
      * Intended for accounts whose credentials are already known — either freshly
-     * fetched via [saveAndInitDavCredentials] or loaded from storage.
+     * fetched via [persistAndInitDavCredentials] or loaded from storage.
      *
      * @param accountId The account to initialize.
      * @param davCredentials Plain-text credentials to pass to [AccountManager].

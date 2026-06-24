@@ -34,7 +34,7 @@ class AccountUtils(
 ) : PersistedCurrentUserAccountUtils(appContext, MainApplication.userDataCleanableList) {
     suspend fun addUser(calendarUser: CalendarUser) {
         val user = calendarUser.user
-        securedDavCredentialsRepository.saveAndInitDavCredentials(user = user, davCredentials = calendarUser.davCredentials)
+        securedDavCredentialsRepository.persistAndInitDavCredentials(user = user, davCredentials = calendarUser.davCredentials)
         super.addUser(user)
     }
 

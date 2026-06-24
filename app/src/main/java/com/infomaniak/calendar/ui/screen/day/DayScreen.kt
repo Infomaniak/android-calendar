@@ -19,8 +19,6 @@ package com.infomaniak.calendar.ui.screen.day
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -29,23 +27,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.infomaniak.calendar.di.ComposeAppGraph
 import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.utils.AccountUtils
-import com.infomaniak.core.auth.models.user.User
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @Composable
 fun DayScreen(
     onTestScreen: () -> Unit,
-    addAddAccount: () -> Unit,
     modifier: Modifier = Modifier,
     accountUtils: AccountUtils = ComposeAppGraph.accountUtils,
 ) {
     val scope = rememberCoroutineScope()
-    val users = accountUtils.users.collectAsStateWithLifecycle(emptyList())
 
     DayScreen(
         modifier = modifier,
@@ -54,8 +48,6 @@ fun DayScreen(
                 accountUtils.removeUser(accountUtils.currentUserIdFlow.first() ?: return@launch)
             }
         },
-        users = users.value,
-        addAddAccount = addAddAccount,
         onTestScreen = onTestScreen,
     )
 }
@@ -64,9 +56,7 @@ fun DayScreen(
 private fun DayScreen(
     onDisconnect: () -> Unit,
     onTestScreen: () -> Unit,
-    addAddAccount: () -> Unit,
     modifier: Modifier = Modifier,
-    users: List<User> = emptyList(),
 ) {
     Scaffold(
         topBar = { TopAppBar(title = { Text("DayScreen") }) },
@@ -75,16 +65,8 @@ private fun DayScreen(
         Column(modifier = Modifier.padding(paddingValues)) {
             Text("DayScreenContent")
             Text("Current user: ${LocalUser.current?.displayName}")
-            Text("List users:")
-            LazyColumn {
-                items(users) {
-                    Text(it.email)
-                }
-            }
-
             Button(onClick = onDisconnect) { Text("Disconnect") }
             Button(onClick = onTestScreen) { Text("Test Calendar") }
-            Button(onClick = addAddAccount) { Text("Add Account") }
         }
     }
 }
@@ -92,5 +74,5 @@ private fun DayScreen(
 @Preview
 @Composable
 private fun DayScreenPreview() {
-    DayScreen(onDisconnect = { }, onTestScreen = { }, addAddAccount = { })
+    DayScreen(onDisconnect = { }, onTestScreen = { })
 }

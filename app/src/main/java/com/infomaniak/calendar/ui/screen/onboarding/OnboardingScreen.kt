@@ -207,6 +207,7 @@ private suspend fun fetchDavCredentials(
         login = user.login,
     )
 }.getOrElse {
+    dependencies.setButtonsLoading(false)
     dependencies.snackbarHostState?.showSnackbar(dependencies.context.getString(RCore.string.anErrorHasOccurred))
     null
 }
