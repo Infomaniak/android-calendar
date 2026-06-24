@@ -155,6 +155,7 @@ dependencies {
     implementation(core.compose.ui.tooling.preview)
     implementation(core.androidx.adaptive)
     implementation(core.material)
+    implementation(core.okhttp)
     implementation(libs.compose.material3)
 
     testImplementation(core.junit)
