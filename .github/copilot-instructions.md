@@ -37,7 +37,7 @@ gradle/libs.versions.toml
 
 ## PR Review Instructions
 
-- Ensure strings are localized via `strings.xml` resources. Note: string resources in this repo are spread across multiple `values*/` folders (for translations) and the dedicated `CalendarComponents/Resources` module — place new strings in the appropriate module's resource directory.
+- Ensure strings are localized via `strings.xml` resources. App strings live under `app/src/main/res/values*/*`; any strings used by `CalendarComponents/*` must go in `CalendarComponents/Resources/src/main/res/values*/*` (and translations in the corresponding `values-<lang>` folders). Do not add strings to other `CalendarComponents/*` modules.
 - Ensure UI is written in Jetpack Compose using Material3 components.
 - DI is **Metro** (not Hilt): use `@Inject`, `@DependencyGraph`, `@Provides` from `dev.zacsweers.metro` — do not introduce Hilt.
 - `standard` flavor only: Firebase, Google services — fdroid builds must compile without them.
