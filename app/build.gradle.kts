@@ -145,6 +145,7 @@ dependencies {
     implementation(core.infomaniak.core.ui.compose.margin)
     implementation(core.infomaniak.core.ui.compose.theme)
 
+    implementation(core.kotlinx.serialization.json)
     implementation(kmpCalendar.androidx.room.runtime)
 
     implementation(platform(core.compose.bom))

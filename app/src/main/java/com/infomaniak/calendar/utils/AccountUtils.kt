@@ -33,7 +33,7 @@ class AccountUtils(
     private val securedDavCredentialsRepository: SecuredDavCredentialsRepository,
 ) : PersistedCurrentUserAccountUtils(appContext, MainApplication.userDataCleanableList) {
     override suspend fun addUser(user: User) {
-        securedDavCredentialsRepository.save(user)
+        securedDavCredentialsRepository.saveAndInitDavCredentials(user)
         super.addUser(user)
     }
 

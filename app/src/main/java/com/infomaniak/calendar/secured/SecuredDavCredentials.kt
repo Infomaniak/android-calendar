@@ -35,7 +35,7 @@ import kotlinx.serialization.Serializable
  * @see SecuredDavCredentialsRepository for persistence and retrieval.
  */
 @Serializable
-data class SecuredDavCredential(
+data class SecuredDavCredentials(
     val encryptedUsername: String,
     val usernameIV: String,
     val encryptedPassword: String,
