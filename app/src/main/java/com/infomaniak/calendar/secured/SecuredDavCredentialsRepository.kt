@@ -43,9 +43,8 @@ class SecuredDavCredentialsRepository @Inject constructor(
      *
      * @param user The authenticated user whose DAV credentials should be fetched and stored.
      */
-    suspend fun saveAndInitDavCredentials(user: User) {
+    suspend fun saveAndInitDavCredentials(user: User, davCredentials: DavCredentials) {
         val userId = user.id.toLong()
-        val davCredentials = accountManager.retrieveDavCredential(authToken = user.apiToken.accessToken, login = user.login)
         dataValues.davCredentials.update { current -> current + (userId to davCredentials) }
         initAndLoadDavCredential(AccountId(userId), davCredentials)
     }

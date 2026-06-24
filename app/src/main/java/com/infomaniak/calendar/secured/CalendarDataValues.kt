@@ -18,13 +18,10 @@
 package com.infomaniak.calendar.secured
 
 import android.content.Context
-import com.infomaniak.core.datavalue.DataValueSerializer
 import com.infomaniak.core.datavalue.DataValues
-import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCredentials
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
-import kotlinx.serialization.json.Json
 
 @SingleIn(AppScope::class)
 class CalendarDataValues @Inject constructor(
@@ -34,31 +31,6 @@ class CalendarDataValues @Inject constructor(
     val davCredentials = dataValue(
         key = "davCredentials",
         defaultValue = emptyMap(),
-        serializer = object : DataValueSerializer<Map<Long, DavCredentials>> {
-            override suspend fun serialize(value: Map<Long, DavCredentials>): String {
-                val secured = value.mapValues { (_, davCredentials) ->
-                    val encryptedUsername = keystoreCipher.encrypt(davCredentials.username)
-                    val encryptedPassword = keystoreCipher.encrypt(davCredentials.password)
-                    SecuredDavCredentials(
-                        encryptedUsername = encryptedUsername.encryptedData,
-                        usernameIV = encryptedUsername.initializationVector,
-                        encryptedPassword = encryptedPassword.encryptedData,
-                        passwordIV = encryptedPassword.initializationVector,
-                    )
-                }
-
-                return Json.encodeToString(secured)
-            }
-
-            override suspend fun deserialize(value: String): Map<Long, DavCredentials> {
-                return Json.decodeFromString<Map<Long, SecuredDavCredentials>>(value)
-                    .mapValues { (_, secured) ->
-                        DavCredentials(
-                            username = keystoreCipher.decrypt(secured.encryptedUsername, secured.usernameIV),
-                            password = keystoreCipher.decrypt(secured.encryptedPassword, secured.passwordIV),
-                        )
-                    }
-            }
-        },
+        serializer = DavCredentialSerializer(keystoreCipher),
     )
 }

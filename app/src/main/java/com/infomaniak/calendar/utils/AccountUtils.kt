@@ -20,8 +20,8 @@ package com.infomaniak.calendar.utils
 import android.content.Context
 import com.infomaniak.calendar.MainApplication
 import com.infomaniak.calendar.secured.SecuredDavCredentialsRepository
+import com.infomaniak.calendar.ui.screen.onboarding.CalendarUser
 import com.infomaniak.core.auth.PersistedCurrentUserAccountUtils
-import com.infomaniak.core.auth.models.user.User
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
@@ -32,8 +32,9 @@ class AccountUtils(
     appContext: Context,
     private val securedDavCredentialsRepository: SecuredDavCredentialsRepository,
 ) : PersistedCurrentUserAccountUtils(appContext, MainApplication.userDataCleanableList) {
-    override suspend fun addUser(user: User) {
-        securedDavCredentialsRepository.saveAndInitDavCredentials(user)
+    suspend fun addUser(calendarUser: CalendarUser) {
+        val user = calendarUser.user
+        securedDavCredentialsRepository.saveAndInitDavCredentials(user = user, davCredentials = calendarUser.davCredentials)
         super.addUser(user)
     }
 
