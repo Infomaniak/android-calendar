@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.planning.Planning
+import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
 import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewParameter
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
@@ -53,6 +54,7 @@ private fun PlanningScreen(weekEvents: () -> EventsByWeekAndDay, modifier: Modif
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = Margin.Medium)
+                    .scrollableToolbar()
                     .fillMaxWidth(),
                 contentPadding = paddingValues,
             )
