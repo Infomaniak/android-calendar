@@ -18,10 +18,13 @@
 package com.infomaniak.calendar.ui.previewparameter
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.ui.screen.planning.EventsByWeekAndDay
+import com.infomaniak.calendar.ui.screen.planning.toEventColorsUi
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import kotlinx.datetime.LocalDate
 import kotlin.time.Instant
 
@@ -43,7 +46,7 @@ private fun eventUi(
     categories = null,
     start = Instant.parse(start),
     end = Instant.parse(end),
-    color = color,
+    colors = EventColors.from(color.toArgb()).toEventColorsUi(),
 )
 
 private val week25 = WeekNumbering.ISO_8601.weekOf(LocalDate(2026, 6, 15))

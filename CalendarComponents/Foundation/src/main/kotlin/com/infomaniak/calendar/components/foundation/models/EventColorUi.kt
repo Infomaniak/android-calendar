@@ -17,16 +17,7 @@
  */
 package com.infomaniak.calendar.components.foundation.models
 
-import androidx.compose.runtime.Immutable
-import kotlin.time.Instant
-
-@Immutable
-data class EventUi(
-    val id: String,
-    val title: String,
-    val location: String?,
-    val categories: String?,
-    val start: Instant,
-    val end: Instant,
-    val colors: EventColorsUi,
+data class EventColorUi(
+    val light: Int,
+    val dark: Int,
 )

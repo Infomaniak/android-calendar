@@ -18,10 +18,12 @@
 package com.infomaniak.calendar.components.planning.preview
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
+import com.infomaniak.calendar.components.foundation.preview.EventColorsUiFactory
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -68,7 +70,7 @@ private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalD
             categories = null,
             start = instantAt(date, hour),
             end = instantAt(date, hour + 1),
-            color = color,
+            colors = EventColorsUiFactory.dummyEventColorsUiFactory.create(color.toArgb()),
         )
     }
 
