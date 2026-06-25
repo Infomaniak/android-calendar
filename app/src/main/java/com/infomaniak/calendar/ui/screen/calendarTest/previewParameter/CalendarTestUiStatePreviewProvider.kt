@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestUiState
 import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
 import com.infomaniak.calendar.ui.screen.calendarTest.model.EventUi
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColor
 
 internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<CalendarTestUiState> {
     override val values = sequenceOf(CalendarTestUiState.Loading, Loaded, Error)
@@ -35,14 +36,14 @@ internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<Cal
             categories = "Work",
             description = "Standup and planning",
             lastModified = "03/01/2026 09:55",
-            color = 0xFF2196F3.toInt(),
+            color = CalendarColor(0xFF2196F3.toInt()),
             canEdit = true,
         )
 
         val CalendarUi = CalendarUi(
             id = "calendar-preview",
             header = "Work · 1 event(s)",
-            color = 0xFF2196F3.toInt(),
+            color = CalendarColor(0xFF2196F3.toInt()),
             isReadOnly = false,
             events = List(3) { EventUi.copy(id = "$it") },
         )
@@ -53,13 +54,13 @@ internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<Cal
                 CalendarUi.copy(
                     id = "calendar-preview-ro",
                     header = "Team (shared) · 2 event(s)",
-                    color = 0xFFE91E63.toInt(),
+                    color = CalendarColor(0xFFE91E63.toInt()),
                     isReadOnly = true,
                 ),
                 CalendarUi.copy(
                     id = "calendar-preview-empty",
                     header = "Holidays · 0 event(s)",
-                    color = 0xFF4CAF50.toInt(),
+                    color = CalendarColor(0xFF4CAF50.toInt()),
                     events = emptyList(),
                 ),
             ),
