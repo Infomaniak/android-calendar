@@ -32,6 +32,6 @@ data class EventUi(
     val categories: String?,
     val description: String?,
     val lastModified: String?,
-    val color: CalendarColor,
+    val calendarColor: CalendarColor,
     val canEdit: Boolean,
 )

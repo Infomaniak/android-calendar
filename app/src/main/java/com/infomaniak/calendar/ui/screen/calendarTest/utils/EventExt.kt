@@ -51,7 +51,7 @@ fun Event.toUi(): EventUi = EventUi(
     categories = categories?.takeIf { it.isNotBlank() },
     description = description?.takeIf { it.isNotBlank() },
     lastModified = lastModified?.formatUtc(),
-    color = color,
+    calendarColor = calendarColor,
     canEdit = canEdit,
 )
 
