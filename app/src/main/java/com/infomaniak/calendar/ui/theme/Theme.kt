@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.infomaniak.calendar.components.foundation.preview.EventColorsUiFactory
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
 import com.infomaniak.calendar.ui.screen.planning.toEventColorsUi
+import com.infomaniak.core.ui.compose.theme.LocalIsThemeDarkMode
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 
 private val DarkColorScheme = darkColorScheme(
@@ -72,7 +73,10 @@ fun CalendarTheme(
         else -> LightColorScheme
     }
 
-    CompositionLocalProvider(LocalEventColorsUiFactory provides EventColorsUiFactory { EventColors.from(it).toEventColorsUi() }) {
+    CompositionLocalProvider(
+        LocalEventColorsUiFactory provides EventColorsUiFactory { EventColors.from(it).toEventColorsUi() },
+        LocalIsThemeDarkMode provides darkTheme,
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,

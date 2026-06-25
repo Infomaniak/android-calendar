@@ -17,9 +17,9 @@
  */
 package com.infomaniak.calendar.components.foundation.models
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.infomaniak.core.ui.compose.theme.LocalIsThemeDarkMode
 
 data class EventColorsUi(
     private val _datavizContainer: EventColorUi,
@@ -34,6 +34,6 @@ data class EventColorsUi(
 
     companion object {
         @Composable
-        fun EventColorUi.toColor(): Color = Color(if (isSystemInDarkTheme()) dark else light)
+        fun EventColorUi.toColor(): Color = Color(if (LocalIsThemeDarkMode.current) dark else light)
     }
 }
