@@ -201,17 +201,10 @@ private fun OnboardingScreen(
 
 private suspend fun fetchDavCredentials(
     user: User,
-    dependencies: OnboardingLoginDependencies,
+    accountManager: AccountManager,
 ): DavCredentials? = runCatching {
-    dependencies.accountManager.retrieveDavCredential(
-        authToken = user.apiToken.accessToken,
-        login = user.login,
-    )
-}.getOrElse {
-    dependencies.setButtonsLoading(false)
-    dependencies.snackbarHostState?.showSnackbar(dependencies.context.getString(RCore.string.anErrorHasOccurred))
-    null
-}
+    accountManager.retrieveDavCredential(authToken = user.apiToken.accessToken, login = user.login)
+}.getOrNull()
 
 @Composable
 private fun rememberOnboardingLoginFlowController(
@@ -224,23 +217,35 @@ private fun rememberOnboardingLoginFlowController(
         infomaniakLogin = infomaniakLogin,
         userExistenceChecker = dependencies.accountUtils,
     ) { userLoginResult ->
-        when (userLoginResult) {
-            is UserLoginResult.Success -> scope.launch {
-                val user = userLoginResult.user
-                val davCredentials = fetchDavCredentials(user, dependencies) ?: return@launch
-                loginUsersIntoTheApp(
-                    users = listOf(CalendarUser(user, davCredentials)),
-                    onlyLoginScreen = dependencies.onlyLoginScreen,
-                    accountUtils = dependencies.accountUtils,
-                    onNavigateToHome = dependencies.onNavigateToHome,
-                    onPopBack = dependencies.onPopBack,
-                )
+        val user: User? = when (userLoginResult) {
+            is UserLoginResult.Success -> userLoginResult.user
+            is UserLoginResult.Failure -> {
+                dependencies.snackbarHostState?.showSnackbar(userLoginResult.errorMessage)
+                null
             }
-            is UserLoginResult.Failure -> dependencies.snackbarHostState?.showSnackbar(userLoginResult.errorMessage)
-            null -> Unit
+            null -> null
         }
 
-        if (userLoginResult !is UserLoginResult.Success) dependencies.setButtonsLoading(false)
+        if (user == null) {
+            dependencies.setButtonsLoading(false)
+            return@rememberLoginFlowController
+        }
+
+        scope.launch {
+            val davCredentials = fetchDavCredentials(user, dependencies.accountManager) ?: run {
+                dependencies.snackbarHostState?.showSnackbar(dependencies.context.getString(RCore.string.anErrorHasOccurred))
+                dependencies.setButtonsLoading(false)
+                return@launch
+            }
+
+            loginUsersIntoTheApp(
+                calendarUsers = listOf(CalendarUser(user, davCredentials)),
+                onlyLoginScreen = dependencies.onlyLoginScreen,
+                accountUtils = dependencies.accountUtils,
+                onNavigateToHome = dependencies.onNavigateToHome,
+                onPopBack = dependencies.onPopBack,
+            )
+        }
     }
 }
 
@@ -264,23 +269,31 @@ private suspend fun loginUsers(loginResult: CrossAppLoginFacade.LoginResult, dep
         userExistenceChecker = dependencies.accountUtils,
     )
 
-    val users = buildList {
+    val users: List<User> = buildList {
         results.forEach { result ->
             when (result) {
-                is UserLoginResult.Success -> {
-                    val davCredentials = fetchDavCredentials(result.user, dependencies) ?: return@forEach
-                    add(CalendarUser(result.user, davCredentials))
-                }
+                is UserLoginResult.Success -> add(result.user)
                 is UserLoginResult.Failure -> dependencies.snackbarHostState?.showSnackbar(result.errorMessage)
             }
         }
     }
 
-    if (users.isEmpty()) {
+    val calendarUsers: List<CalendarUser> = buildList {
+        users.forEach { user ->
+            val davCredentials = fetchDavCredentials(user, dependencies.accountManager)
+            if (davCredentials != null) {
+                add(CalendarUser(user, davCredentials))
+            } else {
+                dependencies.snackbarHostState?.showSnackbar(dependencies.context.getString(RCore.string.anErrorHasOccurred))
+            }
+        }
+    }
+
+    if (calendarUsers.isEmpty()) {
         dependencies.setButtonsLoading(false)
     } else {
         loginUsersIntoTheApp(
-            users = users,
+            calendarUsers = calendarUsers,
             onlyLoginScreen = dependencies.onlyLoginScreen,
             accountUtils = dependencies.accountUtils,
             onNavigateToHome = dependencies.onNavigateToHome,
@@ -290,14 +303,14 @@ private suspend fun loginUsers(loginResult: CrossAppLoginFacade.LoginResult, dep
 }
 
 private suspend fun loginUsersIntoTheApp(
-    users: List<CalendarUser>,
+    calendarUsers: List<CalendarUser>,
     onlyLoginScreen: Boolean,
     accountUtils: AccountUtils,
     onNavigateToHome: () -> Unit,
     onPopBack: () -> Unit,
 ) {
-    users.forEach { user ->
-        accountUtils.addUser(calendarUser = user)
+    calendarUsers.forEach { calendarUser ->
+        accountUtils.addUser(calendarUser = calendarUser)
     }
     if (onlyLoginScreen) onPopBack() else onNavigateToHome()
 }
