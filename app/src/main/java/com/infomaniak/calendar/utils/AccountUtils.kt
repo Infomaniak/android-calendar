@@ -22,6 +22,7 @@ import com.infomaniak.calendar.MainApplication
 import com.infomaniak.calendar.secured.DavCredentialsManager
 import com.infomaniak.calendar.ui.screen.onboarding.CalendarUser
 import com.infomaniak.core.auth.PersistedCurrentUserAccountUtils
+import com.infomaniak.core.auth.models.user.User
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
@@ -35,6 +36,11 @@ class AccountUtils(
     suspend fun addUser(calendarUser: CalendarUser) {
         val user = calendarUser.user
         davCredentialsManager.addCredential(user = user, davCredentials = calendarUser.davCredentials)
+        super.addUser(user)
+    }
+
+    @Deprecated("Use addUser with a CalendarUser instead", replaceWith = ReplaceWith("addUser(calendarUser)"))
+    override suspend fun addUser(user: User) {
         super.addUser(user)
     }
 
