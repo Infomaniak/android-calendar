@@ -210,43 +210,34 @@ private suspend fun fetchDavCredentials(
 private fun rememberOnboardingLoginFlowController(
     infomaniakLogin: InfomaniakLogin,
     dependencies: OnboardingLoginDependencies,
-): LoginFlowController {
-    val scope = rememberCoroutineScope()
-
-    return LoginUtils.rememberLoginFlowController(
-        infomaniakLogin = infomaniakLogin,
-        userExistenceChecker = dependencies.accountUtils,
-    ) { userLoginResult ->
-        val user: User? = when (userLoginResult) {
-            is UserLoginResult.Success -> userLoginResult.user
-            is UserLoginResult.Failure -> {
-                dependencies.snackbarHostState?.showSnackbar(userLoginResult.errorMessage)
-                null
-            }
-            null -> null
+): LoginFlowController = LoginUtils.rememberLoginFlowController(infomaniakLogin, dependencies.accountUtils) { userLoginResult ->
+    val user: User? = when (userLoginResult) {
+        is UserLoginResult.Success -> userLoginResult.user
+        is UserLoginResult.Failure -> {
+            dependencies.snackbarHostState?.showSnackbar(userLoginResult.errorMessage)
+            null
         }
-
-        if (user == null) {
-            dependencies.setButtonsLoading(false)
-            return@rememberLoginFlowController
-        }
-
-        scope.launch {
-            val davCredentials = fetchDavCredentials(user, dependencies.accountManager) ?: run {
-                dependencies.snackbarHostState?.showSnackbar(dependencies.context.getString(RCore.string.anErrorHasOccurred))
-                dependencies.setButtonsLoading(false)
-                return@launch
-            }
-
-            loginUsersIntoTheApp(
-                calendarUsers = listOf(CalendarUser(user, davCredentials)),
-                onlyLoginScreen = dependencies.onlyLoginScreen,
-                accountUtils = dependencies.accountUtils,
-                onNavigateToHome = dependencies.onNavigateToHome,
-                onPopBack = dependencies.onPopBack,
-            )
-        }
+        null -> null
     }
+
+    if (user == null) {
+        dependencies.setButtonsLoading(false)
+        return@rememberLoginFlowController
+    }
+
+    val davCredentials = fetchDavCredentials(user, dependencies.accountManager) ?: run {
+        dependencies.snackbarHostState?.showSnackbar(dependencies.context.getString(RCore.string.anErrorHasOccurred))
+        dependencies.setButtonsLoading(false)
+        return@rememberLoginFlowController
+    }
+
+    loginUsersIntoTheApp(
+        calendarUsers = listOf(CalendarUser(user, davCredentials)),
+        onlyLoginScreen = dependencies.onlyLoginScreen,
+        accountUtils = dependencies.accountUtils,
+        onNavigateToHome = dependencies.onNavigateToHome,
+        onPopBack = dependencies.onPopBack,
+    )
 }
 
 private suspend fun connectSelectedAccounts(
