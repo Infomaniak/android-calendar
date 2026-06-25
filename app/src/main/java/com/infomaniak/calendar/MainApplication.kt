@@ -57,7 +57,7 @@ class MainApplication : Application() {
 
     private fun loadCalDavCredential() {
         applicationScope.launch {
-            appGraph.securedDavCredentialsRepository.loadAndInitAllCredentials()
+            appGraph.davCredentialsManager.initStoredCredentials()
         }
     }
 

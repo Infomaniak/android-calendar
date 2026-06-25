@@ -32,7 +32,7 @@ import kotlinx.serialization.Serializable
  * @property passwordIV Initialization vector used to encrypt the password, Base64-encoded.
  *
  * @see KeystoreCipher for the encryption/decryption logic.
- * @see SecuredDavCredentialsRepository for persistence and retrieval.
+ * @see DavCredentialsManager for persistence and retrieval.
  */
 @Serializable
 data class SecuredDavCredentials(

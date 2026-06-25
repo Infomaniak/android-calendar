@@ -23,7 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.BuildConfig
 import com.infomaniak.calendar.MainApplication
-import com.infomaniak.calendar.secured.SecuredDavCredentialsRepository
+import com.infomaniak.calendar.secured.DavCredentialsManager
 import com.infomaniak.calendar.utils.AccountUtils
 import com.infomaniak.core.login.InfomaniakLogin
 import com.infomaniak.core.network.LOGIN_ENDPOINT_URL
@@ -64,7 +64,7 @@ interface AppGraph {
 
     val accountManager: AccountManager
 
-    val securedDavCredentialsRepository: SecuredDavCredentialsRepository
+    val davCredentialsManager: DavCredentialsManager
 
     @Provides
     @SingleIn(AppScope::class)
