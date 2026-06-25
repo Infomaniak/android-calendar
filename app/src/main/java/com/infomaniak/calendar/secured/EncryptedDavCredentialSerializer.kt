@@ -21,16 +21,16 @@ import com.infomaniak.core.datavalue.DataValueSerializer
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCredentials
 import kotlinx.serialization.json.Json
 
-class DavCredentialSerializer(private val keystoreCipher: KeystoreCipher) : DataValueSerializer<Map<Long, DavCredentials>> {
+class EncryptedDavCredentialSerializer(private val keystoreCipher: KeystoreCipher) : DataValueSerializer<Map<Long, DavCredentials>> {
     override suspend fun serialize(value: Map<Long, DavCredentials>): String {
         val secured = value.mapValues { (_, davCredentials) ->
             val encryptedUsername = keystoreCipher.encrypt(davCredentials.username)
             val encryptedPassword = keystoreCipher.encrypt(davCredentials.password)
             SecuredDavCredentials(
                 encryptedUsername = encryptedUsername.encryptedData,
-                usernameIV = encryptedUsername.initializationVector,
+                usernameIv = encryptedUsername.initializationVector,
                 encryptedPassword = encryptedPassword.encryptedData,
-                passwordIV = encryptedPassword.initializationVector,
+                passwordIv = encryptedPassword.initializationVector,
             )
         }
 
@@ -41,8 +41,8 @@ class DavCredentialSerializer(private val keystoreCipher: KeystoreCipher) : Data
         return Json.decodeFromString<Map<Long, SecuredDavCredentials>>(value)
             .mapValues { (_, secured) ->
                 DavCredentials(
-                    username = keystoreCipher.decrypt(secured.encryptedUsername, secured.usernameIV),
-                    password = keystoreCipher.decrypt(secured.encryptedPassword, secured.passwordIV),
+                    username = keystoreCipher.decrypt(secured.encryptedUsername, secured.usernameIv),
+                    password = keystoreCipher.decrypt(secured.encryptedPassword, secured.passwordIv),
                 )
             }
     }

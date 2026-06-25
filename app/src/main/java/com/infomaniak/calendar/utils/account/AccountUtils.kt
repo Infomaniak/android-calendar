@@ -15,12 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.utils
+package com.infomaniak.calendar.utils.account
 
 import android.content.Context
 import com.infomaniak.calendar.MainApplication
 import com.infomaniak.calendar.secured.DavCredentialsManager
-import com.infomaniak.calendar.ui.screen.onboarding.CalendarUser
 import com.infomaniak.core.auth.PersistedCurrentUserAccountUtils
 import com.infomaniak.core.auth.models.user.User
 import dev.zacsweers.metro.AppScope

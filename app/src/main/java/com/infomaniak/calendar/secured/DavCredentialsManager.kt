@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.secured
 
+import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCredentials

@@ -29,13 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.di.ComposeAppGraph
 import com.infomaniak.calendar.ui.LocalUser
-import com.infomaniak.calendar.utils.AccountUtils
+import com.infomaniak.calendar.utils.account.AccountUtils
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @Composable
 fun DayScreen(
-    onTestScreen: () -> Unit,
+    goToTestScreen: () -> Unit,
     modifier: Modifier = Modifier,
     accountUtils: AccountUtils = ComposeAppGraph.accountUtils,
 ) {
@@ -48,14 +48,14 @@ fun DayScreen(
                 accountUtils.removeUser(accountUtils.currentUserIdFlow.first() ?: return@launch)
             }
         },
-        onTestScreen = onTestScreen,
+        goToTestScreen = goToTestScreen,
     )
 }
 
 @Composable
 private fun DayScreen(
     onDisconnect: () -> Unit,
-    onTestScreen: () -> Unit,
+    goToTestScreen: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -66,7 +66,7 @@ private fun DayScreen(
             Text("DayScreenContent")
             Text("Current user: ${LocalUser.current?.displayName}")
             Button(onClick = onDisconnect) { Text("Disconnect") }
-            Button(onClick = onTestScreen) { Text("Test Calendar") }
+            Button(onClick = goToTestScreen) { Text("Test Calendar") }
         }
     }
 }
@@ -74,5 +74,5 @@ private fun DayScreen(
 @Preview
 @Composable
 private fun DayScreenPreview() {
-    DayScreen(onDisconnect = { }, onTestScreen = { })
+    DayScreen(onDisconnect = { }, goToTestScreen = { })
 }

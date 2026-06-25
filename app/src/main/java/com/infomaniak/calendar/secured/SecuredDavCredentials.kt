@@ -27,9 +27,9 @@ import kotlinx.serialization.Serializable
  * initialization vector (IV), both required for decryption.
  *
  * @property encryptedUsername Encrypted username, Base64-encoded.
- * @property usernameIV Initialization vector used to encrypt the username, Base64-encoded.
+ * @property usernameIv Initialization vector used to encrypt the username, Base64-encoded.
  * @property encryptedPassword Encrypted password, Base64-encoded.
- * @property passwordIV Initialization vector used to encrypt the password, Base64-encoded.
+ * @property passwordIv Initialization vector used to encrypt the password, Base64-encoded.
  *
  * @see KeystoreCipher for the encryption/decryption logic.
  * @see DavCredentialsManager for persistence and retrieval.
@@ -37,7 +37,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SecuredDavCredentials(
     val encryptedUsername: String,
-    val usernameIV: String,
+    val usernameIv: String,
     val encryptedPassword: String,
-    val passwordIV: String,
+    val passwordIv: String,
 )

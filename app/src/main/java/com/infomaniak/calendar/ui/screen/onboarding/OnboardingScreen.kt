@@ -49,7 +49,8 @@ import com.infomaniak.calendar.R
 import com.infomaniak.calendar.di.ComposeAppGraph
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.SharedSnackbarHostState
-import com.infomaniak.calendar.utils.AccountUtils
+import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.calendar.utils.account.CalendarUser
 import com.infomaniak.core.auth.models.UserLoginResult
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.auth.utils.LoginFlowController
@@ -355,11 +356,6 @@ private enum class Page(
         },
     )
 }
-
-data class CalendarUser(
-    val user: User,
-    val davCredentials: DavCredentials,
-)
 
 private data class OnboardingLoginDependencies(
     val context: Context,

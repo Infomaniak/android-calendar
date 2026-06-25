@@ -15,22 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.secured
+package com.infomaniak.calendar.utils.account
 
-import android.content.Context
-import com.infomaniak.core.datavalue.DataValues
-import dev.zacsweers.metro.AppScope
-import dev.zacsweers.metro.Inject
-import dev.zacsweers.metro.SingleIn
+import com.infomaniak.core.auth.models.user.User
+import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCredentials
 
-@SingleIn(AppScope::class)
-class CalendarDataValues @Inject constructor(
-    appContext: Context,
-    keystoreCipher: KeystoreCipher,
-) : DataValues(appContext, name = "calendarData") {
-    val davCredentials = dataValue(
-        key = "davCredentials",
-        defaultValue = emptyMap(),
-        serializer = DavCredentialSerializer(keystoreCipher),
-    )
-}
+data class CalendarUser(
+    val user: User,
+    val davCredentials: DavCredentials,
+)
