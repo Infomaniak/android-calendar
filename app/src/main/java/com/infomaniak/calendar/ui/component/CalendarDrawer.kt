@@ -48,7 +48,7 @@ private fun CalendarDrawer(
             }
         },
         drawerState = drawerState,
-        gesturesEnabled = false,
+        gesturesEnabled = drawerState.isOpen,
         modifier = modifier,
         content = content,
     )
