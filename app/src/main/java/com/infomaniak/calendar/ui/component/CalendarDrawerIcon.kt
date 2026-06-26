@@ -17,44 +17,39 @@
  */
 package com.infomaniak.calendar.ui.component
 
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import kotlinx.coroutines.launch
 
 @Composable
-fun CalendarDrawer(
-    content: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val calendarDrawerState = LocalDrawerState.current ?: return
-    CalendarDrawer(drawerState = calendarDrawerState, content = content, modifier = modifier)
-}
+fun CalendarDrawerIcon(modifier: Modifier = Modifier) {
+    val scope = rememberCoroutineScope()
+    val calendarDrawerState = LocalDrawerState.current
 
-@Composable
-private fun CalendarDrawer(
-    drawerState: DrawerState,
-    content: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    ModalNavigationDrawer(
-        drawerContent = {
-            ModalDrawerSheet {
-            }
-        },
-        drawerState = drawerState,
+    IconButton(
+        onClick = { scope.launch { calendarDrawerState?.open() } },
         modifier = modifier,
-        content = content,
-    )
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_list),
+            contentDescription = stringResource(R.string.contentDescriptionMenuDrawer),
+        )
+    }
 }
 
 @Preview
 @Composable
-private fun CalendarDrawerPreview() {
-    CalendarDrawer(content = { }, drawerState = rememberDrawerState(initialValue = DrawerValue.Open))
+private fun CalendarDrawerIconPreview() {
+    CalendarThemeForPreview {
+        CalendarDrawerIcon()
+    }
 }

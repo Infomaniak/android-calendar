@@ -39,7 +39,7 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Metada
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
-import com.infomaniak.calendar.ui.navigation.state.LocalSharedDrawerState
+import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.state.SharedSnackbarHostState
@@ -66,7 +66,7 @@ fun MainNavHost(backStack: NavBackStack<NavKey>) {
             LocalSharedTransitionScope provides this@SharedTransitionLayout,
             LocalSharedSnackbarHostState provides snackbarHostState,
             LocalToolbarScrollableState provides toolbarScrollableState,
-            LocalSharedDrawerState provides calendarDrawerState,
+            LocalDrawerState provides calendarDrawerState,
         ) {
             NavDisplay(
                 backStack = backStack,
