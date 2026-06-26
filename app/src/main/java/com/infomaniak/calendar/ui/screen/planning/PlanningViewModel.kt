@@ -20,14 +20,18 @@ package com.infomaniak.calendar.ui.screen.planning
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
+import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -39,7 +43,7 @@ import kotlin.time.Clock
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey(PlanningViewModel::class)
-class PlanningViewModel(calendarManager: CalendarManager) : ViewModel() {
+class PlanningViewModel(private val accountUtils: AccountUtils, private val calendarManager: CalendarManager) : ViewModel() {
 
     private val timeZone = TimeZone.currentSystemDefault()
     private val today = Clock.System.now().toLocalDateTime(timeZone).date
@@ -51,6 +55,20 @@ class PlanningViewModel(calendarManager: CalendarManager) : ViewModel() {
         .observeEvents(startDate, endDate)
         .map { it.groupByWeekAndDay() }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = sortedMapOf())
+
+    init {
+        syncCalendars()
+    }
+
+    // TODO: This function is not meant to stay, it will be removed when syncCalendars is moved to a Worker.
+    private fun syncCalendars() {
+        viewModelScope.launch {
+            val users = accountUtils.users.first()
+            users.forEach { user ->
+                calendarManager.syncCalendars(AccountId(user.id.toLong()))
+            }
+        }
+    }
 
     companion object {
         private const val PLANNING_RANGE_DAYS = 250
