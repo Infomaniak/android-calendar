@@ -30,7 +30,7 @@ import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.ExperimentalTime
 
-internal fun Calendar.toChoice() = CalendarChoice(id = id, name = displayName, color = color)
+internal fun Calendar.toChoice() = CalendarChoice(id = id, name = displayName, color = color.argb)
 @OptIn(ExperimentalTime::class)
 internal fun Event.toFormData(): EventFormData {
     val isAllDay = timing is EventTiming.AllDay

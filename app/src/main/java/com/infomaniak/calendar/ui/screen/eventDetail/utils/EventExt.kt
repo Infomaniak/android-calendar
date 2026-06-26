@@ -33,7 +33,7 @@ internal fun Event.toDetailUiState(): EventDetailUiState.Loaded = EventDetailUiS
     categories = categories.notBlank(),
     description = description.notBlank(),
     lastModified = lastModified?.formatUtc(),
-    color = color,
+    color = calendarColor.argb,
     canEdit = canEdit,
 )
 

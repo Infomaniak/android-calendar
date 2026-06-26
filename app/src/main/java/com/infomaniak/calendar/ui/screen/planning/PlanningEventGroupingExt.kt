@@ -84,6 +84,6 @@ private fun Event.toEventUi(): EventUi? {
         categories = categories,
         start = start,
         end = end,
-        color = Color(color),
+        color = Color(calendarColor.argb),
     )
 }
