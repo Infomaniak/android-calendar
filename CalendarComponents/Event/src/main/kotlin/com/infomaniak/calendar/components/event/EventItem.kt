@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.event
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -27,12 +28,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.event.EventItemStatusDefaults.containerColors
-import com.infomaniak.calendar.components.event.EventItemStatusDefaults.containerVariantColors
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
@@ -41,101 +41,103 @@ import com.infomaniak.calendar.components.foundation.utils.TimeFormatter.formatH
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Instant
 
 @Composable
 fun EventItem(event: EventUi, modifier: Modifier = Modifier) {
+    EventItem(event.start, event.end, event.title, event.toEventItemStatus(), modifier)
+}
+
+@Composable
+private fun EventItem(
+    start: Instant,
+    end: Instant,
+    title: String,
+    status: EventItemStatus,
+    modifier: Modifier = Modifier,
+) {
     Card(
-        colors = event.cardColors(),
+        colors = status.cardColors(),
+        border = status.cardBorder(),
         modifier = modifier,
     ) {
         Column(Modifier.padding(Margin.Mini), verticalArrangement = Arrangement.spacedBy(Margin.Micro)) {
-            Text("${event.start.formatHours()} - ${event.end.formatHours()}")
-            Text(event.title)
+            Text("${start.formatHours()} - ${end.formatHours()}")
+            Text(title)
         }
     }
 }
 
+// TODO
+private fun EventUi.toEventItemStatus(): EventItemStatus {
+    return when (status) {
+        EventStatus.Confirmed -> EventItemStatus.Default(colors)
+        EventStatus.Tentative -> EventItemStatus.Default(colors)
+        EventStatus.Cancelled -> EventItemStatus.Declined(colors)
+    }
+}
+
 @Composable
-private fun EventUi.cardColors(): CardColors {
-    return status.toEventItemStatus().cardColors(colors)
-}
+private fun containerColors(eventColors: EventColorsUi): CardColors = CardDefaults.cardColors(
+    containerColor = eventColors.datavizContainerVariant,
+    contentColor = eventColors.onDatavizContainerVariant,
+)
 
-private fun EventStatus.toEventItemStatus(): EventItemStatus {
-    return when (this) {
-        EventStatus.Confirmed -> EventItemStatus.Default
-        EventStatus.Tentative -> EventItemStatus.Default
-        EventStatus.Cancelled -> EventItemStatus.Default
-    }
-}
+@Composable
+private fun containerVariantColors(eventColors: EventColorsUi): CardColors = CardDefaults.cardColors(
+    containerColor = eventColors.datavizContainer,
+    contentColor = eventColors.onDatavizContainer,
+)
 
-private object EventItemStatusDefaults {
-    val containerColors: @Composable (EventColorsUi) -> CardColors = {
-        CardDefaults.cardColors(
-            containerColor = it.datavizContainerVariant,
-            contentColor = it.onDatavizContainerVariant,
-        )
-    }
-
-    val containerVariantColors: @Composable (EventColorsUi) -> CardColors = {
-        CardDefaults.cardColors(
-            containerColor = it.datavizContainer,
-            contentColor = it.onDatavizContainer,
-        )
-    }
-}
-
-private enum class EventItemStatus(
-    val cardColors: @Composable (EventColorsUi) -> CardColors,
-    val borderColor: @Composable (EventColorsUi) -> Color,
-    val stripesColor: @Composable (EventColorsUi) -> Unit,
+@Immutable
+sealed class EventItemStatus(
+    val cardColors: @Composable () -> CardColors,
+    val cardBorder: @Composable () -> BorderStroke? = { null },
+    val stripesColor: @Composable () -> Unit = { Color.Transparent },
 ) {
-    Default(
-        cardColors = containerColors,
-        borderColor = { Color.Transparent },
-        stripesColor = { Color.Transparent },
-    ),
-    Maybe(
-        cardColors = containerColors,
-        borderColor = { Color.Transparent },
-        stripesColor = { it.onDatavizContainerVariant.copy(alpha = 0.9f) },
-    ),
-    Declined(
-        cardColors = containerColors,
-        borderColor = { Color.Transparent },
-        stripesColor = { Color.Transparent },
-    ),
-    Pending(
-        cardColors = containerVariantColors,
-        borderColor = { it.onDatavizContainer },
-        stripesColor = { Color.Transparent },
-    ),
+    abstract val eventColors: EventColorsUi
+
+    data class Default(override val eventColors: EventColorsUi) : EventItemStatus(
+        cardColors = { containerColors(eventColors) },
+    )
+
+    data class Maybe(override val eventColors: EventColorsUi) : EventItemStatus(
+        cardColors = { containerColors(eventColors) },
+        stripesColor = { eventColors.onDatavizContainerVariant.copy(alpha = 0.9f) },
+    )
+
+    data class Declined(override val eventColors: EventColorsUi) : EventItemStatus(
+        cardColors = { containerColors(eventColors) },
+    )
+
+    data class Pending(override val eventColors: EventColorsUi) : EventItemStatus(
+        cardColors = { containerVariantColors(eventColors) },
+        cardBorder = { BorderStroke(1.dp, eventColors.onDatavizContainer) },
+    )
 }
 
 @Preview
 @Composable
 private fun Preview() {
     @Composable
-    fun EventItemForStatus(status: EventStatus) {
+    fun EventItemForStatus(status: EventItemStatus) {
         EventItem(
-            event = EventUi(
-                id = "1",
-                title = "Event title",
-                location = "Event location",
-                status = status,
-                categories = "Event categories",
-                start = Clock.System.now(),
-                end = Clock.System.now().plus(3.hours),
-                colors = LocalEventColorsUiFactory.current.create(0xFF0098FF.toInt()),
-            ),
+            start = Clock.System.now(),
+            end = Clock.System.now() + 1.hours,
+            title = "Event title",
+            status = status,
         )
     }
 
     MaterialTheme {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                EventItemForStatus(EventStatus.Confirmed)
-                EventItemForStatus(EventStatus.Tentative)
-                EventItemForStatus(EventStatus.Cancelled)
+                val eventColors = LocalEventColorsUiFactory.current.create(0x0)
+
+                EventItemForStatus(EventItemStatus.Default(eventColors))
+                EventItemForStatus(EventItemStatus.Declined(eventColors))
+                EventItemForStatus(EventItemStatus.Maybe(eventColors))
+                EventItemForStatus(EventItemStatus.Pending(eventColors))
             }
         }
     }
