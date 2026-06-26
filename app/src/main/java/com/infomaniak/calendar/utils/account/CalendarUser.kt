@@ -15,23 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.utils
+package com.infomaniak.calendar.utils.account
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.remember
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.auth.models.user.User
-import kotlinx.coroutines.flow.map
+import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCredentials
 
-sealed interface UserLoadState {
-    object Awaiting : UserLoadState
-    data class Loaded(val user: User?) : UserLoadState
-}
-
-@Composable
-fun AccountUtils.rememberUserLoadState(): State<UserLoadState> {
-    val userLoadStateFlow = remember { currentUserFlow.map(UserLoadState::Loaded) }
-    return userLoadStateFlow.collectAsStateWithLifecycle(initialValue = UserLoadState.Awaiting)
-}
+data class CalendarUser(
+    val user: User,
+    val davCredentials: DavCredentials,
+)
