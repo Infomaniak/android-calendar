@@ -17,6 +17,7 @@
   -->
 <resources>
     <string name="contentDescriptionCreateEvent">Skapa ett evenemang</string>
+    <string name="contentDescriptionMenuDrawer">Öppna meny</string>
     <string name="contentDescriptionToday">Idag</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Aktuell vy: %1$s. Tryck för att ändra vy.</string>
     <string name="dayTitle">Dag</string>

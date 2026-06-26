@@ -17,6 +17,7 @@
   -->
 <resources>
     <string name="contentDescriptionCreateEvent">Luo tapahtuma</string>
+    <string name="contentDescriptionMenuDrawer">Avaa valikko</string>
     <string name="contentDescriptionToday">Tänään</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Nykyinen näkymä: %1$s. Napauta vaihtaaksesi näkymää.</string>
     <string name="dayTitle">Päivä</string>

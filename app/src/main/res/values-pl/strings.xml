@@ -17,6 +17,7 @@
   -->
 <resources>
     <string name="contentDescriptionCreateEvent">Utwórz wydarzenie</string>
+    <string name="contentDescriptionMenuDrawer">Otwórz menu</string>
     <string name="contentDescriptionToday">Dziś</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Aktualny widok: %1$s. Stuknij, aby zmienić widok.</string>
     <string name="dayTitle">Dzień</string>

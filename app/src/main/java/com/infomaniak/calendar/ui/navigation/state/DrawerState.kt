@@ -15,16 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation
+package com.infomaniak.calendar.ui.navigation.state
 
-enum class MetadataSceneStrategy(val metadata: Map<String, Any>) {
-    FloatingToolbarWithFab(metadata = mapOf(SHOULD_SHOW_FLOATING_TOOLBAR_WITH_FAB to true)),
-    Drawer(metadata = mapOf(SHOULD_SHOW_DRAWER to true)),
-}
+import androidx.compose.material3.DrawerState
+import androidx.compose.runtime.staticCompositionLocalOf
 
-fun metaDataOf(vararg strategies: MetadataSceneStrategy): Map<String, Any> {
-    return buildMap { strategies.forEach { putAll(it.metadata) } }
-}
-
-const val SHOULD_SHOW_FLOATING_TOOLBAR_WITH_FAB = "ShouldShowNavigationWithFabKey"
-const val SHOULD_SHOW_DRAWER = "ShouldShowDrawer"
+val LocalDrawerState = staticCompositionLocalOf<DrawerState?> { null }
