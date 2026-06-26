@@ -16,6 +16,9 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <string name="contentDescriptionHasAttendees">Onko osallistujia</string>
+    <string name="contentDescriptionHasKMeetLink">Sisältää kMeet-linkin</string>
+    <string name="contentDescriptionHasLocation">On sijainti</string>
     <string name="weekHeaderDateRange">%d.–%d. %s %d</string>
     <string name="weekHeaderWeekNumber">V%d</string>
 </resources>

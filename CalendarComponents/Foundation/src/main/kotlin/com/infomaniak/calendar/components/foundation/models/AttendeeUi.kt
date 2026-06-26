@@ -18,23 +18,17 @@
 package com.infomaniak.calendar.components.foundation.models
 
 import androidx.compose.runtime.Immutable
-import kotlin.time.Instant
 
 @Immutable
-data class EventUi(
-    val id: String,
-    val title: String,
-    val location: String?,
-    val status: EventStatus,
-    val categories: String?,
-    val start: Instant,
-    val end: Instant,
-    val colors: EventColorsUi,
-    val attendees: Attendees,
+data class AttendeeUi(
+    val email: String,
+    val displayName: String? = null,
+    val status: ParticipationStatus,
 )
 
-enum class EventStatus {
-    Confirmed,
+enum class ParticipationStatus {
+    Accepted,
+    Declined,
     Tentative,
-    Cancelled,
+    NeedsAction,
 }

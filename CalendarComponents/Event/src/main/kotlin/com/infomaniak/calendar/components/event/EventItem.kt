@@ -17,14 +17,19 @@
  */
 package com.infomaniak.calendar.components.event
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.FloatRange
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32,16 +37,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.component.cardStripes
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
 import com.infomaniak.calendar.components.foundation.utils.TimeFormatter.formatHours
+import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
@@ -49,7 +59,7 @@ import kotlin.time.Instant
 
 @Composable
 fun EventItem(event: EventUi, modifier: Modifier = Modifier) {
-    EventItem(event.start, event.end, event.title, event.toEventItemStatus(), modifier)
+    EventItem(event.start, event.end, event.title, event.toEventItemStatus(), event.toEventIcons(), modifier)
 }
 
 @Composable
@@ -58,6 +68,7 @@ private fun EventItem(
     end: Instant,
     title: String,
     status: EventItemStatus,
+    trailingIcons: Set<EventIcons>,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -66,34 +77,61 @@ private fun EventItem(
         shape = MaterialTheme.shapes.small,
         modifier = modifier,
     ) {
-        Column(
+        Row(
             Modifier
                 .cardStripes(status)
                 .padding(Margin.Mini),
-            verticalArrangement = Arrangement.spacedBy(Margin.Micro),
+            horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
         ) {
-            Text(
-                "${start.formatHours()} - ${end.formatHours()}",
-                style = MaterialTheme.typography.labelSmall,
-                textDecoration = status.textDecoration,
-            )
-            Text(
-                title,
-                style = MaterialTheme.typography.bodySmallEmphasized,
-                fontWeight = FontWeight.Medium,
-                textDecoration = status.textDecoration,
-            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(Margin.Micro),
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(
+                    "${start.formatHours()} - ${end.formatHours()}",
+                    style = MaterialTheme.typography.labelSmall,
+                    textDecoration = status.textDecoration,
+                )
+                Text(
+                    title,
+                    style = MaterialTheme.typography.bodySmallEmphasized,
+                    fontWeight = FontWeight.Medium,
+                    textDecoration = status.textDecoration,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+
+            if (trailingIcons.isNotEmpty()) TrailingIcons(trailingIcons)
         }
     }
 }
 
-// TODO
-private fun EventUi.toEventItemStatus(): EventItemStatus {
-    return when (status) {
-        EventStatus.Confirmed -> EventItemStatus.Default(colors)
-        EventStatus.Tentative -> EventItemStatus.Default(colors)
-        EventStatus.Cancelled -> EventItemStatus.Declined(colors)
+@Composable
+private fun TrailingIcons(trailingIcons: Set<EventIcons>) {
+    Row(horizontalArrangement = Arrangement.spacedBy(Margin.Micro)) {
+        EventIcons.entries.forEach {
+            if (it in trailingIcons) it.TrailingIcon()
+        }
     }
+}
+
+private fun EventUi.toEventItemStatus(): EventItemStatus {
+    if (status == EventStatus.Cancelled) return EventItemStatus.Declined(colors)
+    val me = attendees.me ?: return EventItemStatus.Default(colors)
+    
+    return when (me.status) {
+        ParticipationStatus.Accepted -> EventItemStatus.Default(colors)
+        ParticipationStatus.Declined -> EventItemStatus.Declined(colors)
+        ParticipationStatus.Tentative -> EventItemStatus.Maybe(colors)
+        ParticipationStatus.NeedsAction -> EventItemStatus.Pending(colors)
+    }
+}
+
+private fun EventUi.toEventIcons(): Set<EventIcons> = buildSet {
+    if (location != null) add(EventIcons.Location)
+    if (attendees.all.isNotEmpty()) add(EventIcons.Attendees)
+    // TODO: Detect kMeet links
 }
 
 @Immutable
@@ -150,16 +188,31 @@ sealed class EventItemStatus(
     }
 }
 
+enum class EventIcons(
+    @DrawableRes private val icon: Int,
+    @StringRes private val contentDescription: Int,
+) {
+    Location(R.drawable.ic_map_pin, R.string.contentDescriptionHasLocation),
+    Kmeet(R.drawable.ic_product_kmeet, R.string.contentDescriptionHasKMeetLink),
+    Attendees(R.drawable.ic_users_stacked, R.string.contentDescriptionHasAttendees);
+
+    @Composable
+    fun TrailingIcon() {
+        Icon(painterResource(icon), stringResource(contentDescription), modifier = Modifier.size(16.dp))
+    }
+}
+
 @Preview
 @Composable
 private fun Preview() {
     @Composable
-    fun EventItemForStatus(status: EventItemStatus) {
+    fun EventItemForStatus(status: EventItemStatus, title: String = "Event title") {
         EventItem(
             start = Clock.System.now(),
             end = Clock.System.now() + 1.hours,
-            title = "Event title",
+            title = title,
             status = status,
+            trailingIcons = EventIcons.entries.toSet(),
         )
     }
 
@@ -168,7 +221,10 @@ private fun Preview() {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 val eventColors = LocalEventColorsUiFactory.current.create(0x0)
 
-                EventItemForStatus(EventItemStatus.Default(eventColors))
+                EventItemForStatus(
+                    status = EventItemStatus.Default(eventColors),
+                    title = "How to not get fired. An important guide on how to navigate the workspace",
+                )
                 EventItemForStatus(EventItemStatus.Declined(eventColors))
                 EventItemForStatus(EventItemStatus.Maybe(eventColors))
                 EventItemForStatus(EventItemStatus.Pending(eventColors))

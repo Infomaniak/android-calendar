@@ -17,12 +17,17 @@
  */
 package com.infomaniak.calendar.ui.screen.planning
 
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.models.EventColorUi
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
+import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColor
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
@@ -31,6 +36,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import java.util.SortedMap
 import kotlin.time.ExperimentalTime
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationStatus as KmpParticipationStatus
 
 /**
  * Events grouped by week, then by day.
@@ -55,6 +61,7 @@ typealias EventsByWeekAndDay = SortedMap<YearWeek, SortedMap<LocalDate, List<Eve
  */
 @OptIn(ExperimentalTime::class)
 fun List<Event>.groupByWeekAndDay(
+    emailsByUserId: Map<AccountId, String>,
     weekNumbering: WeekNumbering = WeekNumbering.ISO_8601,
     timeZone: TimeZone = TimeZone.currentSystemDefault(),
 ): EventsByWeekAndDay {
@@ -65,7 +72,7 @@ fun List<Event>.groupByWeekAndDay(
         result
             .getOrPut(weekNumbering.weekOf(date)) { sortedMapOf() }
             .getOrPut(date) { mutableListOf() }
-            .add(event.toEventUi())
+            .add(event.toEventUi(emailsByUserId))
     }
 
     @Suppress("UNCHECKED_CAST") // Shows the exposed list as non-mutable
@@ -77,7 +84,7 @@ private fun Event.getStartAt(timeZone: TimeZone): LocalDate {
     return timing.startIn(timeZone).date
 }
 
-private fun Event.toEventUi(): EventUi {
+private fun Event.toEventUi(emailsByUserId: Map<AccountId, String>): EventUi {
     return EventUi(
         id = id.url,
         title = title,
@@ -87,7 +94,19 @@ private fun Event.toEventUi(): EventUi {
         start = timing.startInstantLocal(),
         end = timing.endInstantLocal(),
         colors = colors.toEventColorsUi(),
+        attendees = toAttendees(attendees, emailsByUserId),
     )
+}
+
+private fun Event.toAttendees(attendees: List<Attendee>, emailsByUserId: Map<AccountId, String>): Attendees {
+    var me: AttendeeUi? = null
+    val all = attendees.map { attendee ->
+        attendee.toAttendeeUi().also { attendeeUi ->
+            if (attendeeUi.email == emailsByUserId[accountId]) me = attendeeUi
+        }
+    }
+
+    return Attendees(all, me)
 }
 
 private fun String?.toEventStatus(): EventStatus {
@@ -104,5 +123,18 @@ fun EventColors.toEventColorsUi(): EventColorsUi = EventColorsUi(
     _datavizContainerVariant = datavizContainerVariant.toEventColorUi(),
     _onDatavizContainerVariant = onDatavizContainerVariant.toEventColorUi(),
 )
+
+private fun Attendee.toAttendeeUi(): AttendeeUi = AttendeeUi(
+    email = email,
+    displayName = displayName,
+    status = status.toParticipationStatus(),
+)
+
+private fun KmpParticipationStatus.toParticipationStatus(): ParticipationStatus = when (this) {
+    KmpParticipationStatus.Accepted -> ParticipationStatus.Accepted
+    KmpParticipationStatus.Declined -> ParticipationStatus.Declined
+    KmpParticipationStatus.Tentative -> ParticipationStatus.Tentative
+    KmpParticipationStatus.NeedsAction -> ParticipationStatus.NeedsAction
+}
 
 private fun EventColor.toEventColorUi(): EventColorUi = EventColorUi(light = light, dark = dark)
