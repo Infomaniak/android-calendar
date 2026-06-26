@@ -142,6 +142,7 @@ dependencies {
     implementation(core.infomaniak.core.onboarding)
     implementation(core.infomaniak.core.sentry)
     implementation(core.infomaniak.core.ui.compose.margin)
+    implementation(core.infomaniak.core.ui.compose.theme)
 
     implementation(kmpCalendar.androidx.room.runtime)
 

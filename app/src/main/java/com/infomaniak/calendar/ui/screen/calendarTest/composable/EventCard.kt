@@ -39,7 +39,7 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 internal fun EventCard(event: EventUi) {
     Card(
         modifier = Modifier.width(200.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(event.color)),
+        colors = CardDefaults.cardColors(containerColor = Color(event.calendarColor.argb)),
     ) {
         Column(
             modifier = Modifier.padding(12.dp),

@@ -15,23 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.calendarTest.model
+package com.infomaniak.calendar.components.foundation.models
 
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColor
-
-/**
- * UI model for an event shown in the CalDAV test screen: everything is already formatted/derived
- * so the composables only have to render plain strings (no date formatting, no business logic).
- */
-data class EventUi(
-    val id: String,
-    val title: String,
-    val timeRange: String?,
-    val location: String?,
-    val status: String?,
-    val categories: String?,
-    val description: String?,
-    val lastModified: String?,
-    val calendarColor: CalendarColor,
-    val canEdit: Boolean,
+data class EventColorUi(
+    val light: Int,
+    val dark: Int,
 )

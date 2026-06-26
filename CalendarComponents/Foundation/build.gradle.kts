@@ -36,6 +36,8 @@ android {
 }
 
 dependencies {
+    implementation(core.infomaniak.core.ui.compose.theme)
+
     implementation(kmpCalendar.kotlinx.datetime)
 
     implementation(platform(core.compose.bom))

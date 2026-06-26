@@ -17,11 +17,14 @@
  */
 package com.infomaniak.calendar.ui.screen.planning
 
-import androidx.compose.ui.graphics.Color
+import com.infomaniak.calendar.components.foundation.models.EventColorUi
+import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColor
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -84,6 +87,15 @@ private fun Event.toEventUi(): EventUi? {
         categories = categories,
         start = start,
         end = end,
-        color = Color(color),
+        colors = colors.toEventColorsUi(),
     )
 }
+
+fun EventColors.toEventColorsUi(): EventColorsUi = EventColorsUi(
+    _datavizContainer = datavizContainer.toEventColorUi(),
+    _onDatavizContainer = onDatavizContainer.toEventColorUi(),
+    _datavizContainerVariant = datavizContainerVariant.toEventColorUi(),
+    _onDatavizContainerVariant = onDatavizContainerVariant.toEventColorUi(),
+)
+
+private fun EventColor.toEventColorUi(): EventColorUi = EventColorUi(light = light, dark = dark)
