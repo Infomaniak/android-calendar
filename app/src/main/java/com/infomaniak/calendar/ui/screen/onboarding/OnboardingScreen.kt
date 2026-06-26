@@ -211,16 +211,14 @@ private fun rememberOnboardingLoginFlowController(
     infomaniakLogin: InfomaniakLogin,
     dependencies: OnboardingLoginDependencies,
 ): LoginFlowController = LoginUtils.rememberLoginFlowController(infomaniakLogin, dependencies.accountUtils) { userLoginResult ->
-    val user: User? = when (userLoginResult) {
+    val user: User = when (userLoginResult) {
         is UserLoginResult.Success -> userLoginResult.user
         is UserLoginResult.Failure -> {
             dependencies.snackbarHostState?.showSnackbar(userLoginResult.errorMessage)
             null
         }
         null -> null
-    }
-
-    if (user == null) {
+    } ?: run {
         dependencies.setButtonsLoading(false)
         return@rememberLoginFlowController
     }
@@ -271,12 +269,12 @@ private suspend fun loginUsers(loginResult: CrossAppLoginFacade.LoginResult, dep
 
     val calendarUsers: List<CalendarUser> = buildList {
         users.forEach { user ->
-            val davCredentials = fetchDavCredentials(user, dependencies.accountManager)
-            if (davCredentials != null) {
-                add(CalendarUser(user, davCredentials))
-            } else {
+            val davCredentials = fetchDavCredentials(user, dependencies.accountManager) ?: run {
                 dependencies.snackbarHostState?.showSnackbar(dependencies.context.getString(RCore.string.anErrorHasOccurred))
+                return@forEach
             }
+
+            add(CalendarUser(user, davCredentials))
         }
     }
 
