@@ -17,14 +17,20 @@
  */
 package com.infomaniak.calendar.ui.screen.planning
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,7 +39,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.planning.Planning
+import com.infomaniak.calendar.components.planning.indexOf
 import com.infomaniak.calendar.ui.component.drawer.DrawerIconButton
+import com.infomaniak.calendar.ui.navigation.state.LocalCurrentDayState
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
 import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewParameter
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -41,12 +49,12 @@ import com.infomaniak.core.ui.compose.margin.Margin
 
 @Composable
 fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier, viewModel: PlanningViewModel = viewModel()) {
-    val weekEvents: EventsByWeekAndDay by viewModel.weekEvents.collectAsStateWithLifecycle()
-    PlanningScreen(goToEventCreation = goToEventCreation, weekEvents = { weekEvents }, modifier = modifier)
+    val planningState: PlanningUiState by viewModel.planningUiState.collectAsStateWithLifecycle()
+    PlanningScreen(goToEventCreation = goToEventCreation, planningState = planningState, modifier = modifier)
 }
 
 @Composable
-private fun PlanningScreen(goToEventCreation: () -> Unit, weekEvents: () -> EventsByWeekAndDay, modifier: Modifier = Modifier) {
+private fun PlanningScreen(goToEventCreation: () -> Unit, planningState: PlanningUiState, modifier: Modifier = Modifier) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -56,18 +64,49 @@ private fun PlanningScreen(goToEventCreation: () -> Unit, weekEvents: () -> Even
         },
         modifier = modifier,
     ) { paddingValues ->
-        Column {
-            Planning(
-                weekEvents = weekEvents,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = Margin.Medium)
-                    .scrollableToolbar()
-                    .fillMaxWidth(),
-                contentPadding = paddingValues,
-                goToEventCreation = goToEventCreation,
-            )
+        when (planningState) {
+            is PlanningUiState.Loading -> LoadingPlanning()
+            is PlanningUiState.Success -> SuccessPlanning(goToEventCreation, planningState, Modifier.padding(paddingValues))
         }
+    }
+}
+
+@Composable
+private fun SuccessPlanning(
+    goToEventCreation: () -> Unit,
+    planningState: PlanningUiState.Success,
+    modifier: Modifier = Modifier,
+) {
+    val currentDayState = LocalCurrentDayState.current ?: return
+    val lazyListState = rememberLazyListState(
+        initialFirstVisibleItemIndex = planningState.eventsByWeekAndDay.indexOf(currentDayState.visibleDate),
+    )
+
+    LaunchedEffect(currentDayState) {
+        currentDayState.scrollCommand.collect { date ->
+            lazyListState.animateScrollToItem(planningState.eventsByWeekAndDay.indexOf(date))
+        }
+    }
+
+    Column(modifier = modifier) {
+        Planning(
+            weekEvents = { planningState.eventsByWeekAndDay },
+            onVisibleDateChanged = currentDayState::onVisibleDateChanged,
+            lazyListState = lazyListState,
+            goToEventCreation = goToEventCreation,
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = Margin.Medium)
+                .scrollableToolbar()
+                .fillMaxWidth(),
+        )
+    }
+}
+
+@Composable
+private fun LoadingPlanning(modifier: Modifier = Modifier) {
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator()
     }
 }
 
@@ -75,6 +114,6 @@ private fun PlanningScreen(goToEventCreation: () -> Unit, weekEvents: () -> Even
 @Composable
 private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class) weekEvents: EventsByWeekAndDay) {
     CalendarThemeForPreview {
-        PlanningScreen(goToEventCreation = { }, weekEvents = { weekEvents })
+        PlanningScreen(goToEventCreation = { }, planningState = PlanningUiState.Success(weekEvents))
     }
 }

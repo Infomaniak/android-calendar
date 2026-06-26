@@ -51,10 +51,10 @@ class PlanningViewModel(private val accountUtils: AccountUtils, private val cale
     private val startDate = today.minus(PLANNING_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
     private val endDate = today.plus(PLANNING_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
 
-    val weekEvents: StateFlow<EventsByWeekAndDay> = calendarManager
+    val planningUiState: StateFlow<PlanningUiState> = calendarManager
         .observeEvents(startDate, endDate)
-        .map { it.groupByWeekAndDay() }
-        .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = sortedMapOf())
+        .map { PlanningUiState.Success(it.groupByWeekAndDay()) }
+        .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = PlanningUiState.Loading)
 
     init {
         syncCalendars()

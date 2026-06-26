@@ -23,11 +23,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,6 +43,8 @@ import com.infomaniak.calendar.components.planning.component.TodayEmptyState
 import com.infomaniak.calendar.components.planning.preview.WeekEventsPreviewParameter
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDate
@@ -53,15 +57,16 @@ private val shortDayNameFormatter = DateTimeFormatter.ofPattern("EEE")
 @Composable
 fun Planning(
     weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
+    onVisibleDateChanged: (LocalDate) -> Unit,
     goToEventCreation: () -> Unit,
     modifier: Modifier = Modifier,
+    lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
     val events = weekEvents()
 
-    val todayIndex = rememberSaveable(Unit) { events.indexOf(today) }
-    val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = todayIndex)
+    ReportVisibleDate(lazyListState, events, onVisibleDateChanged)
 
     LazyColumn(
         state = lazyListState,
@@ -91,6 +96,29 @@ fun Planning(
     }
 }
 
+/**
+ * Reports the topmost visible date to the caller whenever the first fully-visible item changes.
+ * Only emits when the date actually changes (distinctUntilChanged), so [onVisibleDateChanged]
+ * is never called redundantly during an in-place recomposition.
+ */
+@Composable
+private fun ReportVisibleDate(
+    lazyListState: LazyListState,
+    events: Map<YearWeek, Map<LocalDate, List<EventUi>>>,
+    onVisibleDateChanged: (LocalDate) -> Unit,
+) {
+    val allDates = events.values.flatMap { it.keys }
+
+    LaunchedEffect(lazyListState, allDates) {
+        snapshotFlow { lazyListState.firstVisibleItemKey() }
+            .mapNotNull { key -> allDates.firstOrNull { it == key } }
+            .distinctUntilChanged()
+            .collect(onVisibleDateChanged)
+    }
+}
+
+private fun LazyListState.firstVisibleItemKey(): Any? = layoutInfo.visibleItemsInfo.firstOrNull()?.key
+
 @Composable
 private fun EventList(onEventCreation: () -> Unit, events: List<EventUi>, modifier: Modifier = Modifier) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Margin.Mini)) {
@@ -110,15 +138,14 @@ private val YearWeek.label: String
         return "$week - $dateRange"
     }
 
-private fun Map<YearWeek, Map<LocalDate, List<EventUi>>>.indexOf(date: LocalDate): Int {
+fun Map<YearWeek, Map<LocalDate, List<EventUi>>>.indexOf(date: LocalDate): Int {
     var index = 0
-
     entries.forEach { (week, days) ->
         if (date < week.firstDay) return 0
         index++
-        if (date <= week.lastDay) return index + days.keys.count { it < date } else index += days.size
+        if (date <= week.lastDay) return index + days.keys.count { it < date }
+        index += days.size
     }
-
     return 0
 }
 
@@ -126,6 +153,6 @@ private fun Map<YearWeek, Map<LocalDate, List<EventUi>>>.indexOf(date: LocalDate
 @Composable
 private fun PreviewPlanning(@PreviewParameter(WeekEventsPreviewParameter::class) weekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>>) {
     Surface {
-        Planning(goToEventCreation = { }, weekEvents = { weekEvents })
+        Planning(goToEventCreation = { }, weekEvents = { weekEvents }, onVisibleDateChanged = { })
     }
 }
