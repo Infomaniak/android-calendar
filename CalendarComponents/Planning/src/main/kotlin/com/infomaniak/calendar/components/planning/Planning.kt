@@ -23,11 +23,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,10 +55,13 @@ fun Planning(
     weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
     goToEventCreation: () -> Unit,
     modifier: Modifier = Modifier,
-    lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+    val events = weekEvents()
+
+    val todayIndex = rememberSaveable(Unit) { events.indexOf(today) }
+    val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = todayIndex)
 
     LazyColumn(
         state = lazyListState,
@@ -66,12 +69,11 @@ fun Planning(
         contentPadding = contentPadding,
         verticalArrangement = Arrangement.spacedBy(Margin.Large),
     ) {
-        weekEvents().forEach { (week, days) ->
+        events.forEach { (week, days) ->
             item(key = week) {
                 Text(week.label)
             }
-
-            days.forEach { (date, events) ->
+            days.forEach { (date, dayEvents) ->
                 val dayKey = date
                 item(key = dayKey) {
                     Row(horizontalArrangement = Arrangement.spacedBy(Margin.Small)) {
@@ -81,7 +83,7 @@ fun Planning(
                             state = if (date == today) DateState.Today else DateState.None,
                             modifier = Modifier.stickyWithinItem(lazyListState, dayKey),
                         )
-                        EventList(onEventCreation = goToEventCreation, events, Modifier.weight(1f))
+                        EventList(onEventCreation = goToEventCreation, events = dayEvents, modifier = Modifier.weight(1f))
                     }
                 }
             }
@@ -108,6 +110,17 @@ private val YearWeek.label: String
         return "$week - $dateRange"
     }
 
+private fun Map<YearWeek, Map<LocalDate, List<EventUi>>>.indexOf(date: LocalDate): Int {
+    var index = 0
+
+    entries.forEach { (week, days) ->
+        if (date < week.firstDay) return 0
+        index++
+        if (date <= week.lastDay) return index + days.keys.count { it < date } else index += days.size
+    }
+
+    return 0
+}
 
 @Preview
 @Composable
