@@ -28,14 +28,31 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlin.time.Instant
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey(PlanningViewModel::class)
 class PlanningViewModel(calendarManager: CalendarManager) : ViewModel() {
+
+    private val timeZone = TimeZone.currentSystemDefault()
+    private val today = Clock.System.now().toLocalDateTime(timeZone).date
+
+    private val startDate = today.minus(PLANNING_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
+    private val endDate = today.plus(PLANNING_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
+
     val weekEvents: StateFlow<EventsByWeekAndDay> = calendarManager
-        .observeEvents(Instant.DISTANT_PAST, Instant.DISTANT_FUTURE) // TODO: Add some pagination logic
+        .observeEvents(startDate, endDate)
         .map { it.groupByWeekAndDay() }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = sortedMapOf())
+
+    companion object {
+        private const val PLANNING_RANGE_DAYS = 250
+    }
 }
