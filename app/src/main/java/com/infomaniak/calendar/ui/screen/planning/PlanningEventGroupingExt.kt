@@ -65,7 +65,7 @@ fun List<Event>.groupByWeekAndDay(
         result
             .getOrPut(weekNumbering.weekOf(date)) { sortedMapOf() }
             .getOrPut(date) { mutableListOf() }
-            .add(event.toEventUi() ?: continue)
+            .add(event.toEventUi())
     }
 
     @Suppress("UNCHECKED_CAST") // Shows the exposed list as non-mutable
@@ -73,20 +73,18 @@ fun List<Event>.groupByWeekAndDay(
 }
 
 // TODO: Handle AllDay
-private fun Event.getStartAt(timeZone: TimeZone): LocalDate? {
-    return (timing as? EventTiming.Timed)?.start?.toLocalDateTime(timeZone)?.date
+private fun Event.getStartAt(timeZone: TimeZone): LocalDate {
+    return timing.start.toLocalDateTime(timeZone).date
 }
 
-private fun Event.toEventUi(): EventUi? {
-    val start = (timing as? EventTiming.Timed)?.start ?: return null // TODO: Handle AllDay
-    val end = (timing as? EventTiming.Timed)?.end ?: return null // TODO: Handle AllDay
+private fun Event.toEventUi(): EventUi {
     return EventUi(
         id = id.url,
         title = title,
         location = location,
         categories = categories,
-        start = start,
-        end = end,
+        start = timing.start,
+        end = timing.end,
         colors = colors.toEventColorsUi(),
     )
 }
