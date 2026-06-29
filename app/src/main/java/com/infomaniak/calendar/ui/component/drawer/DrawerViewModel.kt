@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
-class DrawerViewModel(accountUtils: AccountUtils, val calendarManager: CalendarManager) : ViewModel() {
+class DrawerViewModel(accountUtils: AccountUtils, private val calendarManager: CalendarManager) : ViewModel() {
     val calendarsUsers: StateFlow<List<UserCalendarsUi>> = combine(
         accountUtils.users,
         calendarManager.observeCalendars(),
