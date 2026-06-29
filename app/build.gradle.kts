@@ -74,9 +74,14 @@ android {
             ndk { abiFilters += setOf("arm64-v8a", "x86_64") }
         }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
+    }
+
+    composeCompiler {
+        stabilityConfigurationFiles = listOf(rootProject.layout.projectDirectory.file("stability_config.conf"))
     }
 
     compileOptions {
@@ -140,6 +145,7 @@ dependencies {
     implementation(libs.infomaniak.multiplatform.calendar.core)
 
     implementation(core.infomaniak.core.auth)
+    implementation(core.infomaniak.core.avatar)
     implementation(core.infomaniak.core.common)
     implementation(core.infomaniak.core.crossapplogin.front)
     implementation(core.infomaniak.core.matomo)
@@ -148,6 +154,7 @@ dependencies {
     implementation(core.infomaniak.core.datavalue)
     implementation(core.infomaniak.core.sentry)
     implementation(core.infomaniak.core.ui.compose.margin)
+    implementation(core.infomaniak.core.ui.compose.preview)
     implementation(core.infomaniak.core.ui.compose.theme)
 
     implementation(core.kotlinx.serialization.json)

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.component
+package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,7 +31,7 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.coroutines.launch
 
 @Composable
-fun CalendarDrawerIcon(modifier: Modifier = Modifier) {
+fun DrawerIconButton(modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     val calendarDrawerState = LocalDrawerState.current
 
@@ -48,8 +48,8 @@ fun CalendarDrawerIcon(modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-private fun CalendarDrawerIconPreview() {
+private fun DrawerIconButtonPreview() {
     CalendarThemeForPreview {
-        CalendarDrawerIcon()
+        DrawerIconButton()
     }
 }

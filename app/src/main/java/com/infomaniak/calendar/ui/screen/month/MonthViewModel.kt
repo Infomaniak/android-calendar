@@ -25,5 +25,5 @@ import dev.zacsweers.metro.Inject
 
 @Inject
 @ContributesIntoMap(AppScope::class)
-@ViewModelKey(MonthViewModel::class)
+@ViewModelKey
 class MonthViewModel : ViewModel()

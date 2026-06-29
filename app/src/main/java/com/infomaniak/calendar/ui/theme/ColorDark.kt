@@ -1,6 +1,6 @@
 /*
  * Infomaniak Calendar - Android
- * Copyright (C) 2026 Infomaniak Network SA
+ * Copyright (C) 2024-2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,14 @@
  */
 package com.infomaniak.calendar.ui.theme
 
-import androidx.compose.runtime.Immutable
-import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.darkColorScheme
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val DarkColorScheme = darkColorScheme(
+    primary = Purple80,
+    secondary = PurpleGrey80,
+    tertiary = Pink80,
+)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
-
-val Bat = Color(0xFF1A1A1A)
-val White = Color(0xFFFFFFFF)
-
-@Immutable
-data class CustomColorScheme(val avatarInitialsColor: Color = Color.Unspecified)
+val CustomDarkColorScheme = CustomColorScheme(
+    avatarInitialsColor = Bat,
+)
