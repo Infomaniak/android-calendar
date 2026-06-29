@@ -132,7 +132,7 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
         drawer = { content ->
             CalendarDrawer(
                 content = content,
-                addAnAccount = {
+                onAddAccount = {
                     backStack.addOrMoveToTop(NavDestination.Onboarding(onlyLogin = true))
                 },
             )

@@ -49,7 +49,7 @@ fun DrawerCalendarItem(
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isChecked by remember(calendar.id, calendar.isVisible) { mutableStateOf(calendar.isVisible) }
+    var isChecked by remember(calendar.isVisible) { mutableStateOf(calendar.isVisible) }
 
     Row(
         modifier = modifier

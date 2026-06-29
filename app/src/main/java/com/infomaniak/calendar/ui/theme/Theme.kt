@@ -17,7 +17,7 @@
  */
 package com.infomaniak.calendar.ui.theme
 
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -45,7 +45,7 @@ fun CalendarTheme(
     content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= 31 -> {
+        dynamicColor && SDK_INT >= 31 -> {
             val context = LocalContext.current
             if (isDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }

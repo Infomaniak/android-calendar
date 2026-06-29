@@ -30,14 +30,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.R
-import com.infomaniak.calendar.ui.component.drawer.CalendarDrawerIcon
+import com.infomaniak.calendar.ui.component.drawer.DrawerIconButton
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
 fun ThreeDayScreen(modifier: Modifier = Modifier) {
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(stringResource(R.string.threeDaysTitle)) }, navigationIcon = { CalendarDrawerIcon() })
+            TopAppBar(title = { Text(stringResource(R.string.threeDaysTitle)) }, navigationIcon = { DrawerIconButton() })
         },
         modifier = modifier,
     ) { paddingValues ->

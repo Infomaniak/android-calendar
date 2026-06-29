@@ -18,13 +18,13 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Icon
@@ -35,7 +35,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,13 +46,13 @@ import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.core.ui.compose.preview.previewparameter.dummyUserOf
 
 @Composable
-fun DrawerAccountItem(user: User, isExpanded: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val rotation by animateFloatAsState(targetValue = if (isExpanded) 90f else 0f)
+fun DrawerAccountItem(user: User, isExpanded: () -> Boolean, onAccountExpanded: () -> Unit, modifier: Modifier = Modifier) {
+    val rotation by animateFloatAsState(targetValue = if (isExpanded()) 90f else 0f)
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(role = Role.Button, onClick = onClick)
+            .toggleable(value = isExpanded(), onValueChange = { onAccountExpanded() })
             .padding(all = Margin.Medium),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Margin.Medium),
@@ -86,5 +85,5 @@ fun DrawerAccountItem(user: User, isExpanded: Boolean, onClick: () -> Unit, modi
 @Composable
 @Preview(showBackground = true)
 private fun DrawerAccountItemCollapsedPreview() {
-    DrawerAccountItem(user = dummyUserOf(1, "John", "Doe"), isExpanded = false, onClick = {})
+    DrawerAccountItem(user = dummyUserOf(1, "John", "Doe"), isExpanded = { false }, onAccountExpanded = {})
 }

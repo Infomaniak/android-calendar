@@ -26,11 +26,11 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColor
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 
-class CalendarDrawerPreviewProvider : PreviewParameterProvider<List<UserCalendarsUi>> {
-    override val values = sequenceOf(Loaded)
+class DrawerPreviewProvider : PreviewParameterProvider<List<UserCalendarsUi>> {
+    override val values = sequenceOf(usersCalendars)
 
     companion object {
-        private val Loaded = listOf(
+        private val usersCalendars = listOf(
             UserCalendarsUi(
                 user = User(
                     id = 1,

@@ -31,7 +31,7 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.coroutines.launch
 
 @Composable
-fun CalendarDrawerIcon(modifier: Modifier = Modifier) {
+fun DrawerIconButton(modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     val calendarDrawerState = LocalDrawerState.current
 
@@ -48,8 +48,8 @@ fun CalendarDrawerIcon(modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-private fun CalendarDrawerIconPreview() {
+private fun DrawerIconButtonPreview() {
     CalendarThemeForPreview {
-        CalendarDrawerIcon()
+        DrawerIconButton()
     }
 }

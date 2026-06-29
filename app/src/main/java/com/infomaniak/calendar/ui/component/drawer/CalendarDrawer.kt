@@ -44,7 +44,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 @Composable
 fun CalendarDrawer(
     content: @Composable () -> Unit,
-    addAnAccount: () -> Unit,
+    onAddAccount: () -> Unit,
     modifier: Modifier = Modifier,
     drawerViewModel: DrawerViewModel = viewModel(),
 ) {
@@ -55,7 +55,7 @@ fun CalendarDrawer(
         drawerState = calendarDrawerState,
         calendarsUsers = calendarsUsers,
         onCalendarVisibilityChanged = drawerViewModel::onCalendarVisibilityChanged,
-        addAnAccount = addAnAccount,
+        onAddAccount = onAddAccount,
         content = content,
         modifier = modifier,
     )
@@ -66,7 +66,7 @@ private fun CalendarDrawerContent(
     drawerState: DrawerState,
     calendarsUsers: List<UserCalendarsUi>,
     onCalendarVisibilityChanged: (CalendarId, Boolean) -> Unit,
-    addAnAccount: () -> Unit,
+    onAddAccount: () -> Unit,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -75,13 +75,13 @@ private fun CalendarDrawerContent(
             ModalDrawerSheet {
                 Column(modifier = Modifier.fillMaxHeight()) {
                     Box(modifier = Modifier.weight(1f)) {
-                        CalendarDrawerList(
+                        DrawerList(
                             usersCalendars = calendarsUsers,
                             onCalendarVisibilityChange = onCalendarVisibilityChanged,
                         )
                     }
                     Button(
-                        onClick = addAnAccount,
+                        onClick = onAddAccount,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = Margin.Medium, vertical = Margin.Micro),
@@ -101,14 +101,14 @@ private fun CalendarDrawerContent(
 @PreviewLightDark
 @Composable
 private fun CalendarDrawerPreview(
-    @PreviewParameter(CalendarDrawerPreviewProvider::class) usersCalendars: List<UserCalendarsUi>,
+    @PreviewParameter(DrawerPreviewProvider::class) usersCalendars: List<UserCalendarsUi>,
 ) {
     CalendarThemeForPreview {
         CalendarDrawerContent(
             drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
             calendarsUsers = usersCalendars,
             onCalendarVisibilityChanged = { _, _ -> },
-            addAnAccount = { },
+            onAddAccount = { },
             content = { },
         )
     }
