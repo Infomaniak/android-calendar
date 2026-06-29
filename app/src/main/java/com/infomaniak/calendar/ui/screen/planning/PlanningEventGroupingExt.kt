@@ -61,7 +61,7 @@ fun List<Event>.groupByWeekAndDay(
     val result = sortedMapOf<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>()
 
     for (event in this) {
-        val date = event.getStartAt(timeZone) ?: continue
+        val date = event.getStartAt(timeZone)
         result
             .getOrPut(weekNumbering.weekOf(date)) { sortedMapOf() }
             .getOrPut(date) { mutableListOf() }
