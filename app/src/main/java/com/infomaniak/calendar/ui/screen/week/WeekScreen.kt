@@ -30,15 +30,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
-import com.infomaniak.calendar.ui.component.CalendarDrawerIcon
+import com.infomaniak.calendar.ui.component.drawer.DrawerIconButton
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
 fun WeekScreen(modifier: Modifier = Modifier) {
     val snackbarHostState = LocalSharedSnackbarHostState.current
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.weekTitle)) }, navigationIcon = { CalendarDrawerIcon() }) },
+        topBar = { TopAppBar(title = { Text(stringResource(R.string.weekTitle)) }, navigationIcon = { DrawerIconButton() }) },
         modifier = modifier,
     ) { paddingValues ->
         Box(
@@ -61,5 +62,7 @@ fun WeekScreen(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun WeekScreenPreview() {
-    WeekScreen()
+    CalendarThemeForPreview {
+        WeekScreen()
+    }
 }

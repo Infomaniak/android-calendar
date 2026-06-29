@@ -30,8 +30,8 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.ui.NavDisplay
-import com.infomaniak.calendar.ui.component.CalendarDrawer
 import com.infomaniak.calendar.ui.component.CalendarFab
+import com.infomaniak.calendar.ui.component.drawer.CalendarDrawer
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.component.CalendarHorizontalFloatingToolbar
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.DrawerDecoratorStrategy
@@ -130,7 +130,12 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
 
     val drawerStrategy = DrawerDecoratorStrategy<NavKey>(
         drawer = { content ->
-            CalendarDrawer(content)
+            CalendarDrawer(
+                content = content,
+                onAddAccount = {
+                    backStack.addOrMoveToTop(NavDestination.Onboarding(onlyLogin = true))
+                },
+            )
         },
     )
 

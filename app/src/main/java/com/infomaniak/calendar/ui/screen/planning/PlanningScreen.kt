@@ -33,7 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.planning.Planning
-import com.infomaniak.calendar.ui.component.CalendarDrawerIcon
+import com.infomaniak.calendar.ui.component.drawer.DrawerIconButton
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
 import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewParameter
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -51,7 +51,7 @@ private fun PlanningScreen(weekEvents: () -> EventsByWeekAndDay, modifier: Modif
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.planningTitle)) },
-                navigationIcon = { CalendarDrawerIcon() },
+                navigationIcon = { DrawerIconButton() },
             )
         },
         modifier = modifier,
