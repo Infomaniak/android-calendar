@@ -64,7 +64,7 @@ fun CalendarDrawer(
 @Composable
 private fun CalendarDrawerContent(
     drawerState: DrawerState,
-    calendarsUsers: UsersCalendarsList?,
+    calendarsUsers: List<UserCalendarsUi>,
     onCalendarVisibilityChanged: (CalendarId, Boolean) -> Unit,
     addAnAccount: () -> Unit,
     content: @Composable () -> Unit,
@@ -75,9 +75,10 @@ private fun CalendarDrawerContent(
             ModalDrawerSheet {
                 Column(modifier = Modifier.fillMaxHeight()) {
                     Box(modifier = Modifier.weight(1f)) {
-                        calendarsUsers?.let {
-                            CalendarDrawerList(usersCalendars = it, onCalendarVisibilityChange = onCalendarVisibilityChanged)
-                        }
+                        CalendarDrawerList(
+                            usersCalendars = calendarsUsers,
+                            onCalendarVisibilityChange = onCalendarVisibilityChanged,
+                        )
                     }
                     Button(
                         onClick = addAnAccount,
@@ -100,12 +101,12 @@ private fun CalendarDrawerContent(
 @PreviewLightDark
 @Composable
 private fun CalendarDrawerPreview(
-    @PreviewParameter(CalendarDrawerPreviewProvider::class) calendarsUsers: UsersCalendarsList,
+    @PreviewParameter(CalendarDrawerPreviewProvider::class) usersCalendars: List<UserCalendarsUi>,
 ) {
     CalendarThemeForPreview {
         CalendarDrawerContent(
             drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
-            calendarsUsers = calendarsUsers,
+            calendarsUsers = usersCalendars,
             onCalendarVisibilityChanged = { _, _ -> },
             addAnAccount = { },
             content = { },

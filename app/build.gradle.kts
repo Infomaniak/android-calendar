@@ -149,6 +149,7 @@ dependencies {
     implementation(core.infomaniak.core.datavalue)
     implementation(core.infomaniak.core.sentry)
     implementation(core.infomaniak.core.ui.compose.margin)
+    implementation(core.infomaniak.core.ui.compose.preview)
     implementation(core.infomaniak.core.ui.compose.theme)
 
     implementation(core.kotlinx.serialization.json)

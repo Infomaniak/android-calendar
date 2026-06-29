@@ -21,10 +21,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.utils.account.AccountUtils
-import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
-import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
@@ -33,56 +31,26 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
-class DrawerViewModel(
-    private val accountManager: AccountManager,
-    private val accountUtils: AccountUtils,
-    private val calendarManager: CalendarManager,
-) : ViewModel() {
-
-    val calendarsUsers: StateFlow<UsersCalendarsList?> = combine(
+class DrawerViewModel(accountUtils: AccountUtils, calendarManager: CalendarManager) : ViewModel() {
+    val calendarsUsers: StateFlow<List<UserCalendarsUi>> = combine(
         accountUtils.users,
         calendarManager.observeCalendars(),
     ) { users, calendars ->
-        return@combine UsersCalendarsList(
-            users.map { user ->
-                val userCalendars = calendars.filter { it.accountId == AccountId(user.id.toLong()) }
-                UserCalendarsUi(user, userCalendars)
-            },
-        )
+        return@combine users.map { user ->
+            val userCalendars = calendars.filter { it.accountId == AccountId(user.id.toLong()) }
+            UserCalendarsUi(user, userCalendars)
+        }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
-        initialValue = null,
+        initialValue = emptyList(),
     )
 
     fun onCalendarVisibilityChanged(calendarId: CalendarId, isVisible: Boolean) {
         //TODO
-    }
-
-    init {
-        initAndSync()
-    }
-
-    private fun initAndSync() {
-        viewModelScope.launch {
-            accountUtils.users.collect { users ->
-                users.forEach { user ->
-                    launch {
-                        val accountId = AccountId(user.id.toLong())
-                        val credentials = accountManager.retrieveDavCredential(user.apiToken.accessToken, user.login)
-
-                        runCatching {
-                            accountManager.initAccount(accountId, credentials)
-                            calendarManager.syncCalendars(accountId)
-                        }.cancellable()
-                    }
-                }
-            }
-        }
     }
 }
