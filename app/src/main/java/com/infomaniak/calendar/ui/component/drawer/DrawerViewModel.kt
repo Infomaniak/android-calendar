@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarEditData
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
@@ -31,11 +32,12 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
-class DrawerViewModel(accountUtils: AccountUtils, calendarManager: CalendarManager) : ViewModel() {
+class DrawerViewModel(accountUtils: AccountUtils, private val calendarManager: CalendarManager) : ViewModel() {
     val calendarsUsers: StateFlow<List<UserCalendarsUi>> = combine(
         accountUtils.users,
         calendarManager.observeCalendars(),
@@ -51,6 +53,8 @@ class DrawerViewModel(accountUtils: AccountUtils, calendarManager: CalendarManag
     )
 
     fun onCalendarVisibilityChanged(calendarId: CalendarId, isVisible: Boolean) {
-        //TODO
+        viewModelScope.launch {
+            calendarManager.updateCalendar(calendarId, edit = CalendarEditData(isVisible = isVisible))
+        }
     }
 }
