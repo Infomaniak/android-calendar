@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.ui.screen.calendarTest.model
 
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColor
 
 /**
  * UI model for an event shown in the CalDAV test screen: everything is already formatted/derived
@@ -32,6 +33,6 @@ data class EventUi(
     val categories: String?,
     val description: String?,
     val lastModified: String?,
-    val color: Int,
+    val calendarColor: CalendarColor,
     val canEdit: Boolean,
 )

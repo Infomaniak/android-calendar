@@ -26,12 +26,20 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.R
+import com.infomaniak.calendar.ui.component.CalendarDrawerIcon
 
 @Composable
 fun ThreeDayScreen(modifier: Modifier = Modifier) {
-    Scaffold(topBar = { TopAppBar(title = { Text("ThreeDayScreen") }) }, modifier = modifier) { paddingValues ->
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text(stringResource(R.string.threeDaysTitle)) }, navigationIcon = { CalendarDrawerIcon() })
+        },
+        modifier = modifier,
+    ) { paddingValues ->
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = paddingValues,

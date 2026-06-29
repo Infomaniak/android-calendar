@@ -27,9 +27,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
 import com.infomaniak.calendar.components.foundation.utils.TimeFormatter.formatHours
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlin.time.Clock
@@ -39,8 +39,8 @@ import kotlin.time.Duration.Companion.hours
 fun EventItem(event: EventUi, modifier: Modifier = Modifier) {
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = event.color,
-            contentColor = Color.White, // TODO: Waiting for KMP event HCT colors
+            containerColor = event.colors.datavizContainerVariant,
+            contentColor = event.colors.onDatavizContainerVariant,
         ),
         modifier = modifier,
     ) {
@@ -64,7 +64,7 @@ private fun Preview() {
                     categories = "Event categories",
                     start = Clock.System.now(),
                     end = Clock.System.now().plus(3.hours),
-                    color = Color.Red,
+                    colors = LocalEventColorsUiFactory.current.create(0xFF0098FF.toInt()),
                 ),
             )
         }

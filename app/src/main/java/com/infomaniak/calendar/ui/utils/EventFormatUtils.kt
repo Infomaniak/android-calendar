@@ -37,7 +37,5 @@ internal val dateTimeFormatter = LocalDateTime.Format {
 internal fun Instant.formatUtc(): String = toLocalDateTime(TimeZone.UTC).format(dateTimeFormatter)
 
 @OptIn(ExperimentalTime::class)
-internal fun EventTiming.toTimeRange(): String = when (this) {
-    is EventTiming.AllDay -> "All day"
-    is EventTiming.Timed -> "${start.formatUtc()} → ${end.formatUtc()}"
-}
+internal fun EventTiming.toTimeRange(): String = if (isAllDay) "All day" else "${start.formatUtc()} → ${end.formatUtc()}"
+

@@ -20,11 +20,9 @@ package com.infomaniak.calendar.ui.screen.calendarTest.utils
 import com.infomaniak.calendar.ui.screen.calendarTest.model.PlanningDayUi
 import com.infomaniak.calendar.ui.screen.calendarTest.model.PlanningWeekUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
@@ -50,7 +48,7 @@ internal fun List<Event>.toPlanningWeeks(rangeStart: Instant, rangeEnd: Instant)
     val dayLabelFormatter = DateTimeFormatter.ofPattern("d MMM", Locale.getDefault())
     val dayHeaderFormatter = DateTimeFormatter.ofPattern("EEEE d MMMM", Locale.getDefault())
 
-    val eventsByDay = groupBy { event -> event.timing.startDate(timeZone) }
+    val eventsByDay = groupBy { event -> event.timing.start.toLocalDateTime(timeZone).date }
 
     val endDate = rangeEnd.toLocalDateTime(timeZone).date
     val weeks = mutableListOf<PlanningWeekUi>()
@@ -65,7 +63,7 @@ internal fun List<Event>.toPlanningWeeks(rangeStart: Instant, rangeEnd: Instant)
                     id = date.toString(),
                     header = date.toJavaLocalDate().format(dayHeaderFormatter)
                         .replaceFirstChar { char -> char.uppercase() },
-                    events = dayEvents.sortedBy { event -> event.timing.sortKey(timeZone) }.map(Event::toUi),
+                    events = dayEvents.sortedBy { event -> event.timing.start }.map(Event::toUi),
                 )
             }
         }
@@ -79,20 +77,6 @@ internal fun List<Event>.toPlanningWeeks(rangeStart: Instant, rangeEnd: Instant)
     }
 
     return weeks
-}
-
-/** The calendar day the event starts on: the date itself for all-day, or the start instant's date. */
-@OptIn(ExperimentalTime::class)
-private fun EventTiming.startDate(timeZone: TimeZone): LocalDate = when (this) {
-    is EventTiming.AllDay -> startDate
-    is EventTiming.Timed -> start.toLocalDateTime(timeZone).date
-}
-
-/** Ordering key within a day: all-day events (start of day) sort before timed events. */
-@OptIn(ExperimentalTime::class)
-private fun EventTiming.sortKey(timeZone: TimeZone): Instant = when (this) {
-    is EventTiming.AllDay -> startDate.atStartOfDayIn(timeZone)
-    is EventTiming.Timed -> start
 }
 
 /** e.g. "S12 2026 · 24 févr. - 2 mars" */

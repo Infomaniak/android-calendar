@@ -22,6 +22,7 @@ import com.infomaniak.calendar.ui.screen.calendarTest.CalendarTestUiState
 import com.infomaniak.calendar.ui.screen.calendarTest.model.EventUi
 import com.infomaniak.calendar.ui.screen.calendarTest.model.PlanningDayUi
 import com.infomaniak.calendar.ui.screen.calendarTest.model.PlanningWeekUi
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColor
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
 
 internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<CalendarTestUiState> {
@@ -37,7 +38,7 @@ internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<Cal
             categories = "Work",
             description = "Standup and planning",
             lastModified = "03/01/2026 09:55",
-            color = 0xFF2196F3.toInt(),
+            calendarColor = CalendarColor(0xFF2196F3.toInt()),
             canEdit = true,
         )
 
@@ -50,7 +51,7 @@ internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<Cal
                     id = EventId("event-preview-2"),
                     title = "Lunch with team",
                     timeRange = "12:30 → 13:30",
-                    color = 0xFFE91E63.toInt(),
+                    calendarColor = CalendarColor(0xFFE91E63.toInt()),
                     canEdit = false,
                 ),
             ),
@@ -80,7 +81,7 @@ internal class CalendarTestUiStatePreviewProvider : PreviewParameterProvider<Cal
                                     id = EventId("event-preview-3"),
                                     title = "Hiking",
                                     timeRange = "All day",
-                                    color = 0xFF4CAF50.toInt(),
+                                    calendarColor = CalendarColor(0xFF4CAF50.toInt()),
                                 ),
                             ),
                         ),

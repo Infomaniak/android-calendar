@@ -17,11 +17,14 @@
  */
 package com.infomaniak.calendar.ui.screen.planning
 
-import androidx.compose.ui.graphics.Color
+import com.infomaniak.calendar.components.foundation.models.EventColorUi
+import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColor
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -58,11 +61,11 @@ fun List<Event>.groupByWeekAndDay(
     val result = sortedMapOf<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>()
 
     for (event in this) {
-        val date = event.getStartAt(timeZone) ?: continue
+        val date = event.getStartAt(timeZone)
         result
             .getOrPut(weekNumbering.weekOf(date)) { sortedMapOf() }
             .getOrPut(date) { mutableListOf() }
-            .add(event.toEventUi() ?: continue)
+            .add(event.toEventUi())
     }
 
     @Suppress("UNCHECKED_CAST") // Shows the exposed list as non-mutable
@@ -70,20 +73,27 @@ fun List<Event>.groupByWeekAndDay(
 }
 
 // TODO: Handle AllDay
-private fun Event.getStartAt(timeZone: TimeZone): LocalDate? {
-    return (timing as? EventTiming.Timed)?.start?.toLocalDateTime(timeZone)?.date
+private fun Event.getStartAt(timeZone: TimeZone): LocalDate {
+    return timing.start.toLocalDateTime(timeZone).date
 }
 
-private fun Event.toEventUi(): EventUi? {
-    val start = (timing as? EventTiming.Timed)?.start ?: return null // TODO: Handle AllDay
-    val end = (timing as? EventTiming.Timed)?.end ?: return null // TODO: Handle AllDay
+private fun Event.toEventUi(): EventUi {
     return EventUi(
         id = id.url,
         title = title,
         location = location,
         categories = categories,
-        start = start,
-        end = end,
-        color = Color(calendarColor.argb),
+        start = timing.start,
+        end = timing.end,
+        colors = colors.toEventColorsUi(),
     )
 }
+
+fun EventColors.toEventColorsUi(): EventColorsUi = EventColorsUi(
+    _datavizContainer = datavizContainer.toEventColorUi(),
+    _onDatavizContainer = onDatavizContainer.toEventColorUi(),
+    _datavizContainerVariant = datavizContainerVariant.toEventColorUi(),
+    _onDatavizContainerVariant = onDatavizContainerVariant.toEventColorUi(),
+)
+
+private fun EventColor.toEventColorUi(): EventColorUi = EventColorUi(light = light, dark = dark)

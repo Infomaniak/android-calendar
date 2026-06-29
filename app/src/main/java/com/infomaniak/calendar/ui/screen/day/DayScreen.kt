@@ -26,15 +26,22 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.R
 import com.infomaniak.calendar.di.ComposeAppGraph
 import com.infomaniak.calendar.ui.LocalUser
-import com.infomaniak.calendar.utils.AccountUtils
+import com.infomaniak.calendar.ui.component.CalendarDrawerIcon
+import com.infomaniak.calendar.utils.account.AccountUtils
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @Composable
-fun DayScreen(modifier: Modifier = Modifier, accountUtils: AccountUtils = ComposeAppGraph.accountUtils) {
+fun DayScreen(
+    goToTestScreen: () -> Unit,
+    modifier: Modifier = Modifier,
+    accountUtils: AccountUtils = ComposeAppGraph.accountUtils,
+) {
     val scope = rememberCoroutineScope()
 
     DayScreen(
@@ -44,19 +51,25 @@ fun DayScreen(modifier: Modifier = Modifier, accountUtils: AccountUtils = Compos
                 accountUtils.removeUser(accountUtils.currentUserIdFlow.first() ?: return@launch)
             }
         },
+        goToTestScreen = goToTestScreen,
     )
 }
 
 @Composable
-private fun DayScreen(onDisconnect: () -> Unit, modifier: Modifier = Modifier) {
+private fun DayScreen(
+    onDisconnect: () -> Unit,
+    goToTestScreen: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
-        topBar = { TopAppBar(title = { Text("DayScreen") }) },
+        topBar = { TopAppBar(title = { Text(stringResource(R.string.dayTitle)) }, navigationIcon = { CalendarDrawerIcon() }) },
         modifier = modifier,
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             Text("DayScreenContent")
-            Text("User: ${LocalUser.current?.displayName}")
+            Text("Current user: ${LocalUser.current?.displayName}")
             Button(onClick = onDisconnect) { Text("Disconnect") }
+            Button(onClick = goToTestScreen) { Text("Test Calendar") }
         }
     }
 }
@@ -64,5 +77,5 @@ private fun DayScreen(onDisconnect: () -> Unit, modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun DayScreenPreview() {
-    DayScreen(onDisconnect = { })
+    DayScreen(onDisconnect = { }, goToTestScreen = { })
 }

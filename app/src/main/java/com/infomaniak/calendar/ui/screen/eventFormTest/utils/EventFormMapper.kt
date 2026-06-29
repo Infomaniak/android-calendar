@@ -23,19 +23,16 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventEditData
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
-import kotlin.time.ExperimentalTime
 
 internal fun Calendar.toChoice() = CalendarChoice(id = id, name = displayName, color = color.argb)
-@OptIn(ExperimentalTime::class)
+
 internal fun Event.toFormData(): EventFormData {
-    val isAllDay = timing is EventTiming.AllDay
-    val start = timing.formStart()
-    val end = timing.formEnd()
+    val isAllDay = timing.isAllDay
+    val start = timing.start.toLocalDateTime(TimeZone.UTC)
+    val end = timing.end.toLocalDateTime(TimeZone.UTC)
     return EventFormData(
         title = title,
         isAllDay = isAllDay,
@@ -46,29 +43,15 @@ internal fun Event.toFormData(): EventFormData {
         calendarId = calendarId,
     )
 }
-@OptIn(ExperimentalTime::class)
+
 internal fun EventFormData.toEditData(): EventEditData = EventEditData(
     title = title,
-    timing = if (isAllDay) {
-        EventTiming.AllDay(startDate = start.date, endDate = end.date)
-    } else {
-        EventTiming.Timed(
-            start = start.toInstant(TimeZone.UTC),
-            end = end.toInstant(TimeZone.UTC),
-        )
-    },
+    timing = EventTiming(
+        start = start.toInstant(TimeZone.UTC),
+        end = end.toInstant(TimeZone.UTC),
+        isAllDay = isAllDay,
+    ),
     location = location.ifBlank { null },
     description = description.ifBlank { null },
     calendarId = calendarId,
 )
-@OptIn(ExperimentalTime::class)
-private fun EventTiming.formStart(): LocalDateTime = when (this) {
-    is EventTiming.AllDay -> LocalDateTime(startDate, LocalTime(0, 0))
-    is EventTiming.Timed -> start.toLocalDateTime(TimeZone.UTC)
-}
-@OptIn(ExperimentalTime::class)
-private fun EventTiming.formEnd(): LocalDateTime = when (this) {
-    is EventTiming.AllDay -> LocalDateTime(endDate, LocalTime(0, 0))
-    is EventTiming.Timed -> end.toLocalDateTime(TimeZone.UTC)
-}
-

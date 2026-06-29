@@ -49,7 +49,8 @@ import com.infomaniak.calendar.R
 import com.infomaniak.calendar.di.ComposeAppGraph
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.SharedSnackbarHostState
-import com.infomaniak.calendar.utils.AccountUtils
+import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.calendar.utils.account.CalendarUser
 import com.infomaniak.core.auth.models.UserLoginResult
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.auth.utils.LoginFlowController
@@ -67,7 +68,10 @@ import com.infomaniak.core.onboarding.OnboardingPage
 import com.infomaniak.core.onboarding.OnboardingScaffold
 import com.infomaniak.core.onboarding.components.OnboardingComponents
 import com.infomaniak.core.onboarding.components.OnboardingComponents.DefaultTitleAndDescription
+import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCredentials
+import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
 import kotlinx.coroutines.launch
+import com.infomaniak.core.common.R as RCore
 
 private val host = ApiEnvironment.current.host
 private val CREATE_ACCOUNT_URL = "https://welcome.$host/signup/swisstransfer" // TODO[login]: Use the correct account creation url
@@ -81,6 +85,7 @@ fun OnboardingScreen(
     onPopBack: () -> Unit,
     crossAppLoginViewModel: CrossAppLoginViewModel = viewModel(),
     accountUtils: AccountUtils = ComposeAppGraph.accountUtils,
+    accountManager: AccountManager = ComposeAppGraph.accountManager,
     infomaniakLogin: InfomaniakLogin = ComposeAppGraph.infomaniakLogin,
 ) {
     val context = LocalContext.current
@@ -95,6 +100,7 @@ fun OnboardingScreen(
     val loginDependencies = OnboardingLoginDependencies(
         context = context,
         accountUtils = accountUtils,
+        accountManager = accountManager,
         snackbarHostState = snackbarHostState,
         onlyLoginScreen = onlyLogin,
         setButtonsLoading = { areButtonsLoading = it },
@@ -193,6 +199,111 @@ private fun OnboardingScreen(
     )
 }
 
+private suspend fun fetchDavCredentials(
+    user: User,
+    accountManager: AccountManager,
+): DavCredentials? = runCatching {
+    accountManager.retrieveDavCredential(authToken = user.apiToken.accessToken, login = user.login)
+}.getOrNull()
+
+@Composable
+private fun rememberOnboardingLoginFlowController(
+    infomaniakLogin: InfomaniakLogin,
+    dependencies: OnboardingLoginDependencies,
+): LoginFlowController = LoginUtils.rememberLoginFlowController(infomaniakLogin, dependencies.accountUtils) { userLoginResult ->
+    val user: User = when (userLoginResult) {
+        is UserLoginResult.Success -> userLoginResult.user
+        is UserLoginResult.Failure -> {
+            dependencies.snackbarHostState?.showSnackbar(userLoginResult.errorMessage)
+            null
+        }
+        null -> null
+    } ?: run {
+        dependencies.setButtonsLoading(false)
+        return@rememberLoginFlowController
+    }
+
+    val davCredentials = fetchDavCredentials(user, dependencies.accountManager) ?: run {
+        dependencies.snackbarHostState?.showSnackbar(dependencies.context.getString(RCore.string.anErrorHasOccurred))
+        dependencies.setButtonsLoading(false)
+        return@rememberLoginFlowController
+    }
+
+    loginUsersIntoTheApp(
+        calendarUsers = listOf(CalendarUser(user, davCredentials)),
+        onlyLoginScreen = dependencies.onlyLoginScreen,
+        accountUtils = dependencies.accountUtils,
+        onNavigateToHome = dependencies.onNavigateToHome,
+        onPopBack = dependencies.onPopBack,
+    )
+}
+
+private suspend fun connectSelectedAccounts(
+    accounts: List<ExternalAccount>,
+    viewModel: BaseCrossAppLoginViewModel,
+    dependencies: OnboardingLoginDependencies,
+) {
+    dependencies.setButtonsLoading(true)
+    val loginResult = viewModel.attemptLogin(selectedAccounts = accounts)
+    loginUsers(loginResult = loginResult, dependencies = dependencies)
+    loginResult.errorMessageIds.forEach { messageResId ->
+        dependencies.snackbarHostState?.showSnackbar(dependencies.context.getString(messageResId))
+    }
+}
+
+private suspend fun loginUsers(loginResult: CrossAppLoginFacade.LoginResult, dependencies: OnboardingLoginDependencies) {
+    val results = LoginUtils.getLoginResultsAfterCrossApp(
+        apiTokens = loginResult.tokens,
+        context = dependencies.context,
+        userExistenceChecker = dependencies.accountUtils,
+    )
+
+    val users: List<User> = buildList {
+        results.forEach { result ->
+            when (result) {
+                is UserLoginResult.Success -> add(result.user)
+                is UserLoginResult.Failure -> dependencies.snackbarHostState?.showSnackbar(result.errorMessage)
+            }
+        }
+    }
+
+    val calendarUsers: List<CalendarUser> = buildList {
+        users.forEach { user ->
+            val davCredentials = fetchDavCredentials(user, dependencies.accountManager) ?: run {
+                dependencies.snackbarHostState?.showSnackbar(dependencies.context.getString(RCore.string.anErrorHasOccurred))
+                return@forEach
+            }
+
+            add(CalendarUser(user, davCredentials))
+        }
+    }
+
+    if (calendarUsers.isEmpty()) {
+        dependencies.setButtonsLoading(false)
+    } else {
+        loginUsersIntoTheApp(
+            calendarUsers = calendarUsers,
+            onlyLoginScreen = dependencies.onlyLoginScreen,
+            accountUtils = dependencies.accountUtils,
+            onNavigateToHome = dependencies.onNavigateToHome,
+            onPopBack = dependencies.onPopBack,
+        )
+    }
+}
+
+private suspend fun loginUsersIntoTheApp(
+    calendarUsers: List<CalendarUser>,
+    onlyLoginScreen: Boolean,
+    accountUtils: AccountUtils,
+    onNavigateToHome: () -> Unit,
+    onPopBack: () -> Unit,
+) {
+    calendarUsers.forEach { calendarUser ->
+        accountUtils.addUser(calendarUser = calendarUser)
+    }
+    if (onlyLoginScreen) onPopBack() else onNavigateToHome()
+}
+
 /**
  * Dummy slides for now
  */
@@ -248,92 +359,10 @@ private enum class Page(
     )
 }
 
-@Composable
-private fun rememberOnboardingLoginFlowController(
-    infomaniakLogin: InfomaniakLogin,
-    dependencies: OnboardingLoginDependencies,
-): LoginFlowController {
-    val scope = rememberCoroutineScope()
-
-    return LoginUtils.rememberLoginFlowController(
-        infomaniakLogin = infomaniakLogin,
-        userExistenceChecker = dependencies.accountUtils,
-    ) { userLoginResult ->
-        when (userLoginResult) {
-            is UserLoginResult.Success -> scope.launch {
-                loginUsersIntoTheApp(
-                    users = listOf(userLoginResult.user),
-                    onlyLoginScreen = dependencies.onlyLoginScreen,
-                    accountUtils = dependencies.accountUtils,
-                    onNavigateToHome = dependencies.onNavigateToHome,
-                    onPopBack = dependencies.onPopBack,
-                )
-            }
-            is UserLoginResult.Failure -> {
-                dependencies.snackbarHostState?.showSnackbar(userLoginResult.errorMessage)
-            }
-            null -> Unit // The user canceled the WebView.
-        }
-
-        if (userLoginResult !is UserLoginResult.Success) dependencies.setButtonsLoading(false)
-    }
-}
-
-private suspend fun connectSelectedAccounts(
-    accounts: List<ExternalAccount>,
-    viewModel: BaseCrossAppLoginViewModel,
-    dependencies: OnboardingLoginDependencies,
-) {
-    dependencies.setButtonsLoading(true)
-    val loginResult = viewModel.attemptLogin(selectedAccounts = accounts)
-    loginUsers(loginResult = loginResult, dependencies = dependencies)
-    loginResult.errorMessageIds.forEach { messageResId ->
-        dependencies.snackbarHostState?.showSnackbar(dependencies.context.getString(messageResId))
-    }
-}
-
-private suspend fun loginUsers(loginResult: CrossAppLoginFacade.LoginResult, dependencies: OnboardingLoginDependencies) {
-    val results = LoginUtils.getLoginResultsAfterCrossApp(
-        apiTokens = loginResult.tokens,
-        context = dependencies.context,
-        userExistenceChecker = dependencies.accountUtils,
-    )
-    val users = buildList {
-        results.forEach { result ->
-            when (result) {
-                is UserLoginResult.Success -> add(result.user)
-                is UserLoginResult.Failure -> dependencies.snackbarHostState?.showSnackbar(result.errorMessage)
-            }
-        }
-    }
-
-    if (users.isEmpty()) {
-        dependencies.setButtonsLoading(false)
-    } else {
-        loginUsersIntoTheApp(
-            users = users,
-            onlyLoginScreen = dependencies.onlyLoginScreen,
-            accountUtils = dependencies.accountUtils,
-            onNavigateToHome = dependencies.onNavigateToHome,
-            onPopBack = dependencies.onPopBack,
-        )
-    }
-}
-
-private suspend fun loginUsersIntoTheApp(
-    users: List<User>,
-    onlyLoginScreen: Boolean,
-    accountUtils: AccountUtils,
-    onNavigateToHome: () -> Unit,
-    onPopBack: () -> Unit,
-) {
-    users.forEach { user -> accountUtils.addUser(user) }
-    if (onlyLoginScreen) onPopBack() else onNavigateToHome()
-}
-
 private data class OnboardingLoginDependencies(
     val context: Context,
     val accountUtils: AccountUtils,
+    val accountManager: AccountManager,
     val snackbarHostState: SharedSnackbarHostState?,
     val onlyLoginScreen: Boolean,
     val setButtonsLoading: (Boolean) -> Unit,

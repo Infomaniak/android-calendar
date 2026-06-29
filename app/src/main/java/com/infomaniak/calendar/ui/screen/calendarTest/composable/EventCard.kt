@@ -44,7 +44,7 @@ internal fun EventCard(
     Card(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(event.color)),
+        colors = CardDefaults.cardColors(containerColor = Color(event.calendarColor.argb)),
     ) {
         Column(
             modifier = Modifier.padding(12.dp),

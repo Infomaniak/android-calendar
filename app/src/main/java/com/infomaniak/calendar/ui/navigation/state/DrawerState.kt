@@ -15,18 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.foundation.models
+package com.infomaniak.calendar.ui.navigation.state
 
-import androidx.compose.runtime.Immutable
-import kotlin.time.Instant
+import androidx.compose.material3.DrawerState
+import androidx.compose.runtime.staticCompositionLocalOf
 
-@Immutable
-data class EventUi(
-    val id: String,
-    val title: String,
-    val location: String?,
-    val categories: String?,
-    val start: Instant,
-    val end: Instant,
-    val colors: EventColorsUi,
-)
+val LocalDrawerState = staticCompositionLocalOf<DrawerState?> { null }

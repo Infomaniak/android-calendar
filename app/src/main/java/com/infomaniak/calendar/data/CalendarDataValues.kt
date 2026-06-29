@@ -15,18 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.foundation.models
+package com.infomaniak.calendar.data
 
-import androidx.compose.runtime.Immutable
-import kotlin.time.Instant
+import android.content.Context
+import com.infomaniak.calendar.secured.EncryptedDavCredentialSerializer
+import com.infomaniak.calendar.secured.KeystoreCipher
+import com.infomaniak.core.datavalue.DataValues
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.SingleIn
 
-@Immutable
-data class EventUi(
-    val id: String,
-    val title: String,
-    val location: String?,
-    val categories: String?,
-    val start: Instant,
-    val end: Instant,
-    val colors: EventColorsUi,
-)
+@SingleIn(AppScope::class)
+class CalendarDataValues @Inject constructor(
+    appContext: Context,
+    keystoreCipher: KeystoreCipher,
+) : DataValues(appContext, name = "calendarData") {
+    val davCredentials = dataValue(
+        key = "davCredentials",
+        defaultValue = emptyMap(),
+        serializer = EncryptedDavCredentialSerializer(keystoreCipher),
+    )
+}

@@ -15,18 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.foundation.models
+package com.infomaniak.calendar.secured
 
-import androidx.compose.runtime.Immutable
-import kotlin.time.Instant
-
-@Immutable
-data class EventUi(
-    val id: String,
-    val title: String,
-    val location: String?,
-    val categories: String?,
-    val start: Instant,
-    val end: Instant,
-    val colors: EventColorsUi,
-)
+/**
+ * Result of an AES/GCM encryption operation.
+ *
+ * @property initializationVector IV (initialization vector) used during encryption, Base64-encoded.
+ * Must be stored alongside the ciphertext and supplied to [KeystoreCipher.decrypt].
+ * @property encryptedData Encrypted payload, Base64-encoded.
+ */
+data class EncryptionResult(val initializationVector: String, val encryptedData: String)

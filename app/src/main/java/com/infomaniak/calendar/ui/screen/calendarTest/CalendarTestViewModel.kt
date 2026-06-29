@@ -22,7 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.ui.screen.calendarTest.paging.PlanningPager
 import com.infomaniak.calendar.ui.screen.calendarTest.utils.toPlanningWeeks
-import com.infomaniak.calendar.utils.AccountUtils
+import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.managers.AccountManager

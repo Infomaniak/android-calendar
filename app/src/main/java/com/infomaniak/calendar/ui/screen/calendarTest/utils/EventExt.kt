@@ -21,6 +21,7 @@ import com.infomaniak.calendar.ui.screen.calendarTest.model.EventUi
 import com.infomaniak.calendar.ui.utils.formatUtc
 import com.infomaniak.calendar.ui.utils.toTimeRange
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 
 internal fun Event.toUi(): EventUi = EventUi(
     id = id,
@@ -31,6 +32,10 @@ internal fun Event.toUi(): EventUi = EventUi(
     categories = categories?.takeIf { it.isNotBlank() },
     description = description?.takeIf { it.isNotBlank() },
     lastModified = lastModified?.formatUtc(),
-    color = calendarColor.argb,
+    calendarColor = calendarColor,
     canEdit = canEdit,
 )
+
+private fun EventTiming.toTimeRange(): String {
+    return if (isAllDay) "All day" else "${start.formatUtc()} → ${end.formatUtc()}"
+}

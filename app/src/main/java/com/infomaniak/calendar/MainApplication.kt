@@ -51,6 +51,14 @@ class MainApplication : Application() {
 
         MatomoCalendar.addTrackingCallbackForDebugLog()
         initCrossAppLogin()
+
+        loadCalDavCredential()
+    }
+
+    private fun loadCalDavCredential() {
+        applicationScope.launch {
+            appGraph.davCredentialsManager.initStoredCredentials()
+        }
     }
 
     /**
