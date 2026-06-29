@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.component.drawer
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -31,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -40,6 +42,7 @@ import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
+import kotlinx.coroutines.launch
 
 @Composable
 fun CalendarDrawer(
@@ -50,6 +53,9 @@ fun CalendarDrawer(
 ) {
     val calendarDrawerState = LocalDrawerState.current ?: return
     val calendarsUsers by drawerViewModel.calendarsUsers.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+
+    BackHandler(enabled = calendarDrawerState.isOpen) { scope.launch { calendarDrawerState.close() } }
 
     CalendarDrawerContent(
         drawerState = calendarDrawerState,
