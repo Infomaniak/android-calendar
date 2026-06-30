@@ -63,7 +63,7 @@ fun EventItem(event: EventUi, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun EventItem(
+internal fun EventItem(
     start: Instant,
     end: Instant,
     title: String,
@@ -104,6 +104,8 @@ private fun EventItem(
 
             if (trailingIcons.isNotEmpty()) TrailingIcons(trailingIcons)
         }
+
+        EventSizeSpacer(end - start)
     }
 }
 
@@ -119,7 +121,7 @@ private fun TrailingIcons(trailingIcons: Set<EventIcons>) {
 private fun EventUi.toEventItemStatus(): EventItemStatus {
     if (status == EventStatus.Cancelled) return EventItemStatus.Declined(colors)
     val me = attendees.me ?: return EventItemStatus.Default(colors)
-    
+
     return when (me.status) {
         ParticipationStatus.Accepted -> EventItemStatus.Default(colors)
         ParticipationStatus.Declined -> EventItemStatus.Declined(colors)
