@@ -81,6 +81,7 @@ private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalD
             categories = null,
             start = instantAt(date, hour),
             end = instantAt(date, hour + 1),
+            isAllDay = false,
             colors = EventColorsUiFactory.dummyEventColorsUiFactory.create(color.toArgb()),
             attendees = Attendees(dummyAttendees, dummyAttendees.first()),
         )

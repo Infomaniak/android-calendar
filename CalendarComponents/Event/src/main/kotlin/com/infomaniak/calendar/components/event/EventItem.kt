@@ -23,7 +23,9 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
@@ -59,7 +61,15 @@ import kotlin.time.Instant
 
 @Composable
 fun EventItem(event: EventUi, modifier: Modifier = Modifier) {
-    EventItem(event.start, event.end, event.title, event.toEventItemStatus(), event.toEventIcons(), modifier)
+    EventItem(
+        start = event.start,
+        end = event.end,
+        title = event.title,
+        status = event.toEventItemStatus(),
+        trailingIcons = event.toEventIcons(),
+        isAllDay = event.isAllDay,
+        modifier = modifier,
+    )
 }
 
 @Composable
@@ -69,44 +79,83 @@ internal fun EventItem(
     title: String,
     status: EventItemStatus,
     trailingIcons: Set<EventIcons>,
+    isAllDay: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    EventItemCard(status, modifier = modifier) {
+        if (isAllDay) {
+            AllDayContent(title)
+        } else {
+            PartialDayContent(start, end, title, trailingIcons, status.textDecoration)
+        }
+    }
+}
+
+@Composable
+private fun EventItemCard(status: EventItemStatus, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     Card(
         colors = status.cardColors(),
         border = status.cardBorder(),
         shape = MaterialTheme.shapes.small,
         modifier = modifier,
     ) {
-        Row(
-            Modifier
+        Column(
+            modifier = Modifier
                 .cardStripes(status)
                 .padding(Margin.Mini),
-            horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
-        ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(Margin.Micro),
-                modifier = Modifier.weight(1f),
-            ) {
-                Text(
-                    "${start.formatHours()} - ${end.formatHours()}",
-                    style = MaterialTheme.typography.labelSmall,
-                    textDecoration = status.textDecoration,
-                )
-                Text(
-                    title,
-                    style = MaterialTheme.typography.bodySmallEmphasized,
-                    fontWeight = FontWeight.Medium,
-                    textDecoration = status.textDecoration,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
+            content = content,
+        )
+    }
+}
 
-            if (trailingIcons.isNotEmpty()) TrailingIcons(trailingIcons)
+@Composable
+private fun AllDayContent(title: String, modifier: Modifier = Modifier) {
+    Text(
+        title,
+        style = MaterialTheme.typography.bodySmallEmphasized,
+        fontWeight = FontWeight.Medium,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun PartialDayContent(
+    start: Instant,
+    end: Instant,
+    title: String,
+    trailingIcons: Set<EventIcons>,
+    textDecoration: TextDecoration?,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier,
+        horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(Margin.Micro),
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                "${start.formatHours()} - ${end.formatHours()}",
+                style = MaterialTheme.typography.labelSmall,
+                textDecoration = textDecoration,
+            )
+            Text(
+                title,
+                style = MaterialTheme.typography.bodySmallEmphasized,
+                fontWeight = FontWeight.Medium,
+                textDecoration = textDecoration,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
 
-        EventSizeSpacer(end - start)
+        if (trailingIcons.isNotEmpty()) TrailingIcons(trailingIcons)
     }
+
+    EventSizeSpacer(end - start)
 }
 
 @Composable
@@ -208,13 +257,20 @@ enum class EventIcons(
 @Composable
 private fun Preview() {
     @Composable
-    fun EventItemForStatus(status: EventItemStatus, title: String = "Event title") {
+    fun EventItemForStatus(
+        status: EventItemStatus,
+        title: String = "Event title",
+        isAllDay: Boolean = false,
+        modifier: Modifier = Modifier,
+    ) {
         EventItem(
             start = Clock.System.now(),
             end = Clock.System.now() + 1.hours,
+            isAllDay = isAllDay,
             title = title,
             status = status,
             trailingIcons = EventIcons.entries.toSet(),
+            modifier = modifier,
         )
     }
 
@@ -223,11 +279,11 @@ private fun Preview() {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 val eventColors = LocalEventColorsUiFactory.current.create(0x0)
 
+                EventItemForStatus(EventItemStatus.Default(eventColors), isAllDay = true, modifier = Modifier.fillMaxWidth())
                 EventItemForStatus(
                     status = EventItemStatus.Default(eventColors),
                     title = "How to not get fired. An important guide on how to navigate the workspace",
                 )
-                EventItemForStatus(EventItemStatus.Declined(eventColors))
                 EventItemForStatus(EventItemStatus.Maybe(eventColors))
                 EventItemForStatus(EventItemStatus.Pending(eventColors))
             }

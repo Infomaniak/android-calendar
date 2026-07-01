@@ -84,19 +84,18 @@ private fun Event.getStartAt(timeZone: TimeZone): LocalDate {
     return timing.startIn(timeZone).date
 }
 
-private fun Event.toEventUi(emailsByUserId: Map<AccountId, String>): EventUi {
-    return EventUi(
-        id = id.url,
-        title = title,
-        location = location,
-        status = status.toEventStatus(),
-        categories = categories,
-        start = timing.startInstantLocal(),
-        end = timing.endInstantLocal(),
-        colors = colors.toEventColorsUi(),
-        attendees = toAttendees(attendees, emailsByUserId),
-    )
-}
+private fun Event.toEventUi(emailsByUserId: Map<AccountId, String>): EventUi = EventUi(
+    id = id.url,
+    title = title,
+    location = location,
+    status = status.toEventStatus(),
+    categories = categories,
+    start = timing.startInstantLocal(),
+    end = timing.endInstantLocal(),
+    isAllDay = timing.isAllDay,
+    colors = colors.toEventColorsUi(),
+    attendees = toAttendees(attendees, emailsByUserId),
+)
 
 private fun Event.toAttendees(attendees: List<Attendee>, emailsByUserId: Map<AccountId, String>): Attendees {
     var me: AttendeeUi? = null

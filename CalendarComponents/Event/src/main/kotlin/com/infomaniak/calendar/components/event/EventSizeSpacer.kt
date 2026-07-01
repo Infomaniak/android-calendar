@@ -119,6 +119,7 @@ private fun EventSizeSpacerStackedPreview() {
                         status = EventItemStatus.Default(eventColors),
                         start = now,
                         end = now + duration,
+                        isAllDay = false,
                         trailingIcons = emptySet(),
                     )
                 }

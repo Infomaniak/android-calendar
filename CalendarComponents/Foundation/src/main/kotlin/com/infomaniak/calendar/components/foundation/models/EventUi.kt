@@ -29,6 +29,7 @@ data class EventUi(
     val categories: String?,
     val start: Instant,
     val end: Instant,
+    val isAllDay: Boolean,
     val colors: EventColorsUi,
     val attendees: Attendees,
 )

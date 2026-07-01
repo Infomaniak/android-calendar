@@ -57,6 +57,7 @@ private fun eventUi(
         categories = null,
         start = Instant.parse(start),
         end = Instant.parse(end),
+        isAllDay = false,
         colors = EventColors.from(color.toArgb()).toEventColorsUi(),
         attendees = Attendees(attendees, attendees.first()),
     )
