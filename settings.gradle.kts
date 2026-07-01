@@ -45,6 +45,10 @@ dependencyResolutionManagement {
         mavenCentral()
         mavenLocal()
         maven {
+            url = uri("https://central.sonatype.com/repository/maven-snapshots/")
+            content { includeGroup("com.infomaniak.multiplatform_calendar") }
+        }
+        maven {
             url = uri("https://jitpack.io")
             content {
                 includeModule("com.github.lottiefiles", "dotlottie-android")

@@ -148,7 +148,7 @@ dependencies {
         implementation(libs.infomaniak.multiplatform.calendar)
         implementation(libs.infomaniak.multiplatform.calendar.core)
     } else {
-        implementation("com.infomaniak.multiplatform_calendar:Core:0.0.1-local")
+        implementation("com.infomaniak.multiplatform_calendar:CalendarCore:0.0.1-SNAPSHOT")
     }
 
     implementation(core.infomaniak.core.auth)
