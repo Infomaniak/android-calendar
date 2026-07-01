@@ -173,8 +173,8 @@ enum class EventIcons(
     Attendees(R.drawable.ic_users_stacked, R.string.contentDescriptionHasAttendees);
 
     @Composable
-    fun TrailingIcon() {
-        Icon(painterResource(icon), stringResource(contentDescription), modifier = Modifier.size(16.dp))
+    internal fun TrailingIcon(modifier: Modifier = Modifier) {
+        Icon(painterResource(icon), stringResource(contentDescription), modifier = modifier.size(16.dp))
     }
 }
 
