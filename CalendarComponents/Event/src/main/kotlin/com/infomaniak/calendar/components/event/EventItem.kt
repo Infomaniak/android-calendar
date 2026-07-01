@@ -18,9 +18,7 @@
 package com.infomaniak.calendar.components.event
 
 import androidx.annotation.DrawableRes
-import androidx.annotation.FloatRange
 import androidx.annotation.StringRes
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -29,16 +27,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,10 +41,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.component.cardStripes
-import com.infomaniak.calendar.components.foundation.models.EventColorsUi
-import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
-import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
 import com.infomaniak.calendar.components.foundation.utils.TimeFormatter.formatHours
 import com.infomaniak.calendar.components.resources.R
@@ -167,76 +158,10 @@ private fun TrailingIcons(trailingIcons: Set<EventIcons>) {
     }
 }
 
-private fun EventUi.toEventItemStatus(): EventItemStatus {
-    if (status == EventStatus.Cancelled) return EventItemStatus.Declined(colors)
-    val me = attendees.me ?: return EventItemStatus.Default(colors)
-
-    return when (me.status) {
-        ParticipationStatus.Accepted -> EventItemStatus.Default(colors)
-        ParticipationStatus.Declined -> EventItemStatus.Declined(colors)
-        ParticipationStatus.Tentative -> EventItemStatus.Maybe(colors)
-        ParticipationStatus.NeedsAction -> EventItemStatus.Pending(colors)
-    }
-}
-
 private fun EventUi.toEventIcons(): Set<EventIcons> = buildSet {
     if (location != null) add(EventIcons.Location)
     if (attendees.all.isNotEmpty()) add(EventIcons.Attendees)
     // TODO: Detect kMeet links
-}
-
-@Immutable
-sealed class EventItemStatus(
-    val cardColors: @Composable () -> CardColors,
-    val cardBorder: @Composable () -> BorderStroke? = { null },
-    val stripesColor: @Composable () -> Color? = { null },
-    val textDecoration: TextDecoration? = null,
-) {
-    abstract val eventColors: EventColorsUi
-
-    data class Default(override val eventColors: EventColorsUi) : EventItemStatus(
-        cardColors = { containerColors(eventColors) },
-    )
-
-    data class Maybe(override val eventColors: EventColorsUi) : EventItemStatus(
-        cardColors = { containerColors(eventColors) },
-        stripesColor = { eventColors.onDatavizContainerVariant.copy(alpha = 0.1f) },
-    )
-
-    data class Declined(override val eventColors: EventColorsUi) : EventItemStatus(
-        cardColors = { containerColors(eventColors, contentAlpha = 0.5f) },
-        textDecoration = TextDecoration.LineThrough,
-    )
-
-    data class Pending(override val eventColors: EventColorsUi) : EventItemStatus(
-        cardColors = { containerVariantColors(eventColors) },
-        cardBorder = { BorderStroke(2.dp, eventColors.onDatavizContainer) },
-    )
-
-    companion object {
-        @Composable
-        private fun containerVariantColors(eventColors: EventColorsUi): CardColors = CardDefaults.cardColors(
-            containerColor = eventColors.datavizContainer,
-            contentColor = eventColors.onDatavizContainer,
-        )
-
-        @Composable
-        private fun containerColors(
-            eventColors: EventColorsUi,
-            @FloatRange(0.0, 1.0) contentAlpha: Float = 1f,
-        ): CardColors = CardDefaults.cardColors(
-            containerColor = eventColors.datavizContainerVariant,
-            contentColor = eventColors.onDatavizContainerVariant.copyIfNeeded(contentAlpha),
-        )
-
-        /**
-         * Skips instantiations cause by copy if we're modifying alpha to be the same value as it already was. Useful for all
-         * common cases where we set alpha to 1.
-         */
-        private fun Color.copyIfNeeded(@FloatRange(0.0, 1.0) alpha: Float): Color {
-            return if (alpha == this.alpha) this else copy(alpha)
-        }
-    }
 }
 
 enum class EventIcons(
@@ -285,6 +210,7 @@ private fun Preview() {
                     title = "How to not get fired. An important guide on how to navigate the workspace",
                 )
                 EventItemForStatus(EventItemStatus.Maybe(eventColors))
+                EventItemForStatus(EventItemStatus.Declined(eventColors))
                 EventItemForStatus(EventItemStatus.Pending(eventColors))
             }
         }
