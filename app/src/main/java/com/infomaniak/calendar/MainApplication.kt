@@ -19,14 +19,22 @@ package com.infomaniak.calendar
 
 import android.app.Application
 import android.os.StrictMode
+import com.infomaniak.calendar.crossAppLogin.DeviceInfoUpdateWorker
 import com.infomaniak.calendar.di.AppGraph
 import com.infomaniak.calendar.utils.ConfigUtils
+import com.infomaniak.core.common.AssociatedUserDataCleanable
+import com.infomaniak.core.crossapplogin.back.internal.deviceinfo.DeviceInfoUpdateManager
 import com.infomaniak.core.network.NetworkConfiguration
 import com.infomaniak.core.sentry.SentryConfig.configureSentry
 import dev.zacsweers.metro.createGraphFactory
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainApplication : Application() {
     val appGraph by lazy { createGraphFactory<AppGraph.Factory>().create(applicationContext) }
+    private val applicationScope = CoroutineScope(Dispatchers.Default + CoroutineName(this::class.java.simpleName))
 
     override fun onCreate() {
         super.onCreate()
@@ -42,6 +50,15 @@ class MainApplication : Application() {
         configureSentry()
 
         MatomoCalendar.addTrackingCallbackForDebugLog()
+        initCrossAppLogin()
+
+        loadCalDavCredential()
+    }
+
+    private fun loadCalDavCredential() {
+        applicationScope.launch {
+            appGraph.davCredentialsManager.initStoredCredentials()
+        }
     }
 
     /**
@@ -72,5 +89,16 @@ class MainApplication : Application() {
                     .build(),
             )
         }
+    }
+
+    private fun initCrossAppLogin() {
+        applicationScope.launch {
+            DeviceInfoUpdateManager.scheduleWorkerOnDeviceInfoUpdate<DeviceInfoUpdateWorker>()
+        }
+    }
+
+    companion object {
+        @JvmStatic
+        val userDataCleanableList: List<AssociatedUserDataCleanable> = listOf(DeviceInfoUpdateManager)
     }
 }

@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.auth.models.user.User
 import kotlinx.coroutines.flow.map
 

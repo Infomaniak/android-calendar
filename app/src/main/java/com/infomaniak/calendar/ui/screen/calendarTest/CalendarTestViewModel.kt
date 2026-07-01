@@ -20,26 +20,20 @@ package com.infomaniak.calendar.ui.screen.calendarTest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
-import com.infomaniak.calendar.ui.screen.calendarTest.model.CalendarUi
-import com.infomaniak.calendar.ui.screen.calendarTest.utils.toUi
-import com.infomaniak.calendar.utils.AccountUtils
+import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.calendar.utils.account.accountId
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
@@ -65,13 +59,12 @@ class CalendarTestViewModel(
 
     init {
         initAndSync()
-        observeCalendars()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun initAndSync() = viewModelScope.launch {
         userFlow.mapLatest { user ->
-            AccountId(user.id.toLong()) to
+            user.accountId to
                     accountManager.retrieveDavCredential(user.apiToken.accessToken, user.login)
         }.collect { (accountId, credentials) ->
             runCatching {
@@ -83,19 +76,6 @@ class CalendarTestViewModel(
                 }
         }
     }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun observeCalendars() = viewModelScope.launch {
-        calendarManager.observeCalendars()
-            .flatMapLatest { calendars -> calendars.map(::observeCalendarUi).combineToList() }
-            .collect { uiState.value = CalendarTestUiState.Loaded(it) }
-    }
-
-    private fun observeCalendarUi(calendar: Calendar): Flow<CalendarUi> =
-        calendarManager.observeEvents(calendar.id).map { calendar.toUi(it) }
-
-    private inline fun <reified T> List<Flow<T>>.combineToList(): Flow<List<T>> =
-        if (isEmpty()) flowOf(emptyList()) else combine(this) { it.toList() }
 
     private fun onClickDisconnect() {
         viewModelScope.launch {

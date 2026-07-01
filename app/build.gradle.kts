@@ -21,6 +21,7 @@ plugins {
     alias(core.plugins.android.application)
     alias(core.plugins.compose.compiler)
     alias(core.plugins.kotlin.android)
+    alias(core.plugins.kotlin.parcelize)
     alias(core.plugins.kotlin.serialization)
     alias(core.plugins.sentry.plugin)
     alias(kmpCalendar.plugins.metro)
@@ -68,9 +69,14 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
+    }
+
+    composeCompiler {
+        stabilityConfigurationFiles = listOf(rootProject.layout.projectDirectory.file("stability_config.conf"))
     }
 
     compileOptions {
@@ -136,6 +142,8 @@ sentry {
 }
 
 dependencies {
+    implementation(project(":CalendarComponents:Planning"))
+
     if (useCalendarCoreCompositeBuild) {
         implementation(libs.infomaniak.multiplatform.calendar)
         implementation(libs.infomaniak.multiplatform.calendar.core)
@@ -144,14 +152,19 @@ dependencies {
     }
 
     implementation(core.infomaniak.core.auth)
+    implementation(core.infomaniak.core.avatar)
     implementation(core.infomaniak.core.common)
     implementation(core.infomaniak.core.crossapplogin.front)
     implementation(core.infomaniak.core.matomo)
     implementation(core.infomaniak.core.network)
     implementation(core.infomaniak.core.onboarding)
+    implementation(core.infomaniak.core.datavalue)
     implementation(core.infomaniak.core.sentry)
     implementation(core.infomaniak.core.ui.compose.margin)
+    implementation(core.infomaniak.core.ui.compose.preview)
+    implementation(core.infomaniak.core.ui.compose.theme)
 
+    implementation(core.kotlinx.serialization.json)
     implementation(kmpCalendar.androidx.room.runtime)
 
     implementation(platform(core.compose.bom))
@@ -159,12 +172,13 @@ dependencies {
     implementation(core.androidx.core.ktx)
     implementation(core.androidx.lifecycle.runtime.ktx)
     implementation(core.appcompat)
-    implementation(libs.compose.material3)
     implementation(core.compose.ui)
     implementation(core.compose.ui.graphics)
     implementation(core.compose.ui.tooling.preview)
     implementation(core.androidx.adaptive)
     implementation(core.material)
+    implementation(core.okhttp)
+    implementation(libs.compose.material3)
 
     testImplementation(core.junit)
     androidTestImplementation(platform(core.compose.bom))

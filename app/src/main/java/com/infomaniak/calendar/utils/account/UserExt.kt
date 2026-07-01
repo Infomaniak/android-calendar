@@ -15,15 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.utils
+package com.infomaniak.calendar.utils.account
 
-import android.content.Context
-import com.infomaniak.core.auth.PersistedCurrentUserAccountUtils
 import com.infomaniak.core.auth.models.user.User
-import dev.zacsweers.metro.AppScope
-import dev.zacsweers.metro.Inject
-import dev.zacsweers.metro.SingleIn
+import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 
-@Inject
-@SingleIn(AppScope::class)
-class AccountUtils(appContext: Context) : PersistedCurrentUserAccountUtils(appContext)
+val User.accountId: AccountId get() = AccountId(id.toLong())

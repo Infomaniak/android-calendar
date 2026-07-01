@@ -19,6 +19,7 @@ package com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation
 
 enum class MetadataSceneStrategy(val metadata: Map<String, Any>) {
     FloatingToolbarWithFab(metadata = mapOf(SHOULD_SHOW_FLOATING_TOOLBAR_WITH_FAB to true)),
+    Drawer(metadata = mapOf(SHOULD_SHOW_DRAWER to true)),
 }
 
 fun metaDataOf(vararg strategies: MetadataSceneStrategy): Map<String, Any> {
@@ -26,3 +27,4 @@ fun metaDataOf(vararg strategies: MetadataSceneStrategy): Map<String, Any> {
 }
 
 const val SHOULD_SHOW_FLOATING_TOOLBAR_WITH_FAB = "ShouldShowNavigationWithFabKey"
+const val SHOULD_SHOW_DRAWER = "ShouldShowDrawer"

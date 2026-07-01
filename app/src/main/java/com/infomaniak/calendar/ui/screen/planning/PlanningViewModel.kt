@@ -1,0 +1,76 @@
+/*
+ * Infomaniak Calendar - Android
+ * Copyright (C) 2026 Infomaniak Network SA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.infomaniak.calendar.ui.screen.planning
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.infomaniak.calendar.di.ViewModelKey
+import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.calendar.utils.account.accountId
+import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+
+@Inject
+@ContributesIntoMap(AppScope::class)
+@ViewModelKey(PlanningViewModel::class)
+class PlanningViewModel(private val accountUtils: AccountUtils, private val calendarManager: CalendarManager) : ViewModel() {
+
+    private val timeZone = TimeZone.currentSystemDefault()
+    private val today = Clock.System.now().toLocalDateTime(timeZone).date
+
+    private val startDate = today.minus(PLANNING_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
+    private val endDate = today.plus(PLANNING_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
+
+    val weekEvents: StateFlow<EventsByWeekAndDay> = calendarManager
+        .observeEvents(startDate, endDate)
+        .map { it.groupByWeekAndDay() }
+        .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = sortedMapOf())
+
+    init {
+        syncCalendars()
+    }
+
+    // TODO: This function is not meant to stay, it will be removed when syncCalendars is moved to a Worker.
+    private fun syncCalendars() {
+        viewModelScope.launch {
+            val users = accountUtils.users.first()
+            users.forEach { user ->
+                calendarManager.syncCalendars(user.accountId)
+            }
+        }
+    }
+
+    companion object {
+        private const val PLANNING_RANGE_DAYS = 250
+    }
+}

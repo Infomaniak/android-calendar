@@ -19,9 +19,10 @@ package com.infomaniak.calendar.ui.navigation
 
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
@@ -30,23 +31,27 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.ui.NavDisplay
 import com.infomaniak.calendar.ui.component.CalendarFab
+import com.infomaniak.calendar.ui.component.drawer.CalendarDrawer
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.component.CalendarHorizontalFloatingToolbar
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.DrawerDecoratorStrategy
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.Drawer
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
+import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.state.SharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.ToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableState
-import com.infomaniak.calendar.ui.screen.agenda.PlanningScreen
 import com.infomaniak.calendar.ui.screen.calendarTest.calendarTest
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventCreation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
+import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
 import com.infomaniak.calendar.ui.screen.threeDays.ThreeDayScreen
 import com.infomaniak.calendar.ui.screen.week.WeekScreen
 
@@ -54,12 +59,14 @@ import com.infomaniak.calendar.ui.screen.week.WeekScreen
 fun MainNavHost(backStack: NavBackStack<NavKey>) {
     val snackbarHostState: SharedSnackbarHostState = rememberCustomSnackbarHostState()
     val toolbarScrollableState: ToolbarScrollableState = rememberToolbarScrollableState()
+    val calendarDrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     SharedTransitionLayout {
         CompositionLocalProvider(
             LocalSharedTransitionScope provides this@SharedTransitionLayout,
             LocalSharedSnackbarHostState provides snackbarHostState,
             LocalToolbarScrollableState provides toolbarScrollableState,
+            LocalDrawerState provides calendarDrawerState,
         ) {
             NavDisplay(
                 backStack = backStack,
@@ -72,19 +79,19 @@ fun MainNavHost(backStack: NavBackStack<NavKey>) {
 }
 
 private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> = entryProvider {
-    entry<NavDestination.CalendarView.Planning>(metadata = metaDataOf(FloatingToolbarWithFab)) {
+    entry<NavDestination.CalendarView.Planning>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         PlanningScreen()
     }
-    entry<NavDestination.CalendarView.Day>(metadata = metaDataOf(FloatingToolbarWithFab)) {
-        DayScreen()
+    entry<NavDestination.CalendarView.Day>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
+        DayScreen(goToTestScreen = { backStack.add(NavDestination.CalendarTest) })
     }
-    entry<NavDestination.CalendarView.ThreeDays>(metadata = metaDataOf(FloatingToolbarWithFab)) {
+    entry<NavDestination.CalendarView.ThreeDays>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         ThreeDayScreen()
     }
-    entry<NavDestination.CalendarView.Week>(metadata = metaDataOf(FloatingToolbarWithFab)) {
+    entry<NavDestination.CalendarView.Week>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         WeekScreen()
     }
-    entry<NavDestination.CalendarView.Month>(metadata = metaDataOf(FloatingToolbarWithFab)) {
+    entry<NavDestination.CalendarView.Month>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         MonthScreen()
     }
     entry<NavDestination.EventCreation> {
@@ -103,9 +110,8 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
     calendarTest()
 }
 
-@Composable
 private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<SceneDecoratorStrategy<NavKey>> {
-    val navigationStrategy: NavigationDecoratorStrategy<NavKey> = remember {
+    val navigationStrategy: NavigationDecoratorStrategy<NavKey> =
         NavigationDecoratorStrategy(
             floatingToolbar = {
                 CalendarHorizontalFloatingToolbar(
@@ -121,9 +127,19 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
                 )
             },
         )
-    }
 
-    return listOf(navigationStrategy)
+    val drawerStrategy = DrawerDecoratorStrategy<NavKey>(
+        drawer = { content ->
+            CalendarDrawer(
+                content = content,
+                onAddAccount = {
+                    backStack.addOrMoveToTop(NavDestination.Onboarding(onlyLogin = true))
+                },
+            )
+        },
+    )
+
+    return listOf(navigationStrategy, drawerStrategy)
 }
 
 private fun NavBackStack<NavKey>.getLastCalendarView(): NavDestination.CalendarView? {

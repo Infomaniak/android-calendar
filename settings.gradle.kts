@@ -62,6 +62,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "Calendar"
 include(":app")
+include(":CalendarComponents:Event")
+include(":CalendarComponents:Foundation")
+include(":CalendarComponents:Planning")
+include(":CalendarComponents:Resources")
 
 // Read local.properties first (git-ignored), then fall back to gradle.properties.
 // Set useCalendarCoreCompositeBuild=true in local.properties to use the local submodule source
@@ -77,8 +81,8 @@ val useCalendarCoreCompositeBuild = (localProperties.getProperty("useCalendarCor
 if (useCalendarCoreCompositeBuild) {
     includeBuild("multiplatform-calendar") {
         dependencySubstitution {
-            substitute(module("com.infomaniak.multiplaform-calendar:Core")).using(project(":Core"))
-            substitute(module("com.infomaniak.multiplaform-calendar:multiplatform-calendar")).using(project(":kmpdav"))
+            substitute(module("com.infomaniak.multiplaform-calendar:Core")).using(project(":CalendarCore"))
+            substitute(module("com.infomaniak.multiplaform-calendar:multiplatform-calendar")).using(project(":CalendarKmpDav"))
         }
     }
 }

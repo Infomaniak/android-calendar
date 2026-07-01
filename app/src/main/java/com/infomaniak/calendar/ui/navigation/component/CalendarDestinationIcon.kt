@@ -24,10 +24,13 @@ import androidx.compose.material.icons.outlined.ViewDay
 import androidx.compose.material.icons.outlined.ViewWeek
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.navigation.NavDestination
 
@@ -58,5 +61,18 @@ private fun getSelectedIcon(lastMainNavigationSelected: NavDestination.CalendarV
         is NavDestination.CalendarView.Week -> SelectedIconData(Icons.Outlined.ViewWeek, R.string.weekTitle)
         is NavDestination.CalendarView.Month -> SelectedIconData(Icons.Outlined.CalendarMonth, R.string.monthTitle)
         is NavDestination.CalendarView.Planning -> SelectedIconData(Icons.Outlined.ViewAgenda, R.string.planningTitle)
+    }
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    MaterialTheme {
+        Surface {
+            CurrentDestinationIcon(
+                currentDestination = NavDestination.CalendarView.Day,
+                onMenuExpanded = {},
+            )
+        }
     }
 }
