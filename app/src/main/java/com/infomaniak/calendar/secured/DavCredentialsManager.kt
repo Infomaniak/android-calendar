@@ -43,9 +43,9 @@ class DavCredentialsManager @Inject constructor(
     }
 
     suspend fun addCredential(user: User, davCredentials: DavCredentials) {
-        val userId = user.accountId
-        dataValues.davCredentials.update { current -> current + (userId.value to davCredentials) }
-        initAccountCredential(userId, davCredentials)
+        val accountId = user.accountId
+        dataValues.davCredentials.update { current -> current + (accountId.value to davCredentials) }
+        initAccountCredential(accountId, davCredentials)
     }
 
     suspend fun initAccountCredential(accountId: AccountId, davCredentials: DavCredentials) {
