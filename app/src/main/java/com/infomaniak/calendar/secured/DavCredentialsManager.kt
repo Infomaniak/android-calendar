@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.secured
 
 import com.infomaniak.calendar.data.CalendarDataValues
+import com.infomaniak.calendar.utils.account.UserExt.accountId
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCredentials
@@ -42,9 +43,9 @@ class DavCredentialsManager @Inject constructor(
     }
 
     suspend fun addCredential(user: User, davCredentials: DavCredentials) {
-        val userId = user.id.toLong()
-        dataValues.davCredentials.update { current -> current + (userId to davCredentials) }
-        initAccountCredential(AccountId(userId), davCredentials)
+        val userId = user.accountId
+        dataValues.davCredentials.update { current -> current + (userId.value to davCredentials) }
+        initAccountCredential(userId, davCredentials)
     }
 
     suspend fun initAccountCredential(accountId: AccountId, davCredentials: DavCredentials) {

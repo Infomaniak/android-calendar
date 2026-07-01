@@ -21,7 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.utils.account.AccountUtils
-import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
+import com.infomaniak.calendar.utils.account.UserExt.accountId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
@@ -65,7 +65,7 @@ class PlanningViewModel(private val accountUtils: AccountUtils, private val cale
         viewModelScope.launch {
             val users = accountUtils.users.first()
             users.forEach { user ->
-                calendarManager.syncCalendars(AccountId(user.id.toLong()))
+                calendarManager.syncCalendars(user.accountId)
             }
         }
     }
