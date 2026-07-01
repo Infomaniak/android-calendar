@@ -21,7 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.utils.account.AccountUtils
-import com.infomaniak.calendar.utils.account.UserExt.accountId
+import com.infomaniak.calendar.utils.account.accountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarEditData
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager

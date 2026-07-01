@@ -21,7 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.utils.account.AccountUtils
-import com.infomaniak.calendar.utils.account.UserExt.accountId
+import com.infomaniak.calendar.utils.account.accountId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
