@@ -35,7 +35,7 @@ class AccountUtils(
     private val davCredentialsManager: DavCredentialsManager,
 ) : PersistedCurrentUserAccountUtils(appContext, MainApplication.userDataCleanableList) {
     val emailsByUserId = users.map { user ->
-        user.associateBy({ AccountId(it.id.toLong()) }, { it.email })
+        user.associateBy({ it.accountId }, { it.email })
     }
 
     suspend fun addUser(calendarUser: CalendarUser) {
