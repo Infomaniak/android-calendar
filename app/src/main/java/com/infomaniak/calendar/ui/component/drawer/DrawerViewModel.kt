@@ -21,7 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.utils.account.AccountUtils
-import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
+import com.infomaniak.calendar.utils.account.accountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarEditData
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
@@ -43,7 +43,7 @@ class DrawerViewModel(accountUtils: AccountUtils, private val calendarManager: C
         calendarManager.observeCalendars(),
     ) { users, calendars ->
         return@combine users.map { user ->
-            val userCalendars = calendars.filter { it.accountId == AccountId(user.id.toLong()) }
+            val userCalendars = calendars.filter { it.accountId == user.accountId }
             UserCalendarsUi(user, userCalendars)
         }
     }.stateIn(
