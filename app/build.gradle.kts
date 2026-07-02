@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import org.codehaus.groovy.runtime.ArrayTypeUtils.dimension
+import java.lang.module.ModuleFinder.compose
 import java.util.Properties
 
 plugins {
@@ -96,6 +98,8 @@ val envProperties = rootProject.file("env.properties")
     .takeIf { it.exists() }
     ?.let { file -> Properties().also { props -> file.reader().use(props::load) } }
 
+val useCalendarCoreCompositeBuild = gradle.extra["useCalendarCoreCompositeBuild"] as Boolean
+
 val sentryAuthToken = envProperties?.getProperty("sentryAuthToken")
     .takeUnless { it.isNullOrBlank() }
     ?: if (isRelease) error("The `sentryAuthToken` property in `env.properties` must be specified (see `env.example.properties`).") else ""
@@ -136,8 +140,11 @@ sentry {
 dependencies {
     implementation(project(":CalendarComponents:Planning"))
 
-    implementation(libs.infomaniak.multiplatform.calendar)
-    implementation(libs.infomaniak.multiplatform.calendar.core)
+    if (useCalendarCoreCompositeBuild) {
+        implementation(libs.infomaniak.multiplatform.calendar.core.submodule)
+    } else {
+        implementation(libs.infomaniak.multiplatform.calendar.core)
+    }
 
     implementation(core.infomaniak.core.auth)
     implementation(core.infomaniak.core.avatar)
