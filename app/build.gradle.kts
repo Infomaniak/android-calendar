@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import org.codehaus.groovy.runtime.ArrayTypeUtils.dimension
+import java.lang.module.ModuleFinder.compose
 import java.util.Properties
 
 plugins {
@@ -96,13 +98,7 @@ val envProperties = rootProject.file("env.properties")
     .takeIf { it.exists() }
     ?.let { file -> Properties().also { props -> file.reader().use(props::load) } }
 
-val localProperties = rootProject.file("local.properties")
-    .takeIf { it.exists() }
-    ?.let { file -> Properties().also { props -> file.reader().use(props::load) } }
-
-val useCalendarCoreCompositeBuild = (localProperties?.getProperty("useCalendarCoreCompositeBuild")
-    ?: providers.gradleProperty("useCalendarCoreCompositeBuild").orNull)
-    ?.toBoolean() ?: false
+val useCalendarCoreCompositeBuild = gradle.extra["useCalendarCoreCompositeBuild"] as Boolean
 
 val sentryAuthToken = envProperties?.getProperty("sentryAuthToken")
     .takeUnless { it.isNullOrBlank() }
@@ -145,10 +141,9 @@ dependencies {
     implementation(project(":CalendarComponents:Planning"))
 
     if (useCalendarCoreCompositeBuild) {
-        implementation(libs.infomaniak.multiplatform.calendar)
-        implementation(libs.infomaniak.multiplatform.calendar.core)
+        implementation(libs.infomaniak.multiplatform.calendar.core.submodule)
     } else {
-        implementation("com.infomaniak.multiplatform_calendar:CalendarCore:0.0.1-SNAPSHOT")
+        implementation(libs.infomaniak.multiplatform.calendar.core)
     }
 
     implementation(core.infomaniak.core.auth)

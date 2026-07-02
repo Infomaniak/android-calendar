@@ -24,7 +24,6 @@ pluginManagement {
                 includeGroupByRegex("androidx.*")
             }
         }
-        mavenLocal()
         mavenCentral()
         gradlePluginPortal()
     }
@@ -43,7 +42,10 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        mavenLocal()
+        // Do not put this in production
+        // mavenLocal {
+        //     content { includeGroup("com.infomaniak.multiplatform_calendar") }
+        // }
         maven {
             url = uri("https://central.sonatype.com/repository/maven-snapshots/")
             content { includeGroup("com.infomaniak.multiplatform_calendar") }
@@ -76,17 +78,17 @@ include(":CalendarComponents:Resources")
 // instead of the published AAR artifacts from Maven Local / Maven Central.
 val localProperties = java.util.Properties().also { props ->
     val localPropertiesFile = file("local.properties")
-    if (localPropertiesFile.exists()) localPropertiesFile.inputStream().use { props.load(it) }
+    if (localPropertiesFile.exists()) localPropertiesFile.reader().use { props.load(it) }
 }
 val useCalendarCoreCompositeBuild = (localProperties.getProperty("useCalendarCoreCompositeBuild")
     ?: providers.gradleProperty("useCalendarCoreCompositeBuild").orNull)
     ?.toBoolean() ?: false
+gradle.extra["useCalendarCoreCompositeBuild"] = useCalendarCoreCompositeBuild
 
 if (useCalendarCoreCompositeBuild) {
     includeBuild("multiplatform-calendar") {
         dependencySubstitution {
-            substitute(module("com.infomaniak.multiplaform-calendar:Core")).using(project(":CalendarCore"))
-            substitute(module("com.infomaniak.multiplaform-calendar:multiplatform-calendar")).using(project(":CalendarKmpDav"))
+            substitute(module("com.infomaniak.multiplaform-calendar:CalendarCore")).using(project(":CalendarCore"))
         }
     }
 }

@@ -37,9 +37,9 @@ Then open the project in Android Studio and let Gradle sync.
 
 The app depends on the `multiplatform-calendar` KMP library. Two modes are available:
 
-### Default — Published AARs (Maven Local / Maven Central)
+### Default — Published AARs (Maven repositories)
 
-No configuration needed. Gradle resolves the library from Maven Local or Maven Central automatically.
+No configuration needed. Gradle resolves `com.infomaniak.multiplatform_calendar:CalendarCore` from the configured Maven repositories (mavenLocal/mavenCentral + the Sonatype snapshots repo for SNAPSHOT versions).
 
 ### Local source — Composite build (for KMP development)
 
@@ -54,8 +54,7 @@ useCalendarCoreCompositeBuild=true
 
 With this flag set, Gradle will:
 1. Include `multiplatform-calendar/` as a composite build.
-2. Substitute `com.infomaniak.multiplaform-calendar:Core` → local `:Core` project.
-3. Substitute `com.infomaniak.multiplaform-calendar:multiplatform-calendar` → local `:kmpdav` project.
+2. Substitute `com.infomaniak.multiplaform-calendar:CalendarCore` → local `:CalendarCore` project.
 
 Remove the line (or set it to `false`) to switch back to the published AARs.
 
