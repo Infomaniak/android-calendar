@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -64,11 +65,11 @@ fun Planning(
         state = lazyListState,
         modifier = modifier,
         contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(Margin.Large),
+        verticalArrangement = Arrangement.spacedBy(Margin.Mini),
     ) {
         weekEvents().forEach { (week, days) ->
             item(key = week) {
-                Text(week.label)
+                Text(week.label, modifier = Modifier.padding(vertical = Margin.Medium))
             }
 
             days.forEach { (date, events) ->
