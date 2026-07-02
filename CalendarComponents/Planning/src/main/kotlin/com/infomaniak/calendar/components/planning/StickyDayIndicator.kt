@@ -58,5 +58,5 @@ internal fun Modifier.stickyDayIndicator(
     } else {
         Float.POSITIVE_INFINITY
     }
-    translationY = (-itemDistanceFromContentOrigin).toFloat().coerceIn(0f, maxOffset)
+    translationY = (-itemDistanceFromContentOrigin).toFloat().coerceIn(minOf(0f, maxOffset), maxOffset)
 }
