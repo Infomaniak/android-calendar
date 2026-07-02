@@ -58,8 +58,8 @@ private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalD
     val pastDay = targetDay.minus(5, DateTimeUnit.DAY)
     val futureDay = targetDay.plus(5, DateTimeUnit.DAY)
 
-    fun instantAt(date: LocalDate, hour: Int): Instant {
-        return LocalDateTime(date.year, date.month.ordinal + 1, date.day, hour, 0).toInstant(timeZone)
+    fun instantAt(date: LocalDate, hour: Int, minute: Int = 0): Instant {
+        return LocalDateTime(date.year, date.month.ordinal + 1, date.day, hour, minute).toInstant(timeZone)
     }
 
     fun event(date: LocalDate, hour: Int, title: String, location: String? = null, color: Color = Color(0xFF4285F4)): EventUi {

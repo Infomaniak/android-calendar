@@ -18,16 +18,17 @@
 package com.infomaniak.calendar.components.planning
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -57,6 +58,7 @@ fun Planning(
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+    val sectionSizing = remember { SectionSizing() }
 
     LazyColumn(
         state = lazyListState,
@@ -70,16 +72,23 @@ fun Planning(
             }
 
             days.forEach { (date, events) ->
-                val dayKey = date
-                item(key = dayKey) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(Margin.Small)) {
+                val sectionItemKeys = events.map { it.itemKey }
+
+                items(events, key = { it.itemKey }) { event ->
+                    Row(
+                        modifier = Modifier.sectionMinHeight(sectionSizing, sectionItemKeys, event.itemKey),
+                        horizontalArrangement = Arrangement.spacedBy(Margin.Small),
+                    ) {
                         DayIndicator(
                             dayName = date.toJavaLocalDate().format(shortDayNameFormatter),
                             dayNumber = date.day,
                             state = if (date == today) DateState.Today else DateState.None,
-                            modifier = Modifier.stickyWithinItem(lazyListState, dayKey),
+                            modifier = Modifier
+                                .measureIndicator(sectionSizing)
+                                .stickyDayIndicator(lazyListState, event.itemKey, sectionItemKeys),
                         )
-                        EventList(events, Modifier.weight(1f))
+
+                        EventItem(event, modifier = Modifier.fillMaxWidth())
                     }
                 }
             }
@@ -87,14 +96,6 @@ fun Planning(
     }
 }
 
-@Composable
-private fun EventList(events: List<EventUi>, modifier: Modifier = Modifier) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Margin.Mini)) {
-        events.forEach { event ->
-            EventItem(event, modifier = Modifier.fillMaxWidth())
-        }
-    }
-}
 
 private val YearWeek.label: String
     @Composable get() {
@@ -103,6 +104,7 @@ private val YearWeek.label: String
         return "$week - $dateRange"
     }
 
+private val EventUi.itemKey get() = id
 
 @Preview
 @Composable
