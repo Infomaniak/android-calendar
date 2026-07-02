@@ -16,6 +16,7 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <string name="allDayLabel">All Day</string>
     <string name="contentDescriptionHasAttendees">Has attendees</string>
     <string name="contentDescriptionHasKMeetLink">Has a kMeet link</string>
     <string name="contentDescriptionHasLocation">Has a location</string>

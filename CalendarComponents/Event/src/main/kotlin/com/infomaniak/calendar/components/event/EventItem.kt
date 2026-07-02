@@ -32,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -101,14 +102,22 @@ private fun EventItemCard(status: EventItemStatus, modifier: Modifier = Modifier
 
 @Composable
 private fun AllDayContent(title: String, modifier: Modifier = Modifier) {
-    Text(
-        title,
-        style = MaterialTheme.typography.bodySmallEmphasized,
-        fontWeight = FontWeight.Medium,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        modifier = modifier,
-    )
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(Margin.Micro),
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            title,
+            style = MaterialTheme.typography.bodySmallEmphasized,
+            fontWeight = FontWeight.Medium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = modifier.weight(1f),
+        )
+
+        Text(stringResource(R.string.allDayLabel), style = MaterialTheme.typography.bodySmall)
+    }
 }
 
 @Composable
