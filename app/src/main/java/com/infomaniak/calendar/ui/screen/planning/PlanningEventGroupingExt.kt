@@ -28,7 +28,6 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import java.util.SortedMap
 import kotlin.time.ExperimentalTime
 
@@ -74,7 +73,7 @@ fun List<Event>.groupByWeekAndDay(
 
 // TODO: Handle AllDay
 private fun Event.getStartAt(timeZone: TimeZone): LocalDate {
-    return timing.start.toLocalDateTime(timeZone).date
+    return timing.startIn(timeZone).date
 }
 
 private fun Event.toEventUi(): EventUi {
@@ -83,8 +82,8 @@ private fun Event.toEventUi(): EventUi {
         title = title,
         location = location,
         categories = categories,
-        start = timing.start,
-        end = timing.end,
+        start = timing.startInstantLocal(),
+        end = timing.endInstantLocal(),
         colors = colors.toEventColorsUi(),
     )
 }

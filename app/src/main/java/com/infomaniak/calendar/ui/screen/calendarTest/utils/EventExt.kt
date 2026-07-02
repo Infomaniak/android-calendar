@@ -41,6 +41,8 @@ private val dateTimeFormatter = LocalDateTime.Format {
 private fun Instant.formatUtc(): String =
     toLocalDateTime(TimeZone.UTC).format(dateTimeFormatter)
 
+private fun LocalDateTime.formatWallClock(): String = format(dateTimeFormatter)
+
 @OptIn(ExperimentalTime::class)
 fun Event.toUi(): EventUi = EventUi(
     id = id.url,
@@ -55,7 +57,6 @@ fun Event.toUi(): EventUi = EventUi(
     canEdit = canEdit,
 )
 
-@OptIn(ExperimentalTime::class)
 private fun EventTiming.toTimeRange(): String {
-    return if (isAllDay) "All day" else "${start.formatUtc()} → ${end.formatUtc()}"
+    return if (isAllDay) "All day" else "${start.formatWallClock()} → ${end.formatWallClock()}"
 }
