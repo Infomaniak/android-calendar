@@ -138,12 +138,12 @@ private fun PartialDayContent(
             modifier = Modifier.weight(1f),
         ) {
             Text(
-                "${start.formatHours()} - ${end.formatHours()}",
+                text = formatDisplayedHour(start, end),
                 style = MaterialTheme.typography.labelSmall,
                 textDecoration = textDecoration,
             )
             Text(
-                title,
+                text = title,
                 style = MaterialTheme.typography.bodySmallEmphasized,
                 fontWeight = FontWeight.Medium,
                 textDecoration = textDecoration,
@@ -157,6 +157,9 @@ private fun PartialDayContent(
 
     EventSizeSpacer(end - start)
 }
+
+@Composable
+private fun formatDisplayedHour(start: Instant, end: Instant): String = "${start.formatHours()} - ${end.formatHours()}"
 
 @Composable
 private fun TrailingIcons(trailingIcons: Set<EventIcons>) {
