@@ -73,7 +73,7 @@ private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalD
     }
 
     fun event(date: LocalDate, hour: Int, title: String, location: String? = null, color: Color = Color(0xFF4285F4)): EventUi {
-        return EventUi(
+        return EventUi.Normal(
             id = "$date-$hour",
             title = title,
             location = location,
