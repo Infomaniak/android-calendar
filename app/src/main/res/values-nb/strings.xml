@@ -16,7 +16,6 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <string name="contentDescriptionCreateEvent">Opprett en hendelse</string>
     <string name="contentDescriptionMenuDrawer">Åpne meny</string>
     <string name="contentDescriptionToday">I dag</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Gjeldende visning: %1$s. Trykk for å endre visning.</string>

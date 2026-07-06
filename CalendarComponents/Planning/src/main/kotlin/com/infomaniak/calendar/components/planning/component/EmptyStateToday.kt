@@ -28,11 +28,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.infomaniak.calendar.components.foundation.utils.EsdsTheme
 import com.infomaniak.calendar.components.resources.R
@@ -48,7 +50,7 @@ internal fun TodayEmptyState(onClick: () -> Unit, modifier: Modifier = Modifier)
             .fillMaxWidth()
             .padding(horizontal = Margin.Medium),
     ) {
-        Text("Rien de prévu.")
+        Text(stringResource(R.string.planningNothingPlannedToday))
         Button(
             onClick = onClick,
             contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
@@ -64,7 +66,7 @@ internal fun TodayEmptyState(onClick: () -> Unit, modifier: Modifier = Modifier)
                 modifier = Modifier.size(ButtonDefaults.IconSize),
             )
             Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
-            Text("Ajouter")
+            Text(stringResource(R.string.addEventLabel))
         }
     }
 }
@@ -72,5 +74,7 @@ internal fun TodayEmptyState(onClick: () -> Unit, modifier: Modifier = Modifier)
 @PreviewLightDark
 @Composable
 private fun TodayEmptyStatePreview() {
-    TodayEmptyState(onClick = { })
+    Surface {
+        TodayEmptyState(onClick = { })
+    }
 }

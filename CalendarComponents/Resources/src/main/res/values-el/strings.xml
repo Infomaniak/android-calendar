@@ -16,6 +16,9 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <string name="addEventLabel">Προσθήκη</string>
+    <string name="contentDescriptionCreateEvent">Δημιουργία εκδήλωσης</string>
+    <string name="planningNothingPlannedToday">Τίποτα προγραμματισμένο.</string>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">Εβδ.%d</string>
 </resources>

@@ -16,6 +16,9 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <string name="addEventLabel">Dodaj</string>
+    <string name="contentDescriptionCreateEvent">Utwórz wydarzenie</string>
+    <string name="planningNothingPlannedToday">Nic zaplanowanego.</string>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">Tydz.%d</string>
 </resources>
