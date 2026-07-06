@@ -19,6 +19,7 @@ package com.infomaniak.calendar.components.foundation.preview
 
 import androidx.annotation.ColorInt
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.foundation.models.EventColorUi
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.preview.EventColorsUiFactory.Companion.dummyEventColorsUiFactory
@@ -30,8 +31,10 @@ fun interface EventColorsUiFactory {
 
     companion object {
         val dummyEventColorsUiFactory by lazy {
-            EventColorsUiFactory {
+            EventColorsUiFactory { color ->
                 EventColorsUi(
+                    color = Color(color),
+                    onColor = Color.White,
                     _datavizContainer = EventColorUi(light = 0xFFFFFFFF.toInt(), dark = 0xFF381E72.toInt()),
                     _onDatavizContainer = EventColorUi(light = 0xFF6750A4.toInt(), dark = 0xFFCFBCFF.toInt()),
                     _datavizContainerVariant = EventColorUi(light = 0xFFE9DDFF.toInt(), dark = 0xFF4F378A.toInt()),

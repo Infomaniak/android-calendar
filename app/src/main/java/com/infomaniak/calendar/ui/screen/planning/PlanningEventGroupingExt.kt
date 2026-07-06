@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.planning
 
+import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.models.EventColorUi
@@ -131,6 +132,8 @@ private fun KmpEventStatus?.toEventStatus(): EventStatus {
 }
 
 fun EventColors.toEventColorsUi(): EventColorsUi = EventColorsUi(
+    color = Color(color),
+    onColor = Color(onColor),
     _datavizContainer = datavizContainer.toEventColorUi(),
     _onDatavizContainer = onDatavizContainer.toEventColorUi(),
     _datavizContainerVariant = datavizContainerVariant.toEventColorUi(),

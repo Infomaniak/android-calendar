@@ -22,6 +22,8 @@ import androidx.compose.ui.graphics.Color
 import com.infomaniak.core.ui.compose.theme.LocalIsThemeDarkMode
 
 data class EventColorsUi(
+    val color: Color,
+    val onColor: Color,
     private val _datavizContainer: EventColorUi,
     private val _onDatavizContainer: EventColorUi,
     private val _datavizContainerVariant: EventColorUi,
