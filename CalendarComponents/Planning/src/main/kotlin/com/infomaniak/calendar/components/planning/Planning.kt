@@ -37,6 +37,7 @@ import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.planning.component.DayIndicator
+import com.infomaniak.calendar.components.planning.component.TodayEmptyState
 import com.infomaniak.calendar.components.planning.preview.WeekEventsPreviewParameter
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
@@ -91,7 +92,10 @@ fun Planning(
 private fun EventList(events: List<EventUi>, modifier: Modifier = Modifier) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Margin.Mini)) {
         events.forEach { event ->
-            EventItem(event, modifier = Modifier.fillMaxWidth())
+            when (event) {
+                is EventUi.Normal -> EventItem(event, modifier = Modifier.fillMaxWidth())
+                is EventUi.TodayEmptyState -> TodayEmptyState(onClick = { })
+            }
         }
     }
 }

@@ -36,7 +36,7 @@ import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 
 @Composable
-fun EventItem(event: EventUi, modifier: Modifier = Modifier) {
+fun EventItem(event: EventUi.Normal, modifier: Modifier = Modifier) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = event.colors.datavizContainerVariant,
@@ -57,7 +57,7 @@ private fun Preview() {
     MaterialTheme {
         Surface {
             EventItem(
-                event = EventUi(
+                event = EventUi.Normal(
                     id = "1",
                     title = "Event title",
                     location = "Event location",

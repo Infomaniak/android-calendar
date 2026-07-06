@@ -15,22 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.foundation.models
+package com.infomaniak.calendar.components.foundation.utils
 
-import androidx.compose.runtime.Immutable
-import kotlin.time.Instant
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
-sealed interface EventUi {
-    @Immutable
-    data class Normal(
-        val id: String,
-        val title: String,
-        val location: String?,
-        val categories: String?,
-        val start: Instant,
-        val end: Instant,
-        val colors: EventColorsUi,
-    ) : EventUi
+data class RadiusToken(val xl: Dp = 12.dp)
 
-    data object TodayEmptyState : EventUi
+object EsdsTheme {
+    @get:Composable
+    @get:ReadOnlyComposable
+    val radius get() = RadiusToken()
 }
