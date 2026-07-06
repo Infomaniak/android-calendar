@@ -46,7 +46,6 @@ import com.infomaniak.calendar.ui.navigation.state.SharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.ToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableState
-import com.infomaniak.calendar.ui.screen.calendarTest.calendarTest
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventCreation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
@@ -83,7 +82,7 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
         PlanningScreen()
     }
     entry<NavDestination.CalendarView.Day>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-        DayScreen(goToTestScreen = { backStack.add(NavDestination.CalendarTest) })
+        DayScreen()
     }
     entry<NavDestination.CalendarView.ThreeDays>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         ThreeDayScreen()
@@ -107,7 +106,6 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
             onPopBack = { backStack.removeLastOrNull() },
         )
     }
-    calendarTest()
 }
 
 private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<SceneDecoratorStrategy<NavKey>> {

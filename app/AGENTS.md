@@ -34,18 +34,16 @@ app/src/main/java/com/infomaniak/calendar/
     ├── navigation/
     │   └── MainNavHost.kt          # Top-level NavDisplay with entryProvider
     ├── screen/
-    │   └── calendarTest/
-    │       ├── CalendarTestScreen.kt       # CalendarTest NavKey + entry function
-    │       ├── CalendarTestScreenContent.kt# Stateless Composable rendering CalendarTestUiState
-    │       ├── CalendarTestUiState.kt      # Sealed interface (Loading / Success / Error)
-    │       ├── CalendarTestViewModel.kt    # ViewModel: observes calendars, triggers CalDAV sync
-    │       └── composable/
-    │           ├── Error.kt        # Error state Composable
-    │           ├── Loading.kt      # Loading state Composable
-    │           └── Success.kt      # Success state Composable
+    │   ├── day/                   # DayScreen — placeholder day view (disconnect, drawer)
+    │   ├── threeDays/             # ThreeDayScreen — placeholder 3-day view
+    │   ├── week/                  # WeekScreen — placeholder week view
+    │   ├── month/                 # MonthScreen + MonthViewModel
+    │   ├── planning/              # PlanningScreen + PlanningViewModel + PlanningEventGroupingExt
+    │   ├── eventCreation/         # EventCreationScreen
+    │   └── onboarding/            # OnboardingScreen + CrossAppLoginViewModel
     └── theme/
         ├── Theme.kt                # CalendarTheme Composable (Material 3 color schemes)
-        ├── Color.kt                # Color tokens
+        ├── Color.kt / ColorLight.kt / ColorDark.kt  # Color tokens
         └── Type.kt                 # Typography tokens
 
 app/src/main/res/
