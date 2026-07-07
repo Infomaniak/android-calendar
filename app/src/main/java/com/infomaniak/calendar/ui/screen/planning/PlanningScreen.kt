@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -41,17 +42,34 @@ import com.infomaniak.calendar.components.planning.Planning
 import com.infomaniak.calendar.ui.component.drawer.DrawerIconButton
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
 import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewParameter
+import com.infomaniak.calendar.ui.state.CurrentDayState
+import com.infomaniak.calendar.ui.state.LocalCurrentDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
+import kotlin.time.Clock
 
 @Composable
 fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier, viewModel: PlanningViewModel = viewModel()) {
     val planningUiState: PlanningUiState by viewModel.planningUiState.collectAsStateWithLifecycle()
-    PlanningScreen(goToEventCreation = goToEventCreation, planningUiState = { planningUiState }, modifier = modifier)
+    val currentDayState = LocalCurrentDayState.current ?: return
+
+    PlanningScreen(
+        goToEventCreation = goToEventCreation,
+        planningUiState = { planningUiState },
+        currentDayState = { currentDayState },
+        modifier = modifier,
+    )
 }
 
 @Composable
-private fun PlanningScreen(goToEventCreation: () -> Unit, planningUiState: () -> PlanningUiState, modifier: Modifier = Modifier) {
+private fun PlanningScreen(
+    goToEventCreation: () -> Unit,
+    planningUiState: () -> PlanningUiState,
+    currentDayState: () -> CurrentDayState,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -62,7 +80,7 @@ private fun PlanningScreen(goToEventCreation: () -> Unit, planningUiState: () ->
         modifier = modifier,
     ) { paddingValues ->
         when (val planningUi = planningUiState()) {
-            is PlanningUiState.Success -> SuccessPlanning(goToEventCreation, planningUi, paddingValues)
+            is PlanningUiState.Success -> SuccessPlanning(goToEventCreation, currentDayState, planningUi, paddingValues)
             is PlanningUiState.Loading -> LoadingPlanning(modifier = Modifier.padding(paddingValues))
         }
     }
@@ -71,11 +89,26 @@ private fun PlanningScreen(goToEventCreation: () -> Unit, planningUiState: () ->
 @Composable
 private fun SuccessPlanning(
     goToEventCreation: () -> Unit,
+    currentDayState: () -> CurrentDayState,
     planningUi: PlanningUiState.Success,
     contentPadding: PaddingValues,
 ) {
+    val currentDayState = currentDayState()
+    val lazyListState = rememberLazyListState(
+        initialFirstVisibleItemIndex = planningUi.eventsByWeekAndDay.indexOf(currentDayState.visibleDate),
+    )
+
+    ObserveScrollAction(
+        currentDay = currentDayState,
+        firstVisibleItemIndex = { lazyListState.firstVisibleItemIndex },
+        eventsByWeekAndDay = { planningUi.eventsByWeekAndDay },
+        animatedScroll = lazyListState::animateScrollToItem,
+        instantScroll = lazyListState::scrollToItem,
+    )
+
     Column {
         Planning(
+            lazyListState = lazyListState,
             weekEvents = { planningUi.eventsByWeekAndDay },
             modifier = Modifier
                 .weight(1f)
@@ -84,6 +117,7 @@ private fun SuccessPlanning(
                 .fillMaxWidth(),
             contentPadding = contentPadding,
             goToEventCreation = goToEventCreation,
+            onVisibleDateChanged = currentDayState::onVisibleDateChanged,
         )
     }
 }
@@ -99,6 +133,10 @@ private fun LoadingPlanning(modifier: Modifier = Modifier) {
 @Composable
 private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class) weekEvents: EventsByWeekAndDay) {
     CalendarThemeForPreview {
-        PlanningScreen(goToEventCreation = { }, planningUiState = { PlanningUiState.Success(weekEvents) })
+        PlanningScreen(
+            planningUiState = { PlanningUiState.Success(weekEvents) },
+            currentDayState = { CurrentDayState(Clock.System.todayIn(TimeZone.currentSystemDefault())) },
+            goToEventCreation = {},
+        )
     }
 }

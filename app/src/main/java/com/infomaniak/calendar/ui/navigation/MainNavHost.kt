@@ -39,11 +39,14 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Metada
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
+import com.infomaniak.calendar.ui.state.CurrentDayState
+import com.infomaniak.calendar.ui.state.LocalCurrentDayState
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.state.SharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.ToolbarScrollableState
+import com.infomaniak.calendar.ui.state.rememberCurrentDayState
 import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableState
 import com.infomaniak.calendar.ui.screen.day.DayScreen
@@ -59,6 +62,7 @@ fun MainNavHost(backStack: NavBackStack<NavKey>) {
     val snackbarHostState: SharedSnackbarHostState = rememberCustomSnackbarHostState()
     val toolbarScrollableState: ToolbarScrollableState = rememberToolbarScrollableState()
     val calendarDrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val currentDayState: CurrentDayState = rememberCurrentDayState()
 
     SharedTransitionLayout {
         CompositionLocalProvider(
@@ -66,6 +70,7 @@ fun MainNavHost(backStack: NavBackStack<NavKey>) {
             LocalSharedSnackbarHostState provides snackbarHostState,
             LocalToolbarScrollableState provides toolbarScrollableState,
             LocalDrawerState provides calendarDrawerState,
+            LocalCurrentDayState provides currentDayState,
         ) {
             NavDisplay(
                 backStack = backStack,
@@ -112,9 +117,11 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
     val navigationStrategy: NavigationDecoratorStrategy<NavKey> =
         NavigationDecoratorStrategy(
             floatingToolbar = {
+                val currentDayState = LocalCurrentDayState.current
+
                 CalendarHorizontalFloatingToolbar(
                     onNavigationButtonClicked = { backStack.addOrMoveToTop(it) },
-                    onCurrentDayClicked = { },
+                    onCurrentDayClicked = { currentDayState?.resetToToday() },
                     currentDestination = { backStack.getLastCalendarView() },
                     floatingActionButton = {
                         CalendarFab(
