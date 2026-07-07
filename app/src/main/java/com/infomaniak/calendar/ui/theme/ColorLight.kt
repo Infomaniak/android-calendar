@@ -17,14 +17,6 @@
  */
 package com.infomaniak.calendar.ui.theme
 
-import androidx.compose.material3.lightColorScheme
-
-val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
-)
-
 val CustomLightColorScheme = CustomColorScheme(
     avatarInitialsColor = White,
 )
