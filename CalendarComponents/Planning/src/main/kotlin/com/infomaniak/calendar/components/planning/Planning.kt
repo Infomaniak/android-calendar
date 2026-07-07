@@ -93,7 +93,7 @@ fun Planning(
 
                         when (event) {
                             is EventUi.Normal -> EventItem(event, modifier = Modifier.fillMaxWidth())
-                            is EventUi.TodayEmptyState -> TodayEmptyState(onClick = { })
+                            is EventUi.TodayEmptyState -> TodayEmptyState(onClick = goToEventCreation)
                         }
                     }
                 }

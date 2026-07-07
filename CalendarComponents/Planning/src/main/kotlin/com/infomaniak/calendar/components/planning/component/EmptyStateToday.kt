@@ -20,7 +20,6 @@ package com.infomaniak.calendar.components.planning.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
@@ -35,7 +34,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.infomaniak.calendar.components.foundation.utils.CalendarButton
+import com.infomaniak.calendar.components.foundation.theme.CalendarButton
+import com.infomaniak.calendar.components.foundation.theme.CalendarComponentsTheme
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
 
