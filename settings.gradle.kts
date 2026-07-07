@@ -45,10 +45,12 @@ dependencyResolutionManagement {
         // Do not put this in production
         // mavenLocal {
         //     content { includeGroup("com.infomaniak.multiplatform_calendar") }
+        //     content { includeGroup("com.infomaniak.designsystem") }
         // }
         maven {
             url = uri("https://central.sonatype.com/repository/maven-snapshots/")
             content { includeGroup("com.infomaniak.multiplatform_calendar") }
+            content { includeGroup("com.infomaniak.designsystem") }
         }
         maven {
             url = uri("https://jitpack.io")
