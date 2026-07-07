@@ -35,28 +35,46 @@ import com.infomaniak.core.avatar.LocalAvatarColors
 import com.infomaniak.core.avatar.theme.DarkAvatarColorsScheme
 import com.infomaniak.core.avatar.theme.LightAvatarColorsScheme
 import com.infomaniak.core.ui.compose.theme.LocalIsThemeDarkMode
+import com.infomaniak.core.ui.compose.theme.selectSchemeForContrast
+import com.infomaniak.designsystem.calendar.CalendarDarkHighContrastTheme
+import com.infomaniak.designsystem.calendar.CalendarDarkMediumContrastTheme
+import com.infomaniak.designsystem.calendar.CalendarDarkTheme
+import com.infomaniak.designsystem.calendar.CalendarLightHighContrastTheme
+import com.infomaniak.designsystem.calendar.CalendarLightMediumContrastTheme
+import com.infomaniak.designsystem.calendar.CalendarLightTheme
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 
 @Composable
 fun CalendarTheme(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
+    val esdsColorScheme = selectSchemeForContrast(
+        isDark = isDarkTheme,
+        darkScheme = CalendarDarkTheme,
+        lightScheme = CalendarLightTheme,
+        mediumContrastDarkColorScheme = CalendarDarkMediumContrastTheme,
+        mediumContrastLightColorScheme = CalendarLightMediumContrastTheme,
+        highContrastDarkColorScheme = CalendarDarkHighContrastTheme,
+        highContrastLightColorScheme = CalendarLightHighContrastTheme,
+    )
+
     val colorScheme = when {
         dynamicColor && SDK_INT >= 31 -> {
             val context = LocalContext.current
             if (isDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        isDarkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        else -> esdsColorScheme.materialColorScheme
     }
 
     val avatarColors = if (isDarkTheme) DarkAvatarColorsScheme else LightAvatarColorsScheme
     val customColors = if (isDarkTheme) CustomDarkColorScheme else CustomLightColorScheme
 
     CompositionLocalProvider(
+        EsdsTheme.LocalEsdsTheme provides esdsColorScheme,
         LocalEventColorsUiFactory provides EventColorsUiFactory { EventColors.from(it).toEventColorsUi() },
         LocalIsThemeDarkMode provides isDarkTheme,
         LocalAvatarColors provides AvatarColors(avatarColors.colorList, customColors.avatarInitialsColor),
