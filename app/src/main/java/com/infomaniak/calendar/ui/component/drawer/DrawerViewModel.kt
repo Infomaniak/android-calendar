@@ -20,10 +20,13 @@ package com.infomaniak.calendar.ui.component.drawer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
+import com.infomaniak.calendar.ui.screen.planning.toEventColorsUi
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.account.accountId
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarEditData
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
@@ -43,7 +46,7 @@ class DrawerViewModel(accountUtils: AccountUtils, private val calendarManager: C
         calendarManager.observeCalendars(),
     ) { users, calendars ->
         return@combine users.map { user ->
-            val userCalendars = calendars.filter { it.accountId == user.accountId }
+            val userCalendars = calendars.filter { it.accountId == user.accountId }.map { it.toCalendarUi() }
             UserCalendarsUi(user, userCalendars)
         }
     }.stateIn(
@@ -58,3 +61,11 @@ class DrawerViewModel(accountUtils: AccountUtils, private val calendarManager: C
         }
     }
 }
+
+private fun Calendar.toCalendarUi(): CalendarUi = CalendarUi(
+    id = id,
+    accountId = accountId,
+    displayName = displayName,
+    colors = colors.toEventColorsUi(),
+    isVisible = isVisible
+)

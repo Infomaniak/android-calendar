@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
@@ -44,7 +45,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 
 @Composable
 fun DrawerCalendarItem(
-    calendar: Calendar,
+    calendar: CalendarUi,
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -69,8 +70,8 @@ fun DrawerCalendarItem(
             checked = isChecked,
             onCheckedChange = null,
             colors = CheckboxDefaults.colors(
-                checkedColor = Color(calendar.color),
-                checkmarkColor = Color(calendar.onColor),
+                checkedColor = calendar.colors.color,
+                checkmarkColor = calendar.colors.onColor,
             ),
         )
 
@@ -81,12 +82,11 @@ fun DrawerCalendarItem(
 @Preview
 @Composable
 private fun DrawerCalendarItemPreview() {
-    val calendarPreview = Calendar(
+    val calendarPreview = CalendarUi(
         id = CalendarId("1"),
         accountId = AccountId(1),
         displayName = "Work",
-        color = 0xFF2196F3.toInt(),
-        onColor = 0xFFFFFFFF.toInt(),
+        colors = LocalEventColorsUiFactory.current.create(0xFF2196F3.toInt()),
         isVisible = true,
     )
 

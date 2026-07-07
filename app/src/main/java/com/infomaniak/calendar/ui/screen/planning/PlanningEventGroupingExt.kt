@@ -131,6 +131,7 @@ private fun KmpEventStatus?.toEventStatus(): EventStatus {
     }
 }
 
+// TODO: Move
 fun EventColors.toEventColorsUi(): EventColorsUi = EventColorsUi(
     color = Color(color),
     onColor = Color(onColor),

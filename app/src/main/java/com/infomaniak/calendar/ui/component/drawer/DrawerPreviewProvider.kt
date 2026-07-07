@@ -18,11 +18,12 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import com.infomaniak.calendar.components.foundation.models.EventColorsUi
+import com.infomaniak.calendar.components.foundation.preview.EventColorsUiFactory.Companion.dummyEventColorsUiFactory
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.auth.models.user.preferences.OrganizationPreference
 import com.infomaniak.core.auth.models.user.preferences.Preferences
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 
 class DrawerPreviewProvider : PreviewParameterProvider<List<UserCalendarsUi>> {
@@ -43,20 +44,18 @@ class DrawerPreviewProvider : PreviewParameterProvider<List<UserCalendarsUi>> {
                     preferences = Preferences(organizationPreference = OrganizationPreference(currentOrganizationId = 1)),
                 ),
                 calendars = listOf(
-                    Calendar(
+                    CalendarUi(
                         id = CalendarId("1"),
                         accountId = AccountId(1),
                         displayName = "Private",
-                        color = 0xFF2196F3.toInt(),
-                        onColor = 0xFFFFFFFF.toInt(),
+                        colors = colorUi(0xFF2196F3),
                         isVisible = true,
                     ),
-                    Calendar(
+                    CalendarUi(
                         id = CalendarId("2"),
                         accountId = AccountId(1),
                         displayName = "Work",
-                        color = 0xFFE91E63.toInt(),
-                        onColor = 0xFFFFFFFF.toInt(),
+                        colors = colorUi(0xFFE91E63),
                         isVisible = false,
                     ),
                 ),
@@ -74,12 +73,11 @@ class DrawerPreviewProvider : PreviewParameterProvider<List<UserCalendarsUi>> {
                     preferences = Preferences(organizationPreference = OrganizationPreference(currentOrganizationId = 1)),
                 ),
                 calendars = listOf(
-                    Calendar(
+                    CalendarUi(
                         id = CalendarId("3"),
                         accountId = AccountId(2),
                         displayName = "Team",
-                        color = 0xFF4CAF50.toInt(),
-                        onColor = 0xFFFFFFFF.toInt(),
+                        colors = colorUi(0xFF4CAF50),
                         isVisible = true,
                     ),
                 ),
@@ -87,3 +85,5 @@ class DrawerPreviewProvider : PreviewParameterProvider<List<UserCalendarsUi>> {
         )
     }
 }
+
+private fun colorUi(color: Long): EventColorsUi = dummyEventColorsUiFactory.create(color.toInt())

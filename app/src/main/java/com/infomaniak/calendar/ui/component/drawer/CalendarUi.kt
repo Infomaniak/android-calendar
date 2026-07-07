@@ -17,10 +17,14 @@
  */
 package com.infomaniak.calendar.ui.component.drawer
 
-import com.infomaniak.core.auth.models.user.User
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
+import com.infomaniak.calendar.components.foundation.models.EventColorsUi
+import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 
-data class UserCalendarsUi(
-    val user: User,
-    val calendars: List<CalendarUi>,
+data class CalendarUi(
+    val id: CalendarId,
+    val accountId: AccountId,
+    val displayName: String,
+    val colors: EventColorsUi,
+    val isVisible: Boolean,
 )
