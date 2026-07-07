@@ -40,7 +40,6 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColor
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 
 @Composable
@@ -70,8 +69,8 @@ fun DrawerCalendarItem(
             checked = isChecked,
             onCheckedChange = null,
             colors = CheckboxDefaults.colors(
-                checkedColor = Color(calendar.color.argb),
-                checkmarkColor = Color.White,
+                checkedColor = Color(calendar.color),
+                checkmarkColor = Color(calendar.onColor),
             ),
         )
 
@@ -86,7 +85,8 @@ private fun DrawerCalendarItemPreview() {
         id = CalendarId("1"),
         accountId = AccountId(1),
         displayName = "Work",
-        color = CalendarColor(0xFF2196F3.toInt()),
+        color = 0xFF2196F3.toInt(),
+        onColor = 0xFFFFFFFF.toInt(),
         isVisible = true,
     )
 
