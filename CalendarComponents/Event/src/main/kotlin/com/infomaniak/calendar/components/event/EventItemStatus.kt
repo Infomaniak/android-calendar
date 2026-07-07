@@ -104,7 +104,7 @@ sealed class EventItemStatus(
         )
 
         /**
-         * Skips instantiations cause by copy if we're modifying alpha to be the same value as it already was. Useful for all
+         * Skips instantiations caused by copy if we're modifying alpha to be the same value as it already was. Useful for all
          * common cases where we set alpha to 1.
          */
         private fun Color.copyIfNeeded(@FloatRange(0.0, 1.0) alpha: Float): Color {
