@@ -69,14 +69,20 @@ fun List<Event>.groupByWeekAndDay(
             .add(event.toEventUi())
     }
 
-    val today = Clock.System.now().toLocalDateTime(timeZone).date
-    val todayEvents = result
-        .getOrPut(weekNumbering.weekOf(today)) { sortedMapOf() }
-        .getOrPut(today) { mutableListOf() }
-    if (todayEvents.isEmpty()) todayEvents.add(EventUi.TodayEmptyState)
+    result.ensureTodayHasEntry(timeZone, weekNumbering)
 
     @Suppress("UNCHECKED_CAST") // Shows the exposed list as non-mutable
     return result as EventsByWeekAndDay
+}
+
+private fun SortedMap<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>.ensureTodayHasEntry(
+    timeZone: TimeZone,
+    weekNumbering: WeekNumbering,
+) {
+    val today = Clock.System.now().toLocalDateTime(timeZone).date
+    val todayEvents = getOrPut(weekNumbering.weekOf(today)) { sortedMapOf() }.getOrPut(today) { mutableListOf() }
+
+    if (todayEvents.isEmpty()) todayEvents.add(EventUi.TodayEmptyState)
 }
 
 // TODO: Handle AllDay

@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -36,7 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.infomaniak.calendar.components.foundation.utils.EsdsTheme
+import com.infomaniak.calendar.components.foundation.utils.CalendarButton
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
 
@@ -45,16 +44,14 @@ import com.infomaniak.core.ui.compose.margin.Margin
 internal fun TodayEmptyState(onClick: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
         modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = Margin.Medium),
+            .padding(all = Margin.Medium),
     ) {
-        Text(stringResource(R.string.planningNothingPlannedToday))
+        Text(stringResource(R.string.planningNothingPlannedToday), modifier = Modifier.weight(1f))
         Button(
             onClick = onClick,
             contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
-            modifier = Modifier.padding(vertical = Margin.Medium),
             shapes = CalendarButton.shapes(),
         ) {
             Icon(

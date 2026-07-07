@@ -40,13 +40,13 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
 
 @Composable
-fun PlanningScreen(modifier: Modifier = Modifier, viewModel: PlanningViewModel = viewModel()) {
+fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier, viewModel: PlanningViewModel = viewModel()) {
     val weekEvents: EventsByWeekAndDay by viewModel.weekEvents.collectAsStateWithLifecycle()
-    PlanningScreen(weekEvents = { weekEvents }, modifier = modifier)
+    PlanningScreen(goToEventCreation = goToEventCreation, weekEvents = { weekEvents }, modifier = modifier)
 }
 
 @Composable
-private fun PlanningScreen(weekEvents: () -> EventsByWeekAndDay, modifier: Modifier = Modifier) {
+private fun PlanningScreen(goToEventCreation: () -> Unit, weekEvents: () -> EventsByWeekAndDay, modifier: Modifier = Modifier) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -65,6 +65,7 @@ private fun PlanningScreen(weekEvents: () -> EventsByWeekAndDay, modifier: Modif
                     .scrollableToolbar()
                     .fillMaxWidth(),
                 contentPadding = paddingValues,
+                goToEventCreation = goToEventCreation,
             )
         }
     }
@@ -74,6 +75,6 @@ private fun PlanningScreen(weekEvents: () -> EventsByWeekAndDay, modifier: Modif
 @Composable
 private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class) weekEvents: EventsByWeekAndDay) {
     CalendarThemeForPreview {
-        PlanningScreen(weekEvents = { weekEvents })
+        PlanningScreen(goToEventCreation = { }, weekEvents = { weekEvents })
     }
 }

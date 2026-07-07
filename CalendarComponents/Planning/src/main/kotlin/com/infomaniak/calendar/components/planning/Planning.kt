@@ -53,6 +53,7 @@ private val shortDayNameFormatter = DateTimeFormatter.ofPattern("EEE")
 @Composable
 fun Planning(
     weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
+    goToEventCreation: () -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(),
@@ -80,7 +81,7 @@ fun Planning(
                             state = if (date == today) DateState.Today else DateState.None,
                             modifier = Modifier.stickyWithinItem(lazyListState, dayKey),
                         )
-                        EventList(events, Modifier.weight(1f))
+                        EventList(onEventCreation = goToEventCreation, events, Modifier.weight(1f))
                     }
                 }
             }
@@ -89,12 +90,12 @@ fun Planning(
 }
 
 @Composable
-private fun EventList(events: List<EventUi>, modifier: Modifier = Modifier) {
+private fun EventList(onEventCreation: () -> Unit, events: List<EventUi>, modifier: Modifier = Modifier) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Margin.Mini)) {
         events.forEach { event ->
             when (event) {
                 is EventUi.Normal -> EventItem(event, modifier = Modifier.fillMaxWidth())
-                is EventUi.TodayEmptyState -> TodayEmptyState(onClick = { })
+                is EventUi.TodayEmptyState -> TodayEmptyState(onClick = onEventCreation, modifier = Modifier.fillMaxWidth())
             }
         }
     }
@@ -112,6 +113,6 @@ private val YearWeek.label: String
 @Composable
 private fun PreviewPlanning(@PreviewParameter(WeekEventsPreviewParameter::class) weekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>>) {
     Surface {
-        Planning(weekEvents = { weekEvents })
+        Planning(goToEventCreation = { }, weekEvents = { weekEvents })
     }
 }
