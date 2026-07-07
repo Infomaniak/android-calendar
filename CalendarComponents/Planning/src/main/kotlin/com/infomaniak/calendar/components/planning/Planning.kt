@@ -96,11 +96,6 @@ fun Planning(
     }
 }
 
-/**
- * Reports the topmost visible date to the caller whenever the first fully-visible item changes.
- * Only emits when the date actually changes (distinctUntilChanged), so [onVisibleDateChanged]
- * is never called redundantly during an in-place recomposition.
- */
 @Composable
 private fun ReportVisibleDate(
     lazyListState: LazyListState,
