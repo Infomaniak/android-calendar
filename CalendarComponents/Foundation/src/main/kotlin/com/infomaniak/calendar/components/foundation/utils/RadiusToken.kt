@@ -25,7 +25,9 @@ import androidx.compose.ui.unit.dp
 data class RadiusToken(val xl: Dp = 12.dp)
 
 object EsdsTheme {
+    private val radiusToken = RadiusToken()
+
     @get:Composable
     @get:ReadOnlyComposable
-    val radius get() = RadiusToken()
+    val radius get() = radiusToken
 }

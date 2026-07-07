@@ -55,6 +55,7 @@ private val shortDayNameFormatter = DateTimeFormatter.ofPattern("EEE")
 @Composable
 fun Planning(
     weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
+    goToEventCreation: () -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(),
@@ -114,6 +115,6 @@ private val EventUi.itemKey get() = id
 @Composable
 private fun PreviewPlanning(@PreviewParameter(WeekEventsPreviewParameter::class) weekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>>) {
     Surface {
-        Planning(weekEvents = { weekEvents })
+        Planning(goToEventCreation = { }, weekEvents = { weekEvents })
     }
 }
