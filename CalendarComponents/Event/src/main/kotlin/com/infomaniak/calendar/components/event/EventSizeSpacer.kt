@@ -58,7 +58,6 @@ internal fun EventSizeSpacer(duration: Duration, modifier: Modifier = Modifier) 
     )
 }
 
-@Composable
 private fun deriveHeightFrom(duration: Duration): Dp = when {
     duration < MinDuration -> MinHeight
     duration > MaxDuration -> MaxHeight
