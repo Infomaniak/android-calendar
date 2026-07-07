@@ -27,19 +27,21 @@ import androidx.compose.ui.layout.layout
 import com.infomaniak.calendar.components.planning.component.DayIndicator
 
 /**
- * Lets independent lazy rows of the same day section agree on a minimum total height for the section, so its [DayIndicator]
- * (drawn with zero layout height, see [measureIndicator]) always has room to fit.
+ * Used to compute the extra padding we need to add to a section's last item if all items of a section are smaller than a
+ * [DayIndicator]'s height.
  */
 @Stable
 internal class SectionSizing {
     private val rowHeights = mutableStateMapOf<Any, Int>()
     private var indicatorHeight by mutableIntStateOf(0)
 
+    /** Record the size of a [DayIndicator] so we can compute what size should be allocated */
     fun reportIndicatorHeight(height: Int) {
         indicatorHeight = height
     }
 
-    fun reportRowHeight(key: Any, height: Int) {
+    /** Record the size of each row so we can compute what size should be allocated to the section's last row */
+    fun reportItemHeight(key: Any, height: Int) {
         if (rowHeights[key] != height) rowHeights[key] = height
     }
 
@@ -51,18 +53,19 @@ internal class SectionSizing {
 }
 
 /**
- * Needed for cases where a section's content is smaller than a [DayIndicator]. It makes the whole section at least the size of a [DayIndicator].
+ * Needed for cases where a section's content is smaller than a [DayIndicator]. It makes the whole section at least the size of a
+ * [DayIndicator].
  *
  * Reports this row's height to [sectionSizing], and on the section's last row appends the height deficit as trailing space so the
  * section can fully contain its [DayIndicator].
  */
-internal fun Modifier.sectionMinHeight(
+internal fun Modifier.ensureSectionMinHeight(
     sectionSizing: SectionSizing,
     sectionItemKeys: List<Any>,
     itemKey: Any,
 ): Modifier = layout { measurable, constraints ->
     val placeable = measurable.measure(constraints)
-    sectionSizing.reportRowHeight(itemKey, placeable.height)
+    sectionSizing.reportItemHeight(itemKey, placeable.height)
 
     val isLastInSection = sectionItemKeys.lastOrNull() == itemKey
     val extra = if (isLastInSection) sectionSizing.deficitFor(sectionItemKeys) else 0
@@ -72,7 +75,7 @@ internal fun Modifier.sectionMinHeight(
 
 /**
  * Lays out a [DayIndicator] at zero height, keeping it out of its row's height, while reporting its real height to [sectionSizing]
- * so [sectionMinHeight] can reserve room for it. The indicator still draws at full size (see [stickyDayIndicator]).
+ * so [ensureSectionMinHeight] can reserve room for it. The indicator still draws at full size (see [stickyDayIndicator]).
  */
 internal fun Modifier.measureIndicator(sectionSizing: SectionSizing): Modifier = layout { measurable, constraints ->
     val placeable = measurable.measure(constraints)

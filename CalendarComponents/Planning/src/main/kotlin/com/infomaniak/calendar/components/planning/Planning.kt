@@ -77,7 +77,7 @@ fun Planning(
 
                 items(events, key = { it.itemKey }) { event ->
                     Row(
-                        modifier = Modifier.sectionMinHeight(sectionSizing, sectionItemKeys, event.itemKey),
+                        modifier = Modifier.ensureSectionMinHeight(sectionSizing, sectionItemKeys, event.itemKey),
                         horizontalArrangement = Arrangement.spacedBy(Margin.Small),
                     ) {
                         DayIndicator(

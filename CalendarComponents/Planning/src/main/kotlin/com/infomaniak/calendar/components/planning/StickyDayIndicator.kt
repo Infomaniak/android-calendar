@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.graphicsLayer
  *
  * Only the first visible item of the section actually draws the indicator (others use `alpha = 0f`, keeping
  * their layout width so [EventItem]s stay aligned). Expects the indicator to be laid out at zero height (see
- * [measureIndicator]) and the section to reserve enough room for it (see [sectionMinHeight]).
+ * [measureIndicator]) and the section to reserve enough room for it (see [ensureSectionMinHeight]).
  *
  * Runs entirely in the draw phase via [graphicsLayer], so scrolling triggers no recomposition.
  */
