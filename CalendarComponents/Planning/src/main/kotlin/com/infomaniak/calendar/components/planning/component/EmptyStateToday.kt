@@ -54,11 +54,8 @@ internal fun TodayEmptyState(onClick: () -> Unit, modifier: Modifier = Modifier)
         Button(
             onClick = onClick,
             contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
-            shapes = ButtonDefaults.shapes().let { shapes ->
-                val shape = RoundedCornerShape(EsdsTheme.radius.xl)
-                shapes.copy(shape = shape, pressedShape = shape)
-            },
             modifier = Modifier.padding(vertical = Margin.Medium),
+            shapes = CalendarButton.shapes(),
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_plus),
