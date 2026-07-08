@@ -21,18 +21,32 @@ import androidx.compose.runtime.Immutable
 import kotlin.time.Instant
 
 @Immutable
-data class EventUi(
-    val id: String,
-    val title: String,
-    val location: String?,
-    val status: EventStatus,
-    val categories: String?,
-    val start: Instant,
-    val end: Instant,
-    val isAllDay: Boolean,
-    val colors: EventColorsUi,
-    val attendees: Attendees,
-)
+sealed interface EventUi {
+    val id: String
+
+    @Immutable
+    data class Normal(
+        override val id: String,
+        val title: String,
+        val location: String?,
+        val status: EventStatus,
+        val categories: String?,
+        val start: Instant,
+        val end: Instant,
+        val isAllDay: Boolean,
+        val colors: EventColorsUi,
+        val attendees: Attendees,
+    ) : EventUi
+
+    @Immutable
+    data object TodayEmptyState : EventUi {
+        override val id: String = TODAY_EMPTY_STATE_ID
+    }
+
+    companion object {
+        private const val TODAY_EMPTY_STATE_ID = "todayEmptyState"
+    }
+}
 
 enum class EventStatus {
     Confirmed,

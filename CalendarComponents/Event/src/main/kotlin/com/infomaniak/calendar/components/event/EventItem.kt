@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.event
 
+import android.graphics.Insets.add
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -52,7 +53,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Instant
 
 @Composable
-fun EventItem(event: EventUi, modifier: Modifier = Modifier) {
+fun EventItem(event: EventUi.Normal, modifier: Modifier = Modifier) {
     EventItem(
         start = event.start,
         end = event.end,
@@ -170,7 +171,7 @@ private fun TrailingIcons(trailingIcons: Set<EventIcons>) {
     }
 }
 
-private fun EventUi.toEventIcons(): Set<EventIcons> = buildSet {
+private fun EventUi.Normal.toEventIcons(): Set<EventIcons> = buildSet {
     if (location != null) add(EventIcons.Location)
     if (attendees.all.isNotEmpty()) add(EventIcons.Attendees)
     // TODO: Detect kMeet links

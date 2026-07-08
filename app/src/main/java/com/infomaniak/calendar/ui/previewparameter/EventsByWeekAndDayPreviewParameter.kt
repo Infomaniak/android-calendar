@@ -43,13 +43,13 @@ private fun eventUi(
     end: String,
     location: String? = null,
     color: Color = Color(0xFF2196F3),
-): EventUi {
+): EventUi.Normal {
     val attendees = listOf(
         AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted),
         AttendeeUi("bob@example.com", "Bob", ParticipationStatus.Tentative),
     )
 
-    return EventUi(
+    return EventUi.Normal(
         id = id,
         title = title,
         location = location,

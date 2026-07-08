@@ -34,7 +34,9 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import java.util.SortedMap
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventStatus as KmpEventStatus
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationStatus as KmpParticipationStatus
@@ -76,8 +78,20 @@ fun List<Event>.groupByWeekAndDay(
             .add(event.toEventUi(emailsByUserId))
     }
 
+    result.ensureTodayHasEntry(timeZone, weekNumbering)
+
     @Suppress("UNCHECKED_CAST") // Shows the exposed list as non-mutable
     return result as EventsByWeekAndDay
+}
+
+private fun SortedMap<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>.ensureTodayHasEntry(
+    timeZone: TimeZone,
+    weekNumbering: WeekNumbering,
+) {
+    val today = Clock.System.now().toLocalDateTime(timeZone).date
+    val todayEvents = getOrPut(weekNumbering.weekOf(today)) { sortedMapOf() }.getOrPut(today) { mutableListOf() }
+
+    if (todayEvents.isEmpty()) todayEvents.add(EventUi.TodayEmptyState)
 }
 
 // TODO: Handle AllDay
@@ -85,7 +99,7 @@ private fun Event.getStartAt(timeZone: TimeZone): LocalDate {
     return timing.startIn(timeZone).date
 }
 
-private fun Event.toEventUi(emailsByUserId: Map<AccountId, String>): EventUi = EventUi(
+private fun Event.toEventUi(emailsByUserId: Map<AccountId, String>): EventUi = EventUi.Normal(
     id = id.url,
     title = title,
     location = location,
