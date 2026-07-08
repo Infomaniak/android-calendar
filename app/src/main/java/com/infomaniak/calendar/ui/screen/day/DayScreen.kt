@@ -39,7 +39,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DayScreen(
-    goToTestScreen: () -> Unit,
     modifier: Modifier = Modifier,
     accountUtils: AccountUtils = ComposeAppGraph.accountUtils,
 ) {
@@ -52,14 +51,12 @@ fun DayScreen(
                 accountUtils.removeUser(accountUtils.currentUserIdFlow.first() ?: return@launch)
             }
         },
-        goToTestScreen = goToTestScreen,
     )
 }
 
 @Composable
 private fun DayScreen(
     onDisconnect: () -> Unit,
-    goToTestScreen: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -70,7 +67,6 @@ private fun DayScreen(
             Text("DayScreenContent")
             Text("Current user: ${LocalUser.current?.displayName}")
             Button(onClick = onDisconnect) { Text("Disconnect") }
-            Button(onClick = goToTestScreen) { Text("Test Calendar") }
         }
     }
 }
@@ -79,6 +75,6 @@ private fun DayScreen(
 @Composable
 private fun DayScreenPreview() {
     CalendarThemeForPreview {
-        DayScreen(goToTestScreen = { }, onDisconnect = { })
+        DayScreen(onDisconnect = { })
     }
 }
