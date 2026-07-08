@@ -26,30 +26,27 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.EventItemStatus
 import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
 
+private val STRIPE_WIDTH = 2.dp
+private val STRIPE_SPACING = 8.dp
+
 @Composable
 internal fun Modifier.cardStripes(status: EventItemStatus): Modifier {
     val stripesColor = status.stripesColor()
-    return then(if (stripesColor != null) Modifier.diagonalStripes(stripesColor) else Modifier.Companion)
+    return then(if (stripesColor != null) Modifier.diagonalStripes(stripesColor) else Modifier)
 }
 
 /**
  * Draws diagonal stripes on top of the existing background, behind the content.
  */
-private fun Modifier.diagonalStripes(
-    color: Color,
-    stripeWidth: Dp = 2.dp,
-    spacing: Dp = 8.dp,
-    rotationDegrees: Float = 45f,
-): Modifier = drawWithContent {
-    val stripeWidthPx = stripeWidth.toPx()
-    val step = stripeWidthPx + spacing.toPx()
+private fun Modifier.diagonalStripes(color: Color, rotationDegrees: Float = 45f): Modifier = drawWithContent {
+    val stripeWidthPx = STRIPE_WIDTH.toPx()
+    val step = stripeWidthPx + STRIPE_SPACING.toPx()
 
     if (step > 0f) {
         val angle = Math.toRadians(rotationDegrees.toDouble())
