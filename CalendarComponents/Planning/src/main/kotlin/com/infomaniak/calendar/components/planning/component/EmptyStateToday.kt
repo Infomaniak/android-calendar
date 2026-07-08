@@ -34,8 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.infomaniak.calendar.components.foundation.theme.CalendarButton
-import com.infomaniak.calendar.components.foundation.theme.CalendarComponentsTheme
+import com.infomaniak.calendar.components.foundation.theme.LocalCalendarComponentsTokens
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
 
@@ -45,14 +44,13 @@ internal fun TodayEmptyState(onClick: () -> Unit, modifier: Modifier = Modifier)
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
-        modifier = modifier
-            .padding(all = Margin.Medium),
+        modifier = modifier.padding(all = Margin.Medium),
     ) {
         Text(stringResource(R.string.planningNothingPlannedToday), modifier = Modifier.weight(1f))
         Button(
             onClick = onClick,
             contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
-            shapes = CalendarButton.shapes(),
+            shapes = LocalCalendarComponentsTokens.current.button.shapes(),
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_plus),

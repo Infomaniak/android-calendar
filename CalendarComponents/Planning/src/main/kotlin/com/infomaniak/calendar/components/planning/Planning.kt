@@ -92,8 +92,8 @@ fun Planning(
                         )
 
                         when (event) {
-                            is EventUi.Normal -> EventItem(event, modifier = Modifier.fillMaxWidth())
-                            is EventUi.TodayEmptyState -> TodayEmptyState(onClick = goToEventCreation)
+                            is EventUi.Normal -> EventItem(event, Modifier.fillMaxWidth())
+                            is EventUi.TodayEmptyState -> TodayEmptyState(onClick = goToEventCreation, Modifier.fillMaxWidth())
                         }
                     }
                 }

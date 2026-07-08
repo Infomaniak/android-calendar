@@ -19,16 +19,9 @@ package com.infomaniak.calendar.components.foundation.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ButtonShapes
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable
 import com.infomaniak.calendar.components.foundation.utils.EsdsTheme
-
-object CalendarButton {
-    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-    @Composable
-    fun shapes(): ButtonShapes = LocalCalendarComponentsTheme.current.button.shapes()
-}
 
 object DefaultCalendarButton {
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)

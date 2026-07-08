@@ -23,12 +23,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 
-val LocalCalendarComponentsTheme = staticCompositionLocalOf { CalendarComponentsTheme() }
+val LocalCalendarComponentsTokens = staticCompositionLocalOf { CalendarComponentsTokens() }
 
 @Immutable
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-class CalendarComponentsTheme(val button: CalendarButtonTheme = CalendarButtonTheme())
+class CalendarComponentsTokens(val button: CalendarButtonTokens = CalendarButtonTokens())
 
 @Immutable
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-class CalendarButtonTheme(val shapes: (@Composable () -> ButtonShapes) = { DefaultCalendarButton.shapes() })
+class CalendarButtonTokens(val shapes: (@Composable () -> ButtonShapes) = { DefaultCalendarButton.shapes() })
