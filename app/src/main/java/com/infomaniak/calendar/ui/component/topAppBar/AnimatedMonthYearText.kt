@@ -26,17 +26,27 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
+
+private const val DURATION_TWEEN = 150
 
 @Composable
 fun AnimatedMonthYearText(date: LocalDate, modifier: Modifier = Modifier) {
@@ -50,7 +60,14 @@ fun AnimatedMonthYearText(date: LocalDate, modifier: Modifier = Modifier) {
         transitionSpec = { verticalRoll() },
         label = "MonthYearAnimation",
     ) { targetDate ->
-        Text(text = targetDate.monthYearLabel(locale, currentYear))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(text = targetDate.monthYearLabel(locale, currentYear))
+            Icon(painter = painterResource(R.drawable.ic_chevron), contentDescription = null)
+        }
     }
 }
 
@@ -62,9 +79,15 @@ private fun rememberCurrentYear(): Int {
 private fun <T : Comparable<T>> AnimatedContentTransitionScope<T>.verticalRoll(): ContentTransform {
     val direction = if (targetState > initialState) 1 else -1
 
-    return (slideInVertically(animationSpec = tween()) { height -> direction * height } + fadeIn(animationSpec = tween()))
+    return (
+            slideInVertically(animationSpec = tween(DURATION_TWEEN)) { height -> direction * height } + fadeIn(
+                animationSpec = tween(DURATION_TWEEN),
+            )
+            )
         .togetherWith(
-            slideOutVertically(animationSpec = tween()) { height -> -direction * height } + fadeOut(animationSpec = tween()),
+            slideOutVertically(animationSpec = tween(DURATION_TWEEN)) { height -> -direction * height } + fadeOut(
+                animationSpec = tween(DURATION_TWEEN),
+            ),
         )
 }
 

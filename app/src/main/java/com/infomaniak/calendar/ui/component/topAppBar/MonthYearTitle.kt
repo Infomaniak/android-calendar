@@ -17,22 +17,16 @@
  */
 package com.infomaniak.calendar.ui.component.topAppBar
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.state.LocalCurrentDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate
 
 @Composable
@@ -48,10 +42,7 @@ private fun MonthYearTitle(date: LocalDate, onClick: () -> Unit, modifier: Modif
         colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
         onClick = onClick,
     ) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
-            ProvideTextStyle(MaterialTheme.typography.titleLarge) { AnimatedMonthYearText(date = date) }
-            Icon(painter = painterResource(R.drawable.ic_chevron), contentDescription = null)
-        }
+        ProvideTextStyle(MaterialTheme.typography.titleLarge) { AnimatedMonthYearText(date = date) }
     }
 }
 
