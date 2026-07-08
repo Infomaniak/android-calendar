@@ -54,7 +54,6 @@ private fun eventUi(
         title = title,
         location = location,
         status = EventStatus.Confirmed,
-        categories = null,
         start = Instant.parse(start),
         end = Instant.parse(end),
         isAllDay = false,

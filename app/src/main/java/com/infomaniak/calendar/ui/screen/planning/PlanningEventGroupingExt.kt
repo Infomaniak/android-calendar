@@ -104,7 +104,6 @@ private fun Event.toEventUi(emailsByUserId: Map<AccountId, String>): EventUi = E
     title = title,
     location = location,
     status = status.toEventStatus(),
-    categories = categories,
     start = timing.startInstantLocal(),
     end = timing.endInstantLocal(),
     isAllDay = timing.isAllDay,

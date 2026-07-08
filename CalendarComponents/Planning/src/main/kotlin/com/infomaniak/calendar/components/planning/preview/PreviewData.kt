@@ -78,7 +78,6 @@ private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalD
             title = title,
             location = location,
             status = EventStatus.Confirmed,
-            categories = null,
             start = instantAt(date, hour),
             end = instantAt(date, hour + 1),
             isAllDay = false,
