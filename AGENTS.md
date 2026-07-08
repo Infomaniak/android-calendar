@@ -3,6 +3,9 @@
 > **Navigation Guide**: This file describes the composite structure. For app-specific norms, see `app/AGENTS.md`. For the
 > shared Kotlin Multiplatform calendar library, see the `multiplatform-calendar/` Git submodule (its own repository).
 
+## Overview
+Infomaniak Calendar for Android. Pure Jetpack Compose + Navigation 3, Metro DI (no Hilt), multiplatform business logic via the `multiplatform-calendar` KMP submodule. Two flavors: `standard` and `fdroid`.
+
 ## Repository Structure
 
 This is a **multi-module Gradle build** with two Git submodules:
