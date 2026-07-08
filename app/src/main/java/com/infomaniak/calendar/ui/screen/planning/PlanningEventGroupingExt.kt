@@ -98,12 +98,8 @@ private fun Event.toEventUi(emailsByUserId: Map<AccountId, String>): EventUi = E
 )
 
 private fun Event.toAttendees(attendees: List<Attendee>, emailsByUserId: Map<AccountId, String>): Attendees {
-    var me: AttendeeUi? = null
-    val all = attendees.map { attendee ->
-        attendee.toAttendeeUi().also { attendeeUi ->
-            if (attendeeUi.email == emailsByUserId[accountId]) me = attendeeUi
-        }
-    }
+    val all = attendees.map(Attendee::toAttendeeUi)
+    val me = all.find { it.email == emailsByUserId[accountId] }
 
     return Attendees(all, me)
 }

@@ -26,10 +26,11 @@ import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -54,9 +55,10 @@ class PlanningViewModel(private val accountUtils: AccountUtils, private val cale
 
     private val emailsByUserId = accountUtils.emailsByUserId.shareIn(viewModelScope, SharingStarted.Eagerly, 1)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val weekEvents: StateFlow<EventsByWeekAndDay> = calendarManager
         .observeEvents(startDate, endDate)
-        .map { it.groupByWeekAndDay(emailsByUserId.first()) }
+        .mapLatest { it.groupByWeekAndDay(emailsByUserId.first()) }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = sortedMapOf())
 
     init {

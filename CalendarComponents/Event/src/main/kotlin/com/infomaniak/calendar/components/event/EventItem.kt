@@ -213,7 +213,7 @@ private fun Preview() {
 
     MaterialTheme {
         Surface {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(Margin.Mini)) {
                 val eventColors = LocalEventColorsUiFactory.current.create(0x0)
 
                 EventItemForStatus(EventItemStatus.Default(eventColors), isAllDay = true, modifier = Modifier.fillMaxWidth())
