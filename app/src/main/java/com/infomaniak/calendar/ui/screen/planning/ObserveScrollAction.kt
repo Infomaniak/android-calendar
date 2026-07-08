@@ -19,6 +19,8 @@ package com.infomaniak.calendar.ui.screen.planning
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import com.infomaniak.calendar.ui.state.CurrentDayState
 import kotlin.math.abs
 
@@ -30,11 +32,15 @@ fun ObserveScrollAction(
     animatedScroll: suspend (index: Int) -> Unit,
     instantScroll: suspend (index: Int) -> Unit,
 ) {
+    val currentEventsByWeekAndDay by rememberUpdatedState(eventsByWeekAndDay)
+    val currentFirstVisibleItemIndex by rememberUpdatedState(firstVisibleItemIndex)
+
     LaunchedEffect(currentDay) {
         currentDay.scrollCommand.collect { date ->
-            val targetIndex = eventsByWeekAndDay().indexOf(date)
-            val distance = abs(targetIndex - firstVisibleItemIndex())
+            val targetIndex = currentEventsByWeekAndDay().indexOf(date)
+            val distance = abs(targetIndex - currentFirstVisibleItemIndex())
 
+            // Swallow CancellationException thrown when a user gesture interrupts the programmatic scroll.
             runCatching {
                 if (distance > SCROLL_THRESHOLD) instantScroll(targetIndex) else animatedScroll(targetIndex)
             }

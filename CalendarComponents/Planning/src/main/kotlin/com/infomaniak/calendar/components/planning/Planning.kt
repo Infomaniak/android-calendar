@@ -30,7 +30,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -69,7 +71,8 @@ fun Planning(
     val events = weekEvents()
     val sectionSizing = remember { SectionSizing() }
 
-    ReportVisibleDate(lazyListState = lazyListState, events = { events }, onVisibleDateChanged = onVisibleDateChanged)
+    val keyToDate = remember(events) { events.buildKeyToDateMap() }
+    ReportVisibleDate(lazyListState = lazyListState, keyToDate = { keyToDate }, onVisibleDateChanged = onVisibleDateChanged)
 
     LazyColumn(
         state = lazyListState,
@@ -110,25 +113,32 @@ fun Planning(
     }
 }
 
+private fun Map<YearWeek, Map<LocalDate, List<EventUi>>>.buildKeyToDateMap(): Map<Any, LocalDate> = buildMap {
+    this@buildKeyToDateMap.forEach { (week, days) ->
+        put(week, week.firstDay)
+        days.forEach { (date, dayEvents) ->
+            dayEvents.forEach { event -> put(event.itemKey, date) }
+        }
+    }
+}
 
 @Composable
 private fun ReportVisibleDate(
     lazyListState: LazyListState,
-    events: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
+    keyToDate: () -> Map<Any, LocalDate>,
     onVisibleDateChanged: (LocalDate) -> Unit,
 ) {
+    val currentKeyToDate by rememberUpdatedState(keyToDate)
+
     LaunchedEffect(lazyListState) {
-        snapshotFlow {
-            val key = lazyListState.firstVisibleItemKey()
-            events().values.asSequence().flatMap { it.keys }.firstOrNull { it == key }
-        }
+        snapshotFlow { currentKeyToDate()[lazyListState.firstVisibleItemKey()] }
             .mapNotNull { it }
             .distinctUntilChanged()
             .collect { onVisibleDateChanged(it) }
     }
 }
 
-private fun LazyListState.firstVisibleItemKey(): Any? = layoutInfo.visibleItemsInfo.firstOrNull()?.key
+private fun LazyListState.firstVisibleItemKey(): Any? = layoutInfo.visibleItemsInfo.firstOrNull { it.offset + it.size > 0 }?.key
 
 private val YearWeek.label: String
     @Composable get() {
