@@ -17,56 +17,214 @@
  */
 package com.infomaniak.calendar.components.event
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.event.component.cardStripes
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
 import com.infomaniak.calendar.components.foundation.utils.TimeFormatter.formatHours
+import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Instant
 
 @Composable
 fun EventItem(event: EventUi, modifier: Modifier = Modifier) {
+    EventItem(
+        start = event.start,
+        end = event.end,
+        title = event.title,
+        status = event.toEventItemStatus(),
+        trailingIcons = event.toEventIcons(),
+        isAllDay = event.isAllDay,
+        modifier = modifier,
+    )
+}
+
+@Composable
+internal fun EventItem(
+    start: Instant,
+    end: Instant,
+    title: String,
+    status: EventItemStatus,
+    trailingIcons: Set<EventIcons>,
+    isAllDay: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    EventItemCard(status, modifier = modifier) {
+        if (isAllDay) {
+            AllDayContent(title)
+        } else {
+            PartialDayContent(start, end, title, trailingIcons, status.textDecoration)
+        }
+    }
+}
+
+@Composable
+private fun EventItemCard(status: EventItemStatus, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = event.colors.datavizContainerVariant,
-            contentColor = event.colors.onDatavizContainerVariant,
-        ),
+        colors = status.cardColors(),
+        border = status.cardBorder(),
+        shape = MaterialTheme.shapes.small,
         modifier = modifier,
     ) {
-        Column(Modifier.padding(Margin.Mini), verticalArrangement = Arrangement.spacedBy(Margin.Micro)) {
-            Text("${event.start.formatHours()} - ${event.end.formatHours()}")
-            Text(event.title)
+        Column(
+            modifier = Modifier
+                .cardStripes(status)
+                .padding(Margin.Mini),
+            content = content,
+        )
+    }
+}
+
+@Composable
+private fun AllDayContent(title: String, modifier: Modifier = Modifier) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(Margin.Micro),
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            title,
+            style = MaterialTheme.typography.bodySmallEmphasized,
+            fontWeight = FontWeight.Medium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = modifier.weight(1f),
+        )
+
+        Text(stringResource(R.string.allDayLabel), style = MaterialTheme.typography.bodySmall)
+    }
+}
+
+@Composable
+private fun PartialDayContent(
+    start: Instant,
+    end: Instant,
+    title: String,
+    trailingIcons: Set<EventIcons>,
+    textDecoration: TextDecoration?,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier,
+        horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(Margin.Micro),
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = formatDisplayedHour(start, end),
+                style = MaterialTheme.typography.labelSmall,
+                textDecoration = textDecoration,
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodySmallEmphasized,
+                fontWeight = FontWeight.Medium,
+                textDecoration = textDecoration,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
+
+        if (trailingIcons.isNotEmpty()) TrailingIcons(trailingIcons)
+    }
+
+    EventSizeSpacer(end - start)
+}
+
+@Composable
+private fun formatDisplayedHour(start: Instant, end: Instant): String = "${start.formatHours()} - ${end.formatHours()}"
+
+@Composable
+private fun TrailingIcons(trailingIcons: Set<EventIcons>) {
+    Row(horizontalArrangement = Arrangement.spacedBy(Margin.Micro)) {
+        EventIcons.entries.forEach {
+            if (it in trailingIcons) it.TrailingIcon()
+        }
+    }
+}
+
+private fun EventUi.toEventIcons(): Set<EventIcons> = buildSet {
+    if (location != null) add(EventIcons.Location)
+    if (attendees.all.isNotEmpty()) add(EventIcons.Attendees)
+    // TODO: Detect kMeet links
+}
+
+enum class EventIcons(
+    @DrawableRes private val icon: Int,
+    @StringRes private val contentDescription: Int,
+) {
+    Location(R.drawable.ic_map_pin, R.string.contentDescriptionHasLocation),
+    Kmeet(R.drawable.ic_product_kmeet, R.string.contentDescriptionHasKMeetLink),
+    Attendees(R.drawable.ic_users_stacked, R.string.contentDescriptionHasAttendees);
+
+    @Composable
+    internal fun TrailingIcon(modifier: Modifier = Modifier) {
+        Icon(painterResource(icon), stringResource(contentDescription), modifier = modifier.size(16.dp))
     }
 }
 
 @Preview
 @Composable
 private fun Preview() {
+    @Composable
+    fun EventItemForStatus(
+        status: EventItemStatus,
+        title: String = "Event title",
+        isAllDay: Boolean = false,
+        modifier: Modifier = Modifier,
+    ) {
+        EventItem(
+            start = Clock.System.now(),
+            end = Clock.System.now() + 1.hours,
+            isAllDay = isAllDay,
+            title = title,
+            status = status,
+            trailingIcons = EventIcons.entries.toSet(),
+            modifier = modifier,
+        )
+    }
+
     MaterialTheme {
         Surface {
-            EventItem(
-                event = EventUi(
-                    id = "1",
-                    title = "Event title",
-                    location = "Event location",
-                    categories = "Event categories",
-                    start = Clock.System.now(),
-                    end = Clock.System.now().plus(3.hours),
-                    colors = LocalEventColorsUiFactory.current.create(0xFF0098FF.toInt()),
-                ),
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(Margin.Mini)) {
+                val eventColors = LocalEventColorsUiFactory.current.create(0x0)
+
+                EventItemForStatus(EventItemStatus.Default(eventColors), isAllDay = true, modifier = Modifier.fillMaxWidth())
+                EventItemForStatus(
+                    status = EventItemStatus.Default(eventColors),
+                    title = "How to not get fired. An important guide on how to navigate the workspace",
+                )
+                EventItemForStatus(EventItemStatus.Maybe(eventColors))
+                EventItemForStatus(EventItemStatus.Declined(eventColors))
+                EventItemForStatus(EventItemStatus.Pending(eventColors))
+            }
         }
     }
 }

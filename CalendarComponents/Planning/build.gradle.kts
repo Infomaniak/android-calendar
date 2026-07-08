@@ -53,9 +53,9 @@ android {
 }
 
 dependencies {
-    api(project(":CalendarComponents:Event"))
     api(project(":CalendarComponents:Foundation"))
-    api(project(":CalendarComponents:Resources"))
+    implementation(project(":CalendarComponents:Event"))
+    implementation(project(":CalendarComponents:Resources"))
 
     implementation(core.infomaniak.core.ui.compose.margin)
 

@@ -16,6 +16,10 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <string name="allDayLabel">De hele dag</string>
+    <string name="contentDescriptionHasAttendees">Heeft deelnemers</string>
+    <string name="contentDescriptionHasKMeetLink">Bevat een kMeet-link</string>
+    <string name="contentDescriptionHasLocation">Heeft een locatie</string>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">W%d</string>
 </resources>

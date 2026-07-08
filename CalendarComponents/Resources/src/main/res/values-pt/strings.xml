@@ -16,6 +16,10 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <string name="allDayLabel">O dia todo</string>
+    <string name="contentDescriptionHasAttendees">Tem participantes</string>
+    <string name="contentDescriptionHasKMeetLink">Tem um link do kMeet</string>
+    <string name="contentDescriptionHasLocation">Tem uma localização</string>
     <string name="weekHeaderDateRange">%d–%d de %s de %d</string>
     <string name="weekHeaderWeekNumber">Sem.%d</string>
 </resources>

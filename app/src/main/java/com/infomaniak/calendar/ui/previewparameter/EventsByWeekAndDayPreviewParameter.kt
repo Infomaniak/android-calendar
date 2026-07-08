@@ -20,7 +20,11 @@ package com.infomaniak.calendar.ui.previewparameter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.Attendees
+import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.ui.screen.planning.EventsByWeekAndDay
 import com.infomaniak.calendar.ui.screen.planning.toEventColorsUi
@@ -39,15 +43,25 @@ private fun eventUi(
     end: String,
     location: String? = null,
     color: Color = Color(0xFF2196F3),
-) = EventUi(
-    id = id,
-    title = title,
-    location = location,
-    categories = null,
-    start = Instant.parse(start),
-    end = Instant.parse(end),
-    colors = EventColors.from(color.toArgb()).toEventColorsUi(),
-)
+): EventUi {
+    val attendees = listOf(
+        AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted),
+        AttendeeUi("bob@example.com", "Bob", ParticipationStatus.Tentative),
+    )
+
+    return EventUi(
+        id = id,
+        title = title,
+        location = location,
+        status = EventStatus.Confirmed,
+        categories = null,
+        start = Instant.parse(start),
+        end = Instant.parse(end),
+        isAllDay = false,
+        colors = EventColors.from(color.toArgb()).toEventColorsUi(),
+        attendees = Attendees(attendees, attendees.first()),
+    )
+}
 
 private val week25 = WeekNumbering.ISO_8601.weekOf(LocalDate(2026, 6, 15))
 private val week26 = WeekNumbering.ISO_8601.weekOf(LocalDate(2026, 6, 22))
