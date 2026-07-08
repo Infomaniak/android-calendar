@@ -25,13 +25,13 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.ui.state.LocalCurrentDayState
+import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.datetime.LocalDate
 
 @Composable
 fun CurrentMonthTitle(onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val visibleDate = LocalCurrentDayState.current?.visibleDate ?: return
+    val visibleDate = LocalVisibleDayState.current?.visibleDate ?: return
     MonthYearTitle(date = visibleDate, onClick = onClick, modifier = modifier)
 }
 

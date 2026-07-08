@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.component.topAppBar
+package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
 import java.time.format.TextStyle
 import java.util.Locale
 
-internal fun LocalDate.monthYearLabel(locale: Locale, currentYear: Int): String {
+fun LocalDate.monthYearLabel(locale: Locale, currentYear: Int): String {
     val month = java.time.Month.of(month.number)
         .getDisplayName(TextStyle.FULL_STANDALONE, locale)
         .replaceFirstChar { if (it.isLowerCase()) it.titlecase(locale) else it.toString() }

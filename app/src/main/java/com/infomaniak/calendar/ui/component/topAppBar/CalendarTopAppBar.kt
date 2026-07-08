@@ -20,10 +20,12 @@ package com.infomaniak.calendar.ui.component.topAppBar
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.ui.state.CurrentDayState
-import com.infomaniak.calendar.ui.state.LocalCurrentDayState
+import com.infomaniak.calendar.ui.state.LocalVisibleDayState
+import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.datetime.LocalDate
 
@@ -44,9 +46,8 @@ fun CalendarTopAppBar(modifier: Modifier = Modifier) {
 @Composable
 private fun CalendarTopAppBarPreview() {
     CalendarThemeForPreview {
-        CompositionLocalProvider(
-            LocalCurrentDayState provides CurrentDayState(initialDate = LocalDate(2026, 7, 8)),
-        ) {
+        val visibleDate = remember { mutableStateOf(LocalDate(2026, 7, 8)) }
+        CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(_visibleDate = visibleDate)) {
             CalendarTopAppBar()
         }
     }

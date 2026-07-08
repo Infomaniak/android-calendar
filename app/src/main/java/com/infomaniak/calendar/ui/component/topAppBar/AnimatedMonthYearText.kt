@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.monthYearLabel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate
