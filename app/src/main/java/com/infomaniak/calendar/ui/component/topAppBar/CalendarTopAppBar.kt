@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.ui.component.drawer.DrawerIconButton
 import com.infomaniak.calendar.ui.state.CurrentDayState
 import com.infomaniak.calendar.ui.state.LocalCurrentDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -32,10 +31,10 @@ import kotlinx.datetime.LocalDate
 fun CalendarTopAppBar(modifier: Modifier = Modifier) {
     TopAppBar(
         title = { CurrentMonthTitle(onClick = { }) },
-        navigationIcon = { DrawerIconButton() },
+        navigationIcon = { TopAppBarButtons.DrawerIconButton() },
         actions = {
-            InboxButton(onClick = { })
-            SearchButton(onClick = { })
+            TopAppBarButtons.InboxButton(onClick = { })
+            TopAppBarButtons.SearchButton(onClick = { })
         },
         modifier = modifier,
     )

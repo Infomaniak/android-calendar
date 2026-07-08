@@ -20,6 +20,7 @@ package com.infomaniak.calendar.ui.component.topAppBar
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -79,17 +80,14 @@ private fun rememberCurrentYear(): Int {
 private fun <T : Comparable<T>> AnimatedContentTransitionScope<T>.verticalRoll(): ContentTransform {
     val direction = if (targetState > initialState) 1 else -1
 
-    return (
-            slideInVertically(animationSpec = tween(DURATION_TWEEN)) { height -> direction * height } + fadeIn(
-                animationSpec = tween(DURATION_TWEEN),
-            )
-            )
-        .togetherWith(
-            slideOutVertically(animationSpec = tween(DURATION_TWEEN)) { height -> -direction * height } + fadeOut(
-                animationSpec = tween(DURATION_TWEEN),
-            ),
-        )
+    val slideInVertically = slideInVertically(animationSpec = dateAnimationSpec()) { height -> direction * height }
+    val slideOutVertically = slideOutVertically(animationSpec = dateAnimationSpec()) { height -> -direction * height }
+
+    return (slideInVertically + fadeIn(animationSpec = dateAnimationSpec()))
+        .togetherWith(slideOutVertically + fadeOut(animationSpec = dateAnimationSpec()))
 }
+
+private fun <T> dateAnimationSpec(): TweenSpec<T> = tween(DURATION_TWEEN)
 
 @Preview
 @Composable
