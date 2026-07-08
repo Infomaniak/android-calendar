@@ -36,6 +36,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import java.util.SortedMap
 import kotlin.time.ExperimentalTime
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventStatus as KmpEventStatus
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationStatus as KmpParticipationStatus
 
 /**
@@ -104,10 +105,10 @@ private fun Event.toAttendees(attendees: List<Attendee>, emailsByUserId: Map<Acc
     return Attendees(all, me)
 }
 
-private fun String?.toEventStatus(): EventStatus {
+private fun KmpEventStatus?.toEventStatus(): EventStatus {
     return when (this) {
-        "TENTATIVE" -> EventStatus.Tentative
-        "CANCELLED" -> EventStatus.Cancelled
+        KmpEventStatus.TENTATIVE -> EventStatus.Tentative
+        KmpEventStatus.CANCELLED -> EventStatus.Cancelled
         else -> EventStatus.Confirmed
     }
 }
