@@ -32,6 +32,9 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColor
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -63,14 +66,15 @@ typealias EventsByWeekAndDay = SortedMap<YearWeek, SortedMap<LocalDate, List<Eve
  * and day bucket, with no intermediate collections allocated along the way.
  */
 @OptIn(ExperimentalTime::class)
-fun List<Event>.groupByWeekAndDay(
+suspend fun List<Event>.groupByWeekAndDay(
     emailsByUserId: Map<AccountId, String>,
     weekNumbering: WeekNumbering = WeekNumbering.ISO_8601,
     timeZone: TimeZone = TimeZone.currentSystemDefault(),
-): EventsByWeekAndDay {
+): EventsByWeekAndDay = withContext(Dispatchers.Default) {
     val result = sortedMapOf<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>()
 
-    for (event in this) {
+    for (event in this@groupByWeekAndDay) {
+        ensureActive()
         val date = event.getStartAt(timeZone)
         result
             .getOrPut(weekNumbering.weekOf(date)) { sortedMapOf() }
@@ -81,7 +85,7 @@ fun List<Event>.groupByWeekAndDay(
     result.ensureTodayHasEntry(timeZone, weekNumbering)
 
     @Suppress("UNCHECKED_CAST") // Shows the exposed list as non-mutable
-    return result as EventsByWeekAndDay
+    return@withContext result as EventsByWeekAndDay
 }
 
 private fun SortedMap<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>.ensureTodayHasEntry(
