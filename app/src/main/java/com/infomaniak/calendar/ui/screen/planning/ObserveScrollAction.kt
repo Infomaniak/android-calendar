@@ -22,6 +22,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import com.infomaniak.calendar.ui.state.CurrentDayState
+import kotlinx.coroutines.channels.consume
+import kotlinx.coroutines.channels.consumeEach
 import kotlin.math.abs
 
 @Composable
@@ -36,7 +38,7 @@ fun ObserveScrollAction(
     val currentFirstVisibleItemIndex by rememberUpdatedState(firstVisibleItemIndex)
 
     LaunchedEffect(currentDay) {
-        currentDay.scrollCommand.collect { date ->
+        currentDay.scrollCommand.consumeEach { date ->
             val targetIndex = currentEventsByWeekAndDay().indexOf(date)
             val distance = abs(targetIndex - currentFirstVisibleItemIndex())
 

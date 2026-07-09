@@ -25,8 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
@@ -47,15 +46,12 @@ class CurrentDayState(initialDate: LocalDate) {
     var visibleDate: LocalDate by mutableStateOf(initialDate)
         private set
 
-    private val _scrollCommand = Channel<LocalDate>(capacity = Channel.CONFLATED)
-    val scrollCommand: Flow<LocalDate> = _scrollCommand.receiveAsFlow()
+    private val _scrollCommand = Channel<LocalDate>(Channel.CONFLATED)
+    val scrollCommand: ReceiveChannel<LocalDate> = _scrollCommand
 
     fun onVisibleDateChanged(date: LocalDate) {
         visibleDate = date
     }
 
-    fun resetToToday() {
-        val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
-        _scrollCommand.trySend(today)
-    }
+    fun jumpTo(date: LocalDate) = _scrollCommand.trySend(date)
 }

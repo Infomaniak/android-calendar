@@ -56,6 +56,9 @@ import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
 import com.infomaniak.calendar.ui.screen.threeDays.ThreeDayScreen
 import com.infomaniak.calendar.ui.screen.week.WeekScreen
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
+import kotlin.time.Clock
 
 @Composable
 fun MainNavHost(backStack: NavBackStack<NavKey>) {
@@ -121,7 +124,7 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
 
                 CalendarHorizontalFloatingToolbar(
                     onNavigationButtonClicked = { backStack.addOrMoveToTop(it) },
-                    onCurrentDayClicked = { currentDayState?.resetToToday() },
+                    onCurrentDayClicked = { currentDayState?.jumpTo(Clock.System.todayIn(TimeZone.currentSystemDefault())) },
                     currentDestination = { backStack.getLastCalendarView() },
                     floatingActionButton = {
                         CalendarFab(
