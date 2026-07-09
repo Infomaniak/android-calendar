@@ -21,14 +21,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
-import com.infomaniak.calendar.ui.state.CurrentDayState
-import kotlinx.coroutines.channels.consume
+import com.infomaniak.calendar.ui.state.VisibleDayState
 import kotlinx.coroutines.channels.consumeEach
 import kotlin.math.abs
 
 @Composable
 fun ObserveScrollAction(
-    currentDay: CurrentDayState,
+    currentDay: VisibleDayState,
     firstVisibleItemIndex: () -> Int,
     eventsByWeekAndDay: () -> EventsByWeekAndDay,
     animatedScroll: suspend (index: Int) -> Unit,

@@ -34,10 +34,10 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import kotlin.time.Clock
 
-val LocalCurrentDayState = staticCompositionLocalOf<CurrentDayState?> { null }
+val LocalVisibleDayState = staticCompositionLocalOf<VisibleDayState?> { null }
 
 @Composable
-fun rememberCurrentDayState(): VisibleDayState {
+fun rememberVisibleDayState(): VisibleDayState {
     return rememberSaveable { VisibleDayState(initialDate = Clock.System.todayIn(TimeZone.currentSystemDefault())) }
 }
 
