@@ -1,6 +1,6 @@
 # Copilot Coding Agent Onboarding — android-calendar
 
-> **Read `AGENTS.md` and `app/AGENTS.md` first** for architecture and conventions. This file covers build, CI, and validation.
+> **Read `AGENTS.md` and `app/AGENTS.md` first** for architecture and conventions. This file covers PR review instructions.
 
 ## PR Review Instructions
 
@@ -9,12 +9,10 @@
   corresponding `values-<lang>` folders). Do not add strings to other `CalendarComponents/*` modules.
 - Make sure fdroid is not forgotten when adding new behavior.
 - When adding/removing a runtime dependency, update `LICENSES.md` at the repo root.
-- Always make sure that when calendar core version is updated, the KMP submodule is also updated to the same version. And vice
-  versa.
-- If a module contains strings, make sure the module is correctly validated inside
+- If a module contains strings, make sure it is covered in `workflows/translations-validation.yml` and validated there. If it is
+  missing, add:- If a module contains strings, make sure the module is correctly validated inside
   the [translations-validation.yml](workflows/translations-validation.yml) CI file. If missing, you can suggest to add the
   following code by adapting it to the new module's actual name:
-
 ```yml
       - name: Run Ink validation for <module name>
         run: |
