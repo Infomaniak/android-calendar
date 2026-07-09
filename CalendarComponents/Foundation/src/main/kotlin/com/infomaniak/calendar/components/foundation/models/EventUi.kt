@@ -30,7 +30,6 @@ sealed interface EventUi {
         val title: String,
         val location: String?,
         val status: EventStatus,
-        val categories: String?,
         val start: Instant,
         val end: Instant,
         val isAllDay: Boolean,
