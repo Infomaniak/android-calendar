@@ -17,44 +17,38 @@
  */
 package com.infomaniak.calendar.ui.state
 
-import android.os.Parcelable
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
-import kotlinx.parcelize.IgnoredOnParcel
-import kotlinx.parcelize.Parcelize
 import kotlin.time.Clock
 
 val LocalVisibleDayState = staticCompositionLocalOf<VisibleDayState?> { null }
 
 @Composable
 fun rememberVisibleDayState(): VisibleDayState {
-    return rememberSaveable { VisibleDayState(initialDate = Clock.System.todayIn(TimeZone.currentSystemDefault())) }
+    val visibleDate = rememberSaveable { mutableStateOf(Clock.System.todayIn(TimeZone.currentSystemDefault())) }
+    return remember { VisibleDayState(_visibleDate = visibleDate) }
 }
 
 @Stable
-@Parcelize
-class VisibleDayState(val initialDate: LocalDate) : Parcelable {
-    @IgnoredOnParcel
-    var visibleDate: LocalDate by mutableStateOf(initialDate)
-        private set
+class VisibleDayState(private val _visibleDate: MutableState<LocalDate>) {
+    val visibleDate by _visibleDate
 
-    @IgnoredOnParcel
     private val _scrollCommand = Channel<LocalDate>(Channel.CONFLATED)
-    @IgnoredOnParcel
     val scrollCommand: ReceiveChannel<LocalDate> = _scrollCommand
 
     fun onVisibleDateChanged(date: LocalDate) {
-        visibleDate = date
+        _visibleDate.value = date
     }
 
     fun jumpTo(date: LocalDate) = _scrollCommand.trySend(date)

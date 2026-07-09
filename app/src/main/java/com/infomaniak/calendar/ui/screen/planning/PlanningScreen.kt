@@ -31,6 +31,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -121,9 +123,9 @@ private fun LoadingPlanning(modifier: Modifier = Modifier) {
 @Composable
 private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class) weekEvents: EventsByWeekAndDay) {
     CalendarThemeForPreview {
-        CompositionLocalProvider(
-            LocalVisibleDayState provides VisibleDayState(Clock.System.todayIn(TimeZone.currentSystemDefault())),
-        ) {
+        val visibleDate = remember { mutableStateOf(Clock.System.todayIn(TimeZone.currentSystemDefault())) }
+
+        CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(visibleDate)) {
             PlanningScreen(
                 planningUiState = { PlanningUiState.Success({ weekEvents }) },
                 goToEventCreation = {},
