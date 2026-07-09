@@ -33,14 +33,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
+import com.infomaniak.calendar.ui.component.drawer.model.CalendarUi
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.calendar.utils.toCalendarColorsUi
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 
 @Composable
@@ -82,15 +82,15 @@ fun DrawerCalendarItem(
 @Preview
 @Composable
 private fun DrawerCalendarItemPreview() {
-    val calendarPreview = CalendarUi(
-        id = CalendarId("1"),
-        accountId = AccountId(1),
-        displayName = "Work",
-        colors = LocalEventColorsUiFactory.current.create(0xFF2196F3.toInt()),
-        isVisible = true,
-    )
-
     CalendarThemeForPreview {
+        val calendarPreview = CalendarUi(
+            id = CalendarId("1"),
+            accountId = AccountId(1),
+            displayName = "Work",
+            colors = CalendarColors.from(0xFF2196F3.toInt()).toCalendarColorsUi(),
+            isVisible = true,
+        )
+
         DrawerCalendarItem(calendar = calendarPreview, onCalendarVisibilityChange = { _, _ -> })
     }
 }

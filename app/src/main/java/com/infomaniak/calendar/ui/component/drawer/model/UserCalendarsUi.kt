@@ -15,16 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.component.drawer
+package com.infomaniak.calendar.ui.component.drawer.model
 
-import com.infomaniak.calendar.components.foundation.models.EventColorsUi
-import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
+import com.infomaniak.core.auth.models.user.User
 
-data class CalendarUi(
-    val id: CalendarId,
-    val accountId: AccountId,
-    val displayName: String,
-    val colors: EventColorsUi,
-    val isVisible: Boolean,
+data class UserCalendarsUi(
+    val user: User,
+    val calendars: List<CalendarUi>,
 )

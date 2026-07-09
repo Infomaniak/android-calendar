@@ -17,20 +17,18 @@
  */
 package com.infomaniak.calendar.ui.screen.planning
 
-import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
-import com.infomaniak.calendar.components.foundation.models.EventColorUi
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
+import com.infomaniak.calendar.utils.toEventColorUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColor
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import kotlinx.coroutines.Dispatchers
@@ -131,10 +129,7 @@ private fun KmpEventStatus?.toEventStatus(): EventStatus {
     }
 }
 
-// TODO: Move
 fun EventColors.toEventColorsUi(): EventColorsUi = EventColorsUi(
-    color = Color(color),
-    onColor = Color(onColor),
     _datavizContainer = datavizContainer.toEventColorUi(),
     _onDatavizContainer = onDatavizContainer.toEventColorUi(),
     _datavizContainerVariant = datavizContainerVariant.toEventColorUi(),
@@ -153,8 +148,6 @@ private fun KmpParticipationStatus.toParticipationStatus(): ParticipationStatus 
     KmpParticipationStatus.Tentative -> ParticipationStatus.Tentative
     KmpParticipationStatus.NeedsAction -> ParticipationStatus.NeedsAction
 }
-
-private fun EventColor.toEventColorUi(): EventColorUi = EventColorUi(light = light, dark = dark)
 
 fun EventsByWeekAndDay.indexOf(date: LocalDate): Int {
     var index = 0

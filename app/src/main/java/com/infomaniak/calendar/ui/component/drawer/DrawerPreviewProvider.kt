@@ -18,12 +18,15 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.infomaniak.calendar.components.foundation.models.EventColorsUi
-import com.infomaniak.calendar.components.foundation.preview.EventColorsUiFactory.Companion.dummyEventColorsUiFactory
+import com.infomaniak.calendar.ui.component.drawer.model.CalendarColorsUi
+import com.infomaniak.calendar.ui.component.drawer.model.CalendarUi
+import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
+import com.infomaniak.calendar.utils.toCalendarColorsUi
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.auth.models.user.preferences.OrganizationPreference
 import com.infomaniak.core.auth.models.user.preferences.Preferences
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 
 class DrawerPreviewProvider : PreviewParameterProvider<List<UserCalendarsUi>> {
@@ -86,4 +89,4 @@ class DrawerPreviewProvider : PreviewParameterProvider<List<UserCalendarsUi>> {
     }
 }
 
-private fun colorUi(color: Long): EventColorsUi = dummyEventColorsUiFactory.create(color.toInt())
+private fun colorUi(color: Long): CalendarColorsUi = CalendarColors.from(color.toInt()).toCalendarColorsUi()
