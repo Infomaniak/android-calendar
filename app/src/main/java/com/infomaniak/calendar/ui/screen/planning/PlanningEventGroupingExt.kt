@@ -157,8 +157,9 @@ fun EventsByWeekAndDay.indexOf(date: LocalDate): Int {
 
     entries.forEach { (week, days) ->
         if (date < week.firstDay) return index
-        index++
-        if (date <= week.lastDay) {
+        index++ // Count the week header
+
+        if (date <= week.lastDay) { // If the day is somewhere inside this week
             days.forEach { (day, events) ->
                 if (day >= date) return index
                 index += events.size
