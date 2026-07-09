@@ -57,7 +57,7 @@ class PlanningViewModel(private val accountUtils: AccountUtils, private val cale
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val planningUiState: StateFlow<PlanningUiState> = calendarManager
-        .observeEvents(startDate, endDate)
+        .observeDaySlices(startDate, endDate, timeZone)
         .mapLatest {
             val events = it.groupByWeekAndDay(emailsByUserId.first())
             PlanningUiState.Success({ events })

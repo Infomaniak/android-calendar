@@ -30,12 +30,13 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import java.util.SortedMap
 import kotlin.time.Clock
@@ -53,38 +54,35 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.Participati
 typealias EventsByWeekAndDay = SortedMap<YearWeek, SortedMap<LocalDate, List<EventUi>>>
 
 /**
- * Groups events by the [week][YearWeek] they fall in and then by their day.
+ * Groups already day-split events ([EventDaySlice]s, keyed by day) by the [week][YearWeek] they fall
+ * in, then by their day, ready to be consumed by the planning UI.
  *
- * Events without a [start][EventTiming.start]
- * instant are ignored since they cannot be placed on a calendar day.
+ * The input is expected to come from `CalendarManager.observeDaySlices`, i.e. already grouped by day
+ * and sorted within each day (all-day first, then by start time). A multi-day event therefore yields
+ * one [EventUi] per day it covers, each carrying that day's clamped [start][EventUi.Normal.start] /
+ * [end][EventUi.Normal.end] bounds (converted to an absolute instant in [timeZone]).
  *
- * Instants are bucketed using [timeZone] (the device's current timezone by default), and weeks are
- * resolved using [weekNumbering] (ISO-8601 by default).
- *
- * The nested sorted structure is filled in a single pass: each event is placed directly into its week
- * and day bucket, with no intermediate collections allocated along the way.
+ * Weeks are resolved using [weekNumbering] (ISO-8601 by default). Today is guaranteed to have an
+ * entry: an empty day gets a single [EventUi.TodayEmptyState] placeholder.
  */
 @OptIn(ExperimentalTime::class)
-suspend fun List<Event>.groupByWeekAndDay(
+suspend fun Map<LocalDate, List<EventDaySlice>>.groupByWeekAndDay(
     emailsByUserId: Map<AccountId, String>,
     weekNumbering: WeekNumbering = WeekNumbering.ISO_8601,
     timeZone: TimeZone = TimeZone.currentSystemDefault(),
 ): EventsByWeekAndDay = withContext(Dispatchers.Default) {
-    val result = sortedMapOf<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>()
+    val eventsByWeekAndDay = sortedMapOf<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>()
 
-    for (event in this@groupByWeekAndDay) {
+    for ((date, daySlices) in this@groupByWeekAndDay) {
         ensureActive()
-        val date = event.getStartAt(timeZone)
-        result
-            .getOrPut(weekNumbering.weekOf(date)) { sortedMapOf() }
-            .getOrPut(date) { mutableListOf() }
-            .add(event.toEventUi(emailsByUserId))
+        val week = eventsByWeekAndDay.getOrPut(weekNumbering.weekOf(date)) { sortedMapOf() }
+        week[date] = daySlices.mapTo(mutableListOf()) { slice -> slice.toEventUi(emailsByUserId, timeZone) }
     }
 
-    result.ensureTodayHasEntry(timeZone, weekNumbering)
+    eventsByWeekAndDay.ensureTodayHasEntry(timeZone, weekNumbering)
 
     @Suppress("UNCHECKED_CAST") // Shows the exposed list as non-mutable
-    return@withContext result as EventsByWeekAndDay
+    return@withContext eventsByWeekAndDay as EventsByWeekAndDay
 }
 
 private fun SortedMap<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>.ensureTodayHasEntry(
@@ -97,26 +95,21 @@ private fun SortedMap<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>.ensu
     if (todayEvents.isEmpty()) todayEvents.add(EventUi.TodayEmptyState)
 }
 
-// TODO: Handle AllDay
-private fun Event.getStartAt(timeZone: TimeZone): LocalDate {
-    return timing.startIn(timeZone).date
-}
-
-private fun Event.toEventUi(emailsByUserId: Map<AccountId, String>): EventUi = EventUi.Normal(
-    id = id.url,
-    title = title,
-    location = location,
-    status = status.toEventStatus(),
-    start = timing.startInstantLocal(),
-    end = timing.endInstantLocal(),
-    isAllDay = timing.isAllDay,
-    colors = colors.toEventColorsUi(),
-    attendees = toAttendees(attendees, emailsByUserId),
+private fun EventDaySlice.toEventUi(emailsByUserId: Map<AccountId, String>, timeZone: TimeZone): EventUi = EventUi.Normal(
+    id = "${event.id.url}@$date",
+    title = event.title,
+    location = event.location,
+    status = event.status.toEventStatus(),
+    start = displayStart.toInstant(timeZone),
+    end = displayEnd.toInstant(timeZone),
+    isAllDay = isAllDay,
+    colors = event.colors.toEventColorsUi(),
+    attendees = toAttendees(event.attendees, emailsByUserId),
 )
 
-private fun Event.toAttendees(attendees: List<Attendee>, emailsByUserId: Map<AccountId, String>): Attendees {
+private fun EventDaySlice.toAttendees(attendees: List<Attendee>, emailsByUserId: Map<AccountId, String>): Attendees {
     val all = attendees.map(Attendee::toAttendeeUi)
-    val me = all.find { it.email == emailsByUserId[accountId] }
+    val me = all.find { it.email == emailsByUserId[event.accountId] }
 
     return Attendees(all, me)
 }
