@@ -58,7 +58,10 @@ class PlanningViewModel(private val accountUtils: AccountUtils, private val cale
     @OptIn(ExperimentalCoroutinesApi::class)
     val planningUiState: StateFlow<PlanningUiState> = calendarManager
         .observeEvents(startDate, endDate)
-        .mapLatest { PlanningUiState.Success(it.groupByWeekAndDay(emailsByUserId.first())) }
+        .mapLatest {
+            val events = it.groupByWeekAndDay(emailsByUserId.first())
+            PlanningUiState.Success({ events })
+        }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = PlanningUiState.Loading)
 
     init {

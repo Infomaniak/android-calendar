@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.planning
 
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,24 +27,21 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlin.math.abs
 
 @Composable
-fun ObserveScrollAction(
-    currentDay: VisibleDayState,
-    firstVisibleItemIndex: () -> Int,
-    eventsByWeekAndDay: () -> EventsByWeekAndDay,
-    animatedScroll: suspend (index: Int) -> Unit,
-    instantScroll: suspend (index: Int) -> Unit,
-) {
-    val currentEventsByWeekAndDay by rememberUpdatedState(eventsByWeekAndDay)
-    val currentFirstVisibleItemIndex by rememberUpdatedState(firstVisibleItemIndex)
+fun ProcessJumpRequests(lazyListState: LazyListState, visibleDayState: VisibleDayState, events: () -> EventsByWeekAndDay) {
+    val currentEventsByWeekAndDay by rememberUpdatedState(events)
 
-    LaunchedEffect(currentDay) {
-        currentDay.scrollCommand.consumeEach { date ->
+    LaunchedEffect(visibleDayState) {
+        visibleDayState.scrollCommand.consumeEach { date ->
             val targetIndex = currentEventsByWeekAndDay().indexOf(date)
-            val distance = abs(targetIndex - currentFirstVisibleItemIndex())
+            val distance = abs(targetIndex - lazyListState.firstVisibleItemIndex)
 
             // Swallow CancellationException thrown when a user gesture interrupts the programmatic scroll.
             runCatching {
-                if (distance > SCROLL_THRESHOLD) instantScroll(targetIndex) else animatedScroll(targetIndex)
+                if (distance > SCROLL_THRESHOLD) {
+                    lazyListState.scrollToItem(targetIndex)
+                } else {
+                    lazyListState.animateScrollToItem(targetIndex)
+                }
             }
         }
     }

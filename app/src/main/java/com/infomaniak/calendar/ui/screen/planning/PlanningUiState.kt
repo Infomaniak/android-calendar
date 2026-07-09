@@ -19,5 +19,5 @@ package com.infomaniak.calendar.ui.screen.planning
 
 sealed interface PlanningUiState {
     data object Loading : PlanningUiState
-    data class Success(val eventsByWeekAndDay: EventsByWeekAndDay) : PlanningUiState
+    data class Success(val eventsByWeekAndDay: () -> EventsByWeekAndDay) : PlanningUiState
 }
