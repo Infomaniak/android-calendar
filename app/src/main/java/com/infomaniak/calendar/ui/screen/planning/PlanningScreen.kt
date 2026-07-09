@@ -62,17 +62,17 @@ private fun PlanningScreen(goToEventCreation: () -> Unit, planningUiState: () ->
         modifier = modifier,
     ) { paddingValues ->
         when (val planningUi = planningUiState()) {
+            is PlanningUiState.Success -> SuccessPlanning(goToEventCreation, planningUi, paddingValues)
             is PlanningUiState.Loading -> LoadingPlanning(modifier = Modifier.padding(paddingValues))
-            is PlanningUiState.Success -> PlanningSuccess(goToEventCreation, planningUi, paddingValues)
         }
     }
 }
 
 @Composable
-private fun PlanningSuccess(
+private fun SuccessPlanning(
     goToEventCreation: () -> Unit,
     planningUi: PlanningUiState.Success,
-    paddingValues: PaddingValues,
+    contentPadding: PaddingValues,
 ) {
     Column {
         Planning(
@@ -82,7 +82,7 @@ private fun PlanningSuccess(
                 .padding(horizontal = Margin.Medium)
                 .scrollableToolbar()
                 .fillMaxWidth(),
-            contentPadding = paddingValues,
+            contentPadding = contentPadding,
             goToEventCreation = goToEventCreation,
         )
     }
