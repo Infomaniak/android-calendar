@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.di.ComposeAppGraph
 import com.infomaniak.calendar.ui.LocalUser
-import com.infomaniak.calendar.ui.component.drawer.DrawerIconButton
+import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.utils.account.AccountUtils
 import kotlinx.coroutines.flow.first
@@ -60,7 +60,12 @@ private fun DayScreen(
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.dayTitle)) }, navigationIcon = { DrawerIconButton() }) },
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.dayTitle)) },
+                navigationIcon = { TopAppBarButtons.DrawerIconButton() },
+            )
+        },
         modifier = modifier,
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {

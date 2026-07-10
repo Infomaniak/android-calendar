@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.foundation.utils
+package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
 import android.text.format.DateFormat
 import androidx.compose.runtime.Composable
@@ -28,7 +28,7 @@ import java.time.format.DateTimeFormatter
 import kotlin.time.Instant
 import kotlin.time.toJavaInstant
 
-object TimeFormatter {
+object HourFormatter {
     private val format24Hours by lazy { DateTimeFormatter.ofPattern("HH:mm") }
     private val format12Hours by lazy { DateTimeFormatter.ofPattern("hh:mm a") }
 

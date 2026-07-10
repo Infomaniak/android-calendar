@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ Infomaniak Calendar - Android
   ~ Copyright (C) 2026 Infomaniak Network SA
   ~
@@ -15,15 +15,16 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources>
-    <string name="contentDescriptionInbox">Open inbox</string>
-    <string name="contentDescriptionMenuDrawer">Open menu</string>
-    <string name="contentDescriptionSearch">Search</string>
-    <string name="contentDescriptionToday">Today</string>
-    <string name="contentDescriptionToolbarCurrentViewButton">Current view: %1$s. Tap to change view.</string>
-    <string name="dayTitle">Day</string>
-    <string name="monthTitle">Month</string>
-    <string name="planningTitle">Planning</string>
-    <string name="threeDaysTitle">Three days</string>
-    <string name="weekTitle">Week</string>
-</resources>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M21,21L16.66,16.66M19,11C19,15.418 15.418,19 11,19C6.582,19 3,15.418 3,11C3,6.582 6.582,3 11,3C15.418,3 19,6.582 19,11Z"
+      android:strokeLineJoin="round"
+      android:strokeWidth="1.75"
+      android:fillColor="#00000000"
+      android:strokeColor="#000000"
+      android:strokeLineCap="round"/>
+</vector>

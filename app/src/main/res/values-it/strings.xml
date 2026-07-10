@@ -16,7 +16,9 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <string name="contentDescriptionInbox">Apri la posta in arrivo</string>
     <string name="contentDescriptionMenuDrawer">Apri menu</string>
+    <string name="contentDescriptionSearch">Cerca</string>
     <string name="contentDescriptionToday">Oggi</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Vista attuale: %1$s. Toccare per cambiare vista.</string>
     <string name="dayTitle">Giorno</string>

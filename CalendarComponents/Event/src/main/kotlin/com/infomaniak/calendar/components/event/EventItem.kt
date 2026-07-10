@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.components.event
 
-import android.graphics.Insets.add
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -45,7 +44,7 @@ import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.component.cardStripes
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
-import com.infomaniak.calendar.components.foundation.utils.TimeFormatter.formatHours
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.HourFormatter.formatHours
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlin.time.Clock

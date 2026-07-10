@@ -38,6 +38,7 @@ import com.infomaniak.calendar.components.event.EventItem
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.YearWeek
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.DayFormatter.toShortDayName
 import com.infomaniak.calendar.components.planning.component.DayIndicator
 import com.infomaniak.calendar.components.planning.component.TodayEmptyState
 import com.infomaniak.calendar.components.planning.preview.WeekEventsPreviewParameter
@@ -45,12 +46,8 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.todayIn
-import java.time.format.DateTimeFormatter
 import kotlin.time.Clock
-
-private val shortDayNameFormatter = DateTimeFormatter.ofPattern("EEE")
 
 @Composable
 fun Planning(
@@ -85,7 +82,7 @@ fun Planning(
                         horizontalArrangement = Arrangement.spacedBy(Margin.Small),
                     ) {
                         DayIndicator(
-                            dayName = date.toJavaLocalDate().format(shortDayNameFormatter),
+                            dayName = date.toShortDayName(),
                             dayNumber = date.day,
                             state = if (date == today) DateState.Today else DateState.None,
                             modifier = Modifier
