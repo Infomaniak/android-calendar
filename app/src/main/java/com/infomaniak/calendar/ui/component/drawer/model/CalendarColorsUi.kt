@@ -15,19 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.foundation.models
+package com.infomaniak.calendar.ui.component.drawer.model
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.infomaniak.calendar.components.foundation.models.ThemedColorUi
 
-data class EventColorsUi(
-    private val _datavizContainer: ThemedColorUi,
-    private val _onDatavizContainer: ThemedColorUi,
+data class CalendarColorsUi(
+    val color: Color,
     private val _datavizContainerVariant: ThemedColorUi,
     private val _onDatavizContainerVariant: ThemedColorUi,
 ) {
-    val datavizContainer: Color @Composable get() = _datavizContainer.toColor()
-    val onDatavizContainer: Color @Composable get() = _onDatavizContainer.toColor()
     val datavizContainerVariant: Color @Composable get() = _datavizContainerVariant.toColor()
     val onDatavizContainerVariant: Color @Composable get() = _onDatavizContainerVariant.toColor()
 }

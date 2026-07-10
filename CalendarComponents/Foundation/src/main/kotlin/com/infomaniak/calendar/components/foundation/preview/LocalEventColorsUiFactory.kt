@@ -19,8 +19,8 @@ package com.infomaniak.calendar.components.foundation.preview
 
 import androidx.annotation.ColorInt
 import androidx.compose.runtime.staticCompositionLocalOf
-import com.infomaniak.calendar.components.foundation.models.EventColorUi
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
+import com.infomaniak.calendar.components.foundation.models.ThemedColorUi
 import com.infomaniak.calendar.components.foundation.preview.EventColorsUiFactory.Companion.dummyEventColorsUiFactory
 
 val LocalEventColorsUiFactory = staticCompositionLocalOf { dummyEventColorsUiFactory }
@@ -32,10 +32,10 @@ fun interface EventColorsUiFactory {
         val dummyEventColorsUiFactory by lazy {
             EventColorsUiFactory {
                 EventColorsUi(
-                    _datavizContainer = EventColorUi(light = 0xFFFFFFFF.toInt(), dark = 0xFF381E72.toInt()),
-                    _onDatavizContainer = EventColorUi(light = 0xFF6750A4.toInt(), dark = 0xFFCFBCFF.toInt()),
-                    _datavizContainerVariant = EventColorUi(light = 0xFFE9DDFF.toInt(), dark = 0xFF4F378A.toInt()),
-                    _onDatavizContainerVariant = EventColorUi(light = 0xFF4F378A.toInt(), dark = 0xFFE9DDFF.toInt()),
+                    _datavizContainer = ThemedColorUi(light = 0xFFFFFFFF.toInt(), dark = 0xFF381E72.toInt()),
+                    _onDatavizContainer = ThemedColorUi(light = 0xFF6750A4.toInt(), dark = 0xFFCFBCFF.toInt()),
+                    _datavizContainerVariant = ThemedColorUi(light = 0xFFE9DDFF.toInt(), dark = 0xFF4F378A.toInt()),
+                    _onDatavizContainerVariant = ThemedColorUi(light = 0xFF4F378A.toInt(), dark = 0xFFE9DDFF.toInt()),
                 )
             }
         }
