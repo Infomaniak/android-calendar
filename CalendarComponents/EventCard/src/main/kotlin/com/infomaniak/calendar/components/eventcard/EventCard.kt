@@ -1,6 +1,10 @@
 package com.infomaniak.calendar.components.eventcard
 
+import android.R.attr.action
+import android.R.attr.label
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -46,6 +50,7 @@ fun EventCard(
     location: String?,
     attendees: List<AvatarType>,
     action: EventCardAction,
+    progress: () -> Float,
     modifier: Modifier = Modifier,
 ) {
     Card(modifier = modifier, shape = MaterialTheme.shapes.large) {
@@ -64,7 +69,7 @@ fun EventCard(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun EventCardContent(
+private fun EventCardContent(
     timeUntilEvent: String,
     title: String,
     startDate: LocalDateTime,
@@ -95,15 +100,40 @@ fun EventCardContent(
                 }
             }
 
-            when (action) {
-                EventCardAction.None -> Unit
-                is EventCardAction.Button -> {
-                    Button(action.onClick, shapes = ButtonDefaults.shapes(ButtonDefaults.squareShape)) {
-                        Icon(painterResource(action.iconRes), null, tint = LocalContentColor.current)
-                        Spacer(modifier = Modifier.width(Margin.Mini))
-                        Text(action.label)
-                    }
-                }
+            ActionButton(action)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun CollapsedEventCardContent(
+    title: String,
+    startDate: LocalDateTime,
+    endDate: LocalDateTime,
+    action: EventCardAction,
+    modifier: Modifier = Modifier,
+) {
+    Row(modifier = modifier) {
+        Column {
+            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+            IconItem(painterResource(R.drawable.ic_clock), null, startDate.formatRangeTo(endDate))
+        }
+
+        ActionButton(action)
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+private fun ActionButton(action: EventCardAction) {
+    when (action) {
+        EventCardAction.None -> Unit
+        is EventCardAction.Button -> {
+            Button(action.onClick, shapes = ButtonDefaults.shapes(ButtonDefaults.squareShape)) {
+                Icon(painterResource(action.iconRes), null, tint = LocalContentColor.current)
+                Spacer(modifier = Modifier.width(Margin.Mini))
+                Text(action.label)
             }
         }
     }
