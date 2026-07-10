@@ -61,6 +61,7 @@ fun Planning(
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+    val events = weekEvents()
     val sectionSizing = remember { SectionSizing() }
 
     LazyColumn(
@@ -69,17 +70,18 @@ fun Planning(
         contentPadding = contentPadding,
         verticalArrangement = Arrangement.spacedBy(Margin.Mini),
     ) {
-        weekEvents().forEach { (week, days) ->
-            item(key = week) {
+        events.forEach { (week, days) ->
+            item(key = PlanningItemKey.WeekHeader(week.firstDay)) {
                 Text(week.label, modifier = Modifier.padding(vertical = Margin.Medium))
             }
 
             days.forEach { (date, events) ->
-                val sectionItemKeys = events.map { it.itemKey }
+                val sectionItemKeys = events.map { it.toItemKey(date) }
 
-                items(events, key = { it.itemKey }) { event ->
+                items(events, key = { it.toItemKey(date) }) { event ->
+                    val itemKey = event.toItemKey(date)
                     Row(
-                        modifier = Modifier.ensureSectionMinHeight(sectionSizing, sectionItemKeys, event.itemKey),
+                        modifier = Modifier.ensureSectionMinHeight(sectionSizing, sectionItemKeys, itemKey),
                         horizontalArrangement = Arrangement.spacedBy(Margin.Small),
                     ) {
                         DayIndicator(
@@ -88,7 +90,7 @@ fun Planning(
                             state = if (date == today) DateState.Today else DateState.None,
                             modifier = Modifier
                                 .measureIndicator(sectionSizing)
-                                .stickyDayIndicator(lazyListState, event.itemKey, sectionItemKeys),
+                                .stickyDayIndicator(lazyListState, itemKey, sectionItemKeys),
                         )
 
                         when (event) {
@@ -109,12 +111,12 @@ private val YearWeek.label: String
         return "$week - $dateRange"
     }
 
-private val EventUi.itemKey get() = id
+private fun EventUi.toItemKey(date: LocalDate): PlanningItemKey = PlanningItemKey.Event(date = date, id = id)
 
 @Preview
 @Composable
 private fun PreviewPlanning(@PreviewParameter(WeekEventsPreviewParameter::class) weekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>>) {
     Surface {
-        Planning(goToEventCreation = { }, weekEvents = { weekEvents })
+        Planning(goToEventCreation = {}, weekEvents = { weekEvents })
     }
 }

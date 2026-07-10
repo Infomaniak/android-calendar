@@ -15,9 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.planning
+package com.infomaniak.calendar.components.planning
 
-sealed interface PlanningUiState {
-    data object Loading : PlanningUiState
-    data class Success(val eventsByWeekAndDay: () -> EventsByWeekAndDay) : PlanningUiState
+import android.os.Parcelable
+import kotlinx.datetime.LocalDate
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+sealed interface PlanningItemKey : Parcelable {
+    val date: LocalDate
+
+    data class WeekHeader(override val date: LocalDate) : PlanningItemKey
+
+    data class Event(override val date: LocalDate, val id: String) : PlanningItemKey
 }

@@ -151,3 +151,25 @@ private fun KmpParticipationStatus.toParticipationStatus(): ParticipationStatus 
 }
 
 private fun EventColor.toEventColorUi(): EventColorUi = EventColorUi(light = light, dark = dark)
+
+fun EventsByWeekAndDay.indexOf(date: LocalDate): Int {
+    var index = 0
+
+    entries.forEach { (week, days) ->
+        if (date < week.firstDay) return index
+        index++ // Count the week header
+
+        if (date <= week.lastDay) { // If the day is somewhere inside this week
+            days.forEach { (day, events) ->
+                if (day >= date) return index
+                index += events.size
+            }
+
+            return index
+        }
+
+        index += days.values.sumOf { it.size }
+    }
+
+    return index
+}

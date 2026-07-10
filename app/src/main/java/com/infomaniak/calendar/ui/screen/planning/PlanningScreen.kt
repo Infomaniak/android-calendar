@@ -23,12 +23,16 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -41,8 +45,13 @@ import com.infomaniak.calendar.components.planning.Planning
 import com.infomaniak.calendar.ui.component.drawer.DrawerIconButton
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
 import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewParameter
+import com.infomaniak.calendar.ui.state.LocalVisibleDayState
+import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
+import kotlin.time.Clock
 
 @Composable
 fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier, viewModel: PlanningViewModel = viewModel()) {
@@ -51,7 +60,11 @@ fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier,
 }
 
 @Composable
-private fun PlanningScreen(goToEventCreation: () -> Unit, planningUiState: () -> PlanningUiState, modifier: Modifier = Modifier) {
+private fun PlanningScreen(
+    goToEventCreation: () -> Unit,
+    planningUiState: () -> PlanningUiState,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -62,21 +75,32 @@ private fun PlanningScreen(goToEventCreation: () -> Unit, planningUiState: () ->
         modifier = modifier,
     ) { paddingValues ->
         when (val planningUi = planningUiState()) {
-            is PlanningUiState.Success -> SuccessPlanning(goToEventCreation, planningUi, paddingValues)
-            is PlanningUiState.Loading -> LoadingPlanning(modifier = Modifier.padding(paddingValues))
+            is PlanningUiState.Success -> {
+                SuccessPlanning(planningUi.eventsByWeekAndDay, paddingValues, goToEventCreation)
+            }
+            is PlanningUiState.Loading -> {
+                LoadingPlanning(modifier = Modifier.padding(paddingValues))
+            }
         }
     }
 }
 
 @Composable
 private fun SuccessPlanning(
-    goToEventCreation: () -> Unit,
-    planningUi: PlanningUiState.Success,
+    events: () -> EventsByWeekAndDay,
     contentPadding: PaddingValues,
+    goToEventCreation: () -> Unit,
 ) {
+    val visibleDayState = LocalVisibleDayState.current ?: return
+    val lazyListState = rememberLazyListState(events().indexOf(visibleDayState.visibleDate))
+
+    ProcessJumpRequests(lazyListState, visibleDayState, events)
+    ReportVisibleDate(lazyListState, onVisibleDateChanged = visibleDayState::onVisibleDateChanged)
+
     Column {
         Planning(
-            weekEvents = { planningUi.eventsByWeekAndDay },
+            lazyListState = lazyListState,
+            weekEvents = events,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = Margin.Medium)
@@ -99,6 +123,13 @@ private fun LoadingPlanning(modifier: Modifier = Modifier) {
 @Composable
 private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class) weekEvents: EventsByWeekAndDay) {
     CalendarThemeForPreview {
-        PlanningScreen(goToEventCreation = { }, planningUiState = { PlanningUiState.Success(weekEvents) })
+        val visibleDate = remember { mutableStateOf(Clock.System.todayIn(TimeZone.currentSystemDefault())) }
+
+        CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(visibleDate)) {
+            PlanningScreen(
+                planningUiState = { PlanningUiState.Success({ weekEvents }) },
+                goToEventCreation = {},
+            )
+        }
     }
 }
