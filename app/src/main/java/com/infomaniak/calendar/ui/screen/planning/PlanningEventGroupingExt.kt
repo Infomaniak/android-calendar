@@ -37,6 +37,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 import java.util.SortedMap
 import kotlin.time.Clock
@@ -95,7 +96,7 @@ private fun SortedMap<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>.ensu
     val today = Clock.System.now().toLocalDateTime(timeZone).date
     val todayEvents = getOrPut(weekNumbering.weekOf(today)) { sortedMapOf() }.getOrPut(today) { mutableListOf() }
 
-    if (todayEvents.isEmpty()) todayEvents.add(EventUi.TodayEmptyState)
+    if (todayEvents.isEmpty()) todayEvents.add(EventUi.TodayEmptyState())
 }
 
 // TODO: Handle AllDay

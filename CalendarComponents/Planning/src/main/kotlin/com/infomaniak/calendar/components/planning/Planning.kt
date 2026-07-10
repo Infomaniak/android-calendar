@@ -30,9 +30,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -71,8 +69,7 @@ fun Planning(
     val events = weekEvents()
     val sectionSizing = remember { SectionSizing() }
 
-    val keyToDate = remember(events) { events.buildKeyToDateMap() }
-    ReportVisibleDate(lazyListState = lazyListState, keyToDate = { keyToDate }, onVisibleDateChanged = onVisibleDateChanged)
+    ReportVisibleDate(lazyListState = lazyListState, onVisibleDateChanged = onVisibleDateChanged)
 
     LazyColumn(
         state = lazyListState,
@@ -81,16 +78,17 @@ fun Planning(
         verticalArrangement = Arrangement.spacedBy(Margin.Mini),
     ) {
         events.forEach { (week, days) ->
-            item(key = week) {
+            item(key = PlanningItemKey.WeekHeader(week.firstDay)) {
                 Text(week.label, modifier = Modifier.padding(vertical = Margin.Medium))
             }
 
             days.forEach { (date, events) ->
-                val sectionItemKeys = events.map { it.itemKey }
+                val sectionItemKeys = events.map { it.toItemKey(date) }
 
-                items(events, key = { it.itemKey }) { event ->
+                items(events, key = { it.toItemKey(date) }) { event ->
+                    val itemKey = event.toItemKey(date)
                     Row(
-                        modifier = Modifier.ensureSectionMinHeight(sectionSizing, sectionItemKeys, event.itemKey),
+                        modifier = Modifier.ensureSectionMinHeight(sectionSizing, sectionItemKeys, itemKey),
                         horizontalArrangement = Arrangement.spacedBy(Margin.Small),
                     ) {
                         DayIndicator(
@@ -99,7 +97,7 @@ fun Planning(
                             state = if (date == today) DateState.Today else DateState.None,
                             modifier = Modifier
                                 .measureIndicator(sectionSizing)
-                                .stickyDayIndicator(lazyListState, event.itemKey, sectionItemKeys),
+                                .stickyDayIndicator(lazyListState, itemKey, sectionItemKeys),
                         )
 
                         when (event) {
@@ -113,25 +111,10 @@ fun Planning(
     }
 }
 
-private fun Map<YearWeek, Map<LocalDate, List<EventUi>>>.buildKeyToDateMap(): Map<Any, LocalDate> = buildMap {
-    this@buildKeyToDateMap.forEach { (week, days) ->
-        put(week, week.firstDay)
-        days.forEach { (date, dayEvents) ->
-            dayEvents.forEach { event -> put(event.itemKey, date) }
-        }
-    }
-}
-
 @Composable
-private fun ReportVisibleDate(
-    lazyListState: LazyListState,
-    keyToDate: () -> Map<Any, LocalDate>,
-    onVisibleDateChanged: (LocalDate) -> Unit,
-) {
-    val currentKeyToDate by rememberUpdatedState(keyToDate)
-
+private fun ReportVisibleDate(lazyListState: LazyListState, onVisibleDateChanged: (LocalDate) -> Unit) {
     LaunchedEffect(lazyListState) {
-        snapshotFlow { currentKeyToDate()[lazyListState.firstVisibleItemKey()] }
+        snapshotFlow { (lazyListState.firstVisibleItemKey() as? PlanningItemKey)?.date }
             .mapNotNull { it }
             .distinctUntilChanged()
             .collect { onVisibleDateChanged(it) }
@@ -147,7 +130,7 @@ private val YearWeek.label: String
         return "$week - $dateRange"
     }
 
-private val EventUi.itemKey get() = id
+private fun EventUi.toItemKey(date: LocalDate): PlanningItemKey = PlanningItemKey.Event(date = date, id = id)
 
 @Preview
 @Composable
