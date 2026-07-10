@@ -30,7 +30,7 @@ fun interface EventColorsUiFactory {
 
     companion object {
         val dummyEventColorsUiFactory by lazy {
-            EventColorsUiFactory { color ->
+            EventColorsUiFactory {
                 EventColorsUi(
                     _datavizContainer = ThemedColorUi(light = 0xFFFFFFFF.toInt(), dark = 0xFF381E72.toInt()),
                     _onDatavizContainer = ThemedColorUi(light = 0xFF6750A4.toInt(), dark = 0xFFCFBCFF.toInt()),
