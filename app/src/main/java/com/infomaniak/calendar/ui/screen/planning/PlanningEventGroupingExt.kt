@@ -25,7 +25,7 @@ import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
-import com.infomaniak.calendar.utils.toEventColorUi
+import com.infomaniak.calendar.utils.toThemedColorUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
@@ -130,10 +130,10 @@ private fun KmpEventStatus?.toEventStatus(): EventStatus {
 }
 
 fun EventColors.toEventColorsUi(): EventColorsUi = EventColorsUi(
-    _datavizContainer = datavizContainer.toEventColorUi(),
-    _onDatavizContainer = onDatavizContainer.toEventColorUi(),
-    _datavizContainerVariant = datavizContainerVariant.toEventColorUi(),
-    _onDatavizContainerVariant = onDatavizContainerVariant.toEventColorUi(),
+    _datavizContainer = datavizContainer.toThemedColorUi(),
+    _onDatavizContainer = onDatavizContainer.toThemedColorUi(),
+    _datavizContainerVariant = datavizContainerVariant.toThemedColorUi(),
+    _onDatavizContainerVariant = onDatavizContainerVariant.toThemedColorUi(),
 )
 
 private fun Attendee.toAttendeeUi(): AttendeeUi = AttendeeUi(

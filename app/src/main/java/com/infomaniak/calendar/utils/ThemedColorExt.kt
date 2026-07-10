@@ -20,4 +20,4 @@ package com.infomaniak.calendar.utils
 import com.infomaniak.calendar.components.foundation.models.ThemedColorUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.ThemedColor
 
-fun ThemedColor.toEventColorUi(): ThemedColorUi = ThemedColorUi(light = light, dark = dark)
+fun ThemedColor.toThemedColorUi(): ThemedColorUi = ThemedColorUi(light = light, dark = dark)

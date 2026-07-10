@@ -23,6 +23,6 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 
 fun CalendarColors.toCalendarColorsUi(): CalendarColorsUi = CalendarColorsUi(
     color = Color(calendarSourceColor),
-    _datavizContainerVariant = datavizContainerVariant.toEventColorUi(),
-    _onDatavizContainerVariant = onDatavizContainerVariant.toEventColorUi(),
+    _datavizContainerVariant = datavizContainerVariant.toThemedColorUi(),
+    _onDatavizContainerVariant = onDatavizContainerVariant.toThemedColorUi(),
 )
