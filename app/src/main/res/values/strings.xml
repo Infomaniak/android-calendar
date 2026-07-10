@@ -16,7 +16,9 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <string name="contentDescriptionInbox">Open inbox</string>
     <string name="contentDescriptionMenuDrawer">Open menu</string>
+    <string name="contentDescriptionSearch">Search</string>
     <string name="contentDescriptionToday">Today</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Current view: %1$s. Tap to change view.</string>
     <string name="dayTitle">Day</string>

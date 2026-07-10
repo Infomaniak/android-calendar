@@ -37,14 +37,22 @@ object TopAppBarButtons {
     @Composable
     fun InboxButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
         IconButton(onClick = onClick) {
-            Icon(painterResource(R.drawable.ic_inbox), contentDescription = null, modifier = modifier)
+            Icon(
+                painter = painterResource(R.drawable.ic_inbox),
+                contentDescription = stringResource(R.string.contentDescriptionInbox),
+                modifier = modifier,
+            )
         }
     }
 
     @Composable
     fun SearchButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
         IconButton(onClick = onClick) {
-            Icon(painterResource(R.drawable.ic_magnifying_glass), contentDescription = null, modifier = modifier)
+            Icon(
+                painter = painterResource(R.drawable.ic_magnifying_glass),
+                contentDescription = stringResource(R.string.contentDescriptionSearch),
+                modifier = modifier,
+            )
         }
     }
 

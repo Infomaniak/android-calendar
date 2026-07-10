@@ -51,13 +51,13 @@ import kotlin.time.Clock
 private const val DURATION_TWEEN = 150
 
 @Composable
-fun AnimatedMonthYearText(date: LocalDate, modifier: Modifier = Modifier) {
+fun AnimatedMonthYearText(date: () -> LocalDate, modifier: Modifier = Modifier) {
     val locale = LocalConfiguration.current.locales[0]
     val currentYear = rememberCurrentYear()
 
     AnimatedContent(
         modifier = modifier,
-        targetState = date,
+        targetState = date(),
         contentKey = { it.year to it.month },
         transitionSpec = { verticalRoll() },
         label = "MonthYearAnimation",
@@ -94,7 +94,7 @@ private fun <T> dateAnimationSpec(): TweenSpec<T> = tween(DURATION_TWEEN)
 @Composable
 private fun AnimatedMonthYearTextPreview() {
     CalendarThemeForPreview {
-        AnimatedMonthYearText(date = LocalDate(2026, 7, 8))
+        AnimatedMonthYearText(date = { LocalDate(2026, 7, 8) })
     }
 }
 
@@ -102,6 +102,6 @@ private fun AnimatedMonthYearTextPreview() {
 @Composable
 private fun AnimatedMonthYearTextPastYearPreview() {
     CalendarThemeForPreview {
-        AnimatedMonthYearText(date = LocalDate(2025, 12, 25))
+        AnimatedMonthYearText(date = { LocalDate(2025, 12, 25) })
     }
 }

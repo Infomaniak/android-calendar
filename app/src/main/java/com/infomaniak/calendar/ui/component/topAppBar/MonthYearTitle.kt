@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.ui.component.topAppBar
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
@@ -28,17 +27,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 
 @Composable
 fun CurrentMonthTitle(onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val visibleDate = LocalVisibleDayState.current?.visibleDate ?: return
-    MonthYearTitle(date = visibleDate, onClick = onClick, modifier = modifier)
+    val visibleDateState = LocalVisibleDayState.current ?: return
+    MonthYearTitle(date = { visibleDateState.visibleDate }, onClick = onClick, modifier = modifier)
 }
 
 @Composable
-private fun MonthYearTitle(date: LocalDate, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun MonthYearTitle(date: () -> LocalDate, onClick: () -> Unit, modifier: Modifier = Modifier) {
     TextButton(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
         colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
         onClick = onClick,
     ) {
@@ -50,7 +52,8 @@ private fun MonthYearTitle(date: LocalDate, onClick: () -> Unit, modifier: Modif
 @Composable
 private fun MonthYearTitlePreview() {
     CalendarThemeForPreview {
-        MonthYearTitle(date = LocalDate(2026, 7, 8), onClick = { })
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        MonthYearTitle(date = { today }, onClick = { })
     }
 }
 
@@ -58,6 +61,6 @@ private fun MonthYearTitlePreview() {
 @Composable
 private fun MonthYearTitleFrenchPreview() {
     CalendarThemeForPreview {
-        MonthYearTitle(date = LocalDate(2025, 12, 25), onClick = { })
+        MonthYearTitle(date = { LocalDate(2025, 12, 25) }, onClick = { })
     }
 }

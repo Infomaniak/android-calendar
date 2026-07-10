@@ -17,7 +17,10 @@
  */
 package com.infomaniak.calendar.ui.component.topAppBar
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
@@ -32,7 +35,7 @@ import kotlinx.datetime.LocalDate
 @Composable
 fun CalendarTopAppBar(modifier: Modifier = Modifier) {
     TopAppBar(
-        title = { CurrentMonthTitle(onClick = { }) },
+        title = { CurrentMonthTitle(onClick = { }, modifier = Modifier.fillMaxWidth()) },
         navigationIcon = { TopAppBarButtons.DrawerIconButton() },
         actions = {
             TopAppBarButtons.InboxButton(onClick = { })
