@@ -43,6 +43,7 @@ import com.infomaniak.designsystem.calendar.CalendarLightHighContrastTheme
 import com.infomaniak.designsystem.calendar.CalendarLightMediumContrastTheme
 import com.infomaniak.designsystem.calendar.CalendarLightTheme
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 
 @Composable
@@ -75,7 +76,7 @@ fun CalendarTheme(
 
     CompositionLocalProvider(
         EsdsTheme.LocalEsdsTheme provides esdsColorScheme,
-        LocalEventColorsUiFactory provides EventColorsUiFactory { EventColors.from(it).toEventColorsUi() },
+        LocalEventColorsUiFactory provides EventColorsUiFactory { EventColors.from(CalendarColors.from(it)).toEventColorsUi() },
         LocalIsThemeDarkMode provides isDarkTheme,
         LocalAvatarColors provides AvatarColors(avatarColors.colorList, customColors.avatarInitialsColor),
     ) {

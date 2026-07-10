@@ -28,6 +28,7 @@ import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.ui.screen.planning.EventsByWeekAndDay
 import com.infomaniak.calendar.ui.screen.planning.toEventColorsUi
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import kotlinx.datetime.LocalDate
 import kotlin.time.Instant
@@ -57,7 +58,7 @@ private fun eventUi(
         start = Instant.parse(start),
         end = Instant.parse(end),
         isAllDay = false,
-        colors = EventColors.from(color.toArgb()).toEventColorsUi(),
+        colors = EventColors.from(CalendarColors.from(color.toArgb())).toEventColorsUi(),
         attendees = Attendees(attendees, attendees.first()),
     )
 }

@@ -15,12 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.component.drawer
+package com.infomaniak.calendar.ui.component.drawer.model
 
 import com.infomaniak.core.auth.models.user.User
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 
 data class UserCalendarsUi(
     val user: User,
-    val calendars: List<Calendar>,
+    val calendars: List<CalendarUi>,
 )

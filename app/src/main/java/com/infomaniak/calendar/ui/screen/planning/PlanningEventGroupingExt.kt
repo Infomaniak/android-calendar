@@ -19,17 +19,16 @@ package com.infomaniak.calendar.ui.screen.planning
 
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
-import com.infomaniak.calendar.components.foundation.models.EventColorUi
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
+import com.infomaniak.calendar.utils.toThemedColorUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColor
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import kotlinx.coroutines.Dispatchers
@@ -131,10 +130,10 @@ private fun KmpEventStatus?.toEventStatus(): EventStatus {
 }
 
 fun EventColors.toEventColorsUi(): EventColorsUi = EventColorsUi(
-    _datavizContainer = datavizContainer.toEventColorUi(),
-    _onDatavizContainer = onDatavizContainer.toEventColorUi(),
-    _datavizContainerVariant = datavizContainerVariant.toEventColorUi(),
-    _onDatavizContainerVariant = onDatavizContainerVariant.toEventColorUi(),
+    _datavizContainer = datavizContainer.toThemedColorUi(),
+    _onDatavizContainer = onDatavizContainer.toThemedColorUi(),
+    _datavizContainerVariant = datavizContainerVariant.toThemedColorUi(),
+    _onDatavizContainerVariant = onDatavizContainerVariant.toThemedColorUi(),
 )
 
 private fun Attendee.toAttendeeUi(): AttendeeUi = AttendeeUi(
@@ -149,8 +148,6 @@ private fun KmpParticipationStatus.toParticipationStatus(): ParticipationStatus 
     KmpParticipationStatus.Tentative -> ParticipationStatus.Tentative
     KmpParticipationStatus.NeedsAction -> ParticipationStatus.NeedsAction
 }
-
-private fun EventColor.toEventColorUi(): EventColorUi = EventColorUi(light = light, dark = dark)
 
 fun EventsByWeekAndDay.indexOf(date: LocalDate): Int {
     var index = 0

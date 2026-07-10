@@ -17,7 +17,14 @@
  */
 package com.infomaniak.calendar.components.foundation.models
 
-data class EventColorUi(
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import com.infomaniak.core.ui.compose.theme.LocalIsThemeDarkMode
+
+data class ThemedColorUi(
     val light: Int,
     val dark: Int,
-)
+) {
+    @Composable
+    fun toColor(): Color = Color(if (LocalIsThemeDarkMode.current) dark else light)
+}
