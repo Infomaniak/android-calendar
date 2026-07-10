@@ -19,7 +19,6 @@ package com.infomaniak.calendar.components.foundation.models
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.infomaniak.core.ui.compose.theme.LocalIsThemeDarkMode
 
 data class EventColorsUi(
     private val _datavizContainer: ThemedColorUi,
