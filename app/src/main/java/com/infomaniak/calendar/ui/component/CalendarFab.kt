@@ -50,6 +50,6 @@ fun CalendarFab(onClick: () -> Unit, modifier: Modifier = Modifier) {
 @Composable
 private fun CalendarFabPreview() {
     CalendarTheme {
-        CalendarFab(onClick = { })
+        CalendarFab(onClick = {})
     }
 }

@@ -114,8 +114,8 @@ private fun CalendarDrawerPreview(
             drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
             calendarsUsers = usersCalendars,
             onCalendarVisibilityChanged = { _, _ -> },
-            onAddAccount = { },
-            content = { },
+            onAddAccount = {},
+            content = {},
         )
     }
 }
