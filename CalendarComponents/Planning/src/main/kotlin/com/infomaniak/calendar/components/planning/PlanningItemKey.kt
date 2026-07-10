@@ -20,10 +20,9 @@ package com.infomaniak.calendar.components.planning
 import android.os.Parcelable
 import kotlinx.datetime.LocalDate
 import kotlinx.parcelize.Parcelize
-import java.io.Serializable
 
 @Parcelize
-sealed interface PlanningItemKey : Serializable, Parcelable {
+sealed interface PlanningItemKey : Parcelable {
     val date: LocalDate
 
     data class WeekHeader(override val date: LocalDate) : PlanningItemKey

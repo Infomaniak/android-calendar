@@ -29,9 +29,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,8 +43,6 @@ import com.infomaniak.calendar.components.planning.component.TodayEmptyState
 import com.infomaniak.calendar.components.planning.preview.WeekEventsPreviewParameter
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDate
@@ -60,7 +56,6 @@ private val shortDayNameFormatter = DateTimeFormatter.ofPattern("EEE")
 fun Planning(
     weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
     goToEventCreation: () -> Unit,
-    onVisibleDateChanged: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(),
@@ -68,8 +63,6 @@ fun Planning(
     val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
     val events = weekEvents()
     val sectionSizing = remember { SectionSizing() }
-
-    ReportVisibleDate(lazyListState = lazyListState, onVisibleDateChanged = onVisibleDateChanged)
 
     LazyColumn(
         state = lazyListState,
@@ -111,18 +104,6 @@ fun Planning(
     }
 }
 
-@Composable
-private fun ReportVisibleDate(lazyListState: LazyListState, onVisibleDateChanged: (LocalDate) -> Unit) {
-    LaunchedEffect(lazyListState) {
-        snapshotFlow { (lazyListState.firstVisibleItemKey() as? PlanningItemKey)?.date }
-            .mapNotNull { it }
-            .distinctUntilChanged()
-            .collect { onVisibleDateChanged(it) }
-    }
-}
-
-private fun LazyListState.firstVisibleItemKey(): Any? = layoutInfo.visibleItemsInfo.firstOrNull { it.offset + it.size > 0 }?.key
-
 private val YearWeek.label: String
     @Composable get() {
         val week = stringResource(R.string.weekHeaderWeekNumber, weekNumber)
@@ -136,6 +117,6 @@ private fun EventUi.toItemKey(date: LocalDate): PlanningItemKey = PlanningItemKe
 @Composable
 private fun PreviewPlanning(@PreviewParameter(WeekEventsPreviewParameter::class) weekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>>) {
     Surface {
-        Planning(goToEventCreation = {}, weekEvents = { weekEvents }, onVisibleDateChanged = {})
+        Planning(goToEventCreation = {}, weekEvents = { weekEvents })
     }
 }

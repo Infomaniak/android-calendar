@@ -95,6 +95,7 @@ private fun SuccessPlanning(
     val lazyListState = rememberLazyListState(events().indexOf(visibleDayState.visibleDate))
 
     ProcessJumpRequests(lazyListState, visibleDayState, events)
+    ReportVisibleDate(lazyListState, onVisibleDateChanged = visibleDayState::onVisibleDateChanged)
 
     Column {
         Planning(
@@ -107,7 +108,6 @@ private fun SuccessPlanning(
                 .fillMaxWidth(),
             contentPadding = contentPadding,
             goToEventCreation = goToEventCreation,
-            onVisibleDateChanged = visibleDayState::onVisibleDateChanged,
         )
     }
 }
