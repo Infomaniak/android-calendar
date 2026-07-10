@@ -80,6 +80,6 @@ private fun DayScreen(
 @Composable
 private fun DayScreenPreview() {
     CalendarThemeForPreview {
-        DayScreen(onDisconnect = { })
+        DayScreen(onDisconnect = {})
     }
 }

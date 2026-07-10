@@ -53,7 +53,7 @@ private fun MonthYearTitle(date: () -> LocalDate, onClick: () -> Unit, modifier:
 private fun MonthYearTitlePreview() {
     CalendarThemeForPreview {
         val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-        MonthYearTitle(date = { today }, onClick = { })
+        MonthYearTitle(date = { today }, onClick = {})
     }
 }
 
@@ -61,6 +61,6 @@ private fun MonthYearTitlePreview() {
 @Composable
 private fun MonthYearTitleFrenchPreview() {
     CalendarThemeForPreview {
-        MonthYearTitle(date = { LocalDate(2025, 12, 25) }, onClick = { })
+        MonthYearTitle(date = { LocalDate(2025, 12, 25) }, onClick = {})
     }
 }

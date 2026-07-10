@@ -77,7 +77,7 @@ object TopAppBarButtons {
 @Composable
 private fun SearchButtonPreview() {
     CalendarThemeForPreview {
-        SearchButton(onClick = { })
+        SearchButton(onClick = {})
     }
 }
 
@@ -85,7 +85,7 @@ private fun SearchButtonPreview() {
 @Composable
 private fun InboxButtonPreview() {
     CalendarThemeForPreview {
-        InboxButton(onClick = { })
+        InboxButton(onClick = {})
     }
 }
 

@@ -67,6 +67,6 @@ internal fun TodayEmptyState(onClick: () -> Unit, modifier: Modifier = Modifier)
 @Composable
 private fun TodayEmptyStatePreview() {
     Surface {
-        TodayEmptyState(onClick = { })
+        TodayEmptyState(onClick = {})
     }
 }

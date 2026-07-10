@@ -35,11 +35,11 @@ import kotlinx.datetime.LocalDate
 @Composable
 fun CalendarTopAppBar(modifier: Modifier = Modifier) {
     TopAppBar(
-        title = { CurrentMonthTitle(onClick = { }, modifier = Modifier.fillMaxWidth()) },
+        title = { CurrentMonthTitle(onClick = {}, modifier = Modifier.fillMaxWidth()) },
         navigationIcon = { TopAppBarButtons.DrawerIconButton() },
         actions = {
-            TopAppBarButtons.InboxButton(onClick = { })
-            TopAppBarButtons.SearchButton(onClick = { })
+            TopAppBarButtons.InboxButton(onClick = {})
+            TopAppBarButtons.SearchButton(onClick = {})
         },
         modifier = modifier,
     )

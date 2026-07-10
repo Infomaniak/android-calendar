@@ -156,10 +156,10 @@ private fun DropdownIconButton(
 @Composable
 private fun CalendarHorizontalFloatingToolbarPreview() = CalendarThemeForPreview {
     CalendarHorizontalFloatingToolbar(
-        onNavigationButtonClicked = { },
-        onCurrentDayClicked = { },
+        onNavigationButtonClicked = {},
+        onCurrentDayClicked = {},
         currentDestination = { NavDestination.CalendarView.Week },
-        floatingActionButton = { CalendarFab(onClick = { }) },
+        floatingActionButton = { CalendarFab(onClick = {}) },
         isExpanded = { true },
     )
 }
