@@ -82,9 +82,11 @@ fun Planning(
             end = contentPadding.calculateEndPadding(LocalLayoutDirection.current),
         )
 
+        val topContentPadding = PaddingValues(top = contentPadding.calculateTopPadding())
+
         HorizontalPager(
             rememberPagerState { 3 },
-            contentPadding = PaddingValues(horizontal = Margin.Medium) + horizontalContentPadding,
+            contentPadding = PaddingValues(horizontal = Margin.Medium) + horizontalContentPadding + topContentPadding,
             pageSpacing = Margin.Small,
         ) {
             EventCard(
@@ -98,7 +100,13 @@ fun Planning(
             )
         }
 
-        Timeline(lazyListState, weekEvents, goToEventCreation, contentPadding, Modifier.weight(1f))
+        Timeline(
+            lazyListState = lazyListState,
+            weekEvents = weekEvents,
+            goToEventCreation = goToEventCreation,
+            contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
+            modifier = Modifier.weight(1f),
+        )
     }
 }
 
@@ -117,7 +125,7 @@ private fun Timeline(
     LazyColumn(
         state = lazyListState,
         modifier = modifier,
-        contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
+        contentPadding = contentPadding,
         verticalArrangement = Arrangement.spacedBy(Margin.Mini),
     ) {
         events.forEach { (week, days) ->
