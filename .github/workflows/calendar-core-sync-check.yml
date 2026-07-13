@@ -15,44 +15,7 @@ concurrency:
 
 jobs:
   check-submodule-and-version-in-sync:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout the code
-        uses: actions/checkout@v5.0.0
-        with:
-          fetch-depth: 0
-
-      - name: Check that the kmp submodule and calendarCore version are updated together
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          set -euo pipefail
-
-          SUBMODULE_CHANGED=false
-          if ! git diff --quiet "$BASE_SHA" "$HEAD_SHA" -- multiplatform-calendar; then
-            SUBMODULE_CHANGED=true
-          fi
-
-          get_calendar_core_version() {
-            git show "$1:gradle/libs.versions.toml" | grep -E '^calendarCore\s*=' | sed -E 's/.*"(.*)".*/\1/'
-          }
-
-          BASE_VERSION="$(get_calendar_core_version "$BASE_SHA")"
-          HEAD_VERSION="$(get_calendar_core_version "$HEAD_SHA")"
-
-          VERSION_CHANGED=false
-          if [ "$BASE_VERSION" != "$HEAD_VERSION" ]; then
-            VERSION_CHANGED=true
-          fi
-
-          echo "multiplatform-calendar submodule changed: $SUBMODULE_CHANGED"
-          echo "calendarCore version changed: $VERSION_CHANGED (base=$BASE_VERSION, head=$HEAD_VERSION)"
-
-          if [ "$SUBMODULE_CHANGED" != "$VERSION_CHANGED" ]; then
-            echo "::error::The multiplatform-calendar submodule reference and the calendarCore version in gradle/libs.versions.toml must always be updated together. submodule changed=$SUBMODULE_CHANGED, calendarCore version changed=$VERSION_CHANGED."
-            exit 1
-          fi
-
-          echo "OK: multiplatform-calendar submodule reference and calendarCore version are in sync."
+    uses: infomaniak/.github/.github/workflows/submodule-android-gradle-version-sync-check.yml@v2
+    with:
+      submodule-path: multiplatform-calendar
+      variable-name: calendarCore
