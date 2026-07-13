@@ -192,7 +192,9 @@ All CalendarComponents source lives **in this repository**. Changes to these mod
 
 1. **Editing submodules**: Do not modify files under `multiplatform-calendar/` or `Core/` from this repository. Open a
    PR in the respective repo (`Infomaniak/multiplatform-calendar` or `Infomaniak/android-core`), then bump the submodule
-   pointer here.
+   pointer here. The `multiplatform-calendar` submodule pointer and the `calendarCore` version in
+   `gradle/libs.versions.toml` must always be bumped together in the same PR — this is enforced by the
+   [`calendar-core-sync-check.yml`](.github/workflows/calendar-core-sync-check.yml) CI workflow.
 2. **CalendarComponents ownership**: All `CalendarComponents/` source lives in **this** repository. Changes go here, not
    in a consuming app or a submodule. The group is designed to be portable — keep it free of `:app` dependencies and DI
    framework references so it can be extracted in the future.
