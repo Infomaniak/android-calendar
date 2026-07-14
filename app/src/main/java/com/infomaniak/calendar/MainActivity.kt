@@ -22,8 +22,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Surface
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +39,13 @@ import com.infomaniak.calendar.syncEvents.SyncEventsForConnectedUsers
 import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.ui.navigation.MainNavHost
 import com.infomaniak.calendar.ui.navigation.NavDestination
+import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
+import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
+import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
+import com.infomaniak.calendar.ui.navigation.state.SharedSnackbarHostState
+import com.infomaniak.calendar.ui.navigation.state.ToolbarScrollableState
+import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostState
+import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableState
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.state.rememberVisibleDayState
@@ -50,8 +58,6 @@ class MainActivity : ComponentActivity() {
 
     private val mainApplication by lazy { application as MainApplication }
     private val appGraph by lazy { mainApplication.appGraph }
-
-    private val mainViewModel: MainViewModel by viewModels()
 
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
         get() = appGraph.viewModelFactory
@@ -78,13 +84,20 @@ class MainActivity : ComponentActivity() {
 private fun MainContent(userLoadState: UserLoadState.Loaded) {
     val startDestination = if (userLoadState.user == null) NavDestination.Onboarding() else NavDestination.CalendarView.Planning
     val backStack = rememberNavBackStack(startDestination)
+
     val visibleDayState: VisibleDayState = rememberVisibleDayState()
     val loadingEventsState = remember { mutableStateOf(false) }
+    val snackbarHostState: SharedSnackbarHostState = rememberCustomSnackbarHostState()
+    val toolbarScrollableState: ToolbarScrollableState = rememberToolbarScrollableState()
+    val calendarDrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     CompositionLocalProvider(
         LocalUser provides userLoadState.user,
         LocalVisibleDayState provides visibleDayState,
         LocalLoadingEventsState provides loadingEventsState,
+        LocalSharedSnackbarHostState provides snackbarHostState,
+        LocalToolbarScrollableState provides toolbarScrollableState,
+        LocalDrawerState provides calendarDrawerState,
     ) {
         SyncEventsForConnectedUsers()
         NavigateToOnboardingIfLastUserIsDisconnected(backStack, userLoadState.user)

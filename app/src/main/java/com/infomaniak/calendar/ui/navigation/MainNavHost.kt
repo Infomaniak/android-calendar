@@ -39,9 +39,6 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Metada
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
-import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
-import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
-import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.state.SharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.ToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostState
@@ -60,17 +57,8 @@ import kotlin.time.Clock
 
 @Composable
 fun MainNavHost(backStack: NavBackStack<NavKey>) {
-    val snackbarHostState: SharedSnackbarHostState = rememberCustomSnackbarHostState()
-    val toolbarScrollableState: ToolbarScrollableState = rememberToolbarScrollableState()
-    val calendarDrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-
     SharedTransitionLayout {
-        CompositionLocalProvider(
-            LocalSharedTransitionScope provides this@SharedTransitionLayout,
-            LocalSharedSnackbarHostState provides snackbarHostState,
-            LocalToolbarScrollableState provides toolbarScrollableState,
-            LocalDrawerState provides calendarDrawerState,
-        ) {
+        CompositionLocalProvider(LocalSharedTransitionScope provides this@SharedTransitionLayout) {
             NavDisplay(
                 backStack = backStack,
                 entryProvider = baseEntryProvider(backStack = backStack),
