@@ -1,0 +1,21 @@
+name: CalendarCore sync check
+
+on:
+  pull_request:
+    paths:
+      - 'multiplatform-calendar'
+      - 'gradle/libs.versions.toml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-submodule-and-version-in-sync:
+    uses: infomaniak/.github/.github/workflows/submodule-android-gradle-version-sync-check.yml@v2
+    with:
+      submodule-path: multiplatform-calendar
+      variable-name: calendarCore
