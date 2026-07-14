@@ -70,10 +70,10 @@ fun EventCard(
             .background(CardDefaults.cardColors().containerColor)
             .padding(Margin.Medium),
         content = {
-            Box(alpha = { collapsedAlpha(progress()) }) {
+            FadingContent(alpha = { collapsedAlpha(progress()) }) {
                 CollapsedEventCardContent(title = title, startDate = startDate, endDate = endDate, action = action)
             }
-            Box(alpha = { expandedAlpha(progress()) }) {
+            FadingContent(alpha = { expandedAlpha(progress()) }) {
                 ExpandedEventCardContent(
                     timeUntilEvent = timeUntilEvent,
                     title = title,
@@ -116,7 +116,7 @@ fun EventCard(
  * without recomposing when the alpha value changes.
  */
 @Composable
-private fun Box(alpha: () -> Float, content: @Composable () -> Unit) {
+private fun FadingContent(alpha: () -> Float, content: @Composable () -> Unit) {
     Layout(
         modifier = Modifier.graphicsLayer { this.alpha = alpha() },
         content = content,
