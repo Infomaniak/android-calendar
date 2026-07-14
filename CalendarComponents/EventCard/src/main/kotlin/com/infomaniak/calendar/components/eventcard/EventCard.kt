@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
@@ -31,9 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.HourFormatter.formatHours
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.components.Avatar
@@ -42,12 +41,6 @@ import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.ui.compose.margin.Margin
 import java.time.LocalDateTime
 import kotlin.math.roundToInt
-
-private val CollapsedCornerRadius = 12.dp
-private val ExpandedCornerRadius = 20.dp
-private val CollapsedPadding = Margin.Small
-private val ExpandedPadding = Margin.Medium
-private val CardElevation = 1.dp
 
 /**
  * A seekable event card that continuously morphs between a collapsed and an expanded state.
@@ -71,17 +64,11 @@ fun EventCard(
     progress: () -> Float,
     modifier: Modifier = Modifier,
 ) {
-    val containerColor = CardDefaults.cardColors().containerColor
-
     Layout(
         modifier = modifier
-            .graphicsLayer {
-                val p = progress().coerceIn(0f, 1f)
-                shape = RoundedCornerShape(lerp(CollapsedCornerRadius, ExpandedCornerRadius, p))
-                clip = true
-                shadowElevation = CardElevation.toPx()
-            }
-            .background(containerColor),
+            .clip(MaterialTheme.shapes.large)
+            .background(CardDefaults.cardColors().containerColor)
+            .padding(Margin.Medium),
         content = {
             Box(alpha = { collapsedAlpha(progress()) }) {
                 CollapsedEventCardContent(title = title, startDate = startDate, endDate = endDate, action = action)
@@ -99,16 +86,9 @@ fun EventCard(
             }
         },
     ) { measurables, constraints ->
-        val p = progress().coerceIn(0f, 1f)
-        val padding = lerp(CollapsedPadding, ExpandedPadding, p).roundToPx()
-
         val childConstraints = Constraints(
             minWidth = 0,
-            maxWidth = if (constraints.hasBoundedWidth) {
-                (constraints.maxWidth - padding * 2).coerceAtLeast(0)
-            } else {
-                Constraints.Infinity
-            },
+            maxWidth = if (constraints.hasBoundedWidth) constraints.maxWidth else Constraints.Infinity,
             minHeight = 0,
             maxHeight = Constraints.Infinity,
         )
@@ -119,14 +99,14 @@ fun EventCard(
         val width = if (constraints.hasBoundedWidth) {
             constraints.maxWidth
         } else {
-            maxOf(collapsed.width, expanded.width) + padding * 2
+            maxOf(collapsed.width, expanded.width)
         }
-        val contentHeight = collapsed.height + ((expanded.height - collapsed.height) * p).roundToInt()
-        val height = contentHeight + padding * 2
+        val progress = progress().coerceIn(0f, 1f)
+        val height = collapsed.height + ((expanded.height - collapsed.height) * progress).roundToInt()
 
         layout(width, height) {
-            collapsed.place(padding, padding)
-            expanded.place(padding, padding)
+            collapsed.place(0, 0)
+            expanded.place(0, 0)
         }
     }
 }
