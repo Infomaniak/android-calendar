@@ -21,6 +21,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +45,27 @@ import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.ui.compose.margin.Margin
 import java.time.LocalDateTime
 import kotlin.math.roundToInt
+
+@Composable
+fun rememberEventCardState(): EventCardState {
+    return remember { EventCardState() }
+}
+
+class EventCardState {
+    var collapsedHeight by mutableStateOf<Int?>(null)
+    var expandedHeight by mutableStateOf<Int?>(null)
+
+    fun recordHeights(collapsedHeight: Int, expandedHeight: Int) {
+        this.collapsedHeight = collapsedHeight
+        this.expandedHeight = expandedHeight
+    }
+
+    // fun getProgress(delta: Int): Float {
+    //     val collapsed = collapsedHeight ?: return 0f
+    //     val expanded = expandedHeight ?: return 1f
+    //     return (delta - collapsed).toFloat() / (expanded - collapsed)
+    // }
+}
 
 /**
  * A seekable event card that continuously morphs between a collapsed and an expanded state.
@@ -63,6 +88,7 @@ fun EventCard(
     action: EventCardAction,
     progress: () -> Float,
     modifier: Modifier = Modifier,
+    eventCardState: EventCardState = rememberEventCardState(),
 ) {
     Layout(
         modifier = modifier
@@ -103,6 +129,8 @@ fun EventCard(
         }
         val progress = progress().coerceIn(0f, 1f)
         val height = collapsed.height + ((expanded.height - collapsed.height) * progress).roundToInt()
+
+        eventCardState.recordHeights(collapsed.height, expanded.height)
 
         layout(width, height) {
             collapsed.place(0, 0)

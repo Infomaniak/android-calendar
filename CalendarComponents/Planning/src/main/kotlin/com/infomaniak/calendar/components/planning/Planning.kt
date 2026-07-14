@@ -51,10 +51,11 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import com.infomaniak.calendar.components.event.EventItem
 import com.infomaniak.calendar.components.eventcard.EventCard
 import com.infomaniak.calendar.components.eventcard.EventCardAction
+import com.infomaniak.calendar.components.eventcard.rememberEventCardState
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.YearWeek
@@ -73,9 +74,6 @@ import kotlinx.datetime.todayIn
 import java.time.LocalDateTime
 import kotlin.time.Clock
 
-private val maxCardSize = 150.dp
-private val minCardSize = 72.dp
-
 @Composable
 fun Planning(
     weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
@@ -84,20 +82,25 @@ fun Planning(
     lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    var currentCardSize by remember { mutableStateOf(maxCardSize) }
+    val eventCardState = rememberEventCardState()
+    var currentCardSize by remember { mutableStateOf<Dp?>(null) }
     val density = LocalDensity.current
 
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                val cardMinSize = with(density) { eventCardState.collapsedHeight?.toDp() } ?: return Offset.Zero
+                val cardMaxSize = with(density) { eventCardState.expandedHeight?.toDp() } ?: return Offset.Zero
+                val previousCardSize = currentCardSize ?: cardMaxSize
+
                 // Calculate the change in card size based on scroll delta
                 val availableYDp = with(density) { available.y.toDp() }
-                val newCardSize = currentCardSize + availableYDp
-                val previousCardSize = currentCardSize
+                val newCardSize = previousCardSize + availableYDp
 
                 // Constrain the card size within the allowed bounds
-                currentCardSize = newCardSize.coerceIn(minCardSize, maxCardSize)
-                val consumed = currentCardSize - previousCardSize
+                val coercedNewCardSize = newCardSize.coerceIn(cardMinSize, cardMaxSize)
+                currentCardSize = coercedNewCardSize
+                val consumed = coercedNewCardSize - previousCardSize
 
                 // Return the consumed scroll amount
                 return Offset(0f, with(density) { consumed.toPx() })
@@ -122,7 +125,8 @@ fun Planning(
             pageSpacing = Margin.Small,
         ) {
             EventCard(
-                modifier = Modifier.height(currentCardSize),
+                eventCardState = eventCardState,
+                modifier = Modifier.fillMaxWidth(),
                 timeUntilEvent = "In $it minutes",
                 title = "Calendar meeting",
                 startDate = LocalDateTime.of(2026, 6, 19, 8, 0),
@@ -130,6 +134,12 @@ fun Planning(
                 location = "Japan room",
                 attendees = List(9) { AvatarType.WithInitials.Initials("AB", AvatarColors(Color.Gray, Color.White)) },
                 action = EventCardAction.Button.JoinMeeting {},
+                progress = {
+                    val currentCardHeight = with(density) { currentCardSize?.toPx() } ?: return@EventCard 1f
+                    val collapsedHeight = eventCardState.collapsedHeight ?: return@EventCard 1f
+                    val expandedHeight = eventCardState.expandedHeight ?: return@EventCard 1f
+                    (currentCardHeight - collapsedHeight) / (expandedHeight - collapsedHeight)
+                },
             )
         }
 
