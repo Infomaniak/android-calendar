@@ -24,6 +24,10 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import com.infomaniak.calendar.di.ComposeAppGraph
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.core.auth.models.user.User
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 val LocalLoadingEventsState = staticCompositionLocalOf<MutableState<Boolean>?> { null }
 
@@ -36,18 +40,22 @@ fun SyncEventsForConnectedUsers(
     val loadingEventsState = LocalLoadingEventsState.current ?: return
 
     LaunchedEffect(Unit) {
-        var previousUsersCount = 0
+        var previousUserIds = emptySet<Int>()
 
-        accountUtils.users.collect { users ->
-            val usersCount = users.size
-            val hasUserBeenRemoved = usersCount < previousUsersCount
-            previousUsersCount = usersCount
-            if (hasUserBeenRemoved || users.isEmpty()) return@collect
+        accountUtils.users
+            .map { it.mapTo(mutableSetOf(), User::id) }
+            .distinctUntilChanged()
+            .collectLatest { userIds ->
+                val savedPreviousUserIds = previousUserIds
+                previousUserIds = userIds
 
-            syncEventsManager.loadCurrentMonths(
-                visibleDate = visibleDayState.visibleDate,
-                onLoadingChanged = { isLoading -> loadingEventsState.value = isLoading },
-            )
-        }
+                // If no new user has been added
+                if (savedPreviousUserIds.containsAll(userIds)) return@collectLatest
+
+                syncEventsManager.loadCurrentMonths(
+                    visibleDate = visibleDayState.visibleDate,
+                    onLoadingChanged = { isLoading -> loadingEventsState.value = isLoading },
+                )
+            }
     }
 }
