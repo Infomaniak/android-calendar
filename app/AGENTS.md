@@ -262,6 +262,34 @@ In Composables, use the standard `viewModel<MyViewModel>()`.
 `MetroViewModelFactory` (set as `defaultViewModelProviderFactory` in `MainActivity`) resolves the VM
 from the multibinding map automatically.
 
+**ViewModel that needs a `SavedStateHandle` (assisted injection):**
+
+`SavedStateHandle` isn't a graph binding — it comes from the `CreationExtras` handed in at ViewModel
+creation time. Use assisted injection with a `ViewModelAssistedFactory` (our local copy of the
+`metrox-viewmodel` API, since that artifact requires a higher `minSdk` than we support):
+
+```kotlin
+@AssistedInject
+class MyViewModel(
+    @Assisted savedStateHandle: SavedStateHandle,
+    private val someDependency: SomeDependency,
+) : ViewModel() {
+
+    @AssistedFactory
+    @ViewModelAssistedFactoryKey(MyViewModel::class)
+    @ContributesIntoMap(AppScope::class)
+    fun interface Factory : ViewModelAssistedFactory {
+        override fun create(extras: CreationExtras): MyViewModel = create(extras.createSavedStateHandle())
+
+        fun create(@Assisted savedStateHandle: SavedStateHandle): MyViewModel
+    }
+}
+```
+
+The `@AssistedFactory` (not the ViewModel class) carries `@ContributesIntoMap` +
+`@ViewModelAssistedFactoryKey`, and is resolved from the `viewModelAssistedFactories` map by
+`MetroViewModelFactory`. Composable usage is unchanged: `viewModel<MyViewModel>()`.
+
 > **Future simplification**: When upgrading to Metro 0.12.0+ (requires Kotlin 2.3.20+),
 > `@ViewModelKey` will support `implicitClassKey` (no need to repeat the class name), and the
 > `metrox-viewmodel` artifact will replace our hand-written `MetroViewModelFactory`, `ViewModelKey`,
