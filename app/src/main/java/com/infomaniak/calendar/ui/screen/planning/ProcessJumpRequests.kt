@@ -30,7 +30,7 @@ fun ProcessJumpRequests(lazyListState: LazyListState, visibleDayState: VisibleDa
     val currentEventsByWeekAndDay by rememberUpdatedState(events)
 
     LaunchedEffect(visibleDayState) {
-        visibleDayState.scrollCommand.collect { date ->
+        for (date in visibleDayState.scrollCommand) {
             val targetIndex = currentEventsByWeekAndDay().indexOf(date)
             val distance = abs(targetIndex - lazyListState.firstVisibleItemIndex)
 

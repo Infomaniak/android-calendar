@@ -20,6 +20,7 @@ package com.infomaniak.calendar.ui.screen.planning
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
+import com.infomaniak.calendar.syncEvents.SyncEventsManager
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
@@ -42,8 +43,13 @@ import kotlin.time.Clock
 
 @Inject
 @ContributesIntoMap(AppScope::class)
-@ViewModelKey(PlanningViewModel::class)
-class PlanningViewModel(accountUtils: AccountUtils, calendarManager: CalendarManager) : ViewModel() {
+@ViewModelKey
+class PlanningViewModel(
+    accountUtils: AccountUtils,
+    calendarManager: CalendarManager,
+    syncEventsManager: SyncEventsManager,
+) : ViewModel() {
+    val isLoadingEvents: StateFlow<Boolean> = syncEventsManager.isLoadingEvents
 
     private val timeZone = TimeZone.currentSystemDefault()
     private val today = Clock.System.now().toLocalDateTime(timeZone).date

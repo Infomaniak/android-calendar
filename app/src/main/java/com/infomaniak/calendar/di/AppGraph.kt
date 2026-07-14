@@ -25,6 +25,7 @@ import com.infomaniak.calendar.BuildConfig
 import com.infomaniak.calendar.MainApplication
 import com.infomaniak.calendar.secured.DavCredentialsManager
 import com.infomaniak.calendar.syncEvents.SyncEventsManager
+import com.infomaniak.calendar.ui.state.VisibleDayHolder
 import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.login.InfomaniakLogin
@@ -71,6 +72,8 @@ interface AppGraph {
     val davCredentialsManager: DavCredentialsManager
 
     val syncEventsManager: SyncEventsManager
+
+    val visibleDayHolder: VisibleDayHolder
 
     @Provides
     @SingleIn(AppScope::class)

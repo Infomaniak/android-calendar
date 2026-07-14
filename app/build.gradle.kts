@@ -161,6 +161,8 @@ dependencies {
     implementation(core.infomaniak.core.ui.compose.theme)
     implementation(libs.infomaniak.designsystem.theme.calendar)
 
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
+
     implementation(core.kotlinx.serialization.json)
     implementation(kmpCalendar.androidx.room.runtime)
 

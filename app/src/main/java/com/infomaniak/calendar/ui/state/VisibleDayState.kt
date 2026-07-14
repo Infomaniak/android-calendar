@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.state
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
@@ -26,8 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
@@ -36,17 +36,19 @@ import kotlin.time.Clock
 val LocalVisibleDayState = staticCompositionLocalOf<VisibleDayState?> { null }
 
 @Composable
-fun rememberVisibleDayState(): VisibleDayState {
-    val visibleDate = rememberSaveable { mutableStateOf(Clock.System.todayIn(TimeZone.currentSystemDefault())) }
+@SuppressLint("ComposeMutableParameters")
+fun rememberVisibleDayState(visibleDate: MutableState<LocalDate> = rememberSaveable { mutableStateOfToday() }): VisibleDayState {
     return remember { VisibleDayState(_visibleDate = visibleDate) }
 }
+
+private fun mutableStateOfToday(): MutableState<LocalDate> = mutableStateOf(Clock.System.todayIn(TimeZone.currentSystemDefault()))
 
 @Stable
 class VisibleDayState(private val _visibleDate: MutableState<LocalDate>) {
     val visibleDate by _visibleDate
 
     private val _scrollCommand = Channel<LocalDate>(Channel.CONFLATED)
-    val scrollCommand: Flow<LocalDate> = _scrollCommand.receiveAsFlow()
+    val scrollCommand: ReceiveChannel<LocalDate> = _scrollCommand
 
     fun onVisibleDateChanged(date: LocalDate) {
         _visibleDate.value = date

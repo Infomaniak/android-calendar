@@ -21,6 +21,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -29,22 +30,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.syncEvents.LocalLoadingEventsState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 private val LoadingIndicatorHeight = 4.dp
 
 @Composable
-fun LoadingEventsIndicator(modifier: Modifier = Modifier) {
-    val loadingEventsState = LocalLoadingEventsState.current ?: return
-    LoadingEventsIndicator(modifier = modifier, isLoading = { loadingEventsState.value })
-}
-
-@Composable
-private fun LoadingEventsIndicator(modifier: Modifier = Modifier, isLoading: () -> Boolean) {
+fun LoadingEventsIndicator(isLoading: () -> Boolean, modifier: Modifier = Modifier) {
     Box(modifier = modifier.height(LoadingIndicatorHeight)) {
         AnimatedVisibility(visible = isLoading(), enter = fadeIn(), exit = fadeOut()) {
-            LinearProgressIndicator(Modifier.fillMaxWidth())
+            LinearProgressIndicator(Modifier.fillMaxSize())
         }
     }
 }

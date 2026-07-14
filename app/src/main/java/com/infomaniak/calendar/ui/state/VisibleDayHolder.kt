@@ -15,21 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.month
+package com.infomaniak.calendar.ui.state
 
-import androidx.lifecycle.ViewModel
-import com.infomaniak.calendar.di.ViewModelKey
-import com.infomaniak.calendar.syncEvents.SyncEventsManager
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import dev.zacsweers.metro.AppScope
-import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
-import kotlinx.coroutines.flow.StateFlow
+import dev.zacsweers.metro.SingleIn
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
+import kotlin.time.Clock
 
+@SingleIn(AppScope::class)
 @Inject
-@ContributesIntoMap(AppScope::class)
-@ViewModelKey
-class MonthViewModel(
-    syncEventsManager: SyncEventsManager,
-) : ViewModel() {
-    val isLoadingEvents: StateFlow<Boolean> = syncEventsManager.isLoadingEvents
+class VisibleDayHolder {
+    val visibleDay: MutableState<LocalDate> = mutableStateOf(Clock.System.todayIn(TimeZone.currentSystemDefault()))
 }

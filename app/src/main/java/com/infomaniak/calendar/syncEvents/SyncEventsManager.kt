@@ -18,9 +18,14 @@
 package com.infomaniak.calendar.syncEvents
 
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
+import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -31,14 +36,18 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.yearMonth
 import kotlin.time.Duration.Companion.milliseconds
 
+@SingleIn(AppScope::class)
 class SyncEventsManager @Inject constructor(private val calendarManager: CalendarManager) {
 
-    suspend fun loadCurrentMonths(visibleDate: LocalDate, onLoadingChanged: (Boolean) -> Unit) {
+    private val _isLoadingEvents = MutableStateFlow(false)
+    val isLoadingEvents: StateFlow<Boolean> = _isLoadingEvents.asStateFlow()
+
+    suspend fun loadCurrentMonths(visibleDate: LocalDate) {
         val timeZone = TimeZone.currentSystemDefault()
         val firstDay = visibleDate.yearMonth.minus(SYNC_WINDOW_MONTHS_BEFORE, DateTimeUnit.MONTH).firstDay
         val lastDay = visibleDate.yearMonth.plus(SYNC_WINDOW_MONTHS_AFTER, DateTimeUnit.MONTH).lastDay.plus(1, DateTimeUnit.DAY)
 
-        withDelayedLoadingIndicator(onLoadingChanged) {
+        withDelayedLoadingIndicator {
             calendarManager.downloadEventsByRange(
                 start = firstDay.atStartOfDayIn(timeZone),
                 end = lastDay.atStartOfDayIn(timeZone),
@@ -48,18 +57,18 @@ class SyncEventsManager @Inject constructor(private val calendarManager: Calenda
         calendarManager.syncEvents()
     }
 
-    private suspend fun withDelayedLoadingIndicator(onLoadingChanged: (Boolean) -> Unit, block: suspend () -> Unit) {
+    private suspend fun withDelayedLoadingIndicator(block: suspend () -> Unit) {
         coroutineScope {
             val delayedLoadingJob = launch {
                 delay(LOADING_INDICATOR_DELAY)
-                onLoadingChanged(true)
+                _isLoadingEvents.value = true
             }
 
             try {
                 block()
             } finally {
                 delayedLoadingJob.cancel()
-                onLoadingChanged(false)
+                _isLoadingEvents.value = false
             }
         }
     }

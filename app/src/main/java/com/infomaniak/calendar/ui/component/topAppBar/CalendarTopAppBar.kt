@@ -26,14 +26,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.syncEvents.LocalLoadingEventsState
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.datetime.LocalDate
 
 @Composable
-fun CalendarTopAppBar(modifier: Modifier = Modifier) {
+fun CalendarTopAppBar(isLoadingEvents: () -> Boolean, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         TopAppBar(
             title = { CurrentMonthTitle(onClick = {}, modifier = Modifier.fillMaxWidth()) },
@@ -43,7 +42,7 @@ fun CalendarTopAppBar(modifier: Modifier = Modifier) {
                 TopAppBarButtons.SearchButton(onClick = {})
             },
         )
-        LoadingEventsIndicator()
+        LoadingEventsIndicator(isLoading = isLoadingEvents)
     }
 }
 
@@ -54,9 +53,8 @@ private fun CalendarTopAppBarPreview() {
         val visibleDate = remember { mutableStateOf(LocalDate(2026, 7, 8)) }
         CompositionLocalProvider(
             LocalVisibleDayState provides VisibleDayState(_visibleDate = visibleDate),
-            LocalLoadingEventsState provides remember { mutableStateOf(true) },
         ) {
-            CalendarTopAppBar()
+            CalendarTopAppBar(isLoadingEvents = { true })
         }
     }
 }

@@ -22,42 +22,41 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
-import com.infomaniak.calendar.syncEvents.LocalLoadingEventsState
-import com.infomaniak.calendar.syncEvents.SyncEventsForConnectedUsers
+import com.infomaniak.calendar.syncEvents.MainViewModel
 import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.ui.navigation.MainNavHost
 import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
-import com.infomaniak.calendar.ui.navigation.state.SharedSnackbarHostState
-import com.infomaniak.calendar.ui.navigation.state.ToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableState
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
-import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.utils.UserLoadState
 import com.infomaniak.calendar.utils.rememberUserLoadState
 import com.infomaniak.core.auth.models.user.User
+import kotlinx.datetime.LocalDate
 
 class MainActivity : ComponentActivity() {
 
     private val mainApplication by lazy { application as MainApplication }
     private val appGraph by lazy { mainApplication.appGraph }
+
+    private val mainViewModel: MainViewModel by viewModels()
 
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
         get() = appGraph.viewModelFactory
@@ -72,7 +71,7 @@ class MainActivity : ComponentActivity() {
                 Surface {
                     when (val userLoadState = appGraph.accountUtils.rememberUserLoadState().value) {
                         UserLoadState.Awaiting -> Unit // Blank surface while waiting for first result
-                        is UserLoadState.Loaded -> MainContent(userLoadState)
+                        is UserLoadState.Loaded -> MainContent(userLoadState, visibleDate = { mainViewModel.visibleDay })
                     }
                 }
             }
@@ -81,25 +80,17 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun MainContent(userLoadState: UserLoadState.Loaded) {
+private fun MainContent(userLoadState: UserLoadState.Loaded, visibleDate: () -> MutableState<LocalDate>) {
     val startDestination = if (userLoadState.user == null) NavDestination.Onboarding() else NavDestination.CalendarView.Planning
     val backStack = rememberNavBackStack(startDestination)
 
-    val visibleDayState: VisibleDayState = rememberVisibleDayState()
-    val loadingEventsState = remember { mutableStateOf(false) }
-    val snackbarHostState: SharedSnackbarHostState = rememberCustomSnackbarHostState()
-    val toolbarScrollableState: ToolbarScrollableState = rememberToolbarScrollableState()
-    val calendarDrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-
     CompositionLocalProvider(
         LocalUser provides userLoadState.user,
-        LocalVisibleDayState provides visibleDayState,
-        LocalLoadingEventsState provides loadingEventsState,
-        LocalSharedSnackbarHostState provides snackbarHostState,
-        LocalToolbarScrollableState provides toolbarScrollableState,
-        LocalDrawerState provides calendarDrawerState,
+        LocalVisibleDayState provides rememberVisibleDayState(visibleDate()),
+        LocalSharedSnackbarHostState provides rememberCustomSnackbarHostState(),
+        LocalToolbarScrollableState provides rememberToolbarScrollableState(),
+        LocalDrawerState provides rememberDrawerState(initialValue = DrawerValue.Closed),
     ) {
-        SyncEventsForConnectedUsers()
         NavigateToOnboardingIfLastUserIsDisconnected(backStack, userLoadState.user)
         MainNavHost(backStack)
     }

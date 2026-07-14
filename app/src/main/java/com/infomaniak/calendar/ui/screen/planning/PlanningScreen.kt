@@ -52,17 +52,25 @@ import kotlin.time.Clock
 @Composable
 fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier, viewModel: PlanningViewModel = viewModel()) {
     val planningUiState: PlanningUiState by viewModel.planningUiState.collectAsStateWithLifecycle()
-    PlanningScreen(goToEventCreation = goToEventCreation, planningUiState = { planningUiState }, modifier = modifier)
+    val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle()
+
+    PlanningScreen(
+        goToEventCreation = goToEventCreation,
+        planningUiState = { planningUiState },
+        isLoadingEvents = { isLoadingEvents },
+        modifier = modifier,
+    )
 }
 
 @Composable
 private fun PlanningScreen(
     goToEventCreation: () -> Unit,
     planningUiState: () -> PlanningUiState,
+    isLoadingEvents: () -> Boolean,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
-        topBar = { CalendarTopAppBar() },
+        topBar = { CalendarTopAppBar(isLoadingEvents = isLoadingEvents) },
         modifier = modifier,
     ) { paddingValues ->
         when (val planningUi = planningUiState()) {
@@ -120,6 +128,7 @@ private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class)
             PlanningScreen(
                 planningUiState = { PlanningUiState.Success({ weekEvents }) },
                 goToEventCreation = {},
+                isLoadingEvents = { false },
             )
         }
     }
