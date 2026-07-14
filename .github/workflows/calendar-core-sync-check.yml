@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   check-submodule-and-version-in-sync:
-    uses: infomaniak/.github/.github/workflows/submodule-android-gradle-version-sync-check.yml@v2
+    uses: infomaniak/.github/.github/workflows/submodule-and-gradle-version-sync-check.yml@v2
     with:
       submodule-path: multiplatform-calendar
       variable-name: calendarCore
