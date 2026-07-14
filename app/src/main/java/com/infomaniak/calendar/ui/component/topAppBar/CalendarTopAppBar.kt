@@ -17,16 +17,16 @@
  */
 package com.infomaniak.calendar.ui.component.topAppBar
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.LocalLoadingEventsState
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -34,15 +34,17 @@ import kotlinx.datetime.LocalDate
 
 @Composable
 fun CalendarTopAppBar(modifier: Modifier = Modifier) {
-    TopAppBar(
-        title = { CurrentMonthTitle(onClick = {}, modifier = Modifier.fillMaxWidth()) },
-        navigationIcon = { TopAppBarButtons.DrawerIconButton() },
-        actions = {
-            TopAppBarButtons.InboxButton(onClick = {})
-            TopAppBarButtons.SearchButton(onClick = {})
-        },
-        modifier = modifier,
-    )
+    Column(modifier = modifier) {
+        TopAppBar(
+            title = { CurrentMonthTitle(onClick = {}, modifier = Modifier.fillMaxWidth()) },
+            navigationIcon = { TopAppBarButtons.DrawerIconButton() },
+            actions = {
+                TopAppBarButtons.InboxButton(onClick = {})
+                TopAppBarButtons.SearchButton(onClick = {})
+            },
+        )
+        LoadingEventsIndicator()
+    }
 }
 
 @Preview
@@ -50,7 +52,10 @@ fun CalendarTopAppBar(modifier: Modifier = Modifier) {
 private fun CalendarTopAppBarPreview() {
     CalendarThemeForPreview {
         val visibleDate = remember { mutableStateOf(LocalDate(2026, 7, 8)) }
-        CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(_visibleDate = visibleDate)) {
+        CompositionLocalProvider(
+            LocalVisibleDayState provides VisibleDayState(_visibleDate = visibleDate),
+            LocalLoadingEventsState provides remember { mutableStateOf(true) },
+        ) {
             CalendarTopAppBar()
         }
     }

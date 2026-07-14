@@ -27,13 +27,20 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
+import com.infomaniak.calendar.syncEvents.LocalLoadingEventsState
+import com.infomaniak.calendar.syncEvents.SyncEventsForConnectedUsers
 import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.ui.navigation.MainNavHost
 import com.infomaniak.calendar.ui.navigation.NavDestination
+import com.infomaniak.calendar.ui.state.LocalVisibleDayState
+import com.infomaniak.calendar.ui.state.VisibleDayState
+import com.infomaniak.calendar.ui.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.utils.UserLoadState
 import com.infomaniak.calendar.utils.rememberUserLoadState
@@ -71,8 +78,15 @@ class MainActivity : ComponentActivity() {
 private fun MainContent(userLoadState: UserLoadState.Loaded) {
     val startDestination = if (userLoadState.user == null) NavDestination.Onboarding() else NavDestination.CalendarView.Planning
     val backStack = rememberNavBackStack(startDestination)
+    val visibleDayState: VisibleDayState = rememberVisibleDayState()
+    val loadingEventsState = remember { mutableStateOf(false) }
 
-    CompositionLocalProvider(LocalUser provides userLoadState.user) {
+    CompositionLocalProvider(
+        LocalUser provides userLoadState.user,
+        LocalVisibleDayState provides visibleDayState,
+        LocalLoadingEventsState provides loadingEventsState,
+    ) {
+        SyncEventsForConnectedUsers()
         NavigateToOnboardingIfLastUserIsDisconnected(backStack, userLoadState.user)
         MainNavHost(backStack)
     }
