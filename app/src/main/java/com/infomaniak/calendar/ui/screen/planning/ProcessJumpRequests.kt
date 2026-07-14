@@ -23,7 +23,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import com.infomaniak.calendar.ui.state.VisibleDayState
-import kotlinx.coroutines.channels.consumeEach
 import kotlin.math.abs
 
 @Composable
@@ -31,7 +30,7 @@ fun ProcessJumpRequests(lazyListState: LazyListState, visibleDayState: VisibleDa
     val currentEventsByWeekAndDay by rememberUpdatedState(events)
 
     LaunchedEffect(visibleDayState) {
-        visibleDayState.scrollCommand.consumeEach { date ->
+        visibleDayState.scrollCommand.collect { date ->
             val targetIndex = currentEventsByWeekAndDay().indexOf(date)
             val distance = abs(targetIndex - lazyListState.firstVisibleItemIndex)
 

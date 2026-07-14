@@ -27,6 +27,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
@@ -45,7 +47,7 @@ class VisibleDayState(private val _visibleDate: MutableState<LocalDate>) {
     val visibleDate by _visibleDate
 
     private val _scrollCommand = Channel<LocalDate>(Channel.CONFLATED)
-    val scrollCommand: ReceiveChannel<LocalDate> = _scrollCommand
+    val scrollCommand: Flow<LocalDate> = _scrollCommand.receiveAsFlow()
 
     fun onVisibleDateChanged(date: LocalDate) {
         _visibleDate.value = date
