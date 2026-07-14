@@ -1,21 +1,18 @@
 package com.infomaniak.calendar.components.eventcard
 
-import android.R.attr.action
-import android.R.attr.label
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -27,11 +24,16 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.HourFormatter.formatHours
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.components.Avatar
@@ -39,7 +41,23 @@ import com.infomaniak.core.avatar.models.AvatarColors
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.ui.compose.margin.Margin
 import java.time.LocalDateTime
+import kotlin.math.roundToInt
 
+private val CollapsedCornerRadius = 12.dp
+private val ExpandedCornerRadius = 20.dp
+private val CollapsedPadding = Margin.Small
+private val ExpandedPadding = Margin.Medium
+private val CardElevation = 1.dp
+
+/**
+ * A seekable event card that continuously morphs between a collapsed and an expanded state.
+ *
+ * [progress] is a `0f..1f` value (`0f` = fully collapsed, `1f` = fully expanded) that is meant to be
+ * driven by an external gesture (e.g. a scroll offset). It is intentionally exposed as a lambda so
+ * every frame is resolved through deferred reads inside `graphicsLayer` / layout blocks: changing
+ * [progress] only re-runs the draw and layout phases, never recomposition. This keeps the transition
+ * cheap even when many cards are laid out in a scrolling list.
+ */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun EventCard(
@@ -53,23 +71,92 @@ fun EventCard(
     progress: () -> Float,
     modifier: Modifier = Modifier,
 ) {
-    Card(modifier = modifier, shape = MaterialTheme.shapes.large) {
-        EventCardContent(
-            timeUntilEvent = timeUntilEvent,
-            title = title,
-            startDate = startDate,
-            endDate = endDate,
-            location = location,
-            attendees = attendees,
-            action = action,
-            modifier = Modifier.padding(Margin.Medium),
+    val containerColor = CardDefaults.cardColors().containerColor
+
+    Layout(
+        modifier = modifier
+            .graphicsLayer {
+                val p = progress().coerceIn(0f, 1f)
+                shape = RoundedCornerShape(lerp(CollapsedCornerRadius, ExpandedCornerRadius, p))
+                clip = true
+                shadowElevation = CardElevation.toPx()
+            }
+            .background(containerColor),
+        content = {
+            Box(alpha = { collapsedAlpha(progress()) }) {
+                CollapsedEventCardContent(title = title, startDate = startDate, endDate = endDate, action = action)
+            }
+            Box(alpha = { expandedAlpha(progress()) }) {
+                ExpandedEventCardContent(
+                    timeUntilEvent = timeUntilEvent,
+                    title = title,
+                    startDate = startDate,
+                    endDate = endDate,
+                    location = location,
+                    attendees = attendees,
+                    action = action,
+                )
+            }
+        },
+    ) { measurables, constraints ->
+        val p = progress().coerceIn(0f, 1f)
+        val padding = lerp(CollapsedPadding, ExpandedPadding, p).roundToPx()
+
+        val childConstraints = Constraints(
+            minWidth = 0,
+            maxWidth = if (constraints.hasBoundedWidth) {
+                (constraints.maxWidth - padding * 2).coerceAtLeast(0)
+            } else {
+                Constraints.Infinity
+            },
+            minHeight = 0,
+            maxHeight = Constraints.Infinity,
         )
+
+        val collapsed = measurables[0].measure(childConstraints)
+        val expanded = measurables[1].measure(childConstraints)
+
+        val width = if (constraints.hasBoundedWidth) {
+            constraints.maxWidth
+        } else {
+            maxOf(collapsed.width, expanded.width) + padding * 2
+        }
+        val contentHeight = collapsed.height + ((expanded.height - collapsed.height) * p).roundToInt()
+        val height = contentHeight + padding * 2
+
+        layout(width, height) {
+            collapsed.place(padding, padding)
+            expanded.place(padding, padding)
+        }
     }
 }
 
+/**
+ * A lightweight [androidx.compose.foundation.layout.Box] replacement that applies a deferred [alpha]
+ * without recomposing when the alpha value changes.
+ */
+@Composable
+private fun Box(alpha: () -> Float, content: @Composable () -> Unit) {
+    Layout(
+        modifier = Modifier.graphicsLayer { this.alpha = alpha() },
+        content = content,
+    ) { measurables, constraints ->
+        val placeables = measurables.map { it.measure(constraints) }
+        val width = placeables.maxOfOrNull { it.width } ?: 0
+        val height = placeables.maxOfOrNull { it.height } ?: 0
+        layout(width, height) {
+            placeables.forEach { it.place(0, 0) }
+        }
+    }
+}
+
+private fun collapsedAlpha(progress: Float): Float = (1f - progress / 0.45f).coerceIn(0f, 1f)
+
+private fun expandedAlpha(progress: Float): Float = ((progress - 0.4f) / 0.6f).coerceIn(0f, 1f)
+
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun EventCardContent(
+private fun ExpandedEventCardContent(
     timeUntilEvent: String,
     title: String,
     startDate: LocalDateTime,
@@ -114,8 +201,8 @@ private fun CollapsedEventCardContent(
     action: EventCardAction,
     modifier: Modifier = Modifier,
 ) {
-    Row(modifier = modifier) {
-        Column {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        Column(modifier = Modifier.weight(1f)) {
             Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
             IconItem(painterResource(R.drawable.ic_clock), null, startDate.formatRangeTo(endDate))
         }
@@ -185,6 +272,7 @@ private fun Preview() {
                 location = "Japan room",
                 attendees = List(9) { AvatarType.WithInitials.Initials("AB", AvatarColors(Color.Gray, Color.White)) },
                 action = EventCardAction.Button.JoinMeeting {},
+                progress = { 1f },
             )
         }
     }
