@@ -42,7 +42,7 @@ fun SyncEventsForConnectedUsers(
             val usersCount = users.size
             val hasUserBeenRemoved = usersCount < previousUsersCount
             previousUsersCount = usersCount
-            if (hasUserBeenRemoved) return@collect
+            if (hasUserBeenRemoved || users.isEmpty()) return@collect
 
             syncEventsManager.loadCurrentMonths(
                 visibleDate = visibleDayState.visibleDate,

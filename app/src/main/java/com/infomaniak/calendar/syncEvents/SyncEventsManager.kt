@@ -66,7 +66,7 @@ class SyncEventsManager @Inject constructor(private val calendarManager: Calenda
 
     companion object {
         private const val SYNC_WINDOW_MONTHS_BEFORE = 2
-        private const val SYNC_WINDOW_MONTHS_AFTER = 4
+        private const val SYNC_WINDOW_MONTHS_AFTER = 3
         private val LOADING_INDICATOR_DELAY = 600.milliseconds
     }
 }
