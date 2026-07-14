@@ -109,7 +109,7 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
             onlyLogin = destination.onlyLogin,
             goToCalendarView = {
                 backStack.clear()
-                backStack.add(NavDestination.CalendarView.Day)
+                backStack.add(NavDestination.CalendarView.Planning)
             },
             onPopBack = { backStack.removeLastOrNull() },
         )
