@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 val LocalSharedSnackbarHostState = staticCompositionLocalOf<SharedSnackbarHostState?> { null }
@@ -39,13 +40,16 @@ fun rememberCustomSnackbarHostState(): SharedSnackbarHostState {
 
 @Stable
 class SharedSnackbarHostState(private val coroutineScope: CoroutineScope, val snackbarHostState: SnackbarHostState) {
+    private var snackBarJob: Job? = null
+
     fun showSnackbar(
         message: String,
         actionLabel: String? = null,
         withDismissAction: Boolean = false,
         duration: SnackbarDuration = if (actionLabel == null) SnackbarDuration.Short else SnackbarDuration.Indefinite,
     ) {
-        coroutineScope.launch {
+        snackBarJob?.cancel()
+        snackBarJob = coroutineScope.launch {
             snackbarHostState.showSnackbar(
                 message = message,
                 actionLabel = actionLabel,
