@@ -22,6 +22,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -42,6 +43,8 @@ class MainActivity : ComponentActivity() {
 
     private val mainApplication by lazy { application as MainApplication }
     private val appGraph by lazy { mainApplication.appGraph }
+
+    private val mainViewModel: MainViewModel by viewModels()
 
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
         get() = appGraph.viewModelFactory

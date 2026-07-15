@@ -19,6 +19,7 @@ package com.infomaniak.calendar.di
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.Provider
@@ -26,30 +27,40 @@ import dev.zacsweers.metro.SingleIn
 import kotlin.reflect.KClass
 
 /**
- * A [ViewModelProvider.Factory] that resolves [ViewModel]s from the Metro multibinding map.
+ * A [ViewModelProvider.Factory] that resolves [ViewModel]s from the Metro multibinding maps.
  *
  * Wired as the activity's `defaultViewModelProviderFactory` so that the standard
  * `viewModel()` composable transparently resolves Metro-built ViewModels.
  *
- * Each ViewModel must be annotated with:
- * - `@Inject`
- * - `@ContributesIntoMap(AppScope::class)`
- * - `@ViewModelKey(MyViewModel::class)`
+ * A ViewModel is resolved in one of two ways:
+ * - Plain ViewModels annotated with `@Inject @ContributesIntoMap(AppScope::class) @ViewModelKey`
+ *   are provided directly from [viewModelProviders].
+ * - Assisted ViewModels that need [CreationExtras] (e.g. a `SavedStateHandle`) expose an
+ *   `@AssistedFactory @ViewModelAssistedFactoryKey(…) @ContributesIntoMap(AppScope::class)`
+ *   factory, resolved from [viewModelAssistedFactories].
  */
 @Inject
 @SingleIn(AppScope::class)
 class MetroViewModelFactory(
     private val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>>,
+    private val viewModelAssistedFactories: Map<KClass<out ViewModel>, ViewModelAssistedFactory>,
 ) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        val provider = viewModelProviders[modelClass.kotlin]
-            ?: error(
-                "No Metro ViewModel binding for ${modelClass.name}. " +
-                    "Did you add @ContributesIntoMap(AppScope::class) " +
-                    "and @ViewModelKey(${modelClass.simpleName}::class)?",
-            )
+    override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+        viewModelProviders[modelClass.kotlin]?.let {
+            @Suppress("UNCHECKED_CAST")
+            return it() as T
+        }
 
-        @Suppress("UNCHECKED_CAST")
-        return provider() as T
+        viewModelAssistedFactories[modelClass.kotlin]?.let {
+            @Suppress("UNCHECKED_CAST")
+            return it.create(extras) as T
+        }
+
+        error(
+            "No Metro ViewModel binding for ${modelClass.name}. " +
+                "Did you add @ContributesIntoMap(AppScope::class) and " +
+                "@ViewModelKey(${modelClass.simpleName}::class) (or an @AssistedFactory with " +
+                "@ViewModelAssistedFactoryKey(${modelClass.simpleName}::class))?",
+        )
     }
 }
