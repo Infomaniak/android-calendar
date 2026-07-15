@@ -35,12 +35,12 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
 fun MonthScreen(modifier: Modifier = Modifier, monthViewModel: MonthViewModel = viewModel()) {
-    val isLoadingEvents by monthViewModel.isLoadingEvents.collectAsStateWithLifecycle()
+    val isLoadingEvents by monthViewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
     MonthScreen(modifier, isLoadingEvents = { isLoadingEvents })
 }
 
 @Composable
-fun MonthScreen(modifier: Modifier = Modifier, isLoadingEvents: () -> Boolean) {
+private fun MonthScreen(modifier: Modifier = Modifier, isLoadingEvents: () -> Boolean) {
     Scaffold(
         topBar = { CalendarTopAppBar(isLoadingEvents = isLoadingEvents) },
         modifier = modifier,

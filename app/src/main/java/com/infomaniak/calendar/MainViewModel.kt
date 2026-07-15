@@ -36,6 +36,7 @@ import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -51,6 +52,8 @@ class MainViewModel(
     private val accountUtils: AccountUtils,
     private val syncEventsManager: SyncEventsManager,
 ) : ViewModel() {
+    val loadingEventsError: ReceiveChannel<Unit> = syncEventsManager.loadingError
+
     @OptIn(SavedStateHandleSaveableApi::class)
     val visibleDay: MutableState<LocalDate> = savedStateHandle.saveable("visibleDay") {
         mutableStateOf(Clock.System.todayIn(TimeZone.currentSystemDefault()))

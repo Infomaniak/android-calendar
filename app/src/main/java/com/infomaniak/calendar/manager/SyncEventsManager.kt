@@ -21,12 +21,13 @@ import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -40,37 +41,33 @@ import kotlin.time.Duration.Companion.milliseconds
 class SyncEventsManager @Inject constructor(private val calendarManager: CalendarManager) {
 
     private val _isLoadingEvents = MutableStateFlow(false)
-    val isLoadingEvents: StateFlow<Boolean> = _isLoadingEvents.asStateFlow()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val isLoadingEvents: Flow<Boolean> = _isLoadingEvents.mapLatest { isLoading ->
+        if (isLoading) delay(LOADING_INDICATOR_DELAY)
+        isLoading
+    }
+
+    private val _loadingError = Channel<Unit>(Channel.CONFLATED)
+    val loadingError: ReceiveChannel<Unit> = _loadingError
 
     suspend fun loadCurrentMonths(visibleDate: LocalDate) {
         val timeZone = TimeZone.currentSystemDefault()
         val firstDay = visibleDate.yearMonth.minus(SYNC_WINDOW_MONTHS_BEFORE, DateTimeUnit.MONTH).firstDay
         val lastDay = visibleDate.yearMonth.plus(SYNC_WINDOW_MONTHS_AFTER, DateTimeUnit.MONTH).lastDay.plus(1, DateTimeUnit.DAY)
 
-        withDelayedLoadingIndicator {
+        _isLoadingEvents.value = true
+        runCatching {
             calendarManager.downloadEventsByRange(
                 start = firstDay.atStartOfDayIn(timeZone),
                 end = lastDay.atStartOfDayIn(timeZone),
             )
+        }.onFailure {
+            _loadingError.trySend(Unit)
         }
+
+        _isLoadingEvents.value = false
 
         calendarManager.syncEvents()
-    }
-
-    private suspend fun withDelayedLoadingIndicator(block: suspend () -> Unit) {
-        coroutineScope {
-            val delayedLoadingJob = launch {
-                delay(LOADING_INDICATOR_DELAY)
-                _isLoadingEvents.value = true
-            }
-
-            try {
-                block()
-            } finally {
-                delayedLoadingJob.cancel()
-                _isLoadingEvents.value = false
-            }
-        }
     }
 
     companion object {

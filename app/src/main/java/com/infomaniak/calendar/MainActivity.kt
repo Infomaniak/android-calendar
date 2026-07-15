@@ -48,6 +48,7 @@ import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.utils.UserLoadState
 import com.infomaniak.calendar.utils.rememberUserLoadState
 import com.infomaniak.core.auth.models.user.User
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.datetime.LocalDate
 
 class MainActivity : ComponentActivity() {
@@ -70,7 +71,11 @@ class MainActivity : ComponentActivity() {
                 Surface {
                     when (val userLoadState = appGraph.accountUtils.rememberUserLoadState().value) {
                         UserLoadState.Awaiting -> Unit // Blank surface while waiting for first result
-                        is UserLoadState.Loaded -> MainContent(userLoadState, visibleDate = { mainViewModel.visibleDay })
+                        is UserLoadState.Loaded -> MainContent(
+                            userLoadState,
+                            visibleDate = { mainViewModel.visibleDay },
+                            loadingEventsError = { mainViewModel.loadingEventsError },
+                        )
                     }
                 }
             }
@@ -79,7 +84,11 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun MainContent(userLoadState: UserLoadState.Loaded, visibleDate: () -> MutableState<LocalDate>) {
+private fun MainContent(
+    userLoadState: UserLoadState.Loaded,
+    visibleDate: () -> MutableState<LocalDate>,
+    loadingEventsError: () -> ReceiveChannel<Unit>,
+) {
     val startDestination = if (userLoadState.user == null) NavDestination.Onboarding() else NavDestination.CalendarView.Planning
     val backStack = rememberNavBackStack(startDestination)
 
@@ -90,8 +99,21 @@ private fun MainContent(userLoadState: UserLoadState.Loaded, visibleDate: () -> 
         LocalToolbarScrollableState provides rememberToolbarScrollableState(),
         LocalDrawerState provides rememberDrawerState(initialValue = DrawerValue.Closed),
     ) {
+        ObserveSyncError(loadingEventsError)
         NavigateToOnboardingIfLastUserIsDisconnected(backStack, userLoadState.user)
         MainNavHost(backStack)
+    }
+}
+
+@Composable
+private fun ObserveSyncError(loadingEventsError: () -> ReceiveChannel<Unit>) {
+    val snackbarHostState = LocalSharedSnackbarHostState.current ?: return
+    // val errorMessage = stringResource(R.string.errorEventsSync)
+
+    LaunchedEffect(Unit) {
+        for (error in loadingEventsError()) {
+            snackbarHostState.showSnackbar("errorMessage")
+        }
     }
 }
 

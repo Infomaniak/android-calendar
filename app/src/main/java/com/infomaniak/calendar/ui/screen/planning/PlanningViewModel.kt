@@ -27,6 +27,7 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -49,7 +50,7 @@ class PlanningViewModel(
     calendarManager: CalendarManager,
     syncEventsManager: SyncEventsManager,
 ) : ViewModel() {
-    val isLoadingEvents: StateFlow<Boolean> = syncEventsManager.isLoadingEvents
+    val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
 
     private val timeZone = TimeZone.currentSystemDefault()
     private val today = Clock.System.now().toLocalDateTime(timeZone).date

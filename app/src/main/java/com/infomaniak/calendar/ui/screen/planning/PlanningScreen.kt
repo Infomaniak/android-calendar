@@ -52,7 +52,7 @@ import kotlin.time.Clock
 @Composable
 fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier, viewModel: PlanningViewModel = viewModel()) {
     val planningUiState: PlanningUiState by viewModel.planningUiState.collectAsStateWithLifecycle()
-    val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle()
+    val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
 
     PlanningScreen(
         goToEventCreation = goToEventCreation,

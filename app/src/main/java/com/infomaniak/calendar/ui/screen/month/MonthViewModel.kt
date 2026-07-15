@@ -23,7 +23,6 @@ import com.infomaniak.calendar.manager.SyncEventsManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
-import kotlinx.coroutines.flow.StateFlow
 
 @Inject
 @ContributesIntoMap(AppScope::class)
@@ -31,5 +30,5 @@ import kotlinx.coroutines.flow.StateFlow
 class MonthViewModel(
     syncEventsManager: SyncEventsManager,
 ) : ViewModel() {
-    val isLoadingEvents: StateFlow<Boolean> = syncEventsManager.isLoadingEvents
+    val isLoadingEvents = syncEventsManager.isLoadingEvents
 }
