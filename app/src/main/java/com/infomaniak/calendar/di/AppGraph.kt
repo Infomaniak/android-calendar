@@ -59,7 +59,6 @@ interface AppGraph {
     val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>>
     val viewModelAssistedFactories: Map<KClass<out ViewModel>, ViewModelAssistedFactory>
 
-
     val infomaniakLogin: InfomaniakLogin
 
     val accountUtils: AccountUtils
