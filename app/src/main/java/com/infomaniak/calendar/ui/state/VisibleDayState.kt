@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.state
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
@@ -35,10 +36,12 @@ import kotlin.time.Clock
 val LocalVisibleDayState = staticCompositionLocalOf<VisibleDayState?> { null }
 
 @Composable
-fun rememberVisibleDayState(): VisibleDayState {
-    val visibleDate = rememberSaveable { mutableStateOf(Clock.System.todayIn(TimeZone.currentSystemDefault())) }
+@SuppressLint("ComposeMutableParameters")
+fun rememberVisibleDayState(visibleDate: MutableState<LocalDate> = rememberSaveable { mutableStateOfToday() }): VisibleDayState {
     return remember { VisibleDayState(_visibleDate = visibleDate) }
 }
+
+private fun mutableStateOfToday(): MutableState<LocalDate> = mutableStateOf(Clock.System.todayIn(TimeZone.currentSystemDefault()))
 
 @Stable
 class VisibleDayState(private val _visibleDate: MutableState<LocalDate>) {

@@ -24,17 +24,25 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
 fun MonthScreen(modifier: Modifier = Modifier, monthViewModel: MonthViewModel = viewModel()) {
+    val isLoadingEvents by monthViewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
+    MonthScreen(modifier, isLoadingEvents = { isLoadingEvents })
+}
+
+@Composable
+private fun MonthScreen(modifier: Modifier = Modifier, isLoadingEvents: () -> Boolean) {
     Scaffold(
-        topBar = { CalendarTopAppBar() },
+        topBar = { CalendarTopAppBar(isLoadingEvents = isLoadingEvents) },
         modifier = modifier,
     ) { paddingValues ->
         LazyColumn(

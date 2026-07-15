@@ -19,6 +19,7 @@ package com.infomaniak.calendar.ui.screen.month
 
 import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.di.ViewModelKey
+import com.infomaniak.calendar.manager.SyncEventsManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
@@ -26,4 +27,8 @@ import dev.zacsweers.metro.Inject
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
-class MonthViewModel : ViewModel()
+class MonthViewModel(
+    syncEventsManager: SyncEventsManager,
+) : ViewModel() {
+    val isLoadingEvents = syncEventsManager.isLoadingEvents
+}

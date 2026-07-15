@@ -24,6 +24,7 @@
     <string name="dayTitle">Päivä</string>
     <string name="monthTitle">Kuukausi</string>
     <string name="planningTitle">Suunnittelu</string>
+    <string name="syncEventsError">Virhe noudettaessa tapahtumia</string>
     <string name="threeDaysTitle">Kolme päivää</string>
     <string name="weekTitle">Viikko</string>
 </resources>

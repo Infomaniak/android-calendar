@@ -17,10 +17,9 @@
  */
 package com.infomaniak.calendar.ui.component.topAppBar
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
@@ -33,16 +32,18 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.datetime.LocalDate
 
 @Composable
-fun CalendarTopAppBar(modifier: Modifier = Modifier) {
-    TopAppBar(
-        title = { CurrentMonthTitle(onClick = {}, modifier = Modifier.fillMaxWidth()) },
-        navigationIcon = { TopAppBarButtons.DrawerIconButton() },
-        actions = {
-            TopAppBarButtons.InboxButton(onClick = {})
-            TopAppBarButtons.SearchButton(onClick = {})
-        },
-        modifier = modifier,
-    )
+fun CalendarTopAppBar(isLoadingEvents: () -> Boolean, modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        TopAppBar(
+            title = { CurrentMonthTitle(onClick = {}, modifier = Modifier.fillMaxWidth()) },
+            navigationIcon = { TopAppBarButtons.DrawerIconButton() },
+            actions = {
+                TopAppBarButtons.InboxButton(onClick = {})
+                TopAppBarButtons.SearchButton(onClick = {})
+            },
+        )
+        LoadingEventsIndicator(isLoading = isLoadingEvents)
+    }
 }
 
 @Preview
@@ -50,8 +51,10 @@ fun CalendarTopAppBar(modifier: Modifier = Modifier) {
 private fun CalendarTopAppBarPreview() {
     CalendarThemeForPreview {
         val visibleDate = remember { mutableStateOf(LocalDate(2026, 7, 8)) }
-        CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(_visibleDate = visibleDate)) {
-            CalendarTopAppBar()
+        CompositionLocalProvider(
+            LocalVisibleDayState provides VisibleDayState(_visibleDate = visibleDate),
+        ) {
+            CalendarTopAppBar(isLoadingEvents = { true })
         }
     }
 }

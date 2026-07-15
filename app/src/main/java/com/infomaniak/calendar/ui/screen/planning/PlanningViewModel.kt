@@ -20,20 +20,20 @@ package com.infomaniak.calendar.ui.screen.planning
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
+import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.utils.account.AccountUtils
-import com.infomaniak.calendar.utils.account.accountId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -44,8 +44,13 @@ import kotlin.time.Clock
 
 @Inject
 @ContributesIntoMap(AppScope::class)
-@ViewModelKey(PlanningViewModel::class)
-class PlanningViewModel(private val accountUtils: AccountUtils, private val calendarManager: CalendarManager) : ViewModel() {
+@ViewModelKey
+class PlanningViewModel(
+    accountUtils: AccountUtils,
+    calendarManager: CalendarManager,
+    syncEventsManager: SyncEventsManager,
+) : ViewModel() {
+    val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
 
     private val timeZone = TimeZone.currentSystemDefault()
     private val today = Clock.System.now().toLocalDateTime(timeZone).date
@@ -63,20 +68,6 @@ class PlanningViewModel(private val accountUtils: AccountUtils, private val cale
             PlanningUiState.Success({ events })
         }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = PlanningUiState.Loading)
-
-    init {
-        syncCalendars()
-    }
-
-    // TODO: This function is not meant to stay, it will be removed when syncCalendars is moved to a Worker.
-    private fun syncCalendars() {
-        viewModelScope.launch {
-            val users = accountUtils.users.first()
-            users.forEach { user ->
-                calendarManager.syncCalendars(user.accountId)
-            }
-        }
-    }
 
     companion object {
         private const val PLANNING_RANGE_DAYS = 250

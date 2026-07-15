@@ -39,14 +39,8 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Metada
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
-import com.infomaniak.calendar.ui.state.VisibleDayState
-import com.infomaniak.calendar.ui.state.LocalVisibleDayState
-import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
-import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
-import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.state.SharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.ToolbarScrollableState
-import com.infomaniak.calendar.ui.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableState
 import com.infomaniak.calendar.ui.screen.day.DayScreen
@@ -56,25 +50,15 @@ import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
 import com.infomaniak.calendar.ui.screen.threeDays.ThreeDayScreen
 import com.infomaniak.calendar.ui.screen.week.WeekScreen
+import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 
 @Composable
 fun MainNavHost(backStack: NavBackStack<NavKey>) {
-    val snackbarHostState: SharedSnackbarHostState = rememberCustomSnackbarHostState()
-    val toolbarScrollableState: ToolbarScrollableState = rememberToolbarScrollableState()
-    val calendarDrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val visibleDayState: VisibleDayState = rememberVisibleDayState()
-
     SharedTransitionLayout {
-        CompositionLocalProvider(
-            LocalSharedTransitionScope provides this@SharedTransitionLayout,
-            LocalSharedSnackbarHostState provides snackbarHostState,
-            LocalToolbarScrollableState provides toolbarScrollableState,
-            LocalDrawerState provides calendarDrawerState,
-            LocalVisibleDayState provides visibleDayState,
-        ) {
+        CompositionLocalProvider(LocalSharedTransitionScope provides this@SharedTransitionLayout) {
             NavDisplay(
                 backStack = backStack,
                 entryProvider = baseEntryProvider(backStack = backStack),
@@ -109,7 +93,7 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
             onlyLogin = destination.onlyLogin,
             goToCalendarView = {
                 backStack.clear()
-                backStack.add(NavDestination.CalendarView.Day)
+                backStack.add(NavDestination.CalendarView.Planning)
             },
             onPopBack = { backStack.removeLastOrNull() },
         )
