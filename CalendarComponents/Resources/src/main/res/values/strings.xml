@@ -17,11 +17,15 @@
   -->
 <resources>
     <string name="addEventLabel">Add</string>
-    <string name="contentDescriptionCreateEvent">Create an event</string>
     <string name="allDayLabel">All Day</string>
+    <string name="contentDescriptionCreateEvent">Create an event</string>
     <string name="contentDescriptionHasAttendees">Has attendees</string>
     <string name="contentDescriptionHasKMeetLink">Has a kMeet link</string>
     <string name="contentDescriptionHasLocation">Has a location</string>
+    <plurals name="moreParticipantsLabel">
+        <item quantity="one">+%d participant</item>
+        <item quantity="other">+%d participants</item>
+    </plurals>
     <string name="planningNothingPlannedToday">Nothing planned.</string>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">W%d</string>
