@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import org.codehaus.groovy.runtime.ArrayTypeUtils.dimension
-import java.lang.module.ModuleFinder.compose
 import java.util.Properties
 
 plugins {
@@ -160,8 +158,6 @@ dependencies {
     implementation(core.infomaniak.core.ui.compose.preview)
     implementation(core.infomaniak.core.ui.compose.theme)
     implementation(libs.infomaniak.designsystem.theme.calendar)
-
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
 
     implementation(core.kotlinx.serialization.json)
     implementation(kmpCalendar.androidx.room.runtime)
