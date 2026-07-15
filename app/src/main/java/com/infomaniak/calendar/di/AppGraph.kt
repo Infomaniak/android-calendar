@@ -56,6 +56,8 @@ val ComposeAppGraph: AppGraph
 @DependencyGraph(AppScope::class)
 interface AppGraph {
     val viewModelFactory: MetroViewModelFactory
+
+    /** [viewModelProviders] and [viewModelAssistedFactories] are only used by [MetroViewModelFactory] to create ViewModels */
     val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>>
     val viewModelAssistedFactories: Map<KClass<out ViewModel>, ViewModelAssistedFactory>
 
