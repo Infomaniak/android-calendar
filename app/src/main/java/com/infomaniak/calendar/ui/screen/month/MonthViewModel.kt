@@ -19,7 +19,7 @@ package com.infomaniak.calendar.ui.screen.month
 
 import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.di.ViewModelKey
-import com.infomaniak.calendar.syncEvents.SyncEventsManager
+import com.infomaniak.calendar.manager.SyncEventsManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject

@@ -17,22 +17,66 @@
  */
 package com.infomaniak.calendar
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
+import androidx.lifecycle.viewmodel.compose.saveable
 import com.infomaniak.calendar.di.ViewModelAssistedFactory
 import com.infomaniak.calendar.di.ViewModelAssistedFactoryKey
+import com.infomaniak.calendar.manager.SyncEventsManager
+import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.core.auth.models.user.User
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
+import kotlin.time.Clock
 
 @AssistedInject
 class MainViewModel(
     @Assisted savedStateHandle: SavedStateHandle,
+    private val accountUtils: AccountUtils,
+    private val syncEventsManager: SyncEventsManager,
 ) : ViewModel() {
+    @OptIn(SavedStateHandleSaveableApi::class)
+    val visibleDay: MutableState<LocalDate> = savedStateHandle.saveable("visibleDay") {
+        mutableStateOf(Clock.System.todayIn(TimeZone.currentSystemDefault()))
+    }
+
+    init {
+        syncEventsForConnectedUsers()
+    }
+
+    private fun syncEventsForConnectedUsers() {
+        var previousUserIds = emptySet<Int>()
+
+        viewModelScope.launch {
+            accountUtils.users
+                .map { users -> users.mapTo(mutableSetOf(), User::id) }
+                .distinctUntilChanged()
+                .collectLatest { userIds ->
+                    val hasNewUser = !previousUserIds.containsAll(userIds)
+                    previousUserIds = userIds
+                    if (!hasNewUser) return@collectLatest
+
+                    syncEventsManager.loadCurrentMonths(visibleDate = visibleDay.value)
+                }
+        }
+    }
+
     @AssistedFactory
     @ViewModelAssistedFactoryKey(MainViewModel::class)
     @ContributesIntoMap(AppScope::class)
