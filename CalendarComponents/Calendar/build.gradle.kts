@@ -29,7 +29,7 @@ val appMinSdk: Int by rootProject.extra
 val javaVersion: JavaVersion by rootProject.extra
 
 android {
-    namespace = "com.infomaniak.calendar.components.planning"
+    namespace = "com.infomaniak.calendar.components.calendar"
     compileSdk = appCompileSdk
 
     defaultConfig {
@@ -53,12 +53,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":CalendarComponents:Calendar"))
-    implementation(project(":CalendarComponents:Event"))
     api(project(":CalendarComponents:Foundation"))
+    implementation(project(":CalendarComponents:Event"))
     implementation(project(":CalendarComponents:Resources"))
 
-    implementation(core.infomaniak.core.common)
     implementation(core.infomaniak.core.ui.compose.margin)
 
     implementation(platform(core.compose.bom))
@@ -69,4 +67,6 @@ dependencies {
     debugImplementation(core.compose.ui.tooling)
 
     implementation(kmpCalendar.kotlinx.datetime)
+
+    implementation(libs.kizitonwose.calendar.compose)//T0D0: Check if we need everything
 }

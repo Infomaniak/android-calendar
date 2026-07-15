@@ -31,6 +31,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -68,13 +70,25 @@ private fun PlanningScreen(
     isLoadingEvents: () -> Boolean,
     modifier: Modifier = Modifier,
 ) {
+    var isCalendarExpanded by rememberSaveable { mutableStateOf(false) }
+
     Scaffold(
-        topBar = { CalendarTopAppBar(isLoadingEvents = isLoadingEvents) },
+        topBar = {
+            CalendarTopAppBar(
+                isLoadingEvents = isLoadingEvents,
+                onToggleCalendar = { isCalendarExpanded = !isCalendarExpanded },
+            )
+        },
         modifier = modifier,
     ) { paddingValues ->
         when (val planningUi = planningUiState()) {
             is PlanningUiState.Success -> {
-                SuccessPlanning(planningUi.eventsByWeekAndDay, paddingValues, goToEventCreation)
+                SuccessPlanning(
+                    events = planningUi.eventsByWeekAndDay,
+                    contentPadding = paddingValues,
+                    goToEventCreation = goToEventCreation,
+                    isCalendarExpanded = { isCalendarExpanded },
+                )
             }
             is PlanningUiState.Loading -> {
                 LoadingPlanning(modifier = Modifier.padding(paddingValues))
@@ -88,6 +102,7 @@ private fun SuccessPlanning(
     events: () -> EventsByWeekAndDay,
     contentPadding: PaddingValues,
     goToEventCreation: () -> Unit,
+    isCalendarExpanded: () -> Boolean,
 ) {
     val visibleDayState = LocalVisibleDayState.current ?: return
     val lazyListState = rememberLazyListState(events().indexOf(visibleDayState.visibleDate))
@@ -95,7 +110,7 @@ private fun SuccessPlanning(
     ProcessJumpRequests(lazyListState, visibleDayState, events)
     ReportVisibleDate(lazyListState, onVisibleDateChanged = visibleDayState::onVisibleDateChanged)
 
-    Column {
+    Column(modifier = Modifier.padding(top = contentPadding.calculateTopPadding())) {
         Planning(
             lazyListState = lazyListState,
             weekEvents = events,
@@ -104,8 +119,11 @@ private fun SuccessPlanning(
                 .padding(horizontal = Margin.Medium)
                 .scrollableToolbar()
                 .fillMaxWidth(),
-            contentPadding = contentPadding,
+            contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
             goToEventCreation = goToEventCreation,
+            onJump = visibleDayState::jumpTo,
+            currentDay = visibleDayState::visibleDate,
+            isCalendarExpanded = isCalendarExpanded,
         )
     }
 }

@@ -42,7 +42,7 @@ fun MonthScreen(modifier: Modifier = Modifier, monthViewModel: MonthViewModel = 
 @Composable
 private fun MonthScreen(modifier: Modifier = Modifier, isLoadingEvents: () -> Boolean) {
     Scaffold(
-        topBar = { CalendarTopAppBar(isLoadingEvents = isLoadingEvents) },
+        topBar = { CalendarTopAppBar(onToggleCalendar = {}, isLoadingEvents = isLoadingEvents) },
         modifier = modifier,
     ) { paddingValues ->
         LazyColumn(

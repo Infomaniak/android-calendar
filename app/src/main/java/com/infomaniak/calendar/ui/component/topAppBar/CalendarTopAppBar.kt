@@ -32,16 +32,22 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.datetime.LocalDate
 
 @Composable
-fun CalendarTopAppBar(isLoadingEvents: () -> Boolean, modifier: Modifier = Modifier) {
-    Column(modifier = modifier) {
+fun CalendarTopAppBar(
+    onToggleCalendar: () -> Unit,
+    isLoadingEvents: () -> Boolean,
+    modifier: Modifier = Modifier,
+    expandableCalendar: @Composable () -> Unit = {},
+) {
+    Column(modifier) {
         TopAppBar(
-            title = { CurrentMonthTitle(onClick = {}, modifier = Modifier.fillMaxWidth()) },
+            title = { CurrentMonthTitle(onClick = onToggleCalendar, modifier = Modifier.fillMaxWidth()) },
             navigationIcon = { TopAppBarButtons.DrawerIconButton() },
             actions = {
                 TopAppBarButtons.InboxButton(onClick = {})
                 TopAppBarButtons.SearchButton(onClick = {})
             },
         )
+        expandableCalendar()
         LoadingEventsIndicator(isLoading = isLoadingEvents)
     }
 }
@@ -54,7 +60,7 @@ private fun CalendarTopAppBarPreview() {
         CompositionLocalProvider(
             LocalVisibleDayState provides VisibleDayState(_visibleDate = visibleDate),
         ) {
-            CalendarTopAppBar(isLoadingEvents = { true })
+            CalendarTopAppBar(onToggleCalendar = {}, isLoadingEvents = { true })
         }
     }
 }
