@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
@@ -45,6 +46,9 @@ import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.ui.compose.margin.Margin
 import java.time.LocalDateTime
 import kotlin.math.roundToInt
+
+private val AVATAR_SPACING = (-8).dp
+private val MAX_AVATAR_COUNT = 3
 
 @Composable
 fun rememberEventCardState(): EventCardState {
@@ -187,12 +191,12 @@ private fun ExpandedEventCardContent(
         Row(verticalAlignment = Alignment.Bottom) {
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Margin.Mini)) {
                 IconItem(painterResource(R.drawable.ic_clock), null, startDate.formatRangeTo(endDate))
+
                 if (location != null) {
                     IconItem(painterResource(R.drawable.ic_door_open), null, location)
                 }
-                if (attendees.isNotEmpty()) {
-                    AttendeesAvatars(attendees)
-                }
+
+                if (attendees.isNotEmpty()) AttendeesAvatars(attendees)
             }
 
             ActionButton(action)
@@ -236,13 +240,22 @@ private fun ActionButton(action: EventCardAction) {
 
 @Composable
 private fun AttendeesAvatars(attendees: List<AvatarType>, modifier: Modifier = Modifier) {
-    DynamicOverflowRow(
-        overflowIndicator = { Text("+$it") },
-        spacing = (-8).dp,
+    Row(
         modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(AVATAR_SPACING),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        attendees.forEach {
-            Avatar(it, modifier = Modifier.size(24.dp))
+        attendees.take(MAX_AVATAR_COUNT).forEach { avatarType ->
+            Avatar(avatarType, modifier = Modifier.size(24.dp))
+        }
+        if (attendees.size > MAX_AVATAR_COUNT) {
+            val extraAttendeeSize = attendees.size - MAX_AVATAR_COUNT
+            val extraAttendeesText = pluralStringResource(R.plurals.moreParticipantsLabel, extraAttendeeSize, extraAttendeeSize)
+            Text(
+                extraAttendeesText,
+                style = MaterialTheme.typography.bodySmallEmphasized,
+                modifier = Modifier.padding(start = -AVATAR_SPACING + Margin.Mini),
+            )
         }
     }
 }
