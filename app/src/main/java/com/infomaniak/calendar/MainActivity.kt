@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar
 
+import android.annotation.SuppressLint
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -29,11 +30,12 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
+import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.ui.navigation.MainNavHost
 import com.infomaniak.calendar.ui.navigation.NavDestination
@@ -43,13 +45,13 @@ import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableState
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
+import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.utils.UserLoadState
 import com.infomaniak.calendar.utils.rememberUserLoadState
 import com.infomaniak.core.auth.models.user.User
 import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.datetime.LocalDate
 
 class MainActivity : ComponentActivity() {
 
@@ -72,9 +74,9 @@ class MainActivity : ComponentActivity() {
                     when (val userLoadState = appGraph.accountUtils.rememberUserLoadState().value) {
                         UserLoadState.Awaiting -> Unit // Blank surface while waiting for first result
                         is UserLoadState.Loaded -> MainContent(
-                            userLoadState,
-                            visibleDate = { mainViewModel.visibleDay },
-                            loadingEventsError = { mainViewModel.loadingEventsError },
+                            userLoadState = userLoadState,
+                            visibleDayState = rememberVisibleDayState(mainViewModel.visibleDay),
+                            loadingEventsError = mainViewModel.loadingEventsError,
                         )
                     }
                 }
@@ -86,15 +88,15 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun MainContent(
     userLoadState: UserLoadState.Loaded,
-    visibleDate: () -> MutableState<LocalDate>,
-    loadingEventsError: () -> ReceiveChannel<Unit>,
+    visibleDayState: VisibleDayState,
+    loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError>,
 ) {
     val startDestination = if (userLoadState.user == null) NavDestination.Onboarding() else NavDestination.CalendarView.Planning
     val backStack = rememberNavBackStack(startDestination)
 
     CompositionLocalProvider(
         LocalUser provides userLoadState.user,
-        LocalVisibleDayState provides rememberVisibleDayState(visibleDate()),
+        LocalVisibleDayState provides visibleDayState,
         LocalSharedSnackbarHostState provides rememberCustomSnackbarHostState(),
         LocalToolbarScrollableState provides rememberToolbarScrollableState(),
         LocalDrawerState provides rememberDrawerState(initialValue = DrawerValue.Closed),
@@ -105,14 +107,15 @@ private fun MainContent(
     }
 }
 
+@SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-private fun ObserveSyncError(loadingEventsError: () -> ReceiveChannel<Unit>) {
+private fun ObserveSyncError(loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError>) {
     val snackbarHostState = LocalSharedSnackbarHostState.current ?: return
-    // val errorMessage = stringResource(R.string.errorEventsSync)
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        for (error in loadingEventsError()) {
-            snackbarHostState.showSnackbar("errorMessage")
+        for (error in loadingEventsError) {
+            snackbarHostState.showSnackbar(message = context.getString(error.errorRes))
         }
     }
 }

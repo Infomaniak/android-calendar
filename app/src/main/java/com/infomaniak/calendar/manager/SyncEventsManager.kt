@@ -17,6 +17,8 @@
  */
 package com.infomaniak.calendar.manager
 
+import androidx.annotation.StringRes
+import com.infomaniak.calendar.R
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
@@ -47,8 +49,8 @@ class SyncEventsManager @Inject constructor(private val calendarManager: Calenda
         isLoading
     }
 
-    private val _loadingError = Channel<Unit>(Channel.CONFLATED)
-    val loadingError: ReceiveChannel<Unit> = _loadingError
+    private val _loadingError = Channel<SyncError>(Channel.CONFLATED)
+    val loadingError: ReceiveChannel<SyncError> = _loadingError
 
     suspend fun loadCurrentMonths(visibleDate: LocalDate) {
         val timeZone = TimeZone.currentSystemDefault()
@@ -56,18 +58,22 @@ class SyncEventsManager @Inject constructor(private val calendarManager: Calenda
         val lastDay = visibleDate.yearMonth.plus(SYNC_WINDOW_MONTHS_AFTER, DateTimeUnit.MONTH).lastDay.plus(1, DateTimeUnit.DAY)
 
         _isLoadingEvents.value = true
+
         runCatching {
             calendarManager.downloadEventsByRange(
                 start = firstDay.atStartOfDayIn(timeZone),
                 end = lastDay.atStartOfDayIn(timeZone),
             )
         }.onFailure {
-            _loadingError.trySend(Unit)
+            _loadingError.trySend(SyncError.ErrorRetrieveEvents)
         }
 
         _isLoadingEvents.value = false
-
         calendarManager.syncEvents()
+    }
+
+    enum class SyncError(@StringRes val errorRes: Int) {
+        ErrorRetrieveEvents(errorRes = R.string.syncEventsError)
     }
 
     companion object {

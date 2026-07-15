@@ -24,6 +24,7 @@
     <string name="dayTitle">Ημέρα</string>
     <string name="monthTitle">Μήνας</string>
     <string name="planningTitle">Προγραμματισμός</string>
+    <string name="syncEventsError">Σφάλμα κατά την ανάκτηση των συμβάντων</string>
     <string name="threeDaysTitle">Τρεις ημέρες</string>
     <string name="weekTitle">Εβδομάδα</string>
 </resources>

@@ -24,6 +24,7 @@
     <string name="dayTitle">Día</string>
     <string name="monthTitle">Mes</string>
     <string name="planningTitle">Planificación</string>
+    <string name="syncEventsError">Error al recuperar los eventos</string>
     <string name="threeDaysTitle">Tres días</string>
     <string name="weekTitle">Semana</string>
 </resources>

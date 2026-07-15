@@ -52,7 +52,7 @@ class MainViewModel(
     private val accountUtils: AccountUtils,
     private val syncEventsManager: SyncEventsManager,
 ) : ViewModel() {
-    val loadingEventsError: ReceiveChannel<Unit> = syncEventsManager.loadingError
+    val loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError> = syncEventsManager.loadingError
 
     @OptIn(SavedStateHandleSaveableApi::class)
     val visibleDay: MutableState<LocalDate> = savedStateHandle.saveable("visibleDay") {
