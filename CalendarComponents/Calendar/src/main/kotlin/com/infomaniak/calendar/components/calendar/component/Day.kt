@@ -65,10 +65,7 @@ internal fun Day(
                 .clip(CircleShape)
                 .clickable { onClick() },
         ) {
-            Text(
-                text = dateNumber,
-                //TODO: Font Static/Body Large
-            )
+            Text(text = dateNumber)
         }
     }
 }

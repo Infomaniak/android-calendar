@@ -50,10 +50,7 @@ internal fun DaysOfWeekTitle(firstDayOfWeek: DayOfWeek, modifier: Modifier = Mod
                     .padding(Margin.Micro),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(
-                    text = dayOfWeek.toSimpleDayName(locale),
-                    //TODO: Font Static/Body Large
-                )
+                Text(text = dayOfWeek.toSimpleDayName(locale))
             }
         }
     }

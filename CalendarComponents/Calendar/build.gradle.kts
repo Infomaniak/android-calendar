@@ -54,8 +54,6 @@ android {
 
 dependencies {
     api(project(":CalendarComponents:Foundation"))
-    implementation(project(":CalendarComponents:Event"))
-    implementation(project(":CalendarComponents:Resources"))
 
     implementation(core.infomaniak.core.ui.compose.margin)
 
@@ -68,5 +66,5 @@ dependencies {
 
     implementation(kmpCalendar.kotlinx.datetime)
 
-    implementation(libs.kizitonwose.calendar.compose)//T0D0: Check if we need everything
+    implementation(libs.kizitonwose.calendar.compose)
 }
