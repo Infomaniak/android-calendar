@@ -11,4 +11,6 @@ compose-material3 = { module = "androidx.compose.material3:material3", version.r
 infomaniak-multiplatform-calendar-core-submodule = { module = "com.infomaniak.multiplaform-calendar:CalendarCore" }
 infomaniak-multiplatform-calendar-core = { group = "com.infomaniak.multiplatform_calendar", name = "CalendarCore", version.ref = "calendarCore" }
 infomaniak-designsystem-theme-calendar = { module = "com.infomaniak.designsystem:ThemeCalendar", version.ref = "designsystem" }
+haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 haze-blur = { module = "dev.chrisbanes.haze:haze-blur", version.ref = "haze" }
+haze-materials = { module = "dev.chrisbanes.haze:haze-blur-materials", version.ref = "haze" }
