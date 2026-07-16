@@ -49,6 +49,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.EventItem
 import com.infomaniak.calendar.components.eventcard.EventCard
 import com.infomaniak.calendar.components.eventcard.EventCardAction
@@ -118,12 +119,7 @@ fun Planning(
                 location = "Japan room",
                 attendees = List(9) { AvatarType.WithInitials.Initials("AB", AvatarColors(Color.Gray, Color.White)) },
                 action = EventCardAction.Button.JoinMeeting {},
-                progress = {
-                    val currentCardHeight = with(density) { currentCardSize?.toPx() } ?: return@EventCard 1f
-                    val collapsedHeight = eventCardState.collapsedHeight ?: return@EventCard 1f
-                    val expandedHeight = eventCardState.expandedHeight ?: return@EventCard 1f
-                    (currentCardHeight - collapsedHeight) / (expandedHeight - collapsedHeight)
-                },
+                progress = { eventCardState.computeProgress(currentCardSize, density) },
             )
         }
 
