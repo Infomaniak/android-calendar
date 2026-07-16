@@ -17,7 +17,9 @@
  */
 package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.toJavaDayOfWeek
 import kotlinx.datetime.toJavaLocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
@@ -28,5 +30,5 @@ object DayFormatter {
 
     fun LocalDate.toShortDayName(): String = toJavaLocalDate().format(formatShortDayName)
 
-    fun LocalDate.toSimpleDayName(locale: Locale): String = toJavaLocalDate().dayOfWeek.getDisplayName(TextStyle.NARROW, locale)
+    fun DayOfWeek.toSimpleDayName(locale: Locale): String = toJavaDayOfWeek().getDisplayName(TextStyle.NARROW, locale)
 }

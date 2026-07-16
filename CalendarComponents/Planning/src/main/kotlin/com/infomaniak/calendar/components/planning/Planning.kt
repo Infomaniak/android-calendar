@@ -65,9 +65,9 @@ fun Planning(
 ) {
     Column(modifier = modifier) {
         ExpandableCalendar(
-            isExpanded = isCalendarExpanded,
             onDayClick = onJump,
             selectedDate = currentDay,
+            isCalendarExpanded = isCalendarExpanded,
         )
 
         Timeline(

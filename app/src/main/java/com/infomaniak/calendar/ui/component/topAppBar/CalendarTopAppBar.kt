@@ -36,7 +36,6 @@ fun CalendarTopAppBar(
     onToggleCalendar: () -> Unit,
     isLoadingEvents: () -> Boolean,
     modifier: Modifier = Modifier,
-    expandableCalendar: @Composable () -> Unit = {},
 ) {
     Column(modifier) {
         TopAppBar(
@@ -47,7 +46,6 @@ fun CalendarTopAppBar(
                 TopAppBarButtons.SearchButton(onClick = {})
             },
         )
-        expandableCalendar()
         LoadingEventsIndicator(isLoading = isLoadingEvents)
     }
 }

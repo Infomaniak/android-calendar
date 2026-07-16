@@ -75,6 +75,11 @@ enum class DateState(
         contentColor = { MaterialTheme.colorScheme.onSurface },
         borderColor = { Color.Transparent },
     ),
+    NotMonth(
+        containerColor = { Color.Transparent },
+        contentColor = { MaterialTheme.colorScheme.onSurface.copy(0.38f) },
+        borderColor = { Color.Transparent },
+    ),
 }
 
 @Preview
@@ -97,16 +102,20 @@ private fun Preview() {
         Surface {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("None", style = MaterialTheme.typography.labelSmall)
+                    Text(DateState.None.name, style = MaterialTheme.typography.labelSmall)
                     Item(DateState.None)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Selected", style = MaterialTheme.typography.labelSmall)
+                    Text(DateState.Selected.name, style = MaterialTheme.typography.labelSmall)
                     Item(DateState.Selected)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Today", style = MaterialTheme.typography.labelSmall)
+                    Text(DateState.Today.name, style = MaterialTheme.typography.labelSmall)
                     Item(DateState.Today)
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(DateState.NotMonth.name, style = MaterialTheme.typography.labelSmall)
+                    Item(DateState.NotMonth)
                 }
             }
         }
