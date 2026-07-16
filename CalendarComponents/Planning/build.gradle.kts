@@ -77,7 +77,7 @@ dependencies {
     implementation(libs.compose.material3)
     debugImplementation(core.compose.ui.tooling)
 
-    implementation(libs.haze.blur)
+    implementation(libs.haze)
 
     implementation(kmpCalendar.kotlinx.datetime)
 }
