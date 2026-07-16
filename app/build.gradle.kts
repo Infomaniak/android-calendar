@@ -184,6 +184,8 @@ dependencies {
     debugImplementation(core.compose.ui.tooling)
     implementation(kmpCalendar.kotlinx.datetime)
 
+    implementation(libs.haze.blur)
+
     // Navigation 3
     implementation(core.androidx.lifecycle.viewmodel.navigation3)
     implementation(core.androidx.navigation3.runtime)
