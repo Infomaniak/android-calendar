@@ -18,24 +18,32 @@
 package com.infomaniak.calendar.ui.screen.planning
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.foundation.models.EventUi
@@ -48,6 +56,13 @@ import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.rememberHazeState
+import dev.chrisbanes.haze.blur.HazeColorEffect
+import dev.chrisbanes.haze.blur.blurEffect
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 
 @Composable
@@ -73,17 +88,46 @@ private fun PlanningScreen(
     isLoadingEvents: () -> Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val hazeState = rememberHazeState()
+    val topBarTint = MaterialTheme.colorScheme.surface
+    val density = LocalDensity.current
+    var topBarHeight by remember { mutableStateOf(0.dp) }
+    val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
     Scaffold(
-        topBar = { CalendarTopAppBar(isLoadingEvents = isLoadingEvents) },
         modifier = modifier,
+        contentWindowInsets = WindowInsets(0),
     ) { paddingValues ->
-        when (val planningUi = planningUiState()) {
-            is PlanningUiState.Success -> {
-                SuccessPlanning(planningUi.eventsByWeekAndDay, nextEvents, paddingValues, goToEventCreation)
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            when (val planningUi = planningUiState()) {
+                is PlanningUiState.Success -> {
+                    SuccessPlanning(
+                        events = planningUi.eventsByWeekAndDay,
+                        nextEvents = nextEvents,
+                        contentPadding = PaddingValues(top = topBarHeight, bottom = bottomInset) + PaddingValues(Margin.Medium),
+                        goToEventCreation = goToEventCreation,
+                        hazeState = hazeState,
+                    )
+                }
+                is PlanningUiState.Loading -> {
+                    LoadingPlanning(modifier = Modifier.fillMaxSize())
+                }
             }
-            is PlanningUiState.Loading -> {
-                LoadingPlanning(modifier = Modifier.padding(paddingValues))
-            }
+
+            CalendarTopAppBar(
+                isLoadingEvents = isLoadingEvents,
+                containerColor = Color.Transparent,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.TopCenter)
+                    .onSizeChanged { topBarHeight = with(density) { it.height.toDp() } }
+                    .hazeEffect(state = hazeState) {
+                        blurEffect {
+                            blurRadius = 24.dp
+                            colorEffects = listOf(HazeColorEffect.tint(topBarTint.copy(alpha = 0.4f)))
+                        }
+                    },
+            )
         }
     }
 }
@@ -94,6 +138,7 @@ private fun SuccessPlanning(
     nextEvents: () -> List<EventUi.Normal>,
     contentPadding: PaddingValues,
     goToEventCreation: () -> Unit,
+    hazeState: HazeState,
 ) {
     val visibleDayState = LocalVisibleDayState.current ?: return
     val lazyListState = rememberLazyListState(events().indexOf(visibleDayState.visibleDate))
@@ -101,19 +146,17 @@ private fun SuccessPlanning(
     ProcessJumpRequests(lazyListState, visibleDayState, events)
     ReportVisibleDate(lazyListState, onVisibleDateChanged = visibleDayState::onVisibleDateChanged)
 
-    Column {
-        Planning(
-            lazyListState = lazyListState,
-            weekEvents = events,
-            nextEvents = nextEvents,
-            modifier = Modifier
-                .weight(1f)
-                .scrollableToolbar()
-                .fillMaxWidth(),
-            contentPadding = contentPadding + PaddingValues(Margin.Medium),
-            goToEventCreation = goToEventCreation,
-        )
-    }
+    Planning(
+        lazyListState = lazyListState,
+        weekEvents = events,
+        nextEvents = nextEvents,
+        hazeState = hazeState,
+        modifier = Modifier
+            .scrollableToolbar()
+            .fillMaxSize(),
+        contentPadding = contentPadding,
+        goToEventCreation = goToEventCreation,
+    )
 }
 
 @Composable

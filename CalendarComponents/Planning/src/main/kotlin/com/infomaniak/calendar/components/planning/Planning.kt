@@ -42,6 +42,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -70,6 +72,12 @@ import com.infomaniak.core.avatar.models.AvatarColors
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.rememberHazeState
+import dev.chrisbanes.haze.blur.HazeColorEffect
+import dev.chrisbanes.haze.blur.blurEffect
 import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
 
@@ -81,10 +89,12 @@ fun Planning(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(),
+    hazeState: HazeState = rememberHazeState(),
 ) {
     val eventCardState = rememberEventCardState()
     var currentCardSize by remember { mutableStateOf<Dp?>(null) }
     val density = LocalDensity.current
+    val cardTint = MaterialTheme.colorScheme.surface
 
     val nestedScrollConnection = remember(density) {
         CardNestedScrollConnection(
@@ -109,10 +119,13 @@ fun Planning(
             contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding(), top = topContentPadding)
                     + horizontalContentPadding
                     + PaddingValues(top = (currentCardSize ?: eventCardState.initialHeightDp ?: 0.dp) + Margin.Medium),
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .hazeSource(hazeState),
         )
 
         val nextEventCards = nextEvents()
+        val cardShape = MaterialTheme.shapes.large
         HorizontalPager(
             state = rememberPagerState { nextEventCards.size },
             contentPadding = horizontalContentPadding,
@@ -128,9 +141,18 @@ fun Planning(
                 attendees = event.attendees.toAvatarTypes(),
                 action = EventCardAction.None,
                 progress = { eventCardState.computeProgress(currentCardSize, density) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(cardShape)
+                    .hazeEffect(state = hazeState) {
+                        blurEffect {
+                            blurRadius = 24.dp
+                            colorEffects = listOf(HazeColorEffect.tint(cardTint.copy(alpha = 0.4f)))
+                        }
+                    },
                 eventCardState = eventCardState,
-                shape = MaterialTheme.shapes.large,
+                shape = cardShape,
+                containerColor = Color.Transparent,
             )
         }
     }
