@@ -41,10 +41,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -86,26 +83,13 @@ fun Planning(
     var currentCardSize by remember { mutableStateOf<Dp?>(null) }
     val density = LocalDensity.current
 
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                val cardMinSize = with(density) { eventCardState.collapsedHeight?.toDp() } ?: return Offset.Zero
-                val cardMaxSize = with(density) { eventCardState.expandedHeight?.toDp() } ?: return Offset.Zero
-                val previousCardSize = currentCardSize ?: cardMaxSize
-
-                // Calculate the change in card size based on scroll delta
-                val availableYDp = with(density) { available.y.toDp() }
-                val newCardSize = previousCardSize + availableYDp
-
-                // Constrain the card size within the allowed bounds
-                val coercedNewCardSize = newCardSize.coerceIn(cardMinSize, cardMaxSize)
-                currentCardSize = coercedNewCardSize
-                val consumed = coercedNewCardSize - previousCardSize
-
-                // Return the consumed scroll amount
-                return Offset(0f, with(density) { consumed.toPx() })
-            }
-        }
+    val nestedScrollConnection = remember(density) {
+        CardNestedScrollConnection(
+            eventCardState = eventCardState,
+            currentCardSize = { currentCardSize },
+            updateCurrentCardSize = { coercedNewCardSize -> currentCardSize = coercedNewCardSize },
+            density = density,
+        )
     }
 
     Column(
