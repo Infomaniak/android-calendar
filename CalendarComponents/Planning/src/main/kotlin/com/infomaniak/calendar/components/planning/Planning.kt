@@ -109,7 +109,9 @@ fun Planning(
     }
 
     Column(
-        modifier = modifier.nestedScroll(nestedScrollConnection),
+        modifier = modifier
+            .nestedScroll(nestedScrollConnection)
+            .padding(top = contentPadding.calculateTopPadding()),
         verticalArrangement = Arrangement.spacedBy(Margin.Large),
     ) {
         val horizontalContentPadding = PaddingValues(
@@ -117,11 +119,9 @@ fun Planning(
             end = contentPadding.calculateEndPadding(LocalLayoutDirection.current),
         )
 
-        val topContentPadding = PaddingValues(top = contentPadding.calculateTopPadding())
-
         HorizontalPager(
-            rememberPagerState { 3 },
-            contentPadding = PaddingValues(horizontal = Margin.Medium) + horizontalContentPadding + topContentPadding,
+            state = rememberPagerState { 3 },
+            contentPadding = horizontalContentPadding,
             pageSpacing = Margin.Small,
         ) {
             EventCard(
@@ -147,7 +147,7 @@ fun Planning(
             lazyListState = lazyListState,
             weekEvents = weekEvents,
             goToEventCreation = goToEventCreation,
-            contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
+            contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()) + horizontalContentPadding,
             modifier = Modifier.weight(1f),
         )
     }

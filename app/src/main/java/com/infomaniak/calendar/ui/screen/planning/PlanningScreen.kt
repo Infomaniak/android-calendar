@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
@@ -101,10 +102,9 @@ private fun SuccessPlanning(
             weekEvents = events,
             modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = Margin.Medium)
                 .scrollableToolbar()
                 .fillMaxWidth(),
-            contentPadding = contentPadding,
+            contentPadding = contentPadding + PaddingValues(Margin.Medium),
             goToEventCreation = goToEventCreation,
         )
     }
