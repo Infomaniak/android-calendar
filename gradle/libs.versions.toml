@@ -2,6 +2,7 @@
 material3 = "1.5.0-alpha18" # Remove when composeBom use same version or higher
 calendarCore = "0.3.0"
 designsystem = "0.1.0"
+haze = "2.0.0-alpha03"
 
 [libraries]
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
@@ -10,3 +11,4 @@ compose-material3 = { module = "androidx.compose.material3:material3", version.r
 infomaniak-multiplatform-calendar-core-submodule = { module = "com.infomaniak.multiplaform-calendar:CalendarCore" }
 infomaniak-multiplatform-calendar-core = { group = "com.infomaniak.multiplatform_calendar", name = "CalendarCore", version.ref = "calendarCore" }
 infomaniak-designsystem-theme-calendar = { module = "com.infomaniak.designsystem:ThemeCalendar", version.ref = "designsystem" }
+haze-blur = { module = "dev.chrisbanes.haze:haze-blur", version.ref = "haze" }

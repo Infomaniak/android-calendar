@@ -20,6 +20,7 @@ package com.infomaniak.calendar.components.planning
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -46,6 +47,9 @@ import com.infomaniak.calendar.components.planning.preview.WeekEventsPreviewPara
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
 
@@ -56,6 +60,26 @@ fun Planning(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(),
+    hazeState: HazeState = rememberHazeState(),
+) {
+    Timeline(
+        lazyListState = lazyListState,
+        weekEvents = weekEvents,
+        goToEventCreation = goToEventCreation,
+        contentPadding = contentPadding,
+        modifier = modifier
+            .fillMaxSize()
+            .hazeSource(hazeState),
+    )
+}
+
+@Composable
+private fun Timeline(
+    lazyListState: LazyListState,
+    weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
+    goToEventCreation: () -> Unit,
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier,
 ) {
     val today = Clock.today()
     val events = weekEvents()
