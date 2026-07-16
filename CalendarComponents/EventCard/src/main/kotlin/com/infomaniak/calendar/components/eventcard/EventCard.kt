@@ -90,11 +90,12 @@ fun EventCard(
     modifier: Modifier = Modifier,
     eventCardState: EventCardState = rememberEventCardState(),
     shape: Shape = MaterialTheme.shapes.large,
+    containerColor: Color = CardDefaults.cardColors().containerColor,
 ) {
     Layout(
         modifier = modifier
             .clip(shape)
-            .background(CardDefaults.cardColors().containerColor)
+            .background(containerColor)
             .padding(CardContentPadding),
         content = {
             FadingContent(alpha = { collapsedAlpha(progress()) }) {
