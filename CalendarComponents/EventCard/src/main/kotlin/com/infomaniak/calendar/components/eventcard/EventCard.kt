@@ -37,6 +37,8 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.HourFormatter.formatHours
 import com.infomaniak.calendar.components.resources.R
@@ -64,11 +66,12 @@ class EventCardState {
         this.expandedHeight = expandedHeight
     }
 
-    // fun getProgress(delta: Int): Float {
-    //     val collapsed = collapsedHeight ?: return 0f
-    //     val expanded = expandedHeight ?: return 1f
-    //     return (delta - collapsed).toFloat() / (expanded - collapsed)
-    // }
+    fun computeProgress(currentCardSize: Dp?, density: Density): Float {
+        val currentCardHeight = with(density) { currentCardSize?.toPx() } ?: return 1f
+        val collapsedHeight = collapsedHeight ?: return 1f
+        val expandedHeight = expandedHeight ?: return 1f
+        return (currentCardHeight - collapsedHeight) / (expandedHeight - collapsedHeight)
+    }
 }
 
 /**
