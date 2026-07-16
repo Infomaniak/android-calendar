@@ -49,7 +49,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.EventItem
 import com.infomaniak.calendar.components.eventcard.EventCard
 import com.infomaniak.calendar.components.eventcard.EventCardAction
@@ -97,7 +96,7 @@ fun Planning(
         modifier = modifier
             .nestedScroll(nestedScrollConnection)
             .padding(top = contentPadding.calculateTopPadding()),
-        verticalArrangement = Arrangement.spacedBy(Margin.Large),
+        verticalArrangement = Arrangement.spacedBy(Margin.Medium),
     ) {
         val horizontalContentPadding = PaddingValues(
             start = contentPadding.calculateStartPadding(LocalLayoutDirection.current),
