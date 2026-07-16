@@ -28,18 +28,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.blur.blurEffect
+import dev.chrisbanes.haze.blur.materials.HazeMaterials
+import dev.chrisbanes.haze.hazeEffect
 import kotlinx.datetime.LocalDate
 
 @Composable
 fun CalendarTopAppBar(
     isLoadingEvents: () -> Boolean,
     modifier: Modifier = Modifier,
-    containerColor: Color = TopAppBarDefaults.topAppBarColors().containerColor,
+    hazeState: HazeState? = null,
 ) {
-    Column(modifier = modifier) {
+    val containerColor = TopAppBarDefaults.topAppBarColors().containerColor
+    Column(modifier = modifier.frostedBackground(containerColor, hazeState)) {
         TopAppBar(
             title = { CurrentMonthTitle(onClick = {}, modifier = Modifier.fillMaxWidth()) },
             navigationIcon = { TopAppBarButtons.DrawerIconButton() },
@@ -47,9 +53,28 @@ fun CalendarTopAppBar(
                 TopAppBarButtons.InboxButton(onClick = {})
                 TopAppBarButtons.SearchButton(onClick = {})
             },
-            colors = TopAppBarDefaults.topAppBarColors(containerColor = containerColor),
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = if (hazeState == null) containerColor else Color.Transparent,
+            ),
         )
         LoadingEventsIndicator(isLoading = isLoadingEvents)
+    }
+}
+
+/**
+ * Frosts the top app bar over the content marked as the haze source. Falls back to an opaque
+ * [containerColor] when no [hazeState] is provided (e.g. in previews).
+ */
+@Composable
+private fun Modifier.frostedBackground(containerColor: Color, hazeState: HazeState?): Modifier {
+    if (hazeState == null) return this
+
+    val style = HazeMaterials.thick(containerColor)
+    return hazeEffect(hazeState) {
+        blurEffect {
+            blurRadius = 8.dp
+            this.style = style
+        }
     }
 }
 
