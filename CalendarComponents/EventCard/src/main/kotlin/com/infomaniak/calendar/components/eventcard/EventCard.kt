@@ -42,6 +42,10 @@ import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarColors
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.ui.compose.margin.Margin
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.blur.blurEffect
+import dev.chrisbanes.haze.blur.materials.HazeMaterials
+import dev.chrisbanes.haze.hazeEffect
 import kotlin.math.roundToInt
 import kotlin.time.Instant
 
@@ -70,12 +74,13 @@ fun EventCard(
     modifier: Modifier = Modifier,
     eventCardState: EventCardState = rememberEventCardState(),
     shape: Shape = MaterialTheme.shapes.large,
-    containerColor: Color = CardDefaults.cardColors().containerColor,
+    hazeState: HazeState? = null,
 ) {
+    val containerColor = CardDefaults.cardColors().containerColor
     Layout(
         modifier = modifier
             .clip(shape)
-            .background(containerColor)
+            .cardBackground(containerColor, hazeState)
             .padding(CardContentPadding),
         content = {
             FadingContent(alpha = { collapsedAlpha(progress()) }) {
@@ -117,6 +122,26 @@ fun EventCard(
         layout(width, height) {
             collapsed.place(0, 0)
             expanded.place(0, 0)
+        }
+    }
+}
+
+/**
+ * Draws the card background. When a [hazeState] is provided, the background is a frosted blur of the
+ * content marked as the haze source (see [dev.chrisbanes.haze.hazeSource]); otherwise it falls back
+ * to an opaque [containerColor]. Must be applied after the `clip` so the blur is clipped to [shape].
+ */
+@Composable
+private fun Modifier.cardBackground(containerColor: Color, hazeState: HazeState?): Modifier {
+    return if (hazeState == null) {
+        background(containerColor)
+    } else {
+        val style = HazeMaterials.thick(containerColor)
+        hazeEffect(hazeState) {
+            blurEffect {
+                blurRadius = 8.dp
+                this.style = style
+            }
         }
     }
 }
