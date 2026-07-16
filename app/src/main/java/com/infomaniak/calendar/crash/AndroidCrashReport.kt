@@ -17,9 +17,9 @@
  */
 package com.infomaniak.calendar.crash
 
-import com.infomaniak.multiplatform_calendar.core.data.BreadcrumbType
-import com.infomaniak.multiplatform_calendar.core.data.CrashReport
-import com.infomaniak.multiplatform_calendar.core.data.CrashReportLevel
+import com.infomaniak.multiplatform_calendar.core.crashreporting.BreadcrumbType
+import com.infomaniak.multiplatform_calendar.core.crashreporting.CrashReport
+import com.infomaniak.multiplatform_calendar.core.crashreporting.CrashReportLevel
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryEvent

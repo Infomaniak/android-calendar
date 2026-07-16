@@ -29,7 +29,7 @@ import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.login.InfomaniakLogin
 import com.infomaniak.core.network.LOGIN_ENDPOINT_URL
-import com.infomaniak.multiplatform_calendar.core.data.CrashReport
+import com.infomaniak.multiplatform_calendar.core.crashreporting.CrashReport
 import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.DependencyGraph
