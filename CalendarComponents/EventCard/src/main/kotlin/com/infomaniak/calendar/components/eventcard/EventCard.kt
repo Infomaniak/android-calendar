@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -29,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.Layout
@@ -96,10 +98,11 @@ fun EventCard(
     progress: () -> Float,
     modifier: Modifier = Modifier,
     eventCardState: EventCardState = rememberEventCardState(),
+    shape: Shape = MaterialTheme.shapes.large,
 ) {
     Layout(
         modifier = modifier
-            .clip(MaterialTheme.shapes.large)
+            .clip(shape)
             .background(CardDefaults.cardColors().containerColor)
             .padding(Margin.Medium),
         content = {
@@ -297,6 +300,7 @@ private fun Preview() {
                 attendees = List(9) { AvatarType.WithInitials.Initials("AB", AvatarColors(Color.Gray, Color.White)) },
                 action = EventCardAction.Button.JoinMeeting {},
                 progress = { 1f },
+                shape = MaterialTheme.shapes.large,
             )
         }
     }

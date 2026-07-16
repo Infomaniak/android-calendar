@@ -18,11 +18,12 @@
 package com.infomaniak.calendar.components.planning
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -33,6 +34,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,6 +51,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.EventItem
 import com.infomaniak.calendar.components.eventcard.EventCard
 import com.infomaniak.calendar.components.eventcard.EventCardAction
@@ -92,25 +95,30 @@ fun Planning(
         )
     }
 
-    Column(
-        modifier = modifier
-            .nestedScroll(nestedScrollConnection)
-            .padding(top = contentPadding.calculateTopPadding()),
-        verticalArrangement = Arrangement.spacedBy(Margin.Medium),
-    ) {
+    Box(modifier = modifier.nestedScroll(nestedScrollConnection)) {
         val horizontalContentPadding = PaddingValues(
             start = contentPadding.calculateStartPadding(LocalLayoutDirection.current),
             end = contentPadding.calculateEndPadding(LocalLayoutDirection.current),
+        )
+        val topContentPadding = contentPadding.calculateTopPadding()
+
+        Timeline(
+            lazyListState = lazyListState,
+            weekEvents = weekEvents,
+            goToEventCreation = goToEventCreation,
+            contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding(), top = topContentPadding)
+                    + horizontalContentPadding
+                    + PaddingValues(top = (currentCardSize ?: 0.dp) + 48.dp),
+            modifier = Modifier.fillMaxSize(),
         )
 
         HorizontalPager(
             state = rememberPagerState { 3 },
             contentPadding = horizontalContentPadding,
             pageSpacing = Margin.Small,
+            modifier = Modifier.padding(top = topContentPadding),
         ) {
             EventCard(
-                eventCardState = eventCardState,
-                modifier = Modifier.fillMaxWidth(),
                 timeUntilEvent = "In $it minutes",
                 title = "Calendar meeting",
                 startDate = LocalDateTime.of(2026, 6, 19, 8, 0),
@@ -119,16 +127,11 @@ fun Planning(
                 attendees = List(9) { AvatarType.WithInitials.Initials("AB", AvatarColors(Color.Gray, Color.White)) },
                 action = EventCardAction.Button.JoinMeeting {},
                 progress = { eventCardState.computeProgress(currentCardSize, density) },
+                modifier = Modifier.fillMaxWidth(),
+                eventCardState = eventCardState,
+                shape = MaterialTheme.shapes.large,
             )
         }
-
-        Timeline(
-            lazyListState = lazyListState,
-            weekEvents = weekEvents,
-            goToEventCreation = goToEventCreation,
-            contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()) + horizontalContentPadding,
-            modifier = Modifier.weight(1f),
-        )
     }
 }
 
