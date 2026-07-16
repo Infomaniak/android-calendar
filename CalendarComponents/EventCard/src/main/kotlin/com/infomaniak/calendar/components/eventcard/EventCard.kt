@@ -121,7 +121,7 @@ fun EventCard(
     ) { measurables, constraints ->
         val childConstraints = Constraints(
             minWidth = 0,
-            maxWidth = if (constraints.hasBoundedWidth) constraints.maxWidth else Constraints.Infinity,
+            maxWidth = constraints.maxWidth,
             minHeight = 0,
             maxHeight = Constraints.Infinity,
         )
