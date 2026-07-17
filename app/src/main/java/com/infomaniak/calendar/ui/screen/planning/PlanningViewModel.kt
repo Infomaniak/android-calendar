@@ -53,9 +53,10 @@ class PlanningViewModel(
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
 
     private val timeZone = TimeZone.currentSystemDefault()
+    val today = Clock.today(timeZone)
 
-    private val startDate = Clock.today(timeZone).minus(PLANNING_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
-    private val endDate = Clock.today(timeZone).plus(PLANNING_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
+    private val startDate = today.minus(PLANNING_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
+    private val endDate = today.plus(PLANNING_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
 
     private val emailsByUserId = accountUtils.emailsByUserId.shareIn(viewModelScope, SharingStarted.Eagerly, 1)
 

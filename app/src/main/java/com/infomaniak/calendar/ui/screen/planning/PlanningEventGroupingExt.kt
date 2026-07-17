@@ -78,14 +78,17 @@ suspend fun Map<LocalDate, List<EventDaySlice>>.groupByWeekAndDay(
         week[date] = daySlices.mapTo(mutableListOf()) { slice -> slice.toEventUi(emailsByUserId, timeZone) }
     }
 
-    eventsByWeekAndDay.ensureTodayHasEntry(weekNumbering)
+    eventsByWeekAndDay.ensureTodayHasEntry(timeZone, weekNumbering)
 
     @Suppress("UNCHECKED_CAST") // Shows the exposed list as non-mutable
     return@withContext eventsByWeekAndDay as EventsByWeekAndDay
 }
 
-private fun SortedMap<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>.ensureTodayHasEntry(weekNumbering: WeekNumbering) {
-    val todayEvents = getOrPut(weekNumbering.weekOf(Clock.today())) { sortedMapOf() }.getOrPut(Clock.today()) { mutableListOf() }
+private fun SortedMap<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>.ensureTodayHasEntry(
+    timeZone: TimeZone,
+    weekNumbering: WeekNumbering,
+) {
+    val todayEvents = getOrPut(weekNumbering.weekOf(Clock.today(timeZone))) { sortedMapOf() }.getOrPut(Clock.today()) { mutableListOf() }
 
     if (todayEvents.isEmpty()) todayEvents.add(EventUi.TodayEmptyState)
 }
