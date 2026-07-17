@@ -21,10 +21,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,8 +34,6 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatRangeTo
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatRelativeToNow
@@ -54,28 +48,6 @@ import kotlin.time.Instant
 private const val MAX_AVATAR_COUNT = 3
 private val AvatarSpacing = (-8).dp
 private val CardContentPadding = Margin.Medium
-
-@Composable
-fun rememberEventCardState(): EventCardState {
-    return remember { EventCardState() }
-}
-
-class EventCardState {
-    var collapsedHeight by mutableStateOf<Int?>(null)
-    var expandedHeight by mutableStateOf<Int?>(null)
-
-    fun recordHeights(collapsedHeight: Int, expandedHeight: Int) {
-        this.collapsedHeight = collapsedHeight
-        this.expandedHeight = expandedHeight
-    }
-
-    fun computeProgress(currentCardSize: Dp?, density: Density): Float {
-        val currentCardHeight = with(density) { currentCardSize?.toPx() } ?: return 1f
-        val collapsedHeight = collapsedHeight ?: return 1f
-        val expandedHeight = expandedHeight ?: return 1f
-        return (currentCardHeight - collapsedHeight) / (expandedHeight - collapsedHeight)
-    }
-}
 
 /**
  * A seekable event card that continuously morphs between a collapsed and an expanded state.
