@@ -40,6 +40,7 @@ import kotlinx.datetime.toInstant
 import java.util.SortedMap
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventStatus as KmpEventStatus
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationStatus as KmpParticipationStatus
 
@@ -160,4 +161,19 @@ fun EventsByWeekAndDay.indexOf(date: LocalDate): Int {
     }
 
     return index
+}
+
+/**
+ * The soonest upcoming event(s): the single next event, or several when they share the earliest
+ * start time. Temporary stand-in for logic that will move to KMP.
+ */
+fun EventsByWeekAndDay.findNextEvents(now: Instant): List<EventUi.Normal> {
+    val upcoming = values.asSequence()
+        .flatMap { days -> days.values.asSequence().flatten() }
+        .filterIsInstance<EventUi.Normal>()
+        .filter { it.start >= now }
+        .toList()
+
+    val nextStart = upcoming.minOfOrNull { it.start } ?: return emptyList()
+    return upcoming.filter { it.start == nextStart }
 }
