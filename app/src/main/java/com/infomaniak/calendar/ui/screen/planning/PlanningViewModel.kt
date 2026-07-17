@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
@@ -39,7 +40,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 
 @Inject
@@ -53,7 +53,7 @@ class PlanningViewModel(
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
 
     private val timeZone = TimeZone.currentSystemDefault()
-    private val today = Clock.System.now().toLocalDateTime(timeZone).date
+    val today = Clock.today(timeZone)
 
     private val startDate = today.minus(PLANNING_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
     private val endDate = today.plus(PLANNING_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)

@@ -131,6 +131,7 @@ consumers: `implementation(project(":CalendarComponents:Planning"))` transitivel
 ### External dependencies used
 
 - `core.compose.bom` / `core.compose.*` — Compose BOM and UI primitives (from `core` catalog).
+- `core.infomaniak.common` — `KotlinDateUtils` date helpers (`Clock.today()`, `LocalDate.isToday()`, …) (from `core` catalog).
 - `core.infomaniak.core.ui.compose.margin` — `Margin` spacing constants (from `core` catalog, Planning only).
 - `kmpCalendar.kotlinx.datetime` — `kotlinx-datetime` types (`LocalDate`, `TimeZone`, …) (Foundation + Planning).
 - `libs.compose.material3` — Material 3 Compose (from `libs` catalog).

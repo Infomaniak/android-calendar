@@ -26,11 +26,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.staticCompositionLocalOf
+import com.infomaniak.core.common.utils.today
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 
 val LocalVisibleDayState = staticCompositionLocalOf<VisibleDayState?> { null }
@@ -41,7 +40,7 @@ fun rememberVisibleDayState(visibleDate: MutableState<LocalDate> = rememberSavea
     return remember { VisibleDayState(_visibleDate = visibleDate) }
 }
 
-private fun mutableStateOfToday(): MutableState<LocalDate> = mutableStateOf(Clock.System.todayIn(TimeZone.currentSystemDefault()))
+private fun mutableStateOfToday(): MutableState<LocalDate> = mutableStateOf(Clock.today())
 
 @Stable
 class VisibleDayState(private val _visibleDate: MutableState<LocalDate>) {

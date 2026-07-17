@@ -44,9 +44,8 @@ import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewPara
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 
 @Composable
@@ -122,7 +121,7 @@ private fun LoadingPlanning(modifier: Modifier = Modifier) {
 @Composable
 private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class) weekEvents: EventsByWeekAndDay) {
     CalendarThemeForPreview {
-        val visibleDate = remember { mutableStateOf(Clock.System.todayIn(TimeZone.currentSystemDefault())) }
+        val visibleDate = remember { mutableStateOf(Clock.today()) }
 
         CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(visibleDate)) {
             PlanningScreen(

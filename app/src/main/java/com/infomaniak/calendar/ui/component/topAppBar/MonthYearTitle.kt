@@ -26,9 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 
 @Composable
@@ -52,8 +51,7 @@ private fun MonthYearTitle(date: () -> LocalDate, onClick: () -> Unit, modifier:
 @Composable
 private fun MonthYearTitlePreview() {
     CalendarThemeForPreview {
-        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-        MonthYearTitle(date = { today }, onClick = {})
+        MonthYearTitle(date = { Clock.today() }, onClick = {})
     }
 }
 

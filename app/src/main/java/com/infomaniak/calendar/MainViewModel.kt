@@ -31,6 +31,7 @@ import com.infomaniak.calendar.di.ViewModelAssistedFactoryKey
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.auth.models.user.User
+import com.infomaniak.core.common.utils.today
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -42,8 +43,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 
 @AssistedInject
@@ -56,7 +55,7 @@ class MainViewModel(
 
     @OptIn(SavedStateHandleSaveableApi::class)
     val visibleDay: MutableState<LocalDate> = savedStateHandle.saveable("visibleDay") {
-        mutableStateOf(Clock.System.todayIn(TimeZone.currentSystemDefault()))
+        mutableStateOf(Clock.today())
     }
 
     init {

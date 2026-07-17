@@ -42,10 +42,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.monthYearLabel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 
 private const val DURATION_TWEEN = 150
@@ -75,7 +74,7 @@ fun AnimatedMonthYearText(date: () -> LocalDate, modifier: Modifier = Modifier) 
 
 @Composable
 private fun rememberCurrentYear(): Int {
-    return remember { Clock.System.todayIn(TimeZone.currentSystemDefault()).year }
+    return remember { Clock.today().year }
 }
 
 private fun <T : Comparable<T>> AnimatedContentTransitionScope<T>.verticalRoll(): ContentTransform {

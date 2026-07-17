@@ -44,10 +44,9 @@ import com.infomaniak.calendar.components.planning.component.DayIndicator
 import com.infomaniak.calendar.components.planning.component.TodayEmptyState
 import com.infomaniak.calendar.components.planning.preview.WeekEventsPreviewParameter
 import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 
 @Composable
@@ -58,7 +57,7 @@ fun Planning(
     lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+    val today = Clock.today()
     val events = weekEvents()
     val sectionSizing = remember { SectionSizing() }
 
