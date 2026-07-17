@@ -71,7 +71,7 @@ fun Planning(
     ) {
         events.forEach { (week, days) ->
             item(key = PlanningItemKey.WeekHeader(week.firstDay)) {
-                Text(week.label, modifier = Modifier.padding(vertical = Margin.Medium))
+                Text(week.label, modifier = Modifier.padding(bottom = Margin.Medium))
             }
 
             days.forEach { (date, events) ->
