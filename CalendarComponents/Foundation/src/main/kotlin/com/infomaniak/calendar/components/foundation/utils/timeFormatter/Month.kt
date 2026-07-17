@@ -20,34 +20,41 @@ package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 import android.text.format.DateFormat
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalLocale
+import com.infomaniak.calendar.components.foundation.utils.CapitalizationUtils.capitalizeFirstLetter
+import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
-import java.time.LocalDate.now
+import kotlinx.datetime.toJavaLocalDate
+import kotlinx.datetime.toLocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
-import java.time.LocalDate as JavaLocalDate
+import kotlin.time.Clock
+import kotlin.time.Instant
 
-//region Kotlin
 fun LocalDate.monthYearLabel(locale: Locale, currentYear: Int): String {
     val month = java.time.Month.of(month.number)
         .getDisplayName(TextStyle.FULL_STANDALONE, locale)
-        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(locale) else it.toString() }
+        .capitalizeFirstLetter(locale)
 
     return if (year == currentYear) month else "$month $year"
 }
-//endregion
 
-//region Java
 /**
  * Format a date either as day and month if it is this year or day, month and year if it's another year.
  */
 @Composable
-internal fun JavaLocalDate.formatDayMonth(): String {
+internal fun Instant.formatDayMonth(
+    timeZone: TimeZone = TimeZone.currentSystemDefault(),
+): String {
     val locale = LocalLocale.current.platformLocale
-    val skeleton = if (year == now().year) "dMMMM" else "dMMMMy"
+
+    val date = toLocalDateTime(timeZone).date
+    val currentYear = Clock.today(timeZone).year
+
+    val skeleton = if (date.year == currentYear) "dMMMM" else "dMMMMy"
     val pattern = DateFormat.getBestDateTimePattern(locale, skeleton)
 
-    return format(DateTimeFormatter.ofPattern(pattern, locale))
+    return date.toJavaLocalDate().format(DateTimeFormatter.ofPattern(pattern, locale))
 }
-//endregion

@@ -68,10 +68,8 @@ import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
-import java.time.LocalDateTime
 import kotlin.time.Clock
+import kotlin.time.Instant
 
 @Composable
 fun Planning(
@@ -118,10 +116,9 @@ fun Planning(
             modifier = Modifier.padding(top = topContentPadding),
         ) {
             EventCard(
-                timeUntilEvent = "In $it minutes",
                 title = "Calendar meeting",
-                startDate = LocalDateTime.of(2026, 6, 19, 8, 0),
-                endDate = LocalDateTime.of(2026, 6, 19, 16, 0),
+                startDate = Instant.parse("2026-07-17T13:00:00Z"),
+                endDate = Instant.parse("2026-07-17T17:00:00Z"),
                 location = "Japan room",
                 attendees = List(9) { AvatarType.WithInitials.Initials("AB", AvatarColors(Color.Gray, Color.White)) },
                 action = EventCardAction.Button.JoinMeeting {},
