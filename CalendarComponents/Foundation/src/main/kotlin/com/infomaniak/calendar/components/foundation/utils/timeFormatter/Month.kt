@@ -17,11 +17,18 @@
  */
 package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
+import android.text.format.DateFormat
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalLocale
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
+import java.time.LocalDate.now
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
+import java.time.LocalDate as JavaLocalDate
 
+//region Kotlin
 fun LocalDate.monthYearLabel(locale: Locale, currentYear: Int): String {
     val month = java.time.Month.of(month.number)
         .getDisplayName(TextStyle.FULL_STANDALONE, locale)
@@ -29,3 +36,18 @@ fun LocalDate.monthYearLabel(locale: Locale, currentYear: Int): String {
 
     return if (year == currentYear) month else "$month $year"
 }
+//endregion
+
+//region Java
+/**
+ * Format a date either as day and month if it is this year or day, month and year if it's another year.
+ */
+@Composable
+internal fun JavaLocalDate.formatDayMonth(): String {
+    val locale = LocalLocale.current.platformLocale
+    val skeleton = if (year == now().year) "dMMMM" else "dMMMMy"
+    val pattern = DateFormat.getBestDateTimePattern(locale, skeleton)
+
+    return format(DateTimeFormatter.ofPattern(pattern, locale))
+}
+//endregion
