@@ -21,6 +21,7 @@ android-calendar/
 │   ├── Foundation/                 # Shared models + base Compose components
 │   ├── Event/                      # EventItem Composable
 │   ├── Planning/                   # Planning Composable (week/day/event list)
+│   ├── Calendar/                   # Calendar Composable (expanded, unexpanded)
 │   └── Resources/                  # Centralised string resources (no code)
 ├── Core/                           # Git submodule - Infomaniak shared Android library
 │   ├── build-logic/                # Composite build: provides com.infomaniak.core.composite plugin

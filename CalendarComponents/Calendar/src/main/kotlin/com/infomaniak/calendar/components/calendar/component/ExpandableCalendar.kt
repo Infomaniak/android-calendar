@@ -1,6 +1,6 @@
 /*
  * Infomaniak Calendar - Android
- * Copyright (C) 2026-2026 Infomaniak Network SA
+ * Copyright (C) 2026 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ private fun UnexpandedCalendarPreview() {
         ExpandableCalendar(
             selectedDate = { Clock.System.todayIn(TimeZone.currentSystemDefault()) },
             onDayClick = {},
-            isCalendarExpanded = { true },
+            isCalendarExpanded = { false },
         )
     }
 }
@@ -57,7 +57,7 @@ private fun ExpandedCalendarPreview() {
         ExpandableCalendar(
             selectedDate = { Clock.System.todayIn(TimeZone.currentSystemDefault()) },
             onDayClick = {},
-            isCalendarExpanded = { false },
+            isCalendarExpanded = { true },
         )
     }
 }

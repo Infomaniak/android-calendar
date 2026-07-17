@@ -63,8 +63,8 @@ internal fun ExpandedCalendar(selectedDate: LocalDate, onDayClick: (LocalDate) -
                     day.position == DayPosition.MonthDate -> DateState.None
                     else -> DateState.NotMonth
                 },
-                dateNumber = day.date.day.toString(),
                 onClick = { onDayClick(day.date) },
+                date = day.date,
             )
         },
         modifier = modifier,

@@ -19,7 +19,6 @@
     <string name="contentDescriptionInbox">Åpne innboksen</string>
     <string name="contentDescriptionMenuDrawer">Åpne meny</string>
     <string name="contentDescriptionSearch">Søk</string>
-    <string name="contentDescriptionToday">I dag</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Gjeldende visning: %1$s. Trykk for å endre visning.</string>
     <string name="dayTitle">Dag</string>
     <string name="monthTitle">Måned</string>

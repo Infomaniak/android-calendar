@@ -17,11 +17,12 @@
   -->
 <resources>
     <string name="addEventLabel">Adicionar</string>
-    <string name="contentDescriptionCreateEvent">Criar um evento</string>
     <string name="allDayLabel">O dia todo</string>
+    <string name="contentDescriptionCreateEvent">Criar um evento</string>
     <string name="contentDescriptionHasAttendees">Tem participantes</string>
     <string name="contentDescriptionHasKMeetLink">Tem um link do kMeet</string>
     <string name="contentDescriptionHasLocation">Tem uma localização</string>
+    <string name="contentDescriptionToday">Hoje</string>
     <string name="planningNothingPlannedToday">Nada planeado.</string>
     <string name="weekHeaderDateRange">%d–%d de %s de %d</string>
     <string name="weekHeaderWeekNumber">Sem.%d</string>

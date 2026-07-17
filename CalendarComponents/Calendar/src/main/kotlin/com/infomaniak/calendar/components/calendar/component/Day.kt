@@ -32,25 +32,43 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalLocale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.component.DayCircle
+import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.toJavaLocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import kotlin.time.Clock
 
 @Composable
 internal fun Day(
+    date: LocalDate,
     dateState: DateState,
-    dateNumber: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val locale = LocalLocale.current.platformLocale
+    val fullDate = remember(date, locale) {
+        date.toJavaLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(locale))
+    }
+    val stateDescriptionToday = if (dateState == DateState.Today) stringResource(R.string.contentDescriptionToday) else null
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -63,9 +81,14 @@ internal fun Day(
             modifier = Modifier
                 .fillMaxSize()
                 .clip(CircleShape)
-                .clickable { onClick() },
+                .clickable(role = Role.Button) { onClick() }
+                .clearAndSetSemantics {
+                    contentDescription = fullDate
+                    selected = dateState == DateState.Selected
+                    stateDescriptionToday?.let { stateDescription = it }
+                },
         ) {
-            Text(text = dateNumber)
+            Text(text = date.day.toString())
         }
     }
 }
@@ -73,7 +96,7 @@ internal fun Day(
 @Composable
 @Preview
 private fun DayPreview() {
-    val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+    val today = Clock.today()
     val previewDaySize = 32.dp
 
     Surface {
@@ -82,7 +105,7 @@ private fun DayPreview() {
                 Text(DateState.Selected.name, style = MaterialTheme.typography.labelSmall)
                 Day(
                     dateState = DateState.Selected,
-                    dateNumber = today.day.toString(),
+                    date = today,
                     onClick = {},
                     modifier = Modifier.size(previewDaySize),
                 )
@@ -91,7 +114,7 @@ private fun DayPreview() {
                 Text(DateState.Today.name, style = MaterialTheme.typography.labelSmall)
                 Day(
                     dateState = DateState.Today,
-                    dateNumber = today.day.toString(),
+                    date = today,
                     onClick = {},
                     modifier = Modifier.size(previewDaySize),
                 )
@@ -100,7 +123,7 @@ private fun DayPreview() {
                 Text(DateState.None.name, style = MaterialTheme.typography.labelSmall)
                 Day(
                     dateState = DateState.None,
-                    dateNumber = today.day.toString(),
+                    date = today,
                     onClick = {},
                     modifier = Modifier.size(previewDaySize),
                 )
@@ -109,7 +132,7 @@ private fun DayPreview() {
                 Text(DateState.NotMonth.name, style = MaterialTheme.typography.labelSmall)
                 Day(
                     dateState = DateState.NotMonth,
-                    dateNumber = today.day.toString(),
+                    date = today,
                     onClick = {},
                     modifier = Modifier.size(previewDaySize),
                 )

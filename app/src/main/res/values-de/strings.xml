@@ -19,7 +19,6 @@
     <string name="contentDescriptionInbox">Posteingang öffnen</string>
     <string name="contentDescriptionMenuDrawer">Menü öffnen</string>
     <string name="contentDescriptionSearch">Suchen</string>
-    <string name="contentDescriptionToday">Heute</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Aktuelle Ansicht: %1$s. Tippen, um die Ansicht zu wechseln.</string>
     <string name="dayTitle">Tag</string>
     <string name="monthTitle">Monat</string>
