@@ -17,11 +17,14 @@
  */
 package com.infomaniak.calendar.components.calendar.component
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.DateState
@@ -32,6 +35,7 @@ import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
@@ -63,13 +67,17 @@ internal fun ExpandedCalendar(
         firstDayOfWeek = firstDayOfWeek,
     )
 
+    LaunchedEffect(Unit) {
+        snapshotFlow { selectedDate().yearMonth }.collectLatest { monthState.animateScrollToMonth(it) }
+    }
+
     HorizontalCalendar(
         state = monthState,
         monthHeader = { DaysOfWeekTitle(firstDayOfWeek) },
         dayContent = { day ->
             DayContent(day = day, selectedDate = selectedDate, today = { today }, onDayClick = onDayClick)
         },
-        modifier = modifier,
+        modifier = modifier.animateContentSize(),
     )
 }
 

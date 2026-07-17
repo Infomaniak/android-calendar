@@ -19,9 +19,11 @@ package com.infomaniak.calendar.components.calendar.component
 
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.DateState
@@ -32,8 +34,10 @@ import com.infomaniak.core.common.utils.today
 import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.WeekDay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toKotlinDayOfWeek
@@ -61,6 +65,10 @@ internal fun CollapsedCalendar(
         firstDayOfWeek = firstDayOfWeek,
     )
 
+    LaunchedEffect(Unit) {
+        snapshotFlow { selectedDate().firstDayOfWeek(firstDayOfWeek) }.collectLatest { weekState.animateScrollToWeek(it) }
+    }
+
     WeekCalendar(
         state = weekState,
         weekHeader = { DaysOfWeekTitle(firstDayOfWeek) },
@@ -69,6 +77,11 @@ internal fun CollapsedCalendar(
         },
         modifier = modifier,
     )
+}
+
+private fun LocalDate.firstDayOfWeek(firstDayOfWeek: DayOfWeek): LocalDate {
+    val daysSinceWeekStart = (dayOfWeek.isoDayNumber - firstDayOfWeek.isoDayNumber + 7) % 7
+    return minus(daysSinceWeekStart, DateTimeUnit.DAY)
 }
 
 @Composable
