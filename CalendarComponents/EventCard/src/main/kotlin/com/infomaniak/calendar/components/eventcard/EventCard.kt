@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -51,8 +50,9 @@ import com.infomaniak.core.ui.compose.margin.Margin
 import java.time.LocalDateTime
 import kotlin.math.roundToInt
 
-private val AVATAR_SPACING = (-8).dp
-private val MAX_AVATAR_COUNT = 3
+private const val MAX_AVATAR_COUNT = 3
+private val AvatarSpacing = (-8).dp
+private val CardContentPadding = Margin.Medium
 
 @Composable
 fun rememberEventCardState(): EventCardState {
@@ -104,7 +104,7 @@ fun EventCard(
         modifier = modifier
             .clip(shape)
             .background(CardDefaults.cardColors().containerColor)
-            .padding(Margin.Medium),
+            .padding(CardContentPadding),
         content = {
             FadingContent(alpha = { collapsedAlpha(progress()) }) {
                 CollapsedEventCardContent(title = title, startDate = startDate, endDate = endDate, action = action)
@@ -140,7 +140,8 @@ fun EventCard(
         val progress = progress().coerceIn(0f, 1f)
         val height = collapsed.height + ((expanded.height - collapsed.height) * progress).roundToInt()
 
-        eventCardState.recordHeights(collapsed.height, expanded.height)
+        val verticalPaddingPx = CardContentPadding.roundToPx() * 2
+        eventCardState.recordHeights(collapsed.height + verticalPaddingPx, expanded.height + verticalPaddingPx)
 
         layout(width, height) {
             collapsed.place(0, 0)
@@ -248,7 +249,7 @@ private fun ActionButton(action: EventCardAction) {
 private fun AttendeesAvatars(attendees: List<AvatarType>, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(AVATAR_SPACING),
+        horizontalArrangement = Arrangement.spacedBy(AvatarSpacing),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         attendees.take(MAX_AVATAR_COUNT).forEach { avatarType ->
@@ -260,7 +261,7 @@ private fun AttendeesAvatars(attendees: List<AvatarType>, modifier: Modifier = M
             Text(
                 extraAttendeesText,
                 style = MaterialTheme.typography.bodySmallEmphasized,
-                modifier = Modifier.padding(start = -AVATAR_SPACING + Margin.Mini),
+                modifier = Modifier.padding(start = -AvatarSpacing + Margin.Mini),
             )
         }
     }
