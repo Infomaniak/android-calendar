@@ -26,9 +26,9 @@ import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.utils.toThemedColorUi
+import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +37,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
 import java.util.SortedMap
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -79,18 +78,14 @@ suspend fun Map<LocalDate, List<EventDaySlice>>.groupByWeekAndDay(
         week[date] = daySlices.mapTo(mutableListOf()) { slice -> slice.toEventUi(emailsByUserId, timeZone) }
     }
 
-    eventsByWeekAndDay.ensureTodayHasEntry(timeZone, weekNumbering)
+    eventsByWeekAndDay.ensureTodayHasEntry(weekNumbering)
 
     @Suppress("UNCHECKED_CAST") // Shows the exposed list as non-mutable
     return@withContext eventsByWeekAndDay as EventsByWeekAndDay
 }
 
-private fun SortedMap<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>.ensureTodayHasEntry(
-    timeZone: TimeZone,
-    weekNumbering: WeekNumbering,
-) {
-    val today = Clock.System.now().toLocalDateTime(timeZone).date
-    val todayEvents = getOrPut(weekNumbering.weekOf(today)) { sortedMapOf() }.getOrPut(today) { mutableListOf() }
+private fun SortedMap<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>.ensureTodayHasEntry(weekNumbering: WeekNumbering) {
+    val todayEvents = getOrPut(weekNumbering.weekOf(Clock.today())) { sortedMapOf() }.getOrPut(Clock.today()) { mutableListOf() }
 
     if (todayEvents.isEmpty()) todayEvents.add(EventUi.TodayEmptyState)
 }

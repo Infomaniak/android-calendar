@@ -57,6 +57,7 @@ dependencies {
     implementation(project(":CalendarComponents:Event"))
     implementation(project(":CalendarComponents:Resources"))
 
+    implementation(core.infomaniak.core.common)
     implementation(core.infomaniak.core.ui.compose.margin)
 
     implementation(platform(core.compose.bom))

@@ -28,6 +28,7 @@ import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.foundation.preview.EventColorsUiFactory
+import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -35,7 +36,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
-import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -47,7 +47,7 @@ class WeekEventsPreviewParameter : PreviewParameterProvider<Map<YearWeek, Map<Lo
 
     companion object {
         internal val todayPreviewWeekEvents by lazy {
-            generateEventsAround(Clock.System.todayIn(TimeZone.currentSystemDefault()))
+            generateEventsAround(Clock.today())
         }
 
         internal val passingYearPreviewWeekEvents by lazy {
