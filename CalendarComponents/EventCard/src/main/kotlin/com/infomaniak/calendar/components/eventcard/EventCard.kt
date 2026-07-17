@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.foundation.utils.timeFormatter.HourFormatter.formatHours
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatRangeTo
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarColors
@@ -276,9 +276,6 @@ private fun IconItem(painter: Painter, contentDescription: String?, text: String
         }
     }
 }
-
-@Composable
-private fun LocalDateTime.formatRangeTo(end: LocalDateTime): String = "${formatHours()} - ${end.formatHours()}"
 
 sealed interface EventCardAction {
     data object None : EventCardAction
