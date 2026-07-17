@@ -42,13 +42,14 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatRangeTo
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatRelativeToNow
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarColors
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.ui.compose.margin.Margin
-import java.time.LocalDateTime
 import kotlin.math.roundToInt
+import kotlin.time.Instant
 
 private const val MAX_AVATAR_COUNT = 3
 private val AvatarSpacing = (-8).dp
@@ -88,10 +89,9 @@ class EventCardState {
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun EventCard(
-    timeUntilEvent: String,
     title: String,
-    startDate: LocalDateTime,
-    endDate: LocalDateTime,
+    startDate: Instant,
+    endDate: Instant,
     location: String?,
     attendees: List<AvatarType>,
     action: EventCardAction,
@@ -111,7 +111,6 @@ fun EventCard(
             }
             FadingContent(alpha = { expandedAlpha(progress()) }) {
                 ExpandedEventCardContent(
-                    timeUntilEvent = timeUntilEvent,
                     title = title,
                     startDate = startDate,
                     endDate = endDate,
@@ -176,10 +175,9 @@ private fun expandedAlpha(progress: Float): Float = ((progress - 0.4f) / 0.6f).c
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ExpandedEventCardContent(
-    timeUntilEvent: String,
     title: String,
-    startDate: LocalDateTime,
-    endDate: LocalDateTime,
+    startDate: Instant,
+    endDate: Instant,
     location: String?,
     attendees: List<AvatarType>,
     action: EventCardAction,
@@ -187,7 +185,7 @@ private fun ExpandedEventCardContent(
 ) {
     Column(horizontalAlignment = Alignment.Start, modifier = modifier) {
         Text(
-            timeUntilEvent.uppercase(),
+            text = startDate.formatRelativeToNow().uppercase(),
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.bodySmallEmphasized,
         )
@@ -215,8 +213,8 @@ private fun ExpandedEventCardContent(
 @Composable
 private fun CollapsedEventCardContent(
     title: String,
-    startDate: LocalDateTime,
-    endDate: LocalDateTime,
+    startDate: Instant,
+    endDate: Instant,
     action: EventCardAction,
     modifier: Modifier = Modifier,
 ) {
@@ -290,10 +288,9 @@ private fun Preview() {
     MaterialTheme {
         Surface {
             EventCard(
-                timeUntilEvent = "In 5 minutes",
                 title = "Calendar meeting",
-                startDate = LocalDateTime.of(2026, 6, 19, 8, 0),
-                endDate = LocalDateTime.of(2026, 6, 19, 16, 0),
+                startDate = Instant.parse("2026-06-19T08:00:00Z"),
+                endDate = Instant.parse("2026-06-19T16:00:00Z"),
                 location = "Japan room",
                 attendees = List(9) { AvatarType.WithInitials.Initials("AB", AvatarColors(Color.Gray, Color.White)) },
                 action = EventCardAction.Button.JoinMeeting {},

@@ -19,8 +19,11 @@ package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
 import androidx.compose.runtime.Composable
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.HourFormatter.formatHours
-import java.time.LocalDate
-import java.time.LocalDateTime
+import com.infomaniak.core.common.utils.today
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 /**
  * Formats a time range, showing only the hours when a bound happens today, otherwise prefixing that hour with its day
@@ -28,13 +31,13 @@ import java.time.LocalDateTime
  * "27 August, 10:00 - 28 August, 12:00".
  */
 @Composable
-fun LocalDateTime.formatRangeTo(end: LocalDateTime): String {
-    val today = LocalDate.now()
-    val startDate = toLocalDate()
-    val endDate = end.toLocalDate()
+fun Instant.formatRangeTo(end: Instant, timeZone: TimeZone = TimeZone.currentSystemDefault()): String {
+    val today = Clock.today(timeZone)
+    val isStartToday = toLocalDateTime(timeZone).date == today
+    val isEndToday = end.toLocalDateTime(timeZone).date == today
 
-    val start = if (startDate == today) formatHours() else "${startDate.formatDayMonth()}, ${formatHours()}"
-    val finish = if (endDate == today) end.formatHours() else "${endDate.formatDayMonth()}, ${end.formatHours()}"
+    val start = if (isStartToday) formatHours() else "${formatDayMonth()}, ${formatHours()}"
+    val finish = if (isEndToday) end.formatHours() else "${end.formatDayMonth()}, ${end.formatHours()}"
 
     return "$start - $finish"
 }
