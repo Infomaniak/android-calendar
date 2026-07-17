@@ -83,8 +83,7 @@ class EventCardState {
  * [progress] is a `0f..1f` value (`0f` = fully collapsed, `1f` = fully expanded) that is meant to be
  * driven by an external gesture (e.g. a scroll offset). It is intentionally exposed as a lambda so
  * every frame is resolved through deferred reads inside `graphicsLayer` / layout blocks: changing
- * [progress] only re-runs the draw and layout phases, never recomposition. This keeps the transition
- * cheap even when many cards are laid out in a scrolling list.
+ * [progress] only re-runs the draw and layout phases, never recomposition.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
