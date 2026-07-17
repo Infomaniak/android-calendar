@@ -41,6 +41,8 @@ fun ExpandableCalendar(
             weekNumbering = weekNumbering,
             modifier = modifier,
         )
+    } else {
+        UnexpandedCalendar(selectedDate = selectedDate(), onDayClick = onDayClick, modifier = modifier)
     }
 }
 
