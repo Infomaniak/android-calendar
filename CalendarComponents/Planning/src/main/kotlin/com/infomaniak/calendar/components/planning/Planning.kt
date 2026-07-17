@@ -42,7 +42,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -56,6 +55,8 @@ import com.infomaniak.calendar.components.eventcard.EventCard
 import com.infomaniak.calendar.components.eventcard.EventCardAction
 import com.infomaniak.calendar.components.eventcard.rememberEventCardState
 import com.infomaniak.calendar.components.foundation.component.DateState
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.DayFormatter.toShortDayName
@@ -63,17 +64,19 @@ import com.infomaniak.calendar.components.planning.component.DayIndicator
 import com.infomaniak.calendar.components.planning.component.TodayEmptyState
 import com.infomaniak.calendar.components.planning.preview.WeekEventsPreviewParameter
 import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.core.avatar.LocalAvatarColors
+import com.infomaniak.core.avatar.getBackgroundColorResBasedOnId
 import com.infomaniak.core.avatar.models.AvatarColors
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
-import kotlin.time.Instant
 
 @Composable
 fun Planning(
     weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
+    nextEvents: () -> List<EventUi.Normal>,
     goToEventCreation: () -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
@@ -109,19 +112,21 @@ fun Planning(
             modifier = Modifier.fillMaxSize(),
         )
 
+        val nextEventCards = nextEvents()
         HorizontalPager(
-            state = rememberPagerState { 3 },
+            state = rememberPagerState { nextEventCards.size },
             contentPadding = horizontalContentPadding,
             pageSpacing = Margin.Small,
             modifier = Modifier.padding(top = topContentPadding),
-        ) {
+        ) { page ->
+            val event = nextEventCards[page]
             EventCard(
-                title = "Calendar meeting",
-                startDate = Instant.parse("2026-07-17T13:00:00Z"),
-                endDate = Instant.parse("2026-07-17T17:00:00Z"),
-                location = "Japan room",
-                attendees = List(9) { AvatarType.WithInitials.Initials("AB", AvatarColors(Color.Gray, Color.White)) },
-                action = EventCardAction.Button.JoinMeeting {},
+                title = event.title,
+                startDate = event.start,
+                endDate = event.end,
+                location = event.location,
+                attendees = event.attendees.toAvatarTypes(),
+                action = EventCardAction.None,
                 progress = { eventCardState.computeProgress(currentCardSize, density) },
                 modifier = Modifier.fillMaxWidth(),
                 eventCardState = eventCardState,
@@ -129,6 +134,29 @@ fun Planning(
             )
         }
     }
+}
+
+@Composable
+private fun Attendees.toAvatarTypes(): List<AvatarType> {
+    val avatarColors = LocalAvatarColors.current
+
+    return all.map { attendee ->
+        val attendeeId = 31 * attendee.email.hashCode() + attendee.displayName.hashCode()
+
+        AvatarType.getUrlOrInitials(
+            avatarUrlData = null,
+            initials = attendee.initials(),
+            colors = AvatarColors(
+                containerColor = getBackgroundColorResBasedOnId(attendeeId, avatarColors.containerColors),
+                contentColor = avatarColors.contentColor,
+            ),
+        )
+    }
+}
+
+private fun AttendeeUi.initials(): String {
+    val source = displayName?.takeIf { it.isNotBlank() } ?: email
+    return source.trim().split(" ").filter { it.isNotEmpty() }.take(2).joinToString("") { it.first().uppercase() }
 }
 
 @Composable
@@ -200,6 +228,21 @@ private fun EventUi.toItemKey(date: LocalDate): PlanningItemKey = PlanningItemKe
 @Composable
 private fun PreviewPlanning(@PreviewParameter(WeekEventsPreviewParameter::class) weekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>>) {
     Surface {
-        Planning(goToEventCreation = {}, weekEvents = { weekEvents })
+        Planning(
+            goToEventCreation = {},
+            weekEvents = { weekEvents },
+            nextEvents = { weekEvents.nextEventsPreview() },
+        )
     }
+}
+
+private fun Map<YearWeek, Map<LocalDate, List<EventUi>>>.nextEventsPreview(): List<EventUi.Normal> {
+    val upcoming = values.asSequence()
+        .flatMap { days -> days.values.asSequence().flatten() }
+        .filterIsInstance<EventUi.Normal>()
+        .filter { it.start >= Clock.System.now() }
+        .toList()
+
+    val nextStart = upcoming.minOfOrNull { it.start } ?: return emptyList()
+    return upcoming.filter { it.start == nextStart }
 }
