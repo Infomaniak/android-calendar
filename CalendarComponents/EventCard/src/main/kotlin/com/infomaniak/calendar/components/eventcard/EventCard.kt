@@ -1,6 +1,24 @@
+/*
+ * Infomaniak Calendar - Android
+ * Copyright (C) 2026 Infomaniak Network SA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.infomaniak.calendar.components.eventcard
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,7 +49,9 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
@@ -120,8 +140,8 @@ fun EventCard(
         eventCardState.recordHeights(collapsed.height + verticalPaddingPx, expanded.height + verticalPaddingPx)
 
         layout(width, height) {
-            collapsed.place(0, 0)
-            expanded.place(0, 0)
+            if (progress < 1f) collapsed.place(0, 0)
+            if (progress > 0f) expanded.place(0, 0)
         }
     }
 }
@@ -187,7 +207,13 @@ private fun ExpandedEventCardContent(
             style = MaterialTheme.typography.bodySmallEmphasized,
         )
         Spacer(modifier = Modifier.height(Margin.Micro))
-        Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
         Spacer(modifier = Modifier.height(Margin.Mini))
 
         Row(verticalAlignment = Alignment.Bottom) {
@@ -217,7 +243,13 @@ private fun CollapsedEventCardContent(
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
             IconItem(painterResource(R.drawable.ic_clock), null, startDate.formatRangeTo(endDate))
         }
 
@@ -234,7 +266,7 @@ private fun ActionButton(action: EventCardAction) {
             Button(action.onClick, shapes = ButtonDefaults.shapes(ButtonDefaults.squareShape)) {
                 Icon(painterResource(action.iconRes), null, tint = LocalContentColor.current)
                 Spacer(modifier = Modifier.width(Margin.Mini))
-                Text(action.label)
+                Text(stringResource(action.label))
             }
         }
     }
@@ -267,15 +299,19 @@ private fun IconItem(painter: Painter, contentDescription: String?, text: String
     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
         Row(horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
             Icon(painter, contentDescription, modifier = Modifier.size(16.dp))
-            Text(text, style = MaterialTheme.typography.bodySmall)
+            Text(
+                text, style = MaterialTheme.typography.bodySmall,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }
 
 sealed interface EventCardAction {
     data object None : EventCardAction
-    sealed class Button(@DrawableRes val iconRes: Int, val label: String, val onClick: () -> Unit) : EventCardAction {
-        class JoinMeeting(onClick: () -> Unit) : Button(R.drawable.ic_product_kmeet, "Join", onClick)
+    sealed class Button(@DrawableRes val iconRes: Int, @StringRes val label: Int, val onClick: () -> Unit) : EventCardAction {
+        class JoinMeeting(onClick: () -> Unit) : Button(R.drawable.ic_product_kmeet, R.string.buttonJoin, onClick)
     }
 }
 

@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Lägg till</string>
     <string name="allDayLabel">Hela dagen</string>
+    <string name="buttonJoin">Gå med</string>
     <string name="contentDescriptionCreateEvent">Skapa ett evenemang</string>
     <string name="contentDescriptionHasAttendees">Har deltagare</string>
     <string name="contentDescriptionHasKMeetLink">Har en kMeet-länk</string>

@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Προσθήκη</string>
     <string name="allDayLabel">Όλη την ημέρα</string>
+    <string name="buttonJoin">Εγγραφείτε</string>
     <string name="contentDescriptionCreateEvent">Δημιουργία εκδήλωσης</string>
     <string name="contentDescriptionHasAttendees">Έχει συμμετέχοντες</string>
     <string name="contentDescriptionHasKMeetLink">Διαθέτει σύνδεσμο kMeet</string>

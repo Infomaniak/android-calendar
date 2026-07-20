@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Toevoegen</string>
     <string name="allDayLabel">De hele dag</string>
+    <string name="buttonJoin">Doe mee</string>
     <string name="contentDescriptionCreateEvent">Een evenement maken</string>
     <string name="contentDescriptionHasAttendees">Heeft deelnemers</string>
     <string name="contentDescriptionHasKMeetLink">Bevat een kMeet-link</string>

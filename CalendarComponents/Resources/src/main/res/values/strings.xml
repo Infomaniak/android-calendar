@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Add</string>
     <string name="allDayLabel">All Day</string>
+    <string name="buttonJoin">Join</string>
     <string name="contentDescriptionCreateEvent">Create an event</string>
     <string name="contentDescriptionHasAttendees">Has attendees</string>
     <string name="contentDescriptionHasKMeetLink">Has a kMeet link</string>
