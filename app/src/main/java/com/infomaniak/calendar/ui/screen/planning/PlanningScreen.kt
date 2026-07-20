@@ -132,10 +132,14 @@ private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class)
         CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(visibleDate)) {
             PlanningScreen(
                 planningUiState = { PlanningUiState.Success({ weekEvents }) },
-                nextEvents = { weekEvents.findNextEvents(Clock.System.now()) },
+                nextEvents = { weekEvents.nextEventsPreview() },
                 goToEventCreation = {},
                 isLoadingEvents = { false },
             )
         }
     }
+}
+
+private fun EventsByWeekAndDay.nextEventsPreview(): List<EventUi.Normal> {
+    return values.flatMap { it.values.flatten() }.filterIsInstance<EventUi.Normal>()
 }
