@@ -21,6 +21,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -39,6 +40,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,9 +54,18 @@ import kotlinx.datetime.LocalDate
 private const val DURATION_TWEEN = 150
 
 @Composable
-fun AnimatedMonthYearText(date: () -> LocalDate, modifier: Modifier = Modifier) {
+fun AnimatedMonthYearText(
+    date: () -> LocalDate,
+    isExpanded: () -> Boolean,
+    modifier: Modifier = Modifier,
+) {
     val locale = LocalConfiguration.current.locales[0]
     val currentYear by rememberCurrentYear()
+    val chevronRotation by animateFloatAsState(
+        targetValue = if (isExpanded()) -180f else 0f,
+        animationSpec = dateAnimationSpec(),
+        label = "ChevronRotation",
+    )
 
     AnimatedContent(
         modifier = modifier,
@@ -69,7 +80,11 @@ fun AnimatedMonthYearText(date: () -> LocalDate, modifier: Modifier = Modifier) 
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(text = targetDate.monthYearLabel(locale, currentYear))
-            Icon(painter = painterResource(R.drawable.ic_chevron_down), contentDescription = null)
+            Icon(
+                painter = painterResource(R.drawable.ic_chevron_down),
+                contentDescription = null,
+                modifier = Modifier.graphicsLayer { rotationZ = chevronRotation },
+            )
         }
     }
 }
@@ -96,7 +111,7 @@ private fun <T> dateAnimationSpec(): TweenSpec<T> = tween(DURATION_TWEEN)
 @Composable
 private fun AnimatedMonthYearTextPreview() {
     CalendarThemeForPreview {
-        AnimatedMonthYearText(date = { LocalDate(2026, 7, 8) })
+        AnimatedMonthYearText(date = { LocalDate(2026, 7, 8) }, isExpanded = { false })
     }
 }
 
@@ -104,6 +119,6 @@ private fun AnimatedMonthYearTextPreview() {
 @Composable
 private fun AnimatedMonthYearTextPastYearPreview() {
     CalendarThemeForPreview {
-        AnimatedMonthYearText(date = { LocalDate(2025, 12, 25) })
+        AnimatedMonthYearText(date = { LocalDate(2025, 12, 25) }, isExpanded = { false })
     }
 }
