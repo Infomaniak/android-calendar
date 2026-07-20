@@ -131,8 +131,8 @@ fun EventCard(
         eventCardState.recordHeights(collapsed.height + verticalPaddingPx, expanded.height + verticalPaddingPx)
 
         layout(width, height) {
-            collapsed.place(0, 0)
-            expanded.place(0, 0)
+            if (progress < 1f) collapsed.place(0, 0)
+            if (progress > 0f) expanded.place(0, 0)
         }
     }
 }
