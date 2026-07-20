@@ -67,7 +67,7 @@ import kotlin.math.roundToInt
 import kotlin.time.Instant
 
 private const val MAX_AVATAR_COUNT = 3
-private val AvatarSpacing = (-8).dp
+private val AvatarSpacing = (-4).dp
 private val CardContentPadding = Margin.Medium
 
 /**
