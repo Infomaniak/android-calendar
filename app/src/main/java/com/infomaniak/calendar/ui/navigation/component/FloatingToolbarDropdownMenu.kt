@@ -45,6 +45,7 @@ fun FloatingToolbarDropdownMenu(
     isExpanded: Boolean,
     onMenuExpanded: (Boolean) -> Unit,
     onNavigationButtonClicked: (NavDestination.CalendarView) -> Unit,
+    currentDestination: () -> NavDestination.CalendarView?,
     modifier: Modifier = Modifier,
 ) {
     DropdownMenuPopup(
@@ -56,17 +57,25 @@ fun FloatingToolbarDropdownMenu(
         modifier = modifier.padding(bottom = Margin.Medium),
         properties = PopupProperties(clippingEnabled = false, focusable = true),
     ) {
+        val lastIndex = DateSelectionItems.entries.lastIndex
+
         DropdownMenuGroup(shapes = MenuDefaults.groupShape(index = 0, count = 1)) {
             DateSelectionItems.entries.forEachIndexed { index, item ->
                 DropdownMenuItem(
-                    shape = MenuDefaults.itemShape(index, DateSelectionItems.entries.count()).shape,
+                    selected = item.destination == currentDestination(),
+                    shapes = MenuDefaults.itemShape(index, DateSelectionItems.entries.count()),
                     text = { Text(stringResource(item.labelRessourceId)) },
                     leadingIcon = { Icon(painter = painterResource(item.icon), contentDescription = null) },
                     onClick = {
                         onMenuExpanded(false)
                         onNavigationButtonClicked(item.destination)
                     },
-                    modifier = Modifier.widthIn(min = 180.dp),
+                    modifier = Modifier
+                        .widthIn(min = 180.dp)
+                        .padding(
+                            top = if (index == 0) 2.dp else 0.dp,
+                            bottom = if (index == lastIndex) 2.dp else 0.dp,
+                        ),
                 )
             }
         }
