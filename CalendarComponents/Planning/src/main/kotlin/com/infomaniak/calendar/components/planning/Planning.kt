@@ -108,7 +108,7 @@ fun Planning(
             goToEventCreation = goToEventCreation,
             contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding(), top = topContentPadding)
                     + horizontalContentPadding
-                    + PaddingValues(top = (currentCardSize ?: 0.dp) + Margin.Medium),
+                    + PaddingValues(top = (currentCardSize ?: eventCardState.initialHeightDp ?: 0.dp) + Margin.Medium),
             modifier = Modifier.fillMaxSize(),
         )
 
