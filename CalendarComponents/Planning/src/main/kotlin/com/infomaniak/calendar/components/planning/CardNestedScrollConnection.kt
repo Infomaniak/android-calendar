@@ -84,6 +84,6 @@ class CardNestedScrollConnection(
         ) { updateCurrentCardSize(value) }
 
         // Consume the fling so the list doesn't also fling.
-        return available
+        return available.copy(y = 0f)
     }
 }
