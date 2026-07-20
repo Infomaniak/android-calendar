@@ -72,6 +72,7 @@ rootProject.name = "Calendar"
 include(":app")
 include(":CalendarComponents:Calendar")
 include(":CalendarComponents:Event")
+include(":CalendarComponents:EventCard")
 include(":CalendarComponents:Foundation")
 include(":CalendarComponents:Planning")
 include(":CalendarComponents:Resources")

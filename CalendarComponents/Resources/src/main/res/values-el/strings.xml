@@ -23,6 +23,10 @@
     <string name="contentDescriptionHasKMeetLink">Διαθέτει σύνδεσμο kMeet</string>
     <string name="contentDescriptionHasLocation">Έχει τοποθεσία</string>
     <string name="contentDescriptionToday">Σήμερα</string>
+    <plurals name="moreParticipantsLabel">
+        <item quantity="one">+%d συμμετέχων</item>
+        <item quantity="other">+%d συμμετέχοντες</item>
+    </plurals>
     <string name="planningNothingPlannedToday">Τίποτα προγραμματισμένο.</string>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">Εβδ.%d</string>

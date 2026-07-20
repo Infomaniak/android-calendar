@@ -23,6 +23,10 @@
     <string name="contentDescriptionHasKMeetLink">Enthält einen kMeet-Link</string>
     <string name="contentDescriptionHasLocation">Hat einen Standort</string>
     <string name="contentDescriptionToday">Heute</string>
+    <plurals name="moreParticipantsLabel">
+        <item quantity="one">+%d Teilnehmer</item>
+        <item quantity="other">+%d Teilnehmer</item>
+    </plurals>
     <string name="planningNothingPlannedToday">Nichts geplant.</string>
     <string name="weekHeaderDateRange">%d.–%d. %s %d</string>
     <string name="weekHeaderWeekNumber">KW%d</string>

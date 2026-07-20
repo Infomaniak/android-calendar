@@ -23,16 +23,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.DateState
+import com.infomaniak.core.common.utils.today
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlinx.datetime.todayIn
 import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
@@ -43,7 +42,7 @@ internal fun ExpandedCalendar(selectedDate: LocalDate, onDayClick: (LocalDate) -
     val firstDayOfWeek = remember { firstDayOfWeekFromLocale() }
     val startMonth = remember { selectedDate.yearMonth.minus(RANGE_MONTHS, DateTimeUnit.MONTH) }
     val endMonth = remember { selectedDate.yearMonth.plus(RANGE_MONTHS, DateTimeUnit.MONTH) }
-    val today = remember { Clock.System.todayIn(TimeZone.currentSystemDefault()) }
+    val today = remember { Clock.today() }
 
     val monthState = rememberCalendarState(
         startMonth = startMonth,
@@ -74,9 +73,7 @@ internal fun ExpandedCalendar(selectedDate: LocalDate, onDayClick: (LocalDate) -
 @Composable
 @Preview
 private fun ExpandedCalendarPreview() {
-    val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
-
     Surface {
-        ExpandedCalendar(selectedDate = today, onDayClick = {})
+        ExpandedCalendar(selectedDate = Clock.today(), onDayClick = {})
     }
 }

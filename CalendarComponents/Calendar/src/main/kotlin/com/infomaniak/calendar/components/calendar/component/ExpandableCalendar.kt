@@ -21,19 +21,18 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 
 @Composable
 fun ExpandableCalendar(
     selectedDate: () -> LocalDate,
     onDayClick: (LocalDate) -> Unit,
+    isExpanded: () -> Boolean,
     modifier: Modifier = Modifier,
-    isCalendarExpanded: () -> Boolean,
 ) {
-    if (isCalendarExpanded()) {
+    if (isExpanded()) {
         ExpandedCalendar(selectedDate = selectedDate(), onDayClick = onDayClick, modifier = modifier)
     }
 }
@@ -43,9 +42,9 @@ fun ExpandableCalendar(
 private fun UnexpandedCalendarPreview() {
     Surface {
         ExpandableCalendar(
-            selectedDate = { Clock.System.todayIn(TimeZone.currentSystemDefault()) },
+            selectedDate = { Clock.today() },
             onDayClick = {},
-            isCalendarExpanded = { false },
+            isExpanded = { false },
         )
     }
 }
@@ -55,9 +54,9 @@ private fun UnexpandedCalendarPreview() {
 private fun ExpandedCalendarPreview() {
     Surface {
         ExpandableCalendar(
-            selectedDate = { Clock.System.todayIn(TimeZone.currentSystemDefault()) },
+            selectedDate = { Clock.today() },
             onDayClick = {},
-            isCalendarExpanded = { true },
+            isExpanded = { true },
         )
     }
 }

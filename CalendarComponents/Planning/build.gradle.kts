@@ -45,6 +45,14 @@ android {
         compose = true
     }
 
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("standard") {
+            isDefault = true
+        }
+        create("fdroid")
+    }
+
     kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.fromTarget(javaVersion.toString()))
@@ -53,11 +61,12 @@ android {
 }
 
 dependencies {
-    implementation(project(":CalendarComponents:Calendar"))
-    implementation(project(":CalendarComponents:Event"))
     api(project(":CalendarComponents:Foundation"))
+    implementation(project(":CalendarComponents:Event"))
+    implementation(project(":CalendarComponents:EventCard"))
     implementation(project(":CalendarComponents:Resources"))
 
+    implementation(core.infomaniak.core.avatar)
     implementation(core.infomaniak.core.common)
     implementation(core.infomaniak.core.ui.compose.margin)
 
@@ -67,6 +76,8 @@ dependencies {
     implementation(core.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     debugImplementation(core.compose.ui.tooling)
+
+    implementation(libs.haze)
 
     implementation(kmpCalendar.kotlinx.datetime)
 }

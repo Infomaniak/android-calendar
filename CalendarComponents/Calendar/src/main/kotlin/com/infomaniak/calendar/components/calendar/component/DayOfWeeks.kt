@@ -30,11 +30,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.DayFormatter.toSimpleDayName
+import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.kizitonwose.calendar.core.daysOfWeek
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 
 @Composable
@@ -59,9 +58,7 @@ internal fun DaysOfWeekTitle(firstDayOfWeek: DayOfWeek, modifier: Modifier = Mod
 @Composable
 @Preview
 private fun DaysOfWeekTitlePreview() {
-    val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
-
     Surface {
-        DaysOfWeekTitle(firstDayOfWeek = today.dayOfWeek)
+        DaysOfWeekTitle(firstDayOfWeek = Clock.today().dayOfWeek)
     }
 }

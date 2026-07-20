@@ -137,6 +137,7 @@ sentry {
 }
 
 dependencies {
+    implementation(project(":CalendarComponents:Calendar"))
     implementation(project(":CalendarComponents:Planning"))
 
     if (useCalendarCoreCompositeBuild) {
@@ -183,6 +184,10 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(core.compose.ui.tooling)
     implementation(kmpCalendar.kotlinx.datetime)
+
+    implementation(libs.haze)
+    implementation(libs.haze.blur)
+    implementation(libs.haze.materials)
 
     // Navigation 3
     implementation(core.androidx.lifecycle.viewmodel.navigation3)

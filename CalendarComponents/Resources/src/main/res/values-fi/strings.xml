@@ -23,6 +23,10 @@
     <string name="contentDescriptionHasKMeetLink">Sisältää kMeet-linkin</string>
     <string name="contentDescriptionHasLocation">On sijainti</string>
     <string name="contentDescriptionToday">Tänään</string>
+    <plurals name="moreParticipantsLabel">
+        <item quantity="one">+%d osallistujaa</item>
+        <item quantity="other">+%d osallistujaa</item>
+    </plurals>
     <string name="planningNothingPlannedToday">Ei suunnitelmia.</string>
     <string name="weekHeaderDateRange">%d.–%d. %s %d</string>
     <string name="weekHeaderWeekNumber">V%d</string>

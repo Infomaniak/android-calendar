@@ -18,11 +18,14 @@
 package com.infomaniak.calendar.ui.screen.planning
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
@@ -35,10 +38,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
+import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.planning.Planning
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
@@ -48,16 +56,20 @@ import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.rememberHazeState
 import kotlin.time.Clock
 
 @Composable
 fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier, viewModel: PlanningViewModel = viewModel()) {
     val planningUiState: PlanningUiState by viewModel.planningUiState.collectAsStateWithLifecycle()
+    val nextEvents: List<EventUi.Normal> by viewModel.nextEvents.collectAsStateWithLifecycle()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
 
     PlanningScreen(
         goToEventCreation = goToEventCreation,
         planningUiState = { planningUiState },
+        nextEvents = { nextEvents },
         isLoadingEvents = { isLoadingEvents },
         modifier = modifier,
     )
@@ -67,32 +79,59 @@ fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier,
 private fun PlanningScreen(
     goToEventCreation: () -> Unit,
     planningUiState: () -> PlanningUiState,
+    nextEvents: () -> List<EventUi.Normal>,
     isLoadingEvents: () -> Boolean,
     modifier: Modifier = Modifier,
 ) {
     var isCalendarExpanded by rememberSaveable { mutableStateOf(false) }
+    val hazeState = rememberHazeState()
+    val density = LocalDensity.current
+    val visibleDayState = LocalVisibleDayState.current
+    var topBarHeight by remember { mutableStateOf(0.dp) }
+    val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
     Scaffold(
-        topBar = {
+        modifier = modifier,
+        contentWindowInsets = WindowInsets(),
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+        ) {
+            when (val planningUi = planningUiState()) {
+                is PlanningUiState.Success -> {
+                    SuccessPlanning(
+                        events = planningUi.eventsByWeekAndDay,
+                        nextEvents = nextEvents,
+                        contentPadding = PaddingValues(top = topBarHeight, bottom = bottomInset) + PaddingValues(Margin.Medium),
+                        goToEventCreation = goToEventCreation,
+                        hazeState = hazeState,
+                    )
+                }
+                is PlanningUiState.Loading -> {
+                    LoadingPlanning(modifier = Modifier.fillMaxSize())
+                }
+            }
+
             CalendarTopAppBar(
                 isLoadingEvents = isLoadingEvents,
+                hazeState = hazeState,
                 onToggleCalendar = { isCalendarExpanded = !isCalendarExpanded },
+                expandableCalendar = visibleDayState?.let { dayState ->
+                    {
+                        ExpandableCalendar(
+                            isExpanded = { isCalendarExpanded },
+                            selectedDate = { dayState.visibleDate },
+                            onDayClick = dayState::jumpTo,
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.TopCenter)
+                    .onSizeChanged { topBarHeight = with(density) { it.height.toDp() } },
             )
-        },
-        modifier = modifier,
-    ) { paddingValues ->
-        when (val planningUi = planningUiState()) {
-            is PlanningUiState.Success -> {
-                SuccessPlanning(
-                    events = planningUi.eventsByWeekAndDay,
-                    contentPadding = paddingValues,
-                    goToEventCreation = goToEventCreation,
-                    isCalendarExpanded = { isCalendarExpanded },
-                )
-            }
-            is PlanningUiState.Loading -> {
-                LoadingPlanning(modifier = Modifier.padding(paddingValues))
-            }
         }
     }
 }
@@ -100,9 +139,10 @@ private fun PlanningScreen(
 @Composable
 private fun SuccessPlanning(
     events: () -> EventsByWeekAndDay,
+    nextEvents: () -> List<EventUi.Normal>,
     contentPadding: PaddingValues,
     goToEventCreation: () -> Unit,
-    isCalendarExpanded: () -> Boolean,
+    hazeState: HazeState,
 ) {
     val visibleDayState = LocalVisibleDayState.current ?: return
     val lazyListState = rememberLazyListState(events().indexOf(visibleDayState.visibleDate))
@@ -110,22 +150,17 @@ private fun SuccessPlanning(
     ProcessJumpRequests(lazyListState, visibleDayState, events)
     ReportVisibleDate(lazyListState, onVisibleDateChanged = visibleDayState::onVisibleDateChanged)
 
-    Column(modifier = Modifier.padding(top = contentPadding.calculateTopPadding())) {
-        Planning(
-            lazyListState = lazyListState,
-            weekEvents = events,
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = Margin.Medium)
-                .scrollableToolbar()
-                .fillMaxWidth(),
-            contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
-            goToEventCreation = goToEventCreation,
-            onJump = visibleDayState::jumpTo,
-            currentDay = visibleDayState::visibleDate,
-            isCalendarExpanded = isCalendarExpanded,
-        )
-    }
+    Planning(
+        lazyListState = lazyListState,
+        weekEvents = events,
+        nextEvents = nextEvents,
+        hazeState = hazeState,
+        modifier = Modifier
+            .scrollableToolbar()
+            .fillMaxSize(),
+        contentPadding = contentPadding,
+        goToEventCreation = goToEventCreation,
+    )
 }
 
 @Composable
@@ -144,6 +179,7 @@ private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class)
         CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(visibleDate)) {
             PlanningScreen(
                 planningUiState = { PlanningUiState.Success({ weekEvents }) },
+                nextEvents = { weekEvents.findNextEvents(Clock.System.now()) },
                 goToEventCreation = {},
                 isLoadingEvents = { false },
             )

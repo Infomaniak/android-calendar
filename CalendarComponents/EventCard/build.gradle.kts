@@ -1,27 +1,9 @@
-/*
- * Infomaniak Calendar - Android
- * Copyright (C) 2026 Infomaniak Network SA
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(core.plugins.android.library)
-    alias(core.plugins.compose.compiler)
     alias(core.plugins.kotlin.android)
-    alias(core.plugins.kotlin.parcelize)
+    alias(core.plugins.compose.compiler)
 }
 
 val appCompileSdk: Int by rootProject.extra
@@ -29,7 +11,7 @@ val appMinSdk: Int by rootProject.extra
 val javaVersion: JavaVersion by rootProject.extra
 
 android {
-    namespace = "com.infomaniak.calendar.components.calendar"
+    namespace = "com.infomaniak.calendar.components.eventcard"
     compileSdk = appCompileSdk
 
     defaultConfig {
@@ -45,6 +27,14 @@ android {
         compose = true
     }
 
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("standard") {
+            isDefault = true
+        }
+        create("fdroid")
+    }
+
     kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.fromTarget(javaVersion.toString()))
@@ -53,20 +43,21 @@ android {
 }
 
 dependencies {
-    api(project(":CalendarComponents:Foundation"))
+    implementation(project(":CalendarComponents:Foundation"))
     implementation(project(":CalendarComponents:Resources"))
 
+    implementation(core.infomaniak.core.avatar)
     implementation(core.infomaniak.core.ui.compose.margin)
 
     implementation(platform(core.compose.bom))
     implementation(core.compose.foundation)
-    implementation(core.infomaniak.core.common)
+    implementation(core.compose.ui)
     implementation(core.compose.ui.android)
     implementation(core.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     debugImplementation(core.compose.ui.tooling)
 
-    implementation(kmpCalendar.kotlinx.datetime)
-
-    implementation(libs.kizitonwose.calendar.compose)
+    implementation(libs.haze)
+    implementation(libs.haze.blur)
+    implementation(libs.haze.materials)
 }
