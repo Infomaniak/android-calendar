@@ -52,11 +52,11 @@ private data class SelectedIconData(
 
 private fun getSelectedIcon(lastMainNavigationSelected: NavDestination.CalendarView): SelectedIconData {
     return when (lastMainNavigationSelected) {
+        is NavDestination.CalendarView.Planning -> SelectedIconData(R.drawable.ic_rows_two, R.string.planningTitle)
         is NavDestination.CalendarView.Day -> SelectedIconData(R.drawable.ic_overline_rectangle_underline, R.string.dayTitle)
         is NavDestination.CalendarView.ThreeDays -> SelectedIconData(R.drawable.ic_columns_three, R.string.threeDaysTitle)
         is NavDestination.CalendarView.Week -> SelectedIconData(R.drawable.ic_columns_four, R.string.weekTitle)
         is NavDestination.CalendarView.Month -> SelectedIconData(R.drawable.ic_grid_three_two, R.string.monthTitle)
-        is NavDestination.CalendarView.Planning -> SelectedIconData(R.drawable.ic_rows_two, R.string.planningTitle)
     }
 }
 

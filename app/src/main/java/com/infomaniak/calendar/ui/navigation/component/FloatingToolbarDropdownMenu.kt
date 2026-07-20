@@ -78,6 +78,11 @@ private enum class DateSelectionItems(
     @DrawableRes val icon: Int,
     val destination: NavDestination.CalendarView,
 ) {
+    Planning(
+        labelRessourceId = R.string.planningTitle,
+        icon = R.drawable.ic_rows_two,
+        destination = NavDestination.CalendarView.Planning,
+    ),
     Day(
         labelRessourceId = R.string.dayTitle,
         icon = R.drawable.ic_overline_rectangle_underline,
@@ -98,9 +103,4 @@ private enum class DateSelectionItems(
         icon = R.drawable.ic_grid_three_two,
         destination = NavDestination.CalendarView.Month,
     ),
-    Planning(
-        labelRessourceId = R.string.planningTitle,
-        icon = R.drawable.ic_rows_two,
-        destination = NavDestination.CalendarView.Planning,
-    )
 }
