@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.eventcard
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -48,6 +49,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
@@ -225,7 +227,7 @@ private fun ActionButton(action: EventCardAction) {
             Button(action.onClick, shapes = ButtonDefaults.shapes(ButtonDefaults.squareShape)) {
                 Icon(painterResource(action.iconRes), null, tint = LocalContentColor.current)
                 Spacer(modifier = Modifier.width(Margin.Mini))
-                Text(action.label)
+                Text(stringResource(action.label))
             }
         }
     }
@@ -265,8 +267,8 @@ private fun IconItem(painter: Painter, contentDescription: String?, text: String
 
 sealed interface EventCardAction {
     data object None : EventCardAction
-    sealed class Button(@DrawableRes val iconRes: Int, val label: String, val onClick: () -> Unit) : EventCardAction {
-        class JoinMeeting(onClick: () -> Unit) : Button(R.drawable.ic_product_kmeet, "Join", onClick)
+    sealed class Button(@DrawableRes val iconRes: Int, @StringRes val label: Int, val onClick: () -> Unit) : EventCardAction {
+        class JoinMeeting(onClick: () -> Unit) : Button(R.drawable.ic_product_kmeet, R.string.buttonJoin, onClick)
     }
 }
 

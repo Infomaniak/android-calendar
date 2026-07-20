@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Ajouter</string>
     <string name="allDayLabel">Journée</string>
+    <string name="buttonJoin">Rejoignez-nous</string>
     <string name="contentDescriptionCreateEvent">Créer un évènement</string>
     <string name="contentDescriptionHasAttendees">Compte des participants</string>
     <string name="contentDescriptionHasKMeetLink">Comprend un lien kMeet</string>

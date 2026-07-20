@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Lisää</string>
     <string name="allDayLabel">Koko päivän</string>
+    <string name="buttonJoin">Liity mukaan</string>
     <string name="contentDescriptionCreateEvent">Luo tapahtuma</string>
     <string name="contentDescriptionHasAttendees">Onko osallistujia</string>
     <string name="contentDescriptionHasKMeetLink">Sisältää kMeet-linkin</string>
