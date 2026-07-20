@@ -67,7 +67,7 @@ fun AnimatedMonthYearText(date: () -> LocalDate, modifier: Modifier = Modifier) 
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(text = targetDate.monthYearLabel(locale, currentYear))
-            Icon(painter = painterResource(R.drawable.ic_chevron), contentDescription = null)
+            Icon(painter = painterResource(R.drawable.ic_chevron_down), contentDescription = null)
         }
     }
 }
