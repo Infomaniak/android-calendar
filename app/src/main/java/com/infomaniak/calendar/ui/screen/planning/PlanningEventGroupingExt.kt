@@ -89,7 +89,8 @@ private fun SortedMap<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>.ensu
     timeZone: TimeZone,
     weekNumbering: WeekNumbering,
 ) {
-    val todayEvents = getOrPut(weekNumbering.weekOf(Clock.today(timeZone))) { sortedMapOf() }.getOrPut(Clock.today()) { mutableListOf() }
+    val todayEvents = getOrPut(weekNumbering.weekOf(Clock.today(timeZone))) { sortedMapOf() }
+        .getOrPut(Clock.today()) { mutableListOf() }
 
     if (todayEvents.isEmpty()) todayEvents.add(EventUi.TodayEmptyState)
 }
@@ -171,7 +172,7 @@ fun EventsByWeekAndDay.findNextEvents(now: Instant): List<EventUi.Normal> {
     val upcoming = values.asSequence()
         .flatMap { days -> days.values.asSequence().flatten() }
         .filterIsInstance<EventUi.Normal>()
-        .filter { it.start >= now }
+        .filter { it.start >= now && it.isAllDay.not() }
         .toList()
 
     val nextStart = upcoming.minOfOrNull { it.start } ?: return emptyList()
