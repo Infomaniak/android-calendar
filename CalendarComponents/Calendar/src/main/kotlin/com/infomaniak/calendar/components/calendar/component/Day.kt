@@ -18,6 +18,8 @@
 package com.infomaniak.calendar.components.calendar.component
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +34,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -70,11 +73,22 @@ internal fun Day(
         date.toJavaLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(locale))
     }
     val stateDescriptionToday = if (dateState == DateState.Today) stringResource(R.string.contentDescriptionToday) else null
+    val interactionSource = remember { MutableInteractionSource() }
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(LocalViewConfiguration.current.minimumTouchTargetSize.height)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                role = Role.Button,
+            ) { onClick() }
+            .clearAndSetSemantics {
+                contentDescription = fullDate
+                selected = dateState == DateState.Selected
+                stateDescriptionToday?.let { stateDescription = it }
+            }
             .padding(Margin.Micro),
         contentAlignment = Alignment.Center,
     ) {
@@ -84,12 +98,7 @@ internal fun Day(
                 .fillMaxHeight()
                 .aspectRatio(1f, matchHeightConstraintsFirst = true)
                 .clip(CircleShape)
-                .clickable(role = Role.Button) { onClick() }
-                .clearAndSetSemantics {
-                    contentDescription = fullDate
-                    selected = dateState == DateState.Selected
-                    stateDescriptionToday?.let { stateDescription = it }
-                },
+                .indication(interactionSource, ripple()),
         ) {
             Text(text = date.day.toString())
         }
