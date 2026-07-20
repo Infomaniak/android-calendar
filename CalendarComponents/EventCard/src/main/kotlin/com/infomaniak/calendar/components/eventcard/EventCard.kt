@@ -19,6 +19,7 @@ package com.infomaniak.calendar.components.eventcard
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -258,7 +259,11 @@ private fun AttendeesAvatars(attendees: List<AvatarType>, modifier: Modifier = M
         verticalAlignment = Alignment.CenterVertically,
     ) {
         attendees.take(MAX_AVATAR_COUNT).forEach { avatarType ->
-            Avatar(avatarType, modifier = Modifier.size(24.dp))
+            Avatar(
+                avatarType = avatarType,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceContainerHighest),
+                modifier = Modifier.size(24.dp),
+            )
         }
         if (attendees.size > MAX_AVATAR_COUNT) {
             val extraAttendeeSize = attendees.size - MAX_AVATAR_COUNT
