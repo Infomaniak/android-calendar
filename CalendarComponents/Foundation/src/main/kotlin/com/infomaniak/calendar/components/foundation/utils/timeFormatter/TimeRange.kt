@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.HourFormatter.formatHours
 import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toJavaZoneId
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -36,8 +37,9 @@ fun Instant.formatRangeTo(end: Instant, timeZone: TimeZone = TimeZone.currentSys
     val isStartToday = toLocalDateTime(timeZone).date == today
     val isEndToday = end.toLocalDateTime(timeZone).date == today
 
-    val start = if (isStartToday) formatHours() else "${formatDayMonth()}, ${formatHours()}"
-    val finish = if (isEndToday) end.formatHours() else "${end.formatDayMonth()}, ${end.formatHours()}"
+    val zoneId = timeZone.toJavaZoneId()
+    val start = if (isStartToday) formatHours(zoneId) else "${formatDayMonth(timeZone)}, ${formatHours(zoneId)}"
+    val finish = if (isEndToday) end.formatHours(zoneId) else "${end.formatDayMonth(timeZone)}, ${end.formatHours(zoneId)}"
 
     return "$start - $finish"
 }
