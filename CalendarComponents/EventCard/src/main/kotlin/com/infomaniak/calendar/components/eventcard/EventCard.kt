@@ -51,6 +51,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
@@ -180,7 +181,13 @@ private fun ExpandedEventCardContent(
             style = MaterialTheme.typography.bodySmallEmphasized,
         )
         Spacer(modifier = Modifier.height(Margin.Micro))
-        Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
         Spacer(modifier = Modifier.height(Margin.Mini))
 
         Row(verticalAlignment = Alignment.Bottom) {
@@ -210,7 +217,13 @@ private fun CollapsedEventCardContent(
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
             IconItem(painterResource(R.drawable.ic_clock), null, startDate.formatRangeTo(endDate))
         }
 
@@ -260,7 +273,11 @@ private fun IconItem(painter: Painter, contentDescription: String?, text: String
     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
         Row(horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
             Icon(painter, contentDescription, modifier = Modifier.size(16.dp))
-            Text(text, style = MaterialTheme.typography.bodySmall)
+            Text(
+                text, style = MaterialTheme.typography.bodySmall,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }
