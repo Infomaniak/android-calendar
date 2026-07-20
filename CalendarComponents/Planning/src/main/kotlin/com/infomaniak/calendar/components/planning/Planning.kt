@@ -237,12 +237,5 @@ private fun PreviewPlanning(@PreviewParameter(WeekEventsPreviewParameter::class)
 }
 
 private fun Map<YearWeek, Map<LocalDate, List<EventUi>>>.nextEventsPreview(): List<EventUi.Normal> {
-    val upcoming = values.asSequence()
-        .flatMap { days -> days.values.asSequence().flatten() }
-        .filterIsInstance<EventUi.Normal>()
-        .filter { it.start >= Clock.System.now() }
-        .toList()
-
-    val nextStart = upcoming.minOfOrNull { it.start } ?: return emptyList()
-    return upcoming.filter { it.start == nextStart }
+    return values.flatMap { it.values.flatten() }.filterIsInstance<EventUi.Normal>()
 }

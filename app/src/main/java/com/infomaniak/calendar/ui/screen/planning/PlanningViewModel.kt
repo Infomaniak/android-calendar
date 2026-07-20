@@ -62,18 +62,19 @@ class PlanningViewModel(
 
     private val emailsByUserId = accountUtils.emailsByUserId.shareIn(viewModelScope, SharingStarted.Eagerly, 1)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val eventsByWeekAndDay: Flow<EventsByWeekAndDay> = calendarManager
-        .observeDaySlices(startDate, endDate, timeZone)
-        .mapLatest { it.groupByWeekAndDay(emailsByUserId.first()) }
-        .shareIn(scope = viewModelScope, started = SharingStarted.Lazily, replay = 1)
+    private val daySlices = calendarManager.observeDaySlices(startDate, endDate, timeZone)
 
-    val planningUiState: StateFlow<PlanningUiState> = eventsByWeekAndDay
-        .map { events -> PlanningUiState.Success({ events }) }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val planningUiState: StateFlow<PlanningUiState> = daySlices
+        .mapLatest {
+            val events = it.groupByWeekAndDay(emailsByUserId.first())
+            PlanningUiState.Success({ events })
+        }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = PlanningUiState.Loading)
 
-    val nextEvents: StateFlow<List<EventUi.Normal>> = eventsByWeekAndDay
-        .map { it.findNextEvents(Clock.System.now()) } // TODO[midnight]: Combine with a flow to update computation when day changes
+    val nextEvents: StateFlow<List<EventUi.Normal>> = daySlices
+        // TODO[midnight]: Combine with a flow to update computation when day changes
+        .map { it.findNextEvents(emailsByUserId.first(), Clock.System.now(), timeZone) }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyList())
 
     companion object {
