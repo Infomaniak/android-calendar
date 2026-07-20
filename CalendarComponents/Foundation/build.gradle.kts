@@ -47,4 +47,8 @@ dependencies {
     implementation(core.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     debugImplementation(core.compose.ui.tooling)
+
+    implementation(libs.haze)
+    implementation(libs.haze.blur)
+    implementation(libs.haze.materials)
 }

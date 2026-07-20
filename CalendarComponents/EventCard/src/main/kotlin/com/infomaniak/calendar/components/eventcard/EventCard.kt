@@ -20,7 +20,6 @@ package com.infomaniak.calendar.components.eventcard
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,7 +41,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
@@ -56,6 +54,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.foundation.utils.backgroundBlur
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatRangeTo
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatRelativeToNow
 import com.infomaniak.calendar.components.resources.R
@@ -64,9 +63,6 @@ import com.infomaniak.core.avatar.models.AvatarColors
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.ui.compose.margin.Margin
 import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.blur.blurEffect
-import dev.chrisbanes.haze.blur.materials.HazeMaterials
-import dev.chrisbanes.haze.hazeEffect
 import kotlin.math.roundToInt
 import kotlin.time.Instant
 
@@ -100,8 +96,7 @@ fun EventCard(
     val containerColor = CardDefaults.cardColors().containerColor
     Layout(
         modifier = modifier
-            .clip(shape)
-            .cardBackground(containerColor, hazeState)
+            .backgroundBlur(containerColor, hazeState, shape)
             .padding(CardContentPadding),
         content = {
             FadingContent(alpha = { collapsedAlpha(progress()) }) {
@@ -143,26 +138,6 @@ fun EventCard(
         layout(width, height) {
             if (progress < 1f) collapsed.place(0, 0)
             if (progress > 0f) expanded.place(0, 0)
-        }
-    }
-}
-
-/**
- * Draws the card background. When a [hazeState] is provided, the background is a frosted blur of the
- * content marked as the haze source (see [dev.chrisbanes.haze.hazeSource]); otherwise it falls back
- * to an opaque [containerColor]. Must be applied after the `clip` so the blur is clipped to [shape].
- */
-@Composable
-private fun Modifier.cardBackground(containerColor: Color, hazeState: HazeState?): Modifier {
-    return if (hazeState == null) {
-        background(containerColor)
-    } else {
-        val style = HazeMaterials.thick(containerColor)
-        hazeEffect(hazeState) {
-            blurEffect {
-                blurRadius = 8.dp
-                this.style = style
-            }
         }
     }
 }
