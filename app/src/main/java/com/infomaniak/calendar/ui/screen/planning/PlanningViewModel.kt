@@ -73,7 +73,7 @@ class PlanningViewModel(
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = PlanningUiState.Loading)
 
     val nextEvents: StateFlow<List<EventUi.Normal>> = eventsByWeekAndDay
-        .map { it.findNextEvents(Clock.System.now()) }
+        .map { it.findNextEvents(Clock.System.now()) } // TODO[midnight]: Combine with a flow to update computation when day changes
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyList())
 
     companion object {
