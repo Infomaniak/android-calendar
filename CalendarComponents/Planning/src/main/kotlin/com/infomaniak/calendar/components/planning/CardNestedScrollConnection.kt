@@ -41,7 +41,8 @@ class CardNestedScrollConnection(
     override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
         val cardMinSize = with(density) { eventCardState.collapsedHeight?.toDp() } ?: return Offset.Zero
         val cardMaxSize = with(density) { eventCardState.expandedHeight?.toDp() } ?: return Offset.Zero
-        val previousCardSize = currentCardSize() ?: cardMaxSize
+        val initialHeight = with(density) { eventCardState.initialHeight?.toDp() } ?: return Offset.Zero
+        val previousCardSize = currentCardSize() ?: initialHeight
 
         // Calculate the change in card size based on scroll delta
         val availableYDp = with(density) { available.y.toDp() }
