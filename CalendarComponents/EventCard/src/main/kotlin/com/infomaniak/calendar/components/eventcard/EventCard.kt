@@ -190,7 +190,7 @@ private fun ExpandedEventCardContent(
         )
         Spacer(modifier = Modifier.height(Margin.Mini))
 
-        Row(verticalAlignment = Alignment.Bottom) {
+        Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Margin.Mini)) {
                 IconItem(painterResource(R.drawable.ic_clock), null, startDate.formatRangeTo(endDate))
 
@@ -215,7 +215,11 @@ private fun CollapsedEventCardContent(
     action: EventCardAction,
     modifier: Modifier = Modifier,
 ) {
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
+    ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
