@@ -36,6 +36,7 @@ fun rememberEventCardState(): EventCardState {
 
 @Stable
 class EventCardState {
+    // TODO[nextCard]: Support multiple next event cards
     var collapsedHeight by mutableStateOf<Int?>(null)
     var expandedHeight by mutableStateOf<Int?>(null)
 

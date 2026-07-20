@@ -75,6 +75,8 @@ class PlanningViewModel(
     val nextEvents: StateFlow<List<EventUi.Normal>> = daySlices
         // TODO[midnight]: Combine with a flow to update computation when day changes
         .map { it.findNextEvents(emailsByUserId.first(), Clock.System.now(), timeZone) }
+        // TODO[nextCard]: Update the design of the UI to support displaying multiple cards with different heights
+        .map { it.firstOrNull()?.let { event -> listOf(event) } ?: emptyList() }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyList())
 
     companion object {
