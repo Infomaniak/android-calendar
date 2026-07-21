@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.ui.component
 
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -31,7 +30,6 @@ import com.infomaniak.calendar.ui.theme.CalendarTheme
 
 private const val FAB_KEY = "FAB"
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CalendarFab(onClick: () -> Unit, modifier: Modifier = Modifier) {
     FloatingActionButton(

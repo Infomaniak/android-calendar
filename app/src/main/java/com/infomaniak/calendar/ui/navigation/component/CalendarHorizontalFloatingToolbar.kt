@@ -94,6 +94,8 @@ private fun CalendarHorizontalFloatingToolbar(
             HorizontalFloatingToolbar(
                 expanded = isExpanded(),
                 shape = RoundedCornerShape(16.dp),
+                expandedShadowElevation = 3.dp,
+                collapsedShadowElevation = 3.dp,
                 floatingActionButton = { floatingActionButton.invoke() },
                 content = {
                     ContentFloatingToolbar(onCurrentDayClicked, onNavigationButtonClicked, currentDestination)
@@ -103,6 +105,8 @@ private fun CalendarHorizontalFloatingToolbar(
             HorizontalFloatingToolbar(
                 expanded = isExpanded(),
                 shape = RoundedCornerShape(16.dp),
+                expandedShadowElevation = 3.dp,
+                collapsedShadowElevation = 3.dp,
                 content = {
                     ContentFloatingToolbar(onCurrentDayClicked, onNavigationButtonClicked, currentDestination)
                 },
