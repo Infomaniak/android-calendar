@@ -80,7 +80,7 @@ private enum class DateSelectionItems(
 ) {
     Day(
         labelRessourceId = R.string.dayTitle,
-        icon = R.drawable.ic_rows_two,
+        icon = R.drawable.ic_overline_rectangle_underline,
         destination = NavDestination.CalendarView.Day,
     ),
     ThreeDays(
@@ -100,7 +100,7 @@ private enum class DateSelectionItems(
     ),
     Planning(
         labelRessourceId = R.string.planningTitle,
-        icon = R.drawable.ic_overline_rectangle_underline,
+        icon = R.drawable.ic_rows_two,
         destination = NavDestination.CalendarView.Planning,
     )
 }
