@@ -30,5 +30,5 @@ object DayFormatter {
 
     fun LocalDate.toShortDayName(): String = toJavaLocalDate().format(formatShortDayName)
 
-    fun DayOfWeek.toSimpleDayName(locale: Locale): String = toJavaDayOfWeek().getDisplayName(TextStyle.NARROW, locale)
+    fun DayOfWeek.toNarrowDayName(locale: Locale): String = toJavaDayOfWeek().getDisplayName(TextStyle.NARROW_STANDALONE, locale)
 }

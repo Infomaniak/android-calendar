@@ -25,6 +25,7 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toKotlinLocalDate
 import kotlinx.parcelize.Parcelize
+import java.time.DayOfWeek
 import java.time.format.TextStyle
 import java.time.temporal.WeekFields
 import java.util.Locale
@@ -68,6 +69,7 @@ data class YearWeek(val firstDay: LocalDate, val weekNumber: Int) : Parcelable, 
  * The Java [LocalDate] is needed to provide this [WeekFields] customization.
  */
 class WeekNumbering private constructor(internal val weekFields: WeekFields) {
+    val firstDayOfWeek: DayOfWeek by weekFields::firstDayOfWeek
 
     /** Returns the [YearWeek] that [date] belongs to under this numbering scheme. */
     fun weekOf(date: LocalDate): YearWeek {

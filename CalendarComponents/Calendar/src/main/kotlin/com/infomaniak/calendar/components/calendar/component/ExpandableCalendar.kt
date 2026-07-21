@@ -21,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
@@ -30,10 +31,16 @@ fun ExpandableCalendar(
     selectedDate: () -> LocalDate,
     onDayClick: (LocalDate) -> Unit,
     isExpanded: () -> Boolean,
+    weekNumbering: WeekNumbering,
     modifier: Modifier = Modifier,
 ) {
     if (isExpanded()) {
-        ExpandedCalendar(selectedDate = selectedDate(), onDayClick = onDayClick, modifier = modifier)
+        ExpandedCalendar(
+            selectedDate = selectedDate,
+            onDayClick = onDayClick,
+            weekNumbering = weekNumbering,
+            modifier = modifier,
+        )
     }
 }
 
@@ -45,6 +52,7 @@ private fun UnexpandedCalendarPreview() {
             selectedDate = { Clock.today() },
             onDayClick = {},
             isExpanded = { false },
+            weekNumbering = WeekNumbering.ISO_8601,
         )
     }
 }
@@ -57,6 +65,7 @@ private fun ExpandedCalendarPreview() {
             selectedDate = { Clock.today() },
             onDayClick = {},
             isExpanded = { true },
+            weekNumbering = WeekNumbering.ISO_8601,
         )
     }
 }

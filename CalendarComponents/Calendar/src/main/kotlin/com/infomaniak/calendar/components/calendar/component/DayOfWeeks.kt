@@ -29,7 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.foundation.utils.timeFormatter.DayFormatter.toSimpleDayName
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.DayFormatter.toNarrowDayName
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.kizitonwose.calendar.core.daysOfWeek
@@ -49,7 +49,7 @@ internal fun DaysOfWeekTitle(firstDayOfWeek: DayOfWeek, modifier: Modifier = Mod
                     .padding(Margin.Micro),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(text = dayOfWeek.toSimpleDayName(locale))
+                Text(text = dayOfWeek.toNarrowDayName(locale))
             }
         }
     }

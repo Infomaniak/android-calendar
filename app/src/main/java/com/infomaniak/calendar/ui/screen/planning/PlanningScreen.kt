@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
+import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.planning.Planning
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
@@ -111,12 +112,13 @@ private fun PlanningScreen(
                 isLoadingEvents = isLoadingEvents,
                 hazeState = hazeState,
                 onToggleCalendar = { isCalendarExpanded = !isCalendarExpanded },
-                expandableCalendar = visibleDayState?.let { dayState ->
-                    {
+                calendar = {
+                    if (visibleDayState != null) {
                         ExpandableCalendar(
                             isExpanded = { isCalendarExpanded },
-                            selectedDate = { dayState.visibleDate },
-                            onDayClick = dayState::jumpTo,
+                            selectedDate = { visibleDayState.visibleDate },
+                            onDayClick = visibleDayState::jumpTo,
+                            weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
                         )
                     }
                 },

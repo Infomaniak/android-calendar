@@ -19,35 +19,44 @@ package com.infomaniak.calendar.components.calendar.component
 
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.DateState
+import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.core.common.utils.today
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.DayPosition
-import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
+import kotlinx.datetime.toKotlinDayOfWeek
 import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
 private const val RANGE_MONTHS = 100
 
 @Composable
-internal fun ExpandedCalendar(selectedDate: LocalDate, onDayClick: (LocalDate) -> Unit, modifier: Modifier = Modifier) {
-    val firstDayOfWeek = remember { firstDayOfWeekFromLocale() }
-    val startMonth = remember { selectedDate.yearMonth.minus(RANGE_MONTHS, DateTimeUnit.MONTH) }
-    val endMonth = remember { selectedDate.yearMonth.plus(RANGE_MONTHS, DateTimeUnit.MONTH) }
-    val today = remember { Clock.today() }
+internal fun ExpandedCalendar(
+    selectedDate: () -> LocalDate,
+    weekNumbering: WeekNumbering,
+    onDayClick: (LocalDate) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
+
+    val initialMonth = remember { selectedDate().yearMonth }
+    val todayState = rememberToday()
 
     val monthState = rememberCalendarState(
-        startMonth = startMonth,
-        endMonth = endMonth,
-        firstVisibleMonth = selectedDate.yearMonth,
+        startMonth = remember { initialMonth.minus(RANGE_MONTHS, DateTimeUnit.MONTH) },
+        endMonth = remember { initialMonth.plus(RANGE_MONTHS, DateTimeUnit.MONTH) },
+        firstVisibleMonth = initialMonth,
         firstDayOfWeek = firstDayOfWeek,
     )
 
@@ -55,13 +64,18 @@ internal fun ExpandedCalendar(selectedDate: LocalDate, onDayClick: (LocalDate) -
         state = monthState,
         monthHeader = { DaysOfWeekTitle(firstDayOfWeek) },
         dayContent = { day ->
+            val dateState by remember(day) {
+                derivedStateOf {
+                    when {
+                        day.date == selectedDate() -> DateState.Selected
+                        day.date == todayState.value -> DateState.Today
+                        day.position == DayPosition.MonthDate -> DateState.None
+                        else -> DateState.NotMonth
+                    }
+                }
+            }
             Day(
-                dateState = when {
-                    day.date == selectedDate -> DateState.Selected
-                    day.date == today -> DateState.Today
-                    day.position == DayPosition.MonthDate -> DateState.None
-                    else -> DateState.NotMonth
-                },
+                dateState = dateState,
                 onClick = { onDayClick(day.date) },
                 date = day.date,
             )
@@ -74,6 +88,6 @@ internal fun ExpandedCalendar(selectedDate: LocalDate, onDayClick: (LocalDate) -
 @Preview
 private fun ExpandedCalendarPreview() {
     Surface {
-        ExpandedCalendar(selectedDate = Clock.today(), onDayClick = {})
+        ExpandedCalendar(selectedDate = { Clock.today() }, onDayClick = {}, weekNumbering = WeekNumbering.ISO_8601)
     }
 }
