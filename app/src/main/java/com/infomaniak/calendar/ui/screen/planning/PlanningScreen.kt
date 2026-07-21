@@ -19,16 +19,16 @@ package com.infomaniak.calendar.ui.screen.planning
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -55,7 +55,7 @@ import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
-import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlin.time.Clock
 
@@ -79,33 +79,29 @@ private fun PlanningScreen(
     isLoadingEvents: () -> Boolean,
     modifier: Modifier = Modifier,
 ) {
-    var isCalendarExpanded by rememberSaveable { mutableStateOf(false) }
     val hazeState = rememberHazeState()
     val density = LocalDensity.current
-    val visibleDayState = LocalVisibleDayState.current
     var topBarHeight by remember { mutableStateOf(0.dp) }
-    val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
+    var isCalendarExpanded by rememberSaveable { mutableStateOf(false) }
+    val visibleDayState = LocalVisibleDayState.current
 
     Scaffold(
         modifier = modifier,
-        contentWindowInsets = WindowInsets(),
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-        ) {
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
+    ) { contentPadding ->
+        Box(modifier = Modifier.fillMaxSize()) {
             when (val planningUi = planningUiState()) {
                 is PlanningUiState.Success -> {
                     SuccessPlanning(
                         events = planningUi.eventsByWeekAndDay,
-                        contentPadding = PaddingValues(top = topBarHeight, bottom = bottomInset) + PaddingValues(Margin.Medium),
+                        contentPadding = contentPadding + PaddingValues(top = topBarHeight) + PaddingValues(Margin.Medium),
                         goToEventCreation = goToEventCreation,
-                        hazeState = hazeState,
+                        modifier = Modifier.hazeSource(hazeState),
                     )
                 }
                 is PlanningUiState.Loading -> {
-                    LoadingPlanning(modifier = Modifier.fillMaxSize())
+                    LoadingPlanning(modifier = Modifier.padding(contentPadding))
                 }
             }
 
@@ -136,7 +132,7 @@ private fun SuccessPlanning(
     events: () -> EventsByWeekAndDay,
     contentPadding: PaddingValues,
     goToEventCreation: () -> Unit,
-    hazeState: HazeState,
+    modifier: Modifier = Modifier,
 ) {
     val visibleDayState = LocalVisibleDayState.current ?: return
     val lazyListState = rememberLazyListState(events().indexOf(visibleDayState.visibleDate))
@@ -145,10 +141,9 @@ private fun SuccessPlanning(
     ReportVisibleDate(lazyListState, onVisibleDateChanged = visibleDayState::onVisibleDateChanged)
 
     Planning(
-        weekEvents = events,
         lazyListState = lazyListState,
-        hazeState = hazeState,
-        modifier = Modifier
+        weekEvents = events,
+        modifier = modifier
             .scrollableToolbar()
             .fillMaxSize(),
         contentPadding = contentPadding,

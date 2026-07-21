@@ -23,12 +23,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,15 +36,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.resources.R
+import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.modifier.sharedElement
 import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.calendar.components.resources.R as RComponents
 
 private const val FLOATING_TOOLBARBAR_KEY = "FloatingToolbar"
 
@@ -92,6 +94,9 @@ private fun CalendarHorizontalFloatingToolbar(
         if (floatingActionButton != null) {
             HorizontalFloatingToolbar(
                 expanded = isExpanded(),
+                shape = MaterialTheme.shapes.large,
+                expandedShadowElevation = 3.dp,
+                collapsedShadowElevation = 3.dp,
                 floatingActionButton = { floatingActionButton.invoke() },
                 content = {
                     ContentFloatingToolbar(onCurrentDayClicked, onNavigationButtonClicked, currentDestination)
@@ -100,6 +105,9 @@ private fun CalendarHorizontalFloatingToolbar(
         } else {
             HorizontalFloatingToolbar(
                 expanded = isExpanded(),
+                shape = MaterialTheme.shapes.large,
+                expandedShadowElevation = 3.dp,
+                collapsedShadowElevation = 3.dp,
                 content = {
                     ContentFloatingToolbar(onCurrentDayClicked, onNavigationButtonClicked, currentDestination)
                 },
@@ -118,8 +126,8 @@ private fun ContentFloatingToolbar(
     Row(modifier = modifier) {
         IconButton(onClick = onCurrentDayClicked) {
             Icon(
-                imageVector = Icons.Outlined.CalendarToday,
-                contentDescription = stringResource(R.string.contentDescriptionToday),
+                painter = painterResource(R.drawable.ic_calendar_number_one),
+                contentDescription = stringResource(RComponents.string.contentDescriptionToday),
             )
         }
         DropdownIconButton(
@@ -148,6 +156,7 @@ private fun DropdownIconButton(
             isExpanded = menuExpanded,
             onMenuExpanded = { menuExpanded = it },
             onNavigationButtonClicked = onNavigationButtonClicked,
+            currentDestination = currentDestination,
         )
     }
 }

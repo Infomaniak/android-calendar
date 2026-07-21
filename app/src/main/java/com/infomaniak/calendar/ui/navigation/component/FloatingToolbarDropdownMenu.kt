@@ -17,14 +17,12 @@
  */
 package com.infomaniak.calendar.ui.navigation.component
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.ViewAgenda
-import androidx.compose.material.icons.outlined.ViewDay
-import androidx.compose.material.icons.outlined.ViewWeek
 import androidx.compose.material3.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenuPopup
@@ -35,7 +33,7 @@ import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
@@ -49,6 +47,7 @@ fun FloatingToolbarDropdownMenu(
     isExpanded: Boolean,
     onMenuExpanded: (Boolean) -> Unit,
     onNavigationButtonClicked: (NavDestination.CalendarView) -> Unit,
+    currentDestination: () -> NavDestination.CalendarView?,
     modifier: Modifier = Modifier,
 ) {
     DropdownMenuPopup(
@@ -60,12 +59,19 @@ fun FloatingToolbarDropdownMenu(
         modifier = modifier.padding(bottom = Margin.Medium),
         properties = PopupProperties(clippingEnabled = false, focusable = true),
     ) {
-        DropdownMenuGroup(shapes = MenuDefaults.groupShape(index = 0, count = 1)) {
+        val lastIndex = DateSelectionItems.entries.lastIndex
+        val currentDestination = currentDestination()
+
+        DropdownMenuGroup(
+            shapes = MenuDefaults.groupShape(index = 0, count = 1),
+            contentPadding = MenuDefaults.DropdownMenuGroupContentPadding + PaddingValues(vertical = 2.dp),
+        ) {
             DateSelectionItems.entries.forEachIndexed { index, item ->
                 DropdownMenuItem(
-                    shape = MenuDefaults.itemShape(index, DateSelectionItems.entries.count()).shape,
+                    selected = item.destination == currentDestination,
+                    shapes = MenuDefaults.itemShape(index, DateSelectionItems.entries.count()),
                     text = { Text(stringResource(item.labelRessourceId)) },
-                    leadingIcon = { Icon(imageVector = item.icon, contentDescription = null) },
+                    leadingIcon = { Icon(painter = painterResource(item.icon), contentDescription = null) },
                     onClick = {
                         onMenuExpanded(false)
                         onNavigationButtonClicked(item.destination)
@@ -79,32 +85,32 @@ fun FloatingToolbarDropdownMenu(
 
 private enum class DateSelectionItems(
     @param:StringRes val labelRessourceId: Int,
-    val icon: ImageVector,
+    @DrawableRes val icon: Int,
     val destination: NavDestination.CalendarView,
 ) {
+    Planning(
+        labelRessourceId = R.string.planningTitle,
+        icon = R.drawable.ic_rows_two,
+        destination = NavDestination.CalendarView.Planning,
+    ),
     Day(
         labelRessourceId = R.string.dayTitle,
-        icon = Icons.Outlined.ViewDay,
+        icon = R.drawable.ic_overline_rectangle_underline,
         destination = NavDestination.CalendarView.Day,
     ),
     ThreeDays(
         labelRessourceId = R.string.threeDaysTitle,
-        icon = Icons.Outlined.ViewDay,
+        icon = R.drawable.ic_columns_three,
         destination = NavDestination.CalendarView.ThreeDays,
     ),
     Week(
         labelRessourceId = R.string.weekTitle,
-        icon = Icons.Outlined.ViewWeek,
+        icon = R.drawable.ic_columns_four,
         destination = NavDestination.CalendarView.Week,
     ),
     Month(
         labelRessourceId = R.string.monthTitle,
-        icon = Icons.Outlined.CalendarMonth,
+        icon = R.drawable.ic_grid_three_two,
         destination = NavDestination.CalendarView.Month,
     ),
-    Planning(
-        labelRessourceId = R.string.planningTitle,
-        icon = Icons.Outlined.ViewAgenda,
-        destination = NavDestination.CalendarView.Planning,
-    )
 }
