@@ -35,9 +35,9 @@ import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.WeekDay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toKotlinDayOfWeek
@@ -65,8 +65,10 @@ internal fun CollapsedCalendar(
         firstDayOfWeek = firstDayOfWeek,
     )
 
-    LaunchedEffect(Unit) {
-        snapshotFlow { selectedDate().firstDayOfWeek(firstDayOfWeek) }.collectLatest { weekState.animateScrollToWeek(it) }
+    LaunchedEffect(selectedDate) {
+        snapshotFlow { selectedDate().startOfWeek(firstDayOfWeek) }.distinctUntilChanged().collectLatest {
+            weekState.animateScrollToWeek(it)
+        }
     }
 
     WeekCalendar(
@@ -77,11 +79,6 @@ internal fun CollapsedCalendar(
         },
         modifier = modifier,
     )
-}
-
-private fun LocalDate.firstDayOfWeek(firstDayOfWeek: DayOfWeek): LocalDate {
-    val daysSinceWeekStart = (dayOfWeek.isoDayNumber - firstDayOfWeek.isoDayNumber + 7) % 7
-    return minus(daysSinceWeekStart, DateTimeUnit.DAY)
 }
 
 @Composable
