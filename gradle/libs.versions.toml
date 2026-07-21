@@ -4,6 +4,7 @@ calendarCore = "0.3.0"
 designsystem = "0.1.0"
 haze = "2.0.0-alpha03"
 kizitonwoseCalendar = "2.10.1"
+metrox = "1.2.1"
 
 [libraries]
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
@@ -16,3 +17,4 @@ haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 haze-blur = { module = "dev.chrisbanes.haze:haze-blur", version.ref = "haze" }
 haze-materials = { module = "dev.chrisbanes.haze:haze-blur-materials", version.ref = "haze" }
 kizitonwose-calendar-compose = { module = "com.kizitonwose.calendar:compose-multiplatform", version.ref = "kizitonwoseCalendar" }
+metrox-viewmodel-compose = { group = "dev.zacsweers.metro", name = "metrox-viewmodel-compose", version.ref = "metrox" }

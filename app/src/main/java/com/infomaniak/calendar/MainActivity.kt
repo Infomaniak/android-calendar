@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
     private val mainViewModel: MainViewModel by viewModels()
 
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
-        get() = appGraph.viewModelFactory
+        get() = appGraph.metroViewModelFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

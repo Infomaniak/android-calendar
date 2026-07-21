@@ -20,7 +20,6 @@ package com.infomaniak.calendar.di
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.BuildConfig
 import com.infomaniak.calendar.MainApplication
 import com.infomaniak.calendar.crash.AndroidCrashReport
@@ -34,10 +33,9 @@ import com.infomaniak.multiplatform_calendar.core.crashreporting.CrashReport
 import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.DependencyGraph
-import dev.zacsweers.metro.Provider
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
-import kotlin.reflect.KClass
+import dev.zacsweers.metrox.viewmodel.ViewModelGraph
 
 val ComposeAppGraph: AppGraph
     @Composable get() {
@@ -53,16 +51,11 @@ val ComposeAppGraph: AppGraph
  * `@ContributesTo(AppScope)` and exposes `accountManager` / `calendarManager`.
  *
  * ViewModels are auto-discovered via multibinding: any class annotated with
- * `@Inject @ContributesIntoMap(AppScope::class) @ViewModelKey(…)` is automatically
- * registered in [viewModelProviders] and resolved by [MetroViewModelFactory].
+ * `@Inject @ContributesIntoMap(AppScope::class) @ViewModelKey` is automatically registered and
+ * resolved by [dev.zacsweers.metrox.viewmodel.MetroViewModelFactory] (provided by [ViewModelGraph]).
  */
 @DependencyGraph(AppScope::class)
-interface AppGraph : AndroidComponentProvider {
-    val viewModelFactory: MetroViewModelFactory
-
-    /** [viewModelProviders] and [viewModelAssistedFactories] are only used by [MetroViewModelFactory] to create ViewModels */
-    val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>>
-    val viewModelAssistedFactories: Map<KClass<out ViewModel>, ViewModelAssistedFactory>
+interface AppGraph : AndroidComponentProvider, ViewModelGraph {
 
     val infomaniakLogin: InfomaniakLogin
 
