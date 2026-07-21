@@ -89,13 +89,15 @@ private fun PlanningScreen(
     Scaffold(
         modifier = modifier,
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
-    ) { contentPadding ->
+    ) { scaffoldContentPadding ->
+        val contentPadding = scaffoldContentPadding + PaddingValues(top = topBarHeight)
+
         Box(modifier = Modifier.fillMaxSize()) {
             when (val planningUi = planningUiState()) {
                 is PlanningUiState.Success -> {
                     SuccessPlanning(
                         events = planningUi.eventsByWeekAndDay,
-                        contentPadding = contentPadding + PaddingValues(top = topBarHeight) + PaddingValues(Margin.Medium),
+                        contentPadding = contentPadding + PaddingValues(Margin.Medium),
                         goToEventCreation = goToEventCreation,
                         modifier = Modifier.hazeSource(hazeState),
                     )
