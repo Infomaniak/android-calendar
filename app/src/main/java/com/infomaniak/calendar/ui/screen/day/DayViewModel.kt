@@ -18,11 +18,11 @@
 package com.infomaniak.calendar.ui.screen.day
 
 import androidx.lifecycle.ViewModel
-import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.manager.SyncEventsManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
+import dev.zacsweers.metrox.viewmodel.ViewModelKey
 
 @Inject
 @ContributesIntoMap(AppScope::class)
