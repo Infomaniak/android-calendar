@@ -33,12 +33,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
+import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.utils.today
+import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlin.time.Clock
 
@@ -68,18 +70,19 @@ private fun DayScreen(isLoadingEvents: () -> Boolean, modifier: Modifier = Modif
                 hazeState = hazeState,
                 onToggleCalendar = { isCalendarExpanded = !isCalendarExpanded },
                 isCalendarExpanded = { isCalendarExpanded },
-                expandableCalendar = visibleDayState?.let { dayState ->
-                    {
+                calendar = {
+                    if (visibleDayState != null) {
                         ExpandableCalendar(
                             isExpanded = { isCalendarExpanded },
-                            selectedDate = { dayState.visibleDate },
-                            onDayClick = dayState::jumpTo,
+                            selectedDate = { visibleDayState.visibleDate },
+                            onDayClick = visibleDayState::jumpTo,
+                            weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
                         )
                     }
                 },
             )
         },
-        modifier = modifier,
+        modifier = modifier.hazeSource(hazeState),
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             Text("DayScreenContent")
