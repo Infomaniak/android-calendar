@@ -51,7 +51,7 @@ import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
-import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlin.time.Clock
 
@@ -90,7 +90,7 @@ private fun PlanningScreen(
                         events = planningUi.eventsByWeekAndDay,
                         contentPadding = contentPadding + PaddingValues(top = topBarHeight) + PaddingValues(Margin.Medium),
                         goToEventCreation = goToEventCreation,
-                        hazeState = hazeState,
+                        modifier = Modifier.hazeSource(hazeState),
                     )
                 }
                 is PlanningUiState.Loading -> {
@@ -115,7 +115,7 @@ private fun SuccessPlanning(
     events: () -> EventsByWeekAndDay,
     contentPadding: PaddingValues,
     goToEventCreation: () -> Unit,
-    hazeState: HazeState,
+    modifier: Modifier = Modifier,
 ) {
     val visibleDayState = LocalVisibleDayState.current ?: return
     val lazyListState = rememberLazyListState(events().indexOf(visibleDayState.visibleDate))
@@ -126,8 +126,7 @@ private fun SuccessPlanning(
     Planning(
         lazyListState = lazyListState,
         weekEvents = events,
-        hazeState = hazeState,
-        modifier = Modifier
+        modifier = modifier
             .scrollableToolbar()
             .fillMaxSize(),
         contentPadding = contentPadding,

@@ -60,16 +60,13 @@ fun Planning(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(),
-    hazeState: HazeState = rememberHazeState(),
 ) {
     Timeline(
         lazyListState = lazyListState,
         weekEvents = weekEvents,
         goToEventCreation = goToEventCreation,
         contentPadding = contentPadding,
-        modifier = modifier
-            .fillMaxSize()
-            .hazeSource(hazeState),
+        modifier = modifier,
     )
 }
 
