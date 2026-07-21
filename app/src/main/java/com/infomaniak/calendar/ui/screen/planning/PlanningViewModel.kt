@@ -19,6 +19,7 @@ package com.infomaniak.calendar.ui.screen.planning
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.utils.account.AccountUtils
@@ -32,6 +33,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
@@ -60,14 +62,22 @@ class PlanningViewModel(
 
     private val emailsByUserId = accountUtils.emailsByUserId.shareIn(viewModelScope, SharingStarted.Eagerly, 1)
 
+    private val daySlices = calendarManager.observeDaySlices(startDate, endDate, timeZone)
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    val planningUiState: StateFlow<PlanningUiState> = calendarManager
-        .observeDaySlices(startDate, endDate, timeZone)
+    val planningUiState: StateFlow<PlanningUiState> = daySlices
         .mapLatest {
             val events = it.groupByWeekAndDay(emailsByUserId.first())
             PlanningUiState.Success({ events })
         }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = PlanningUiState.Loading)
+
+    val nextEvents: StateFlow<List<EventUi.Normal>> = daySlices
+        // TODO[midnight]: Combine with a flow to update computation when day changes
+        .map { it.findNextEvents(emailsByUserId.first(), Clock.System.now(), timeZone) }
+        // TODO[nextCard]: Update the design of the UI to support displaying multiple cards with different heights
+        .map { it.firstOrNull()?.let { event -> listOf(event) } ?: emptyList() }
+        .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyList())
 
     companion object {
         private const val PLANNING_RANGE_DAYS = 250

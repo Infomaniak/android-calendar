@@ -34,12 +34,16 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySli
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import java.util.SortedMap
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventStatus as KmpEventStatus
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationStatus as KmpParticipationStatus
 
@@ -88,12 +92,13 @@ private fun SortedMap<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>.ensu
     timeZone: TimeZone,
     weekNumbering: WeekNumbering,
 ) {
-    val todayEvents = getOrPut(weekNumbering.weekOf(Clock.today(timeZone))) { sortedMapOf() }.getOrPut(Clock.today()) { mutableListOf() }
+    val todayEvents = getOrPut(weekNumbering.weekOf(Clock.today(timeZone))) { sortedMapOf() }
+        .getOrPut(Clock.today()) { mutableListOf() }
 
     if (todayEvents.isEmpty()) todayEvents.add(EventUi.TodayEmptyState)
 }
 
-private fun EventDaySlice.toEventUi(emailsByUserId: Map<AccountId, String>, timeZone: TimeZone): EventUi = EventUi.Normal(
+private fun EventDaySlice.toEventUi(emailsByUserId: Map<AccountId, String>, timeZone: TimeZone): EventUi.Normal = EventUi.Normal(
     id = "${event.id.url}@$date",
     title = event.title,
     location = event.location,
@@ -160,4 +165,30 @@ fun EventsByWeekAndDay.indexOf(date: LocalDate): Int {
     }
 
     return index
+}
+
+/**
+ * The soonest upcoming timed event(s): the single next event, or several when they share the earliest
+ * start time. Only today and tomorrow are inspected, since the next-event card never looks further
+ * ahead. Temporary stand-in for logic that will move to KMP.
+ */
+fun Map<LocalDate, List<EventDaySlice>>.findNextEvents(
+    emailsByUserId: Map<AccountId, String>,
+    now: Instant,
+    timeZone: TimeZone = TimeZone.currentSystemDefault(),
+): List<EventUi.Normal> {
+    val today = now.toLocalDateTime(timeZone).date
+    val tomorrow = today.plus(1, DateTimeUnit.DAY)
+
+    // Slices are already sorted within a day (all-day first, then by start time) and today precedes tomorrow, so the
+    // concatenation is ordered by start time: the first upcoming timed slice is the soonest, and we stop once it changes.
+    val upcomingSlices = (get(today).orEmpty().asSequence() + get(tomorrow).orEmpty())
+        .filter { it.isAllDay.not() && it.displayStart.toInstant(timeZone) >= now }
+
+    val nextSlices = mutableListOf<EventDaySlice>()
+    for (slice in upcomingSlices) {
+        if (nextSlices.isEmpty() || slice.displayStart == nextSlices.first().displayStart) nextSlices.add(slice) else break
+    }
+
+    return nextSlices.map { it.toEventUi(emailsByUserId, timeZone) }
 }

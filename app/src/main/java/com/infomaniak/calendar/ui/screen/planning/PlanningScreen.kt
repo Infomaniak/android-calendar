@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
@@ -37,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.planning.Planning
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
@@ -51,11 +53,13 @@ import kotlin.time.Clock
 @Composable
 fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier, viewModel: PlanningViewModel = viewModel()) {
     val planningUiState: PlanningUiState by viewModel.planningUiState.collectAsStateWithLifecycle()
+    val nextEvents: List<EventUi.Normal> by viewModel.nextEvents.collectAsStateWithLifecycle()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
 
     PlanningScreen(
         goToEventCreation = goToEventCreation,
         planningUiState = { planningUiState },
+        nextEvents = { nextEvents },
         isLoadingEvents = { isLoadingEvents },
         modifier = modifier,
     )
@@ -65,6 +69,7 @@ fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier,
 private fun PlanningScreen(
     goToEventCreation: () -> Unit,
     planningUiState: () -> PlanningUiState,
+    nextEvents: () -> List<EventUi.Normal>,
     isLoadingEvents: () -> Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -74,7 +79,7 @@ private fun PlanningScreen(
     ) { paddingValues ->
         when (val planningUi = planningUiState()) {
             is PlanningUiState.Success -> {
-                SuccessPlanning(planningUi.eventsByWeekAndDay, paddingValues, goToEventCreation)
+                SuccessPlanning(planningUi.eventsByWeekAndDay, nextEvents, paddingValues, goToEventCreation)
             }
             is PlanningUiState.Loading -> {
                 LoadingPlanning(modifier = Modifier.padding(paddingValues))
@@ -86,6 +91,7 @@ private fun PlanningScreen(
 @Composable
 private fun SuccessPlanning(
     events: () -> EventsByWeekAndDay,
+    nextEvents: () -> List<EventUi.Normal>,
     contentPadding: PaddingValues,
     goToEventCreation: () -> Unit,
 ) {
@@ -99,12 +105,12 @@ private fun SuccessPlanning(
         Planning(
             lazyListState = lazyListState,
             weekEvents = events,
+            nextEvents = nextEvents,
             modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = Margin.Medium)
                 .scrollableToolbar()
                 .fillMaxWidth(),
-            contentPadding = contentPadding,
+            contentPadding = contentPadding + PaddingValues(Margin.Medium),
             goToEventCreation = goToEventCreation,
         )
     }
@@ -126,9 +132,14 @@ private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class)
         CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(visibleDate)) {
             PlanningScreen(
                 planningUiState = { PlanningUiState.Success({ weekEvents }) },
+                nextEvents = { weekEvents.nextEventsPreview() },
                 goToEventCreation = {},
                 isLoadingEvents = { false },
             )
         }
     }
+}
+
+private fun EventsByWeekAndDay.nextEventsPreview(): List<EventUi.Normal> {
+    return values.flatMap { it.values.flatten() }.filterIsInstance<EventUi.Normal>()
 }

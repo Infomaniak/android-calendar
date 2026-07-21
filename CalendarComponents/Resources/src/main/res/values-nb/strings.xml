@@ -17,11 +17,16 @@
   -->
 <resources>
     <string name="addEventLabel">Legg til</string>
-    <string name="contentDescriptionCreateEvent">Opprett en hendelse</string>
     <string name="allDayLabel">Hele dagen</string>
+    <string name="buttonJoin">Bli med</string>
+    <string name="contentDescriptionCreateEvent">Opprett en hendelse</string>
     <string name="contentDescriptionHasAttendees">Har deltakere</string>
     <string name="contentDescriptionHasKMeetLink">Har en kMeet-lenke</string>
     <string name="contentDescriptionHasLocation">Har en beliggenhet</string>
+    <plurals name="moreParticipantsLabel">
+        <item quantity="one">+%d deltaker</item>
+        <item quantity="other">+%d deltakere</item>
+    </plurals>
     <string name="planningNothingPlannedToday">Ingenting planlagt.</string>
     <string name="weekHeaderDateRange">%d.–%d. %s %d</string>
     <string name="weekHeaderWeekNumber">U%d</string>

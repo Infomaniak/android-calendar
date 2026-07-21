@@ -17,11 +17,16 @@
   -->
 <resources>
     <string name="addEventLabel">Lisää</string>
-    <string name="contentDescriptionCreateEvent">Luo tapahtuma</string>
     <string name="allDayLabel">Koko päivän</string>
+    <string name="buttonJoin">Liity mukaan</string>
+    <string name="contentDescriptionCreateEvent">Luo tapahtuma</string>
     <string name="contentDescriptionHasAttendees">Onko osallistujia</string>
     <string name="contentDescriptionHasKMeetLink">Sisältää kMeet-linkin</string>
     <string name="contentDescriptionHasLocation">On sijainti</string>
+    <plurals name="moreParticipantsLabel">
+        <item quantity="one">+%d osallistujaa</item>
+        <item quantity="other">+%d osallistujaa</item>
+    </plurals>
     <string name="planningNothingPlannedToday">Ei suunnitelmia.</string>
     <string name="weekHeaderDateRange">%d.–%d. %s %d</string>
     <string name="weekHeaderWeekNumber">V%d</string>

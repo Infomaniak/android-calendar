@@ -105,15 +105,18 @@ String resources follow the single-module pattern — all strings consumed by an
 | `:CalendarComponents:Foundation`  | `com.infomaniak.calendar.components.foundation`  | Shared models (`EventUi`, `YearWeek`, `WeekNumbering`) and base Compose components (`DayCircle`, `DateState`) used by all other CalendarComponents modules. |
 | `:CalendarComponents:Resources`   | `com.infomaniak.calendar.components.resources`   | String-only module: `res/values/strings.xml` (+ translations). No Kotlin code, no Compose. Centralises all CalendarComponents string resources. |
 | `:CalendarComponents:Event`       | `com.infomaniak.calendar.components.event`       | `EventItem` Composable — renders a single event row. Re-exports Foundation via `api`. **Placeholder UI** — visual design is not final. |
+| `:CalendarComponents:EventCard`   | `com.infomaniak.calendar.components.eventcard`   | `EventCard` Composable — renders a seekable next-event card with collapsed and expanded states for Planning. |
 | `:CalendarComponents:Planning`    | `com.infomaniak.calendar.components.planning`    | `Planning` Composable — a `LazyColumn` with ISO week headers and per-day event lists. Also provides the `stickyWithinItem` `Modifier` extension. Re-exports Event, Foundation, and Resources via `api`. Week header design is a **placeholder**. |
 
 ### Dependency graph
 
 ```
-Planning ──api──► Event ──api──► Foundation
-    │                                 ▲
-    ├──api──────────────────────────► Foundation
-    └──api──► Resources
+Planning ──implementation──► Event ──api──► Foundation
+    │
+    ├──implementation──► EventCard ──implementation──► Foundation
+    │                             └──implementation──► Resources
+    ├──api───────────────────────────────────────────► Foundation
+    └──implementation────────────────────────────────► Resources
 ```
 
 `Foundation` is the only module with no CalendarComponents dependency. `Planning` is the top-level entry point for
