@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.BuildConfig
 import com.infomaniak.calendar.MainApplication
 import com.infomaniak.calendar.crash.AndroidCrashReport
+import com.infomaniak.calendar.di.metroAndroidExtensions.AndroidComponentProvider
 import com.infomaniak.calendar.secured.DavCredentialsManager
 import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.calendar.utils.account.AccountUtils
@@ -56,7 +57,7 @@ val ComposeAppGraph: AppGraph
  * registered in [viewModelProviders] and resolved by [MetroViewModelFactory].
  */
 @DependencyGraph(AppScope::class)
-interface AppGraph {
+interface AppGraph : AndroidComponentProvider {
     val viewModelFactory: MetroViewModelFactory
 
     /** [viewModelProviders] and [viewModelAssistedFactories] are only used by [MetroViewModelFactory] to create ViewModels */
