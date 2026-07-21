@@ -19,51 +19,64 @@ package com.infomaniak.calendar.ui.screen.day
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.R
-import com.infomaniak.calendar.di.ComposeAppGraph
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.ui.LocalUser
-import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
+import com.infomaniak.calendar.ui.state.LocalVisibleDayState
+import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.calendar.utils.account.AccountUtils
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
+import com.infomaniak.core.common.utils.today
+import dev.chrisbanes.haze.rememberHazeState
+import kotlin.time.Clock
 
 @Composable
 fun DayScreen(
     modifier: Modifier = Modifier,
-    accountUtils: AccountUtils = ComposeAppGraph.accountUtils,
+    dayViewModel: DayViewModel = viewModel(),
 ) {
-    val scope = rememberCoroutineScope()
+    val isLoadingEvents by dayViewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
 
     DayScreen(
         modifier = modifier,
-        onDisconnect = {
-            scope.launch {
-                accountUtils.removeUser(accountUtils.currentUserIdFlow.first() ?: return@launch)
-            }
-        },
+        isLoadingEvents = { isLoadingEvents },
     )
 }
 
 @Composable
-private fun DayScreen(
-    onDisconnect: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+private fun DayScreen(isLoadingEvents: () -> Boolean, modifier: Modifier = Modifier) {
+    val hazeState = rememberHazeState()
+    var isCalendarExpanded by rememberSaveable { mutableStateOf(false) }
+    val visibleDayState = LocalVisibleDayState.current
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.dayTitle)) },
-                navigationIcon = { TopAppBarButtons.DrawerIconButton() },
+            CalendarTopAppBar(
+                isLoadingEvents = isLoadingEvents,
+                hazeState = hazeState,
+                onToggleCalendar = { isCalendarExpanded = !isCalendarExpanded },
+                isCalendarExpanded = { isCalendarExpanded },
+                expandableCalendar = visibleDayState?.let { dayState ->
+                    {
+                        ExpandableCalendar(
+                            isExpanded = { isCalendarExpanded },
+                            selectedDate = { dayState.visibleDate },
+                            onDayClick = dayState::jumpTo,
+                        )
+                    }
+                },
             )
         },
         modifier = modifier,
@@ -71,7 +84,6 @@ private fun DayScreen(
         Column(modifier = Modifier.padding(paddingValues)) {
             Text("DayScreenContent")
             Text("Current user: ${LocalUser.current?.displayName}")
-            Button(onClick = onDisconnect) { Text("Disconnect") }
         }
     }
 }
@@ -80,6 +92,10 @@ private fun DayScreen(
 @Composable
 private fun DayScreenPreview() {
     CalendarThemeForPreview {
-        DayScreen(onDisconnect = {})
+        val visibleDate = remember { mutableStateOf(Clock.today()) }
+
+        CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(visibleDate)) {
+            DayScreen(isLoadingEvents = { true })
+        }
     }
 }
