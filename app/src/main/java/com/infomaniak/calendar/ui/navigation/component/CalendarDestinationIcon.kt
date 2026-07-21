@@ -17,18 +17,14 @@
  */
 package com.infomaniak.calendar.ui.navigation.component
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.ViewAgenda
-import androidx.compose.material.icons.outlined.ViewDay
-import androidx.compose.material.icons.outlined.ViewWeek
+import androidx.annotation.DrawableRes
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
@@ -45,22 +41,22 @@ fun CurrentDestinationIcon(
     val contentDescription = stringResource(R.string.contentDescriptionToolbarCurrentViewButton, labelText)
 
     IconButton(onClick = onMenuExpanded, modifier = modifier) {
-        Icon(imageVector = selectedIcon.icon, contentDescription = contentDescription)
+        Icon(painter = painterResource(selectedIcon.icon), contentDescription = contentDescription)
     }
 }
 
 private data class SelectedIconData(
-    val icon: ImageVector,
+    @DrawableRes val icon: Int,
     val contentDescription: Int,
 )
 
 private fun getSelectedIcon(lastMainNavigationSelected: NavDestination.CalendarView): SelectedIconData {
     return when (lastMainNavigationSelected) {
-        is NavDestination.CalendarView.Day -> SelectedIconData(Icons.Outlined.ViewDay, R.string.dayTitle)
-        is NavDestination.CalendarView.ThreeDays -> SelectedIconData(Icons.Outlined.ViewDay, R.string.threeDaysTitle)
-        is NavDestination.CalendarView.Week -> SelectedIconData(Icons.Outlined.ViewWeek, R.string.weekTitle)
-        is NavDestination.CalendarView.Month -> SelectedIconData(Icons.Outlined.CalendarMonth, R.string.monthTitle)
-        is NavDestination.CalendarView.Planning -> SelectedIconData(Icons.Outlined.ViewAgenda, R.string.planningTitle)
+        is NavDestination.CalendarView.Day -> SelectedIconData(R.drawable.ic_overline_rectangle_underline, R.string.dayTitle)
+        is NavDestination.CalendarView.ThreeDays -> SelectedIconData(R.drawable.ic_columns_three, R.string.threeDaysTitle)
+        is NavDestination.CalendarView.Week -> SelectedIconData(R.drawable.ic_columns_four, R.string.weekTitle)
+        is NavDestination.CalendarView.Month -> SelectedIconData(R.drawable.ic_grid_three_two, R.string.monthTitle)
+        is NavDestination.CalendarView.Planning -> SelectedIconData(R.drawable.ic_rows_two, R.string.planningTitle)
     }
 }
 
