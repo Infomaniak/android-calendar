@@ -40,10 +40,9 @@ import kotlinx.datetime.toKotlinDayOfWeek
 import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
-private const val RANGE_MONTHS = 100
-
 @Composable
 internal fun ExpandedCalendar(
+    monthRange: Int,
     selectedDate: () -> LocalDate,
     weekNumbering: WeekNumbering,
     onDayClick: (LocalDate) -> Unit,
@@ -54,8 +53,8 @@ internal fun ExpandedCalendar(
     val today by rememberToday()
 
     val initialMonth by remember { derivedStateOf { selectedDate().yearMonth } }
-    val startMonth by remember { derivedStateOf { selectedDate().yearMonth.minus(RANGE_MONTHS, DateTimeUnit.MONTH) } }
-    val endMonth by remember { derivedStateOf { selectedDate().yearMonth.plus(RANGE_MONTHS, DateTimeUnit.MONTH) } }
+    val startMonth by remember { derivedStateOf { selectedDate().yearMonth.minus(monthRange, DateTimeUnit.MONTH) } }
+    val endMonth by remember { derivedStateOf { selectedDate().yearMonth.plus(monthRange, DateTimeUnit.MONTH) } }
 
     val monthState = rememberCalendarState(
         startMonth = startMonth,
@@ -103,6 +102,11 @@ private fun DayContent(
 @Preview
 private fun ExpandedCalendarPreview() {
     Surface {
-        ExpandedCalendar(selectedDate = { Clock.today() }, onDayClick = {}, weekNumbering = WeekNumbering.ISO_8601)
+        ExpandedCalendar(
+            monthRange = 3,
+            selectedDate = { Clock.today() },
+            onDayClick = {},
+            weekNumbering = WeekNumbering.ISO_8601,
+        )
     }
 }
