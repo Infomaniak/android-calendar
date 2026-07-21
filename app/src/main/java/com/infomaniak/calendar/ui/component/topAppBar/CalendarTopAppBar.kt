@@ -38,8 +38,8 @@ import kotlinx.datetime.LocalDate
 @Composable
 fun CalendarTopAppBar(
     isLoadingEvents: () -> Boolean,
+    hazeState: HazeState,
     modifier: Modifier = Modifier,
-    hazeState: HazeState? = null,
 ) {
     val containerColor = TopAppBarDefaults.topAppBarColors().containerColor
     Column(modifier = modifier.backgroundBlur(containerColor, hazeState)) {
@@ -50,9 +50,7 @@ fun CalendarTopAppBar(
                 TopAppBarButtons.InboxButton(onClick = {})
                 TopAppBarButtons.SearchButton(onClick = {})
             },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = if (hazeState == null) containerColor else Color.Transparent,
-            ),
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
         )
         LoadingEventsIndicator(isLoading = isLoadingEvents)
     }
@@ -66,7 +64,7 @@ private fun CalendarTopAppBarPreview() {
         CompositionLocalProvider(
             LocalVisibleDayState provides VisibleDayState(_visibleDate = visibleDate),
         ) {
-            CalendarTopAppBar(isLoadingEvents = { true })
+            CalendarTopAppBar(isLoadingEvents = { true }, hazeState = HazeState())
         }
     }
 }
