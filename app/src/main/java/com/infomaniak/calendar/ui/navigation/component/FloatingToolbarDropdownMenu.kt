@@ -19,7 +19,9 @@ package com.infomaniak.calendar.ui.navigation.component
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
@@ -58,11 +60,15 @@ fun FloatingToolbarDropdownMenu(
         properties = PopupProperties(clippingEnabled = false, focusable = true),
     ) {
         val lastIndex = DateSelectionItems.entries.lastIndex
+        val currentDestination = currentDestination()
 
-        DropdownMenuGroup(shapes = MenuDefaults.groupShape(index = 0, count = 1)) {
+        DropdownMenuGroup(
+            shapes = MenuDefaults.groupShape(index = 0, count = 1),
+            contentPadding = MenuDefaults.DropdownMenuGroupContentPadding + PaddingValues(vertical = 2.dp),
+        ) {
             DateSelectionItems.entries.forEachIndexed { index, item ->
                 DropdownMenuItem(
-                    selected = item.destination == currentDestination(),
+                    selected = item.destination == currentDestination,
                     shapes = MenuDefaults.itemShape(index, DateSelectionItems.entries.count()),
                     text = { Text(stringResource(item.labelRessourceId)) },
                     leadingIcon = { Icon(painter = painterResource(item.icon), contentDescription = null) },
@@ -70,12 +76,7 @@ fun FloatingToolbarDropdownMenu(
                         onMenuExpanded(false)
                         onNavigationButtonClicked(item.destination)
                     },
-                    modifier = Modifier
-                        .widthIn(min = 180.dp)
-                        .padding(
-                            top = if (index == 0) 2.dp else 0.dp,
-                            bottom = if (index == lastIndex) 2.dp else 0.dp,
-                        ),
+                    modifier = Modifier.widthIn(min = 180.dp),
                 )
             }
         }
