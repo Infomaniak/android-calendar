@@ -101,7 +101,7 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
 
                 CalendarHorizontalFloatingToolbar(
                     onNavigationButtonClicked = { destination ->
-                        backStack.removeAll(backStack)
+                        backStack.clear()
                         backStack.add(destination)
                     },
                     onCurrentDayClicked = { visibleDayState?.jumpTo(Clock.today()) },
