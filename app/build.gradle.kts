@@ -139,6 +139,7 @@ sentry {
 dependencies {
     implementation(project(":CalendarComponents:Calendar"))
     implementation(project(":CalendarComponents:Planning"))
+    implementation(project(":CalendarComponents:Foundation"))
 
     if (useCalendarCoreCompositeBuild) {
         implementation(libs.infomaniak.multiplatform.calendar.core.submodule)

@@ -33,6 +33,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,19 +43,18 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
+import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.monthYearLabel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate
-import kotlin.time.Clock
 
 private const val DURATION_TWEEN = 150
 
 @Composable
 fun AnimatedMonthYearText(date: () -> LocalDate, modifier: Modifier = Modifier) {
     val locale = LocalConfiguration.current.locales[0]
-    val currentYear = rememberCurrentYear()
+    val currentYear by rememberCurrentYear()
 
     AnimatedContent(
         modifier = modifier,
@@ -73,8 +75,9 @@ fun AnimatedMonthYearText(date: () -> LocalDate, modifier: Modifier = Modifier) 
 }
 
 @Composable
-private fun rememberCurrentYear(): Int {
-    return remember { Clock.today().year }
+private fun rememberCurrentYear(): State<Int> {
+    val today by rememberToday()
+    return remember { derivedStateOf { today.year } }
 }
 
 private fun <T : Comparable<T>> AnimatedContentTransitionScope<T>.verticalRoll(): ContentTransform {
