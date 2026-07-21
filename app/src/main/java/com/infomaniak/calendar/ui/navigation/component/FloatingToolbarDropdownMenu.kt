@@ -19,7 +19,9 @@ package com.infomaniak.calendar.ui.navigation.component
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
@@ -45,6 +47,7 @@ fun FloatingToolbarDropdownMenu(
     isExpanded: Boolean,
     onMenuExpanded: (Boolean) -> Unit,
     onNavigationButtonClicked: (NavDestination.CalendarView) -> Unit,
+    currentDestination: () -> NavDestination.CalendarView?,
     modifier: Modifier = Modifier,
 ) {
     DropdownMenuPopup(
@@ -56,10 +59,17 @@ fun FloatingToolbarDropdownMenu(
         modifier = modifier.padding(bottom = Margin.Medium),
         properties = PopupProperties(clippingEnabled = false, focusable = true),
     ) {
-        DropdownMenuGroup(shapes = MenuDefaults.groupShape(index = 0, count = 1)) {
+        val lastIndex = DateSelectionItems.entries.lastIndex
+        val currentDestination = currentDestination()
+
+        DropdownMenuGroup(
+            shapes = MenuDefaults.groupShape(index = 0, count = 1),
+            contentPadding = MenuDefaults.DropdownMenuGroupContentPadding + PaddingValues(vertical = 2.dp),
+        ) {
             DateSelectionItems.entries.forEachIndexed { index, item ->
                 DropdownMenuItem(
-                    shape = MenuDefaults.itemShape(index, DateSelectionItems.entries.count()).shape,
+                    selected = item.destination == currentDestination,
+                    shapes = MenuDefaults.itemShape(index, DateSelectionItems.entries.count()),
                     text = { Text(stringResource(item.labelRessourceId)) },
                     leadingIcon = { Icon(painter = painterResource(item.icon), contentDescription = null) },
                     onClick = {
@@ -78,6 +88,11 @@ private enum class DateSelectionItems(
     @DrawableRes val icon: Int,
     val destination: NavDestination.CalendarView,
 ) {
+    Planning(
+        labelRessourceId = R.string.planningTitle,
+        icon = R.drawable.ic_rows_two,
+        destination = NavDestination.CalendarView.Planning,
+    ),
     Day(
         labelRessourceId = R.string.dayTitle,
         icon = R.drawable.ic_overline_rectangle_underline,
@@ -98,9 +113,4 @@ private enum class DateSelectionItems(
         icon = R.drawable.ic_grid_three_two,
         destination = NavDestination.CalendarView.Month,
     ),
-    Planning(
-        labelRessourceId = R.string.planningTitle,
-        icon = R.drawable.ic_rows_two,
-        destination = NavDestination.CalendarView.Planning,
-    )
 }
