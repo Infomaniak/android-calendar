@@ -20,20 +20,29 @@ package com.infomaniak.calendar.ui.component.topAppBar
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.ui.modifier.backgroundBlur
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import dev.chrisbanes.haze.HazeState
 import kotlinx.datetime.LocalDate
 
 @Composable
-fun CalendarTopAppBar(isLoadingEvents: () -> Boolean, modifier: Modifier = Modifier) {
-    Column(modifier = modifier) {
+fun CalendarTopAppBar(
+    isLoadingEvents: () -> Boolean,
+    hazeState: HazeState,
+    modifier: Modifier = Modifier,
+) {
+    val containerColor = TopAppBarDefaults.topAppBarColors().containerColor
+    Column(modifier = modifier.backgroundBlur(containerColor, hazeState)) {
         TopAppBar(
             title = { CurrentMonthTitle(onClick = {}, modifier = Modifier.fillMaxWidth()) },
             navigationIcon = { TopAppBarButtons.DrawerIconButton() },
@@ -41,6 +50,7 @@ fun CalendarTopAppBar(isLoadingEvents: () -> Boolean, modifier: Modifier = Modif
                 TopAppBarButtons.InboxButton(onClick = {})
                 TopAppBarButtons.SearchButton(onClick = {})
             },
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
         )
         LoadingEventsIndicator(isLoading = isLoadingEvents)
     }
@@ -54,7 +64,7 @@ private fun CalendarTopAppBarPreview() {
         CompositionLocalProvider(
             LocalVisibleDayState provides VisibleDayState(_visibleDate = visibleDate),
         ) {
-            CalendarTopAppBar(isLoadingEvents = { true })
+            CalendarTopAppBar(isLoadingEvents = { true }, hazeState = HazeState())
         }
     }
 }

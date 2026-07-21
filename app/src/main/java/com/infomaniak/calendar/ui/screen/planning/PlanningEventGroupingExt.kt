@@ -88,7 +88,8 @@ private fun SortedMap<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>.ensu
     timeZone: TimeZone,
     weekNumbering: WeekNumbering,
 ) {
-    val todayEvents = getOrPut(weekNumbering.weekOf(Clock.today(timeZone))) { sortedMapOf() }.getOrPut(Clock.today()) { mutableListOf() }
+    val todayEvents = getOrPut(weekNumbering.weekOf(Clock.today(timeZone))) { sortedMapOf() }
+        .getOrPut(Clock.today()) { mutableListOf() }
 
     if (todayEvents.isEmpty()) todayEvents.add(EventUi.TodayEmptyState)
 }

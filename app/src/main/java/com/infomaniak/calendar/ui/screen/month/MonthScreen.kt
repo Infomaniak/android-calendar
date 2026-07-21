@@ -32,6 +32,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.rememberHazeState
 
 @Composable
 fun MonthScreen(modifier: Modifier = Modifier, monthViewModel: MonthViewModel = viewModel()) {
@@ -41,12 +43,15 @@ fun MonthScreen(modifier: Modifier = Modifier, monthViewModel: MonthViewModel = 
 
 @Composable
 private fun MonthScreen(modifier: Modifier = Modifier, isLoadingEvents: () -> Boolean) {
+    val hazeState = rememberHazeState()
     Scaffold(
-        topBar = { CalendarTopAppBar(isLoadingEvents = isLoadingEvents) },
+        topBar = { CalendarTopAppBar(isLoadingEvents, hazeState) },
         modifier = modifier,
     ) { paddingValues ->
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .hazeSource(hazeState),
             contentPadding = paddingValues,
         ) {
             items(50) { index ->

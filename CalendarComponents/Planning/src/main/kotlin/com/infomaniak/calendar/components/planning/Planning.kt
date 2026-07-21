@@ -57,6 +57,23 @@ fun Planning(
     lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(),
 ) {
+    Timeline(
+        lazyListState = lazyListState,
+        weekEvents = weekEvents,
+        goToEventCreation = goToEventCreation,
+        contentPadding = contentPadding,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun Timeline(
+    lazyListState: LazyListState,
+    weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
+    goToEventCreation: () -> Unit,
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier,
+) {
     val today = Clock.today()
     val events = weekEvents()
     val sectionSizing = remember { SectionSizing() }
@@ -79,28 +96,53 @@ fun Planning(
                     val itemKey = event.toItemKey(date)
                     val bottomPadding = if (index == events.lastIndex) Margin.Medium else 0.dp
 
-                    Row(
+                    Event(
+                        event = event,
+                        date = date,
+                        today = today,
+                        lazyListState = lazyListState,
+                        sectionSizing = sectionSizing,
+                        itemKey = itemKey,
+                        sectionItemKeys = sectionItemKeys,
+                        goToEventCreation = goToEventCreation,
                         modifier = Modifier
                             .ensureSectionMinHeight(sectionSizing, sectionItemKeys, itemKey)
                             .padding(bottom = bottomPadding),
-                        horizontalArrangement = Arrangement.spacedBy(Margin.Small),
-                    ) {
-                        DayIndicator(
-                            dayName = date.toShortDayName(),
-                            dayNumber = date.day,
-                            state = if (date == today) DateState.Today else DateState.None,
-                            modifier = Modifier
-                                .measureIndicator(sectionSizing)
-                                .stickyDayIndicator(lazyListState, itemKey, sectionItemKeys),
-                        )
-
-                        when (event) {
-                            is EventUi.Normal -> EventItem(event, Modifier.fillMaxWidth())
-                            is EventUi.TodayEmptyState -> TodayEmptyState(onClick = goToEventCreation, Modifier.fillMaxWidth())
-                        }
-                    }
+                    )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun Event(
+    event: EventUi,
+    date: LocalDate,
+    today: LocalDate,
+    lazyListState: LazyListState,
+    sectionSizing: SectionSizing,
+    itemKey: PlanningItemKey,
+    sectionItemKeys: List<PlanningItemKey>,
+    goToEventCreation: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(Margin.Small),
+    ) {
+        DayIndicator(
+            dayName = date.toShortDayName(),
+            dayNumber = date.day,
+            state = if (date == today) DateState.Today else DateState.None,
+            modifier = Modifier
+                .measureIndicator(sectionSizing)
+                .stickyDayIndicator(lazyListState, itemKey, sectionItemKeys),
+        )
+
+        when (event) {
+            is EventUi.Normal -> EventItem(event, Modifier.fillMaxWidth())
+            is EventUi.TodayEmptyState -> TodayEmptyState(onClick = goToEventCreation, Modifier.fillMaxWidth())
         }
     }
 }
