@@ -100,12 +100,15 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
                 val visibleDayState = LocalVisibleDayState.current
 
                 CalendarHorizontalFloatingToolbar(
-                    onNavigationButtonClicked = { backStack.addOrMoveToTop(it) },
+                    onNavigationButtonClicked = { destination ->
+                        backStack.removeAll(backStack)
+                        backStack.add(destination)
+                    },
                     onCurrentDayClicked = { visibleDayState?.jumpTo(Clock.today()) },
                     currentDestination = { backStack.getLastCalendarView() },
                     floatingActionButton = {
                         CalendarFab(
-                            onClick = { backStack.addOrMoveToTop(NavDestination.EventCreation) },
+                            onClick = { backStack.add(NavDestination.EventCreation) },
                             modifier = Modifier.fillMaxSize(),
                         )
                     },
@@ -118,7 +121,7 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
             CalendarDrawer(
                 content = content,
                 onAddAccount = {
-                    backStack.addOrMoveToTop(NavDestination.Onboarding(onlyLogin = true))
+                    backStack.add(NavDestination.Onboarding(onlyLogin = true))
                 },
             )
         },
@@ -129,9 +132,4 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
 
 private fun NavBackStack<NavKey>.getLastCalendarView(): NavDestination.CalendarView? {
     return this.filterIsInstance<NavDestination.CalendarView>().lastOrNull()
-}
-
-private fun NavBackStack<NavKey>.addOrMoveToTop(destination: NavKey) {
-    this.removeAll { it == destination }
-    this.add(destination)
 }
