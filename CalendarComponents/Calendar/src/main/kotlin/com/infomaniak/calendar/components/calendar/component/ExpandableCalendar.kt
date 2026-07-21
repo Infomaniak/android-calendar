@@ -42,7 +42,7 @@ fun ExpandableCalendar(
             modifier = modifier,
         )
     } else {
-        UnexpandedCalendar(selectedDate = selectedDate(), onDayClick = onDayClick, modifier = modifier)
+        CollapsedCalendar(selectedDate = selectedDate(), onDayClick = onDayClick, modifier = modifier)
     }
 }
 

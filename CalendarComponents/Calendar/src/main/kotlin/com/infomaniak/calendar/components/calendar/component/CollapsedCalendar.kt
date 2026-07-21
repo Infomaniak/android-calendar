@@ -38,7 +38,7 @@ import kotlin.time.Clock
 private const val RANGE_MONTHS = 100
 
 @Composable
-internal fun UnexpandedCalendar(selectedDate: LocalDate, onDayClick: (LocalDate) -> Unit, modifier: Modifier = Modifier) {
+internal fun CollapsedCalendar(selectedDate: LocalDate, onDayClick: (LocalDate) -> Unit, modifier: Modifier = Modifier) {
     val firstDayOfWeek = remember { firstDayOfWeekFromLocale() }
     val startDate = remember { selectedDate.minus(RANGE_MONTHS, DateTimeUnit.MONTH) }
     val endDate = remember { selectedDate.plus(RANGE_MONTHS, DateTimeUnit.MONTH) }
@@ -72,10 +72,10 @@ internal fun UnexpandedCalendar(selectedDate: LocalDate, onDayClick: (LocalDate)
 
 @Composable
 @Preview
-private fun UnexpandedCalendarPreview() {
+private fun CollapsedCalendarPreview() {
     val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
 
     Surface {
-        UnexpandedCalendar(selectedDate = today, onDayClick = {})
+        CollapsedCalendar(selectedDate = today, onDayClick = {})
     }
 }
