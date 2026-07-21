@@ -20,7 +20,6 @@ package com.infomaniak.calendar.components.planning
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -47,9 +46,6 @@ import com.infomaniak.calendar.components.planning.preview.WeekEventsPreviewPara
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.hazeSource
-import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
 
@@ -100,28 +96,53 @@ private fun Timeline(
                     val itemKey = event.toItemKey(date)
                     val bottomPadding = if (index == events.lastIndex) Margin.Medium else 0.dp
 
-                    Row(
+                    Event(
+                        event = event,
+                        date = date,
+                        today = today,
+                        lazyListState = lazyListState,
+                        sectionSizing = sectionSizing,
+                        itemKey = itemKey,
+                        sectionItemKeys = sectionItemKeys,
+                        goToEventCreation = goToEventCreation,
                         modifier = Modifier
                             .ensureSectionMinHeight(sectionSizing, sectionItemKeys, itemKey)
                             .padding(bottom = bottomPadding),
-                        horizontalArrangement = Arrangement.spacedBy(Margin.Small),
-                    ) {
-                        DayIndicator(
-                            dayName = date.toShortDayName(),
-                            dayNumber = date.day,
-                            state = if (date == today) DateState.Today else DateState.None,
-                            modifier = Modifier
-                                .measureIndicator(sectionSizing)
-                                .stickyDayIndicator(lazyListState, itemKey, sectionItemKeys),
-                        )
-
-                        when (event) {
-                            is EventUi.Normal -> EventItem(event, Modifier.fillMaxWidth())
-                            is EventUi.TodayEmptyState -> TodayEmptyState(onClick = goToEventCreation, Modifier.fillMaxWidth())
-                        }
-                    }
+                    )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun Event(
+    event: EventUi,
+    date: LocalDate,
+    today: LocalDate,
+    lazyListState: LazyListState,
+    sectionSizing: SectionSizing,
+    itemKey: PlanningItemKey,
+    sectionItemKeys: List<PlanningItemKey>,
+    goToEventCreation: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(Margin.Small),
+    ) {
+        DayIndicator(
+            dayName = date.toShortDayName(),
+            dayNumber = date.day,
+            state = if (date == today) DateState.Today else DateState.None,
+            modifier = Modifier
+                .measureIndicator(sectionSizing)
+                .stickyDayIndicator(lazyListState, itemKey, sectionItemKeys),
+        )
+
+        when (event) {
+            is EventUi.Normal -> EventItem(event, Modifier.fillMaxWidth())
+            is EventUi.TodayEmptyState -> TodayEmptyState(onClick = goToEventCreation, Modifier.fillMaxWidth())
         }
     }
 }
