@@ -19,16 +19,28 @@ package com.infomaniak.calendar.crossAppLogin
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.infomaniak.calendar.MainApplication
+import com.infomaniak.calendar.di.metroAndroidExtensions.worker.MetroWorker
+import com.infomaniak.calendar.di.metroAndroidExtensions.worker.WorkerInstanceFactory
+import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.crossapplogin.back.internal.deviceinfo.AbstractDeviceInfoUpdateWorker
-import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.binding
 import okhttp3.OkHttpClient
 
-@Inject
+@AssistedInject
 class DeviceInfoUpdateWorker(
     appContext: Context,
-    params: WorkerParameters,
+    @Assisted params: WorkerParameters,
+    private val accountUtils: AccountUtils,
 ) : AbstractDeviceInfoUpdateWorker(appContext, params) {
-    private val appGraph by lazy { (appContext as MainApplication).appGraph }
-    override suspend fun getConnectedHttpClient(userId: Int): OkHttpClient = appGraph.accountUtils.getHttpClient(userId)
+    override suspend fun getConnectedHttpClient(userId: Int): OkHttpClient = accountUtils.getHttpClient(userId)
+
+    @MetroWorker(DeviceInfoUpdateWorker::class)
+    @ContributesIntoMap(scope = AppScope::class, binding = binding<WorkerInstanceFactory<*>>())
+    @AssistedFactory
+    abstract class Factory : WorkerInstanceFactory<DeviceInfoUpdateWorker>
 }
