@@ -34,8 +34,8 @@ object HourFormatter {
 
     //region Kotlin
     @Composable
-    fun Instant.formatHours(timeZone: ZoneId = ZoneId.systemDefault()): String = toJavaInstant()
-        .atZone(timeZone)
+    fun Instant.formatHours(): String = toJavaInstant()
+        .atZone(ZoneId.systemDefault())
         .format(getHourMinuteFormatter())
     //endregion
 

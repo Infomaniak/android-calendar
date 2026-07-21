@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
-import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.planning.Planning
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
@@ -63,13 +62,11 @@ import kotlin.time.Clock
 @Composable
 fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier, viewModel: PlanningViewModel = viewModel()) {
     val planningUiState: PlanningUiState by viewModel.planningUiState.collectAsStateWithLifecycle()
-    val nextEvents: List<EventUi.Normal> by viewModel.nextEvents.collectAsStateWithLifecycle()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
 
     PlanningScreen(
         goToEventCreation = goToEventCreation,
         planningUiState = { planningUiState },
-        nextEvents = { nextEvents },
         isLoadingEvents = { isLoadingEvents },
         modifier = modifier,
     )
@@ -79,7 +76,6 @@ fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier,
 private fun PlanningScreen(
     goToEventCreation: () -> Unit,
     planningUiState: () -> PlanningUiState,
-    nextEvents: () -> List<EventUi.Normal>,
     isLoadingEvents: () -> Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -103,7 +99,6 @@ private fun PlanningScreen(
                 is PlanningUiState.Success -> {
                     SuccessPlanning(
                         events = planningUi.eventsByWeekAndDay,
-                        nextEvents = nextEvents,
                         contentPadding = PaddingValues(top = topBarHeight, bottom = bottomInset) + PaddingValues(Margin.Medium),
                         goToEventCreation = goToEventCreation,
                         hazeState = hazeState,
@@ -139,7 +134,6 @@ private fun PlanningScreen(
 @Composable
 private fun SuccessPlanning(
     events: () -> EventsByWeekAndDay,
-    nextEvents: () -> List<EventUi.Normal>,
     contentPadding: PaddingValues,
     goToEventCreation: () -> Unit,
     hazeState: HazeState,
@@ -151,9 +145,8 @@ private fun SuccessPlanning(
     ReportVisibleDate(lazyListState, onVisibleDateChanged = visibleDayState::onVisibleDateChanged)
 
     Planning(
-        lazyListState = lazyListState,
         weekEvents = events,
-        nextEvents = nextEvents,
+        lazyListState = lazyListState,
         hazeState = hazeState,
         modifier = Modifier
             .scrollableToolbar()
@@ -179,14 +172,9 @@ private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class)
         CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(visibleDate)) {
             PlanningScreen(
                 planningUiState = { PlanningUiState.Success({ weekEvents }) },
-                nextEvents = { weekEvents.nextEventsPreview() },
                 goToEventCreation = {},
                 isLoadingEvents = { false },
             )
         }
     }
-}
-
-private fun EventsByWeekAndDay.nextEventsPreview(): List<EventUi.Normal> {
-    return values.flatMap { it.values.flatten() }.filterIsInstance<EventUi.Normal>()
 }
