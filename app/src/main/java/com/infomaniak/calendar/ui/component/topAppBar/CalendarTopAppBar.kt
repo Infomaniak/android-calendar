@@ -41,7 +41,7 @@ fun CalendarTopAppBar(
     isLoadingEvents: () -> Boolean,
     hazeState: HazeState,
     modifier: Modifier = Modifier,
-    calendar: (@Composable () -> Unit) = {},
+    calendar: @Composable () -> Unit = {},
 ) {
     val containerColor = TopAppBarDefaults.topAppBarColors().containerColor
     Column(modifier = modifier.backgroundBlur(containerColor, hazeState)) {

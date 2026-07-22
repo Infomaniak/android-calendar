@@ -68,6 +68,7 @@ data class YearWeek(val firstDay: LocalDate, val weekNumber: Int) : Parcelable, 
  *
  * The Java [LocalDate] is needed to provide this [WeekFields] customization.
  */
+@Immutable
 class WeekNumbering private constructor(internal val weekFields: WeekFields) {
     val firstDayOfWeek: DayOfWeek by weekFields::firstDayOfWeek
 

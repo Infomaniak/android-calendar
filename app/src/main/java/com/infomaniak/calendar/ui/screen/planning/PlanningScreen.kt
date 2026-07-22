@@ -116,7 +116,7 @@ private fun PlanningScreen(
                     if (visibleDayState != null) {
                         ExpandableCalendar(
                             isExpanded = { isCalendarExpanded },
-                            selectedDate = { visibleDayState.visibleDate },
+                            selectedDate = visibleDayState::visibleDate,
                             onDayClick = visibleDayState::jumpTo,
                             weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
                         )

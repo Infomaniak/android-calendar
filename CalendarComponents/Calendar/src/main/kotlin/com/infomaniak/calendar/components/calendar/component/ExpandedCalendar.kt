@@ -30,6 +30,7 @@ import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.core.common.utils.today
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
+import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -50,12 +51,15 @@ internal fun ExpandedCalendar(
 ) {
     val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
 
-    val initialMonth = remember { selectedDate().yearMonth }
-    val todayState = rememberToday()
+    val today by rememberToday()
+
+    val initialMonth by remember { derivedStateOf { selectedDate().yearMonth } }
+    val startMonth by remember { derivedStateOf { selectedDate().yearMonth.minus(RANGE_MONTHS, DateTimeUnit.MONTH) } }
+    val endMonth by remember { derivedStateOf { selectedDate().yearMonth.plus(RANGE_MONTHS, DateTimeUnit.MONTH) } }
 
     val monthState = rememberCalendarState(
-        startMonth = remember { initialMonth.minus(RANGE_MONTHS, DateTimeUnit.MONTH) },
-        endMonth = remember { initialMonth.plus(RANGE_MONTHS, DateTimeUnit.MONTH) },
+        startMonth = startMonth,
+        endMonth = endMonth,
         firstVisibleMonth = initialMonth,
         firstDayOfWeek = firstDayOfWeek,
     )
@@ -64,23 +68,34 @@ internal fun ExpandedCalendar(
         state = monthState,
         monthHeader = { DaysOfWeekTitle(firstDayOfWeek) },
         dayContent = { day ->
-            val dateState by remember(day) {
-                derivedStateOf {
-                    when {
-                        day.date == selectedDate() -> DateState.Selected
-                        day.date == todayState.value -> DateState.Today
-                        day.position == DayPosition.MonthDate -> DateState.None
-                        else -> DateState.NotMonth
-                    }
-                }
-            }
-            Day(
-                dateState = dateState,
-                onClick = { onDayClick(day.date) },
-                date = day.date,
-            )
+            DayContent(day = day, selectedDate = selectedDate, today = { today }, onDayClick = onDayClick)
         },
         modifier = modifier,
+    )
+}
+
+@Composable
+private fun DayContent(
+    day: CalendarDay,
+    selectedDate: () -> LocalDate,
+    today: () -> LocalDate,
+    onDayClick: (LocalDate) -> Unit,
+) {
+    val dateState by remember {
+        derivedStateOf {
+            when {
+                day.date == selectedDate() -> DateState.Selected
+                day.date == today() -> DateState.Today
+                day.position == DayPosition.MonthDate -> DateState.None
+                else -> DateState.NotMonth
+            }
+        }
+    }
+
+    Day(
+        dateState = dateState,
+        onClick = { onDayClick(day.date) },
+        date = day.date,
     )
 }
 
