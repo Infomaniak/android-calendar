@@ -48,7 +48,7 @@ internal fun TodayEmptyState(onClick: () -> Unit, modifier: Modifier = Modifier)
         modifier = modifier.padding(all = Margin.Medium),
     ) {
         Text(
-            stringResource(R.string.planningNothingPlannedToday),
+            stringResource(R.string.planningNothingPlanned),
             modifier = Modifier.weight(1f),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

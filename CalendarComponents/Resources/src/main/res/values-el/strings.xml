@@ -17,13 +17,13 @@
   -->
 <resources>
     <string name="addEventLabel">Προσθήκη</string>
-    <string name="contentDescriptionCreateEvent">Δημιουργία εκδήλωσης</string>
     <string name="allDayLabel">Όλη την ημέρα</string>
+    <string name="contentDescriptionCreateEvent">Δημιουργία εκδήλωσης</string>
     <string name="contentDescriptionHasAttendees">Έχει συμμετέχοντες</string>
     <string name="contentDescriptionHasKMeetLink">Διαθέτει σύνδεσμο kMeet</string>
     <string name="contentDescriptionHasLocation">Έχει τοποθεσία</string>
     <string name="contentDescriptionToday">Σήμερα</string>
-    <string name="planningNothingPlannedToday">Τίποτα προγραμματισμένο.</string>
+    <string name="planningNothingPlanned">Τίποτα προγραμματισμένο</string>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">Εβδ.%d</string>
 </resources>
