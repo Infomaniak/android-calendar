@@ -43,6 +43,7 @@ import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.DayFormatter.toShortDayName
 import com.infomaniak.calendar.components.planning.component.DayIndicator
+import com.infomaniak.calendar.components.planning.component.EmptyState
 import com.infomaniak.calendar.components.planning.component.TodayEmptyState
 import com.infomaniak.calendar.components.planning.preview.WeekEventsPreviewParameter
 import com.infomaniak.calendar.components.resources.R
@@ -143,6 +144,7 @@ private fun Event(
         when (event) {
             is EventUi.Normal -> EventItem(event, Modifier.fillMaxWidth())
             is EventUi.TodayEmptyState -> TodayEmptyState(onClick = goToEventCreation, Modifier.fillMaxWidth())
+            is EventUi.EmptyState -> EmptyState(onClick = goToEventCreation, Modifier.fillMaxWidth())
         }
     }
 }
