@@ -32,11 +32,8 @@ import com.infomaniak.core.common.utils.today
 import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.WeekDay
-import com.kizitonwose.calendar.core.WeekDayPosition
 import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toKotlinDayOfWeek
@@ -55,11 +52,11 @@ internal fun CollapsedCalendar(
 
     val selectedWeekStart by remember { derivedStateOf { selectedDate().startOfWeek(firstDayOfWeek) } }
     val startDate by remember { derivedStateOf { selectedDate().minus(monthRange, DateTimeUnit.MONTH) } }
-    val endMonth by remember { derivedStateOf { selectedDate().plus(monthRange, DateTimeUnit.MONTH) } }
+    val endDate by remember { derivedStateOf { selectedDate().plus(monthRange, DateTimeUnit.MONTH) } }
 
     val weekState = rememberWeekCalendarState(
         startDate = startDate,
-        endDate = endMonth,
+        endDate = endDate,
         firstVisibleWeekDate = selectedWeekStart,
         firstDayOfWeek = firstDayOfWeek,
     )
@@ -81,13 +78,12 @@ private fun ContentToday(
     today: () -> LocalDate,
     onDayClick: (LocalDate) -> Unit,
 ) {
-    val dateState by remember(day) {
+    val dateState by remember {
         derivedStateOf {
-            when {
-                day.date == selectedDate() -> DateState.Selected
-                day.date == today() -> DateState.Today
-                day.position == WeekDayPosition.RangeDate -> DateState.None
-                else -> DateState.NotMonth
+            when (day.date) {
+                selectedDate() -> DateState.Selected
+                today() -> DateState.Today
+                else -> DateState.None
             }
         }
     }
