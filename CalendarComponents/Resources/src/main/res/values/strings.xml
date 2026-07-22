@@ -22,6 +22,7 @@
     <string name="contentDescriptionHasAttendees">Has attendees</string>
     <string name="contentDescriptionHasKMeetLink">Has a kMeet link</string>
     <string name="contentDescriptionHasLocation">Has a location</string>
+    <string name="contentDescriptionToday">Today</string>
     <string name="planningNothingPlannedToday">Nothing planned.</string>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">W%d</string>

@@ -47,6 +47,7 @@ import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.calendar.components.resources.R as RComponents
 
 private const val FLOATING_TOOLBARBAR_KEY = "FloatingToolbar"
 
@@ -126,7 +127,7 @@ private fun ContentFloatingToolbar(
         IconButton(onClick = onCurrentDayClicked) {
             Icon(
                 painter = painterResource(R.drawable.ic_calendar_number_one),
-                contentDescription = stringResource(R.string.contentDescriptionToday),
+                contentDescription = stringResource(RComponents.string.contentDescriptionToday),
             )
         }
         DropdownIconButton(

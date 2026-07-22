@@ -34,6 +34,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +45,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
+import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.planning.Planning
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
@@ -81,6 +84,9 @@ private fun PlanningScreen(
     val density = LocalDensity.current
     var topBarHeight by remember { mutableStateOf(0.dp) }
 
+    var isCalendarExpanded by rememberSaveable { mutableStateOf(false) }
+    val visibleDayState = LocalVisibleDayState.current
+
     Scaffold(
         modifier = modifier,
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
@@ -105,6 +111,17 @@ private fun PlanningScreen(
             CalendarTopAppBar(
                 isLoadingEvents = isLoadingEvents,
                 hazeState = hazeState,
+                onToggleCalendar = { isCalendarExpanded = !isCalendarExpanded },
+                calendar = {
+                    if (visibleDayState != null) {
+                        ExpandableCalendar(
+                            isExpanded = { isCalendarExpanded },
+                            selectedDate = visibleDayState::visibleDate,
+                            onDayClick = visibleDayState::jumpTo,
+                            weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
+                        )
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.TopCenter)

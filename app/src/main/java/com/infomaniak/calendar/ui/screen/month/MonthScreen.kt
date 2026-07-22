@@ -45,7 +45,7 @@ fun MonthScreen(modifier: Modifier = Modifier, monthViewModel: MonthViewModel = 
 private fun MonthScreen(modifier: Modifier = Modifier, isLoadingEvents: () -> Boolean) {
     val hazeState = rememberHazeState()
     Scaffold(
-        topBar = { CalendarTopAppBar(isLoadingEvents, hazeState) },
+        topBar = { CalendarTopAppBar({}, isLoadingEvents, hazeState) },
         modifier = modifier,
     ) { paddingValues ->
         LazyColumn(

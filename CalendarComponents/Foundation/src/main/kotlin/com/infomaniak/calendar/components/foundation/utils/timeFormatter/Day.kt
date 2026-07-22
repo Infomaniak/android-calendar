@@ -17,12 +17,18 @@
  */
 package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.toJavaDayOfWeek
 import kotlinx.datetime.toJavaLocalDate
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
+import java.util.Locale
 
 object DayFormatter {
     private val formatShortDayName by lazy { DateTimeFormatter.ofPattern("EEE") }
 
     fun LocalDate.toShortDayName(): String = toJavaLocalDate().format(formatShortDayName)
+
+    fun DayOfWeek.toNarrowDayName(locale: Locale): String = toJavaDayOfWeek().getDisplayName(TextStyle.NARROW_STANDALONE, locale)
 }

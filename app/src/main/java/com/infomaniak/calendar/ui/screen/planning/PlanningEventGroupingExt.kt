@@ -67,7 +67,7 @@ typealias EventsByWeekAndDay = SortedMap<YearWeek, SortedMap<LocalDate, List<Eve
 @OptIn(ExperimentalTime::class)
 suspend fun Map<LocalDate, List<EventDaySlice>>.groupByWeekAndDay(
     emailsByUserId: Map<AccountId, String>,
-    weekNumbering: WeekNumbering = WeekNumbering.ISO_8601,
+    weekNumbering: WeekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
     timeZone: TimeZone = TimeZone.currentSystemDefault(),
 ): EventsByWeekAndDay = withContext(Dispatchers.Default) {
     val eventsByWeekAndDay = sortedMapOf<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>()
