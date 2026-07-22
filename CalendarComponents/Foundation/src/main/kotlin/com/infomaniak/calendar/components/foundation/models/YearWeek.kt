@@ -81,6 +81,15 @@ class WeekNumbering private constructor(internal val weekFields: WeekFields) {
         )
     }
 
+    /** All the [YearWeek]s covering the range from [start] to [end], both inclusive. */
+    fun weeksBetween(start: LocalDate, end: LocalDate): Sequence<YearWeek> {
+        val lastWeek = weekOf(end)
+        return generateSequence(weekOf(start)) { week ->
+            val next = week.firstDay.plus(DatePeriod(days = DAYS_IN_WEEK))
+            if (next > lastWeek.firstDay) null else weekOf(next)
+        }
+    }
+
     companion object {
         /**
          * ISO-8601 numbering: weeks start on Monday and week 1 is the first week with at least 4 of its

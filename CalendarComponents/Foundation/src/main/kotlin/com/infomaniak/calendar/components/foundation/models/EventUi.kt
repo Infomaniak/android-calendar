@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.foundation.models
 
 import androidx.compose.runtime.Immutable
+import kotlinx.datetime.LocalDate
 import kotlin.time.Instant
 
 @Immutable
@@ -42,8 +43,14 @@ sealed interface EventUi {
         override val id: String = TODAY_EMPTY_STATE_ID
     }
 
+    @Immutable
+    data class EmptyState(val date: LocalDate) : EventUi {
+        override val id: String = "${date}_$EMPTY_STATE_ID"
+    }
+
     companion object {
         private const val TODAY_EMPTY_STATE_ID = "todayEmptyState"
+        private const val EMPTY_STATE_ID = "emptyState"
     }
 }
 
