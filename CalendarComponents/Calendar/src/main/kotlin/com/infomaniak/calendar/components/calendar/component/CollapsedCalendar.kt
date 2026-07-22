@@ -27,12 +27,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberToday
+import com.infomaniak.calendar.components.foundation.utils.startOfWeek
 import com.infomaniak.core.common.utils.today
 import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
+import com.kizitonwose.calendar.core.WeekDay
 import com.kizitonwose.calendar.core.WeekDayPosition
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toKotlinDayOfWeek
@@ -47,14 +51,16 @@ internal fun CollapsedCalendar(
     modifier: Modifier = Modifier,
 ) {
     val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
+    val today by rememberToday()
 
-    val initialDate = remember { selectedDate() }
-    val todayState = rememberToday()
+    val selectedWeekStart by remember { derivedStateOf { selectedDate().startOfWeek(firstDayOfWeek) } }
+    val startDate by remember { derivedStateOf { selectedDate().minus(monthRange, DateTimeUnit.MONTH) } }
+    val endMonth by remember { derivedStateOf { selectedDate().plus(monthRange, DateTimeUnit.MONTH) } }
 
     val weekState = rememberWeekCalendarState(
-        startDate = remember { initialDate.minus(monthRange, DateTimeUnit.MONTH) },
-        endDate = remember { initialDate.plus(monthRange, DateTimeUnit.MONTH) },
-        firstVisibleWeekDate = initialDate,
+        startDate = startDate,
+        endDate = endMonth,
+        firstVisibleWeekDate = selectedWeekStart,
         firstDayOfWeek = firstDayOfWeek,
     )
 
@@ -62,23 +68,34 @@ internal fun CollapsedCalendar(
         state = weekState,
         weekHeader = { DaysOfWeekTitle(firstDayOfWeek) },
         dayContent = { day ->
-            val dateState by remember(day) {
-                derivedStateOf {
-                    when {
-                        day.date == selectedDate() -> DateState.Selected
-                        day.date == todayState.value -> DateState.Today
-                        day.position == WeekDayPosition.RangeDate -> DateState.None
-                        else -> DateState.NotMonth
-                    }
-                }
-            }
-            Day(
-                dateState = dateState,
-                onClick = { onDayClick(day.date) },
-                date = day.date,
-            )
+            ContentToday(day = day, selectedDate = selectedDate, today = { today }, onDayClick = onDayClick)
         },
         modifier = modifier,
+    )
+}
+
+@Composable
+private fun ContentToday(
+    day: WeekDay,
+    selectedDate: () -> LocalDate,
+    today: () -> LocalDate,
+    onDayClick: (LocalDate) -> Unit,
+) {
+    val dateState by remember(day) {
+        derivedStateOf {
+            when {
+                day.date == selectedDate() -> DateState.Selected
+                day.date == today() -> DateState.Today
+                day.position == WeekDayPosition.RangeDate -> DateState.None
+                else -> DateState.NotMonth
+            }
+        }
+    }
+
+    Day(
+        dateState = dateState,
+        onClick = { onDayClick(day.date) },
+        date = day.date,
     )
 }
 
