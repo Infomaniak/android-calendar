@@ -39,6 +39,7 @@ import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.WeekDay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
@@ -46,12 +47,15 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toKotlinDayOfWeek
 import kotlin.time.Clock
 
+private const val DAYS_IN_WEEK = 7
+
 @Composable
 internal fun CollapsedCalendar(
     monthRange: Int,
     selectedDate: () -> LocalDate,
     weekNumbering: WeekNumbering,
     onDayClick: (LocalDate) -> Unit,
+    onVisibleWeekChange: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
     headerState: CalendarHeaderState = rememberCalendarHeaderState(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -73,24 +77,35 @@ internal fun CollapsedCalendar(
         derivedStateOf { weekState.firstVisibleWeek.days.mapTo(mutableSetOf()) { it.date } }
     }
 
+    // Follow external selection changes (day click, jump to today, deep link).
     LaunchedEffect(weekState) {
         snapshotFlow { selectedDate().startOfWeek(firstDayOfWeek) }.collectLatest { weekStart ->
-            val visibleWeekDate = weekState.firstVisibleWeek.days.first().date
-            // Updating the range shifts the index-to-week mapping but not the scroll index.
-            weekState.startDate = weekStart.minus(monthRange, DateTimeUnit.MONTH)
-            weekState.endDate = weekStart.plus(monthRange, DateTimeUnit.MONTH)
-            // Snap back to the week the user was on, then animate from there.
-            weekState.scrollToWeek(visibleWeekDate)
-            weekState.animateScrollToWeek(weekStart)
+            // Wait for any ongoing gesture or settle instead of dropping the request.
+            snapshotFlow { weekState.isScrollInProgress }.first { !it }
+            if (weekStart != weekState.firstVisibleWeek.days.first().date) {
+                weekState.animateScrollToWeek(weekStart)
+            }
         }
     }
 
     LaunchedEffect(weekState, headerState) {
-        headerState.setCollapsedOffsetSource { weekState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset?.toFloat() ?: 0f }
+        headerState.setCollapsedOffsetSource {
+            val layoutInfo = weekState.layoutInfo
+            val pageWidth = layoutInfo.viewportSize.width
+            if (pageWidth <= 0) return@setCollapsedOffsetSource 0f
+            val info = layoutInfo.visibleItemsInfo.firstOrNull() ?: return@setCollapsedOffsetSource 0f
+            // Absolute scroll position in px: stays continuous when the leading item changes.
+            val scrolled = info.index.toLong() * pageWidth - info.offset
+            -(scrolled.toFloat().mod(pageWidth.toFloat()))
+        }
     }
 
     WeekCalendar(
         state = weekState,
+        // Keeps one-week-per-viewport layout. The paged fling never runs since
+        // userScrollEnabled is false: our pagedSwipe drives the scrolling.
+        calendarScrollPaged = true,
+        userScrollEnabled = false,
         weekHeader = {
             DaysOfWeekTitle(
                 firstDayOfWeek = firstDayOfWeek,
@@ -110,7 +125,12 @@ internal fun CollapsedCalendar(
                 isSharedElementEnabled = day.date in visibleWeekDates,
             )
         },
-        modifier = modifier,
+        modifier = modifier.pagedSwipe(
+            state = weekState,
+            firstVisibleItemOffset = { weekState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset ?: 0 },
+            currentPage = { weekState.firstVisibleWeek.days.first().date },
+            onPageChange = { from, step -> onVisibleWeekChange(from.plus(step * DAYS_IN_WEEK, DateTimeUnit.DAY)) },
+        ),
     )
 }
 
@@ -124,7 +144,7 @@ private fun DayContent(
     animatedVisibilityScope: AnimatedVisibilityScope?,
     isSharedElementEnabled: Boolean,
 ) {
-    val dateState by remember {
+    val dateState by remember(day) {
         derivedStateOf {
             when (day.date) {
                 selectedDate() -> DateState.Selected
@@ -155,6 +175,7 @@ private fun CollapsedCalendarPreview() {
             monthRange = 3,
             selectedDate = { Clock.today() },
             onDayClick = {},
+            onVisibleWeekChange = {},
             weekNumbering = WeekNumbering.ISO_8601,
         )
     }

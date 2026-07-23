@@ -40,8 +40,10 @@ import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.YearMonth
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toKotlinDayOfWeek
@@ -54,6 +56,7 @@ internal fun ExpandedCalendar(
     selectedDate: () -> LocalDate,
     weekNumbering: WeekNumbering,
     onDayClick: (LocalDate) -> Unit,
+    onVisibleMonthChange: (YearMonth) -> Unit,
     modifier: Modifier = Modifier,
     headerState: CalendarHeaderState = rememberCalendarHeaderState(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -72,24 +75,31 @@ internal fun ExpandedCalendar(
     val today by rememberToday()
     val visibleMonthDays by remember { derivedStateOf { monthState.firstVisibleMonth.weekDays.flatten().toSet() } }
 
+    // Follow external selection changes (day click, jump to today, deep link).
     LaunchedEffect(monthState) {
         snapshotFlow { selectedDate().yearMonth }.collectLatest { month ->
-            val visibleMonth = monthState.firstVisibleMonth.yearMonth
-            // Updating the range shifts the index-to-month mapping but not the scroll index.
-            monthState.startMonth = month.minus(monthRange, DateTimeUnit.MONTH)
-            monthState.endMonth = month.plus(monthRange, DateTimeUnit.MONTH)
-            // Snap back to the month the user was on, then animate from there.
-            monthState.scrollToMonth(visibleMonth)
-            monthState.animateScrollToMonth(month)
+            // Wait for any ongoing gesture or settle instead of dropping the request.
+            snapshotFlow { monthState.isScrollInProgress }.first { !it }
+            if (month != monthState.firstVisibleMonth.yearMonth) monthState.animateScrollToMonth(month)
         }
     }
 
     LaunchedEffect(monthState, headerState) {
-        headerState.setExpandedOffsetSource { monthState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset?.toFloat() ?: 0f }
+        headerState.setExpandedOffsetSource {
+            val layoutInfo = monthState.layoutInfo
+            val pageWidth = layoutInfo.viewportSize.width
+            if (pageWidth <= 0) return@setExpandedOffsetSource 0f
+            val info = layoutInfo.visibleItemsInfo.firstOrNull() ?: return@setExpandedOffsetSource 0f
+            // Absolute scroll position in px: stays continuous when the leading item changes.
+            val scrolled = info.index.toLong() * pageWidth - info.offset
+            -(scrolled.toFloat().mod(pageWidth.toFloat()))
+        }
     }
 
     HorizontalCalendar(
         state = monthState,
+        calendarScrollPaged = false,
+        userScrollEnabled = false,
         monthHeader = {
             DaysOfWeekTitle(
                 firstDayOfWeek = firstDayOfWeek,
@@ -109,9 +119,17 @@ internal fun ExpandedCalendar(
                 isSharedElementEnabled = day in visibleMonthDays,
             )
         },
-        modifier = modifier.animateContentSize(),
+        modifier = modifier
+            .pagedSwipe(
+                state = monthState,
+                firstVisibleItemOffset = { monthState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset ?: 0 },
+                currentPage = { monthState.firstVisibleMonth.yearMonth },
+                onPageChange = { from, step -> onVisibleMonthChange(from.plus(step, DateTimeUnit.MONTH)) },
+            )
+            .animateContentSize(),
     )
 }
+
 @Composable
 private fun DayContent(
     day: CalendarDay,
@@ -122,12 +140,13 @@ private fun DayContent(
     animatedVisibilityScope: AnimatedVisibilityScope?,
     isSharedElementEnabled: Boolean,
 ) {
-    val dateState by remember {
+    val dateState by remember(day) {
         derivedStateOf {
+            val isInMonth = day.position == DayPosition.MonthDate
             when {
-                day.date == selectedDate() -> DateState.Selected
-                day.date == today() -> DateState.Today
-                day.position == DayPosition.MonthDate -> DateState.None
+                isInMonth && day.date == selectedDate() -> DateState.Selected
+                isInMonth && day.date == today() -> DateState.Today
+                isInMonth -> DateState.None
                 else -> DateState.NotMonth
             }
         }
@@ -154,6 +173,7 @@ private fun ExpandedCalendarPreview() {
             monthRange = 3,
             selectedDate = { Clock.today() },
             onDayClick = {},
+            onVisibleMonthChange = {},
             weekNumbering = WeekNumbering.ISO_8601,
         )
     }

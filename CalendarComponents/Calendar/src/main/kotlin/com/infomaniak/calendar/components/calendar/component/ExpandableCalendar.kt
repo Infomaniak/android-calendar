@@ -38,7 +38,6 @@ import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toKotlinDayOfWeek
-import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
 private const val RANGE_MONTHS = 100
@@ -66,21 +65,21 @@ fun ExpandableCalendar(
                         ExpandedCalendar(
                             selectedDate = selectedDate,
                             onDayClick = onDayClick,
+                            // Swiping to another month selects its first day.
+                            onVisibleMonthChange = { onDayClick(it.firstDay) },
                             weekNumbering = weekNumbering,
                             monthRange = RANGE_MONTHS,
                             headerState = headerState,
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this@AnimatedContent,
                         )
-                        HorizontalMonthSelector(
-                            selectedMonth = { selectedDate().yearMonth },
-                            onMonthSelected = { date -> onDayClick(date.firstDay) },
-                        )
                     }
                 } else {
                     CollapsedCalendar(
                         selectedDate = selectedDate,
                         onDayClick = onDayClick,
+                        // The reported date is already the first day of the week.
+                        onVisibleWeekChange = { onDayClick(it) },
                         weekNumbering = weekNumbering,
                         monthRange = RANGE_MONTHS,
                         headerState = headerState,
