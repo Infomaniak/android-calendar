@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.calendar.component
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -30,34 +31,38 @@ private const val RANGE_MONTHS = 100
 
 @Composable
 fun ExpandableCalendar(
+    isExpanded: () -> Boolean,
     selectedDate: () -> LocalDate,
     onDayClick: (LocalDate) -> Unit,
-    isExpanded: () -> Boolean,
     weekNumbering: WeekNumbering,
     modifier: Modifier = Modifier,
 ) {
-    if (isExpanded()) {
-        ExpandedCalendar(
-            selectedDate = selectedDate,
-            onDayClick = onDayClick,
-            weekNumbering = weekNumbering,
-            monthRange = RANGE_MONTHS,
-            modifier = modifier,
-        )
-    } else {
-        CollapsedCalendar(
-            selectedDate = selectedDate,
-            onDayClick = onDayClick,
-            weekNumbering = weekNumbering,
-            monthRange = RANGE_MONTHS,
-            modifier = modifier,
-        )
+    AnimatedContent(
+        targetState = isExpanded(),
+        label = "calendarExpansion",
+        modifier = modifier,
+    ) { expanded ->
+        if (expanded) {
+            ExpandedCalendar(
+                selectedDate = selectedDate,
+                onDayClick = onDayClick,
+                weekNumbering = weekNumbering,
+                monthRange = RANGE_MONTHS,
+            )
+        } else {
+            CollapsedCalendar(
+                selectedDate = selectedDate,
+                onDayClick = onDayClick,
+                weekNumbering = weekNumbering,
+                monthRange = RANGE_MONTHS,
+            )
+        }
     }
 }
 
 @Composable
 @Preview
-private fun UnexpandedCalendarPreview() {
+private fun ExpandableCalendarCollapsedPreview() {
     Surface {
         ExpandableCalendar(
             selectedDate = { Clock.today() },
@@ -70,7 +75,7 @@ private fun UnexpandedCalendarPreview() {
 
 @Composable
 @Preview
-private fun ExpandedCalendarPreview() {
+private fun ExpandableCalendarExpandedPreview() {
     Surface {
         ExpandableCalendar(
             selectedDate = { Clock.today() },

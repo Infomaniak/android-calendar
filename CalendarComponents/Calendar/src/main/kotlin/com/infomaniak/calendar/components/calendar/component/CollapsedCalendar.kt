@@ -19,9 +19,11 @@ package com.infomaniak.calendar.components.calendar.component
 
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.DateState
@@ -32,6 +34,7 @@ import com.infomaniak.core.common.utils.today
 import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.WeekDay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
@@ -50,29 +53,39 @@ internal fun CollapsedCalendar(
     val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
     val today by rememberToday()
 
-    val selectedWeekStart by remember { derivedStateOf { selectedDate().startOfWeek(firstDayOfWeek) } }
-    val startDate by remember { derivedStateOf { selectedDate().minus(monthRange, DateTimeUnit.MONTH) } }
-    val endDate by remember { derivedStateOf { selectedDate().plus(monthRange, DateTimeUnit.MONTH) } }
+    val initialWeekStart = remember { selectedDate().startOfWeek(firstDayOfWeek) }
 
     val weekState = rememberWeekCalendarState(
-        startDate = startDate,
-        endDate = endDate,
-        firstVisibleWeekDate = selectedWeekStart,
+        startDate = remember { initialWeekStart.minus(monthRange, DateTimeUnit.MONTH) },
+        endDate = remember { initialWeekStart.plus(monthRange, DateTimeUnit.MONTH) },
+        firstVisibleWeekDate = initialWeekStart,
         firstDayOfWeek = firstDayOfWeek,
     )
+
+    LaunchedEffect(weekState) {
+        snapshotFlow { selectedDate().startOfWeek(firstDayOfWeek) }.collectLatest { weekStart ->
+            val visibleWeekDate = weekState.firstVisibleWeek.days.first().date
+            // Updating the range shifts the index-to-week mapping but not the scroll index.
+            weekState.startDate = weekStart.minus(monthRange, DateTimeUnit.MONTH)
+            weekState.endDate = weekStart.plus(monthRange, DateTimeUnit.MONTH)
+            // Snap back to the week the user was on, then animate from there.
+            weekState.scrollToWeek(visibleWeekDate)
+            weekState.animateScrollToWeek(weekStart)
+        }
+    }
 
     WeekCalendar(
         state = weekState,
         weekHeader = { DaysOfWeekTitle(firstDayOfWeek) },
         dayContent = { day ->
-            ContentToday(day = day, selectedDate = selectedDate, today = { today }, onDayClick = onDayClick)
+            DayContent(day = day, selectedDate = selectedDate, today = { today }, onDayClick = onDayClick)
         },
         modifier = modifier,
     )
 }
 
 @Composable
-private fun ContentToday(
+private fun DayContent(
     day: WeekDay,
     selectedDate: () -> LocalDate,
     today: () -> LocalDate,

@@ -17,11 +17,14 @@
  */
 package com.infomaniak.calendar.components.calendar.component
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.DateState
@@ -32,6 +35,7 @@ import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
@@ -49,19 +53,28 @@ internal fun ExpandedCalendar(
     modifier: Modifier = Modifier,
 ) {
     val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
-
     val today by rememberToday()
 
-    val initialMonth by remember { derivedStateOf { selectedDate().yearMonth } }
-    val startMonth by remember { derivedStateOf { selectedDate().yearMonth.minus(monthRange, DateTimeUnit.MONTH) } }
-    val endMonth by remember { derivedStateOf { selectedDate().yearMonth.plus(monthRange, DateTimeUnit.MONTH) } }
+    val initialMonth = remember { selectedDate().yearMonth }
 
     val monthState = rememberCalendarState(
-        startMonth = startMonth,
-        endMonth = endMonth,
+        startMonth = remember { initialMonth.minus(monthRange, DateTimeUnit.MONTH) },
+        endMonth = remember { initialMonth.plus(monthRange, DateTimeUnit.MONTH) },
         firstVisibleMonth = initialMonth,
         firstDayOfWeek = firstDayOfWeek,
     )
+
+    LaunchedEffect(monthState) {
+        snapshotFlow { selectedDate().yearMonth }.collectLatest { month ->
+            val visibleMonth = monthState.firstVisibleMonth.yearMonth
+            // Updating the range shifts the index-to-month mapping but not the scroll index.
+            monthState.startMonth = month.minus(monthRange, DateTimeUnit.MONTH)
+            monthState.endMonth = month.plus(monthRange, DateTimeUnit.MONTH)
+            // Snap back to the month the user was on, then animate from there.
+            monthState.scrollToMonth(visibleMonth)
+            monthState.animateScrollToMonth(month)
+        }
+    }
 
     HorizontalCalendar(
         state = monthState,
@@ -69,10 +82,9 @@ internal fun ExpandedCalendar(
         dayContent = { day ->
             DayContent(day = day, selectedDate = selectedDate, today = { today }, onDayClick = onDayClick)
         },
-        modifier = modifier,
+        modifier = modifier.animateContentSize(),
     )
 }
-
 @Composable
 private fun DayContent(
     day: CalendarDay,

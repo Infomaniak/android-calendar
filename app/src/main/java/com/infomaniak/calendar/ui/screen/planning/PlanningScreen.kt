@@ -116,8 +116,8 @@ private fun PlanningScreen(
                     if (visibleDayState != null) {
                         ExpandableCalendar(
                             isExpanded = { isCalendarExpanded },
-                            selectedDate = visibleDayState::visibleDate,
-                            onDayClick = visibleDayState::jumpTo,
+                            selectedDate = { visibleDayState.visibleDate },
+                            onDayClick = { visibleDayState.jumpTo(it) },
                             weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
                         )
                     }
@@ -142,7 +142,7 @@ private fun SuccessPlanning(
     val lazyListState = rememberLazyListState(events().indexOf(visibleDayState.visibleDate))
 
     ProcessJumpRequests(lazyListState, visibleDayState, events)
-    ReportVisibleDate(lazyListState, onVisibleDateChanged = visibleDayState::onVisibleDateChanged)
+    ReportVisibleDate(lazyListState, onVisibleDateChanged = { visibleDayState.onVisibleDateChanged(it) })
 
     Planning(
         lazyListState = lazyListState,
