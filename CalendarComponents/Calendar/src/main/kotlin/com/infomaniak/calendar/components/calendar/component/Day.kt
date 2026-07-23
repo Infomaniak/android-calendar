@@ -114,22 +114,19 @@ internal fun Day(
  * and simply fade in/out with the [AnimatedVisibilityScope].
  *
  * Returns [Modifier] unchanged when [enabled] is false or when the transition scopes are unavailable
- * (e.g. previews), so the day renders normally without participating in any shared transition.
+ * so the day renders normally without participating in any shared transition.
  */
 @Composable
-internal fun daySharedElementModifier(
+internal fun Modifier.daySharedElement(
     sharedTransitionScope: SharedTransitionScope?,
     animatedVisibilityScope: AnimatedVisibilityScope?,
     date: LocalDate,
     enabled: Boolean,
 ): Modifier {
-    if (!enabled || sharedTransitionScope == null || animatedVisibilityScope == null) return Modifier
+    if (!enabled || sharedTransitionScope == null || animatedVisibilityScope == null) return this
 
     return with(sharedTransitionScope) {
-        Modifier.sharedElement(
-            rememberSharedContentState(key = date),
-            animatedVisibilityScope,
-        )
+        sharedElement(rememberSharedContentState(key = date), animatedVisibilityScope)
     }
 }
 

@@ -130,7 +130,7 @@ private fun DayContent(
         dateState = dateState,
         onClick = { onDayClick(day.date) },
         date = day.date,
-        modifier = daySharedElementModifier(
+        modifier = Modifier.daySharedElement(
             sharedTransitionScope = sharedTransitionScope,
             animatedVisibilityScope = animatedVisibilityScope,
             date = day.date,
