@@ -39,7 +39,7 @@ fun ExpandableCalendar(
 ) {
     AnimatedContent(
         targetState = isExpanded(),
-        label = "calendar_expansion",
+        label = "calendarExpansion",
         modifier = modifier,
     ) { expanded ->
         if (expanded) {
