@@ -92,7 +92,7 @@ internal fun ExpandedCalendar(
 
     HorizontalCalendar(
         state = monthState,
-        monthHeader = { DaysOfWeekTitle(firstDayOfWeek, Modifier.alpha(0f)) },
+        monthHeader = { DaysOfWeekTitle(firstDayOfWeek, Modifier.alpha(0f)) }, // Reserves the space to keep the swiping on header
         dayContent = { day ->
             DayContent(
                 day = day,

@@ -90,7 +90,7 @@ internal fun CollapsedCalendar(
 
     WeekCalendar(
         state = weekState,
-        weekHeader = { DaysOfWeekTitle(firstDayOfWeek, Modifier.alpha(0f)) },
+        weekHeader = { DaysOfWeekTitle(firstDayOfWeek, Modifier.alpha(0f)) }, // Reserves the space to keep the swiping on header
         dayContent = { day ->
             DayContent(
                 day = day,
