@@ -27,21 +27,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberToday
+import com.infomaniak.calendar.components.foundation.utils.startOfWeek
 import com.infomaniak.core.common.utils.today
-import com.kizitonwose.calendar.compose.HorizontalCalendar
-import com.kizitonwose.calendar.compose.rememberCalendarState
-import com.kizitonwose.calendar.core.CalendarDay
-import com.kizitonwose.calendar.core.DayPosition
+import com.kizitonwose.calendar.compose.WeekCalendar
+import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
+import com.kizitonwose.calendar.core.WeekDay
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toKotlinDayOfWeek
-import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
 @Composable
-internal fun ExpandedCalendar(
+internal fun CollapsedCalendar(
     monthRange: Int,
     selectedDate: () -> LocalDate,
     weekNumbering: WeekNumbering,
@@ -49,44 +48,42 @@ internal fun ExpandedCalendar(
     modifier: Modifier = Modifier,
 ) {
     val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
-
     val today by rememberToday()
 
-    val initialMonth by remember { derivedStateOf { selectedDate().yearMonth } }
-    val startMonth by remember { derivedStateOf { selectedDate().yearMonth.minus(monthRange, DateTimeUnit.MONTH) } }
-    val endMonth by remember { derivedStateOf { selectedDate().yearMonth.plus(monthRange, DateTimeUnit.MONTH) } }
+    val selectedWeekStart by remember { derivedStateOf { selectedDate().startOfWeek(firstDayOfWeek) } }
+    val startDate by remember { derivedStateOf { selectedDate().minus(monthRange, DateTimeUnit.MONTH) } }
+    val endDate by remember { derivedStateOf { selectedDate().plus(monthRange, DateTimeUnit.MONTH) } }
 
-    val monthState = rememberCalendarState(
-        startMonth = startMonth,
-        endMonth = endMonth,
-        firstVisibleMonth = initialMonth,
+    val weekState = rememberWeekCalendarState(
+        startDate = startDate,
+        endDate = endDate,
+        firstVisibleWeekDate = selectedWeekStart,
         firstDayOfWeek = firstDayOfWeek,
     )
 
-    HorizontalCalendar(
-        state = monthState,
-        monthHeader = { DaysOfWeekTitle(firstDayOfWeek) },
+    WeekCalendar(
+        state = weekState,
+        weekHeader = { DaysOfWeekTitle(firstDayOfWeek) },
         dayContent = { day ->
-            DayContent(day = day, selectedDate = selectedDate, today = { today }, onDayClick = onDayClick)
+            ContentToday(day = day, selectedDate = selectedDate, today = { today }, onDayClick = onDayClick)
         },
         modifier = modifier,
     )
 }
 
 @Composable
-private fun DayContent(
-    day: CalendarDay,
+private fun ContentToday(
+    day: WeekDay,
     selectedDate: () -> LocalDate,
     today: () -> LocalDate,
     onDayClick: (LocalDate) -> Unit,
 ) {
     val dateState by remember {
         derivedStateOf {
-            when {
-                day.date == selectedDate() -> DateState.Selected
-                day.date == today() -> DateState.Today
-                day.position == DayPosition.MonthDate -> DateState.None
-                else -> DateState.NotMonth
+            when (day.date) {
+                selectedDate() -> DateState.Selected
+                today() -> DateState.Today
+                else -> DateState.None
             }
         }
     }
@@ -100,9 +97,9 @@ private fun DayContent(
 
 @Composable
 @Preview
-private fun ExpandedCalendarPreview() {
+private fun CollapsedCalendarPreview() {
     Surface {
-        ExpandedCalendar(
+        CollapsedCalendar(
             monthRange = 3,
             selectedDate = { Clock.today() },
             onDayClick = {},

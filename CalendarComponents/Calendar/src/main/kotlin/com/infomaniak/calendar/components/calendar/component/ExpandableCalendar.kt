@@ -26,6 +26,8 @@ import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
 
+private const val RANGE_MONTHS = 100
+
 @Composable
 fun ExpandableCalendar(
     selectedDate: () -> LocalDate,
@@ -39,6 +41,15 @@ fun ExpandableCalendar(
             selectedDate = selectedDate,
             onDayClick = onDayClick,
             weekNumbering = weekNumbering,
+            monthRange = RANGE_MONTHS,
+            modifier = modifier,
+        )
+    } else {
+        CollapsedCalendar(
+            selectedDate = selectedDate,
+            onDayClick = onDayClick,
+            weekNumbering = weekNumbering,
+            monthRange = RANGE_MONTHS,
             modifier = modifier,
         )
     }
