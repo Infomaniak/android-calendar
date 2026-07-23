@@ -17,6 +17,8 @@
  */
 package com.infomaniak.calendar.components.calendar.component
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
@@ -49,6 +52,9 @@ internal fun CollapsedCalendar(
     weekNumbering: WeekNumbering,
     onDayClick: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
+    onProvideHeaderOffset: (() -> Float) -> Unit = {},
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
     val today by rememberToday()
@@ -62,6 +68,10 @@ internal fun CollapsedCalendar(
         firstDayOfWeek = firstDayOfWeek,
     )
 
+    val visibleWeekDates by remember {
+        derivedStateOf { weekState.firstVisibleWeek.days.mapTo(mutableSetOf()) { it.date } }
+    }
+
     LaunchedEffect(weekState) {
         snapshotFlow { selectedDate().startOfWeek(firstDayOfWeek) }.collectLatest { weekStart ->
             val visibleWeekDate = weekState.firstVisibleWeek.days.first().date
@@ -74,11 +84,23 @@ internal fun CollapsedCalendar(
         }
     }
 
+    LaunchedEffect(weekState) {
+        onProvideHeaderOffset { weekState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset?.toFloat() ?: 0f }
+    }
+
     WeekCalendar(
         state = weekState,
-        weekHeader = { DaysOfWeekTitle(firstDayOfWeek) },
+        weekHeader = { DaysOfWeekTitle(firstDayOfWeek, Modifier.alpha(0f)) },
         dayContent = { day ->
-            DayContent(day = day, selectedDate = selectedDate, today = { today }, onDayClick = onDayClick)
+            DayContent(
+                day = day,
+                selectedDate = selectedDate,
+                today = { today },
+                onDayClick = onDayClick,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
+                isSharedElementEnabled = day.date in visibleWeekDates,
+            )
         },
         modifier = modifier,
     )
@@ -90,6 +112,9 @@ private fun DayContent(
     selectedDate: () -> LocalDate,
     today: () -> LocalDate,
     onDayClick: (LocalDate) -> Unit,
+    sharedTransitionScope: SharedTransitionScope?,
+    animatedVisibilityScope: AnimatedVisibilityScope?,
+    isSharedElementEnabled: Boolean,
 ) {
     val dateState by remember {
         derivedStateOf {
@@ -105,6 +130,12 @@ private fun DayContent(
         dateState = dateState,
         onClick = { onDayClick(day.date) },
         date = day.date,
+        modifier = daySharedElementModifier(
+            sharedTransitionScope = sharedTransitionScope,
+            animatedVisibilityScope = animatedVisibilityScope,
+            date = day.date,
+            enabled = isSharedElementEnabled,
+        ),
     )
 }
 

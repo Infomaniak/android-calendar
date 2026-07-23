@@ -17,6 +17,8 @@
  */
 package com.infomaniak.calendar.components.calendar.component
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -102,6 +104,32 @@ internal fun Day(
         ) {
             Text(text = date.day.toString())
         }
+    }
+}
+
+/**
+ * Builds a [Modifier] that turns a day cell into a shared element keyed by its [date], so the same day
+ * translates gracefully between the collapsed week and the expanded month during the expand/collapse
+ * transition. Days that only exist on one side (e.g. days from other weeks of the month) have no match
+ * and simply fade in/out with the [AnimatedVisibilityScope].
+ *
+ * Returns [Modifier] unchanged when [enabled] is false or when the transition scopes are unavailable
+ * (e.g. previews), so the day renders normally without participating in any shared transition.
+ */
+@Composable
+internal fun daySharedElementModifier(
+    sharedTransitionScope: SharedTransitionScope?,
+    animatedVisibilityScope: AnimatedVisibilityScope?,
+    date: LocalDate,
+    enabled: Boolean,
+): Modifier {
+    if (!enabled || sharedTransitionScope == null || animatedVisibilityScope == null) return Modifier
+
+    return with(sharedTransitionScope) {
+        Modifier.sharedElement(
+            rememberSharedContentState(key = date),
+            animatedVisibilityScope,
+        )
     }
 }
 
