@@ -59,16 +59,17 @@ internal fun ExpandedCalendar(
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
-    val today by rememberToday()
 
     val initialMonth = remember { selectedDate().yearMonth }
-
     val monthState = rememberCalendarState(
         startMonth = remember { initialMonth.minus(monthRange, DateTimeUnit.MONTH) },
         endMonth = remember { initialMonth.plus(monthRange, DateTimeUnit.MONTH) },
         firstVisibleMonth = initialMonth,
         firstDayOfWeek = firstDayOfWeek,
     )
+
+    val today by rememberToday()
+    val visibleMonthDays by remember { derivedStateOf { monthState.firstVisibleMonth.weekDays.flatten().toSet() } }
 
     LaunchedEffect(monthState) {
         snapshotFlow { selectedDate().yearMonth }.collectLatest { month ->
@@ -84,10 +85,6 @@ internal fun ExpandedCalendar(
 
     LaunchedEffect(monthState, headerState) {
         headerState.setOffsetSource { monthState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset?.toFloat() ?: 0f }
-    }
-
-    val visibleMonthDays by remember {
-        derivedStateOf { monthState.firstVisibleMonth.weekDays.flatten().toHashSet() }
     }
 
     HorizontalCalendar(
