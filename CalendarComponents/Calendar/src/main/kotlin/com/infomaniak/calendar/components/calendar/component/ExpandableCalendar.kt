@@ -55,7 +55,6 @@ fun ExpandableCalendar(
 
     Box(modifier = modifier) {
         SharedTransitionLayout {
-            val sharedTransitionScope = this
             AnimatedContent(
                 targetState = isExpanded(),
                 label = "calendarExpansion",
@@ -67,7 +66,7 @@ fun ExpandableCalendar(
                         weekNumbering = weekNumbering,
                         monthRange = RANGE_MONTHS,
                         headerState = headerState,
-                        sharedTransitionScope = sharedTransitionScope,
+                        sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
                     )
                 } else {
@@ -77,7 +76,7 @@ fun ExpandableCalendar(
                         weekNumbering = weekNumbering,
                         monthRange = RANGE_MONTHS,
                         headerState = headerState,
-                        sharedTransitionScope = sharedTransitionScope,
+                        sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
                     )
                 }
