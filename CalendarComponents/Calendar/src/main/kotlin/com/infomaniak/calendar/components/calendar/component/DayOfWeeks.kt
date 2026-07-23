@@ -45,7 +45,6 @@ internal fun DaysOfWeekTitle(firstDayOfWeek: DayOfWeek, modifier: Modifier = Mod
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .aspectRatio(1f)
                     .padding(Margin.Micro),
                 contentAlignment = Alignment.Center,
             ) {
