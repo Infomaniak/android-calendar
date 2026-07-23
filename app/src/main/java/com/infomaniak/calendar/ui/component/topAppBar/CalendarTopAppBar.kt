@@ -40,7 +40,7 @@ fun CalendarTopAppBar(
     onToggleCalendar: () -> Unit,
     isLoadingEvents: () -> Boolean,
     isCalendarExpanded: () -> Boolean,
-    hazeState: HazeState,
+    hazeState: HazeState?,
     modifier: Modifier = Modifier,
     calendar: @Composable () -> Unit = {},
 ) {

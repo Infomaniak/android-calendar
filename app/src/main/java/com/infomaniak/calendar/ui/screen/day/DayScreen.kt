@@ -22,10 +22,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -38,11 +36,8 @@ import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.state.VisibleDayState
+import com.infomaniak.calendar.ui.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.common.utils.today
-import dev.chrisbanes.haze.hazeSource
-import dev.chrisbanes.haze.rememberHazeState
-import kotlin.time.Clock
 
 @Composable
 fun DayScreen(
@@ -50,39 +45,37 @@ fun DayScreen(
     dayViewModel: DayViewModel = viewModel(),
 ) {
     val isLoadingEvents by dayViewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
+    val visibleDayState = LocalVisibleDayState.current ?: return
 
     DayScreen(
         modifier = modifier,
+        visibleDayState = visibleDayState,
         isLoadingEvents = { isLoadingEvents },
     )
 }
 
 @Composable
-private fun DayScreen(isLoadingEvents: () -> Boolean, modifier: Modifier = Modifier) {
-    val hazeState = rememberHazeState()
+private fun DayScreen(isLoadingEvents: () -> Boolean, visibleDayState: VisibleDayState, modifier: Modifier = Modifier) {
     var isCalendarExpanded by rememberSaveable { mutableStateOf(false) }
-    val visibleDayState = LocalVisibleDayState.current
 
     Scaffold(
         topBar = {
             CalendarTopAppBar(
                 isLoadingEvents = isLoadingEvents,
-                hazeState = hazeState,
                 onToggleCalendar = { isCalendarExpanded = !isCalendarExpanded },
                 isCalendarExpanded = { isCalendarExpanded },
+                hazeState = null,
                 calendar = {
-                    if (visibleDayState != null) {
-                        ExpandableCalendar(
-                            isExpanded = { isCalendarExpanded },
-                            selectedDate = { visibleDayState.visibleDate },
-                            onDayClick = visibleDayState::jumpTo,
-                            weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
-                        )
-                    }
+                    ExpandableCalendar(
+                        isExpanded = { isCalendarExpanded },
+                        selectedDate = { visibleDayState.visibleDate },
+                        onDayClick = { visibleDayState.jumpTo(it) },
+                        weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
+                    )
                 },
             )
         },
-        modifier = modifier.hazeSource(hazeState),
+        modifier = modifier,
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             Text("DayScreenContent")
@@ -95,10 +88,7 @@ private fun DayScreen(isLoadingEvents: () -> Boolean, modifier: Modifier = Modif
 @Composable
 private fun DayScreenPreview() {
     CalendarThemeForPreview {
-        val visibleDate = remember { mutableStateOf(Clock.today()) }
-
-        CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(visibleDate)) {
-            DayScreen(isLoadingEvents = { true })
-        }
+        val visibleDayState = rememberVisibleDayState()
+        DayScreen(isLoadingEvents = { true }, visibleDayState = visibleDayState)
     }
 }
