@@ -54,7 +54,7 @@ internal fun ExpandedCalendar(
     weekNumbering: WeekNumbering,
     onDayClick: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
-    onProvideHeaderOffset: (() -> Float) -> Unit = {},
+    headerState: CalendarHeaderState = rememberCalendarHeaderState(),
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
@@ -82,8 +82,8 @@ internal fun ExpandedCalendar(
         }
     }
 
-    LaunchedEffect(monthState) {
-        onProvideHeaderOffset { monthState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset?.toFloat() ?: 0f }
+    LaunchedEffect(monthState, headerState) {
+        headerState.setOffsetSource { monthState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset?.toFloat() ?: 0f }
     }
 
     val visibleMonthDays by remember {

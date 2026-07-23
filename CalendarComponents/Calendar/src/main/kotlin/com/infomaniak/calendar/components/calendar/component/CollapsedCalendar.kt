@@ -52,7 +52,7 @@ internal fun CollapsedCalendar(
     weekNumbering: WeekNumbering,
     onDayClick: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
-    onProvideHeaderOffset: (() -> Float) -> Unit = {},
+    headerState: CalendarHeaderState = rememberCalendarHeaderState(),
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
@@ -84,8 +84,8 @@ internal fun CollapsedCalendar(
         }
     }
 
-    LaunchedEffect(weekState) {
-        onProvideHeaderOffset { weekState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset?.toFloat() ?: 0f }
+    LaunchedEffect(weekState, headerState) {
+        headerState.setOffsetSource { weekState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset?.toFloat() ?: 0f }
     }
 
     WeekCalendar(

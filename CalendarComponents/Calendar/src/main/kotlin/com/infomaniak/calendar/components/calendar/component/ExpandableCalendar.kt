@@ -25,7 +25,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -35,6 +34,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.core.common.utils.today
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toKotlinDayOfWeek
 import kotlin.time.Clock
@@ -50,7 +50,7 @@ fun ExpandableCalendar(
     modifier: Modifier = Modifier,
 ) {
     val firstDayOfWeek = remember(weekNumbering) { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
-    var headerOffsetProvider by remember { mutableStateOf({ 0f }) }
+    val headerState = rememberCalendarHeaderState()
     var headerWidth by remember { mutableIntStateOf(0) }
 
     Box(modifier = modifier) {
@@ -66,7 +66,7 @@ fun ExpandableCalendar(
                         onDayClick = onDayClick,
                         weekNumbering = weekNumbering,
                         monthRange = RANGE_MONTHS,
-                        onProvideHeaderOffset = { headerOffsetProvider = it },
+                        headerState = headerState,
                         sharedTransitionScope = sharedTransitionScope,
                         animatedVisibilityScope = this,
                     )
@@ -76,7 +76,7 @@ fun ExpandableCalendar(
                         onDayClick = onDayClick,
                         weekNumbering = weekNumbering,
                         monthRange = RANGE_MONTHS,
-                        onProvideHeaderOffset = { headerOffsetProvider = it },
+                        headerState = headerState,
                         sharedTransitionScope = sharedTransitionScope,
                         animatedVisibilityScope = this,
                     )
@@ -84,21 +84,36 @@ fun ExpandableCalendar(
             }
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clipToBounds()
-                .onSizeChanged { headerWidth = it.width },
-        ) {
-            DaysOfWeekTitle(
-                firstDayOfWeek = firstDayOfWeek,
-                modifier = Modifier.graphicsLayer { translationX = headerOffsetProvider() },
-            )
-            DaysOfWeekTitle(
-                firstDayOfWeek = firstDayOfWeek,
-                modifier = Modifier.graphicsLayer { translationX = headerOffsetProvider() + headerWidth },
-            )
-        }
+        DayOfWeekOverlayHeader(
+            headerWidth = { headerWidth },
+            updateHeaderWidth = { headerWidth = it },
+            firstDayOfWeek = firstDayOfWeek,
+            headerState = headerState,
+        )
+    }
+}
+
+@Composable
+private fun DayOfWeekOverlayHeader(
+    headerWidth: () -> Int,
+    updateHeaderWidth: (Int) -> Unit,
+    firstDayOfWeek: DayOfWeek,
+    headerState: CalendarHeaderState,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clipToBounds()
+            .onSizeChanged { updateHeaderWidth(it.width) },
+    ) {
+        DaysOfWeekTitle(
+            firstDayOfWeek = firstDayOfWeek,
+            modifier = Modifier.graphicsLayer { translationX = headerState.offset },
+        )
+        DaysOfWeekTitle(
+            firstDayOfWeek = firstDayOfWeek,
+            modifier = Modifier.graphicsLayer { translationX = headerState.offset + headerWidth() },
+        )
     }
 }
 
