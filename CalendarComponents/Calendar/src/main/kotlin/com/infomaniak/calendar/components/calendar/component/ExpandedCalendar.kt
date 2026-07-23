@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
@@ -89,7 +90,14 @@ internal fun ExpandedCalendar(
 
     HorizontalCalendar(
         state = monthState,
-        monthHeader = { DaysOfWeekTitle(firstDayOfWeek, Modifier.alpha(0f)) }, // Reserves the space to keep the swiping on header
+        monthHeader = {
+            DaysOfWeekTitle(
+                firstDayOfWeek = firstDayOfWeek,
+                modifier = Modifier
+                    .alpha(0f) // Reserves the space to keep the swiping on header
+                    .clearAndSetSemantics {},
+            )
+        },
         dayContent = { day ->
             DayContent(
                 day = day,
