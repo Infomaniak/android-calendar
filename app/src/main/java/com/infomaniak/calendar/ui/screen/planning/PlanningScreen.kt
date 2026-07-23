@@ -122,6 +122,7 @@ private fun PlanningScreen(
                         )
                     }
                 },
+                isCalendarExpanded = { isCalendarExpanded },
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.TopCenter)

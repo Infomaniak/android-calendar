@@ -39,6 +39,7 @@ import kotlinx.datetime.LocalDate
 fun CalendarTopAppBar(
     onToggleCalendar: () -> Unit,
     isLoadingEvents: () -> Boolean,
+    isCalendarExpanded: () -> Boolean,
     hazeState: HazeState,
     modifier: Modifier = Modifier,
     calendar: @Composable () -> Unit = {},
@@ -46,7 +47,9 @@ fun CalendarTopAppBar(
     val containerColor = TopAppBarDefaults.topAppBarColors().containerColor
     Column(modifier = modifier.backgroundBlur(containerColor, hazeState)) {
         TopAppBar(
-            title = { CurrentMonthTitle(onClick = onToggleCalendar, modifier = Modifier.fillMaxWidth()) },
+            title = {
+                CurrentMonthTitle(isExpanded = isCalendarExpanded, onClick = onToggleCalendar, modifier = Modifier.fillMaxWidth())
+            },
             navigationIcon = { TopAppBarButtons.DrawerIconButton() },
             actions = {
                 TopAppBarButtons.InboxButton(onClick = {})
@@ -67,7 +70,12 @@ private fun CalendarTopAppBarPreview() {
         CompositionLocalProvider(
             LocalVisibleDayState provides VisibleDayState(_visibleDate = visibleDate),
         ) {
-            CalendarTopAppBar(onToggleCalendar = {}, isLoadingEvents = { true }, hazeState = HazeState())
+            CalendarTopAppBar(
+                onToggleCalendar = {},
+                isLoadingEvents = { true },
+                isCalendarExpanded = { false },
+                hazeState = HazeState(),
+            )
         }
     }
 }
