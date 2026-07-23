@@ -17,6 +17,8 @@
  */
 package com.infomaniak.calendar.components.calendar.component
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.animateContentSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -26,6 +28,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
@@ -51,18 +55,22 @@ internal fun ExpandedCalendar(
     weekNumbering: WeekNumbering,
     onDayClick: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
+    headerState: CalendarHeaderState = rememberCalendarHeaderState(),
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
-    val today by rememberToday()
 
     val initialMonth = remember { selectedDate().yearMonth }
-
     val monthState = rememberCalendarState(
         startMonth = remember { initialMonth.minus(monthRange, DateTimeUnit.MONTH) },
         endMonth = remember { initialMonth.plus(monthRange, DateTimeUnit.MONTH) },
         firstVisibleMonth = initialMonth,
         firstDayOfWeek = firstDayOfWeek,
     )
+
+    val today by rememberToday()
+    val visibleMonthDays by remember { derivedStateOf { monthState.firstVisibleMonth.weekDays.flatten().toSet() } }
 
     LaunchedEffect(monthState) {
         snapshotFlow { selectedDate().yearMonth }.collectLatest { month ->
@@ -76,11 +84,30 @@ internal fun ExpandedCalendar(
         }
     }
 
+    LaunchedEffect(monthState, headerState) {
+        headerState.setExpandedOffsetSource { monthState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset?.toFloat() ?: 0f }
+    }
+
     HorizontalCalendar(
         state = monthState,
-        monthHeader = { DaysOfWeekTitle(firstDayOfWeek) },
+        monthHeader = {
+            DaysOfWeekTitle(
+                firstDayOfWeek = firstDayOfWeek,
+                modifier = Modifier
+                    .alpha(0f) // Reserves the space to keep the swiping on header
+                    .clearAndSetSemantics {},
+            )
+        },
         dayContent = { day ->
-            DayContent(day = day, selectedDate = selectedDate, today = { today }, onDayClick = onDayClick)
+            DayContent(
+                day = day,
+                selectedDate = selectedDate,
+                today = { today },
+                onDayClick = onDayClick,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
+                isSharedElementEnabled = day in visibleMonthDays,
+            )
         },
         modifier = modifier.animateContentSize(),
     )
@@ -91,6 +118,9 @@ private fun DayContent(
     selectedDate: () -> LocalDate,
     today: () -> LocalDate,
     onDayClick: (LocalDate) -> Unit,
+    sharedTransitionScope: SharedTransitionScope?,
+    animatedVisibilityScope: AnimatedVisibilityScope?,
+    isSharedElementEnabled: Boolean,
 ) {
     val dateState by remember {
         derivedStateOf {
@@ -107,6 +137,12 @@ private fun DayContent(
         dateState = dateState,
         onClick = { onDayClick(day.date) },
         date = day.date,
+        modifier = Modifier.daySharedElement(
+            sharedTransitionScope = sharedTransitionScope,
+            animatedVisibilityScope = animatedVisibilityScope,
+            date = day.date,
+            enabled = isSharedElementEnabled,
+        ),
     )
 }
 
