@@ -27,18 +27,25 @@ import androidx.compose.runtime.setValue
 /**
  * Keeps the days-of-week header horizontally in sync with the currently displayed calendar pager.
  *
- * The active pager registers its scroll via [setOffsetSource], and the header reads [offset]. The read
- * is lazy (pull-based) so it can be sampled during the draw phase (e.g. inside `graphicsLayer`) and stay
- * in sync with the scrolling day columns, without the one-frame lag a pushed value would introduce.
+ * Each pager owns its own slot ([setExpandedOffsetSource] / [setCollapsedOffsetSource]) so they never
+ * clobber each other during a transition, and the header reads the slot matching the current expansion
+ * state via [offset]. The read is lazy (pull-based) so it can be sampled during the draw phase (e.g. inside
+ * `graphicsLayer`) and stay in sync with the scrolling day columns, without the one-frame lag a pushed value
+ * would introduce.
  */
 @Stable
 internal class CalendarHeaderState {
-    private var offsetSourceLambda: () -> Float by mutableStateOf({ 0f })
+    private var expandedOffset: () -> Float by mutableStateOf({ 0f })
+    private var collapsedOffset: () -> Float by mutableStateOf({ 0f })
 
-    val offset: Float get() = offsetSourceLambda()
+    fun offset(isExpanded: Boolean): Float = if (isExpanded) expandedOffset() else collapsedOffset()
 
-    fun setOffsetSource(source: () -> Float) {
-        offsetSourceLambda = source
+    fun setExpandedOffsetSource(source: () -> Float) {
+        expandedOffset = source
+    }
+
+    fun setCollapsedOffsetSource(source: () -> Float) {
+        collapsedOffset = source
     }
 }
 

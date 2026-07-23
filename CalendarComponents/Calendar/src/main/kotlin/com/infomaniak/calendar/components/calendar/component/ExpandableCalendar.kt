@@ -89,6 +89,7 @@ fun ExpandableCalendar(
             updateHeaderWidth = { headerWidth = it },
             firstDayOfWeek = firstDayOfWeek,
             headerState = headerState,
+            isExpanded = isExpanded,
         )
     }
 }
@@ -99,6 +100,7 @@ private fun DayOfWeekOverlayHeader(
     updateHeaderWidth: (Int) -> Unit,
     firstDayOfWeek: DayOfWeek,
     headerState: CalendarHeaderState,
+    isExpanded: () -> Boolean,
 ) {
     Box(
         modifier = Modifier
@@ -108,11 +110,11 @@ private fun DayOfWeekOverlayHeader(
     ) {
         DaysOfWeekTitle(
             firstDayOfWeek = firstDayOfWeek,
-            modifier = Modifier.graphicsLayer { translationX = headerState.offset },
+            modifier = Modifier.graphicsLayer { translationX = headerState.offset(isExpanded()) },
         )
         DaysOfWeekTitle(
             firstDayOfWeek = firstDayOfWeek,
-            modifier = Modifier.graphicsLayer { translationX = headerState.offset + headerWidth() },
+            modifier = Modifier.graphicsLayer { translationX = headerState.offset(isExpanded()) + headerWidth() },
         )
     }
 }

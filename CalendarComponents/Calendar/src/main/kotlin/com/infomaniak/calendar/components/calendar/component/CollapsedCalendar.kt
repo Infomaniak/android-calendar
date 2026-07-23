@@ -85,7 +85,7 @@ internal fun CollapsedCalendar(
     }
 
     LaunchedEffect(weekState, headerState) {
-        headerState.setOffsetSource { weekState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset?.toFloat() ?: 0f }
+        headerState.setCollapsedOffsetSource { weekState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset?.toFloat() ?: 0f }
     }
 
     WeekCalendar(

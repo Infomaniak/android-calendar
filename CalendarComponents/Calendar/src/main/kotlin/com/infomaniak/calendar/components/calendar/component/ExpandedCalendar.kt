@@ -84,7 +84,7 @@ internal fun ExpandedCalendar(
     }
 
     LaunchedEffect(monthState, headerState) {
-        headerState.setOffsetSource { monthState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset?.toFloat() ?: 0f }
+        headerState.setExpandedOffsetSource { monthState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset?.toFloat() ?: 0f }
     }
 
     HorizontalCalendar(
