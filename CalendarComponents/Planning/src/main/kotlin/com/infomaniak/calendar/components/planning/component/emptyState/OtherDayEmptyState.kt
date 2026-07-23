@@ -15,45 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.planning.component
+package com.infomaniak.calendar.components.planning.component.emptyState
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.infomaniak.calendar.components.resources.R
-import com.infomaniak.core.ui.compose.margin.Margin
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-internal fun EmptyState(onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+internal fun OtherDayEmptyState(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    EmptyStateContainer(
         modifier = modifier
             .clip(MaterialTheme.shapes.medium)
-            .clickable(onClick = onClick)
-            .padding(all = Margin.Medium),
-    ) {
-        Text(
-            stringResource(R.string.planningNothingPlanned),
-            modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
+            .clickable(onClick = onClick),
+    )
 }
 
 @PreviewLightDark
 @Composable
-private fun EmptyStatePreview() {
+private fun OtherDayEmptyStatePreview() {
     Surface {
-        EmptyState(onClick = {})
+        OtherDayEmptyState(onClick = {})
     }
 }
