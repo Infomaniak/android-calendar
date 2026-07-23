@@ -34,12 +34,13 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySli
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import java.util.SortedMap
 import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventStatus as KmpEventStatus
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationStatus as KmpParticipationStatus
 
@@ -64,7 +65,7 @@ typealias EventsByWeekAndDay = SortedMap<YearWeek, SortedMap<LocalDate, List<Eve
  * Weeks are resolved using [weekNumbering] (ISO-8601 by default). Today is guaranteed to have an
  * entry: an empty day gets a single [EventUi.TodayEmptyState] placeholder.
  */
-@OptIn(ExperimentalTime::class)
+@Suppress("UNCHECKED_CAST") // Shows the exposed list as non-mutable
 suspend fun Map<LocalDate, List<EventDaySlice>>.groupByWeekAndDay(
     emailsByUserId: Map<AccountId, String>,
     weekNumbering: WeekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
@@ -72,26 +73,28 @@ suspend fun Map<LocalDate, List<EventDaySlice>>.groupByWeekAndDay(
 ): EventsByWeekAndDay = withContext(Dispatchers.Default) {
     val eventsByWeekAndDay = sortedMapOf<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>()
 
-    for ((date, daySlices) in this@groupByWeekAndDay) {
+    val firstDate = keys.firstOrNull() ?: return@withContext eventsByWeekAndDay as EventsByWeekAndDay
+    val lastDate = keys.lastOrNull() ?: return@withContext eventsByWeekAndDay as EventsByWeekAndDay
+
+    for (week in weekNumbering.weeksBetween(firstDate, lastDate)) {
         ensureActive()
-        val week = eventsByWeekAndDay.getOrPut(weekNumbering.weekOf(date)) { sortedMapOf() }
-        week[date] = daySlices.mapTo(mutableListOf()) { slice -> slice.toEventUi(emailsByUserId, timeZone) }
+        val days = eventsByWeekAndDay.getOrPut(week) { sortedMapOf() }
+        var date = week.firstDay
+        while (date <= week.lastDay) {
+            days[date] = this@groupByWeekAndDay[date]
+                ?.mapTo(mutableListOf()) { it.toEventUi(emailsByUserId, timeZone) }
+                .ensureHasEntry(date, timeZone)
+            date = date.plus(DatePeriod(days = 1))
+        }
     }
 
-    eventsByWeekAndDay.ensureTodayHasEntry(timeZone, weekNumbering)
-
-    @Suppress("UNCHECKED_CAST") // Shows the exposed list as non-mutable
     return@withContext eventsByWeekAndDay as EventsByWeekAndDay
 }
 
-private fun SortedMap<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>.ensureTodayHasEntry(
-    timeZone: TimeZone,
-    weekNumbering: WeekNumbering,
-) {
-    val todayEvents = getOrPut(weekNumbering.weekOf(Clock.today(timeZone))) { sortedMapOf() }
-        .getOrPut(Clock.today()) { mutableListOf() }
-
-    if (todayEvents.isEmpty()) todayEvents.add(EventUi.TodayEmptyState)
+private fun MutableList<EventUi>?.ensureHasEntry(date: LocalDate, timeZone: TimeZone): MutableList<EventUi> {
+    val events = this ?: mutableListOf()
+    if (events.isEmpty()) events.add(if (date == Clock.today(timeZone)) EventUi.TodayEmptyState else EventUi.EmptyState(date))
+    return events
 }
 
 private fun EventDaySlice.toEventUi(emailsByUserId: Map<AccountId, String>, timeZone: TimeZone): EventUi = EventUi.Normal(
