@@ -40,23 +40,8 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toKotlinDayOfWeek
 import kotlin.time.Clock
 
-/** Roughly eight years each way, far enough that the range never needs to be recentered. */
 private const val RANGE_MONTHS = 100
 
-/**
- * A calendar that switches between a single week ([CollapsedCalendar]) and a full month
- * ([ExpandedCalendar]), with the days shared between the two forms so they slide into place rather
- * than cross-fading.
- *
- * The days-of-week header is not rendered by either calendar: they only reserve its space, and the
- * real one is drawn on top by [DayOfWeekOverlayHeader]. See that function for why.
- *
- * @param isExpanded which form to display, as a lambda so the read stays as low as possible.
- * @param selectedDate the highlighted day, forwarded as a lambda all the way down to the day cells
- * so a selection change only recomposes the two cells it affects.
- * @param onDayClick called when a day is picked, whether by tapping it or by swiping to another
- * page (in which case the first day of that page is reported).
- */
 @Composable
 fun ExpandableCalendar(
     isExpanded: () -> Boolean,
@@ -67,16 +52,11 @@ fun ExpandableCalendar(
 ) {
     val firstDayOfWeek = remember(weekNumbering) { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
 
-    // Shared by both calendars: each one publishes its own scroll offset into its own slot, so the
-    // two never overwrite each other while both are on screen during the expand/collapse animation.
     val headerState = rememberCalendarHeaderState()
 
     var headerWidth by remember { mutableIntStateOf(0) }
 
     Box(modifier = modifier) {
-        // Gives the day cells a shared element scope: a day present in both forms (the days of the
-        // selected week) is matched by date and animates from its week position to its month
-        // position instead of fading out and back in.
         SharedTransitionLayout {
             AnimatedContent(
                 targetState = isExpanded(),
@@ -87,7 +67,6 @@ fun ExpandableCalendar(
                         ExpandedCalendar(
                             selectedDate = selectedDate,
                             onDayClick = onDayClick,
-                            // Swiping to another month selects its first day.
                             onVisibleMonthChange = { onDayClick(it.firstDay) },
                             weekNumbering = weekNumbering,
                             monthRange = RANGE_MONTHS,
@@ -100,7 +79,6 @@ fun ExpandableCalendar(
                     CollapsedCalendar(
                         selectedDate = selectedDate,
                         onDayClick = onDayClick,
-                        // The reported date is already the first day of the week.
                         onVisibleWeekChange = { onDayClick(it) },
                         weekNumbering = weekNumbering,
                         monthRange = RANGE_MONTHS,
@@ -122,18 +100,6 @@ fun ExpandableCalendar(
     }
 }
 
-/**
- * Draws the days-of-week row on top of the calendars.
- *
- * Each calendar already renders this row inside its scrolling content, but fully transparent: that
- * copy exists only to reserve the right amount of space and to keep the header area part of the
- * swipe surface. Drawing the visible one here instead means it survives the expand/collapse
- * transition untouched, rather than being torn down and rebuilt with the calendar it belongs to.
- *
- * Two copies are rendered side by side, both translated by the pager's scroll offset: as the first
- * slides out to the left, the second — sitting exactly one width further right — takes its place,
- * so the row scrolls along with the day columns and loops seamlessly.
- */
 @Composable
 private fun DayOfWeekOverlayHeader(
     headerWidth: () -> Int,
@@ -145,7 +111,6 @@ private fun DayOfWeekOverlayHeader(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            // Without this the trailing copy would paint outside the calendar while sliding in.
             .clipToBounds()
             .onSizeChanged { updateHeaderWidth(it.width) },
     ) {

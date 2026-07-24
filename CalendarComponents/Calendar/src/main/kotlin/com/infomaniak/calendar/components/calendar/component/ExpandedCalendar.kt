@@ -29,6 +29,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.calendar.modifier.FollowExternalSelection
+import com.infomaniak.calendar.components.calendar.modifier.SyncHeaderOffset
+import com.infomaniak.calendar.components.calendar.modifier.pagedSwipe
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberToday
@@ -46,20 +49,6 @@ import kotlinx.datetime.toKotlinDayOfWeek
 import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
-/**
- * The expanded (full month) form of [ExpandableCalendar]. Its collapsed counterpart is
- * [CollapsedCalendar]; both are built the same way and any change here likely applies there too.
- *
- * @param monthRange how far back and forward the calendar can be scrolled, in months.
- * @param selectedDate the highlighted day, passed as a lambda so the state read can be deferred
- * down to the individual day cells (see [DayContent]). Reading it here would subscribe the whole
- * calendar to every selection change.
- * @param onDayClick called when the user taps a day.
- * @param onVisibleMonthChange called when a swipe lands on another month. Fired as soon as the
- * gesture ends, before the settle animation runs.
- * @param headerState shared with [ExpandableCalendar]'s overlay header, which needs this pager's
- * scroll offset to translate along with the day columns.
- */
 @Composable
 internal fun ExpandedCalendar(
     monthRange: Int,
@@ -73,15 +62,7 @@ internal fun ExpandedCalendar(
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
-
-    // Snapshot of the selection taken when this calendar enters composition. Using a keyless
-    // `remember` means the lambda runs once, so this scope stops being subscribed to the
-    // selection state after the first change instead of recomposing on every one.
     val initialMonth = remember { selectedDate().yearMonth }
-
-    // `rememberCalendarState` passes these as `rememberSaveable` inputs, so any change to them
-    // recreates the state from scratch, teleporting the calendar to `firstVisibleMonth` with no
-    // animation. They must therefore stay frozen; scrolling is done through the state instead.
     val monthState = rememberCalendarState(
         startMonth = remember { initialMonth.minus(monthRange, DateTimeUnit.MONTH) },
         endMonth = remember { initialMonth.plus(monthRange, DateTimeUnit.MONTH) },
@@ -91,39 +72,32 @@ internal fun ExpandedCalendar(
 
     val today by rememberToday()
 
-    // Days of the month currently on screen. Only those take part in the expand/collapse shared
-    // transition: neighbouring months hold the same dates as in/out dates, and letting them match
-    // would make the transition pick an arbitrary duplicate.
-    val visibleMonthDays by remember { derivedStateOf { monthState.firstVisibleMonth.weekDays.flatten().toSet() } }
+    val sharedElementDays by remember { derivedStateOf { monthState.firstVisibleMonth.weekDays.flatten().toSet() } }
 
     FollowExternalSelection(
-        state = monthState,
+        scrollableState = monthState,
         selectedPage = { selectedDate().yearMonth },
-        currentPage = { monthState.firstVisibleMonth.yearMonth },
+        displayedPage = { monthState.firstVisibleMonth.yearMonth },
         animateScrollToPage = { monthState.animateScrollToMonth(it) },
     )
 
     SyncHeaderOffset(
-        state = monthState,
+        scrollableState = monthState,
         headerState = headerState,
         layoutInfo = { monthState.layoutInfo },
-        setSource = headerState::setExpandedOffsetSource,
+        setOffsetSource = { headerState.setCollapsedOffsetSource(it) },
     )
 
     HorizontalCalendar(
         state = monthState,
-        // Only affects the fling here, which never runs: month items always fill the viewport
-        // width regardless of this flag (unlike weeks, where `CollapsedCalendar` needs `true`).
         calendarScrollPaged = false,
-        // The list must not consume gestures: `pagedSwipe` below drives the scrolling so it can
-        // decide the destination month itself, at drag end, instead of reading it back afterwards.
         userScrollEnabled = false,
         monthHeader = {
             DaysOfWeekTitle(
                 firstDayOfWeek = firstDayOfWeek,
                 modifier = Modifier
                     .alpha(0f) // Reserves the space to keep the swiping on header
-                    .clearAndSetSemantics {}, // The visible header is the overlay one, announce it only once
+                    .clearAndSetSemantics {},
             )
         },
         dayContent = { day ->
@@ -134,22 +108,18 @@ internal fun ExpandedCalendar(
                 onDayClick = onDayClick,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
-                isSharedElementEnabled = day in visibleMonthDays,
+                isSharedElementEnabled = day in sharedElementDays,
             )
         },
         modifier = modifier
             .pagedSwipe(
-                state = monthState,
-                currentPage = { monthState.firstVisibleMonth.yearMonth },
-                // A page is a month, so stepping means moving a whole month. The returned value is
-                // kept by `pagedSwipe` as the starting point of a chained swipe, so quick successive
-                // swipes report every month instead of repeating the same one.
-                onPageChange = { from, step ->
-                    from.plus(step, DateTimeUnit.MONTH).also(onVisibleMonthChange)
+                scrollableState = monthState,
+                displayedPage = { monthState.firstVisibleMonth.yearMonth },
+                onPageSwiped = { from, pageOffset ->
+                    from.plus(pageOffset, DateTimeUnit.MONTH).also(onVisibleMonthChange)
                 },
                 animateScrollToPage = { monthState.animateScrollToMonth(it) },
             )
-            // Months have 4 to 6 week rows, so the calendar height changes from page to page.
             .animateContentSize(),
     )
 }
@@ -164,15 +134,8 @@ private fun DayContent(
     animatedVisibilityScope: AnimatedVisibilityScope?,
     isSharedElementEnabled: Boolean,
 ) {
-    // Both lambdas are read here rather than by the caller, so a selection change invalidates only
-    // the cells whose state actually changes. `derivedStateOf` filters on the result: every visible
-    // cell re-runs this cheap `when`, but only the day losing `Selected` and the one gaining it
-    // recompose. The `day` key is required because lazy layouts reuse slots across items.
     val dateState by remember(day) {
         derivedStateOf {
-            // In/out dates repeat a neighbouring month's days, so the same date can be on screen
-            // twice while two pages overlap. Only the month that owns the date may highlight it,
-            // otherwise the selection appears on two cells at once during a swipe.
             val isInMonth = day.position == DayPosition.MonthDate
             when {
                 isInMonth && day.date == selectedDate() -> DateState.Selected
