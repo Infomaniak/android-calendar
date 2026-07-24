@@ -37,7 +37,6 @@ import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -49,17 +48,18 @@ import kotlin.math.abs
  * otherwise the closest page wins on distance. The settle reuses the gesture velocity with
  * the spring the library's snap uses, so the motion stays continuous with the finger.
  *
- * Use with `calendarScrollPaged = false` and `userScrollEnabled = false`.
+ * Use with `userScrollEnabled = false` so the list never competes for the gesture.
  *
- * @param currentPage read at drag start, before the leading item flips mid-gesture.
- * @param onPageChange called with the page the gesture started on and the step (-1 or 1),
- * before any animation runs. Not called when the swipe doesn't change page.
+ * @param currentPage the page currently displayed, read only when no swipe is pending.
+ * @param onPageChange called with the page the gesture started from and the step (-1 or 1),
+ * before any animation runs. Must return the resulting page. Not called when the swipe
+ * doesn't change page.
  */
 internal fun <P> Modifier.pagedSwipe(
     state: ScrollableState,
     firstVisibleItemOffset: () -> Int,
     currentPage: () -> P,
-    onPageChange: (from: P, step: Int) -> Unit,
+    onPageChange: (from: P, step: Int) -> P,
 ): Modifier = this then PagedSwipeElement(state, firstVisibleItemOffset, currentPage, onPageChange)
 
 private val MIN_FLING_VELOCITY = 300.dp
@@ -68,7 +68,7 @@ private data class PagedSwipeElement<P>(
     private val state: ScrollableState,
     private val firstVisibleItemOffset: () -> Int,
     private val currentPage: () -> P,
-    private val onPageChange: (P, Int) -> Unit,
+    private val onPageChange: (P, Int) -> P,
 ) : ModifierNodeElement<PagedSwipeNode<P>>() {
 
     override fun create() = PagedSwipeNode(state, firstVisibleItemOffset, currentPage, onPageChange)
@@ -87,13 +87,22 @@ private class PagedSwipeNode<P>(
     private var state: ScrollableState,
     private var firstVisibleItemOffset: () -> Int,
     private var currentPage: () -> P,
-    private var onPageChange: (P, Int) -> Unit,
+    private var onPageChange: (P, Int) -> P,
 ) : DelegatingNode(), PointerInputModifierNode {
 
     private var width = 0
     private var endVelocity = 0f
     private var deltas: Channel<Float>? = null
     private val velocityTracker = VelocityTracker()
+
+    /**
+     * Page the last swipe targeted, while its settle animation is still running.
+     *
+     * Chained swipes must start from it rather than from [currentPage]: the displayed page
+     * only flips past the halfway point, so a fast second swipe would otherwise read the
+     * page the first one started from and report a change that already happened.
+     */
+    private var pendingPage: P? = null
 
     private val pointerInput = delegate(
         SuspendingPointerInputModifierNode {
@@ -119,11 +128,12 @@ private class PagedSwipeNode<P>(
         state: ScrollableState,
         firstVisibleItemOffset: () -> Int,
         currentPage: () -> P,
-        onPageChange: (P, Int) -> Unit,
+        onPageChange: (P, Int) -> P,
     ) {
         if (this.state != state) {
             this.state = state
             deltas?.close()
+            pendingPage = null
             pointerInput.resetPointerInputHandler()
         }
         this.firstVisibleItemOffset = firstVisibleItemOffset
@@ -150,7 +160,7 @@ private class PagedSwipeNode<P>(
         velocityTracker.resetTracking()
         endVelocity = 0f
 
-        val from = currentPage()
+        val from = pendingPage ?: currentPage()
         val minFlingVelocity = with(requireDensity()) { MIN_FLING_VELOCITY.toPx() }
 
         coroutineScope.launch {
@@ -159,9 +169,7 @@ private class PagedSwipeNode<P>(
             // the calendar a few dozen pixels off until a final snap yanked it back.
             state.scroll(MutatePriority.UserInput) {
                 var dragged = 0f
-                for (delta in channel) {
-                    dragged -= scrollBy(-delta)
-                }
+                for (delta in channel) dragged -= scrollBy(-delta)
 
                 val step = when {
                     abs(endVelocity) >= minFlingVelocity -> if (endVelocity < 0) 1 else -1
@@ -170,7 +178,7 @@ private class PagedSwipeNode<P>(
                 }
 
                 // Fire before animating: the destination is already known.
-                if (step != 0) onPageChange(from, step)
+                if (step != 0) pendingPage = onPageChange(from, step)
 
                 var last = 0f
                 AnimationState(initialValue = 0f, initialVelocity = -endVelocity).animateTo(
@@ -185,6 +193,9 @@ private class PagedSwipeNode<P>(
                 val offset = firstVisibleItemOffset()
                 val correction = if (-offset <= width / 2) offset else offset + width
                 if (correction != 0) scrollBy(correction.toFloat())
+
+                // Settled: the displayed page is authoritative again.
+                pendingPage = null
             }
         }
     }

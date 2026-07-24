@@ -124,7 +124,9 @@ internal fun ExpandedCalendar(
                 state = monthState,
                 firstVisibleItemOffset = { monthState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset ?: 0 },
                 currentPage = { monthState.firstVisibleMonth.yearMonth },
-                onPageChange = { from, step -> onVisibleMonthChange(from.plus(step, DateTimeUnit.MONTH)) },
+                onPageChange = { from, step ->
+                    from.plus(step, DateTimeUnit.MONTH).also(onVisibleMonthChange)
+                },
             )
             .animateContentSize(),
     )

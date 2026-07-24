@@ -129,7 +129,9 @@ internal fun CollapsedCalendar(
             state = weekState,
             firstVisibleItemOffset = { weekState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset ?: 0 },
             currentPage = { weekState.firstVisibleWeek.days.first().date },
-            onPageChange = { from, step -> onVisibleWeekChange(from.plus(step * DAYS_IN_WEEK, DateTimeUnit.DAY)) },
+            onPageChange = { from, step ->
+                from.plus(step * DAYS_IN_WEEK, DateTimeUnit.DAY).also(onVisibleWeekChange)
+            },
         ),
     )
 }
