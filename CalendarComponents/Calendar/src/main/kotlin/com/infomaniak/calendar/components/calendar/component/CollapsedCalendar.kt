@@ -140,7 +140,6 @@ internal fun CollapsedCalendar(
         },
         modifier = modifier.pagedSwipe(
             state = weekState,
-            firstVisibleItemOffset = { weekState.layoutInfo.firstVisibleItemOffset() },
             currentPage = { weekState.firstVisibleWeek.days.first().date },
             // A page is a week, so stepping means moving a whole week. The returned value is kept by
             // `pagedSwipe` as the starting point of a chained swipe, so quick successive swipes
@@ -148,6 +147,7 @@ internal fun CollapsedCalendar(
             onPageChange = { from, step ->
                 from.plus(step * DAYS_IN_WEEK, DateTimeUnit.DAY).also(onVisibleWeekChange)
             },
+            animateScrollToPage = { weekState.animateScrollToWeek(it) },
         ),
     )
 }

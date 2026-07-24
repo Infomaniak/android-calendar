@@ -17,10 +17,6 @@
  */
 package com.infomaniak.calendar.components.calendar.component
 
-import androidx.compose.animation.core.AnimationState
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateTo
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -56,39 +52,45 @@ import kotlin.math.abs
  * Mirrors what Compose does, so the calendar still feels like a standard pager: a flick faster than
  * [MIN_FLING_VELOCITY] moves one page in the direction of the flick, whatever the distance covered;
  * below that threshold, the page that is closest wins, i.e. the swipe must pass the halfway mark.
- * The settle animation reuses the gesture velocity with the spring the library's snap uses, so the
- * motion stays continuous with the finger.
+ *
+ * ### Settling exactly on a page
+ * Once the finger lifts and the destination page is known, the settle is delegated to
+ * [animateScrollToPage], the calendar library's own animated scroll to a page. It always lands the
+ * pager exactly on that page (leading offset 0), so repeated swipes can never accumulate a
+ * fraction-of-a-pixel drift. Driving the settle by hand instead — animating a *relative* distance
+ * and correcting the leftover afterwards — left every swipe a spring-epsilon off, and those errors
+ * piled up into a visible, self-correcting jitter when swipes were spammed.
  *
  * Use with `userScrollEnabled = false` so the list never competes for the gesture.
  *
- * @param state the calendar's scrollable state, scrolled directly by this modifier.
- * @param firstVisibleItemOffset offset in px of the leading item, used to re-align pages exactly
- * once the spring has settled.
+ * @param state the calendar's scrollable state, scrolled directly by this modifier during the drag.
  * @param currentPage the page currently displayed, read only when no swipe is pending.
  * @param onPageChange called with the page the gesture started from and the step (-1 or 1), before
  * any animation runs. Must return the resulting page. Not called when the swipe doesn't change page.
+ * @param animateScrollToPage animates the pager to the given page and lands exactly on it; used to
+ * settle once the destination is known.
  */
 internal fun <P> Modifier.pagedSwipe(
     state: ScrollableState,
-    firstVisibleItemOffset: () -> Int,
     currentPage: () -> P,
     onPageChange: (from: P, step: Int) -> P,
-): Modifier = this then PagedSwipeElement(state, firstVisibleItemOffset, currentPage, onPageChange)
+    animateScrollToPage: suspend (P) -> Unit,
+): Modifier = this then PagedSwipeElement(state, currentPage, onPageChange, animateScrollToPage)
 
 /** Same threshold as Compose's `SnapFlingBehavior`, so a flick feels identical to a system pager. */
 private val MIN_FLING_VELOCITY = 300.dp
 
 private data class PagedSwipeElement<P>(
     private val state: ScrollableState,
-    private val firstVisibleItemOffset: () -> Int,
     private val currentPage: () -> P,
     private val onPageChange: (P, Int) -> P,
+    private val animateScrollToPage: suspend (P) -> Unit,
 ) : ModifierNodeElement<PagedSwipeNode<P>>() {
 
-    override fun create() = PagedSwipeNode(state, firstVisibleItemOffset, currentPage, onPageChange)
+    override fun create() = PagedSwipeNode(state, currentPage, onPageChange, animateScrollToPage)
 
     override fun update(node: PagedSwipeNode<P>) {
-        node.update(state, firstVisibleItemOffset, currentPage, onPageChange)
+        node.update(state, currentPage, onPageChange, animateScrollToPage)
     }
 
     override fun InspectorInfo.inspectableProperties() {
@@ -99,9 +101,9 @@ private data class PagedSwipeElement<P>(
 
 private class PagedSwipeNode<P>(
     private var state: ScrollableState,
-    private var firstVisibleItemOffset: () -> Int,
     private var currentPage: () -> P,
     private var onPageChange: (P, Int) -> P,
+    private var animateScrollToPage: suspend (P) -> Unit,
 ) : DelegatingNode(), PointerInputModifierNode {
 
     /** Viewport width in px, which is also the page width. Kept up to date from pointer events. */
@@ -156,9 +158,9 @@ private class PagedSwipeNode<P>(
 
     fun update(
         state: ScrollableState,
-        firstVisibleItemOffset: () -> Int,
         currentPage: () -> P,
         onPageChange: (P, Int) -> P,
+        animateScrollToPage: suspend (P) -> Unit,
     ) {
         // A new state means a different calendar: abort the gesture rather than scroll the old one.
         if (this.state != state) {
@@ -167,9 +169,9 @@ private class PagedSwipeNode<P>(
             pendingPage = null
             pointerInput.resetPointerInputHandler()
         }
-        this.firstVisibleItemOffset = firstVisibleItemOffset
         this.currentPage = currentPage
         this.onPageChange = onPageChange
+        this.animateScrollToPage = animateScrollToPage
     }
 
     override fun onPointerEvent(pointerEvent: PointerEvent, pass: PointerEventPass, bounds: IntSize) {
@@ -200,50 +202,39 @@ private class PagedSwipeNode<P>(
         val minFlingVelocity = with(requireDensity()) { MIN_FLING_VELOCITY.toPx() }
 
         coroutineScope.launch {
-            // A single scroll session owns the whole gesture, drag and settle alike. Launching one
-            // coroutine per drag event instead let the last delta land *after* the settle distance
-            // had been computed, leaving the calendar a page-fraction off for the duration of the
-            // animation until a final snap yanked it back into place.
+            // The drag owns a single scroll session: deltas are consumed until `onDragEnd`/
+            // `onDragCancel` closes the channel, so no delta is still in flight when the loop exits
+            // and the snap decision below sees the complete gesture. `dragged` accumulates what the
+            // list actually took, which is less than the finger travel at the range edges, so the
+            // distance test stays truthful there too.
+            var dragged = 0f
             state.scroll(MutatePriority.UserInput) {
-                // Consume deltas until `onDragEnd`/`onDragCancel` closes the channel. `dragged`
-                // accumulates what the list actually took, which is less than the finger travel at
-                // the range edges, so the settle distance below stays truthful.
-                var dragged = 0f
                 for (delta in channel) {
                     dragged -= scrollBy(-delta)
                 }
-
-                val step = when {
-                    abs(endVelocity) >= minFlingVelocity -> if (endVelocity < 0) 1 else -1
-                    abs(dragged) > width / 2f -> if (dragged < 0) 1 else -1
-                    else -> 0
-                }
-
-                // Fire before animating: this is the whole point of handling the gesture manually.
-                if (step != 0) pendingPage = onPageChange(from, step)
-
-                // One page spans the viewport, so what remains is the page width minus the part the
-                // finger already covered. `dragged` is negative when swiping forward, hence the sum.
-                var last = 0f
-                AnimationState(initialValue = 0f, initialVelocity = -endVelocity).animateTo(
-                    targetValue = width * step + dragged,
-                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-                ) {
-                    // `animateTo` exposes an absolute value while `scrollBy` takes deltas.
-                    scrollBy(value - last)
-                    last = value
-                }
-
-                // Springs stop within an epsilon of their target, and those epsilons would pile up
-                // over many swipes until pages sat visibly off-grid. Snap the leftover to whichever
-                // page edge is nearest.
-                val offset = firstVisibleItemOffset()
-                val correction = if (-offset <= width / 2) offset else offset + width
-                if (correction != 0) scrollBy(correction.toFloat())
-
-                // Settled: the displayed page is authoritative again, chaining is over.
-                pendingPage = null
             }
+
+            val step = when {
+                abs(endVelocity) >= minFlingVelocity -> if (endVelocity < 0) 1 else -1
+                abs(dragged) > width / 2f -> if (dragged < 0) 1 else -1
+                else -> 0
+            }
+
+            // Destination page: the neighbour when the swipe commits, otherwise the page we started
+            // on (snap back). `onPageChange` fires before the settle animation — the whole point of
+            // handling the gesture by hand — and only when the page actually changes.
+            val target = if (step != 0) onPageChange(from, step) else from
+            pendingPage = target
+
+            // Settle by delegating to the library's animated scroll, which lands the pager exactly
+            // on `target` (leading offset 0). No relative distance to compute and no leftover to
+            // correct, so the alignment can't drift no matter how fast swipes are chained. A chained
+            // swipe's `UserInput` scroll pre-empts this animation and keeps `pendingPage` as its
+            // start, so the reset below is skipped until a settle finishes uninterrupted.
+            animateScrollToPage(target)
+
+            // Settled without interruption: the displayed page is authoritative again.
+            pendingPage = null
         }
     }
 }

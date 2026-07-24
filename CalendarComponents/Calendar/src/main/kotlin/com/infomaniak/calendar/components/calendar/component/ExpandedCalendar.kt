@@ -140,7 +140,6 @@ internal fun ExpandedCalendar(
         modifier = modifier
             .pagedSwipe(
                 state = monthState,
-                firstVisibleItemOffset = { monthState.layoutInfo.firstVisibleItemOffset() },
                 currentPage = { monthState.firstVisibleMonth.yearMonth },
                 // A page is a month, so stepping means moving a whole month. The returned value is
                 // kept by `pagedSwipe` as the starting point of a chained swipe, so quick successive
@@ -148,6 +147,7 @@ internal fun ExpandedCalendar(
                 onPageChange = { from, step ->
                     from.plus(step, DateTimeUnit.MONTH).also(onVisibleMonthChange)
                 },
+                animateScrollToPage = { monthState.animateScrollToMonth(it) },
             )
             // Months have 4 to 6 week rows, so the calendar height changes from page to page.
             .animateContentSize(),

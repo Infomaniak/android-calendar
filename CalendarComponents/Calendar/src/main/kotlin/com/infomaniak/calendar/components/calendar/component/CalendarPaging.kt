@@ -32,9 +32,6 @@ import kotlinx.coroutines.flow.first
  * and can never drift.
  */
 
-/** Offset in px of the leading visible item, used by [pagedSwipe] to re-align pages after settling. */
-internal fun LazyListLayoutInfo.firstVisibleItemOffset(): Int = visibleItemsInfo.firstOrNull()?.offset ?: 0
-
 /**
  * Absolute scroll position of the pager wrapped to a single page, in px, within `[-pageWidth, 0]`.
  *
