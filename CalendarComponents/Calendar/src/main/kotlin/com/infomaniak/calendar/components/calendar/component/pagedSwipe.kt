@@ -124,6 +124,10 @@ private class PagedSwipeNode<P>(
      * Chained swipes must start from it rather than from [currentPage]: the displayed page only
      * flips past the halfway point, so a fast second swipe would otherwise read the page the first
      * one started from, report a change that already happened, and leave the selection stuck.
+     *
+     * It is only trusted while that settle is still in progress (see [startGesture]); once it has
+     * finished the displayed page is authoritative again, so a selection made outside a swipe in the
+     * meantime is picked up instead of this now-stale destination.
      */
     private var pendingPage: P? = null
 
@@ -189,7 +193,10 @@ private class PagedSwipeNode<P>(
         velocityTracker.resetTracking()
         endVelocity = 0f
 
-        val from = pendingPage ?: currentPage()
+        // Trust the pending destination only while its settle is still running (a chained swipe);
+        // once it has finished the displayed page is authoritative again, so an external selection
+        // that happened in between is honoured instead of a stale destination.
+        val from = pendingPage?.takeIf { state.isScrollInProgress } ?: currentPage()
         val minFlingVelocity = with(requireDensity()) { MIN_FLING_VELOCITY.toPx() }
 
         coroutineScope.launch {

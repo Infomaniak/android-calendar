@@ -21,11 +21,9 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -38,8 +36,6 @@ import com.infomaniak.core.common.utils.today
 import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.WeekDay
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
@@ -100,36 +96,19 @@ internal fun CollapsedCalendar(
         derivedStateOf { weekState.firstVisibleWeek.days.mapTo(mutableSetOf()) { it.date } }
     }
 
-    // Follow selection changes coming from outside (day click, jump to today, deep link).
-    LaunchedEffect(weekState) {
-        snapshotFlow { selectedDate().startOfWeek(firstDayOfWeek) }.collectLatest { weekStart ->
-            // Wait for any ongoing gesture or settle rather than dropping the request: scrolling
-            // now would fight the swipe animation, and skipping would lose the jump entirely
-            // (e.g. tapping "today" right after a swipe).
-            snapshotFlow { weekState.isScrollInProgress }.first { !it }
-            if (weekStart != weekState.firstVisibleWeek.days.first().date) {
-                weekState.animateScrollToWeek(weekStart)
-            }
-        }
-    }
+    FollowExternalSelection(
+        state = weekState,
+        selectedPage = { selectedDate().startOfWeek(firstDayOfWeek) },
+        currentPage = { weekState.firstVisibleWeek.days.first().date },
+        animateScrollToPage = { weekState.animateScrollToWeek(it) },
+    )
 
-    // Feeds the overlay header its horizontal offset. Pull-based: the header samples it during the
-    // draw phase so it stays in sync with the day columns, with no one-frame lag.
-    LaunchedEffect(weekState, headerState) {
-        headerState.setCollapsedOffsetSource {
-            val layoutInfo = weekState.layoutInfo
-            val pageWidth = layoutInfo.viewportSize.width
-            if (pageWidth <= 0) return@setCollapsedOffsetSource 0f
-            val info = layoutInfo.visibleItemsInfo.firstOrNull() ?: return@setCollapsedOffsetSource 0f
-            // Absolute scroll position in px. Computing it from the index keeps it continuous when
-            // the leading item changes mid-swipe, unlike `info.offset` alone which jumps back to ~0
-            // and would make the header snap sideways by a full page.
-            val scrolled = info.index.toLong() * pageWidth - info.offset
-            // Wrapped to a single page: the header renders two copies chasing each other, and
-            // expects an offset within [-pageWidth, 0].
-            -(scrolled.toFloat().mod(pageWidth.toFloat()))
-        }
-    }
+    SyncHeaderOffset(
+        state = weekState,
+        headerState = headerState,
+        layoutInfo = { weekState.layoutInfo },
+        setSource = headerState::setCollapsedOffsetSource,
+    )
 
     WeekCalendar(
         state = weekState,
@@ -161,7 +140,7 @@ internal fun CollapsedCalendar(
         },
         modifier = modifier.pagedSwipe(
             state = weekState,
-            firstVisibleItemOffset = { weekState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset ?: 0 },
+            firstVisibleItemOffset = { weekState.layoutInfo.firstVisibleItemOffset() },
             currentPage = { weekState.firstVisibleWeek.days.first().date },
             // A page is a week, so stepping means moving a whole week. The returned value is kept by
             // `pagedSwipe` as the starting point of a chained swipe, so quick successive swipes
