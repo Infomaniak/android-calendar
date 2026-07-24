@@ -78,14 +78,22 @@ internal fun ExpandedCalendar(
         scrollableState = monthState,
         selectedPage = { selectedDate().yearMonth },
         displayedPage = { monthState.firstVisibleMonth.yearMonth },
-        animateScrollToPage = { monthState.animateScrollToMonth(it) },
+        animateScrollToPage = { month ->
+            if (month in monthState.startMonth..monthState.endMonth) {
+                monthState.animateScrollToMonth(month)
+            } else {
+                monthState.startMonth = month.minus(monthRange, DateTimeUnit.MONTH)
+                monthState.endMonth = month.plus(monthRange, DateTimeUnit.MONTH)
+                monthState.scrollToMonth(month)
+            }
+        },
     )
 
     SyncHeaderOffset(
         scrollableState = monthState,
         headerState = headerState,
         layoutInfo = { monthState.layoutInfo },
-        setOffsetSource = { headerState.setCollapsedOffsetSource(it) },
+        setOffsetSource = { headerState.setExpandedOffsetSource(it) },
     )
 
     HorizontalCalendar(

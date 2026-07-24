@@ -80,7 +80,15 @@ internal fun CollapsedCalendar(
         scrollableState = weekState,
         selectedPage = { selectedDate().startOfWeek(firstDayOfWeek) },
         displayedPage = { weekState.firstVisibleWeek.days.first().date },
-        animateScrollToPage = { weekState.animateScrollToWeek(it) },
+        animateScrollToPage = { weekStart ->
+            if (weekStart in weekState.startDate..weekState.endDate) {
+                weekState.animateScrollToWeek(weekStart)
+            } else {
+                weekState.startDate = weekStart.minus(monthRange, DateTimeUnit.MONTH)
+                weekState.endDate = weekStart.plus(monthRange, DateTimeUnit.MONTH)
+                weekState.scrollToWeek(weekStart)
+            }
+        },
     )
 
     SyncHeaderOffset(
