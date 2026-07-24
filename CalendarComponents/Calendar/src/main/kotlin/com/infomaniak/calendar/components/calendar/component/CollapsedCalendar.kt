@@ -49,6 +49,20 @@ import kotlin.time.Clock
 
 private const val DAYS_IN_WEEK = 7
 
+/**
+ * The collapsed (single week) form of [ExpandableCalendar]. Its expanded counterpart is
+ * [ExpandedCalendar]; both are built the same way and any change here likely applies there too.
+ *
+ * @param monthRange how far back and forward the calendar can be scrolled, in months.
+ * @param selectedDate the highlighted day, passed as a lambda so the state read can be deferred
+ * down to the individual day cells (see [DayContent]). Reading it here would subscribe the whole
+ * calendar to every selection change.
+ * @param onDayClick called when the user taps a day.
+ * @param onVisibleWeekChange called when a swipe lands on another week, with the first day of that
+ * week. Fired as soon as the gesture ends, before the settle animation runs.
+ * @param headerState shared with [ExpandableCalendar]'s overlay header, which needs this pager's
+ * scroll offset to translate along with the day columns.
+ */
 @Composable
 internal fun CollapsedCalendar(
     monthRange: Int,
@@ -64,8 +78,14 @@ internal fun CollapsedCalendar(
     val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
     val today by rememberToday()
 
+    // Snapshot of the selection taken when this calendar enters composition. Using a keyless
+    // `remember` means the lambda runs once, so this scope stops being subscribed to the
+    // selection state after the first change instead of recomposing on every one.
     val initialWeekStart = remember { selectedDate().startOfWeek(firstDayOfWeek) }
 
+    // `rememberWeekCalendarState` passes these as `rememberSaveable` inputs, so any change to them
+    // recreates the state from scratch, teleporting the calendar to `firstVisibleWeekDate` with no
+    // animation. They must therefore stay frozen; scrolling is done through the state instead.
     val weekState = rememberWeekCalendarState(
         startDate = remember { initialWeekStart.minus(monthRange, DateTimeUnit.MONTH) },
         endDate = remember { initialWeekStart.plus(monthRange, DateTimeUnit.MONTH) },
@@ -73,14 +93,19 @@ internal fun CollapsedCalendar(
         firstDayOfWeek = firstDayOfWeek,
     )
 
+    // Days of the week currently on screen. Only those take part in the expand/collapse shared
+    // transition: the off-screen weeks hold the same dates as the expanded month grid, and letting
+    // them match would make the transition pick an arbitrary duplicate.
     val visibleWeekDates by remember {
         derivedStateOf { weekState.firstVisibleWeek.days.mapTo(mutableSetOf()) { it.date } }
     }
 
-    // Follow external selection changes (day click, jump to today, deep link).
+    // Follow selection changes coming from outside (day click, jump to today, deep link).
     LaunchedEffect(weekState) {
         snapshotFlow { selectedDate().startOfWeek(firstDayOfWeek) }.collectLatest { weekStart ->
-            // Wait for any ongoing gesture or settle instead of dropping the request.
+            // Wait for any ongoing gesture or settle rather than dropping the request: scrolling
+            // now would fight the swipe animation, and skipping would lose the jump entirely
+            // (e.g. tapping "today" right after a swipe).
             snapshotFlow { weekState.isScrollInProgress }.first { !it }
             if (weekStart != weekState.firstVisibleWeek.days.first().date) {
                 weekState.animateScrollToWeek(weekStart)
@@ -88,30 +113,39 @@ internal fun CollapsedCalendar(
         }
     }
 
+    // Feeds the overlay header its horizontal offset. Pull-based: the header samples it during the
+    // draw phase so it stays in sync with the day columns, with no one-frame lag.
     LaunchedEffect(weekState, headerState) {
         headerState.setCollapsedOffsetSource {
             val layoutInfo = weekState.layoutInfo
             val pageWidth = layoutInfo.viewportSize.width
             if (pageWidth <= 0) return@setCollapsedOffsetSource 0f
             val info = layoutInfo.visibleItemsInfo.firstOrNull() ?: return@setCollapsedOffsetSource 0f
-            // Absolute scroll position in px: stays continuous when the leading item changes.
+            // Absolute scroll position in px. Computing it from the index keeps it continuous when
+            // the leading item changes mid-swipe, unlike `info.offset` alone which jumps back to ~0
+            // and would make the header snap sideways by a full page.
             val scrolled = info.index.toLong() * pageWidth - info.offset
+            // Wrapped to a single page: the header renders two copies chasing each other, and
+            // expects an offset within [-pageWidth, 0].
             -(scrolled.toFloat().mod(pageWidth.toFloat()))
         }
     }
 
     WeekCalendar(
         state = weekState,
-        // Keeps one-week-per-viewport layout. The paged fling never runs since
-        // userScrollEnabled is false: our pagedSwipe drives the scrolling.
+        // Required for the layout, not for the fling: this is what gives each week the viewport
+        // width and each day its `weight(1f)`. With `false` the days keep their intrinsic width and
+        // `Day`'s `fillMaxWidth()` makes each one span the whole screen.
         calendarScrollPaged = true,
+        // The list must not consume gestures: `pagedSwipe` below drives the scrolling so it can
+        // decide the destination week itself, at drag end, instead of reading it back afterwards.
         userScrollEnabled = false,
         weekHeader = {
             DaysOfWeekTitle(
                 firstDayOfWeek = firstDayOfWeek,
                 modifier = Modifier
                     .alpha(0f) // Reserves the space to keep the swiping on header
-                    .clearAndSetSemantics {},
+                    .clearAndSetSemantics {}, // The visible header is the overlay one, announce it only once
             )
         },
         dayContent = { day ->
@@ -129,6 +163,9 @@ internal fun CollapsedCalendar(
             state = weekState,
             firstVisibleItemOffset = { weekState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset ?: 0 },
             currentPage = { weekState.firstVisibleWeek.days.first().date },
+            // A page is a week, so stepping means moving a whole week. The returned value is kept by
+            // `pagedSwipe` as the starting point of a chained swipe, so quick successive swipes
+            // report every week instead of repeating the same one.
             onPageChange = { from, step ->
                 from.plus(step * DAYS_IN_WEEK, DateTimeUnit.DAY).also(onVisibleWeekChange)
             },
@@ -146,6 +183,10 @@ private fun DayContent(
     animatedVisibilityScope: AnimatedVisibilityScope?,
     isSharedElementEnabled: Boolean,
 ) {
+    // Both lambdas are read here rather than by the caller, so a selection change invalidates only
+    // the cells whose state actually changes. `derivedStateOf` filters on the result: every visible
+    // cell re-runs this cheap `when`, but only the day losing `Selected` and the one gaining it
+    // recompose. The `day` key is required because lazy layouts reuse slots across items.
     val dateState by remember(day) {
         derivedStateOf {
             when (day.date) {
