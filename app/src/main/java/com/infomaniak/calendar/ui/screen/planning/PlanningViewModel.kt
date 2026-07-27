@@ -68,10 +68,9 @@ class PlanningViewModel(
             Pager(
                 config = PagingConfig(
                     pageSize = ROWS_PER_PAGE_HINT,
-                    // Kept below one week of rows on purpose: a jump lands the target at least a full
-                    // (leading) week below the top, so a small prefetch distance guarantees no prepend
-                    // fires right after a jump — which would otherwise run away upward. Neighbouring
-                    // weeks are already preloaded by the 3-week refresh (see PlanningPagingSource).
+                    // Small on purpose: the 3-week refresh already preloads the immediate neighbours
+                    // (see PlanningPagingSource), so this only needs to keep continued scrolling smooth
+                    // by loading the next/previous week shortly before reaching an edge.
                     prefetchDistance = PREFETCH_ROWS,
                     // Bound the pages kept in memory: scrolling far drops the farthest weeks (re-loaded
                     // on the way back) so the presented list can't grow unbounded.
@@ -105,9 +104,8 @@ class PlanningViewModel(
         // (each source load still returns exactly one week regardless of the requested load size).
         private const val ROWS_PER_PAGE_HINT = 10
 
-        // Strictly below the minimum rows of a week (1 header + 7 day rows = 8), so a freshly jumped-to
-        // target — always at least a leading week below the top — never sits within the prepend
-        // trigger zone. This is what stops a backward jump from scrolling away endlessly.
+        // How many rows from an edge of the loaded list Paging waits before loading the next/previous
+        // week. Kept small since the 3-week refresh already preloads the immediate neighbours.
         private const val PREFETCH_ROWS = 6
 
         // Upper bound on the rows Paging keeps in memory (must be >= pageSize + 2 * prefetchDistance).
