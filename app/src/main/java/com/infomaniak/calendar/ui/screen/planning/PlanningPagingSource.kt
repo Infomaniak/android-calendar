@@ -25,14 +25,15 @@ import com.infomaniak.calendar.components.planning.PlanningRow
 import com.infomaniak.calendar.components.planning.planningRows
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -55,8 +56,10 @@ import kotlinx.datetime.plus
  *
  * [initialDay] resolves the very first refresh key ([initialWeek]). Because
  * [CalendarManager.observeDaySlices] is reactive but a [PagingSource] load is one-shot, each loaded
- * range keeps observing and calls [invalidate] on the first *actual* change, so Paging reloads the
- * currently loaded pages (mirroring Room's PagingSource behaviour).
+ * range keeps observing **its own** slice of data and calls [invalidate] on the first change *within
+ * that range*, so a change on whichever page the user is looking at reloads the currently loaded pages
+ * (mirroring Room's PagingSource behaviour). The number of live observers is bounded by the Pager's
+ * `maxSize`.
  */
 internal class PlanningPagingSource(
     private val initialDay: LocalDate,
@@ -68,7 +71,7 @@ internal class PlanningPagingSource(
 
     private val initialWeek: YearWeek = weekNumbering.weekOf(initialDay)
 
-    // Observes loaded weeks for changes; cancelled once the source is invalidated.
+    // Hosts the per-loaded-range data observers; cancelled once the source is invalidated.
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     init {
@@ -95,14 +98,22 @@ internal class PlanningPagingSource(
         val endExclusive = lastWeek.lastDay.plus(1, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
 
         val slices = calendarManager.observeDaySlices(start = start, end = endExclusive, timeZone = timeZone)
+            .distinctUntilChanged()
 
-        // Reload when this range's data actually changes after the snapshot we're about to page.
+        // Single subscription per loaded range: the first emission is the current DB snapshot we page
+        // now; the first *later, distinct* change to THIS range invalidates so Paging reloads the pages
+        // (invalidate() cancels this scope, ending the collection). No drop(1): a range already in the DB
+        // only emits once, so dropping it would hang firstSlices.await() and freeze the load (jumps).
+        val firstSlices = CompletableDeferred<Map<LocalDate, List<EventDaySlice>>>()
         coroutineScope.launch {
-            slices.distinctUntilChanged().drop(1).first()
-            invalidate()
+            runCatching {
+                slices.collectIndexed { index, value ->
+                    if (index == 0) firstSlices.complete(value) else invalidate()
+                }
+            }.cancellable().onFailure(firstSlices::completeExceptionally)
         }
 
-        val slicesByDay = slices.first()
+        val slicesByDay = firstSlices.await()
         val emails = emailsByUserId()
         val data = buildList {
             for (week in weekNumbering.weeksBetween(firstWeek.firstDay, lastWeek.firstDay)) {
