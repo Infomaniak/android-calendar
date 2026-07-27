@@ -69,10 +69,10 @@ internal class PlanningPagingSource(
     private val initialWeek: YearWeek = weekNumbering.weekOf(initialDay)
 
     // Observes loaded weeks for changes; cancelled once the source is invalidated.
-    private val observerScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     init {
-        registerInvalidatedCallback { observerScope.cancel() }
+        registerInvalidatedCallback { coroutineScope.cancel() }
     }
 
     override suspend fun load(params: LoadParams<YearWeek>): LoadResult<YearWeek, PlanningRow> {
@@ -97,7 +97,7 @@ internal class PlanningPagingSource(
         val slices = calendarManager.observeDaySlices(start = start, end = endExclusive, timeZone = timeZone)
 
         // Reload when this range's data actually changes after the snapshot we're about to page.
-        observerScope.launch {
+        coroutineScope.launch {
             slices.distinctUntilChanged().drop(1).first()
             invalidate()
         }
