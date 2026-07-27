@@ -83,15 +83,15 @@ class PlanningViewModel(
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
 
     private fun EventsByWeekAndDay.toEventDots(): Map<LocalDate, List<EventColorsUi>> = buildMap {
+        //TODO: This will be provided by the backend in the future, so we can remove this logic when it is available
         this@toEventDots.forEach { (_, byDay) ->
             byDay.forEach { (date, events) ->
-                if (events.isNotEmpty()) put(date, events.take(MAX_DOTS).mapNotNull { (it as? EventUi.Normal)?.colors })
+                if (events.isNotEmpty()) put(date, events.mapNotNull { (it as? EventUi.Normal)?.colors })
             }
         }
     }
 
     companion object {
-        private const val MAX_DOTS = 3
         private const val PLANNING_RANGE_DAYS = 250
     }
 }
