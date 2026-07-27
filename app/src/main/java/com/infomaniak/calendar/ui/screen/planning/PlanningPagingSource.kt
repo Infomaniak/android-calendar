@@ -23,6 +23,7 @@ import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.planning.PlanningRow
 import com.infomaniak.calendar.components.planning.planningRows
+import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import kotlinx.coroutines.CoroutineScope
@@ -39,7 +40,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Pages the planning by ISO week, presenting a *flat* [PlanningRow] stream (`WeekHeader` + one row
@@ -76,7 +76,7 @@ internal class PlanningPagingSource(
     }
 
     override suspend fun load(params: LoadParams<YearWeek>): LoadResult<YearWeek, PlanningRow> {
-        return try {
+        return runCatching {
             when (params) {
                 is LoadParams.Refresh -> {
                     val center = params.key ?: initialWeek
@@ -85,10 +85,8 @@ internal class PlanningPagingSource(
                 is LoadParams.Append -> loadWeeks(firstWeek = params.key, lastWeek = params.key)
                 is LoadParams.Prepend -> loadWeeks(firstWeek = params.key, lastWeek = params.key)
             }
-        } catch (exception: CancellationException) {
-            throw exception
-        } catch (throwable: Throwable) {
-            LoadResult.Error(throwable)
+        }.cancellable().getOrElse {
+            LoadResult.Error(it)
         }
     }
 
