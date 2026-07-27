@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -36,6 +35,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import com.infomaniak.calendar.components.event.EventItem
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.EventUi
@@ -43,16 +47,16 @@ import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.DayFormatter.toShortDayName
 import com.infomaniak.calendar.components.planning.component.DayIndicator
-import com.infomaniak.calendar.components.planning.component.emptyState.OtherDayEmptyState
 import com.infomaniak.calendar.components.planning.component.emptyState.TodayEmptyState
-import com.infomaniak.calendar.components.planning.preview.WeekEventsPreviewParameter
+import com.infomaniak.calendar.components.planning.preview.PlanningRowPreviewParameter
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.LocalDate
 
 @Composable
 fun Planning(
-    weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
+    rows: LazyPagingItems<PlanningRow>,
     goToEventCreation: () -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
@@ -60,7 +64,7 @@ fun Planning(
 ) {
     Timeline(
         lazyListState = lazyListState,
-        weekEvents = weekEvents,
+        rows = rows,
         goToEventCreation = goToEventCreation,
         contentPadding = contentPadding,
         modifier = modifier,
@@ -70,13 +74,12 @@ fun Planning(
 @Composable
 private fun Timeline(
     lazyListState: LazyListState,
-    weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
+    rows: LazyPagingItems<PlanningRow>,
     goToEventCreation: () -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
     val today by rememberToday()
-    val events = weekEvents()
     val sectionSizing = remember { SectionSizing() }
 
     LazyColumn(
@@ -85,32 +88,31 @@ private fun Timeline(
         contentPadding = contentPadding,
         verticalArrangement = Arrangement.spacedBy(Margin.Mini),
     ) {
-        events.forEach { (week, days) ->
-            item(key = PlanningItemKey.WeekHeader(week.firstDay)) {
-                Text(week.label, modifier = Modifier.padding(bottom = Margin.Medium))
-            }
-
-            days.forEach { (date, events) ->
-                val sectionItemKeys = events.map { it.toItemKey(date) }
-
-                itemsIndexed(events, key = { _, event -> event.toItemKey(date) }) { index, event ->
-                    val itemKey = event.toItemKey(date)
-                    val bottomPadding = if (index == events.lastIndex) Margin.Medium else 0.dp
-
+        items(
+            count = rows.itemCount,
+            key = rows.itemKey { it.key },
+            contentType = rows.itemContentType { it.contentType },
+        ) { index ->
+            when (val row = rows[index]) {
+                is PlanningRow.WeekHeader -> {
+                    Text(row.week.label, modifier = Modifier.padding(bottom = Margin.Medium))
+                }
+                is PlanningRow.Event -> {
                     Event(
-                        event = event,
-                        date = date,
+                        event = row.event,
+                        date = row.date,
                         today = today,
                         lazyListState = lazyListState,
                         sectionSizing = sectionSizing,
-                        itemKey = itemKey,
-                        sectionItemKeys = sectionItemKeys,
+                        itemKey = row.key,
+                        sectionItemKeys = row.daySectionKeys,
                         goToEventCreation = goToEventCreation,
                         modifier = Modifier
-                            .ensureSectionMinHeight(sectionSizing, sectionItemKeys, itemKey)
-                            .padding(bottom = bottomPadding),
+                            .ensureSectionMinHeight(sectionSizing, row.daySectionKeys, row.key)
+                            .padding(bottom = if (row.isLastInDay) Margin.Medium else 0.dp),
                     )
                 }
+                null -> Unit
             }
         }
     }
@@ -144,7 +146,9 @@ private fun Event(
         when (event) {
             is EventUi.Normal -> EventItem(event, Modifier.fillMaxWidth())
             is EventUi.TodayEmptyState -> TodayEmptyState(onClick = goToEventCreation, Modifier.fillMaxWidth())
-            is EventUi.EmptyState -> OtherDayEmptyState(onClick = goToEventCreation, Modifier.fillMaxWidth())
+            // An empty (non-today) day only shows its day indicator, with no content — matches the
+            // previous non-exhaustive `when` behaviour.
+            is EventUi.EmptyState -> Unit
         }
     }
 }
@@ -156,12 +160,13 @@ private val YearWeek.label: String
         return "$week - $dateRange"
     }
 
-private fun EventUi.toItemKey(date: LocalDate): PlanningItemKey = PlanningItemKey.Event(date = date, id = id)
-
 @Preview
 @Composable
-private fun PreviewPlanning(@PreviewParameter(WeekEventsPreviewParameter::class) weekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>>) {
+private fun PreviewPlanning(@PreviewParameter(PlanningRowPreviewParameter::class) rows: List<PlanningRow>) {
     Surface {
-        Planning(goToEventCreation = {}, weekEvents = { weekEvents })
+        Planning(
+            goToEventCreation = {},
+            rows = flowOf(PagingData.from(rows)).collectAsLazyPagingItems(),
+        )
     }
 }
