@@ -164,6 +164,9 @@ dependencies {
     implementation(core.kotlinx.serialization.json)
     implementation(kmpCalendar.androidx.room.runtime)
 
+    implementation(libs.paging)
+    implementation(libs.paging.compose)
+
     implementation(platform(core.compose.bom))
     implementation(core.activity.compose)
     implementation(core.androidx.core.ktx)

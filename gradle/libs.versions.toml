@@ -1,18 +1,21 @@
 [versions]
-material3 = "1.5.0-alpha18" # Remove when composeBom use same version or higher
 calendarCore = "0.3.0"
 designsystem = "0.1.0"
 haze = "2.0.0-alpha03"
 kizitonwoseCalendar = "2.10.1"
+material3 = "1.5.0-alpha18" # Remove when composeBom use same version or higher
+paging3 = "3.5.0"
 
 [libraries]
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
-infomaniak-multiplatform-calendar-core-submodule = { module = "com.infomaniak.multiplaform-calendar:CalendarCore" }
-infomaniak-multiplatform-calendar-core = { group = "com.infomaniak.multiplatform_calendar", name = "CalendarCore", version.ref = "calendarCore" }
-infomaniak-designsystem-theme-calendar = { module = "com.infomaniak.designsystem:ThemeCalendar", version.ref = "designsystem" }
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 haze-blur = { module = "dev.chrisbanes.haze:haze-blur", version.ref = "haze" }
 haze-materials = { module = "dev.chrisbanes.haze:haze-blur-materials", version.ref = "haze" }
 kizitonwose-calendar-compose = { module = "com.kizitonwose.calendar:compose-multiplatform", version.ref = "kizitonwoseCalendar" }
+infomaniak-designsystem-theme-calendar = { module = "com.infomaniak.designsystem:ThemeCalendar", version.ref = "designsystem" }
+infomaniak-multiplatform-calendar-core = { group = "com.infomaniak.multiplatform_calendar", name = "CalendarCore", version.ref = "calendarCore" }
+infomaniak-multiplatform-calendar-core-submodule = { module = "com.infomaniak.multiplaform-calendar:CalendarCore" }
+paging = { module = "androidx.paging:paging-common", version.ref = "paging3" }
+paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging3" }
