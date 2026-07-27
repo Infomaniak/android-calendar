@@ -142,7 +142,7 @@ internal fun Day(
 private fun EventDots(dots: List<EventColorsUi>, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier.height(DOT_SIZE),
-        horizontalArrangement = Arrangement.spacedBy(Margin.Micro, Alignment.CenterHorizontally),
+        horizontalArrangement = Arrangement.spacedBy(1.dp, Alignment.CenterHorizontally),
     ) {
         dots.take(MAX_DOTS).forEach { eventColor ->
             Box(
@@ -194,45 +194,17 @@ private fun DayPreview() {
 
     Surface {
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(DateState.Selected.name, style = MaterialTheme.typography.labelSmall)
-                Day(
-                    dateState = DateState.Selected,
-                    date = today,
-                    onClick = {},
-                    dotsFor = { listOf(eventColors, eventColors, eventColors) },
-                    modifier = Modifier.size(previewDaySize),
-                )
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(DateState.Today.name, style = MaterialTheme.typography.labelSmall)
-                Day(
-                    dateState = DateState.Today,
-                    date = today,
-                    onClick = {},
-                    dotsFor = { listOf(eventColors, eventColors, eventColors) },
-                    modifier = Modifier.size(previewDaySize),
-                )
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(DateState.None.name, style = MaterialTheme.typography.labelSmall)
-                Day(
-                    dateState = DateState.None,
-                    date = today,
-                    onClick = {},
-                    dotsFor = { listOf(eventColors, eventColors, eventColors, eventColors, eventColors) },
-                    modifier = Modifier.size(previewDaySize),
-                )
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(DateState.NotMonth.name, style = MaterialTheme.typography.labelSmall)
-                Day(
-                    dateState = DateState.NotMonth,
-                    date = today,
-                    onClick = {},
-                    dotsFor = { listOf(eventColors, eventColors, eventColors) },
-                    modifier = Modifier.size(previewDaySize),
-                )
+            DateState.entries.forEach { dateState ->
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(dateState.name, style = MaterialTheme.typography.labelSmall)
+                    Day(
+                        dateState = dateState,
+                        date = today,
+                        onClick = {},
+                        dotsFor = { listOf(eventColors, eventColors, eventColors) },
+                        modifier = Modifier.size(previewDaySize),
+                    )
+                }
             }
         }
     }
