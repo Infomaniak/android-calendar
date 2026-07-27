@@ -19,6 +19,7 @@ package com.infomaniak.calendar.components.calendar.component
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -28,11 +29,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -44,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.LocalViewConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -54,6 +58,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.component.DayCircle
+import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
@@ -63,11 +68,14 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import kotlin.time.Clock
 
+private const val MAX_DOTS = 2
+
 @Composable
 internal fun Day(
     date: LocalDate,
     dateState: DateState,
     onClick: () -> Unit,
+    dotsFor: () -> List<EventColorsUi>,
     modifier: Modifier = Modifier,
 ) {
     val locale = LocalLocale.current.platformLocale
@@ -102,7 +110,42 @@ internal fun Day(
                 .clip(CircleShape)
                 .indication(interactionSource, ripple()),
         ) {
-            Text(text = date.day.toString())
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    text = date.day.toString(),
+                    modifier = Modifier.align(Alignment.Center),
+                )
+
+                if (dateState == DateState.NotMonth || dateState == DateState.None) {
+                    EventDots(
+                        dots = dotsFor(),
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .fillMaxWidth()
+                            .padding(bottom = 4.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EventDots(dots: List<EventColorsUi>, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier.height(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(3.dp, Alignment.CenterHorizontally),
+    ) {
+        dots.take(MAX_DOTS).forEach { eventColor ->
+            Box(
+                modifier = Modifier
+                    .size(6.dp)
+                    .clip(CircleShape)
+                    .background(eventColor.datavizContainerVariant),
+            )
+        }
+        if (dots.size > MAX_DOTS) {
+            Icon(painter = painterResource(id = R.drawable.ic_plus), contentDescription = null, modifier = Modifier.size(6.dp))
         }
     }
 }
@@ -134,7 +177,7 @@ internal fun Modifier.daySharedElement(
 @Preview
 private fun DayPreview() {
     val today = Clock.today()
-    val previewDaySize = 32.dp
+    val previewDaySize = 48.dp
 
     Surface {
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -144,6 +187,7 @@ private fun DayPreview() {
                     dateState = DateState.Selected,
                     date = today,
                     onClick = {},
+                    dotsFor = { emptyList() },
                     modifier = Modifier.size(previewDaySize),
                 )
             }
@@ -153,6 +197,7 @@ private fun DayPreview() {
                     dateState = DateState.Today,
                     date = today,
                     onClick = {},
+                    dotsFor = { emptyList() },
                     modifier = Modifier.size(previewDaySize),
                 )
             }
@@ -162,6 +207,7 @@ private fun DayPreview() {
                     dateState = DateState.None,
                     date = today,
                     onClick = {},
+                    dotsFor = { emptyList() },
                     modifier = Modifier.size(previewDaySize),
                 )
             }
@@ -171,6 +217,7 @@ private fun DayPreview() {
                     dateState = DateState.NotMonth,
                     date = today,
                     onClick = {},
+                    dotsFor = { emptyList() },
                     modifier = Modifier.size(previewDaySize),
                 )
             }

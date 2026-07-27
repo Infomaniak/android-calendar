@@ -19,6 +19,8 @@ package com.infomaniak.calendar.ui.screen.planning
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.calendar.components.foundation.models.EventColorsUi
+import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.common.utils.today
@@ -32,10 +34,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.minus
@@ -69,7 +73,25 @@ class PlanningViewModel(
         }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = PlanningUiState.Loading)
 
+    val eventDots: StateFlow<Map<LocalDate, List<EventColorsUi>>> = planningUiState
+        .map { state ->
+            when (state) {
+                is PlanningUiState.Success -> state.eventsByWeekAndDay().toEventDots()
+                PlanningUiState.Loading -> emptyMap()
+            }
+        }
+        .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
+
+    private fun EventsByWeekAndDay.toEventDots(): Map<LocalDate, List<EventColorsUi>> = buildMap {
+        this@toEventDots.forEach { (_, byDay) ->
+            byDay.forEach { (date, events) ->
+                if (events.isNotEmpty()) put(date, events.take(MAX_DOTS).mapNotNull { (it as? EventUi.Normal)?.colors })
+            }
+        }
+    }
+
     companion object {
+        private const val MAX_DOTS = 3
         private const val PLANNING_RANGE_DAYS = 250
     }
 }

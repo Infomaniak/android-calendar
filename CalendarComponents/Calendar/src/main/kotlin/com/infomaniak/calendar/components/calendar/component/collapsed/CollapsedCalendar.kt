@@ -33,6 +33,7 @@ import com.infomaniak.calendar.components.calendar.modifier.SyncHeaderOffset
 import com.infomaniak.calendar.components.calendar.modifier.pagedSwipe
 import com.infomaniak.calendar.components.calendar.component.collapsed.rememberWeekPager
 import com.infomaniak.calendar.components.foundation.component.DateState
+import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.calendar.components.foundation.utils.startOfWeek
@@ -60,6 +61,7 @@ internal fun CollapsedCalendar(
     headerState: CalendarHeaderState = rememberCalendarHeaderState(),
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
 ) {
     val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
     val today by rememberToday()
@@ -108,6 +110,7 @@ internal fun CollapsedCalendar(
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
                 isSharedElementEnabled = day.date in sharedElementDates,
+                dotsFor = { eventsDots()[day.date].orEmpty() },
             )
         },
         modifier = modifier.pagedSwipe(pager = pager, onPageSwiped = onDayClick),
@@ -123,6 +126,7 @@ private fun DayContent(
     sharedTransitionScope: SharedTransitionScope?,
     animatedVisibilityScope: AnimatedVisibilityScope?,
     isSharedElementEnabled: Boolean,
+    dotsFor: () -> List<EventColorsUi>,
 ) {
     val dateState by remember(day) {
         derivedStateOf {
@@ -138,6 +142,7 @@ private fun DayContent(
         dateState = dateState,
         onClick = { onDayClick(day.date) },
         date = day.date,
+        dotsFor = dotsFor,
         modifier = Modifier.daySharedElement(
             sharedTransitionScope = sharedTransitionScope,
             animatedVisibilityScope = animatedVisibilityScope,
@@ -156,6 +161,7 @@ private fun CollapsedCalendarPreview() {
             selectedDate = { Clock.today() },
             onDayClick = {},
             weekNumbering = WeekNumbering.ISO_8601,
+            eventsDots = { emptyMap() },
         )
     }
 }

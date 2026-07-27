@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.calendar.component.expanded.ExpandedCalendar
+import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.DayOfWeek
@@ -50,6 +51,7 @@ fun ExpandableCalendar(
     selectedDate: () -> LocalDate,
     onDayClick: (LocalDate) -> Unit,
     weekNumbering: WeekNumbering,
+    eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     modifier: Modifier = Modifier,
 ) {
     val firstDayOfWeek = remember(weekNumbering) { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
@@ -74,6 +76,7 @@ fun ExpandableCalendar(
                             headerState = headerState,
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this@AnimatedContent,
+	                        eventsDots = eventsDots,
                         )
                         HorizontalMonthSelector(
                             selectedMonth = { selectedDate().yearMonth },
@@ -89,6 +92,7 @@ fun ExpandableCalendar(
                         headerState = headerState,
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this@AnimatedContent,
+                        eventsDots = eventsDots,
                     )
                 }
             }
@@ -136,10 +140,11 @@ private fun DayOfWeekOverlayHeader(
 private fun ExpandableCalendarCollapsedPreview() {
     Surface {
         ExpandableCalendar(
+            isExpanded = { false },
             selectedDate = { Clock.today() },
             onDayClick = {},
-            isExpanded = { false },
             weekNumbering = WeekNumbering.ISO_8601,
+            eventsDots = { emptyMap() },
         )
     }
 }
@@ -149,10 +154,11 @@ private fun ExpandableCalendarCollapsedPreview() {
 private fun ExpandableCalendarExpandedPreview() {
     Surface {
         ExpandableCalendar(
+            isExpanded = { true },
             selectedDate = { Clock.today() },
             onDayClick = {},
-            isExpanded = { true },
             weekNumbering = WeekNumbering.ISO_8601,
+            eventsDots = { emptyMap() },
         )
     }
 }
