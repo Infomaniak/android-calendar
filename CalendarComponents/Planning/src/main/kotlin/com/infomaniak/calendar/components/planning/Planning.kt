@@ -48,6 +48,7 @@ import com.infomaniak.calendar.components.foundation.state.DateState
 import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortDayNameUppercase
 import com.infomaniak.calendar.components.planning.component.DayIndicator
+import com.infomaniak.calendar.components.planning.component.emptyState.OtherDayEmptyState
 import com.infomaniak.calendar.components.planning.component.emptyState.TodayEmptyState
 import com.infomaniak.calendar.components.planning.preview.PlanningRowPreviewParameter
 import com.infomaniak.calendar.components.resources.R
@@ -159,9 +160,7 @@ private fun Event(
                 )
             }
             is EventSummaryUi.TodayEmptyState -> TodayEmptyState(onClick = { goToEventCreation(date) }, Modifier.fillMaxWidth())
-            // An empty (non-today) day only shows its day indicator, with no content — matches the
-            // previous non-exhaustive `when` behaviour.
-            is EventSummaryUi.EmptyState -> Unit
+            is EventSummaryUi.EmptyState -> OtherDayEmptyState(onClick = { goToEventCreation(date) }, Modifier.fillMaxWidth())
         }
     }
 }
