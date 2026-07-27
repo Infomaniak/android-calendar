@@ -106,7 +106,7 @@ String resources follow the single-module pattern — all strings consumed by an
 | `:CalendarComponents:Foundation`  | `com.infomaniak.calendar.components.foundation`  | Shared models (`EventUi`, `YearWeek`, `WeekNumbering`) and base Compose components (`DayCircle`, `DateState`) used by all other CalendarComponents modules. |
 | `:CalendarComponents:Resources`   | `com.infomaniak.calendar.components.resources`   | String-only module: `res/values/strings.xml` (+ translations). No Kotlin code, no Compose. Centralises all CalendarComponents string resources. |
 | `:CalendarComponents:Event`       | `com.infomaniak.calendar.components.event`       | `EventItem` Composable — renders a single event row. Re-exports Foundation via `api`. **Placeholder UI** — visual design is not final. |
-| `:CalendarComponents:Planning`    | `com.infomaniak.calendar.components.planning`    | `Planning` Composable — a `LazyColumn` with ISO week headers and per-day event lists. Also provides the `stickyWithinItem` `Modifier` extension. Re-exports Event, Foundation, and Resources via `api`. Week header design is a **placeholder**. |
+| `:CalendarComponents:Planning`    | `com.infomaniak.calendar.components.planning`    | `Planning` Composable — a `LazyColumn` driven by `LazyPagingItems<PlanningRow>` (Paging 3), with ISO week headers and one lazy item per event. `PlanningRow` is the flat paged row type (`WeekHeader` / `Event`); `planningRows(week, days)` flattens a week into rows. Also provides the `stickyDayIndicator` `Modifier` extension. Re-exports Event, Foundation, and Resources via `api`. Week header design is a **placeholder**. |
 
 ### Dependency graph
 
@@ -136,6 +136,7 @@ consumers: `implementation(project(":CalendarComponents:Planning"))` transitivel
 - `core.infomaniak.core.ui.compose.margin` — `Margin` spacing constants (from `core` catalog, Planning only).
 - `kmpCalendar.kotlinx.datetime` — `kotlinx-datetime` types (`LocalDate`, `TimeZone`, …) (Foundation + Planning).
 - `libs.compose.material3` — Material 3 Compose (from `libs` catalog).
+- `libs.paging.compose` — Paging 3 Compose (`LazyPagingItems`, `collectAsLazyPagingItems`) consumed by `Planning`.
 
 ### Ownership
 
