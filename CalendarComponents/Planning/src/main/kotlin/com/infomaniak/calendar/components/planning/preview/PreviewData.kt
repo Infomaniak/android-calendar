@@ -28,6 +28,8 @@ import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.foundation.preview.EventColorsUiFactory
+import com.infomaniak.calendar.components.planning.PlanningRow
+import com.infomaniak.calendar.components.planning.planningRows
 import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -39,10 +41,10 @@ import kotlinx.datetime.toInstant
 import kotlin.time.Clock
 import kotlin.time.Instant
 
-class WeekEventsPreviewParameter : PreviewParameterProvider<Map<YearWeek, Map<LocalDate, List<EventUi>>>> {
-    override val values: Sequence<Map<YearWeek, Map<LocalDate, List<EventUi>>>> = sequenceOf(
-        todayPreviewWeekEvents,
-        passingYearPreviewWeekEvents,
+class PlanningRowPreviewParameter : PreviewParameterProvider<List<PlanningRow>> {
+    override val values: Sequence<List<PlanningRow>> = sequenceOf(
+        todayPreviewWeekEvents.toPlanningRows(),
+        passingYearPreviewWeekEvents.toPlanningRows(),
     )
 
     companion object {
@@ -55,6 +57,9 @@ class WeekEventsPreviewParameter : PreviewParameterProvider<Map<YearWeek, Map<Lo
         }
     }
 }
+
+private fun Map<YearWeek, Map<LocalDate, List<EventUi>>>.toPlanningRows(): List<PlanningRow> =
+    flatMap { (week, days) -> planningRows(week, days) }
 
 private val dummyAttendees = listOf(
     AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted),
