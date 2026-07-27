@@ -25,11 +25,17 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
@@ -38,18 +44,20 @@ import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
 import com.infomaniak.calendar.components.planning.Planning
+import com.infomaniak.calendar.components.planning.PlanningRow
+import com.infomaniak.calendar.components.planning.preview.PlanningRowPreviewParameter
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.ScreenLoader
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
-import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewParameter
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.LocalDate
 
 @Composable
@@ -59,7 +67,7 @@ fun PlanningScreen(
     modifier: Modifier = Modifier,
     viewModel: PlanningViewModel = viewModel(),
 ) {
-    val planningUiState: PlanningUiState by viewModel.planningUiState.collectAsStateWithLifecycle()
+    val planningRows = viewModel.planningRows.collectAsLazyPagingItems()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
     val eventsDots by viewModel.eventDots.collectAsStateWithLifecycle(initialValue = emptyMap())
     val visibleDayState = LocalVisibleDayState.current ?: return
@@ -67,7 +75,8 @@ fun PlanningScreen(
     PlanningScreen(
         goToEventCreation = goToEventCreation,
         goToEventDetail = goToEventDetail,
-        planningUiState = { planningUiState },
+        planningRows = planningRows,
+        onJumpTo = viewModel::jumpTo,
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventsDots },
         visibleDayState = visibleDayState,
@@ -79,7 +88,8 @@ fun PlanningScreen(
 private fun PlanningScreen(
     goToEventCreation: (LocalDate) -> Unit,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
-    planningUiState: () -> PlanningUiState,
+    planningRows: LazyPagingItems<PlanningRow>,
+    onJumpTo: (LocalDate) -> Boolean,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     visibleDayState: VisibleDayState,
@@ -107,43 +117,48 @@ private fun PlanningScreen(
         },
         modifier = modifier,
     ) { contentPadding ->
-        when (val planningUi = planningUiState()) {
-            is PlanningUiState.Success -> {
-                SuccessPlanning(
-                    events = planningUi.eventsByWeekAndDay,
-                    contentPadding = contentPadding + PaddingValues(Margin.Medium),
-                    goToEventCreation = goToEventCreation,
-                    goToEventDetail = goToEventDetail,
-                    visibleDayState = visibleDayState,
-                    modifier = Modifier
-                        .hazeSource(hazeState)
-                        .collapseCalendarOnScroll(calendarExpansionState),
-                )
-            }
-            is PlanningUiState.Loading -> {
-                ScreenLoader(modifier = Modifier.padding(contentPadding))
-            }
+        // Keep the planning mounted once it has shown content, so a far jump's refresh (itemCount
+        // momentarily 0) doesn't tear down the jump/scroll handling — only the very first load shows a spinner.
+        var hasLoadedOnce by rememberSaveable { mutableStateOf(false) }
+        if (planningRows.itemCount > 0) hasLoadedOnce = true
+
+        if (hasLoadedOnce) {
+            SuccessPlanning(
+                planningRows = planningRows,
+                onJumpTo = onJumpTo,
+                contentPadding = contentPadding + PaddingValues(Margin.Medium),
+                goToEventCreation = goToEventCreation,
+                goToEventDetail = goToEventDetail,
+                visibleDayState = visibleDayState,
+                modifier = Modifier
+                    .hazeSource(hazeState)
+                    .collapseCalendarOnScroll(calendarExpansionState),
+            )
+        } else {
+            ScreenLoader(modifier = Modifier.padding(contentPadding))
         }
     }
 }
 
 @Composable
 private fun SuccessPlanning(
-    events: () -> EventsByWeekAndDay,
+    planningRows: LazyPagingItems<PlanningRow>,
+    onJumpTo: (LocalDate) -> Boolean,
     contentPadding: PaddingValues,
     goToEventCreation: (LocalDate) -> Unit,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     visibleDayState: VisibleDayState,
     modifier: Modifier = Modifier,
 ) {
-    val lazyListState = rememberLazyListState(events().indexOf(visibleDayState.visibleDate))
+    val lazyListState = rememberLazyListState()
 
-    ProcessJumpRequests(lazyListState, visibleDayState, events)
+    CenterOnVisibleDate(lazyListState, planningRows, visibleDayState, onJumpTo)
+    ProcessJumpRequests(lazyListState, planningRows, visibleDayState, onJumpTo)
     ReportVisibleDate(lazyListState, onVisibleDateChanged = visibleDayState::updateVisibleDate)
 
     Planning(
         lazyListState = lazyListState,
-        weekEvents = events,
+        rows = planningRows,
         modifier = modifier
             .scrollableToolbar()
             .fillMaxSize(),
@@ -155,12 +170,15 @@ private fun SuccessPlanning(
 
 @Preview
 @Composable
-private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class) weekEvents: EventsByWeekAndDay) {
+private fun Preview(@PreviewParameter(PlanningRowPreviewParameter::class) rows: List<PlanningRow>) {
     CalendarThemeForPreview {
         val visibleDayState = rememberVisibleDayState()
+        val planningRows = flowOf(PagingData.from(rows)).collectAsLazyPagingItems()
+
         CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
             PlanningScreen(
-                planningUiState = { PlanningUiState.Success({ weekEvents }) },
+                planningRows = planningRows,
+                onJumpTo = { false },
                 goToEventCreation = {},
                 goToEventDetail = {},
                 isLoadingEvents = { false },
