@@ -73,6 +73,9 @@ class PlanningViewModel(
                     // fires right after a jump — which would otherwise run away upward. Neighbouring
                     // weeks are already preloaded by the 3-week refresh (see PlanningPagingSource).
                     prefetchDistance = PREFETCH_ROWS,
+                    // Bound the pages kept in memory: scrolling far drops the farthest weeks (re-loaded
+                    // on the way back) so the presented list can't grow unbounded.
+                    maxSize = MAX_ROWS_IN_MEMORY,
                     enablePlaceholders = false,
                 ),
             ) {
@@ -106,5 +109,9 @@ class PlanningViewModel(
         // target — always at least a leading week below the top — never sits within the prepend
         // trigger zone. This is what stops a backward jump from scrolling away endlessly.
         private const val PREFETCH_ROWS = 6
+
+        // Upper bound on the rows Paging keeps in memory (must be >= pageSize + 2 * prefetchDistance).
+        // Roughly a couple of dozen weeks, enough for smooth back-scrolling while capping growth.
+        private const val MAX_ROWS_IN_MEMORY = 250
     }
 }
