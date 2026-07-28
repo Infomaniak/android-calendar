@@ -26,13 +26,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
@@ -54,66 +52,56 @@ import java.time.Month
 import java.time.format.TextStyle
 import kotlin.time.Clock
 
+private const val CENTER_INDEX = Int.MAX_VALUE / 2
+
+private fun monthAt(anchorMonth: LocalDate, index: Int): LocalDate =
+    anchorMonth.plus(index - CENTER_INDEX, DateTimeUnit.MONTH)
+
+private fun monthDistance(from: LocalDate, to: LocalDate): Int =
+    (to.year - from.year) * 12 + (to.month.number - from.month.number)
+
 @Composable
-fun HorizontalMonthSelector(
+internal fun HorizontalMonthSelector(
     selectedDate: () -> LocalDate,
     onMonthSelected: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val locale = LocalLocale.current.platformLocale
-    val listState = rememberLazyListState()
-
-    val months = remember {
-        val selected = selectedDate()
-        (-12..12).map { offset ->
-            selected.plus(offset, DateTimeUnit.MONTH)
-        }
+    val anchorMonth = remember(selectedDate()) {
+        val date = selectedDate()
+        LocalDate(year = date.year, month = date.month, day = 1)
     }
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = CENTER_INDEX)
 
-    LaunchedEffect(selectedDate()) {
-        snapshotFlow { selectedDate() }.collectLatest { newDate ->
-            val currentMonthIndex = months.indexOfFirst {
-                it.year == newDate.year && it.month == newDate.month
-            }
-            if (currentMonthIndex >= 0) {
-                listState.animateScrollToItem(currentMonthIndex)
-            }
+    LaunchedEffect(anchorMonth) {
+        snapshotFlow { selectedDate() }.collectLatest { date ->
+            val selectedMonth = LocalDate(date.year, date.month, 1)
+            val target = CENTER_INDEX + monthDistance(anchorMonth, selectedMonth)
+            listState.animateScrollToItem(target.coerceIn(0, Int.MAX_VALUE - 1))
         }
     }
 
     LazyRow(
         state = listState,
         contentPadding = PaddingValues(horizontal = Margin.Large),
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
     ) {
-        val itemsToDisplay = buildList {
-            for (i in months.indices) {
-                val month = months[i]
-                if (i > 0 && months[i - 1].year != month.year) {
-                    add(MonthDisplayItem.YearSeparator(month.year))
-                }
-                add(MonthDisplayItem.MonthItem(month))
-            }
-        }
+        items(count = Int.MAX_VALUE) { index ->
+            val month = monthAt(anchorMonth, index)
+            val isSelected = month.year == selectedDate().year && month.month == selectedDate().month
 
-        items(itemsToDisplay.size) { index ->
-            when (val item = itemsToDisplay[index]) {
-                is MonthDisplayItem.MonthItem -> {
-                    val month = item.date
-                    val isSelected = month.year == selectedDate().year && month.month == selectedDate().month
-
-                    MonthButton(
-                        month = month,
-                        isSelected = isSelected,
-                        locale = locale,
-                        onMonthClick = { onMonthSelected(month) },
-                    )
-                }
-                is MonthDisplayItem.YearSeparator -> {
-                    YearSeparator(item.year)
-                }
+            // If the month is January, add the Year separator before the MonthButton
+            if (month.month.number == 1) {
+                YearSeparator(month.year)
             }
+
+            MonthButton(
+                month = month,
+                isSelected = isSelected,
+                locale = locale,
+                onMonthClick = { onMonthSelected(month) },
+            )
         }
     }
 }
@@ -153,13 +141,12 @@ private fun MonthButton(
             .padding(horizontal = Margin.Medium, vertical = Margin.Mini),
         contentAlignment = Alignment.Center,
     ) {
-        CompositionLocalProvider(LocalContentColor provides contentColor) {
-            Text(
-                text = monthName,
-                style = MaterialTheme.typography.labelLarge,
-                textAlign = TextAlign.Center,
-            )
-        }
+        Text(
+            text = monthName,
+            style = MaterialTheme.typography.labelLarge,
+            textAlign = TextAlign.Center,
+            color = contentColor,
+        )
     }
 }
 
@@ -176,11 +163,6 @@ private fun YearSeparator(year: Int) {
             color = MaterialTheme.colorScheme.onSurface,
         )
     }
-}
-
-private sealed class MonthDisplayItem {
-    data class MonthItem(val date: LocalDate) : MonthDisplayItem()
-    data class YearSeparator(val year: Int) : MonthDisplayItem()
 }
 
 @Composable
