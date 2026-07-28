@@ -56,6 +56,7 @@ import kotlinx.datetime.number
 import kotlinx.datetime.plus
 import java.time.Month
 import java.time.format.TextStyle
+import java.util.Locale
 import kotlin.time.Clock
 
 private const val CENTER_INDEX = Int.MAX_VALUE / 2
@@ -111,7 +112,7 @@ internal fun HorizontalMonthSelector(
 private fun MonthButton(
     month: LocalDate,
     isSelected: Boolean,
-    locale: java.util.Locale,
+    locale: Locale,
     onMonthClick: () -> Unit,
 ) {
     val monthName = Month.of(month.month.number).getDisplayName(TextStyle.SHORT, locale)
