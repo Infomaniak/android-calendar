@@ -19,17 +19,19 @@ package com.infomaniak.calendar.components.foundation.utils
 
 import android.R.attr.firstDayOfWeek
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.monthYearLabel
+import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import java.util.Locale
+import kotlin.time.Clock
 
 fun LocalDate.firstDayOfMonth(): LocalDate {
     return LocalDate(year = year, month = month, day = 1)
 }
 
 fun LocalDate.getMonthYearLabel(locale: Locale): String {
-    return monthYearLabel(locale = locale, currentYear = year)
+    return monthYearLabel(locale = locale, currentYear = Clock.today().year)
 }
