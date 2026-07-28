@@ -154,8 +154,7 @@ private fun SuccessPlanning(
     val visibleDayState = LocalVisibleDayState.current ?: return
     val lazyListState = rememberLazyListState()
 
-    CenterOnVisibleDate(lazyListState, planningRows, visibleDayState, onJumpTo)
-    ProcessJumpRequests(lazyListState, planningRows, visibleDayState, onJumpTo)
+    AlignPlanningToDate(lazyListState, planningRows, visibleDayState, onJumpTo)
     ReportVisibleDate(lazyListState, onVisibleDateChanged = { visibleDayState.onVisibleDateChanged(it) })
 
     Planning(
