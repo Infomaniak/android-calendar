@@ -73,13 +73,12 @@ internal fun HorizontalMonthSelector(
     modifier: Modifier = Modifier,
 ) {
     val locale = LocalLocale.current.platformLocale
-    val anchorDate = remember { selectedDate().firstDayOfMonth() }
+    val anchorDate = remember { selectedDate() }
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = CENTER_INDEX)
 
     LaunchedEffect(anchorDate) {
         snapshotFlow { selectedDate() }.collectLatest { date ->
-            val firstDayOfSelectedMonth = date.firstDayOfMonth()
-            val target = CENTER_INDEX + monthDistance(anchorDate, firstDayOfSelectedMonth)
+            val target = CENTER_INDEX + monthDistance(anchorDate, date)
             listState.animateScrollToItem(target.coerceIn(0, Int.MAX_VALUE - 1))
         }
     }
