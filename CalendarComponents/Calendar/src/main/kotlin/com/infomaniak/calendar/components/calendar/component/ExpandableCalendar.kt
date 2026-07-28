@@ -20,7 +20,9 @@ package com.infomaniak.calendar.components.calendar.component
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,6 +36,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.core.common.utils.today
+import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toKotlinDayOfWeek
@@ -60,15 +63,24 @@ fun ExpandableCalendar(
                 label = "calendarExpansion",
             ) { expanded ->
                 if (expanded) {
-                    ExpandedCalendar(
-                        selectedDate = selectedDate,
-                        onDayClick = onDayClick,
-                        weekNumbering = weekNumbering,
-                        monthRange = RANGE_MONTHS,
-                        headerState = headerState,
-                        sharedTransitionScope = this@SharedTransitionLayout,
-                        animatedVisibilityScope = this,
-                    )
+                    Column(
+                        modifier = Modifier
+                            .padding(vertical = Margin.Medium),
+                    ) {
+                        ExpandedCalendar(
+                            selectedDate = selectedDate,
+                            onDayClick = onDayClick,
+                            weekNumbering = weekNumbering,
+                            monthRange = RANGE_MONTHS,
+                            headerState = headerState,
+                            sharedTransitionScope = this@SharedTransitionLayout,
+                            animatedVisibilityScope = this@AnimatedContent,
+                        )
+                        HorizontalMonthSelector(
+                            selectedDate = { Clock.today() },
+                            onMonthSelected = { },
+                        )
+                    }
                 } else {
                     CollapsedCalendar(
                         selectedDate = selectedDate,
@@ -77,7 +89,7 @@ fun ExpandableCalendar(
                         monthRange = RANGE_MONTHS,
                         headerState = headerState,
                         sharedTransitionScope = this@SharedTransitionLayout,
-                        animatedVisibilityScope = this,
+                        animatedVisibilityScope = this@AnimatedContent,
                     )
                 }
             }
