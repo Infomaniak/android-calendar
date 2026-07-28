@@ -39,8 +39,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.foundation.utils.firstDayOfMonth
+import com.infomaniak.calendar.components.foundation.utils.getMonthYearLabel
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.monthYearLabel
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.coroutines.flow.collectLatest
@@ -54,8 +60,8 @@ import kotlin.time.Clock
 
 private const val CENTER_INDEX = Int.MAX_VALUE / 2
 
-private fun monthAt(anchorMonth: LocalDate, index: Int): LocalDate =
-    anchorMonth.plus(index - CENTER_INDEX, DateTimeUnit.MONTH)
+private fun monthAt(anchorDate: LocalDate, index: Int): LocalDate =
+    anchorDate.plus(index - CENTER_INDEX, DateTimeUnit.MONTH)
 
 private fun monthDistance(from: LocalDate, to: LocalDate): Int =
     (to.year - from.year) * 12 + (to.month.number - from.month.number)
@@ -67,16 +73,13 @@ internal fun HorizontalMonthSelector(
     modifier: Modifier = Modifier,
 ) {
     val locale = LocalLocale.current.platformLocale
-    val anchorMonth = remember(selectedDate()) {
-        val date = selectedDate()
-        LocalDate(year = date.year, month = date.month, day = 1)
-    }
+    val anchorDate = remember { selectedDate().firstDayOfMonth() }
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = CENTER_INDEX)
 
-    LaunchedEffect(anchorMonth) {
+    LaunchedEffect(anchorDate) {
         snapshotFlow { selectedDate() }.collectLatest { date ->
-            val selectedMonth = LocalDate(date.year, date.month, 1)
-            val target = CENTER_INDEX + monthDistance(anchorMonth, selectedMonth)
+            val firstDayOfSelectedMonth = date.firstDayOfMonth()
+            val target = CENTER_INDEX + monthDistance(anchorDate, firstDayOfSelectedMonth)
             listState.animateScrollToItem(target.coerceIn(0, Int.MAX_VALUE - 1))
         }
     }
@@ -88,10 +91,9 @@ internal fun HorizontalMonthSelector(
         modifier = modifier,
     ) {
         items(count = Int.MAX_VALUE) { index ->
-            val month = monthAt(anchorMonth, index)
+            val month = monthAt(anchorDate, index)
             val isSelected = month.year == selectedDate().year && month.month == selectedDate().month
 
-            // If the month is January, add the Year separator before the MonthButton
             if (month.month.number == 1) {
                 YearSeparator(month.year)
             }
@@ -138,6 +140,10 @@ private fun MonthButton(
                 indication = ripple(),
                 role = Role.Button,
             ) { onMonthClick() }
+            .clearAndSetSemantics {
+                contentDescription = month.getMonthYearLabel(locale)
+                selected = isSelected
+            }
             .padding(horizontal = Margin.Medium, vertical = Margin.Mini),
         contentAlignment = Alignment.Center,
     ) {

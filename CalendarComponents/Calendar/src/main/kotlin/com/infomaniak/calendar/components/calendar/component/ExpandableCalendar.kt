@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.calendar.components.foundation.utils.firstDayOfMonth
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.DayOfWeek
@@ -78,9 +79,7 @@ fun ExpandableCalendar(
                         )
                         HorizontalMonthSelector(
                             selectedDate = selectedDate,
-                            onMonthSelected = { month ->
-                                onDayClick(LocalDate(month.year, month.month, 1))
-                            },
+                            onMonthSelected = { date -> onDayClick(date.firstDayOfMonth()) },
                         )
                     }
                 } else {
