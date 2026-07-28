@@ -52,6 +52,11 @@ import kotlinx.datetime.plus
  *   already has trailing (and leading) content to scroll against;
  * - the previous/next weeks are **preloaded by construction**, independent of prefetch timing.
  *
+ * The leading week matters even for the initial today-centered generation: it keeps the aligned target
+ * away from the leading edge, so prefetch doesn't prepend endlessly (which would otherwise scroll the
+ * list back to the start of time). Alignment is handled by re-scrolling until settled (see
+ * `AlignPlanningToDate`), never by opening the window at the target's week.
+ *
  * Subsequent append and prepend loads fetch a single week at a time, keeping page drops fine-grained.
  *
  * [initialDay] resolves the very first refresh key ([initialWeek]). Because
