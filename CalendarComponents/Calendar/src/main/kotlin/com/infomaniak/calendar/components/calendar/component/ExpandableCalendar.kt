@@ -64,10 +64,7 @@ fun ExpandableCalendar(
                 label = "calendarExpansion",
             ) { expanded ->
                 if (expanded) {
-                    Column(
-                        modifier = Modifier
-                            .padding(vertical = Margin.Medium),
-                    ) {
+                    Column {
                         ExpandedCalendar(
                             selectedDate = selectedDate,
                             onDayClick = onDayClick,
