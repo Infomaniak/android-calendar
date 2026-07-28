@@ -39,6 +39,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toKotlinDayOfWeek
 import kotlin.time.Clock
 
+//TODO: reduce to 1 once https://github.com/Infomaniak/android-calendar/pull/119 (auto-select the initial month) lands.
 private const val RANGE_MONTHS = 100
 
 @Composable
