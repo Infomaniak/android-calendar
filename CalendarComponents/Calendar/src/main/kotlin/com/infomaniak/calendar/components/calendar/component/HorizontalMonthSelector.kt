@@ -115,7 +115,7 @@ private fun MonthButton(
     locale: Locale,
     onMonthClick: () -> Unit,
 ) {
-    val monthName = Month.of(month.month.number).getDisplayName(TextStyle.SHORT, locale)
+    val monthName = month.monthDisplayName(locale)
 
     val interactionSource = remember { MutableInteractionSource() }
     val backgroundColor = if (isSelected) {

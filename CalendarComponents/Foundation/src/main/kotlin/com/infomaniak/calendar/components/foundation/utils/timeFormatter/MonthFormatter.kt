@@ -19,13 +19,18 @@ package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
+import java.time.Month
 import java.time.format.TextStyle
 import java.util.Locale
 
 fun LocalDate.monthYearLabel(locale: Locale, currentYear: Int): String {
-    val month = java.time.Month.of(month.number)
+    val month = Month.of(month.number)
         .getDisplayName(TextStyle.FULL_STANDALONE, locale)
         .replaceFirstChar { if (it.isLowerCase()) it.titlecase(locale) else it.toString() }
 
     return if (year == currentYear) month else "$month $year"
+}
+
+fun LocalDate.monthDisplayName(locale: Locale): String {
+    return Month.of(month.number).getDisplayName(TextStyle.SHORT, locale)
 }
