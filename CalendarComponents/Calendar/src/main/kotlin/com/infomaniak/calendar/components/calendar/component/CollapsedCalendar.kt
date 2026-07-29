@@ -48,13 +48,15 @@ import kotlin.time.Clock
 
 private const val DAYS_IN_WEEK = 7
 
+/** Margins held on each side at startup, so the first swipes never have to grow the range. */
+private const val INITIAL_MARGINS = 2
+
 @Composable
 internal fun CollapsedCalendar(
-    monthRange: Int,
+    monthMargin: Int,
     selectedDate: () -> LocalDate,
     weekNumbering: WeekNumbering,
     onDayClick: (LocalDate) -> Unit,
-    onVisibleWeekChange: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
     headerState: CalendarHeaderState = rememberCalendarHeaderState(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -66,8 +68,8 @@ internal fun CollapsedCalendar(
     val initialWeekStart = remember { selectedDate().startOfWeek(firstDayOfWeek) }
 
     val weekState = rememberWeekCalendarState(
-        startDate = remember { initialWeekStart.minus(monthRange, DateTimeUnit.MONTH) },
-        endDate = remember { initialWeekStart.plus(monthRange, DateTimeUnit.MONTH) },
+        startDate = remember { initialWeekStart.minus(INITIAL_MARGINS * monthMargin, DateTimeUnit.MONTH) },
+        endDate = remember { initialWeekStart.plus(INITIAL_MARGINS * monthMargin, DateTimeUnit.MONTH) },
         firstVisibleWeekDate = initialWeekStart,
         firstDayOfWeek = firstDayOfWeek,
     )
@@ -80,14 +82,15 @@ internal fun CollapsedCalendar(
         scrollableState = weekState,
         selectedPage = { selectedDate().startOfWeek(firstDayOfWeek) },
         displayedPage = { weekState.firstVisibleWeek.days.first().date },
-        animateScrollToPage = { weekStart ->
-            if (weekStart in weekState.startDate..weekState.endDate) {
-                weekState.animateScrollToWeek(weekStart)
-            } else {
-                weekState.startDate = weekStart.minus(monthRange, DateTimeUnit.MONTH)
-                weekState.endDate = weekStart.plus(monthRange, DateTimeUnit.MONTH)
-                weekState.scrollToWeek(weekStart)
-            }
+        pageRange = { weekState.startDate..weekState.endDate },
+        setPageRange = { dates ->
+            // Appending first: the range only ever widens, so neither assignment can invert it.
+            weekState.endDate = dates.endInclusive
+            weekState.startDate = dates.start
+        },
+        shiftByMargins = { weekStart, margins -> weekStart.plus(margins * monthMargin, DateTimeUnit.MONTH) },
+        scrollToPage = { weekStart, animate ->
+            if (animate) weekState.animateScrollToWeek(weekStart) else weekState.scrollToWeek(weekStart)
         },
     )
 
@@ -125,7 +128,7 @@ internal fun CollapsedCalendar(
             scrollableState = weekState,
             displayedPage = { weekState.firstVisibleWeek.days.first().date },
             onPageSwiped = { from, pageOffset ->
-                from.plus(pageOffset * DAYS_IN_WEEK, DateTimeUnit.DAY).also(onVisibleWeekChange)
+                from.plus(pageOffset * DAYS_IN_WEEK, DateTimeUnit.DAY).also { onDayClick(it) }
             },
             animateScrollToPage = { weekState.animateScrollToWeek(it) },
         ),
@@ -170,10 +173,9 @@ private fun DayContent(
 private fun CollapsedCalendarPreview() {
     Surface {
         CollapsedCalendar(
-            monthRange = 3,
+            monthMargin = 12,
             selectedDate = { Clock.today() },
             onDayClick = {},
-            onVisibleWeekChange = {},
             weekNumbering = WeekNumbering.ISO_8601,
         )
     }

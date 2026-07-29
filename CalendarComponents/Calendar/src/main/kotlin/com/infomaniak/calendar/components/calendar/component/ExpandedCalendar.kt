@@ -42,20 +42,21 @@ import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.YearMonth
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toKotlinDayOfWeek
 import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
+/** Margins held on each side at startup, so the first swipes never have to grow the range. */
+private const val INITIAL_MARGINS = 2
+
 @Composable
 internal fun ExpandedCalendar(
-    monthRange: Int,
+    monthMargin: Int,
     selectedDate: () -> LocalDate,
     weekNumbering: WeekNumbering,
     onDayClick: (LocalDate) -> Unit,
-    onVisibleMonthChange: (YearMonth) -> Unit,
     modifier: Modifier = Modifier,
     headerState: CalendarHeaderState = rememberCalendarHeaderState(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -64,8 +65,8 @@ internal fun ExpandedCalendar(
     val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
     val initialMonth = remember { selectedDate().yearMonth }
     val monthState = rememberCalendarState(
-        startMonth = remember { initialMonth.minus(monthRange, DateTimeUnit.MONTH) },
-        endMonth = remember { initialMonth.plus(monthRange, DateTimeUnit.MONTH) },
+        startMonth = remember { initialMonth.minus(INITIAL_MARGINS * monthMargin, DateTimeUnit.MONTH) },
+        endMonth = remember { initialMonth.plus(INITIAL_MARGINS * monthMargin, DateTimeUnit.MONTH) },
         firstVisibleMonth = initialMonth,
         firstDayOfWeek = firstDayOfWeek,
     )
@@ -78,14 +79,15 @@ internal fun ExpandedCalendar(
         scrollableState = monthState,
         selectedPage = { selectedDate().yearMonth },
         displayedPage = { monthState.firstVisibleMonth.yearMonth },
-        animateScrollToPage = { month ->
-            if (month in monthState.startMonth..monthState.endMonth) {
-                monthState.animateScrollToMonth(month)
-            } else {
-                monthState.startMonth = month.minus(monthRange, DateTimeUnit.MONTH)
-                monthState.endMonth = month.plus(monthRange, DateTimeUnit.MONTH)
-                monthState.scrollToMonth(month)
-            }
+        pageRange = { monthState.startMonth..monthState.endMonth },
+        setPageRange = { months ->
+            // Appending first: the range only ever widens, so neither assignment can invert it.
+            monthState.endMonth = months.endInclusive
+            monthState.startMonth = months.start
+        },
+        shiftByMargins = { month, margins -> month.plus(margins * monthMargin, DateTimeUnit.MONTH) },
+        scrollToPage = { month, animate ->
+            if (animate) monthState.animateScrollToMonth(month) else monthState.scrollToMonth(month)
         },
     )
 
@@ -124,7 +126,7 @@ internal fun ExpandedCalendar(
                 scrollableState = monthState,
                 displayedPage = { monthState.firstVisibleMonth.yearMonth },
                 onPageSwiped = { from, pageOffset ->
-                    from.plus(pageOffset, DateTimeUnit.MONTH).also(onVisibleMonthChange)
+                    from.plus(pageOffset, DateTimeUnit.MONTH).also { onDayClick(it.firstDay) }
                 },
                 animateScrollToPage = { monthState.animateScrollToMonth(it) },
             )
@@ -172,10 +174,9 @@ private fun DayContent(
 private fun ExpandedCalendarPreview() {
     Surface {
         ExpandedCalendar(
-            monthRange = 3,
+            monthMargin = 12,
             selectedDate = { Clock.today() },
             onDayClick = {},
-            onVisibleMonthChange = {},
             weekNumbering = WeekNumbering.ISO_8601,
         )
     }

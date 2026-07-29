@@ -23,7 +23,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import com.infomaniak.calendar.ui.state.VisibleDayState
-import kotlin.math.abs
 
 @Composable
 fun ProcessJumpRequests(lazyListState: LazyListState, visibleDayState: VisibleDayState, events: () -> EventsByWeekAndDay) {

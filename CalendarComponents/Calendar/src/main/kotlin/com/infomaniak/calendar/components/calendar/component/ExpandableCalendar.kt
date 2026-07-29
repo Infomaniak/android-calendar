@@ -19,6 +19,7 @@ package com.infomaniak.calendar.components.calendar.component
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,7 +41,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toKotlinDayOfWeek
 import kotlin.time.Clock
 
-private const val RANGE_MONTHS = 100
+private const val MONTH_MARGIN = 1
 
 @Composable
 fun ExpandableCalendar(
@@ -67,9 +68,8 @@ fun ExpandableCalendar(
                         ExpandedCalendar(
                             selectedDate = selectedDate,
                             onDayClick = onDayClick,
-                            onVisibleMonthChange = { onDayClick(it.firstDay) },
                             weekNumbering = weekNumbering,
-                            monthRange = RANGE_MONTHS,
+                            monthMargin = MONTH_MARGIN,
                             headerState = headerState,
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this@AnimatedContent,
@@ -79,9 +79,8 @@ fun ExpandableCalendar(
                     CollapsedCalendar(
                         selectedDate = selectedDate,
                         onDayClick = onDayClick,
-                        onVisibleWeekChange = { onDayClick(it) },
                         weekNumbering = weekNumbering,
-                        monthRange = RANGE_MONTHS,
+                        monthMargin = MONTH_MARGIN,
                         headerState = headerState,
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this@AnimatedContent,
