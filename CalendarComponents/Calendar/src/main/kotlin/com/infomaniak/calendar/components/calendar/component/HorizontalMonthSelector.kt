@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +45,7 @@ import com.infomaniak.calendar.components.foundation.utils.timeFormatter.monthDi
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.monthYearLabel
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -145,7 +145,7 @@ private fun MonthButton(
 
     TextButton(
         onClick = onMonthClick,
-        shape = RoundedCornerShape(50),
+        shape = EsdsTheme.radius.full,
         modifier = modifier
             .clearAndSetSemantics {
                 contentDescription = month.monthYearLabel(locale)
