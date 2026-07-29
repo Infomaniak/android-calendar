@@ -26,6 +26,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import com.infomaniak.calendar.components.calendar.component.CalendarHeaderState
+import com.infomaniak.calendar.components.calendar.component.CalendarPager
+import com.infomaniak.calendar.components.calendar.component.followSelection
+import com.infomaniak.calendar.components.calendar.component.growRangeAround
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.datetime.LocalDate
 

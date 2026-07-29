@@ -19,7 +19,6 @@ package com.infomaniak.calendar.components.calendar.component
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,11 +33,13 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.calendar.component.expanded.ExpandedCalendar
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toKotlinDayOfWeek
+import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
 private const val MONTH_MARGIN = 1
@@ -73,6 +74,10 @@ fun ExpandableCalendar(
                             headerState = headerState,
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this@AnimatedContent,
+                        )
+                        HorizontalMonthSelector(
+                            selectedMonth = { selectedDate().yearMonth },
+                            onMonthSelected = { date -> onDayClick(date.firstDay) },
                         )
                     }
                 } else {

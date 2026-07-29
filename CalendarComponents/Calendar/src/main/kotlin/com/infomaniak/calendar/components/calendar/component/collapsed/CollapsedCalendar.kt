@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.calendar.modifier.FollowExternalSelection
 import com.infomaniak.calendar.components.calendar.modifier.SyncHeaderOffset
 import com.infomaniak.calendar.components.calendar.modifier.pagedSwipe
-import com.infomaniak.calendar.components.calendar.modifier.rememberWeekPager
+import com.infomaniak.calendar.components.calendar.component.collapsed.rememberWeekPager
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberToday

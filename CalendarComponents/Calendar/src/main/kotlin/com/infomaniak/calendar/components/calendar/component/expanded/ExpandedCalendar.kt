@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.calendar.component
+package com.infomaniak.calendar.components.calendar.component.expanded
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
@@ -29,10 +29,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.calendar.component.CalendarHeaderState
+import com.infomaniak.calendar.components.calendar.component.Day
+import com.infomaniak.calendar.components.calendar.component.DaysOfWeekTitle
+import com.infomaniak.calendar.components.calendar.component.daySharedElement
+import com.infomaniak.calendar.components.calendar.component.rememberCalendarHeaderState
 import com.infomaniak.calendar.components.calendar.modifier.FollowExternalSelection
 import com.infomaniak.calendar.components.calendar.modifier.SyncHeaderOffset
 import com.infomaniak.calendar.components.calendar.modifier.pagedSwipe
-import com.infomaniak.calendar.components.calendar.modifier.rememberMonthPager
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberToday

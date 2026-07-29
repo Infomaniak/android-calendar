@@ -15,43 +15,49 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.calendar.modifier
+package com.infomaniak.calendar.components.calendar.component.collapsed
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.kizitonwose.calendar.compose.CalendarState
+import com.infomaniak.calendar.components.calendar.component.CalendarPager
+import com.infomaniak.calendar.components.foundation.utils.startOfWeek
+import com.kizitonwose.calendar.compose.weekcalendar.WeekCalendarState
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
-import kotlinx.datetime.yearMonth
+
+private const val DAYS_IN_WEEK = 7
 
 @Composable
-internal fun rememberMonthPager(state: CalendarState, monthMargin: Int): CalendarPager {
-    return remember(state, monthMargin) { MonthPager(state, monthMargin) }
-}
+internal fun rememberWeekPager(
+    state: WeekCalendarState,
+    firstDayOfWeek: DayOfWeek,
+    monthMargin: Int,
+): CalendarPager = remember(state, firstDayOfWeek, monthMargin) { WeekPager(state, firstDayOfWeek, monthMargin) }
 
-private class MonthPager(
-    private val state: CalendarState,
+private class WeekPager(
+    private val state: WeekCalendarState,
+    private val firstDayOfWeek: DayOfWeek,
     override val monthMargin: Int,
 ) : CalendarPager {
-
     override val scrollableState get() = state
-    override val displayedPage get() = state.firstVisibleMonth.yearMonth.firstDay
-    override val pageRange get() = state.startMonth.firstDay..state.endMonth.firstDay
+    override val displayedPage get() = state.firstVisibleWeek.days.first().date
+    override val pageRange get() = state.startDate..state.endDate
 
-    override fun pageOf(date: LocalDate) = date.yearMonth.firstDay
+    override fun pageOf(date: LocalDate) = date.startOfWeek(firstDayOfWeek)
 
-    override fun pageAt(from: LocalDate, pageOffset: Int) = from.plus(pageOffset, DateTimeUnit.MONTH)
+    override fun pageAt(from: LocalDate, pageOffset: Int) = from.plus(pageOffset * DAYS_IN_WEEK, DateTimeUnit.DAY)
 
     override fun growRangeStart(page: LocalDate) {
-        state.startMonth = page.yearMonth
+        state.startDate = page
     }
 
     override fun growRangeEnd(page: LocalDate) {
-        state.endMonth = page.yearMonth
+        state.endDate = page
     }
 
     override suspend fun scrollToPage(page: LocalDate, animate: Boolean) {
-        if (animate) state.animateScrollToMonth(page.yearMonth) else state.scrollToMonth(page.yearMonth)
+        if (animate) state.animateScrollToWeek(page) else state.scrollToWeek(page)
     }
 }
