@@ -130,22 +130,21 @@ private fun MonthButton(
         MaterialTheme.colorScheme.onSurface
     }
 
-    Box(
+    TextButton(
+        onClick = onMonthClick,
+        shape = RoundedCornerShape(50),
         modifier = Modifier
-            .padding(horizontal = Margin.Mini, vertical = Margin.Medium)
-            .clip(RoundedCornerShape(50))
-            .background(backgroundColor)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = ripple(),
-                role = Role.Button,
-            ) { onMonthClick() }
+            .padding(horizontal = Margin.Medium, vertical = Margin.Large)
+            .size(width = 60.dp, height = 32.dp)
             .clearAndSetSemantics {
                 contentDescription = month.getMonthYearLabel(locale)
                 selected = isSelected
-            }
-            .padding(horizontal = Margin.Medium, vertical = Margin.Mini),
-        contentAlignment = Alignment.Center,
+            },
+        contentPadding = PaddingValues(0.dp),
+        colors = ButtonDefaults.textButtonColors(
+            containerColor = backgroundColor,
+            contentColor = contentColor,
+        ),
     ) {
         Text(
             text = monthName,
