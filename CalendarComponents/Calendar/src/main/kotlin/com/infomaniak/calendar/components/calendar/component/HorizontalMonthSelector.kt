@@ -78,10 +78,21 @@ internal fun HorizontalMonthSelector(
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = CENTER_INDEX)
 
     LaunchedEffect(anchorDate) {
-        snapshotFlow { selectedDate() }.collectLatest { date ->
-            val target = CENTER_INDEX + monthDistance(anchorDate, date)
-            listState.animateScrollToItem(target.coerceIn(0, Int.MAX_VALUE - 1))
-        }
+        snapshotFlow { selectedDate() }
+            .distinctUntilChanged()
+            .collectLatest { selectedDate ->
+                val target = CENTER_INDEX + monthDistance(anchorDate, selectedDate)
+                val layoutInfo = listState.layoutInfo
+                val targetItem = layoutInfo.visibleItemsInfo.firstOrNull { it.index == target }
+
+                val isFullyVisible = targetItem != null &&
+                        targetItem.offset >= layoutInfo.viewportStartOffset &&
+                        targetItem.offset + targetItem.size <= layoutInfo.viewportEndOffset
+
+                if (!isFullyVisible) {
+                    listState.animateScrollToItem(target)
+                }
+            }
     }
 
     LazyRow(
