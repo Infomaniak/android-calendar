@@ -108,6 +108,7 @@ internal fun HorizontalMonthSelector(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun MonthButton(
     month: LocalDate,
@@ -117,7 +118,6 @@ private fun MonthButton(
 ) {
     val monthName = month.monthDisplayName(locale)
 
-    val interactionSource = remember { MutableInteractionSource() }
     val backgroundColor = if (isSelected) {
         MaterialTheme.colorScheme.primary
     } else {
