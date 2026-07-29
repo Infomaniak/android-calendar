@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.calendar.modifier.FollowExternalSelection
 import com.infomaniak.calendar.components.calendar.modifier.SyncHeaderOffset
 import com.infomaniak.calendar.components.calendar.modifier.pagedSwipe
+import com.infomaniak.calendar.components.calendar.modifier.rememberMonthPager
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberToday
@@ -70,26 +71,13 @@ internal fun ExpandedCalendar(
         firstVisibleMonth = initialMonth,
         firstDayOfWeek = firstDayOfWeek,
     )
+    val pager = rememberMonthPager(state = monthState, monthMargin = monthMargin)
 
     val today by rememberToday()
 
     val sharedElementDays by remember { derivedStateOf { monthState.firstVisibleMonth.weekDays.flatten().toSet() } }
 
-    FollowExternalSelection(
-        scrollableState = monthState,
-        selectedPage = { selectedDate().yearMonth },
-        displayedPage = { monthState.firstVisibleMonth.yearMonth },
-        pageRange = { monthState.startMonth..monthState.endMonth },
-        setPageRange = { months ->
-            // Appending first: the range only ever widens, so neither assignment can invert it.
-            monthState.endMonth = months.endInclusive
-            monthState.startMonth = months.start
-        },
-        shiftByMargins = { month, margins -> month.plus(margins * monthMargin, DateTimeUnit.MONTH) },
-        scrollToPage = { month, animate ->
-            if (animate) monthState.animateScrollToMonth(month) else monthState.scrollToMonth(month)
-        },
-    )
+    FollowExternalSelection(pager = pager, selectedDate = selectedDate)
 
     SyncHeaderOffset(
         scrollableState = monthState,
@@ -122,14 +110,7 @@ internal fun ExpandedCalendar(
             )
         },
         modifier = modifier
-            .pagedSwipe(
-                scrollableState = monthState,
-                displayedPage = { monthState.firstVisibleMonth.yearMonth },
-                onPageSwiped = { from, pageOffset ->
-                    from.plus(pageOffset, DateTimeUnit.MONTH).also { onDayClick(it.firstDay) }
-                },
-                animateScrollToPage = { monthState.animateScrollToMonth(it) },
-            )
+            .pagedSwipe(pager = pager, onPageSwiped = onDayClick)
             .animateContentSize(),
     )
 }

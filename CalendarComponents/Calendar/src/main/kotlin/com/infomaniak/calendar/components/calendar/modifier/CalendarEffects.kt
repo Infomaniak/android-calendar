@@ -22,110 +22,29 @@ import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import com.infomaniak.calendar.components.calendar.component.CalendarHeaderState
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
-
-/** How close the selection may get to a bound before the range is grown on that side. */
-private const val GROWTH_TRIGGER_MARGINS = 1
-
-/** How far past the selection a bound is pushed when growing, so this only happens once per margin. */
-private const val GROWTH_TARGET_MARGINS = 2
+import kotlinx.datetime.LocalDate
 
 /**
- * Keeps a paged calendar showing the current selection, and keeps its page range wide enough for
- * the pager to always have somewhere to go.
+ * Keeps the pager showing the selected date when something other than a swipe changes it, and keeps
+ * its page range wide enough that it always has somewhere to go.
  *
- * The range matters because a calendar state resolves a page to a list index and gives up silently
- * when the page falls outside its bounds: an out-of-range scroll is not an error, it is a no-op. A
- * pager that has reached its bounds therefore looks frozen while the rest of the screen keeps
- * following the selection.
- *
- * Growing forward only appends pages, which leaves the existing indices pointing at the same dates,
- * so it can happen at any time. Growing backward prepends pages and shifts every index by the
- * number added, silently moving the pager onto another page, so it waits for the pager to be still
- * and puts the visible page back afterwards.
- *
- * @param scrollableState the layout being scrolled.
- * @param selectedPage the page the rest of the screen is on.
- * @param displayedPage the page currently on screen.
- * @param pageRange the pages the layout currently holds.
- * @param setPageRange widens [pageRange]. Only ever called with a range containing the current one.
- * @param shiftByMargins a page shifted by a signed number of margins, the unit this grows by.
- * @param scrollToPage moves the layout to the given page, animated or not.
+ * The range matters because a calendar resolves a page to a list index and gives up silently when
+ * the page falls outside its bounds: an out-of-range scroll is not an error, it is a no-op. A pager
+ * that has reached its bounds therefore looks frozen while the rest of the screen keeps following
+ * the selection.
  */
 @Composable
-internal fun <P : Comparable<P>> FollowExternalSelection(
-    scrollableState: ScrollableState,
-    selectedPage: () -> P,
-    displayedPage: () -> P,
-    pageRange: () -> ClosedRange<P>,
-    setPageRange: (ClosedRange<P>) -> Unit,
-    shiftByMargins: (page: P, margins: Int) -> P,
-    scrollToPage: suspend (page: P, animate: Boolean) -> Unit,
-) {
-    val currentSelectedPage by rememberUpdatedState(selectedPage)
-    val currentDisplayedPage by rememberUpdatedState(displayedPage)
-    val currentPageRange by rememberUpdatedState(pageRange)
-    val currentSetPageRange by rememberUpdatedState(setPageRange)
-    val currentShiftByMargins by rememberUpdatedState(shiftByMargins)
-    val currentScrollToPage by rememberUpdatedState(scrollToPage)
+internal fun FollowExternalSelection(pager: CalendarPager, selectedDate: () -> LocalDate) {
+    val currentSelectedDate by rememberUpdatedState(selectedDate)
+    val selectedPage = remember(pager) { snapshotFlow { pager.pageOf(currentSelectedDate()) } }
 
-    LaunchedEffect(scrollableState) {
-        snapshotFlow { currentSelectedPage() }.collect { page ->
-            val range = currentPageRange()
-
-            if (currentShiftByMargins(page, GROWTH_TRIGGER_MARGINS) > range.endInclusive) {
-                currentSetPageRange(range.start..currentShiftByMargins(page, GROWTH_TARGET_MARGINS))
-            }
-
-            if (currentShiftByMargins(page, -GROWTH_TRIGGER_MARGINS) < range.start) {
-                snapshotFlow { scrollableState.isScrollInProgress }.first { !it }
-
-                val settledRange = currentPageRange()
-                val wantedStart = currentShiftByMargins(page, -GROWTH_TARGET_MARGINS)
-                if (wantedStart < settledRange.start) {
-                    // Read what is on screen before the indices move under it.
-                    val anchor = currentDisplayedPage()
-                    currentSetPageRange(wantedStart..settledRange.endInclusive)
-                    reanchorOn(anchor, currentScrollToPage)
-                }
-            }
-        }
-    }
-
-    LaunchedEffect(scrollableState) {
-        snapshotFlow { currentSelectedPage() }.collectLatest { page ->
-            // Waiting rather than skipping: scrolling now would fight an ongoing swipe, and
-            // dropping the request would lose the jump entirely.
-            snapshotFlow { scrollableState.isScrollInProgress }.first { !it }
-            // A page the layout does not hold yet cannot be scrolled to, and the effect above may
-            // still be catching up with a distant jump.
-            snapshotFlow { page in currentPageRange() }.first { it }
-
-            if (page != currentDisplayedPage()) currentScrollToPage(page, true)
-        }
-    }
-}
-
-/**
- * Puts [anchor] back on screen after the indices have shifted under it.
- *
- * A gesture starting in that same frame takes the scroll over and cancels this, which is survivable:
- * the pager follows the finger from a page off by the growth, and the next release corrects it. The
- * alternative, letting the cancellation through, would tear down the effect for good.
- */
-private suspend fun <P> reanchorOn(anchor: P, scrollToPage: suspend (P, Boolean) -> Unit) {
-    try {
-        scrollToPage(anchor, false)
-    } catch (_: CancellationException) {
-        currentCoroutineContext().ensureActive()
-    }
+    LaunchedEffect(pager) { selectedPage.collect { pager.growRangeAround(it) } }
+    LaunchedEffect(pager) { selectedPage.collectLatest { pager.followSelection(it) } }
 }
 
 @Composable

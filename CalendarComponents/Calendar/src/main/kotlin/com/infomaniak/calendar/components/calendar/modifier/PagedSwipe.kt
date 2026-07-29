@@ -18,7 +18,6 @@
 package com.infomaniak.calendar.components.calendar.modifier
 
 import androidx.compose.foundation.MutatePriority
-import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEvent
@@ -34,6 +33,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 import kotlin.math.abs
 
 private val FAST_SWIPE_VELOCITY = 300.dp
@@ -56,49 +56,39 @@ private const val PREVIOUS_PAGE = -1
  *
  * The scrolling layout must have its own gesture handling disabled, or it will fight this one.
  *
- * @param scrollableState the layout being scrolled, driven directly by this modifier.
- * @param displayedPage the page currently on screen.
- * @param onPageSwiped called with the page the swipe started from and the direction ([NEXT_PAGE] or
- * [PREVIOUS_PAGE]), before any animation runs. Must return the page being navigated to.
- * @param animateScrollToPage moves the layout to the given page once the finger is lifted.
+ * @param pager the calendar being paged, driven directly by this modifier.
+ * @param onPageSwiped called with the date opening the page being navigated to, before any
+ * animation runs. Not called when the swipe lands back on the page it started from.
  */
-internal fun <P> Modifier.pagedSwipe(
-    scrollableState: ScrollableState,
-    displayedPage: () -> P,
-    onPageSwiped: (from: P, pageOffset: Int) -> P,
-    animateScrollToPage: suspend (P) -> Unit,
-): Modifier = this then PagedSwipeElement(scrollableState, displayedPage, onPageSwiped, animateScrollToPage)
+internal fun Modifier.pagedSwipe(
+    pager: CalendarPager,
+    onPageSwiped: (LocalDate) -> Unit,
+): Modifier = this then PagedSwipeElement(pager, onPageSwiped)
 
-private data class PagedSwipeElement<P>(
-    private val scrollableState: ScrollableState,
-    private val displayedPage: () -> P,
-    private val onPageSwiped: (P, Int) -> P,
-    private val animateScrollToPage: suspend (P) -> Unit,
-) : ModifierNodeElement<PagedSwipeNode<P>>() {
+private data class PagedSwipeElement(
+    private val pager: CalendarPager,
+    private val onPageSwiped: (LocalDate) -> Unit,
+) : ModifierNodeElement<PagedSwipeNode>() {
 
-    override fun create() = PagedSwipeNode(scrollableState, displayedPage, onPageSwiped, animateScrollToPage)
+    override fun create() = PagedSwipeNode(pager, onPageSwiped)
 
-    override fun update(node: PagedSwipeNode<P>) {
-        node.update(scrollableState, displayedPage, onPageSwiped, animateScrollToPage)
-    }
+    override fun update(node: PagedSwipeNode) = node.update(pager, onPageSwiped)
 
     override fun InspectorInfo.inspectableProperties() {
         name = "pagedSwipe"
-        properties["scrollableState"] = scrollableState
+        properties["pager"] = pager
     }
 }
 
-private class PagedSwipeNode<P>(
-    private var scrollableState: ScrollableState,
-    private var displayedPage: () -> P,
-    private var onPageSwiped: (P, Int) -> P,
-    private var animateScrollToPage: suspend (P) -> Unit,
+private class PagedSwipeNode(
+    private var pager: CalendarPager,
+    private var onPageSwiped: (LocalDate) -> Unit,
 ) : DelegatingNode(), PointerInputModifierNode {
 
     private var pageWidth = 0
     private var releaseVelocity = 0f
     private val velocityTracker = VelocityTracker()
-    private var animatingToPage: P? = null
+    private var animatingToPage: LocalDate? = null
 
     /**
      * Bridges the pointer callbacks, which can't suspend, to the scroll session, which stays open
@@ -123,20 +113,13 @@ private class PagedSwipeNode<P>(
         },
     )
 
-    fun update(
-        scrollableState: ScrollableState,
-        displayedPage: () -> P,
-        onPageSwiped: (P, Int) -> P,
-        animateScrollToPage: suspend (P) -> Unit,
-    ) {
-        if (this.scrollableState != scrollableState) {
-            this.scrollableState = scrollableState
+    fun update(pager: CalendarPager, onPageSwiped: (LocalDate) -> Unit) {
+        if (this.pager != pager) {
+            this.pager = pager
             abortSwipe()
             pointerInput.resetPointerInputHandler()
         }
-        this.displayedPage = displayedPage
         this.onPageSwiped = onPageSwiped
-        this.animateScrollToPage = animateScrollToPage
     }
 
     override fun onPointerEvent(pointerEvent: PointerEvent, pass: PointerEventPass, bounds: IntSize) {
@@ -169,12 +152,18 @@ private class PagedSwipeNode<P>(
             val draggedDistance = consumeDrag(deltas)
             val pageOffset = pageOffsetFor(draggedDistance, fastSwipeVelocity)
 
-            val targetPage = if (pageOffset == NO_PAGE_CHANGE) startPage else onPageSwiped(startPage, pageOffset)
+            val targetPage = if (pageOffset == NO_PAGE_CHANGE) {
+                startPage
+            } else {
+                pager.pageAt(startPage, pageOffset).also(onPageSwiped)
+            }
+
             animatingToPage = targetPage
-
-            animateScrollToPage(targetPage)
-
-            animatingToPage = null
+            try {
+                pager.scrollToPage(targetPage, animate = true)
+            } finally {
+                animatingToPage = null
+            }
         }
     }
 
@@ -188,11 +177,13 @@ private class PagedSwipeNode<P>(
      * changes past the halfway mark, so a quick second swipe would otherwise report a page change
      * that already happened.
      */
-    private fun swipeStartPage(): P = animatingToPage?.takeIf { scrollableState.isScrollInProgress } ?: displayedPage()
+    private fun swipeStartPage(): LocalDate {
+        return animatingToPage?.takeIf { pager.scrollableState.isScrollInProgress } ?: pager.displayedPage
+    }
 
     private suspend fun consumeDrag(deltas: Channel<Float>): Float {
         var draggedDistance = 0f
-        scrollableState.scroll(MutatePriority.UserInput) {
+        pager.scrollableState.scroll(MutatePriority.UserInput) {
             for (delta in deltas) {
                 draggedDistance -= scrollBy(-delta)
             }

@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.calendar.modifier.FollowExternalSelection
 import com.infomaniak.calendar.components.calendar.modifier.SyncHeaderOffset
 import com.infomaniak.calendar.components.calendar.modifier.pagedSwipe
+import com.infomaniak.calendar.components.calendar.modifier.rememberWeekPager
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberToday
@@ -45,8 +46,6 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toKotlinDayOfWeek
 import kotlin.time.Clock
-
-private const val DAYS_IN_WEEK = 7
 
 /** Margins held on each side at startup, so the first swipes never have to grow the range. */
 private const val INITIAL_MARGINS = 2
@@ -73,26 +72,13 @@ internal fun CollapsedCalendar(
         firstVisibleWeekDate = initialWeekStart,
         firstDayOfWeek = firstDayOfWeek,
     )
+    val pager = rememberWeekPager(state = weekState, firstDayOfWeek = firstDayOfWeek, monthMargin = monthMargin)
 
     val sharedElementDates by remember {
         derivedStateOf { weekState.firstVisibleWeek.days.mapTo(mutableSetOf()) { it.date } }
     }
 
-    FollowExternalSelection(
-        scrollableState = weekState,
-        selectedPage = { selectedDate().startOfWeek(firstDayOfWeek) },
-        displayedPage = { weekState.firstVisibleWeek.days.first().date },
-        pageRange = { weekState.startDate..weekState.endDate },
-        setPageRange = { dates ->
-            // Appending first: the range only ever widens, so neither assignment can invert it.
-            weekState.endDate = dates.endInclusive
-            weekState.startDate = dates.start
-        },
-        shiftByMargins = { weekStart, margins -> weekStart.plus(margins * monthMargin, DateTimeUnit.MONTH) },
-        scrollToPage = { weekStart, animate ->
-            if (animate) weekState.animateScrollToWeek(weekStart) else weekState.scrollToWeek(weekStart)
-        },
-    )
+    FollowExternalSelection(pager = pager, selectedDate = selectedDate)
 
     SyncHeaderOffset(
         scrollableState = weekState,
@@ -124,14 +110,7 @@ internal fun CollapsedCalendar(
                 isSharedElementEnabled = day.date in sharedElementDates,
             )
         },
-        modifier = modifier.pagedSwipe(
-            scrollableState = weekState,
-            displayedPage = { weekState.firstVisibleWeek.days.first().date },
-            onPageSwiped = { from, pageOffset ->
-                from.plus(pageOffset * DAYS_IN_WEEK, DateTimeUnit.DAY).also { onDayClick(it) }
-            },
-            animateScrollToPage = { weekState.animateScrollToWeek(it) },
-        ),
+        modifier = modifier.pagedSwipe(pager = pager, onPageSwiped = onDayClick),
     )
 }
 
