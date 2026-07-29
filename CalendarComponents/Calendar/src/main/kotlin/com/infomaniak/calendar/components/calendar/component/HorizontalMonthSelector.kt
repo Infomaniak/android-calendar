@@ -17,11 +17,9 @@
  */
 package com.infomaniak.calendar.components.calendar.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,7 +35,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -45,14 +42,16 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.foundation.utils.getMonthYearLabel
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.monthDisplayName
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.monthYearLabel
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.monthsUntil
 import kotlinx.datetime.number
 import kotlinx.datetime.plus
 import kotlinx.datetime.yearMonth
@@ -61,14 +60,14 @@ import kotlin.time.Clock
 
 private const val CENTER_INDEX = Int.MAX_VALUE / 2
 
-private fun monthAt(anchorDate: LocalDate, index: Int): LocalDate =
-    anchorDate.plus(index - CENTER_INDEX, DateTimeUnit.MONTH)
+private fun monthAt(anchorDate: LocalDate, index: Int): LocalDate {
+    return anchorDate.plus(index - CENTER_INDEX, DateTimeUnit.MONTH)
+}
 
-private fun monthDistance(from: LocalDate, to: LocalDate): Int =
-    (to.year - from.year) * 12 + (to.month.number - from.month.number)
+private fun monthDistance(from: LocalDate, to: LocalDate): Int = from.yearMonth.monthsUntil(to.yearMonth)
 
 @Composable
-internal fun HorizontalMonthSelector(
+fun HorizontalMonthSelector(
     selectedDate: () -> LocalDate,
     onMonthSelected: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
@@ -79,6 +78,7 @@ internal fun HorizontalMonthSelector(
 
     LaunchedEffect(anchorDate) {
         snapshotFlow { selectedDate() }
+            .drop(1)
             .distinctUntilChanged()
             .collectLatest { selectedDate ->
                 val target = CENTER_INDEX + monthDistance(anchorDate, selectedDate)
@@ -114,6 +114,7 @@ internal fun HorizontalMonthSelector(
                 isSelected = isSelected,
                 locale = locale,
                 onMonthClick = { onMonthSelected(month) },
+                modifier = Modifier.padding(horizontal = Margin.Medium, vertical = Margin.Large),
             )
         }
     }
@@ -126,6 +127,7 @@ private fun MonthButton(
     isSelected: Boolean,
     locale: Locale,
     onMonthClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val monthName = month.monthDisplayName(locale)
 
@@ -144,11 +146,9 @@ private fun MonthButton(
     TextButton(
         onClick = onMonthClick,
         shape = RoundedCornerShape(50),
-        modifier = Modifier
-            .padding(horizontal = Margin.Medium, vertical = Margin.Large)
-            .size(width = 60.dp, height = 32.dp)
+        modifier = modifier
             .clearAndSetSemantics {
-                contentDescription = month.getMonthYearLabel(locale)
+                contentDescription = month.monthYearLabel(locale)
                 selected = isSelected
             },
         contentPadding = PaddingValues(0.dp),
@@ -167,10 +167,9 @@ private fun MonthButton(
 }
 
 @Composable
-private fun YearSeparator(year: Int) {
+private fun YearSeparator(year: Int, modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier
-            .padding(horizontal = Margin.Small, vertical = Margin.Micro),
+        modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
         Text(
