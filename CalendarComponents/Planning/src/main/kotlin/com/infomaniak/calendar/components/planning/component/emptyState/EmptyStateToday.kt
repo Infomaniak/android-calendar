@@ -30,8 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.infomaniak.calendar.components.foundation.theme.LocalCalendarComponentsTokens
 import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -40,7 +40,7 @@ internal fun TodayEmptyState(onClick: () -> Unit, modifier: Modifier = Modifier)
         Button(
             onClick = onClick,
             contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
-            shapes = LocalCalendarComponentsTokens.current.button.shapes(),
+            shapes = ButtonDefaults.shapes(shape = EsdsTheme.radius.xl, pressedShape = EsdsTheme.radius.xl),
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_plus),

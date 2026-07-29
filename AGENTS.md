@@ -136,6 +136,7 @@ consumers: `implementation(project(":CalendarComponents:Planning"))` transitivel
 - `core.infomaniak.core.ui.compose.margin` — `Margin` spacing constants (from `core` catalog, Planning only).
 - `kmpCalendar.kotlinx.datetime` — `kotlinx-datetime` types (`LocalDate`, `TimeZone`, …) (Foundation + Planning).
 - `libs.compose.material3` — Material 3 Compose (from `libs` catalog).
+- `libs.infomaniak.designsystem.theme.calendar` — Infomaniak Design System.
 
 ### Ownership
 
