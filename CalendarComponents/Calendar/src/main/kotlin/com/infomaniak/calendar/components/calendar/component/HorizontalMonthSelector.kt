@@ -92,7 +92,7 @@ internal fun HorizontalMonthSelector(
     ) {
         items(count = Int.MAX_VALUE) { index ->
             val month = monthAt(anchorDate, index)
-            val isSelected = month.year == selectedDate().year && month.month == selectedDate().month
+            val isSelected = month.yearMonth == selectedDate().yearMonth
 
             if (month.month.number == 1) {
                 YearSeparator(month.year)
