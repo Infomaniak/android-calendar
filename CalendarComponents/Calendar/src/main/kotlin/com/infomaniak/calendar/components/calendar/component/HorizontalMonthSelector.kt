@@ -50,7 +50,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.YearMonth
 import kotlinx.datetime.monthsUntil
 import kotlinx.datetime.number
 import kotlinx.datetime.plus
@@ -60,28 +60,28 @@ import kotlin.time.Clock
 
 private const val CENTER_INDEX = Int.MAX_VALUE / 2
 
-private fun monthAt(anchorDate: LocalDate, index: Int): LocalDate {
-    return anchorDate.plus(index - CENTER_INDEX, DateTimeUnit.MONTH)
+private fun monthAt(anchorMonth: YearMonth, index: Int): YearMonth {
+    return anchorMonth.plus(index - CENTER_INDEX, DateTimeUnit.MONTH)
 }
 
-private fun monthDistance(from: LocalDate, to: LocalDate): Int = from.yearMonth.monthsUntil(to.yearMonth)
+private fun monthDistance(from: YearMonth, to: YearMonth): Int = from.monthsUntil(to)
 
 @Composable
 fun HorizontalMonthSelector(
-    selectedDate: () -> LocalDate,
-    onMonthSelected: (LocalDate) -> Unit,
+    selectedMonth: () -> YearMonth,
+    onMonthSelected: (YearMonth) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val locale = LocalLocale.current.platformLocale
-    val anchorDate = remember { selectedDate() }
+    val anchorMonth = remember { selectedMonth() }
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = CENTER_INDEX)
 
-    LaunchedEffect(anchorDate) {
-        snapshotFlow { selectedDate() }
+    LaunchedEffect(anchorMonth) {
+        snapshotFlow { selectedMonth() }
             .drop(1)
             .distinctUntilChanged()
-            .collectLatest { selectedDate ->
-                val target = CENTER_INDEX + monthDistance(anchorDate, selectedDate)
+            .collectLatest { selectedMonth ->
+                val target = CENTER_INDEX + monthDistance(anchorMonth, selectedMonth)
                 val layoutInfo = listState.layoutInfo
                 val targetItem = layoutInfo.visibleItemsInfo.firstOrNull { it.index == target }
 
@@ -102,8 +102,8 @@ fun HorizontalMonthSelector(
         modifier = modifier,
     ) {
         items(count = Int.MAX_VALUE) { index ->
-            val month = monthAt(anchorDate, index)
-            val isSelected = month.yearMonth == selectedDate().yearMonth
+            val month = monthAt(anchorMonth, index)
+            val isSelected = month == selectedMonth()
 
             if (month.month.number == 1) {
                 YearSeparator(month.year, Modifier.padding(horizontal = Margin.Small, vertical = Margin.Micro))
@@ -123,7 +123,7 @@ fun HorizontalMonthSelector(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun MonthButton(
-    month: LocalDate,
+    month: YearMonth,
     isSelected: Boolean,
     locale: Locale,
     onMonthClick: () -> Unit,
@@ -185,7 +185,7 @@ private fun YearSeparator(year: Int, modifier: Modifier = Modifier) {
 private fun HorizontalMonthSelectorPreview() {
     Surface {
         HorizontalMonthSelector(
-            selectedDate = { Clock.today() },
+            selectedMonth = { Clock.today().yearMonth },
             onMonthSelected = {},
         )
     }

@@ -73,8 +73,8 @@ fun ExpandableCalendar(
                             animatedVisibilityScope = this@AnimatedContent,
                         )
                         HorizontalMonthSelector(
-                            selectedDate = selectedDate,
-                            onMonthSelected = { date -> onDayClick(date.yearMonth.firstDay) },
+                            selectedMonth = { selectedDate().yearMonth },
+                            onMonthSelected = { date -> onDayClick(date.firstDay) },
                         )
                     }
                 } else {

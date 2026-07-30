@@ -18,14 +18,14 @@
 package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
 import com.infomaniak.core.common.utils.today
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.YearMonth
 import kotlinx.datetime.number
 import java.time.Month
 import java.time.format.TextStyle
 import java.util.Locale
 import kotlin.time.Clock
 
-fun LocalDate.monthYearLabel(locale: Locale, currentYear: Int = Clock.today().year): String {
+fun YearMonth.monthYearLabel(locale: Locale, currentYear: Int = Clock.today().year): String {
     val month = Month.of(month.number)
         .getDisplayName(TextStyle.FULL_STANDALONE, locale)
         .replaceFirstChar { if (it.isLowerCase()) it.titlecase(locale) else it.toString() }
@@ -33,6 +33,6 @@ fun LocalDate.monthYearLabel(locale: Locale, currentYear: Int = Clock.today().ye
     return if (year == currentYear) month else "$month $year"
 }
 
-fun LocalDate.monthDisplayName(locale: Locale): String {
+fun YearMonth.monthDisplayName(locale: Locale): String {
     return Month.of(month.number).getDisplayName(TextStyle.SHORT, locale)
 }
