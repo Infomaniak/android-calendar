@@ -106,7 +106,7 @@ fun HorizontalMonthSelector(
             val isSelected = month.yearMonth == selectedDate().yearMonth
 
             if (month.month.number == 1) {
-                YearSeparator(month.year)
+                YearSeparator(month.year, Modifier.padding(horizontal = Margin.Small, vertical = Margin.Micro))
             }
 
             MonthButton(
