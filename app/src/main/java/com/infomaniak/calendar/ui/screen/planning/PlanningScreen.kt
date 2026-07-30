@@ -48,6 +48,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.planning.Planning
+import com.infomaniak.calendar.di.metroViewModel
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
 import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewParameter
@@ -56,17 +57,23 @@ import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlin.time.Clock
 
 @Composable
-fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier, viewModel: PlanningViewModel = viewModel()) {
+fun PlanningScreen(
+    goToEventCreation: () -> Unit,
+    goToEventDetail: (EventId) -> Unit,
+    modifier: Modifier = Modifier, viewModel: PlanningViewModel = metroViewModel(),
+) {
     val planningUiState: PlanningUiState by viewModel.planningUiState.collectAsStateWithLifecycle()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
 
     PlanningScreen(
         goToEventCreation = goToEventCreation,
+        goToEventDetail = goToEventDetail,
         planningUiState = { planningUiState },
         isLoadingEvents = { isLoadingEvents },
         modifier = modifier,
@@ -76,6 +83,7 @@ fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier,
 @Composable
 private fun PlanningScreen(
     goToEventCreation: () -> Unit,
+    goToEventDetail: (EventId) -> Unit,
     planningUiState: () -> PlanningUiState,
     isLoadingEvents: () -> Boolean,
     modifier: Modifier = Modifier,
@@ -100,6 +108,7 @@ private fun PlanningScreen(
                         events = planningUi.eventsByWeekAndDay,
                         contentPadding = contentPadding + PaddingValues(Margin.Medium),
                         goToEventCreation = goToEventCreation,
+                        goToEventDetail = goToEventDetail,
                         modifier = Modifier.hazeSource(hazeState),
                     )
                 }
@@ -137,6 +146,7 @@ private fun SuccessPlanning(
     events: () -> EventsByWeekAndDay,
     contentPadding: PaddingValues,
     goToEventCreation: () -> Unit,
+    goToEventDetail: (EventId) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val visibleDayState = LocalVisibleDayState.current ?: return
@@ -153,6 +163,7 @@ private fun SuccessPlanning(
             .fillMaxSize(),
         contentPadding = contentPadding,
         goToEventCreation = goToEventCreation,
+        goToEventDetail = { goToEventDetail(EventId(it)) },
     )
 }
 
@@ -173,6 +184,7 @@ private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class)
             PlanningScreen(
                 planningUiState = { PlanningUiState.Success({ weekEvents }) },
                 goToEventCreation = {},
+                goToEventDetail = {},
                 isLoadingEvents = { false },
             )
         }

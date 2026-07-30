@@ -52,11 +52,12 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Instant
 
 @Composable
-fun EventItem(event: EventUi.Normal, modifier: Modifier = Modifier) {
+fun EventItem(event: EventUi.Normal, onClick: () -> Unit = {}, modifier: Modifier = Modifier) {
     EventItem(
         start = event.start,
         end = event.end,
         title = event.title,
+        onClick = onClick,
         status = event.toEventItemStatus(),
         trailingIcons = event.toEventIcons(),
         isAllDay = event.isAllDay,
@@ -72,9 +73,10 @@ internal fun EventItem(
     status: EventItemStatus,
     trailingIcons: Set<EventIcons>,
     isAllDay: Boolean,
+    onClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    EventItemCard(status, modifier = modifier) {
+    EventItemCard(status, onClick = onClick, modifier = modifier) {
         if (isAllDay) {
             AllDayContent(title)
         } else {
@@ -84,8 +86,14 @@ internal fun EventItem(
 }
 
 @Composable
-private fun EventItemCard(status: EventItemStatus, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+private fun EventItemCard(
+    status: EventItemStatus,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Card(
+        onClick = onClick,
         colors = status.cardColors(),
         border = status.cardBorder(),
         shape = MaterialTheme.shapes.small,

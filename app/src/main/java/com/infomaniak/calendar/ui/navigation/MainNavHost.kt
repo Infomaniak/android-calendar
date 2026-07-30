@@ -65,7 +65,10 @@ fun MainNavHost(backStack: NavBackStack<NavKey>) {
 
 private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> = entryProvider {
     entry<NavDestination.CalendarView.Planning>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-        PlanningScreen(goToEventCreation = { backStack.add(NavDestination.EventCreation) })
+        PlanningScreen(
+            goToEventCreation = { backStack.add(NavDestination.EventCreation) },
+            goToEventDetail = { backStack.add(NavDestination.EventDetail(it)) },
+        )
     }
     entry<NavDestination.CalendarView.Day>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         DayScreen()
