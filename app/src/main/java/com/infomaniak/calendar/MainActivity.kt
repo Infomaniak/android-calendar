@@ -52,6 +52,7 @@ import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.utils.UserLoadState
 import com.infomaniak.calendar.utils.rememberUserLoadState
 import com.infomaniak.core.auth.models.user.User
+import dev.zacsweers.metrox.viewmodel.LocalMetroViewModelFactory
 import kotlinx.coroutines.channels.ReceiveChannel
 
 class MainActivity : ComponentActivity() {
@@ -67,15 +68,17 @@ class MainActivity : ComponentActivity() {
         if (SDK_INT >= 29) window.isNavigationBarContrastEnforced = false
 
         setContent {
-            CalendarTheme {
-                Surface {
-                    when (val userLoadState = appGraph.accountUtils.rememberUserLoadState().value) {
-                        UserLoadState.Awaiting -> Unit // Blank surface while waiting for first result
-                        is UserLoadState.Loaded -> MainContent(
-                            userLoadState = userLoadState,
-                            visibleDayState = rememberVisibleDayState(mainViewModel.visibleDay),
-                            loadingEventsError = mainViewModel.loadingEventsError,
-                        )
+            CompositionLocalProvider(LocalMetroViewModelFactory provides appGraph.metroViewModelFactory) {
+                CalendarTheme {
+                    Surface {
+                        when (val userLoadState = appGraph.accountUtils.rememberUserLoadState().value) {
+                            UserLoadState.Awaiting -> Unit // Blank surface while waiting for first result
+                            is UserLoadState.Loaded -> MainContent(
+                                userLoadState = userLoadState,
+                                visibleDayState = rememberVisibleDayState(mainViewModel.visibleDay),
+                                loadingEventsError = mainViewModel.loadingEventsError,
+                            )
+                        }
                     }
                 }
             }
