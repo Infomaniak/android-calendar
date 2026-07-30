@@ -49,22 +49,37 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
-import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.YearMonth
-import kotlinx.datetime.monthsUntil
 import kotlinx.datetime.number
-import kotlinx.datetime.plus
 import kotlinx.datetime.yearMonth
 import java.util.Locale
 import kotlin.time.Clock
 
 private const val CENTER_INDEX = Int.MAX_VALUE / 2
+private const val ITEMS_PER_YEAR = 13
 
-private fun monthAt(anchorMonth: YearMonth, index: Int): YearMonth {
-    return anchorMonth.plus(index - CENTER_INDEX, DateTimeUnit.MONTH)
+private sealed interface SelectorItem {
+    @JvmInline
+    value class Year(val year: Int) : SelectorItem
+    @JvmInline
+    value class Month(val yearMonth: YearMonth) : SelectorItem
 }
 
-private fun monthDistance(from: YearMonth, to: YearMonth): Int = from.monthsUntil(to)
+private fun yearSeparatorIndex(anchorYear: Int, year: Int): Int =
+    CENTER_INDEX + (year - anchorYear) * ITEMS_PER_YEAR
+
+private fun monthIndex(anchorYear: Int, month: YearMonth): Int =
+    yearSeparatorIndex(anchorYear, month.year) + month.month.number
+
+private fun selectorItemAt(anchorYear: Int, index: Int): SelectorItem {
+    val offset = index - CENTER_INDEX
+    val year = anchorYear + offset.floorDiv(ITEMS_PER_YEAR)
+
+    return when (val positionInYear = offset.mod(ITEMS_PER_YEAR)) {
+        0 -> SelectorItem.Year(year)
+        else -> SelectorItem.Month(YearMonth(year, positionInYear))
+    }
+}
 
 @Composable
 fun HorizontalMonthSelector(
@@ -74,14 +89,17 @@ fun HorizontalMonthSelector(
 ) {
     val locale = LocalLocale.current.platformLocale
     val anchorMonth = remember { selectedMonth() }
-    val listState = rememberLazyListState(initialFirstVisibleItemIndex = CENTER_INDEX)
+    val anchorYear = anchorMonth.year
+    val listState = rememberLazyListState(
+        initialFirstVisibleItemIndex = monthIndex(anchorYear, anchorMonth),
+    )
 
     LaunchedEffect(anchorMonth) {
         snapshotFlow { selectedMonth() }
             .drop(1)
             .distinctUntilChanged()
-            .collectLatest { selectedMonth ->
-                val target = CENTER_INDEX + monthDistance(anchorMonth, selectedMonth)
+            .collectLatest { month ->
+                val target = monthIndex(anchorYear, month)
                 val layoutInfo = listState.layoutInfo
                 val targetItem = layoutInfo.visibleItemsInfo.firstOrNull { it.index == target }
 
@@ -89,9 +107,7 @@ fun HorizontalMonthSelector(
                         targetItem.offset >= layoutInfo.viewportStartOffset &&
                         targetItem.offset + targetItem.size <= layoutInfo.viewportEndOffset
 
-                if (!isFullyVisible) {
-                    listState.animateScrollToItem(target)
-                }
+                if (!isFullyVisible) listState.animateScrollToItem(target)
             }
     }
 
@@ -101,21 +117,25 @@ fun HorizontalMonthSelector(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
     ) {
-        items(count = Int.MAX_VALUE) { index ->
-            val month = monthAt(anchorMonth, index)
-            val isSelected = month == selectedMonth()
-
-            if (month.month.number == 1) {
-                YearSeparator(month.year, Modifier.padding(horizontal = Margin.Small, vertical = Margin.Micro))
+        items(
+            count = Int.MAX_VALUE,
+            contentType = { index -> selectorItemAt(anchorYear, index)::class },
+        ) { index ->
+            when (val item = selectorItemAt(anchorYear, index)) {
+                is SelectorItem.Year -> YearSeparator(
+                    year = item.year,
+                    modifier = Modifier.padding(horizontal = Margin.Small, vertical = Margin.Micro),
+                )
+                is SelectorItem.Month -> MonthButton(
+                    month = item.yearMonth,
+                    isSelected = item.yearMonth == selectedMonth(),
+                    locale = locale,
+                    onMonthClick = { onMonthSelected(item.yearMonth) },
+                    modifier = Modifier
+                        .padding(horizontal = Margin.Mini)
+                        .padding(top = Margin.Mini, bottom = Margin.Micro),
+                )
             }
-
-            MonthButton(
-                month = month,
-                isSelected = isSelected,
-                locale = locale,
-                onMonthClick = { onMonthSelected(month) },
-                modifier = Modifier.padding(horizontal = Margin.Medium, vertical = Margin.Large),
-            )
         }
     }
 }
