@@ -15,20 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.month
+package com.infomaniak.calendar.di.metroAndroidExtensions.worker
 
-import androidx.lifecycle.ViewModel
-import com.infomaniak.calendar.manager.SyncEventsManager
+import android.content.Context
+import androidx.work.ListenableWorker
+import androidx.work.WorkerFactory
+import androidx.work.WorkerParameters
 import dev.zacsweers.metro.AppScope
-import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
-import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import kotlin.reflect.KClass
 
+@ContributesBinding(AppScope::class)
 @Inject
-@ContributesIntoMap(AppScope::class)
-@ViewModelKey
-class MonthViewModel(
-    syncEventsManager: SyncEventsManager,
-) : ViewModel() {
-    val isLoadingEvents = syncEventsManager.isLoadingEvents
+class MetroWorkerFactory(
+    val workerProviders: Map<KClass<out ListenableWorker>, WorkerInstanceFactory<*>>,
+) : WorkerFactory() {
+    override fun createWorker(
+        appContext: Context,
+        workerClassName: String,
+        workerParameters: WorkerParameters,
+    ): ListenableWorker? {
+        val workerClass = runCatching { Class.forName(workerClassName).kotlin }.getOrNull() ?: return null
+        return workerProviders[workerClass]?.create(workerParameters)
+    }
 }

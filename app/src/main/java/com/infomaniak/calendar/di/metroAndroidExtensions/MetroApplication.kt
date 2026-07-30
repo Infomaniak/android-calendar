@@ -15,12 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.crossAppLogin
+package com.infomaniak.calendar.di.metroAndroidExtensions
 
-import com.infomaniak.calendar.extensions.appGraph
-import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginService
+import androidx.work.Configuration
+import com.infomaniak.calendar.di.AppGraph
 
-class CrossAppLoginService : BaseCrossAppLoginService() {
+interface MetroApplication : Configuration.Provider {
+    val appGraph: AppGraph
 
-    override val selectedUserIdFlow by lazy { appGraph.accountUtils.currentUserIdFlow }
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder().setWorkerFactory(appGraph.workerFactory).build()
 }

@@ -35,6 +35,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
+import com.infomaniak.calendar.extensions.appGraph
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.ui.navigation.MainNavHost
@@ -55,13 +56,10 @@ import kotlinx.coroutines.channels.ReceiveChannel
 
 class MainActivity : ComponentActivity() {
 
-    private val mainApplication by lazy { application as MainApplication }
-    private val appGraph by lazy { mainApplication.appGraph }
-
     private val mainViewModel: MainViewModel by viewModels()
 
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
-        get() = appGraph.viewModelFactory
+        get() = appGraph.metroViewModelFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

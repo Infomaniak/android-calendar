@@ -15,12 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.crossAppLogin
+package com.infomaniak.calendar.di.metroAndroidExtensions.worker
 
-import com.infomaniak.calendar.extensions.appGraph
-import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginService
+import androidx.work.ListenableWorker
+import dev.zacsweers.metro.MapKey
+import kotlin.reflect.KClass
 
-class CrossAppLoginService : BaseCrossAppLoginService() {
-
-    override val selectedUserIdFlow by lazy { appGraph.accountUtils.currentUserIdFlow }
-}
+/** A [MapKey] annotation for binding Worker in a multibinding map. */
+@MapKey
+@Target(AnnotationTarget.CLASS, AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class MetroWorker(val value: KClass<out ListenableWorker>)

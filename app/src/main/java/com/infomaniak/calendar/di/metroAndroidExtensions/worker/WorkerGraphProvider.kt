@@ -15,12 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.crossAppLogin
+package com.infomaniak.calendar.di.metroAndroidExtensions.worker
 
-import com.infomaniak.calendar.extensions.appGraph
-import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginService
+import android.content.Context
+import androidx.work.ListenableWorker
+import androidx.work.WorkManager
+import dev.zacsweers.metro.Multibinds
+import dev.zacsweers.metro.Provides
+import kotlin.reflect.KClass
 
-class CrossAppLoginService : BaseCrossAppLoginService() {
+interface WorkerGraphProvider {
 
-    override val selectedUserIdFlow by lazy { appGraph.accountUtils.currentUserIdFlow }
+    val workManager: WorkManager
+
+    @Provides
+    fun providesWorkManager(application: Context): WorkManager {
+        return WorkManager.getInstance(application)
+    }
+
+    @Multibinds(allowEmpty = true)
+    val workerProviders: Map<KClass<out ListenableWorker>, WorkerInstanceFactory<*>>
+
+    val workerFactory: MetroWorkerFactory
 }
