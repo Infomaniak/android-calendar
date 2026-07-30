@@ -55,6 +55,7 @@ fun MainNavHost(backStack: NavBackStack<NavKey>) {
             NavDisplay(
                 backStack = backStack,
                 entryProvider = baseEntryProvider(backStack = backStack),
+                sceneStrategies = sceneStrategies(),
                 sceneDecoratorStrategies = sceneDecoratorStrategies(backStack = backStack),
                 sharedTransitionScope = this@SharedTransitionLayout,
             )
@@ -93,36 +94,35 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
     }
 }
 
-private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<SceneDecoratorStrategy<NavKey>> {
-    val navigationStrategy: NavigationDecoratorStrategy<NavKey> =
-        NavigationDecoratorStrategy(
-            floatingToolbar = {
-                val visibleDayState = LocalVisibleDayState.current
+private fun sceneStrategies(): List<SceneStrategy<NavKey>> = listOf(BottomSheetSceneStrategy())
 
-                CalendarHorizontalFloatingToolbar(
-                    onNavigationButtonClicked = { destination ->
-                        backStack.clear()
-                        backStack.add(destination)
-                    },
-                    onCurrentDayClicked = { visibleDayState?.jumpTo(Clock.today()) },
-                    currentDestination = { backStack.getLastCalendarView() },
-                    floatingActionButton = {
-                        CalendarFab(
-                            onClick = { backStack.add(NavDestination.EventCreation) },
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                    },
-                )
-            },
-        )
+private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<SceneDecoratorStrategy<NavKey>> {
+    val navigationStrategy = NavigationDecoratorStrategy<NavKey>(
+        floatingToolbar = {
+            val visibleDayState = LocalVisibleDayState.current
+
+            CalendarHorizontalFloatingToolbar(
+                onNavigationButtonClicked = { destination ->
+                    backStack.clear()
+                    backStack.add(destination)
+                },
+                onCurrentDayClicked = { visibleDayState?.jumpTo(Clock.today()) },
+                currentDestination = { backStack.getLastCalendarView() },
+                floatingActionButton = {
+                    CalendarFab(
+                        onClick = { backStack.add(NavDestination.EventCreation) },
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                },
+            )
+        },
+    )
 
     val drawerStrategy = DrawerDecoratorStrategy<NavKey>(
         drawer = { content ->
             CalendarDrawer(
                 content = content,
-                onAddAccount = {
-                    backStack.add(NavDestination.Onboarding(onlyLogin = true))
-                },
+                onAddAccount = { backStack.add(NavDestination.Onboarding(onlyLogin = true)) },
             )
         },
     )
