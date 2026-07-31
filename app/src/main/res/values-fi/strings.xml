@@ -16,13 +16,16 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <string name="accountManagement">Tilien hallinta</string>
     <string name="contentDescriptionInbox">Avaa saapuneet</string>
     <string name="contentDescriptionMenuDrawer">Avaa valikko</string>
     <string name="contentDescriptionSearch">Haku</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Nykyinen näkymä: %1$s. Napauta vaihtaaksesi näkymää.</string>
     <string name="dayTitle">Päivä</string>
+    <string name="helpTitle">Ohjekeskus</string>
     <string name="monthTitle">Kuukausi</string>
     <string name="planningTitle">Suunnittelu</string>
+    <string name="settingsTitle">Asetukset</string>
     <string name="syncEventsError">Virhe noudettaessa tapahtumia</string>
     <string name="threeDaysTitle">Kolme päivää</string>
     <string name="weekTitle">Viikko</string>
