@@ -18,20 +18,24 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import android.os.Parcelable
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import kotlinx.parcelize.Parcelize
 
@@ -43,39 +47,34 @@ fun DrawerList(
 ) {
     val expandedAccountIds = rememberExpandedUsers()
 
-    LazyColumn(modifier = modifier.fillMaxSize()) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(all = Margin.Medium)
+            .clip(shape = EsdsTheme.radius.lg)
+            .background(color = MaterialTheme.colorScheme.surfaceContainer)
+            .padding(all = Margin.Small),
+    ) {
         usersCalendars.forEach { userCalendars ->
-            calendarSection(userCalendars, expandedAccountIds, onCalendarVisibilityChange)
-        }
-    }
-}
+            val userId = userCalendars.user.id
+            val isExpanded = expandedAccountIds.contains(userId)
 
-private fun LazyListScope.calendarSection(
-    userCalendars: UserCalendarsUi,
-    expandedAccountIds: SnapshotStateSet<Int>,
-    onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
-) {
-    val userId = userCalendars.user.id
-    val isExpanded = expandedAccountIds.contains(userId)
-
-    item(key = userId) {
-        DrawerAccountItem(
-            modifier = Modifier.animateItem(),
-            user = userCalendars.user,
-            isExpanded = { isExpanded },
-            onAccountExpanded = {
-                if (isExpanded) expandedAccountIds.remove(userId) else expandedAccountIds.add(userId)
-            },
-        )
-    }
-
-    if (isExpanded) {
-        items(items = userCalendars.calendars, key = { calendar -> CalendarKey(calendar.id.url, userId) }) { calendar ->
-            DrawerCalendarItem(
-                modifier = Modifier.animateItem(),
-                calendar = calendar,
-                onCalendarVisibilityChange = onCalendarVisibilityChange,
+            DrawerAccountItem(
+                user = userCalendars.user,
+                isExpanded = { isExpanded },
+                onAccountExpanded = {
+                    if (isExpanded) expandedAccountIds.remove(userId) else expandedAccountIds.add(userId)
+                },
             )
+
+            if (isExpanded) {
+                userCalendars.calendars.forEach { calendar ->
+                    DrawerCalendarItem(
+                        calendar = calendar,
+                        onCalendarVisibilityChange = onCalendarVisibilityChange,
+                    )
+                }
+            }
         }
     }
 }
