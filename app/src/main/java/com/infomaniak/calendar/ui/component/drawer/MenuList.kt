@@ -40,9 +40,9 @@ fun MenuList(
     Column(
         modifier = modifier
             .padding(horizontal = Margin.Medium)
-            .clip(shape = EsdsTheme.radius.lg)
+            .clip(shape = EsdsTheme.radius.twoXl)
             .background(color = MaterialTheme.colorScheme.surfaceContainer)
-            .padding(all = Margin.Micro),
+            .padding(horizontal = Margin.Small, vertical = Margin.Mini),
     ) {
         menuOptions.forEach { menuOption ->
             MenuItem(menuOption = menuOption)
