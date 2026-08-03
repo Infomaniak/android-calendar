@@ -72,6 +72,7 @@ fun DrawerCalendarItem(
             colors = CheckboxDefaults.colors(
                 checkedColor = calendar.colors.datavizContainerVariant,
                 checkmarkColor = calendar.colors.onDatavizContainerVariant,
+                uncheckedColor = calendar.colors.datavizContainerVariant,
             ),
         )
 
