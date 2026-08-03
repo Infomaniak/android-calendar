@@ -73,15 +73,20 @@ fun DrawerAccountItem(user: User, isExpanded: () -> Boolean, onAccountExpanded: 
                 overflow = TextOverflow.Ellipsis,
             )
         }
-        Icon(
+        Box(
             modifier = Modifier
-                .rotate(rotation)
                 .background(MaterialTheme.colorScheme.surface, CircleShape)
-                .padding(vertical = Margin.Medium, horizontal = Margin.Mini),
-            painter = painterResource(R.drawable.ic_chevron_down),
-            contentDescription = null,
-        )
+        ) {
+            Icon(
+                modifier = Modifier
+                    .rotate(rotation)
+                    .padding(vertical = Margin.Medium, horizontal = Margin.Mini),
+                painter = painterResource(R.drawable.ic_chevron_down),
+                contentDescription = null,
+            )
+        }
     }
+
     if (isExpanded()) {
         Spacer(modifier = Modifier.padding(vertical = Margin.Micro))
     }
