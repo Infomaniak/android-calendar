@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
@@ -37,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -48,6 +48,7 @@ import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.core.ui.compose.preview.previewparameter.dummyUserOf
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
 fun DrawerAccountItem(user: User, isExpanded: () -> Boolean, onAccountExpanded: () -> Unit, modifier: Modifier = Modifier) {
@@ -55,13 +56,14 @@ fun DrawerAccountItem(user: User, isExpanded: () -> Boolean, onAccountExpanded: 
     val interactionSource = remember { MutableInteractionSource() }
     Row(
         modifier = modifier
+            .padding(all = Margin.Small)
             .toggleable(
                 value = isExpanded(),
                 onValueChange = { onAccountExpanded() },
                 interactionSource = interactionSource,
                 indication = null,
             )
-            .padding(horizontal = Margin.Mini),
+            .background(color = MaterialTheme.colorScheme.surfaceContainer),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Margin.Medium),
     ) {
@@ -77,7 +79,7 @@ fun DrawerAccountItem(user: User, isExpanded: () -> Boolean, onAccountExpanded: 
         }
         Box(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface, CircleShape)
+                .background(MaterialTheme.colorScheme.surface, CircleShape),
         ) {
             Icon(
                 modifier = Modifier
@@ -87,10 +89,6 @@ fun DrawerAccountItem(user: User, isExpanded: () -> Boolean, onAccountExpanded: 
                 contentDescription = null,
             )
         }
-    }
-
-    if (isExpanded()) {
-        Spacer(modifier = Modifier.padding(vertical = Margin.Micro))
     }
 }
 

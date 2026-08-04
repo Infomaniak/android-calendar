@@ -62,7 +62,7 @@ fun DrawerCalendarItem(
                 },
                 role = Role.Checkbox,
             )
-            .padding(vertical = Margin.Small),
+            .padding(all = Margin.Small),
         horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
         verticalAlignment = Alignment.CenterVertically,
     ) {

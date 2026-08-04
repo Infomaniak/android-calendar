@@ -19,10 +19,10 @@ package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
@@ -38,13 +38,13 @@ import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import kotlinx.coroutines.launch
 
 @Composable
 fun CalendarDrawer(
     content: @Composable () -> Unit,
+    onAddAccount: () -> Unit,
     modifier: Modifier = Modifier,
     drawerViewModel: DrawerViewModel = viewModel(),
 ) {
@@ -58,6 +58,7 @@ fun CalendarDrawer(
         drawerState = calendarDrawerState,
         calendarsUsers = calendarsUsers,
         onCalendarVisibilityChanged = drawerViewModel::onCalendarVisibilityChanged,
+        onAddAccount = onAddAccount,
         content = content,
         modifier = modifier,
     )
@@ -68,6 +69,7 @@ private fun CalendarDrawerContent(
     drawerState: DrawerState,
     calendarsUsers: List<UserCalendarsUi>,
     onCalendarVisibilityChanged: (CalendarId, Boolean) -> Unit,
+    onAddAccount: () -> Unit,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -76,24 +78,36 @@ private fun CalendarDrawerContent(
         onSettings = {},
         onHelp = {},
     )
+    val expandedAccountIds = rememberDrawerListExpandedIds()
 
     ModalNavigationDrawer(
         drawerContent = {
-            ModalDrawerSheet {
+            ModalDrawerSheet(
+                drawerContainerColor = MaterialTheme.colorScheme.surface,
+            ) {
                 LazyColumn(
                     modifier = Modifier
-                        .padding(bottom = Margin.Medium)
                         .fillMaxHeight(),
                 ) {
-                    item {
-                        DrawerList(
-                            usersCalendars = calendarsUsers,
-                            onCalendarVisibilityChange = onCalendarVisibilityChanged,
-                        )
-                    }
+                    drawerListItems(
+                        usersCalendars = calendarsUsers,
+                        onCalendarVisibilityChange = onCalendarVisibilityChanged,
+                        expandedAccountIds = expandedAccountIds,
+                    )
                     item {
                         MenuList(menuOptions = menuOptions)
                     }
+
+                    // item {
+                    //     Button(
+                    //         onClick = onAddAccount,
+                    //         modifier = Modifier
+                    //             .fillMaxWidth()
+                    //             .padding(horizontal = Margin.Medium, vertical = Margin.Micro),
+                    //     ) {
+                    //         Text(text = "Add an account")
+                    //     }
+                    // }
                 }
             }
         },
@@ -138,6 +152,7 @@ private fun CalendarDrawerPreview(
             drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
             calendarsUsers = usersCalendars,
             onCalendarVisibilityChanged = { _, _ -> },
+            onAddAccount = {},
             content = {},
         )
     }
