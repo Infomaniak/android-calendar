@@ -42,22 +42,21 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import kotlinx.parcelize.Parcelize
 
-@Composable
-fun rememberDrawerListExpandedIds(): SnapshotStateSet<Int> = rememberExpandedUsers()
-
 fun LazyListScope.drawerListItems(
     usersCalendars: List<UserCalendarsUi>,
-    expandedAccountIds: SnapshotStateSet<Int>,
+    onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
+    expandedAccountIds: Set<Int>,
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
 ) {
     usersCalendars.forEach { userCalendars ->
-        calendarSection(userCalendars, expandedAccountIds, onCalendarVisibilityChange)
+        calendarSection(userCalendars, expandedAccountIds, onAccountExpandedChange, onCalendarVisibilityChange)
     }
 }
 
 private fun LazyListScope.calendarSection(
     userCalendars: UserCalendarsUi,
-    expandedAccountIds: SnapshotStateSet<Int>,
+    expandedAccountIds: Set<Int>,
+    onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
 ) {
     val userId = userCalendars.user.id
@@ -76,9 +75,7 @@ private fun LazyListScope.calendarSection(
                 modifier = Modifier.animateItem(),
                 user = userCalendars.user,
                 isExpanded = { isExpanded },
-                onAccountExpanded = {
-                    if (isExpanded) expandedAccountIds.remove(userId) else expandedAccountIds.add(userId)
-                },
+                onAccountExpanded = { onAccountExpandedChange(userId, !isExpanded) },
             )
             if (isExpanded) {
                 Column {
@@ -105,7 +102,14 @@ fun DrawerList(
     val expandedAccountIds = rememberExpandedUsers()
 
     LazyColumn(modifier = modifier.fillMaxSize()) {
-        drawerListItems(usersCalendars, expandedAccountIds, onCalendarVisibilityChange)
+        drawerListItems(
+            usersCalendars = usersCalendars,
+            onAccountExpandedChange = { userId, isExpanded ->
+                if (isExpanded) expandedAccountIds.add(userId) else expandedAccountIds.remove(userId)
+            },
+            expandedAccountIds = expandedAccountIds,
+            onCalendarVisibilityChange = onCalendarVisibilityChange,
+        )
     }
 }
 

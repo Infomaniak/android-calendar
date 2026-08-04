@@ -50,6 +50,7 @@ fun CalendarDrawer(
 ) {
     val calendarDrawerState = LocalDrawerState.current ?: return
     val calendarsUsers by drawerViewModel.calendarsUsers.collectAsStateWithLifecycle()
+    val expandedAccountIds by drawerViewModel.expandedAccountIds.collectAsStateWithLifecycle(emptySet())
     val scope = rememberCoroutineScope()
 
     BackHandler(enabled = calendarDrawerState.isOpen) { scope.launch { calendarDrawerState.close() } }
@@ -60,6 +61,8 @@ fun CalendarDrawer(
         onCalendarVisibilityChanged = drawerViewModel::onCalendarVisibilityChanged,
         onAddAccount = onAddAccount,
         content = content,
+        onAccountExpandedChange = drawerViewModel::onAccountExpandedChanged,
+        expandedAccountIds = expandedAccountIds,
         modifier = modifier,
     )
 }
@@ -70,6 +73,8 @@ private fun CalendarDrawerContent(
     calendarsUsers: List<UserCalendarsUi>,
     onCalendarVisibilityChanged: (CalendarId, Boolean) -> Unit,
     onAddAccount: () -> Unit,
+    onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
+    expandedAccountIds: Set<Int>,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -78,7 +83,6 @@ private fun CalendarDrawerContent(
         onSettings = {},
         onHelp = {},
     )
-    val expandedAccountIds = rememberDrawerListExpandedIds()
 
     ModalNavigationDrawer(
         drawerContent = {
@@ -93,6 +97,7 @@ private fun CalendarDrawerContent(
                         usersCalendars = calendarsUsers,
                         onCalendarVisibilityChange = onCalendarVisibilityChanged,
                         expandedAccountIds = expandedAccountIds,
+                        onAccountExpandedChange = onAccountExpandedChange,
                     )
                     item {
                         MenuList(menuOptions = menuOptions)
@@ -153,7 +158,10 @@ private fun CalendarDrawerPreview(
             calendarsUsers = usersCalendars,
             onCalendarVisibilityChanged = { _, _ -> },
             onAddAccount = {},
+            onAccountExpandedChange = { _, _ -> },
+            expandedAccountIds = emptySet(),
             content = {},
+            modifier = Modifier,
         )
     }
 }

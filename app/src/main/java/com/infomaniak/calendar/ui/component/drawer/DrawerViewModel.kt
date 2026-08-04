@@ -19,6 +19,8 @@ package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.calendar.data.CalendarDataValues
+import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.ui.component.drawer.model.CalendarUi
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.utils.account.AccountUtils
@@ -41,7 +43,11 @@ import kotlinx.coroutines.launch
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
-class DrawerViewModel(accountUtils: AccountUtils, private val calendarManager: CalendarManager) : ViewModel() {
+class DrawerViewModel(
+    accountUtils: AccountUtils,
+    private val calendarManager: CalendarManager,
+    private val calendarDataValues: CalendarDataValues,
+) : ViewModel() {
     val calendarsUsers: StateFlow<List<UserCalendarsUi>> = combine(
         accountUtils.users,
         calendarManager.observeCalendars(),
@@ -56,9 +62,20 @@ class DrawerViewModel(accountUtils: AccountUtils, private val calendarManager: C
         initialValue = emptyList(),
     )
 
+    val expandedAccountIds: StateFlow<Set<Int>> = calendarDataValues.expandedDrawerAccountIds.flow
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptySet())
+
     fun onCalendarVisibilityChanged(calendarId: CalendarId, isVisible: Boolean) {
         viewModelScope.launch {
             calendarManager.updateCalendar(calendarId, edit = CalendarEditData(isVisible = isVisible))
+        }
+    }
+
+    fun onAccountExpandedChanged(userId: Int, isExpanded: Boolean) {
+        viewModelScope.launch {
+            calendarDataValues.expandedDrawerAccountIds.update { current ->
+                if (isExpanded) current + userId else current - userId
+            }
         }
     }
 }
