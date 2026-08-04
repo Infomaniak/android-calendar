@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.ui.component.drawer
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,45 +32,48 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
 fun MenuItem(menuOption: MenuOption, modifier: Modifier = Modifier) {
-    Row(
+    Surface(
+        onClick = menuOption.itemAction,
+        shape = EsdsTheme.radius.twoXl,
         modifier = modifier
             .fillMaxWidth()
-            .clickable(
-                onClick = menuOption.itemAction,
-                role = Role.Button
-            )
-            .padding(all = Margin.Small),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Margin.Medium),
+            .padding(horizontal = Margin.Micro),
+        color = Color.Transparent,
     ) {
-        Icon(
-            painter = painterResource(menuOption.itemIcon),
-            contentDescription = null,
-            tint = Color.Unspecified
-        )
-        Column(
-            modifier = Modifier.weight(1f),
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Margin.Medium),
+            modifier = Modifier.padding(all = Margin.Small),
         ) {
-            Text(
-                text = stringResource(menuOption.itemNameRes),
-                style = MaterialTheme.typography.bodyLarge,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+            Icon(
+                painter = painterResource(menuOption.itemIcon),
+                contentDescription = null,
+                tint = Color.Unspecified,
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(
+                    text = stringResource(menuOption.itemNameRes),
+                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            Icon(
+                painter = painterResource(R.drawable.ic_chevron_right),
+                contentDescription = null,
             )
         }
-        Icon(
-            painter = painterResource(R.drawable.ic_chevron_right),
-            contentDescription = null,
-        )
     }
 }
 

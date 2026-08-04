@@ -22,8 +22,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
@@ -56,27 +56,25 @@ fun DrawerAccountItem(user: User, isExpanded: () -> Boolean, onAccountExpanded: 
     val interactionSource = remember { MutableInteractionSource() }
     Row(
         modifier = modifier
-            .padding(all = Margin.Small)
+            .clip(shape = EsdsTheme.radius.twoXl)
+            .background(color = MaterialTheme.colorScheme.surfaceContainer)
+            .fillMaxWidth()
             .toggleable(
                 value = isExpanded(),
                 onValueChange = { onAccountExpanded() },
                 interactionSource = interactionSource,
-                indication = null,
             )
-            .background(color = MaterialTheme.colorScheme.surfaceContainer),
+            .padding(all = Margin.Medium),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Margin.Medium),
     ) {
         Avatar(avatarType = AvatarType.fromUser(user), Modifier.size(32.dp))
-        Column(
+        Text(
             modifier = Modifier.weight(1f),
-        ) {
-            Text(
-                text = user.email,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
+            text = user.email,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
         Box(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surface, CircleShape),
