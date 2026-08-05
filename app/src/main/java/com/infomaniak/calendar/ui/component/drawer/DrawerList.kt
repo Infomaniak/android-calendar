@@ -75,7 +75,7 @@ private fun LazyListScope.calendarSection(
             )
             if (isExpanded) {
                 Column {
-                    userCalendars.calendars.forEachIndexed { index, calendar ->
+                    userCalendars.calendars.forEach { calendar ->
                         DrawerCalendarItem(
                             modifier = Modifier.animateItem(),
                             calendar = calendar,
