@@ -39,7 +39,7 @@ fun MenuList(
 ) {
     Column(
         modifier = modifier
-            .padding(horizontal = Margin.Medium, vertical = Margin.Mini)
+            .padding(start = Margin.Medium, end = Margin.Medium, top = Margin.Mini, bottom = Margin.Large)
             .clip(shape = EsdsTheme.radius.twoXl)
             .background(color = MaterialTheme.colorScheme.surfaceContainer)
             .padding(vertical = Margin.Mini, horizontal = Margin.Micro),
