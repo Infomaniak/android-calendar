@@ -47,7 +47,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun CalendarDrawer(
     content: @Composable () -> Unit,
-    onAddAccount: () -> Unit,
     modifier: Modifier = Modifier,
     drawerViewModel: DrawerViewModel = viewModel(),
 ) {
@@ -62,7 +61,6 @@ fun CalendarDrawer(
         drawerState = calendarDrawerState,
         calendarsUsers = calendarsUsers,
         onCalendarVisibilityChanged = drawerViewModel::onCalendarVisibilityChanged,
-        onAddAccount = onAddAccount,
         content = content,
         onAccountExpandedChange = drawerViewModel::onAccountExpandedChanged,
         expandedAccountIds = expandedAccountIds,
@@ -75,7 +73,6 @@ private fun CalendarDrawerContent(
     drawerState: DrawerState,
     calendarsUsers: List<UserCalendarsUi>,
     onCalendarVisibilityChanged: (CalendarId, Boolean) -> Unit,
-    onAddAccount: () -> Unit,
     onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
     expandedAccountIds: Set<Int>,
     content: @Composable () -> Unit,
@@ -106,17 +103,6 @@ private fun CalendarDrawerContent(
                     item {
                         MenuList(menuOptions = menuOptions)
                     }
-
-                    // item {
-                    //     Button(
-                    //         onClick = onAddAccount,
-                    //         modifier = Modifier
-                    //             .fillMaxWidth()
-                    //             .padding(horizontal = Margin.Medium, vertical = Margin.Micro),
-                    //     ) {
-                    //         Text(text = "Add an account")
-                    //     }
-                    // }
                 }
             }
         },
@@ -161,7 +147,6 @@ private fun CalendarDrawerPreview(
             drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
             calendarsUsers = usersCalendars,
             onCalendarVisibilityChanged = { _, _ -> },
-            onAddAccount = {},
             onAccountExpandedChange = { _, _ -> },
             expandedAccountIds = emptySet(),
             content = {},

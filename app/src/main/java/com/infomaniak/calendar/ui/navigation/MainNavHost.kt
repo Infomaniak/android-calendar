@@ -120,9 +120,6 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
         drawer = { content ->
             CalendarDrawer(
                 content = content,
-                onAddAccount = {
-                    backStack.add(NavDestination.Onboarding(onlyLogin = true))
-                },
             )
         },
     )
