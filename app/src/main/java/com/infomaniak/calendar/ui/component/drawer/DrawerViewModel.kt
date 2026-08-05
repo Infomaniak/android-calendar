@@ -20,7 +20,6 @@ package com.infomaniak.calendar.ui.component.drawer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.data.CalendarDataValues
-import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.ui.component.drawer.model.CalendarUi
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.utils.account.AccountUtils
@@ -33,8 +32,8 @@ import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
-import kotlinx.coroutines.flow.Flow
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
