@@ -33,6 +33,7 @@ import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
+import kotlinx.coroutines.flow.Flow
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -62,8 +63,7 @@ class DrawerViewModel(
         initialValue = emptyList(),
     )
 
-    val expandedAccountIds: StateFlow<Set<Int>> = calendarDataValues.expandedDrawerAccountIds.flow
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptySet())
+    val expandedAccountIds: Flow<Set<Int>> = calendarDataValues.expandedDrawerAccountIds.flow
 
     fun onCalendarVisibilityChanged(calendarId: CalendarId, isVisible: Boolean) {
         viewModelScope.launch {
