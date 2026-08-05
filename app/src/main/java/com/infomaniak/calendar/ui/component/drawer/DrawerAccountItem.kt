@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -64,6 +65,7 @@ fun DrawerAccountItem(user: User, isExpanded: () -> Boolean, onAccountExpanded: 
                 value = isExpanded(),
                 onValueChange = { onAccountExpanded() },
                 interactionSource = interactionSource,
+                indication = LocalIndication.current,
             )
             .padding(all = Margin.Medium),
         verticalAlignment = Alignment.CenterVertically,
