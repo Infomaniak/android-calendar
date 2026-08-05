@@ -54,6 +54,7 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 fun DrawerAccountItem(user: User, isExpanded: () -> Boolean, onAccountExpanded: () -> Unit, modifier: Modifier = Modifier) {
     val rotation by animateFloatAsState(targetValue = if (isExpanded()) 180f else 0f)
     val interactionSource = remember { MutableInteractionSource() }
+
     Row(
         modifier = modifier
             .clip(shape = EsdsTheme.radius.twoXl)

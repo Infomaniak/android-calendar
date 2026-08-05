@@ -27,10 +27,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateSetOf
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
@@ -81,8 +77,7 @@ private fun LazyListScope.calendarSection(
                 Column {
                     userCalendars.calendars.forEachIndexed { index, calendar ->
                         DrawerCalendarItem(
-                            modifier = Modifier
-                                .animateItem(),
+                            modifier = Modifier.animateItem(),
                             calendar = calendar,
                             onCalendarVisibilityChange = onCalendarVisibilityChange,
                         )
@@ -94,34 +89,16 @@ private fun LazyListScope.calendarSection(
 }
 
 @Composable
-fun DrawerList(
+private fun DrawerListPreviewContent(
     usersCalendars: List<UserCalendarsUi>,
-    onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-    val expandedAccountIds = rememberExpandedUsers()
-
-    LazyColumn(modifier = modifier.fillMaxSize()) {
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
         drawerListItems(
             usersCalendars = usersCalendars,
-            onAccountExpandedChange = { userId, isExpanded ->
-                if (isExpanded) expandedAccountIds.add(userId) else expandedAccountIds.remove(userId)
-            },
-            expandedAccountIds = expandedAccountIds,
-            onCalendarVisibilityChange = onCalendarVisibilityChange,
+            onAccountExpandedChange = { _, _ -> {} },
+            expandedAccountIds = emptySet(),
+            onCalendarVisibilityChange = { _, _ -> },
         )
-    }
-}
-
-@Composable
-private fun rememberExpandedUsers(): SnapshotStateSet<Int> {
-    return rememberSaveable(
-        saver = Saver(
-            save = { it.toIntArray() },
-            restore = { mutableStateSetOf<Int>().apply { addAll(it.toList()) } },
-        ),
-    ) {
-        mutableStateSetOf()
     }
 }
 
@@ -134,6 +111,6 @@ private fun DrawerListPreview(
     @PreviewParameter(DrawerPreviewProvider::class) usersCalendars: List<UserCalendarsUi>,
 ) {
     CalendarThemeForPreview {
-        DrawerList(usersCalendars = usersCalendars, onCalendarVisibilityChange = { _, _ -> })
+        DrawerListPreviewContent(usersCalendars)
     }
 }

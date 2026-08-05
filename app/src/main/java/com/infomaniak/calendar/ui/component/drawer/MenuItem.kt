@@ -18,7 +18,6 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -59,16 +58,13 @@ fun MenuItem(menuOption: MenuOption, modifier: Modifier = Modifier) {
                 contentDescription = null,
                 tint = Color.Unspecified,
             )
-            Column(
+            Text(
                 modifier = Modifier.weight(1f),
-            ) {
-                Text(
-                    text = stringResource(menuOption.itemNameRes),
-                    style = MaterialTheme.typography.bodyLarge,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
+                text = stringResource(menuOption.itemNameRes),
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
             Icon(
                 painter = painterResource(R.drawable.ic_chevron_right),
                 contentDescription = null,
