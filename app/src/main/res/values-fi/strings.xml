@@ -19,6 +19,7 @@
     <string name="accountManagement">Tilien hallinta</string>
     <string name="accountsTitle">Tilit</string>
     <string name="addAccount">Lisää tili</string>
+    <string name="contentDescriptionBack">Takaisin</string>
     <string name="contentDescriptionInbox">Avaa saapuneet</string>
     <string name="contentDescriptionMenuDrawer">Avaa valikko</string>
     <string name="contentDescriptionSearch">Haku</string>

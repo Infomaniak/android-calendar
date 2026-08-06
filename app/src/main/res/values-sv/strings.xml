@@ -19,6 +19,7 @@
     <string name="accountManagement">Kontohantering</string>
     <string name="accountsTitle">Konton</string>
     <string name="addAccount">Lägg till ett konto</string>
+    <string name="contentDescriptionBack">Tillbaka</string>
     <string name="contentDescriptionInbox">Öppna inkorgen</string>
     <string name="contentDescriptionMenuDrawer">Öppna meny</string>
     <string name="contentDescriptionSearch">Sök</string>

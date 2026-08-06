@@ -19,6 +19,7 @@
     <string name="accountManagement">Kontostyring</string>
     <string name="accountsTitle">Kontoer</string>
     <string name="addAccount">Legg til en konto</string>
+    <string name="contentDescriptionBack">Tilbake</string>
     <string name="contentDescriptionInbox">Åpne innboksen</string>
     <string name="contentDescriptionMenuDrawer">Åpne meny</string>
     <string name="contentDescriptionSearch">Søk</string>

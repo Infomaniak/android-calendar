@@ -19,6 +19,7 @@
     <string name="accountManagement">Gestión de cuentas</string>
     <string name="accountsTitle">Cuentas</string>
     <string name="addAccount">Añadir una cuenta</string>
+    <string name="contentDescriptionBack">Atrás</string>
     <string name="contentDescriptionInbox">Abrir la bandeja de entrada</string>
     <string name="contentDescriptionMenuDrawer">Abrir menú</string>
     <string name="contentDescriptionSearch">Buscar</string>
