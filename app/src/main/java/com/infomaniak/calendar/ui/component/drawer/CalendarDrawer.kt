@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 fun CalendarDrawer(
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
+    onManageAccounts: () -> Unit = {},
     drawerViewModel: DrawerViewModel = viewModel(),
 ) {
     val calendarDrawerState = LocalDrawerState.current ?: return
@@ -64,6 +65,7 @@ fun CalendarDrawer(
         content = content,
         onAccountExpandedChange = drawerViewModel::onAccountExpandedChanged,
         isSectionExpanded = { expandedAccountIds.contains(it) },
+        onManageAccounts = onManageAccounts,
         modifier = modifier,
     )
 }
@@ -75,11 +77,12 @@ private fun CalendarDrawerContent(
     onCalendarVisibilityChanged: (CalendarId, Boolean) -> Unit,
     onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
     isSectionExpanded: (Int) -> Boolean,
+    onManageAccounts: () -> Unit,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val menuOptions = drawerMenuOptions(
-        onManageAccounts = {}, // TODO: Add navigation to accounts
+        onManageAccounts = onManageAccounts,
         onSettings = {}, // TODO: Add navigation to settings
         onHelp = {}, // TODO: Add intent to help 
     )
@@ -149,6 +152,7 @@ private fun CalendarDrawerPreview(
             onCalendarVisibilityChanged = { _, _ -> },
             onAccountExpandedChange = { _, _ -> },
             isSectionExpanded = { false },
+            onManageAccounts = {},
             content = {},
             modifier = Modifier,
         )

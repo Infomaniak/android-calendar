@@ -43,5 +43,8 @@ sealed interface NavDestination : NavKey {
     }
 
     @Serializable
+    data object AccountManagement : NavDestination
+
+    @Serializable
     data object EventCreation : NavDestination
 }

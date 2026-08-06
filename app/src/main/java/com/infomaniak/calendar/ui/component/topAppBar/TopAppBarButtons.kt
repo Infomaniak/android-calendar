@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
+import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.BackButton
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.DrawerIconButton
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.InboxButton
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.SearchButton
@@ -71,6 +72,16 @@ object TopAppBarButtons {
             )
         }
     }
+
+    @Composable
+    fun BackButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
+        IconButton(onClick = onClick, modifier = modifier) {
+            Icon(
+                painter = painterResource(R.drawable.ic_arrow_back),
+                contentDescription = stringResource(R.string.contentDescriptionBack),
+            )
+        }
+    }
 }
 
 @Preview
@@ -94,5 +105,13 @@ private fun InboxButtonPreview() {
 private fun DrawerIconButtonPreview() {
     CalendarThemeForPreview {
         DrawerIconButton()
+    }
+}
+
+@Preview
+@Composable
+private fun BackButtonPreview() {
+    CalendarThemeForPreview {
+        BackButton(onClick = {})
     }
 }

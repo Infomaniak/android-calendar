@@ -37,6 +37,7 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Metada
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
+import com.infomaniak.calendar.ui.screen.accountManagement.AccountManagement
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventCreation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
@@ -81,6 +82,12 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
     entry<NavDestination.EventCreation> {
         EventCreationScreen()
     }
+    entry<NavDestination.AccountManagement> {
+        AccountManagement(
+            onBack = { backStack.removeLastOrNull() },
+            onAddAccount = { backStack.add(NavDestination.Onboarding(onlyLogin = true)) },
+        )
+    }
     entry<NavDestination.Onboarding> { destination ->
         OnboardingScreen(
             onlyLogin = destination.onlyLogin,
@@ -120,6 +127,9 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
         drawer = { content ->
             CalendarDrawer(
                 content = content,
+                onManageAccounts = {
+                    backStack.add(NavDestination.AccountManagement)
+                },
             )
         },
     )
