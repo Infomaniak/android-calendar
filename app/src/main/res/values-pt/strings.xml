@@ -17,6 +17,8 @@
   -->
 <resources>
     <string name="accountManagement">Gestão de contas</string>
+    <string name="accountsTitle">Contas</string>
+    <string name="addAccount">Adicionar uma conta</string>
     <string name="contentDescriptionInbox">Abrir a caixa de entrada</string>
     <string name="contentDescriptionMenuDrawer">Abrir menu</string>
     <string name="contentDescriptionSearch">Pesquisar</string>

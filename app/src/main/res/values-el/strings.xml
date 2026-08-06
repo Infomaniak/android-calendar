@@ -17,6 +17,8 @@
   -->
 <resources>
     <string name="accountManagement">Διαχείριση λογαριασμών</string>
+    <string name="accountsTitle">Λογαριασμοί</string>
+    <string name="addAccount">Προσθήκη λογαριασμού</string>
     <string name="contentDescriptionInbox">Άνοιγμα εισερχομένων</string>
     <string name="contentDescriptionMenuDrawer">Άνοιγμα μενού</string>
     <string name="contentDescriptionSearch">Αναζήτηση</string>

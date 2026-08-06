@@ -17,6 +17,8 @@
   -->
 <resources>
     <string name="accountManagement">Account Management</string>
+    <string name="accountsTitle">Accounts</string>
+    <string name="addAccount">Add an account</string>
     <string name="contentDescriptionInbox">Open inbox</string>
     <string name="contentDescriptionMenuDrawer">Open menu</string>
     <string name="contentDescriptionSearch">Search</string>

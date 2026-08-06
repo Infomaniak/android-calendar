@@ -17,6 +17,8 @@
   -->
 <resources>
     <string name="accountManagement">Accountbeheer</string>
+    <string name="accountsTitle">Rekeningen</string>
+    <string name="addAccount">Een account toevoegen</string>
     <string name="contentDescriptionInbox">Postvak IN openen</string>
     <string name="contentDescriptionMenuDrawer">Menu openen</string>
     <string name="contentDescriptionSearch">Zoeken</string>
