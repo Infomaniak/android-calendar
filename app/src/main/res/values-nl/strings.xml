@@ -16,7 +16,7 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <string name="accountsTitle">Rekeningen</string>
+    <string name="accountsTitle">Accounts</string>
     <string name="addAccount">Een account toevoegen</string>
     <string name="contentDescriptionBack">Terug</string>
     <string name="contentDescriptionInbox">Postvak IN openen</string>
