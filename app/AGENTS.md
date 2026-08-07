@@ -16,7 +16,7 @@ Kotlin Multiplatform library.
 - **Build System**: Gradle with Kotlin DSL, version catalog (`gradle/libs.versions.toml`)
 - **UI Framework**: Jetpack Compose (Material 3), Navigation 3
 - **Architecture**: Single-Activity + Compose, with shared logic delegated to the KMP module
-- **Shared Logic**: Consumed from `multiplatform-calendar` composite build via `libs.infomaniak.multiplaform.calendar.core`
+- **Shared Logic**: Consumed from `multiplatform-calendar` composite build via `libs.infomaniak.multiplatform.calendar.core`
 - **Testing**: JUnit 4 (unit), Espresso + Compose UI Test (instrumented)
 
 ## Context Map
@@ -36,13 +36,15 @@ app/src/main/java/com/infomaniak/calendar/
 │       └── worker/                 # MetroWorker key, MetroWorkerFactory, WorkerGraphProvider, WorkerInstanceFactory
 └── ui/
     ├── navigation/
-    │   └── MainNavHost.kt          # Top-level NavDisplay with entryProvider
+    │   ├── MainNavHost.kt          # Top-level NavDisplay with entryProvider
+    │   └── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, Accounts, Onboarding)
     ├── screen/
     │   ├── day/                   # DayScreen + DayViewModel
     │   ├── threeDays/             # ThreeDayScreen — placeholder 3-day view
     │   ├── week/                  # WeekScreen — placeholder week view
     │   ├── month/                 # MonthScreen + MonthViewModel
     │   ├── planning/              # PlanningScreen + PlanningViewModel + PlanningEventGroupingExt
+    │   ├── accounts/              # Accounts screen + AccountItem (drawer-backed account list and add account action)
     │   ├── eventCreation/         # EventCreationScreen
     │   └── onboarding/            # OnboardingScreen + CrossAppLoginViewModel
     └── theme/
