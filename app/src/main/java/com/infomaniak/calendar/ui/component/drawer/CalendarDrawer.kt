@@ -65,7 +65,12 @@ fun CalendarDrawer(
         content = content,
         onAccountExpandedChange = drawerViewModel::onAccountExpandedChanged,
         isSectionExpanded = { expandedAccountIds.contains(it) },
-        onManageAccounts = onManageAccounts,
+        onManageAccounts = {
+            scope.launch {
+                calendarDrawerState.close()
+                onManageAccounts()
+            }
+        },
         modifier = modifier,
     )
 }
