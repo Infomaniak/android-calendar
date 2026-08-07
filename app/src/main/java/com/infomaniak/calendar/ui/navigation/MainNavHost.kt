@@ -82,7 +82,7 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
     entry<NavDestination.EventCreation> {
         EventCreationScreen()
     }
-    entry<NavDestination.AccountManagement> {
+    entry<NavDestination.Accounts> {
         Accounts(
             onBack = { backStack.removeLastOrNull() },
             onAddAccount = { backStack.add(NavDestination.Onboarding(onlyLogin = true)) },
@@ -128,7 +128,7 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
             CalendarDrawer(
                 content = content,
                 onManageAccounts = {
-                    backStack.add(NavDestination.AccountManagement)
+                    backStack.add(NavDestination.Accounts)
                 },
             )
         },
