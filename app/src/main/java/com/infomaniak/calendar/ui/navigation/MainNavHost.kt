@@ -84,7 +84,7 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
     }
     entry<NavDestination.Accounts> {
         Accounts(
-            onBack = { backStack.removeLastOrNull() },
+            onBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
             onAddAccount = { backStack.add(NavDestination.Onboarding(onlyLogin = true)) },
         )
     }
@@ -92,10 +92,9 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
         OnboardingScreen(
             onlyLogin = destination.onlyLogin,
             goToCalendarView = {
-                backStack.clear()
-                backStack.add(NavDestination.CalendarView.Planning)
+                backStack.replaceRoot(NavDestination.CalendarView.Planning)
             },
-            onPopBack = { backStack.removeLastOrNull() },
+            onPopBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
         )
     }
 }
@@ -108,8 +107,7 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
 
                 CalendarHorizontalFloatingToolbar(
                     onNavigationButtonClicked = { destination ->
-                        backStack.clear()
-                        backStack.add(destination)
+                        backStack.replaceRoot(destination)
                     },
                     onCurrentDayClicked = { visibleDayState?.jumpTo(Clock.today()) },
                     currentDestination = { backStack.getLastCalendarView() },
