@@ -152,7 +152,7 @@ app/
 - Enum entries: PascalCase for new enums (`Home`, `Favorites`). Existing entries that are persisted (e.g., to
   `SharedPreferences`) must not be renamed.
 - Resource IDs (drawables, mipmaps, layouts, etc.): snake_case (`ic_home`, `ic_account_box`).
-- String resource names: keep the existing camelCase pattern (`accountsTitle`, `settingsTitle`).
+- String resource names: keep the existing camelCase pattern (`dayTitle`, `planningTitle`).
 
 **Control Flow:**
 
