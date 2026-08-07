@@ -123,7 +123,7 @@ private fun drawerMenuOptions(
 ): List<MenuOption> {
     return listOf(
         MenuOption(
-            itemNameRes = R.string.accountManagement,
+            itemNameRes = R.string.accountsTitle,
             itemIcon = R.drawable.ic_circle_user,
             itemAction = onManageAccounts,
         ),

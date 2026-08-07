@@ -16,7 +16,6 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <string name="accountManagement">Gestion des comptes</string>
     <string name="accountsTitle">Comptes</string>
     <string name="addAccount">Ajouter un compte</string>
     <string name="contentDescriptionBack">Retour</string>

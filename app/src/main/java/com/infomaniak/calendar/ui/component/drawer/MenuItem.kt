@@ -79,7 +79,7 @@ private fun MenuItemPreview() {
     CalendarThemeForPreview {
         MenuItem(
             menuOption = MenuOption(
-                itemNameRes = R.string.accountManagement,
+                itemNameRes = R.string.accountsTitle,
                 itemIcon = R.drawable.ic_circle_user,
                 itemAction = {},
             ),

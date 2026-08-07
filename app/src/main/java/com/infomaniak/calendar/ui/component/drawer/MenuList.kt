@@ -56,7 +56,7 @@ private fun MenuListPreview() {
     CalendarThemeForPreview {
         MenuList(
             menuOptions = listOf(
-                MenuOption(R.string.accountManagement, R.drawable.ic_circle_user, {}),
+                MenuOption(R.string.accountsTitle, R.drawable.ic_circle_user, {}),
                 MenuOption(R.string.settingsTitle, R.drawable.ic_cog, {}),
                 MenuOption(R.string.helpTitle, R.drawable.ic_headset, {}),
             ),

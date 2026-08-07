@@ -15,14 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.accountManagement
+package com.infomaniak.calendar.ui.screen.accounts
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -47,14 +46,14 @@ import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
-fun AccountManagement(
+fun Accounts(
     onAddAccount: () -> Unit,
     modifier: Modifier = Modifier,
     drawerViewModel: DrawerViewModel = viewModel(),
     onBack: () -> Unit,
 ) {
     val calendarsUsers by drawerViewModel.calendarsUsers.collectAsStateWithLifecycle()
-    AccountManagementContent(
+    AccountsContent(
         calendarsUsers = calendarsUsers,
         modifier = modifier,
         onAddAccount = onAddAccount,
@@ -63,7 +62,7 @@ fun AccountManagement(
 }
 
 @Composable
-private fun AccountManagementContent(
+private fun AccountsContent(
     calendarsUsers: List<UserCalendarsUi>,
     onAddAccount: () -> Unit,
     modifier: Modifier = Modifier,
@@ -72,7 +71,7 @@ private fun AccountManagementContent(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.accountManagement)) },
+                title = { Text(stringResource(R.string.accountsTitle)) },
                 navigationIcon = { TopAppBarButtons.BackButton(onClick = onBack) },
             )
         },
@@ -104,10 +103,10 @@ private fun AccountManagementContent(
 
 @Preview
 @Composable
-private fun AccountManagementPreview(
+private fun AccountsPreview(
     @PreviewParameter(DrawerPreviewProvider::class) calendarsUsers: List<UserCalendarsUi>,
 ) {
     CalendarThemeForPreview {
-        AccountManagementContent(calendarsUsers = calendarsUsers, onBack = {}, onAddAccount = {})
+        AccountsContent(calendarsUsers = calendarsUsers, onBack = {}, onAddAccount = {})
     }
 }

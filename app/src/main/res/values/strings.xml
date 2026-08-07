@@ -16,7 +16,6 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <string name="accountManagement">Account Management</string>
     <string name="accountsTitle">Accounts</string>
     <string name="addAccount">Add an account</string>
     <string name="contentDescriptionBack">Back</string>
