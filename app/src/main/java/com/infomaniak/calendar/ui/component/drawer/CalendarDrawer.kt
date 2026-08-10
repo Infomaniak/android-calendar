@@ -97,7 +97,7 @@ private fun CalendarDrawerContent(
                     drawerListItems(
                         usersCalendars = calendarsUsers,
                         onCalendarVisibilityChange = onCalendarVisibilityChanged,
-                        expandedAccountIds = expandedAccountIds,
+                        isSectionExpanded = { expandedAccountIds.contains(it) },
                         onAccountExpandedChange = onAccountExpandedChange,
                     )
                     item {

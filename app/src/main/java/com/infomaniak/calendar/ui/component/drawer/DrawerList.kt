@@ -41,22 +41,21 @@ import kotlinx.parcelize.Parcelize
 fun LazyListScope.drawerListItems(
     usersCalendars: List<UserCalendarsUi>,
     onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
-    expandedAccountIds: Set<Int>,
+    isSectionExpanded: (Int) -> Boolean,
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
 ) {
     usersCalendars.forEach { userCalendars ->
-        calendarSection(userCalendars, expandedAccountIds, onAccountExpandedChange, onCalendarVisibilityChange)
+        calendarSection(userCalendars, isSectionExpanded, onAccountExpandedChange, onCalendarVisibilityChange)
     }
 }
 
 private fun LazyListScope.calendarSection(
     userCalendars: UserCalendarsUi,
-    expandedAccountIds: Set<Int>,
+    isExpanded: (Int) -> Boolean,
     onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
 ) {
     val userId = userCalendars.user.id
-    val isExpanded = expandedAccountIds.contains(userId)
 
     item(key = userId) {
         Column(
@@ -70,10 +69,10 @@ private fun LazyListScope.calendarSection(
             DrawerAccountItem(
                 modifier = Modifier.animateItem(),
                 user = userCalendars.user,
-                isExpanded = { isExpanded },
-                onAccountExpanded = { onAccountExpandedChange(userId, !isExpanded) },
+                isExpanded = { isExpanded(userId) },
+                onAccountExpanded = { onAccountExpandedChange(userId, !isExpanded(userId)) },
             )
-            if (isExpanded) {
+            if (isExpanded(userId)) {
                 Column {
                     userCalendars.calendars.forEach { calendar ->
                         DrawerCalendarItem(
@@ -96,7 +95,7 @@ private fun DrawerListPreviewContent(
         drawerListItems(
             usersCalendars = usersCalendars,
             onAccountExpandedChange = { _, _ -> {} },
-            expandedAccountIds = emptySet(),
+            isSectionExpanded = { false },
             onCalendarVisibilityChange = { _, _ -> },
         )
     }
