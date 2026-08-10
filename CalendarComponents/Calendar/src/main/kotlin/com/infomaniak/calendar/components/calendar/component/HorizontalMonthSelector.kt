@@ -120,6 +120,7 @@ fun HorizontalMonthSelector(
         items(
             count = Int.MAX_VALUE,
             contentType = { index -> selectorItemAt(anchorYear, index)::class },
+            key = { index -> selectorItemAt(anchorYear, index).toString() },
         ) { index ->
             when (val item = selectorItemAt(anchorYear, index)) {
                 is SelectorItem.Year -> YearSeparator(
