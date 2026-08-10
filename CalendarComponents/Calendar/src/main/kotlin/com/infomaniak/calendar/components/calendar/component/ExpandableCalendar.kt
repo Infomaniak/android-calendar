@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.calendar.component.expanded.ExpandedCalendar
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.DayOfWeek
@@ -41,7 +42,7 @@ import kotlinx.datetime.toKotlinDayOfWeek
 import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
-private const val RANGE_MONTHS = 100
+private const val MONTH_MARGIN = 1
 
 @Composable
 fun ExpandableCalendar(
@@ -52,7 +53,9 @@ fun ExpandableCalendar(
     modifier: Modifier = Modifier,
 ) {
     val firstDayOfWeek = remember(weekNumbering) { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
+
     val headerState = rememberCalendarHeaderState()
+
     var headerWidth by remember { mutableIntStateOf(0) }
 
     Box(modifier = modifier) {
@@ -67,7 +70,7 @@ fun ExpandableCalendar(
                             selectedDate = selectedDate,
                             onDayClick = onDayClick,
                             weekNumbering = weekNumbering,
-                            monthRange = RANGE_MONTHS,
+                            monthMargin = MONTH_MARGIN,
                             headerState = headerState,
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this@AnimatedContent,
@@ -82,7 +85,7 @@ fun ExpandableCalendar(
                         selectedDate = selectedDate,
                         onDayClick = onDayClick,
                         weekNumbering = weekNumbering,
-                        monthRange = RANGE_MONTHS,
+                        monthMargin = MONTH_MARGIN,
                         headerState = headerState,
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this@AnimatedContent,
@@ -115,6 +118,8 @@ private fun DayOfWeekOverlayHeader(
             .clipToBounds()
             .onSizeChanged { updateHeaderWidth(it.width) },
     ) {
+        // The offset is read inside `graphicsLayer`, so it is sampled at draw time: the row follows
+        // the columns frame for frame, and a scroll never triggers recomposition here.
         DaysOfWeekTitle(
             firstDayOfWeek = firstDayOfWeek,
             modifier = Modifier.graphicsLayer { translationX = headerState.offset(isExpanded()) },

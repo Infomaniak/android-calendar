@@ -23,7 +23,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import com.infomaniak.calendar.ui.state.VisibleDayState
-import kotlin.math.abs
 
 @Composable
 fun ProcessJumpRequests(lazyListState: LazyListState, visibleDayState: VisibleDayState, events: () -> EventsByWeekAndDay) {
@@ -32,18 +31,11 @@ fun ProcessJumpRequests(lazyListState: LazyListState, visibleDayState: VisibleDa
     LaunchedEffect(visibleDayState) {
         for (date in visibleDayState.scrollCommand) {
             val targetIndex = currentEventsByWeekAndDay().indexOf(date)
-            val distance = abs(targetIndex - lazyListState.firstVisibleItemIndex)
 
             // Swallow CancellationException thrown when a user gesture interrupts the programmatic scroll.
             runCatching {
-                if (distance > SCROLL_THRESHOLD) {
-                    lazyListState.scrollToItem(targetIndex)
-                } else {
-                    lazyListState.animateScrollToItem(targetIndex)
-                }
+                lazyListState.scrollToItem(targetIndex)
             }
         }
     }
 }
-
-private const val SCROLL_THRESHOLD = 50

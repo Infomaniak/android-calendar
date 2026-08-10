@@ -15,22 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.calendar.component
+package com.infomaniak.calendar.components.calendar.component.expanded
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.animateContentSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.calendar.component.CalendarHeaderState
+import com.infomaniak.calendar.components.calendar.component.Day
+import com.infomaniak.calendar.components.calendar.component.DaysOfWeekTitle
+import com.infomaniak.calendar.components.calendar.component.daySharedElement
+import com.infomaniak.calendar.components.calendar.component.rememberCalendarHeaderState
+import com.infomaniak.calendar.components.calendar.modifier.FollowExternalSelection
+import com.infomaniak.calendar.components.calendar.modifier.SyncHeaderOffset
+import com.infomaniak.calendar.components.calendar.modifier.pagedSwipe
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberToday
@@ -39,7 +45,6 @@ import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
@@ -48,9 +53,12 @@ import kotlinx.datetime.toKotlinDayOfWeek
 import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
+/** Margins held on each side at startup, so the first swipes never have to grow the range. */
+private const val INITIAL_MARGINS = 2
+
 @Composable
 internal fun ExpandedCalendar(
-    monthRange: Int,
+    monthMargin: Int,
     selectedDate: () -> LocalDate,
     weekNumbering: WeekNumbering,
     onDayClick: (LocalDate) -> Unit,
@@ -60,36 +68,32 @@ internal fun ExpandedCalendar(
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
-
     val initialMonth = remember { selectedDate().yearMonth }
     val monthState = rememberCalendarState(
-        startMonth = remember { initialMonth.minus(monthRange, DateTimeUnit.MONTH) },
-        endMonth = remember { initialMonth.plus(monthRange, DateTimeUnit.MONTH) },
+        startMonth = remember { initialMonth.minus(INITIAL_MARGINS * monthMargin, DateTimeUnit.MONTH) },
+        endMonth = remember { initialMonth.plus(INITIAL_MARGINS * monthMargin, DateTimeUnit.MONTH) },
         firstVisibleMonth = initialMonth,
         firstDayOfWeek = firstDayOfWeek,
     )
+    val pager = rememberMonthPager(state = monthState, monthMargin = monthMargin)
 
     val today by rememberToday()
-    val visibleMonthDays by remember { derivedStateOf { monthState.firstVisibleMonth.weekDays.flatten().toSet() } }
 
-    LaunchedEffect(monthState) {
-        snapshotFlow { selectedDate().yearMonth }.collectLatest { month ->
-            val visibleMonth = monthState.firstVisibleMonth.yearMonth
-            // Updating the range shifts the index-to-month mapping but not the scroll index.
-            monthState.startMonth = month.minus(monthRange, DateTimeUnit.MONTH)
-            monthState.endMonth = month.plus(monthRange, DateTimeUnit.MONTH)
-            // Snap back to the month the user was on, then animate from there.
-            monthState.scrollToMonth(visibleMonth)
-            monthState.animateScrollToMonth(month)
-        }
-    }
+    val sharedElementDays by remember { derivedStateOf { monthState.firstVisibleMonth.weekDays.flatten().toSet() } }
 
-    LaunchedEffect(monthState, headerState) {
-        headerState.setExpandedOffsetSource { monthState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset?.toFloat() ?: 0f }
-    }
+    FollowExternalSelection(pager = pager, selectedDate = selectedDate)
+
+    SyncHeaderOffset(
+        scrollableState = monthState,
+        headerState = headerState,
+        layoutInfo = { monthState.layoutInfo },
+        setOffsetSource = { headerState.setExpandedOffsetSource(it) },
+    )
 
     HorizontalCalendar(
         state = monthState,
+        calendarScrollPaged = false,
+        userScrollEnabled = false,
         monthHeader = {
             DaysOfWeekTitle(
                 firstDayOfWeek = firstDayOfWeek,
@@ -106,12 +110,15 @@ internal fun ExpandedCalendar(
                 onDayClick = onDayClick,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
-                isSharedElementEnabled = day in visibleMonthDays,
+                isSharedElementEnabled = day in sharedElementDays,
             )
         },
-        modifier = modifier.animateContentSize(),
+        modifier = modifier
+            .pagedSwipe(pager = pager, onPageSwiped = onDayClick)
+            .animateContentSize(),
     )
 }
+
 @Composable
 private fun DayContent(
     day: CalendarDay,
@@ -122,12 +129,13 @@ private fun DayContent(
     animatedVisibilityScope: AnimatedVisibilityScope?,
     isSharedElementEnabled: Boolean,
 ) {
-    val dateState by remember {
+    val dateState by remember(day) {
         derivedStateOf {
+            val isInMonth = day.position == DayPosition.MonthDate
             when {
-                day.date == selectedDate() -> DateState.Selected
-                day.date == today() -> DateState.Today
-                day.position == DayPosition.MonthDate -> DateState.None
+                isInMonth && day.date == selectedDate() -> DateState.Selected
+                isInMonth && day.date == today() -> DateState.Today
+                isInMonth -> DateState.None
                 else -> DateState.NotMonth
             }
         }
@@ -151,7 +159,7 @@ private fun DayContent(
 private fun ExpandedCalendarPreview() {
     Surface {
         ExpandedCalendar(
-            monthRange = 3,
+            monthMargin = 12,
             selectedDate = { Clock.today() },
             onDayClick = {},
             weekNumbering = WeekNumbering.ISO_8601,
