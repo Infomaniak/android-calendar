@@ -60,6 +60,8 @@ import com.infomaniak.core.ui.compose.margin.Margin
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.YearMonth
+import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
 @Composable
@@ -73,6 +75,7 @@ fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier,
         planningUiState = { planningUiState },
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventsDots },
+        onVisibleMonthChanged = viewModel::onVisibleMonthChanged,
         modifier = modifier,
     )
 }
@@ -83,6 +86,7 @@ private fun PlanningScreen(
     planningUiState: () -> PlanningUiState,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
+    onVisibleMonthChanged: (YearMonth) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val hazeState = rememberHazeState()
@@ -122,9 +126,12 @@ private fun PlanningScreen(
                         ExpandableCalendar(
                             isExpanded = { isCalendarExpanded },
                             selectedDate = { visibleDayState.visibleDate },
-                            onDayClick = { visibleDayState.jumpTo(it) },
+                            onDayClick = {
+                                onVisibleMonthChanged(it.yearMonth)
+                                visibleDayState.jumpTo(it)
+                            },
                             weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
-                            eventsDots  = eventsDots,
+                            eventsDots = eventsDots,
                         )
                     }
                 },
@@ -181,6 +188,7 @@ private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class)
                 goToEventCreation = {},
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
+                onVisibleMonthChanged = {},
             )
         }
     }

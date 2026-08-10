@@ -20,10 +20,11 @@ package com.infomaniak.calendar.ui.screen.planning
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
-import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.common.utils.today
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColors
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
@@ -31,9 +32,12 @@ import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.shareIn
@@ -41,9 +45,11 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.YearMonth
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
+import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
 @Inject
@@ -51,7 +57,7 @@ import kotlin.time.Clock
 @ViewModelKey
 class PlanningViewModel(
     accountUtils: AccountUtils,
-    calendarManager: CalendarManager,
+    private val calendarManager: CalendarManager,
     syncEventsManager: SyncEventsManager,
 ) : ViewModel() {
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
@@ -73,22 +79,26 @@ class PlanningViewModel(
         }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = PlanningUiState.Loading)
 
-    val eventDots: StateFlow<Map<LocalDate, List<EventColorsUi>>> = planningUiState
-        .map { state ->
-            when (state) {
-                is PlanningUiState.Success -> state.eventsByWeekAndDay().toEventDots()
-                PlanningUiState.Loading -> emptyMap()
+    private val visibleMonth = MutableStateFlow(today.yearMonth)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val eventDots: StateFlow<Map<LocalDate, List<EventColorsUi>>> = visibleMonth
+        .flatMapLatest { month ->
+            val months = listOf(month.minus(1, DateTimeUnit.MONTH), month, month.plus(1, DateTimeUnit.MONTH))
+
+            combine(months.map { calendarManager.observeMonthlyCalendarColors(it, timeZone) }) { monthlyColors ->
+                buildMap { monthlyColors.forEach(::putAll) }
             }
         }
+        .map { it.toEventDots() }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
 
-    private fun EventsByWeekAndDay.toEventDots(): Map<LocalDate, List<EventColorsUi>> = buildMap {
-        //TODO: This will be provided by the backend in the future, so we can remove this logic when it is available
-        this@toEventDots.forEach { (_, byDay) ->
-            byDay.forEach { (date, events) ->
-                if (events.isNotEmpty()) put(date, events.mapNotNull { (it as? EventUi.Normal)?.colors })
-            }
-        }
+    fun onVisibleMonthChanged(month: YearMonth) {
+        visibleMonth.value = month
+    }
+
+    private fun Map<LocalDate, List<CalendarColors>>.toEventDots(): Map<LocalDate, List<EventColorsUi>> {
+        return mapValues { (_, colors) -> colors.map { EventColors.from(it).toEventColorsUi() } }
     }
 
     companion object {
