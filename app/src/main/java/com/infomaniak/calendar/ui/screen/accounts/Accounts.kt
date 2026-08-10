@@ -55,8 +55,9 @@ fun Accounts(
     onBack: () -> Unit,
 ) {
     val calendarsUsers by drawerViewModel.calendarsUsers.collectAsStateWithLifecycle()
+
     AccountsContent(
-        calendarsUsers = calendarsUsers,
+        calendarsUsers = { calendarsUsers },
         modifier = modifier,
         onAddAccount = onAddAccount,
         onBack = onBack,
@@ -65,7 +66,7 @@ fun Accounts(
 
 @Composable
 private fun AccountsContent(
-    calendarsUsers: List<UserCalendarsUi>,
+    calendarsUsers: () -> List<UserCalendarsUi>,
     onAddAccount: () -> Unit,
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
@@ -81,7 +82,7 @@ private fun AccountsContent(
     ) { paddingValues ->
         LazyColumn(contentPadding = paddingValues) {
             items(
-                items = calendarsUsers,
+                items = calendarsUsers(),
                 key = { it.user.id },
             ) { userCalendars ->
                 AccountItem(user = userCalendars.user)
