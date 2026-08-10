@@ -50,6 +50,7 @@ import com.infomaniak.calendar.components.foundation.utils.timeFormatter.monthYe
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.yearMonth
 
 private const val DURATION_TWEEN = 150
 
@@ -79,7 +80,7 @@ fun AnimatedMonthYearText(
             horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(text = targetDate.monthYearLabel(locale, currentYear))
+            Text(text = targetDate.yearMonth.monthYearLabel(locale, currentYear))
             Icon(
                 painter = painterResource(R.drawable.ic_chevron_down),
                 contentDescription = null,
