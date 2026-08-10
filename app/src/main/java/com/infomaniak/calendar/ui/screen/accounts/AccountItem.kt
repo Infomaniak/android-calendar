@@ -15,12 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.component.drawer
+package com.infomaniak.calendar.ui.screen.accounts
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -28,43 +30,53 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.R
-import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.core.auth.models.user.User
+import com.infomaniak.core.avatar.components.Avatar
+import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.core.ui.compose.preview.previewparameter.dummyUserOf
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
-fun MenuItem(menuOption: MenuOption, modifier: Modifier = Modifier) {
+fun AccountItem(user: User, modifier: Modifier = Modifier) {
     Surface(
-        onClick = menuOption.itemAction,
-        shape = EsdsTheme.radius.twoXl,
+        onClick = {},
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = Margin.Micro),
+            .padding(horizontal = Margin.Medium)
+            .clip(EsdsTheme.radius.twoXl),
         color = Color.Transparent,
     ) {
         Row(
+            modifier = Modifier.padding(horizontal = Margin.Small, vertical = Margin.Small),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Margin.Medium),
-            modifier = Modifier.padding(all = Margin.Small),
         ) {
-            Icon(
-                painter = painterResource(menuOption.itemIcon),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-            )
-            Text(
+            Avatar(avatarType = AvatarType.fromUser(user), Modifier.size(32.dp))
+            Column(
                 modifier = Modifier.weight(1f),
-                text = stringResource(menuOption.itemNameRes),
-                style = MaterialTheme.typography.bodyLarge,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            ) {
+                Text(
+                    text = user.displayName.toString(),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = user.email,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
             Icon(
                 painter = painterResource(R.drawable.ic_chevron_right),
                 contentDescription = null,
@@ -75,14 +87,6 @@ fun MenuItem(menuOption: MenuOption, modifier: Modifier = Modifier) {
 
 @Composable
 @Preview(showBackground = true)
-private fun MenuItemPreview() {
-    CalendarThemeForPreview {
-        MenuItem(
-            menuOption = MenuOption(
-                itemNameRes = R.string.accountsTitle,
-                itemIcon = R.drawable.ic_circle_user,
-                itemAction = {},
-            ),
-        )
-    }
+private fun AccountItemPreview() {
+    AccountItem(user = dummyUserOf(1, "John", "Doe"))
 }

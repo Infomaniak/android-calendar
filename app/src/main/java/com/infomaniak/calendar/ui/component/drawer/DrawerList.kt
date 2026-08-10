@@ -56,6 +56,7 @@ private fun LazyListScope.calendarSection(
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
 ) {
     val userId = userCalendars.user.id
+    val expanded = isExpanded(userId)
 
     item(key = userId) {
         Column(
@@ -69,10 +70,10 @@ private fun LazyListScope.calendarSection(
             DrawerAccountItem(
                 modifier = Modifier.animateItem(),
                 user = userCalendars.user,
-                isExpanded = { isExpanded(userId) },
-                onAccountExpanded = { onAccountExpandedChange(userId, !isExpanded(userId)) },
+                isExpanded = { expanded },
+                onAccountExpanded = { onAccountExpandedChange(userId, !expanded) },
             )
-            if (isExpanded(userId)) {
+            if (expanded) {
                 Column {
                     userCalendars.calendars.forEach { calendar ->
                         DrawerCalendarItem(

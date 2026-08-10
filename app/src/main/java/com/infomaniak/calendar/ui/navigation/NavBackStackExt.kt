@@ -17,34 +17,19 @@
  */
 package com.infomaniak.calendar.ui.navigation
 
+import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
-import kotlinx.serialization.Serializable
 
-@Serializable
-sealed interface NavDestination : NavKey {
-    @Serializable
-    data class Onboarding(val onlyLogin: Boolean = false) : NavDestination
-
-    sealed interface CalendarView : NavDestination {
-        @Serializable
-        data object Planning : CalendarView
-
-        @Serializable
-        data object Day : CalendarView
-
-        @Serializable
-        data object ThreeDays : CalendarView
-
-        @Serializable
-        data object Week : CalendarView
-
-        @Serializable
-        data object Month : CalendarView
+fun NavBackStack<NavKey>.replaceRoot(destination: NavKey) {
+    if (isEmpty()) {
+        add(destination)
+        return
     }
 
-    @Serializable
-    data object Accounts : NavDestination
+    this[lastIndex] = destination
+    while (size > 1) removeAt(0)
+}
 
-    @Serializable
-    data object EventCreation : NavDestination
+fun NavBackStack<NavKey>.popOrReplaceRoot(fallback: NavKey) {
+    if (size <= 1) replaceRoot(fallback) else removeLastOrNull()
 }

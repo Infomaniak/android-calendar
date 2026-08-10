@@ -16,7 +16,9 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <string name="accountManagement">Kontostyring</string>
+    <string name="accountsTitle">Konti</string>
+    <string name="addAccount">Tilføj en konto</string>
+    <string name="contentDescriptionBack">Tilbage</string>
     <string name="contentDescriptionInbox">Åbn indbakken</string>
     <string name="contentDescriptionMenuDrawer">Åbn menu</string>
     <string name="contentDescriptionSearch">Søg</string>

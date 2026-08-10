@@ -16,7 +16,9 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <string name="accountManagement">Kontoverwaltung</string>
+    <string name="accountsTitle">Konten</string>
+    <string name="addAccount">Konto hinzufügen</string>
+    <string name="contentDescriptionBack">Zurück</string>
     <string name="contentDescriptionInbox">Posteingang öffnen</string>
     <string name="contentDescriptionMenuDrawer">Menü öffnen</string>
     <string name="contentDescriptionSearch">Suchen</string>

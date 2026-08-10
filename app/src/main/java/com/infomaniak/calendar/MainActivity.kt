@@ -40,6 +40,7 @@ import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.ui.navigation.MainNavHost
 import com.infomaniak.calendar.ui.navigation.NavDestination
+import com.infomaniak.calendar.ui.navigation.replaceRoot
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
@@ -124,8 +125,7 @@ private fun NavigateToOnboardingIfLastUserIsDisconnected(backStack: NavBackStack
 
     LaunchedEffect(isUserLoaded) {
         if (isUserLoaded.not()) {
-            backStack.clear()
-            backStack.add(NavDestination.Onboarding())
+            backStack.replaceRoot(NavDestination.Onboarding())
         }
     }
 }

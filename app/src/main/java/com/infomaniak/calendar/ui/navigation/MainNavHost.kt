@@ -37,6 +37,7 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Metada
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
+import com.infomaniak.calendar.ui.screen.accounts.Accounts
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventCreation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
@@ -81,14 +82,19 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
     entry<NavDestination.EventCreation> {
         EventCreationScreen()
     }
+    entry<NavDestination.Accounts> {
+        Accounts(
+            onBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
+            onAddAccount = { backStack.add(NavDestination.Onboarding(onlyLogin = true)) },
+        )
+    }
     entry<NavDestination.Onboarding> { destination ->
         OnboardingScreen(
             onlyLogin = destination.onlyLogin,
             goToCalendarView = {
-                backStack.clear()
-                backStack.add(NavDestination.CalendarView.Planning)
+                backStack.replaceRoot(NavDestination.CalendarView.Planning)
             },
-            onPopBack = { backStack.removeLastOrNull() },
+            onPopBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
         )
     }
 }
@@ -101,8 +107,7 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
 
                 CalendarHorizontalFloatingToolbar(
                     onNavigationButtonClicked = { destination ->
-                        backStack.clear()
-                        backStack.add(destination)
+                        backStack.replaceRoot(destination)
                     },
                     onCurrentDayClicked = { visibleDayState?.jumpTo(Clock.today()) },
                     currentDestination = { backStack.getLastCalendarView() },
@@ -120,6 +125,9 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
         drawer = { content ->
             CalendarDrawer(
                 content = content,
+                onManageAccounts = {
+                    backStack.add(NavDestination.Accounts)
+                },
             )
         },
     )
