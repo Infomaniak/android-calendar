@@ -84,8 +84,9 @@ fun DrawerAccountItem(user: User, isExpanded: () -> Boolean, onAccountExpanded: 
         ) {
             Icon(
                 modifier = Modifier
-                    .rotate(rotation)
-                    .padding(vertical = Margin.Medium, horizontal = Margin.Mini),
+                    .padding(vertical = Margin.Mini, horizontal = Margin.Micro)
+                    .size(20.dp)
+                    .rotate(rotation),
                 painter = painterResource(R.drawable.ic_chevron_down),
                 contentDescription = null,
             )
