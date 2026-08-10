@@ -22,7 +22,7 @@
     <string name="contentDescriptionSearch">Suchen</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Aktuelle Ansicht: %1$s. Tippen, um die Ansicht zu wechseln.</string>
     <string name="dayTitle">Tag</string>
-    <string name="helpTitle">Hilfezentrum</string>
+    <string name="helpTitle">Hilfe</string>
     <string name="monthTitle">Monat</string>
     <string name="planningTitle">Planung</string>
     <string name="settingsTitle">Einstellungen</string>

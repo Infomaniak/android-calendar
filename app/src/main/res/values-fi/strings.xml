@@ -22,7 +22,7 @@
     <string name="contentDescriptionSearch">Haku</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Nykyinen näkymä: %1$s. Napauta vaihtaaksesi näkymää.</string>
     <string name="dayTitle">Päivä</string>
-    <string name="helpTitle">Ohjekeskus</string>
+    <string name="helpTitle">Apua</string>
     <string name="monthTitle">Kuukausi</string>
     <string name="planningTitle">Suunnittelu</string>
     <string name="settingsTitle">Asetukset</string>

@@ -22,7 +22,7 @@
     <string name="contentDescriptionSearch">Search</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Current view: %1$s. Tap to change view.</string>
     <string name="dayTitle">Day</string>
-    <string name="helpTitle">Help center</string>
+    <string name="helpTitle">Help</string>
     <string name="monthTitle">Month</string>
     <string name="planningTitle">Planning</string>
     <string name="settingsTitle">Settings</string>
