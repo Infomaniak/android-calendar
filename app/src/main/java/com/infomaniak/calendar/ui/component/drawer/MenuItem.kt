@@ -56,7 +56,7 @@ fun MenuItem(menuOption: MenuOption, modifier: Modifier = Modifier) {
             Icon(
                 painter = painterResource(menuOption.itemIcon),
                 contentDescription = null,
-                tint = Color.Unspecified,
+                tint = MaterialTheme.colorScheme.primary,
             )
             Text(
                 modifier = Modifier.weight(1f),
