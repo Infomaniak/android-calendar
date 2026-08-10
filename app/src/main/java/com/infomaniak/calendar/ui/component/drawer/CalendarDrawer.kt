@@ -79,9 +79,9 @@ private fun CalendarDrawerContent(
     modifier: Modifier = Modifier,
 ) {
     val menuOptions = drawerMenuOptions(
-        onManageAccounts = {},
-        onSettings = {},
-        onHelp = {},
+        onManageAccounts = {}, // TODO: Add navigation to accounts
+        onSettings = {}, // TODO: Add navigation to settings
+        onHelp = {}, // TODO: Add intent to help 
     )
 
     ModalNavigationDrawer(
