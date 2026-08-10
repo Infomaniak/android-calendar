@@ -63,7 +63,7 @@ fun CalendarDrawer(
         onCalendarVisibilityChanged = drawerViewModel::onCalendarVisibilityChanged,
         content = content,
         onAccountExpandedChange = drawerViewModel::onAccountExpandedChanged,
-        expandedAccountIds = expandedAccountIds,
+        isSectionExpanded = { expandedAccountIds.contains(it) },
         modifier = modifier,
     )
 }
@@ -74,7 +74,7 @@ private fun CalendarDrawerContent(
     calendarsUsers: List<UserCalendarsUi>,
     onCalendarVisibilityChanged: (CalendarId, Boolean) -> Unit,
     onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
-    expandedAccountIds: Set<Int>,
+    isSectionExpanded: (Int) -> Boolean,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -97,7 +97,7 @@ private fun CalendarDrawerContent(
                     drawerListItems(
                         usersCalendars = calendarsUsers,
                         onCalendarVisibilityChange = onCalendarVisibilityChanged,
-                        isSectionExpanded = { expandedAccountIds.contains(it) },
+                        isSectionExpanded = isSectionExpanded,
                         onAccountExpandedChange = onAccountExpandedChange,
                     )
                     item {
@@ -148,7 +148,7 @@ private fun CalendarDrawerPreview(
             calendarsUsers = usersCalendars,
             onCalendarVisibilityChanged = { _, _ -> },
             onAccountExpandedChange = { _, _ -> },
-            expandedAccountIds = emptySet(),
+            isSectionExpanded = { false },
             content = {},
             modifier = Modifier,
         )
