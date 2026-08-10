@@ -108,9 +108,9 @@ private fun AccountsContent(
 @Preview
 @Composable
 private fun AccountsPreview(
-    @PreviewParameter(DrawerPreviewProvider::class) calendarsUsers: List<UserCalendarsUi>,
+    @PreviewParameter(DrawerPreviewProvider::class) calendarsUsers: () -> List<UserCalendarsUi>,
 ) {
     CalendarThemeForPreview {
-        AccountsContent(calendarsUsers = calendarsUsers, onBack = {}, onAddAccount = {})
+        AccountsContent(calendarsUsers = { calendarsUsers() }, onBack = {}, onAddAccount = {})
     }
 }
