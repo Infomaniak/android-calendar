@@ -16,11 +16,15 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="14dp"
-    android:height="14dp"
-    android:viewportWidth="14"
-    android:viewportHeight="14">
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
   <path
-      android:pathData="M6.053,0.22C6.345,-0.073 6.82,-0.073 7.113,0.22C7.406,0.512 7.406,0.987 7.113,1.28L2.56,5.833H12.417C12.831,5.833 13.167,6.169 13.167,6.583C13.167,6.997 12.831,7.333 12.417,7.333H2.56L7.113,11.887C7.406,12.179 7.406,12.654 7.113,12.947C6.82,13.24 6.345,13.24 6.053,12.947L0.22,7.113C-0.073,6.82 -0.073,6.345 0.22,6.053L6.053,0.22Z"
-      android:fillColor="#364860"/>
+      android:pathData="M12,5L5,12L12,19M5,12H19"
+      android:strokeLineJoin="round"
+      android:strokeWidth="1.75"
+      android:fillColor="#00000000"
+      android:strokeColor="#000000"
+      android:strokeLineCap="round"/>
 </vector>
