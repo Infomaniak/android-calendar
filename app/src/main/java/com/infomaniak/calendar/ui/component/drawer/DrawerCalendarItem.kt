@@ -62,7 +62,7 @@ fun DrawerCalendarItem(
                 },
                 role = Role.Checkbox,
             )
-            .padding(horizontal = Margin.Medium, vertical = Margin.Small),
+            .padding(all = Margin.Small),
         horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -72,6 +72,7 @@ fun DrawerCalendarItem(
             colors = CheckboxDefaults.colors(
                 checkedColor = calendar.colors.datavizContainerVariant,
                 checkmarkColor = calendar.colors.onDatavizContainerVariant,
+                uncheckedColor = calendar.colors.datavizContainerVariant,
             ),
         )
 

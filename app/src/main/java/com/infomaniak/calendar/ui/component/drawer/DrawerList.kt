@@ -18,77 +18,86 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import android.os.Parcelable
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateSetOf
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import kotlinx.parcelize.Parcelize
 
-@Composable
-fun DrawerList(
+fun LazyListScope.drawerListItems(
     usersCalendars: List<UserCalendarsUi>,
+    onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
+    isSectionExpanded: (Int) -> Boolean,
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-    val expandedAccountIds = rememberExpandedUsers()
-
-    LazyColumn(modifier = modifier.fillMaxSize()) {
-        usersCalendars.forEach { userCalendars ->
-            calendarSection(userCalendars, expandedAccountIds, onCalendarVisibilityChange)
-        }
+    usersCalendars.forEach { userCalendars ->
+        calendarSection(userCalendars, isSectionExpanded, onAccountExpandedChange, onCalendarVisibilityChange)
     }
 }
 
 private fun LazyListScope.calendarSection(
     userCalendars: UserCalendarsUi,
-    expandedAccountIds: SnapshotStateSet<Int>,
+    isExpanded: (Int) -> Boolean,
+    onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
 ) {
     val userId = userCalendars.user.id
-    val isExpanded = expandedAccountIds.contains(userId)
 
     item(key = userId) {
-        DrawerAccountItem(
-            modifier = Modifier.animateItem(),
-            user = userCalendars.user,
-            isExpanded = { isExpanded },
-            onAccountExpanded = {
-                if (isExpanded) expandedAccountIds.remove(userId) else expandedAccountIds.add(userId)
-            },
-        )
-    }
-
-    if (isExpanded) {
-        items(items = userCalendars.calendars, key = { calendar -> CalendarKey(calendar.id.url, userId) }) { calendar ->
-            DrawerCalendarItem(
+        Column(
+            modifier = Modifier
+                .padding(horizontal = Margin.Medium, vertical = Margin.Mini)
+                .clip(EsdsTheme.radius.twoXl)
+                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .animateItem()
+                .animateContentSize(),
+        ) {
+            DrawerAccountItem(
                 modifier = Modifier.animateItem(),
-                calendar = calendar,
-                onCalendarVisibilityChange = onCalendarVisibilityChange,
+                user = userCalendars.user,
+                isExpanded = { isExpanded(userId) },
+                onAccountExpanded = { onAccountExpandedChange(userId, !isExpanded(userId)) },
             )
+            if (isExpanded(userId)) {
+                Column {
+                    userCalendars.calendars.forEach { calendar ->
+                        DrawerCalendarItem(
+                            modifier = Modifier.animateItem(),
+                            calendar = calendar,
+                            onCalendarVisibilityChange = onCalendarVisibilityChange,
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun rememberExpandedUsers(): SnapshotStateSet<Int> {
-    return rememberSaveable(
-        saver = Saver(
-            save = { it.toIntArray() },
-            restore = { mutableStateSetOf<Int>().apply { addAll(it.toList()) } },
-        ),
-    ) {
-        mutableStateSetOf()
+private fun DrawerListPreviewContent(
+    usersCalendars: List<UserCalendarsUi>,
+) {
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        drawerListItems(
+            usersCalendars = usersCalendars,
+            onAccountExpandedChange = { _, _ -> {} },
+            isSectionExpanded = { false },
+            onCalendarVisibilityChange = { _, _ -> },
+        )
     }
 }
 
@@ -101,6 +110,6 @@ private fun DrawerListPreview(
     @PreviewParameter(DrawerPreviewProvider::class) usersCalendars: List<UserCalendarsUi>,
 ) {
     CalendarThemeForPreview {
-        DrawerList(usersCalendars = usersCalendars, onCalendarVisibilityChange = { _, _ -> })
+        DrawerListPreviewContent(usersCalendars)
     }
 }

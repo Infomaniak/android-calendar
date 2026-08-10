@@ -16,13 +16,16 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <string name="accountManagement">Zarządzanie kontami</string>
     <string name="contentDescriptionInbox">Otwórz skrzynkę odbiorczą</string>
     <string name="contentDescriptionMenuDrawer">Otwórz menu</string>
     <string name="contentDescriptionSearch">Szukaj</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Aktualny widok: %1$s. Stuknij, aby zmienić widok.</string>
     <string name="dayTitle">Dzień</string>
+    <string name="helpTitle">Pomoc</string>
     <string name="monthTitle">Miesiąc</string>
     <string name="planningTitle">Planowanie</string>
+    <string name="settingsTitle">Ustawienia</string>
     <string name="syncEventsError">Błąd podczas pobierania wydarzeń</string>
     <string name="threeDaysTitle">Trzy dni</string>
     <string name="weekTitle">Tydzień</string>

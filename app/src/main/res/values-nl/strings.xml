@@ -16,13 +16,16 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <string name="accountManagement">Accountbeheer</string>
     <string name="contentDescriptionInbox">Postvak IN openen</string>
     <string name="contentDescriptionMenuDrawer">Menu openen</string>
     <string name="contentDescriptionSearch">Zoeken</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Huidige weergave: %1$s. Tik om de weergave te wijzigen.</string>
     <string name="dayTitle">Dag</string>
+    <string name="helpTitle">Hulp</string>
     <string name="monthTitle">Maand</string>
     <string name="planningTitle">Planning</string>
+    <string name="settingsTitle">Instellingen</string>
     <string name="syncEventsError">Fout bij het ophalen van gebeurtenissen</string>
     <string name="threeDaysTitle">Drie dagen</string>
     <string name="weekTitle">Week</string>

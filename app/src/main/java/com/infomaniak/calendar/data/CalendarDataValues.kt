@@ -35,4 +35,9 @@ class CalendarDataValues @Inject constructor(
         defaultValue = emptyMap(),
         serializer = EncryptedDavCredentialSerializer(keystoreCipher),
     )
+
+    val expandedDrawerAccountIds = dataValue(
+        key = "expandedDrawerAccountIds",
+        defaultValue = emptySet<Int>(),
+    )
 }
