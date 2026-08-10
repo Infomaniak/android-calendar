@@ -76,6 +76,7 @@ fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier,
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventsDots },
         onVisibleMonthChanged = viewModel::onVisibleMonthChanged,
+        jumpTo = viewModel::jumpTo,
         modifier = modifier,
     )
 }
@@ -87,6 +88,7 @@ private fun PlanningScreen(
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     onVisibleMonthChanged: (YearMonth) -> Unit,
+    jumpTo: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val hazeState = rememberHazeState()
@@ -109,6 +111,7 @@ private fun PlanningScreen(
                         events = planningUi.eventsByWeekAndDay,
                         contentPadding = contentPadding + PaddingValues(Margin.Medium),
                         goToEventCreation = goToEventCreation,
+                        jumpTo = jumpTo,
                         modifier = Modifier.hazeSource(hazeState),
                     )
                 }
@@ -150,13 +153,20 @@ private fun SuccessPlanning(
     events: () -> EventsByWeekAndDay,
     contentPadding: PaddingValues,
     goToEventCreation: () -> Unit,
+    jumpTo: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val visibleDayState = LocalVisibleDayState.current ?: return
     val lazyListState = rememberLazyListState(events().indexOf(visibleDayState.visibleDate))
 
     ProcessJumpRequests(lazyListState, visibleDayState, events)
-    ReportVisibleDate(lazyListState, onVisibleDateChanged = { visibleDayState.onVisibleDateChanged(it) })
+    ReportVisibleDate(
+        lazyListState = lazyListState,
+        onVisibleDateChanged = {
+            jumpTo(it)
+            visibleDayState.onVisibleDateChanged(it)
+        },
+    )
 
     Planning(
         lazyListState = lazyListState,
@@ -189,6 +199,7 @@ private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class)
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
                 onVisibleMonthChanged = {},
+                jumpTo = {},
             )
         }
     }

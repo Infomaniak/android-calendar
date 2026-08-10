@@ -68,7 +68,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import kotlin.time.Clock
 
-private const val MAX_DOTS = 4
+private const val MAX_DOTS = 2
 private val DOT_SIZE = 6.dp
 
 @Composable

@@ -80,6 +80,7 @@ class PlanningViewModel(
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = PlanningUiState.Loading)
 
     private val visibleMonth = MutableStateFlow(today.yearMonth)
+    private val initialDay = MutableStateFlow(today)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val eventDots: StateFlow<Map<LocalDate, List<EventColorsUi>>> = visibleMonth
@@ -95,6 +96,13 @@ class PlanningViewModel(
 
     fun onVisibleMonthChanged(month: YearMonth) {
         visibleMonth.value = month
+    }
+
+    fun jumpTo(date: LocalDate): Boolean {
+        val changed = initialDay.value != date
+        initialDay.value = date
+        onVisibleMonthChanged(date.yearMonth)
+        return changed
     }
 
     private fun Map<LocalDate, List<CalendarColors>>.toEventDots(): Map<LocalDate, List<EventColorsUi>> {
