@@ -64,11 +64,9 @@ private fun LazyListScope.calendarSection(
                 .padding(horizontal = Margin.Medium, vertical = Margin.Mini)
                 .clip(EsdsTheme.radius.twoXl)
                 .background(MaterialTheme.colorScheme.surfaceContainer)
-                .animateItem()
                 .animateContentSize(),
         ) {
             DrawerAccountItem(
-                modifier = Modifier.animateItem(),
                 user = userCalendars.user,
                 isExpanded = { expanded },
                 onAccountExpanded = { onAccountExpandedChange(userId, !expanded) },
@@ -77,7 +75,6 @@ private fun LazyListScope.calendarSection(
                 Column {
                     userCalendars.calendars.forEach { calendar ->
                         DrawerCalendarItem(
-                            modifier = Modifier.animateItem(),
                             calendar = calendar,
                             onCalendarVisibilityChange = onCalendarVisibilityChange,
                         )
