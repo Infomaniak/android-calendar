@@ -115,6 +115,7 @@ private fun EventSizeSpacerStackedPreview() {
                 previewCases.forEach { (duration, label) ->
                     EventItem(
                         title = "Event ($label gap below)",
+                        location = null,
                         status = EventItemStatus.Default(eventColors),
                         start = now,
                         end = now + duration,

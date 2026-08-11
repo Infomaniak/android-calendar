@@ -61,6 +61,7 @@ internal fun EventUi.Normal.toEventItemStatus(): EventItemStatus {
 
 @Immutable
 sealed class EventItemStatus(
+    val sourceColor: @Composable () -> Color?,
     val cardColors: @Composable () -> CardColors,
     val cardBorder: @Composable () -> BorderStroke? = { null },
     val stripesColor: @Composable () -> Color? = { null },
@@ -69,20 +70,24 @@ sealed class EventItemStatus(
     abstract val eventColors: EventColorsUi
 
     data class Default(override val eventColors: EventColorsUi) : EventItemStatus(
+        sourceColor = { eventColors.sourceColor },
         cardColors = { containerColors(eventColors) },
     )
 
     data class Maybe(override val eventColors: EventColorsUi) : EventItemStatus(
+        sourceColor = { eventColors.sourceColor },
         cardColors = { containerColors(eventColors) },
         stripesColor = { eventColors.onDatavizContainerVariant.copy(alpha = 0.1f) },
     )
 
     data class Declined(override val eventColors: EventColorsUi) : EventItemStatus(
+        sourceColor = { eventColors.sourceColor },
         cardColors = { containerColors(eventColors, contentAlpha = 0.5f) },
         textDecoration = TextDecoration.LineThrough,
     )
 
     data class Pending(override val eventColors: EventColorsUi) : EventItemStatus(
+        sourceColor = { eventColors.sourceColor },
         cardColors = { containerVariantColors(eventColors) },
         cardBorder = { BorderStroke(2.dp, eventColors.onDatavizContainer) },
     )
@@ -99,7 +104,7 @@ sealed class EventItemStatus(
             eventColors: EventColorsUi,
             @FloatRange(0.0, 1.0) contentAlpha: Float = 1f,
         ): CardColors = CardDefaults.cardColors(
-            containerColor = eventColors.datavizContainerVariant,
+            containerColor = eventColors.sourceColor.copyIfNeeded(0.20f),
             contentColor = eventColors.onDatavizContainerVariant.copyIfNeeded(contentAlpha),
         )
 
@@ -124,6 +129,7 @@ private fun Preview() {
             end = Clock.System.now() + 15.minutes,
             isAllDay = false,
             title = "Event title",
+            location = "Salle Tokyo",
             status = status,
             trailingIcons = EventIcons.entries.toSet(),
             modifier = modifier,
