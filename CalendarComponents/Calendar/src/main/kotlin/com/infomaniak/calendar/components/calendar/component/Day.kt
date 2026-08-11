@@ -44,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.res.painterResource
@@ -68,7 +69,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import kotlin.time.Clock
 
-private const val MAX_DOTS = 2
+private const val MAX_DOTS = 3
 private val DOT_SIZE = 6.dp
 
 @Composable
@@ -140,19 +141,18 @@ internal fun Day(
 
 @Composable
 private fun EventDots(dots: List<EventColorsUi>, modifier: Modifier = Modifier) {
+    val hasOverflow = dots.size > MAX_DOTS
+    val visibleDots = dots.take(if (hasOverflow) MAX_DOTS - 1 else MAX_DOTS)
+
     Row(
         modifier = modifier.height(DOT_SIZE),
         horizontalArrangement = Arrangement.spacedBy(1.dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        dots.take(MAX_DOTS).forEach { eventColor ->
-            Box(
-                modifier = Modifier
-                    .size(DOT_SIZE)
-                    .clip(CircleShape)
-                    .background(eventColor.datavizContainerVariant),
-            )
+        visibleDots.forEach { eventColor ->
+            EventDot(color = eventColor.datavizContainerVariant)
         }
-        if (dots.size > MAX_DOTS) {
+        if (hasOverflow) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_plus),
                 contentDescription = null,
@@ -160,6 +160,16 @@ private fun EventDots(dots: List<EventColorsUi>, modifier: Modifier = Modifier) 
             )
         }
     }
+}
+
+@Composable
+private fun EventDot(color: Color, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .size(DOT_SIZE)
+            .clip(CircleShape)
+            .background(color),
+    )
 }
 
 /**
