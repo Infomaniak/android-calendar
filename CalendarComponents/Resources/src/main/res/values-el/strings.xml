@@ -19,6 +19,10 @@
     <string name="addEventLabel">Προσθήκη</string>
     <string name="allDayLabel">Όλη την ημέρα</string>
     <string name="contentDescriptionCreateEvent">Δημιουργία εκδήλωσης</string>
+    <plurals name="contentDescriptionEventCount">
+        <item quantity="one">%1$d γεγονός</item>
+        <item quantity="other">%1$d γεγονότα</item>
+    </plurals>
     <string name="contentDescriptionHasAttendees">Έχει συμμετέχοντες</string>
     <string name="contentDescriptionHasKMeetLink">Διαθέτει σύνδεσμο kMeet</string>
     <string name="contentDescriptionHasLocation">Έχει τοποθεσία</string>

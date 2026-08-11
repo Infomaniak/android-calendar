@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
+import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.planning.Planning
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
@@ -58,17 +59,24 @@ import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.YearMonth
+import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
 @Composable
 fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier, viewModel: PlanningViewModel = viewModel()) {
     val planningUiState: PlanningUiState by viewModel.planningUiState.collectAsStateWithLifecycle()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
+    val eventsDots by viewModel.eventDots.collectAsStateWithLifecycle(initialValue = emptyMap())
 
     PlanningScreen(
         goToEventCreation = goToEventCreation,
         planningUiState = { planningUiState },
         isLoadingEvents = { isLoadingEvents },
+        eventsDots = { eventsDots },
+        onVisibleMonthChanged = viewModel::onVisibleMonthChanged,
+        jumpTo = viewModel::jumpTo,
         modifier = modifier,
     )
 }
@@ -78,6 +86,9 @@ private fun PlanningScreen(
     goToEventCreation: () -> Unit,
     planningUiState: () -> PlanningUiState,
     isLoadingEvents: () -> Boolean,
+    eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
+    onVisibleMonthChanged: (YearMonth) -> Unit,
+    jumpTo: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val hazeState = rememberHazeState()
@@ -100,6 +111,7 @@ private fun PlanningScreen(
                         events = planningUi.eventsByWeekAndDay,
                         contentPadding = contentPadding + PaddingValues(Margin.Medium),
                         goToEventCreation = goToEventCreation,
+                        jumpTo = jumpTo,
                         modifier = Modifier.hazeSource(hazeState),
                     )
                 }
@@ -117,8 +129,12 @@ private fun PlanningScreen(
                         ExpandableCalendar(
                             isExpanded = { isCalendarExpanded },
                             selectedDate = { visibleDayState.visibleDate },
-                            onDayClick = { visibleDayState.jumpTo(it) },
+                            onDayClick = {
+                                onVisibleMonthChanged(it.yearMonth)
+                                visibleDayState.jumpTo(it)
+                            },
                             weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
+                            eventsDots = eventsDots,
                         )
                     }
                 },
@@ -137,13 +153,20 @@ private fun SuccessPlanning(
     events: () -> EventsByWeekAndDay,
     contentPadding: PaddingValues,
     goToEventCreation: () -> Unit,
+    jumpTo: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val visibleDayState = LocalVisibleDayState.current ?: return
     val lazyListState = rememberLazyListState(events().indexOf(visibleDayState.visibleDate))
 
     ProcessJumpRequests(lazyListState, visibleDayState, events)
-    ReportVisibleDate(lazyListState, onVisibleDateChanged = { visibleDayState.onVisibleDateChanged(it) })
+    ReportVisibleDate(
+        lazyListState = lazyListState,
+        onVisibleDateChanged = {
+            jumpTo(it)
+            visibleDayState.onVisibleDateChanged(it)
+        },
+    )
 
     Planning(
         lazyListState = lazyListState,
@@ -174,6 +197,9 @@ private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class)
                 planningUiState = { PlanningUiState.Success({ weekEvents }) },
                 goToEventCreation = {},
                 isLoadingEvents = { false },
+                eventsDots = { emptyMap() },
+                onVisibleMonthChanged = {},
+                jumpTo = {},
             )
         }
     }

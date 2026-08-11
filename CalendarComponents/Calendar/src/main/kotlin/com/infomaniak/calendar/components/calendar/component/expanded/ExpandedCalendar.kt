@@ -38,6 +38,7 @@ import com.infomaniak.calendar.components.calendar.modifier.FollowExternalSelect
 import com.infomaniak.calendar.components.calendar.modifier.SyncHeaderOffset
 import com.infomaniak.calendar.components.calendar.modifier.pagedSwipe
 import com.infomaniak.calendar.components.foundation.component.DateState
+import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.core.common.utils.today
@@ -62,6 +63,7 @@ internal fun ExpandedCalendar(
     selectedDate: () -> LocalDate,
     weekNumbering: WeekNumbering,
     onDayClick: (LocalDate) -> Unit,
+    eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     modifier: Modifier = Modifier,
     headerState: CalendarHeaderState = rememberCalendarHeaderState(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -111,6 +113,7 @@ internal fun ExpandedCalendar(
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
                 isSharedElementEnabled = day in sharedElementDays,
+                dotsFor = { eventsDots()[day.date].orEmpty() },
             )
         },
         modifier = modifier
@@ -128,6 +131,7 @@ private fun DayContent(
     sharedTransitionScope: SharedTransitionScope?,
     animatedVisibilityScope: AnimatedVisibilityScope?,
     isSharedElementEnabled: Boolean,
+    dotsFor: () -> List<EventColorsUi>,
 ) {
     val dateState by remember(day) {
         derivedStateOf {
@@ -142,15 +146,16 @@ private fun DayContent(
     }
 
     Day(
+        date = day.date,
         dateState = dateState,
         onClick = { onDayClick(day.date) },
-        date = day.date,
         modifier = Modifier.daySharedElement(
             sharedTransitionScope = sharedTransitionScope,
             animatedVisibilityScope = animatedVisibilityScope,
             date = day.date,
             enabled = isSharedElementEnabled,
         ),
+        dotsFor = dotsFor,
     )
 }
 
@@ -163,6 +168,7 @@ private fun ExpandedCalendarPreview() {
             selectedDate = { Clock.today() },
             onDayClick = {},
             weekNumbering = WeekNumbering.ISO_8601,
+            eventsDots = { emptyMap() },
         )
     }
 }
