@@ -19,6 +19,10 @@
     <string name="addEventLabel">Lisää</string>
     <string name="allDayLabel">Koko päivän</string>
     <string name="contentDescriptionCreateEvent">Luo tapahtuma</string>
+    <plurals name="contentDescriptionEventCount">
+        <item quantity="one">%1$d tapahtuma</item>
+        <item quantity="other">%1$d tapahtumaa</item>
+    </plurals>
     <string name="contentDescriptionHasAttendees">Onko osallistujia</string>
     <string name="contentDescriptionHasKMeetLink">Sisältää kMeet-linkin</string>
     <string name="contentDescriptionHasLocation">On sijainti</string>

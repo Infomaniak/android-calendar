@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -84,6 +85,17 @@ internal fun Day(
     val fullDate = remember(date, locale) {
         date.toJavaLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(locale))
     }
+
+    val dots = dotsFor()
+    val eventsDescription = if (dots.isEmpty()) {
+        null
+    } else {
+        pluralStringResource(R.plurals.contentDescriptionEventCount, dots.size, dots.size)
+    }
+    val dayDescription = remember(fullDate, eventsDescription) {
+        listOfNotNull(fullDate, eventsDescription).joinToString()
+    }
+
     val stateDescriptionToday = if (dateState == DateState.Today) stringResource(R.string.contentDescriptionToday) else null
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -97,7 +109,7 @@ internal fun Day(
                 role = Role.Button,
             ) { onClick() }
             .clearAndSetSemantics {
-                contentDescription = fullDate
+                contentDescription = dayDescription
                 selected = dateState == DateState.Selected
                 stateDescriptionToday?.let { stateDescription = it }
             }
