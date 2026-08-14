@@ -127,10 +127,8 @@ private fun KmpEventStatus?.toEventStatus(): EventStatus {
 
 fun EventColors.toEventColorsUi(): EventColorsUi = EventColorsUi(
     _sourceColor = eventSourceColor.argb,
-    _datavizContainer = datavizContainer.toThemedColorUi(),
-    _onDatavizContainer = onDatavizContainer.toThemedColorUi(),
-    _datavizContainerVariant = datavizContainerVariant.toThemedColorUi(),
-    _onDatavizContainerVariant = onDatavizContainerVariant.toThemedColorUi(),
+    _sourceVariantColor = sourceVariantColor,
+    _onSourceVariantColor = onSourceVariantColor.toThemedColorUi(),
 )
 
 private fun Attendee.toAttendeeUi(): AttendeeUi = AttendeeUi(

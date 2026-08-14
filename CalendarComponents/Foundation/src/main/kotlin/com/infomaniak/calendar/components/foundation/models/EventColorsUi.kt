@@ -22,14 +22,10 @@ import androidx.compose.ui.graphics.Color
 
 data class EventColorsUi(
     private val _sourceColor: Int,
-    private val _datavizContainer: ThemedColorUi,
-    private val _onDatavizContainer: ThemedColorUi,
-    private val _datavizContainerVariant: ThemedColorUi,
-    private val _onDatavizContainerVariant: ThemedColorUi,
+    private val _sourceVariantColor: Int,
+    private val _onSourceVariantColor: ThemedColorUi,
 ) {
     val sourceColor: Color @Composable get() = Color(_sourceColor)
-    val datavizContainer: Color @Composable get() = _datavizContainer.toColor()
-    val onDatavizContainer: Color @Composable get() = _onDatavizContainer.toColor()
-    val datavizContainerVariant: Color @Composable get() = _datavizContainerVariant.toColor()
-    val onDatavizContainerVariant: Color @Composable get() = _onDatavizContainerVariant.toColor()
+    val sourceVariantColor: Color @Composable get() = Color(_sourceVariantColor)
+    val onSourceVariantColor: Color @Composable get() = _onSourceVariantColor.toColor()
 }

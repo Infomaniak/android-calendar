@@ -32,11 +32,9 @@ fun interface EventColorsUiFactory {
         val dummyEventColorsUiFactory by lazy {
             EventColorsUiFactory {
                 EventColorsUi(
-                    _sourceColor = 0xFF381E72.toInt(),
-                    _datavizContainer = ThemedColorUi(light = 0xFFFFFFFF.toInt(), dark = 0xFF381E72.toInt()),
-                    _onDatavizContainer = ThemedColorUi(light = 0xFF6750A4.toInt(), dark = 0xFFCFBCFF.toInt()),
-                    _datavizContainerVariant = ThemedColorUi(light = 0xFFE9DDFF.toInt(), dark = 0xFF4F378A.toInt()),
-                    _onDatavizContainerVariant = ThemedColorUi(light = 0xFF4F378A.toInt(), dark = 0xFFE9DDFF.toInt()),
+                    _sourceColor = 0xFF6750A4.toInt(),
+                    _sourceVariantColor = 0x206750A4,
+                    _onSourceVariantColor = ThemedColorUi(light = 0xFF21005D.toInt(), dark = 0xFFEADDFF.toInt()),
                 )
             }
         }

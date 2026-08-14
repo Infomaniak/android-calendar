@@ -22,10 +22,10 @@ import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.foundation.models.ThemedColorUi
 
 data class CalendarColorsUi(
-    val color: Color,
-    private val _datavizContainerVariant: ThemedColorUi,
-    private val _onDatavizContainerVariant: ThemedColorUi,
+    val sourceColor: Color,
+    val sourceVariantColor: Color,
+    private val _onSourceColor: ThemedColorUi,
+    private val _onSourceVariantColor: ThemedColorUi,
 ) {
-    val datavizContainerVariant: Color @Composable get() = _datavizContainerVariant.toColor()
-    val onDatavizContainerVariant: Color @Composable get() = _onDatavizContainerVariant.toColor()
+    val onSourceColor: Color @Composable get() = _onSourceColor.toColor()
 }

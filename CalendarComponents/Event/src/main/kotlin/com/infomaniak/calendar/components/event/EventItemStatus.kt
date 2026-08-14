@@ -35,6 +35,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -71,42 +72,51 @@ sealed class EventItemStatus(
 
     data class Default(override val eventColors: EventColorsUi) : EventItemStatus(
         sourceColor = { eventColors.sourceColor },
-        cardColors = { containerColors(eventColors) },
+        cardColors = { containerVariantColors(eventColors) },
     )
 
     data class Maybe(override val eventColors: EventColorsUi) : EventItemStatus(
         sourceColor = { eventColors.sourceColor },
-        cardColors = { containerColors(eventColors) },
-        stripesColor = { eventColors.onDatavizContainerVariant.copy(alpha = 0.1f) },
+        cardColors = { compositeOverContainerColors(eventColors) },
+        stripesColor = { eventColors.sourceColor.copyIfNeeded(0.25f) },
     )
 
     data class Declined(override val eventColors: EventColorsUi) : EventItemStatus(
         sourceColor = { eventColors.sourceColor },
-        cardColors = { containerColors(eventColors, contentAlpha = 0.5f) },
+        cardColors = { containerVariantColors(eventColors) },
         textDecoration = TextDecoration.LineThrough,
     )
 
     data class Pending(override val eventColors: EventColorsUi) : EventItemStatus(
         sourceColor = { eventColors.sourceColor },
-        cardColors = { containerVariantColors(eventColors) },
-        cardBorder = { BorderStroke(2.dp, eventColors.onDatavizContainer) },
+        cardColors = { noBackgroundContainerColors(eventColors) },
+        cardBorder = { BorderStroke(2.dp, eventColors.sourceColor) },
     )
 
     companion object {
         @Composable
-        private fun containerVariantColors(eventColors: EventColorsUi): CardColors = CardDefaults.cardColors(
-            containerColor = eventColors.datavizContainer,
-            contentColor = eventColors.onDatavizContainer,
-        )
+        private fun containerVariantColors(eventColors: EventColorsUi): CardColors {
+            return CardDefaults.cardColors(
+                containerColor = eventColors.sourceVariantColor,
+                contentColor = eventColors.onSourceVariantColor,
+            )
+        }
 
         @Composable
-        private fun containerColors(
-            eventColors: EventColorsUi,
-            @FloatRange(0.0, 1.0) contentAlpha: Float = 1f,
-        ): CardColors = CardDefaults.cardColors(
-            containerColor = eventColors.sourceColor.copyIfNeeded(0.20f),
-            contentColor = eventColors.onDatavizContainerVariant.copyIfNeeded(contentAlpha),
-        )
+        private fun noBackgroundContainerColors(eventColors: EventColorsUi): CardColors {
+            return CardDefaults.cardColors(
+                containerColor = Color.Transparent,
+                contentColor = eventColors.onSourceVariantColor,
+            )
+        }
+
+        @Composable
+        private fun compositeOverContainerColors(eventColors: EventColorsUi): CardColors {
+            return CardDefaults.cardColors(
+                containerColor = eventColors.sourceVariantColor.compositeOver(MaterialTheme.colorScheme.surface),
+                contentColor = eventColors.onSourceVariantColor,
+            )
+        }
 
         /**
          * Skips instantiations caused by copy if we're modifying alpha to be the same value as it already was. Useful for all

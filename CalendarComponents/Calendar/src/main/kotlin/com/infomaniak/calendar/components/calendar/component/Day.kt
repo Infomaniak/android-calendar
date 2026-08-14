@@ -162,7 +162,7 @@ private fun EventDots(dots: List<EventColorsUi>, modifier: Modifier = Modifier) 
         verticalAlignment = Alignment.CenterVertically,
     ) {
         visibleDots.forEach { eventColor ->
-            EventDot(color = eventColor.datavizContainerVariant)
+            EventDot(color = eventColor.sourceColor)
         }
         if (hasOverflow) {
             Icon(
