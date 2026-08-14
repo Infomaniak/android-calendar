@@ -39,7 +39,7 @@ The app depends on the `multiplatform-calendar` KMP library. Two modes are avail
 
 ### Default — Published AARs (Maven repositories)
 
-No configuration needed. Gradle resolves `com.infomaniak.multiplatform_calendar:CalendarCore` from the configured Maven repositories (mavenLocal/mavenCentral + the Sonatype snapshots repo for SNAPSHOT versions).
+No configuration needed. Gradle resolves `com.infomaniak.multiplatform_calendar:CalendarCore` (and `com.infomaniak.designsystem` artifacts) from our self-hosted Reposilite repositories (releases + snapshots).
 
 ### Local source — Composite build (for KMP development)
 
