@@ -23,9 +23,7 @@ import com.infomaniak.calendar.components.foundation.models.ThemedColorUi
 
 data class CalendarColorsUi(
     val sourceColor: Color,
-    val sourceVariantColor: Color,
     private val _onSourceColor: ThemedColorUi,
-    private val _onSourceVariantColor: ThemedColorUi,
 ) {
     val onSourceColor: Color @Composable get() = _onSourceColor.toColor()
 }
