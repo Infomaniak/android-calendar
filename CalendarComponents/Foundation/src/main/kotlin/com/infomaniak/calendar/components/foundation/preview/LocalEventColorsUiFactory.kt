@@ -33,8 +33,10 @@ fun interface EventColorsUiFactory {
             EventColorsUiFactory {
                 EventColorsUi(
                     _sourceColor = 0xFF6750A4.toInt(),
-                    _sourceVariantColor = 0x206750A4,
-                    _onSourceVariantColor = ThemedColorUi(light = 0xFF21005D.toInt(), dark = 0xFFEADDFF.toInt()),
+                    _containerColor = 0x206750A4,
+                    _onContainerColor = ThemedColorUi(light = 0xFF21005D.toInt(), dark = 0xFFEADDFF.toInt()),
+                    _containerVariantColor = 0x106750A4,
+                    _onContainerVariantColor = ThemedColorUi(light = 0xFF21005D.toInt(), dark = 0xFFEADDFF.toInt()),
                 )
             }
         }
