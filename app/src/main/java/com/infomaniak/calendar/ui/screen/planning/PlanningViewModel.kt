@@ -24,6 +24,7 @@ import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColors
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.VisibleCalendarColor
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
@@ -35,7 +36,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -85,11 +85,11 @@ class PlanningViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     val eventDots: StateFlow<Map<LocalDate, List<EventColorsUi>>> = visibleMonth
         .flatMapLatest { month ->
-            val months = listOf(month.minus(1, DateTimeUnit.MONTH), month, month.plus(1, DateTimeUnit.MONTH))
-
-            combine(months.map { calendarManager.observeMonthlyCalendarColors(it, timeZone) }) { monthlyColors ->
-                buildMap { monthlyColors.forEach(::putAll) }
-            }
+            calendarManager.observeMonthlyCalendarColors(
+                startMonth = month.minus(1, DateTimeUnit.MONTH),
+                endMonth = month.plus(1, DateTimeUnit.MONTH),
+                timeZone = timeZone,
+            )
         }
         .map { it.toEventDots() }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
@@ -105,8 +105,8 @@ class PlanningViewModel(
         return changed
     }
 
-    private fun Map<LocalDate, List<CalendarColors>>.toEventDots(): Map<LocalDate, List<EventColorsUi>> {
-        return mapValues { (_, colors) -> colors.map { EventColors.from(it).toEventColorsUi() } }
+    private fun Map<LocalDate, List<VisibleCalendarColor>>.toEventDots(): Map<LocalDate, List<EventColorsUi>> {
+        return mapValues { (_, colors) -> colors.map { EventColors.from(it.colors).toEventColorsUi() } }
     }
 
     companion object {
