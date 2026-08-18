@@ -54,7 +54,7 @@ import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.HourFormatter.formatHours
 import com.infomaniak.calendar.components.resources.R
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Instant
@@ -118,7 +118,7 @@ private fun EventItemCard(status: EventItemStatus, modifier: Modifier = Modifier
             Column(
                 modifier = Modifier
                     .cardStripes(status)
-                    .padding(Margin.Mini),
+                    .padding(EsdsTheme.spacing.sm),
                 content = content,
             )
         }
@@ -128,7 +128,7 @@ private fun EventItemCard(status: EventItemStatus, modifier: Modifier = Modifier
 @Composable
 private fun AllDayContent(title: String, modifier: Modifier = Modifier) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(Margin.Micro),
+        horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -157,10 +157,10 @@ private fun PartialDayContent(
 ) {
     Row(
         modifier,
-        horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
+        horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.sm),
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(2.dp),
+            verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.twoXs),
             modifier = Modifier.weight(1f),
         ) {
             Text(
@@ -184,6 +184,8 @@ private fun PartialDayContent(
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Medium,
                     textDecoration = textDecoration,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
 
@@ -200,7 +202,7 @@ private fun formatDisplayedHour(start: Instant, end: Instant): String = "${start
 
 @Composable
 private fun TrailingIcons(trailingIcons: Set<EventIcons>) {
-    Row(horizontalArrangement = Arrangement.spacedBy(Margin.Micro)) {
+    Row(horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs)) {
         EventIcons.entries.forEach {
             if (it in trailingIcons) it.TrailingIcon()
         }
@@ -252,7 +254,7 @@ private fun Preview() {
 
     MaterialTheme {
         Surface {
-            Column(verticalArrangement = Arrangement.spacedBy(Margin.Mini)) {
+            Column(verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.sm)) {
                 val eventColors = LocalEventColorsUiFactory.current.create(0x0)
 
                 EventItemForStatus(EventItemStatus.Default(eventColors), isAllDay = true, modifier = Modifier.fillMaxWidth())
