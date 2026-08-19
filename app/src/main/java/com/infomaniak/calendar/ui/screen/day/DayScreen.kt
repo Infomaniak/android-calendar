@@ -94,7 +94,11 @@ private fun DayScreen(
         modifier = modifier,
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
-            DayTimeline(state = timelineState, modifier = Modifier.fillMaxSize())
+            DayTimeline(
+                date = visibleDayState.visibleDate,
+                state = timelineState,
+                modifier = Modifier.fillMaxSize(),
+            )
         }
     }
 }

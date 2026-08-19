@@ -27,15 +27,24 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.day.component.CurrentTimeIndicator
 import com.infomaniak.calendar.components.day.component.HourGrid
 import com.infomaniak.calendar.components.day.component.HourLabelOverhang
 import com.infomaniak.calendar.components.day.state.DayTimelineState
+import com.infomaniak.calendar.components.day.state.minuteOfDay
+import com.infomaniak.calendar.components.day.state.rememberCurrentDateTime
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.core.common.utils.today
+import kotlinx.datetime.LocalDate
+import kotlin.time.Clock
 
 @Composable
-fun DayTimeline(state: DayTimelineState, modifier: Modifier = Modifier) {
+fun DayTimeline(date: LocalDate, state: DayTimelineState, modifier: Modifier = Modifier) {
+    val currentDateTime by rememberCurrentDateTime()
+
     // The timeline runs under the navigation bar, and the toolbar floats above it: the end of
     // the day has to clear the two of them stacked.
     val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -47,6 +56,12 @@ fun DayTimeline(state: DayTimelineState, modifier: Modifier = Modifier) {
             .padding(top = HourLabelOverhang, bottom = DayTimelineDefaults.BottomPadding + navigationBarPadding),
     ) {
         HourGrid(state = state, modifier = Modifier.fillMaxWidth())
+
+        if (currentDateTime.date == date) {
+            CurrentTimeIndicator(
+                minuteOfDay = currentDateTime.minuteOfDay, state = state, modifier = Modifier.matchParentSize(),
+            )
+        }
     }
 }
 
@@ -54,6 +69,9 @@ fun DayTimeline(state: DayTimelineState, modifier: Modifier = Modifier) {
 @Composable
 private fun DayTimelinePreview() {
     Surface {
-        DayTimeline(state = rememberDayTimelineState(scrollState = rememberScrollState(initial = 430)))
+        DayTimeline(
+            date = Clock.today(),
+            state = rememberDayTimelineState(scrollState = rememberScrollState(initial = 430)),
+        )
     }
 }
