@@ -108,7 +108,7 @@ String resources follow the single-module pattern — all strings consumed by an
 | `:CalendarComponents:Resources`   | `com.infomaniak.calendar.components.resources`   | String-only module: `res/values/strings.xml` (+ translations). No Kotlin code, no Compose. Centralises all CalendarComponents string resources. |
 | `:CalendarComponents:Event`       | `com.infomaniak.calendar.components.event`       | `EventItem` Composable — renders a single event row. Re-exports Foundation via `api`. |
 | `:CalendarComponents:Planning`    | `com.infomaniak.calendar.components.planning`    | `Planning` Composable — a `LazyColumn` with ISO week headers and per-day event lists. Also provides the `stickyWithinItem` `Modifier` extension. Re-exports Event, Foundation, and Resources via `api`. Week header design is a **placeholder**. |
-| `:CalendarComponents:Day`         | `com.infomaniak.calendar.components.day`         | Day view — the scrollable hour grid a single day is drawn on. Reusable by the future 3-day / week views. Re-exports Foundation via `api`. |
+| `:CalendarComponents:Day`         | `com.infomaniak.calendar.components.day`         | Day view — the scrollable hour grid a single day is drawn on. Holds `resolveOverlaps`, the pure-Kotlin solver placing concurrent events, ported from the [Eventually](https://github.com/claustrofob/Eventually) SwiftUI layout the iOS calendar uses so both platforms arrange a day identically. Reusable by the future 3-day / week views. Re-exports Foundation via `api`. |
 
 ### Dependency graph
 
