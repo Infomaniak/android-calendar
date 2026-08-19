@@ -27,8 +27,14 @@ import java.util.Locale
 
 object DayFormatter {
     private val formatShortDayName by lazy { DateTimeFormatter.ofPattern("EEE") }
+    private val formatFullDayAndDate by lazy { DateTimeFormatter.ofPattern("EEEE - d MMM") }
 
     fun LocalDate.toShortDayName(): String = toJavaLocalDate().format(formatShortDayName)
+
+    /** Full weekday followed by the day and short month, as shown in the day view header. */
+    fun LocalDate.toFullDayAndDateName(): String {
+        return toJavaLocalDate().format(formatFullDayAndDate).replaceFirstChar { it.uppercase() }
+    }
 
     fun DayOfWeek.toNarrowDayName(locale: Locale): String = toJavaDayOfWeek().getDisplayName(TextStyle.NARROW_STANDALONE, locale)
 }

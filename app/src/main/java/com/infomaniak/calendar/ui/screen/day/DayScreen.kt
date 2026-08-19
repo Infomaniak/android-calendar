@@ -37,7 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
-import com.infomaniak.calendar.components.day.DayTimeline
+import com.infomaniak.calendar.components.day.DayView
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
@@ -131,10 +131,11 @@ private fun SuccessDay(
 ) {
     val date = visibleDayState.visibleDate
 
-    DayTimeline(
+    DayView(
         date = date,
         events = eventsByDate()[date] ?: DayEvents.Empty,
         state = timelineState,
+        weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
         onEventClick = {}, //TODO[eventDetail]: Open the event detail screen
         modifier = modifier.fillMaxSize(),
     )
