@@ -90,7 +90,8 @@ fun DayTimeline(
 
         Box(
             modifier = Modifier
-                .verticalScroll(state.scrollState)
+                .verticalScroll(state.scrollState, enabled = !state.isPinching)
+                .pinchToZoom(state)
                 .padding(top = HourLabelOverhang, bottom = DayTimelineDefaults.BottomPadding + navigationBarPadding),
         ) {
             HourGrid(state = state, modifier = Modifier.fillMaxWidth())
@@ -119,6 +120,19 @@ private fun DayTimelinePreview() {
             date = Clock.today(),
             events = previewDayEvents,
             state = rememberDayTimelineState(scrollState = rememberScrollState(initial = 430)),
+            onEventClick = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun DayTimelineZoomedOutPreview() {
+    Surface {
+        DayTimeline(
+            date = Clock.today(),
+            events = previewDayEvents,
+            state = rememberDayTimelineState(initialHourHeight = DayTimelineDefaults.MinHourHeight),
             onEventClick = {},
         )
     }

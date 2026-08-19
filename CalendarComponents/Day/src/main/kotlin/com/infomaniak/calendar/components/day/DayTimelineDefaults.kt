@@ -24,6 +24,8 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 object DayTimelineDefaults {
     val HourHeight: Dp = 64.dp
+    val MinHourHeight: Dp = 64.dp
+    val MaxHourHeight: Dp = 200.dp
     val HourGutterWidth: Dp = 64.dp
 
     /**

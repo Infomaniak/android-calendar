@@ -20,9 +20,13 @@ package com.infomaniak.calendar.components.day.state
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
@@ -38,10 +42,17 @@ private const val INITIAL_VISIBLE_HOUR = 8
 /**
  * The timeline opens on [INITIAL_VISIBLE_HOUR], unless [scrollState] was restored to a position the
  * user had already scrolled to.
+ *
+ * [initialHourHeight] is read once, when the state is built, and is deliberately not a key of the
+ * remember: the state owns its height from then on, so a pinch in progress survives a recomposition
+ * rather than being reset to the height the caller first asked for.
  */
 @Composable
-fun rememberDayTimelineState(scrollState: ScrollState = rememberScrollState()): DayTimelineState {
-    val state = remember(scrollState) { DayTimelineState(DayTimelineDefaults.HourHeight, scrollState) }
+fun rememberDayTimelineState(
+    initialHourHeight: Dp = DayTimelineDefaults.HourHeight,
+    scrollState: ScrollState = rememberScrollState(),
+): DayTimelineState {
+    val state = remember(scrollState) { DayTimelineState(initialHourHeight, scrollState) }
     val density = LocalDensity.current
 
     LaunchedEffect(state) {
@@ -60,16 +71,46 @@ fun rememberDayTimelineState(scrollState: ScrollState = rememberScrollState()): 
  * translation between a minute of the day and a vertical offset.
  */
 @Stable
-class DayTimelineState(val hourHeight: Dp, val scrollState: ScrollState) {
+class DayTimelineState(initialHourHeight: Dp, val scrollState: ScrollState) {
+
+    private var clampedHourHeight by mutableStateOf(initialHourHeight.coerceToAllowedRange())
+
+    var isPinching: Boolean by mutableStateOf(false)
+        internal set
+
+    var hourHeight: Dp
+        get() = clampedHourHeight
+        set(value) {
+            clampedHourHeight = value.coerceToAllowedRange()
+        }
 
     val timelineHeight: Dp get() = hourHeight * HOURS_PER_DAY
 
     fun verticalOffsetOf(minuteOfDay: Int): Dp = hourHeight * (minuteOfDay / MINUTES_PER_HOUR.toFloat())
+
+    internal fun anchorAt(contentY: Float, density: Density): PinchAnchor = PinchAnchor(
+        hourOfDay = contentY / with(density) { hourHeight.toPx() },
+        viewportY = contentY - scrollState.value,
+    )
+
+    internal fun zoomAround(anchor: PinchAnchor, zoom: Float, density: Density) {
+        hourHeight *= zoom
+
+        val anchorY = anchor.hourOfDay * with(density) { hourHeight.toPx() }
+        val delta = anchorY - anchor.viewportY - scrollState.value
+        scrollState.dispatchRawDelta(delta)
+    }
 
     suspend fun scrollToMinuteOfDay(minuteOfDay: Int, density: Density) {
         val target = verticalOffsetOf(minuteOfDay) - hourHeight
 
         scrollState.scrollTo(with(density) { target.roundToPx() }.coerceAtLeast(0))
     }
+
+    private fun Dp.coerceToAllowedRange(): Dp {
+        return coerceIn(DayTimelineDefaults.MinHourHeight, DayTimelineDefaults.MaxHourHeight)
+    }
 }
 
+@Immutable
+internal data class PinchAnchor(val hourOfDay: Float, val viewportY: Float)
