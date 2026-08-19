@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.day
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,39 +29,80 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.component.CurrentTimeIndicator
 import com.infomaniak.calendar.components.day.component.HourGrid
 import com.infomaniak.calendar.components.day.component.HourLabelOverhang
+import com.infomaniak.calendar.components.day.layout.TimedEventsLayout
+import com.infomaniak.calendar.components.day.layout.eventLayoutConfig
+import com.infomaniak.calendar.components.day.layout.resolveOverlaps
+import com.infomaniak.calendar.components.day.model.DayEvents
+import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
+import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.minuteOfDay
 import com.infomaniak.calendar.components.day.state.rememberCurrentDateTime
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
 
+/**
+ * Overlaps are resolved once per width and zoom level rather than on every frame, since the
+ * arrangement only changes when one of the two does.
+ */
 @Composable
-fun DayTimeline(date: LocalDate, state: DayTimelineState, modifier: Modifier = Modifier) {
+fun DayTimeline(
+    date: LocalDate,
+    events: DayEvents,
+    state: DayTimelineState,
+    onEventClick: (EventUi.Normal) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val currentDateTime by rememberCurrentDateTime()
 
-    // The timeline runs under the navigation bar, and the toolbar floats above it: the end of
-    // the day has to clear the two of them stacked.
-    val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val density = LocalDensity.current
+        val config = remember(density) { density.eventLayoutConfig() }
+        val eventsAreaWidth = maxWidth - DayTimelineDefaults.HourGutterWidth
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .verticalScroll(state.scrollState)
-            .padding(top = HourLabelOverhang, bottom = DayTimelineDefaults.BottomPadding + navigationBarPadding),
-    ) {
-        HourGrid(state = state, modifier = Modifier.fillMaxWidth())
+        val placements = remember(events, eventsAreaWidth, state.hourHeight, config) {
+            with(density) {
+                events.timed.resolveOverlaps(
+                    layoutWidth = eventsAreaWidth.toPx(),
+                    pixelsPerMinute = state.hourHeight.toPx() / MINUTES_PER_HOUR,
+                    config = config,
+                )
+            }
+        }
 
-        if (currentDateTime.date == date) {
-            CurrentTimeIndicator(
-                minuteOfDay = currentDateTime.minuteOfDay, state = state, modifier = Modifier.matchParentSize(),
+        // The timeline runs under the navigation bar, and the toolbar floats above it: the end of
+        // the day has to clear the two of them stacked.
+        val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
+        Box(
+            modifier = Modifier
+                .verticalScroll(state.scrollState)
+                .padding(top = HourLabelOverhang, bottom = DayTimelineDefaults.BottomPadding + navigationBarPadding),
+        ) {
+            HourGrid(state = state, modifier = Modifier.fillMaxWidth())
+
+            TimedEventsLayout(
+                timedEvents = events.timed,
+                placements = placements,
+                onEventClick = onEventClick,
+                modifier = Modifier.matchParentSize(),
             )
+
+            if (currentDateTime.date == date) {
+                CurrentTimeIndicator(
+                    minuteOfDay = currentDateTime.minuteOfDay, state = state, modifier = Modifier.matchParentSize(),
+                )
+            }
         }
     }
 }
@@ -71,7 +113,9 @@ private fun DayTimelinePreview() {
     Surface {
         DayTimeline(
             date = Clock.today(),
+            events = previewDayEvents,
             state = rememberDayTimelineState(scrollState = rememberScrollState(initial = 430)),
+            onEventClick = {},
         )
     }
 }

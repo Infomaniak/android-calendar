@@ -22,19 +22,23 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.components.day.DayTimeline
+import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
@@ -49,20 +53,36 @@ fun DayScreen(
     modifier: Modifier = Modifier,
     dayViewModel: DayViewModel = viewModel(),
 ) {
+    val dayUiState by dayViewModel.dayUiState.collectAsStateWithLifecycle()
     val isLoadingEvents by dayViewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
     val visibleDayState = LocalVisibleDayState.current ?: return
     val timelineState = rememberDayTimelineState()
 
+    ApplyJumpRequests(visibleDayState)
+
     DayScreen(
         modifier = modifier,
+        dayUiState = { dayUiState },
         visibleDayState = visibleDayState,
         timelineState = timelineState,
         isLoadingEvents = { isLoadingEvents },
     )
 }
 
+/**
+ * Turns a jump request, such as tapping a day in the calendar, into a change of visible date, which
+ * is what the screen draws its events for.
+ */
+@Composable
+private fun ApplyJumpRequests(visibleDayState: VisibleDayState) {
+    LaunchedEffect(visibleDayState) {
+        for (date in visibleDayState.scrollCommand) visibleDayState.onVisibleDateChanged(date)
+    }
+}
+
 @Composable
 private fun DayScreen(
+    dayUiState: () -> DayUiState,
     isLoadingEvents: () -> Boolean,
     visibleDayState: VisibleDayState,
     timelineState: DayTimelineState,
@@ -94,12 +114,36 @@ private fun DayScreen(
         modifier = modifier,
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
-            DayTimeline(
-                date = visibleDayState.visibleDate,
-                state = timelineState,
-                modifier = Modifier.fillMaxSize(),
-            )
+            when (val state = dayUiState()) {
+                is DayUiState.Loading -> LoadingDay()
+                is DayUiState.Success -> SuccessDay(visibleDayState, timelineState, state.eventsByDate)
+            }
         }
+    }
+}
+
+@Composable
+private fun SuccessDay(
+    visibleDayState: VisibleDayState,
+    timelineState: DayTimelineState,
+    eventsByDate: () -> DayEventsByDate,
+    modifier: Modifier = Modifier,
+) {
+    val date = visibleDayState.visibleDate
+
+    DayTimeline(
+        date = date,
+        events = eventsByDate()[date] ?: DayEvents.Empty,
+        state = timelineState,
+        onEventClick = {}, //TODO[eventDetail]: Open the event detail screen
+        modifier = modifier.fillMaxSize(),
+    )
+}
+
+@Composable
+private fun LoadingDay(modifier: Modifier = Modifier) {
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator()
     }
 }
 
@@ -109,6 +153,7 @@ private fun DayScreenPreview() {
     CalendarThemeForPreview {
         val visibleDayState = rememberVisibleDayState()
         DayScreen(
+            dayUiState = { DayUiState.Success({ emptyMap() }) },
             isLoadingEvents = { true },
             visibleDayState = visibleDayState,
             timelineState = rememberDayTimelineState(),
