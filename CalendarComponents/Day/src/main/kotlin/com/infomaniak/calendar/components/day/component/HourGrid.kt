@@ -31,7 +31,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
@@ -43,6 +46,18 @@ import java.time.LocalTime
 
 private val HourLineWidth = 1.dp
 private const val FIRST_LABELLED_HOUR = 0
+
+private val HourLabelStyle: TextStyle
+    @Composable get() = MaterialTheme.typography.bodyMedium
+
+/**
+ * How far the first and last labels stick out past the grid. Each label is centred on the line it
+ * names, so half of midnight's sits above the very first line, where there is no grid left to hold
+ * it: the timeline has to keep this much room around the grid, or the label is cut in half by the
+ * edge of the screen.
+ */
+internal val HourLabelOverhang: Dp
+    @Composable get() = with(LocalDensity.current) { HourLabelStyle.lineHeight.toDp() / 2 }
 
 @Composable
 internal fun HourGrid(state: DayTimelineState, modifier: Modifier = Modifier) {
@@ -108,7 +123,7 @@ private fun HourLabels(state: DayTimelineState, modifier: Modifier = Modifier) {
 private fun HourLabel(hour: Int, modifier: Modifier = Modifier) {
     Text(
         text = LocalTime.of(hour, 0).formatHourLabel(),
-        style = MaterialTheme.typography.bodyMedium,
+        style = HourLabelStyle,
         color = MaterialTheme.colorScheme.onSurface,
         maxLines = 1,
         modifier = modifier.padding(end = EsdsTheme.spacing.lg),

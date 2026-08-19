@@ -19,6 +19,7 @@ package com.infomaniak.calendar.components.day
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
@@ -26,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.component.HourGrid
+import com.infomaniak.calendar.components.day.component.HourLabelOverhang
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 
@@ -35,7 +37,8 @@ fun DayTimeline(state: DayTimelineState, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .verticalScroll(state.scrollState),
+            .verticalScroll(state.scrollState)
+            .padding(top = HourLabelOverhang),
     ) {
         HourGrid(state = state, modifier = Modifier.fillMaxWidth())
     }
