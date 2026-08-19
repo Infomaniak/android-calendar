@@ -44,8 +44,10 @@ import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
-private const val CHIPS_PER_ROW = 2
 private val ChipHeight = 32.dp
+
+/** A chip narrower than this has no room left to read a title in. */
+private val MinChipWidth = 120.dp
 private const val WHOLE_ROWS = 2
 private val NextRowPeek = 12.dp
 
@@ -70,7 +72,7 @@ internal fun AllDayEventsBand(
         )
 
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(300.dp),
+            columns = GridCells.Adaptive(MinChipWidth),
             verticalArrangement = Arrangement.spacedBy(spacing),
             horizontalArrangement = Arrangement.spacedBy(spacing),
             modifier = Modifier
