@@ -18,14 +18,15 @@
 package com.infomaniak.calendar.components.day.component
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
 
 private val DotRadius = 4.dp
 private val LineWidth = 1.dp
@@ -36,7 +37,7 @@ private val LineWidth = 1.dp
  */
 @Composable
 internal fun CurrentTimeIndicator(minuteOfDay: Int, state: DayTimelineState, modifier: Modifier = Modifier) {
-    val color = Color(0xFF990241) //TODO: Find where to source this color (datavizOnPink)
+    val color = MaterialTheme.extendedColorScheme.datavizPink
     val spacingMd = EsdsTheme.spacing.md
 
     Canvas(modifier = modifier) {
