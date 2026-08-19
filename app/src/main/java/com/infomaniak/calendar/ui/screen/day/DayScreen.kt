@@ -26,9 +26,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -37,7 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
-import com.infomaniak.calendar.components.day.DayView
+import com.infomaniak.calendar.components.day.DayPager
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
@@ -47,12 +49,15 @@ import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.core.common.utils.today
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlin.time.Clock
 
 @Composable
-fun DayScreen(
-    modifier: Modifier = Modifier,
-    dayViewModel: DayViewModel = viewModel(),
-) {
+fun DayScreen(modifier: Modifier = Modifier, dayViewModel: DayViewModel = viewModel()) {
     val dayUiState by dayViewModel.dayUiState.collectAsStateWithLifecycle()
     val isLoadingEvents by dayViewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
     val visibleDayState = LocalVisibleDayState.current ?: return
@@ -65,13 +70,14 @@ fun DayScreen(
         dayUiState = { dayUiState },
         visibleDayState = visibleDayState,
         timelineState = timelineState,
+        dateRange = dayViewModel.dateRange,
         isLoadingEvents = { isLoadingEvents },
     )
 }
 
 /**
- * Turns a jump request, such as tapping a day in the calendar, into a change of visible date, which
- * is what the screen draws its events for.
+ * Turns a jump request, such as tapping a day in the calendar, into a change of visible date. The
+ * pager then animates to it on its own, since it follows the visible date.
  */
 @Composable
 private fun ApplyJumpRequests(visibleDayState: VisibleDayState) {
@@ -86,6 +92,7 @@ private fun DayScreen(
     isLoadingEvents: () -> Boolean,
     visibleDayState: VisibleDayState,
     timelineState: DayTimelineState,
+    dateRange: ClosedRange<LocalDate>,
     modifier: Modifier = Modifier,
 ) {
     var isCalendarExpanded by rememberSaveable { mutableStateOf(false) }
@@ -116,7 +123,7 @@ private fun DayScreen(
         Box(modifier = Modifier.padding(paddingValues)) {
             when (val state = dayUiState()) {
                 is DayUiState.Loading -> LoadingDay()
-                is DayUiState.Success -> SuccessDay(visibleDayState, timelineState, state.eventsByDate)
+                is DayUiState.Success -> SuccessDay(visibleDayState, timelineState, dateRange, state.eventsByDate)
             }
         }
     }
@@ -126,16 +133,17 @@ private fun DayScreen(
 private fun SuccessDay(
     visibleDayState: VisibleDayState,
     timelineState: DayTimelineState,
+    dateRange: ClosedRange<LocalDate>,
     eventsByDate: () -> DayEventsByDate,
     modifier: Modifier = Modifier,
 ) {
-    val date = visibleDayState.visibleDate
-
-    DayView(
-        date = date,
-        events = eventsByDate()[date] ?: DayEvents.Empty,
+    DayPager(
+        dateRange = dateRange,
+        selectedDate = { visibleDayState.visibleDate },
+        eventsOf = { eventsByDate()[it] ?: DayEvents.Empty },
         state = timelineState,
         weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
+        onVisibleDateChanged = { visibleDayState.onVisibleDateChanged(it) },
         onEventClick = {}, //TODO[eventDetail]: Open the event detail screen
         modifier = modifier.fillMaxSize(),
     )
@@ -152,12 +160,16 @@ private fun LoadingDay(modifier: Modifier = Modifier) {
 @Composable
 private fun DayScreenPreview() {
     CalendarThemeForPreview {
-        val visibleDayState = rememberVisibleDayState()
-        DayScreen(
-            dayUiState = { DayUiState.Success({ emptyMap() }) },
-            isLoadingEvents = { true },
-            visibleDayState = visibleDayState,
-            timelineState = rememberDayTimelineState(),
-        )
+        val visibleDate = remember { mutableStateOf(Clock.today()) }
+
+        CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(visibleDate)) {
+            DayScreen(
+                dayUiState = { DayUiState.Success({ emptyMap() }) },
+                isLoadingEvents = { false },
+                visibleDayState = rememberVisibleDayState(visibleDate),
+                timelineState = rememberDayTimelineState(),
+                dateRange = visibleDate.value.minus(1, DateTimeUnit.DAY)..visibleDate.value.plus(1, DateTimeUnit.DAY),
+            )
+        }
     }
 }

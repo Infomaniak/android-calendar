@@ -75,6 +75,9 @@ fun rememberDayTimelineState(
 /**
  * Vertical geometry of the day view: how tall an hour is, where the timeline is scrolled, and the
  * translation between a minute of the day and a vertical offset.
+ *
+ * A single instance is shared by every page of the day pager, so swiping to another day keeps the
+ * same zoom level and the same scroll position.
  */
 @Stable
 class DayTimelineState(initialHourHeight: Dp, val scrollState: ScrollState) {
