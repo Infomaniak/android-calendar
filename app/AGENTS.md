@@ -34,6 +34,8 @@ app/src/main/java/com/infomaniak/calendar/
 │       ├── viewModel/
 │       │   └── CalendarViewModelFactory.kt # Concrete metrox MetroViewModelFactory binding (multibinding maps)
 │       └── worker/                 # MetroWorker key, MetroWorkerFactory, WorkerGraphProvider, WorkerInstanceFactory
+├── utils/
+│   └── EventDaySliceExt.kt         # KMP EventDaySlice → EventUi mapping, shared by every calendar view
 └── ui/
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay with entryProvider
