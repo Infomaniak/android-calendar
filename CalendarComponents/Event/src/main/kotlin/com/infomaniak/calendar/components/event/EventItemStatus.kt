@@ -46,7 +46,7 @@ import com.infomaniak.core.ui.compose.theme.LocalIsThemeDarkMode
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
 
-internal fun EventUi.Normal.toEventItemStatus(): EventItemStatus {
+fun EventUi.Normal.toEventItemStatus(): EventItemStatus {
     if (status == EventStatus.Cancelled) return EventItemStatus.Declined(colors)
     val me = attendees.me ?: return EventItemStatus.Default(colors)
 
