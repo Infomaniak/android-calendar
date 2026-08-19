@@ -33,9 +33,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
@@ -50,11 +52,18 @@ import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.utils.today
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.first
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
+
+private val HourHeightSaveDelay = 500.milliseconds
 
 @Composable
 fun DayScreen(modifier: Modifier = Modifier, dayViewModel: DayViewModel = viewModel()) {
@@ -63,6 +72,11 @@ fun DayScreen(modifier: Modifier = Modifier, dayViewModel: DayViewModel = viewMo
     val visibleDayState = LocalVisibleDayState.current ?: return
     val timelineState = rememberDayTimelineState()
 
+    RestoreThenSaveHourHeight(
+        timelineState = timelineState,
+        storedHourHeight = dayViewModel.hourHeight,
+        onHourHeightChanged = dayViewModel::saveHourHeight,
+    )
     ApplyJumpRequests(visibleDayState)
 
     DayScreen(
@@ -83,6 +97,26 @@ fun DayScreen(modifier: Modifier = Modifier, dayViewModel: DayViewModel = viewMo
 private fun ApplyJumpRequests(visibleDayState: VisibleDayState) {
     LaunchedEffect(visibleDayState) {
         for (date in visibleDayState.scrollCommand) visibleDayState.onVisibleDateChanged(date)
+    }
+}
+
+/**
+ * Brings back the zoom level the user left the day view on, then keeps it stored as they pinch.
+ * Writes are debounced so a pinch does not hit the disk on every frame.
+ */
+@OptIn(FlowPreview::class)
+@Composable
+private fun RestoreThenSaveHourHeight(
+    timelineState: DayTimelineState,
+    storedHourHeight: Flow<Dp>,
+    onHourHeightChanged: suspend (Dp) -> Unit,
+) {
+    LaunchedEffect(timelineState) {
+        timelineState.hourHeight = storedHourHeight.first()
+
+        snapshotFlow { timelineState.hourHeight }
+            .debounce(HourHeightSaveDelay)
+            .collect(onHourHeightChanged)
     }
 }
 
