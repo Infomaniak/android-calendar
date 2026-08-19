@@ -17,10 +17,10 @@
  */
 package com.infomaniak.calendar.ui.screen.day
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,8 +31,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
+import com.infomaniak.calendar.components.day.DayTimeline
+import com.infomaniak.calendar.components.day.state.DayTimelineState
+import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
-import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.state.VisibleDayState
@@ -46,16 +48,23 @@ fun DayScreen(
 ) {
     val isLoadingEvents by dayViewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
     val visibleDayState = LocalVisibleDayState.current ?: return
+    val timelineState = rememberDayTimelineState()
 
     DayScreen(
         modifier = modifier,
         visibleDayState = visibleDayState,
+        timelineState = timelineState,
         isLoadingEvents = { isLoadingEvents },
     )
 }
 
 @Composable
-private fun DayScreen(isLoadingEvents: () -> Boolean, visibleDayState: VisibleDayState, modifier: Modifier = Modifier) {
+private fun DayScreen(
+    isLoadingEvents: () -> Boolean,
+    visibleDayState: VisibleDayState,
+    timelineState: DayTimelineState,
+    modifier: Modifier = Modifier,
+) {
     var isCalendarExpanded by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
@@ -78,9 +87,8 @@ private fun DayScreen(isLoadingEvents: () -> Boolean, visibleDayState: VisibleDa
         },
         modifier = modifier,
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
-            Text("DayScreenContent")
-            Text("Current user: ${LocalUser.current?.displayName}")
+        Box(modifier = Modifier.padding(paddingValues)) {
+            DayTimeline(state = timelineState, modifier = Modifier.fillMaxSize())
         }
     }
 }
@@ -90,6 +98,10 @@ private fun DayScreen(isLoadingEvents: () -> Boolean, visibleDayState: VisibleDa
 private fun DayScreenPreview() {
     CalendarThemeForPreview {
         val visibleDayState = rememberVisibleDayState()
-        DayScreen(isLoadingEvents = { true }, visibleDayState = visibleDayState)
+        DayScreen(
+            isLoadingEvents = { true },
+            visibleDayState = visibleDayState,
+            timelineState = rememberDayTimelineState(),
+        )
     }
 }

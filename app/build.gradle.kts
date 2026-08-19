@@ -138,6 +138,7 @@ sentry {
 
 dependencies {
     implementation(project(":CalendarComponents:Calendar"))
+    implementation(project(":CalendarComponents:Day"))
     implementation(project(":CalendarComponents:Planning"))
     implementation(project(":CalendarComponents:Foundation"))
 
