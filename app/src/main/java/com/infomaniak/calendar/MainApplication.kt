@@ -21,6 +21,7 @@ import android.app.Application
 import android.os.StrictMode
 import com.infomaniak.calendar.crossAppLogin.DeviceInfoUpdateWorker
 import com.infomaniak.calendar.di.AppGraph
+import com.infomaniak.calendar.di.metroAndroidExtensions.MetroApplication
 import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.core.common.AssociatedUserDataCleanable
 import com.infomaniak.core.crossapplogin.back.internal.deviceinfo.DeviceInfoUpdateManager
@@ -32,8 +33,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class MainApplication : Application() {
-    val appGraph by lazy { createGraphFactory<AppGraph.Factory>().create(applicationContext) }
+class MainApplication : Application(), MetroApplication {
+    override val appGraph by lazy { createGraphFactory<AppGraph.Factory>().create(applicationContext) }
     private val applicationScope = CoroutineScope(Dispatchers.Default + CoroutineName(this::class.java.simpleName))
 
     override fun onCreate() {

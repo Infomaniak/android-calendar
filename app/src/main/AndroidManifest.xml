@@ -43,6 +43,22 @@
             android:name="io.sentry.dsn"
             android:value="https://afcc80384a2911f1a5c6de3982f677f1@sentry-mobile.infomaniak.com/25" />
 
+        <!--
+          Disable WorkManager's default startup initializer so the on-demand initialization
+          uses MainApplication's Configuration.Provider (and therefore the MetroWorkerFactory),
+          which is required to instantiate assisted/DI-injected Workers such as DeviceInfoUpdateWorker.
+        -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -137,6 +137,7 @@ consumers: `implementation(project(":CalendarComponents:Planning"))` transitivel
 - `kmpCalendar.kotlinx.datetime` — `kotlinx-datetime` types (`LocalDate`, `TimeZone`, …) (Foundation + Planning).
 - `libs.compose.material3` — Material 3 Compose (from `libs` catalog).
 - `libs.paging.compose` — Paging 3 Compose (`LazyPagingItems`, `collectAsLazyPagingItems`) consumed by `Planning`.
+- `libs.infomaniak.designsystem.theme.calendar` — Infomaniak Design System.
 
 ### Ownership
 

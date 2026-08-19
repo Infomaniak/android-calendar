@@ -19,6 +19,10 @@
     <string name="addEventLabel">Legg til</string>
     <string name="allDayLabel">Hele dagen</string>
     <string name="contentDescriptionCreateEvent">Opprett en hendelse</string>
+    <plurals name="contentDescriptionEventCount">
+        <item quantity="one">%1$d hendelse</item>
+        <item quantity="other">%1$d hendelser</item>
+    </plurals>
     <string name="contentDescriptionHasAttendees">Har deltakere</string>
     <string name="contentDescriptionHasKMeetLink">Har en kMeet-lenke</string>
     <string name="contentDescriptionHasLocation">Har en beliggenhet</string>

@@ -78,7 +78,8 @@ private fun emptyStateFor(date: LocalDate, timeZone: TimeZone): EventUi {
 
 @OptIn(ExperimentalTime::class)
 private fun EventDaySlice.toEventUi(emailsByUserId: Map<AccountId, String>, timeZone: TimeZone): EventUi = EventUi.Normal(
-    id = "${event.id.url}@$date",
+    id = "${event.occurrenceId.value}@$date",
+    masterEventId = event.masterEventId.url,
     title = event.title,
     location = event.location,
     status = event.status.toEventStatus(),

@@ -19,6 +19,10 @@
     <string name="addEventLabel">Añadir</string>
     <string name="allDayLabel">Todo el día</string>
     <string name="contentDescriptionCreateEvent">Crear un evento</string>
+    <plurals name="contentDescriptionEventCount">
+        <item quantity="one">%1$d evento</item>
+        <item quantity="other">%1$d eventos</item>
+    </plurals>
     <string name="contentDescriptionHasAttendees">Cuenta con asistentes</string>
     <string name="contentDescriptionHasKMeetLink">Tiene un enlace de kMeet</string>
     <string name="contentDescriptionHasLocation">Tiene una ubicación</string>

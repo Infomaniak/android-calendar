@@ -18,17 +18,16 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Text
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,22 +37,23 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import kotlinx.coroutines.launch
 
 @Composable
 fun CalendarDrawer(
     content: @Composable () -> Unit,
-    onAddAccount: () -> Unit,
     modifier: Modifier = Modifier,
+    onManageAccounts: () -> Unit = {},
     drawerViewModel: DrawerViewModel = viewModel(),
 ) {
     val calendarDrawerState = LocalDrawerState.current ?: return
     val calendarsUsers by drawerViewModel.calendarsUsers.collectAsStateWithLifecycle()
+    val expandedAccountIds by drawerViewModel.expandedAccountIds.collectAsStateWithLifecycle(emptySet())
     val scope = rememberCoroutineScope()
 
     BackHandler(enabled = calendarDrawerState.isOpen) { scope.launch { calendarDrawerState.close() } }
@@ -62,8 +62,15 @@ fun CalendarDrawer(
         drawerState = calendarDrawerState,
         calendarsUsers = calendarsUsers,
         onCalendarVisibilityChanged = drawerViewModel::onCalendarVisibilityChanged,
-        onAddAccount = onAddAccount,
         content = content,
+        onAccountExpandedChange = drawerViewModel::onAccountExpandedChanged,
+        isSectionExpanded = { expandedAccountIds.contains(it) },
+        onManageAccounts = {
+            scope.launch {
+                calendarDrawerState.close()
+                onManageAccounts()
+            }
+        },
         modifier = modifier,
     )
 }
@@ -73,27 +80,36 @@ private fun CalendarDrawerContent(
     drawerState: DrawerState,
     calendarsUsers: List<UserCalendarsUi>,
     onCalendarVisibilityChanged: (CalendarId, Boolean) -> Unit,
-    onAddAccount: () -> Unit,
+    onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
+    isSectionExpanded: (Int) -> Boolean,
+    onManageAccounts: () -> Unit,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val menuOptions = drawerMenuOptions(
+        onManageAccounts = onManageAccounts,
+        onSettings = {}, // TODO: Add navigation to settings
+        onHelp = {}, // TODO: Add intent to help 
+    )
+
     ModalNavigationDrawer(
         drawerContent = {
-            ModalDrawerSheet {
-                Column(modifier = Modifier.fillMaxHeight()) {
-                    Box(modifier = Modifier.weight(1f)) {
-                        DrawerList(
-                            usersCalendars = calendarsUsers,
-                            onCalendarVisibilityChange = onCalendarVisibilityChanged,
-                        )
-                    }
-                    Button(
-                        onClick = onAddAccount,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = Margin.Medium, vertical = Margin.Micro),
-                    ) {
-                        Text(text = "Add an account")
+            ModalDrawerSheet(
+                drawerContainerColor = MaterialTheme.colorScheme.surface,
+                windowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
+            ) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxHeight(),
+                ) {
+                    drawerListItems(
+                        usersCalendars = calendarsUsers,
+                        onCalendarVisibilityChange = onCalendarVisibilityChanged,
+                        isSectionExpanded = isSectionExpanded,
+                        onAccountExpandedChange = onAccountExpandedChange,
+                    )
+                    item {
+                        MenuList(menuOptions = menuOptions)
                     }
                 }
             }
@@ -102,6 +118,30 @@ private fun CalendarDrawerContent(
         gesturesEnabled = drawerState.isOpen,
         modifier = modifier,
         content = content,
+    )
+}
+
+private fun drawerMenuOptions(
+    onManageAccounts: () -> Unit,
+    onSettings: () -> Unit,
+    onHelp: () -> Unit,
+): List<MenuOption> {
+    return listOf(
+        MenuOption(
+            itemNameRes = R.string.accountsTitle,
+            itemIcon = R.drawable.ic_circle_user,
+            itemAction = onManageAccounts,
+        ),
+        MenuOption(
+            itemNameRes = R.string.settingsTitle,
+            itemIcon = R.drawable.ic_cog,
+            itemAction = onSettings,
+        ),
+        MenuOption(
+            itemNameRes = R.string.helpTitle,
+            itemIcon = R.drawable.ic_headset,
+            itemAction = onHelp,
+        ),
     )
 }
 
@@ -115,8 +155,11 @@ private fun CalendarDrawerPreview(
             drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
             calendarsUsers = usersCalendars,
             onCalendarVisibilityChanged = { _, _ -> },
-            onAddAccount = {},
+            onAccountExpandedChange = { _, _ -> },
+            isSectionExpanded = { false },
+            onManageAccounts = {},
             content = {},
+            modifier = Modifier,
         )
     }
 }

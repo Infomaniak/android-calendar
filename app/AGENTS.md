@@ -16,7 +16,7 @@ Kotlin Multiplatform library.
 - **Build System**: Gradle with Kotlin DSL, version catalog (`gradle/libs.versions.toml`)
 - **UI Framework**: Jetpack Compose (Material 3), Navigation 3
 - **Architecture**: Single-Activity + Compose, with shared logic delegated to the KMP module
-- **Shared Logic**: Consumed from `multiplatform-calendar` composite build via `libs.infomaniak.multiplaform.calendar.core`
+- **Shared Logic**: Consumed from `multiplatform-calendar` composite build via `libs.infomaniak.multiplatform.calendar.core`
 - **Testing**: JUnit 4 (unit), Espresso + Compose UI Test (instrumented)
 
 ## Context Map
@@ -27,18 +27,24 @@ app/src/main/java/com/infomaniak/calendar/
 ├── MainActivity.kt                 # Single Activity, hosts Compose content
 ├── MatomoCalendar.kt               # Matomo tracker (implements Core's Matomo interface)
 ├── di/
-│   ├── AppGraph.kt                 # Metro @DependencyGraph (AppScope) — inherits CalendarCoreGraph + multibinding
-│   ├── MetroViewModelFactory.kt    # ViewModelProvider.Factory backed by multibinding map
-│   └── ViewModelKey.kt             # @MapKey annotation for ViewModel multibinding
+│   ├── AppGraph.kt                 # Metro @DependencyGraph (AppScope) — inherits CalendarCoreGraph, ViewModelGraph (metrox) + worker support
+│   └── metroAndroidExtensions/     # Portable Metro↔Android glue (no :app coupling)
+│       ├── MetroApplication.kt     # Application interface exposing appGraph + WorkManager Configuration.Provider
+│       ├── AndroidComponentProvider.kt # Aggregates the Android component providers (currently WorkerGraphProvider)
+│       ├── viewModel/
+│       │   └── CalendarViewModelFactory.kt # Concrete metrox MetroViewModelFactory binding (multibinding maps)
+│       └── worker/                 # MetroWorker key, MetroWorkerFactory, WorkerGraphProvider, WorkerInstanceFactory
 └── ui/
     ├── navigation/
-    │   └── MainNavHost.kt          # Top-level NavDisplay with entryProvider
+    │   ├── MainNavHost.kt          # Top-level NavDisplay with entryProvider
+    │   └── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, Accounts, Onboarding)
     ├── screen/
     │   ├── day/                   # DayScreen + DayViewModel
     │   ├── threeDays/             # ThreeDayScreen — placeholder 3-day view
     │   ├── week/                  # WeekScreen — placeholder week view
     │   ├── month/                 # MonthScreen + MonthViewModel
     │   ├── planning/              # PlanningScreen + PlanningViewModel + PlanningPagingSource (Paging 3) + PlanningEventGroupingExt
+    │   ├── accounts/              # Accounts screen + AccountItem (drawer-backed account list and add account action)
     │   ├── eventCreation/         # EventCreationScreen
     │   └── onboarding/            # OnboardingScreen + CrossAppLoginViewModel
     └── theme/
@@ -72,9 +78,10 @@ app/
 - **Navigation**: Uses Jetpack Navigation 3 (`NavDisplay` + `entryProvider`). Each screen defines its own `NavKey`
   data object and an `EntryProviderScope<NavKey>` extension (e.g., `home()`). Top-level wiring lives in `MainNavHost`.
 - **DI**: Metro `@DependencyGraph` (`AppGraph`) scoped to `AppScope`. ViewModels are auto-registered
-  via multibinding (`@ContributesIntoMap` + `@ViewModelKey`) and resolved through `MetroViewModelFactory`,
-  set as `defaultViewModelProviderFactory` in `MainActivity`. In Composables, use the standard
-  `viewModel<MyViewModel>()` from `androidx.lifecycle.viewmodel.compose`.
+  via multibinding (`@ContributesIntoMap` + `@ViewModelKey`) and resolved through the `metrox-viewmodel`
+  `MetroViewModelFactory` (exposed as `metroViewModelFactory` by the `ViewModelGraph` the graph implements,
+  bound concretely by `CalendarViewModelFactory`), set as `defaultViewModelProviderFactory` in `MainActivity`.
+  In Composables, use the standard `viewModel<MyViewModel>()` from `androidx.lifecycle.viewmodel.compose`.
 - **Edge-to-edge**: Call `enableEdgeToEdge()` in `onCreate` before `setContent` (already wired in `MainActivity`).
 - **Shared logic**: Prefer reusing models / logic from `com.infomaniak.multiplatform_calendar.*` instead of duplicating
   Android-only equivalents.
@@ -146,7 +153,8 @@ app/
 - Packages: single word if possible  (`com.infomaniak.calendar.ui.theme`) or camelCase if not possible in one word.
 - Enum entries: PascalCase for new enums (`Home`, `Favorites`). Existing entries that are persisted (e.g., to
   `SharedPreferences`) must not be renamed.
-- Resource IDs: snake_case (`ic_home`, `ic_account_box`).
+- Resource IDs (drawables, mipmaps, layouts, etc.): snake_case (`ic_home`, `ic_account_box`).
+- String resource names: keep the existing camelCase pattern (`dayTitle`, `planningTitle`).
 
 **Control Flow:**
 
@@ -254,19 +262,19 @@ Every new ViewModel needs three annotations — no changes to `AppGraph` require
 ```kotlin
 @Inject
 @ContributesIntoMap(AppScope::class)
-@ViewModelKey(MyViewModel::class)
+@ViewModelKey
 class MyViewModel(...) : ViewModel()
 ```
 
-In Composables, use the standard `viewModel<MyViewModel>()`.
-`MetroViewModelFactory` (set as `defaultViewModelProviderFactory` in `MainActivity`) resolves the VM
-from the multibinding map automatically.
+`@ViewModelKey` comes from `dev.zacsweers.metrox.viewmodel` and needs no class argument (implicit class
+key). In Composables, use the standard `viewModel<MyViewModel>()`. The metrox `MetroViewModelFactory`
+(exposed as `metroViewModelFactory` and set as `defaultViewModelProviderFactory` in `MainActivity`)
+resolves the VM from the multibinding map automatically.
 
 **ViewModel that needs a `SavedStateHandle` (assisted injection):**
 
 `SavedStateHandle` isn't a graph binding — it comes from the `CreationExtras` handed in at ViewModel
-creation time. Use assisted injection with a `ViewModelAssistedFactory` (our local copy of the
-`metrox-viewmodel` API, since that artifact requires a higher `minSdk` than we support):
+creation time. Use assisted injection with the metrox `ViewModelAssistedFactory`:
 
 ```kotlin
 @AssistedInject
@@ -286,14 +294,37 @@ class MyViewModel(
 }
 ```
 
+`ViewModelAssistedFactory` / `ViewModelAssistedFactoryKey` come from `dev.zacsweers.metrox.viewmodel`.
 The `@AssistedFactory` (not the ViewModel class) carries `@ContributesIntoMap` +
-`@ViewModelAssistedFactoryKey`, and is resolved from the `viewModelAssistedFactories` map by
+`@ViewModelAssistedFactoryKey`, and is resolved from the assisted-factory multibinding map by the metrox
 `MetroViewModelFactory`. Composable usage is unchanged: `viewModel<MyViewModel>()`.
 
-> **Future simplification**: When upgrading to Metro 0.12.0+ (requires Kotlin 2.3.20+),
-> `@ViewModelKey` will support `implicitClassKey` (no need to repeat the class name), and the
-> `metrox-viewmodel` artifact will replace our hand-written `MetroViewModelFactory`, `ViewModelKey`,
-> and `@Multibinds` declarations.
+**WorkManager (Metro-injected) Worker pattern:**
+
+WorkManager uses on-demand initialization: the default `WorkManagerInitializer` is removed in
+`AndroidManifest.xml` and `MainApplication` (via `MetroApplication`) implements `Configuration.Provider`,
+supplying `appGraph.workerFactory` (the `MetroWorkerFactory`). A `ListenableWorker` is DI-built by
+declaring an assisted `@AssistedInject` constructor plus a nested factory bound into the worker
+multibinding map:
+
+```kotlin
+@AssistedInject
+class MyWorker(
+    appContext: Context,
+    @Assisted params: WorkerParameters,
+    private val someDependency: SomeDependency,
+) : AbstractWorker(appContext, params) {
+
+    @MetroWorker(MyWorker::class)
+    @ContributesIntoMap(scope = AppScope::class, binding = binding<WorkerInstanceFactory<*>>())
+    @AssistedFactory
+    abstract class Factory : WorkerInstanceFactory<MyWorker>
+}
+```
+
+`MetroWorker`, `WorkerInstanceFactory`, `MetroWorkerFactory` and `WorkerGraphProvider` live in
+`di/metroAndroidExtensions/worker/`; `AppGraph` gets the worker support by implementing
+`AndroidComponentProvider`.
 
 **Kotlin Control Flow:**
 

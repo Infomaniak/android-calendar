@@ -17,12 +17,10 @@
  */
 package com.infomaniak.calendar.crossAppLogin
 
-import com.infomaniak.calendar.MainApplication
+import com.infomaniak.calendar.extensions.appGraph
 import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginService
-import dev.zacsweers.metro.Inject
 
-@Inject
 class CrossAppLoginService : BaseCrossAppLoginService() {
-    private val appGraph by lazy { (application as MainApplication).appGraph }
+
     override val selectedUserIdFlow by lazy { appGraph.accountUtils.currentUserIdFlow }
 }

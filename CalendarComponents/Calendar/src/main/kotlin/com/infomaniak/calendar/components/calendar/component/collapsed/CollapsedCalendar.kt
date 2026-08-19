@@ -30,7 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.calendar.modifier.FollowExternalSelection
+import com.infomaniak.calendar.components.calendar.modifier.SyncHeaderOffset
+import com.infomaniak.calendar.components.calendar.modifier.pagedSwipe
+import com.infomaniak.calendar.components.calendar.component.collapsed.rememberWeekPager
 import com.infomaniak.calendar.components.foundation.component.DateState
+import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.calendar.components.foundation.utils.startOfWeek
@@ -38,20 +43,27 @@ import com.infomaniak.core.common.utils.today
 import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.WeekDay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.YearMonth
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toKotlinDayOfWeek
+import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
+
+/** Margins held on each side at startup, so the first swipes never have to grow the range. */
+private const val INITIAL_MARGINS = 2
 
 @Composable
 internal fun CollapsedCalendar(
-    monthRange: Int,
+    monthMargin: Int,
     selectedDate: () -> LocalDate,
     weekNumbering: WeekNumbering,
     onDayClick: (LocalDate) -> Unit,
+    eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     modifier: Modifier = Modifier,
     headerState: CalendarHeaderState = rememberCalendarHeaderState(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -63,34 +75,30 @@ internal fun CollapsedCalendar(
     val initialWeekStart = remember { selectedDate().startOfWeek(firstDayOfWeek) }
 
     val weekState = rememberWeekCalendarState(
-        startDate = remember { initialWeekStart.minus(monthRange, DateTimeUnit.MONTH) },
-        endDate = remember { initialWeekStart.plus(monthRange, DateTimeUnit.MONTH) },
+        startDate = remember { initialWeekStart.minus(INITIAL_MARGINS * monthMargin, DateTimeUnit.MONTH) },
+        endDate = remember { initialWeekStart.plus(INITIAL_MARGINS * monthMargin, DateTimeUnit.MONTH) },
         firstVisibleWeekDate = initialWeekStart,
         firstDayOfWeek = firstDayOfWeek,
     )
+    val pager = rememberWeekPager(state = weekState, firstDayOfWeek = firstDayOfWeek, monthMargin = monthMargin)
 
-    val visibleWeekDates by remember {
+    val sharedElementDates by remember {
         derivedStateOf { weekState.firstVisibleWeek.days.mapTo(mutableSetOf()) { it.date } }
     }
 
-    LaunchedEffect(weekState) {
-        snapshotFlow { selectedDate().startOfWeek(firstDayOfWeek) }.collectLatest { weekStart ->
-            val visibleWeekDate = weekState.firstVisibleWeek.days.first().date
-            // Updating the range shifts the index-to-week mapping but not the scroll index.
-            weekState.startDate = weekStart.minus(monthRange, DateTimeUnit.MONTH)
-            weekState.endDate = weekStart.plus(monthRange, DateTimeUnit.MONTH)
-            // Snap back to the week the user was on, then animate from there.
-            weekState.scrollToWeek(visibleWeekDate)
-            weekState.animateScrollToWeek(weekStart)
-        }
-    }
+    FollowExternalSelection(pager = pager, selectedDate = selectedDate)
 
-    LaunchedEffect(weekState, headerState) {
-        headerState.setCollapsedOffsetSource { weekState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset?.toFloat() ?: 0f }
-    }
+    SyncHeaderOffset(
+        scrollableState = weekState,
+        headerState = headerState,
+        layoutInfo = { weekState.layoutInfo },
+        setOffsetSource = { headerState.setCollapsedOffsetSource(it) },
+    )
 
     WeekCalendar(
         state = weekState,
+        calendarScrollPaged = true,
+        userScrollEnabled = false,
         weekHeader = {
             DaysOfWeekTitle(
                 firstDayOfWeek = firstDayOfWeek,
@@ -107,10 +115,11 @@ internal fun CollapsedCalendar(
                 onDayClick = onDayClick,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
-                isSharedElementEnabled = day.date in visibleWeekDates,
+                isSharedElementEnabled = day.date in sharedElementDates,
+                dotsFor = { eventsDots()[day.date].orEmpty() },
             )
         },
-        modifier = modifier,
+        modifier = modifier.pagedSwipe(pager = pager, onPageSwiped = onDayClick),
     )
 }
 
@@ -123,8 +132,9 @@ private fun DayContent(
     sharedTransitionScope: SharedTransitionScope?,
     animatedVisibilityScope: AnimatedVisibilityScope?,
     isSharedElementEnabled: Boolean,
+    dotsFor: () -> List<EventColorsUi>,
 ) {
-    val dateState by remember {
+    val dateState by remember(day) {
         derivedStateOf {
             when (day.date) {
                 selectedDate() -> DateState.Selected
@@ -138,6 +148,7 @@ private fun DayContent(
         dateState = dateState,
         onClick = { onDayClick(day.date) },
         date = day.date,
+        dotsFor = dotsFor,
         modifier = Modifier.daySharedElement(
             sharedTransitionScope = sharedTransitionScope,
             animatedVisibilityScope = animatedVisibilityScope,
@@ -152,10 +163,11 @@ private fun DayContent(
 private fun CollapsedCalendarPreview() {
     Surface {
         CollapsedCalendar(
-            monthRange = 3,
+            monthMargin = 12,
             selectedDate = { Clock.today() },
             onDayClick = {},
             weekNumbering = WeekNumbering.ISO_8601,
+            eventsDots = { emptyMap() },
         )
     }
 }

@@ -20,6 +20,7 @@ package com.infomaniak.calendar.components.calendar.component
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -32,15 +33,17 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.calendar.component.expanded.ExpandedCalendar
+import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toKotlinDayOfWeek
+import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
-//TODO: reduce to 1 once https://github.com/Infomaniak/android-calendar/pull/119 (auto-select the initial month) lands.
-private const val RANGE_MONTHS = 100
+private const val MONTH_MARGIN = 1
 
 @Composable
 fun ExpandableCalendar(
@@ -48,10 +51,13 @@ fun ExpandableCalendar(
     selectedDate: () -> LocalDate,
     onDayClick: (LocalDate) -> Unit,
     weekNumbering: WeekNumbering,
+    eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     modifier: Modifier = Modifier,
 ) {
     val firstDayOfWeek = remember(weekNumbering) { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
+
     val headerState = rememberCalendarHeaderState()
+
     var headerWidth by remember { mutableIntStateOf(0) }
 
     Box(modifier = modifier) {
@@ -61,24 +67,32 @@ fun ExpandableCalendar(
                 label = "calendarExpansion",
             ) { expanded ->
                 if (expanded) {
-                    ExpandedCalendar(
-                        selectedDate = selectedDate,
-                        onDayClick = onDayClick,
-                        weekNumbering = weekNumbering,
-                        monthRange = RANGE_MONTHS,
-                        headerState = headerState,
-                        sharedTransitionScope = this@SharedTransitionLayout,
-                        animatedVisibilityScope = this,
-                    )
+                    Column {
+                        ExpandedCalendar(
+                            selectedDate = selectedDate,
+                            onDayClick = onDayClick,
+                            weekNumbering = weekNumbering,
+                            monthMargin = MONTH_MARGIN,
+                            headerState = headerState,
+                            sharedTransitionScope = this@SharedTransitionLayout,
+                            animatedVisibilityScope = this@AnimatedContent,
+                            eventsDots = eventsDots,
+                        )
+                        HorizontalMonthSelector(
+                            selectedMonth = { selectedDate().yearMonth },
+                            onMonthSelected = { date -> onDayClick(date.firstDay) },
+                        )
+                    }
                 } else {
                     CollapsedCalendar(
                         selectedDate = selectedDate,
                         onDayClick = onDayClick,
                         weekNumbering = weekNumbering,
-                        monthRange = RANGE_MONTHS,
+                        monthMargin = MONTH_MARGIN,
                         headerState = headerState,
                         sharedTransitionScope = this@SharedTransitionLayout,
-                        animatedVisibilityScope = this,
+                        animatedVisibilityScope = this@AnimatedContent,
+                        eventsDots = eventsDots,
                     )
                 }
             }
@@ -108,6 +122,8 @@ private fun DayOfWeekOverlayHeader(
             .clipToBounds()
             .onSizeChanged { updateHeaderWidth(it.width) },
     ) {
+        // The offset is read inside `graphicsLayer`, so it is sampled at draw time: the row follows
+        // the columns frame for frame, and a scroll never triggers recomposition here.
         DaysOfWeekTitle(
             firstDayOfWeek = firstDayOfWeek,
             modifier = Modifier.graphicsLayer { translationX = headerState.offset(isExpanded()) },
@@ -124,10 +140,11 @@ private fun DayOfWeekOverlayHeader(
 private fun ExpandableCalendarCollapsedPreview() {
     Surface {
         ExpandableCalendar(
+            isExpanded = { false },
             selectedDate = { Clock.today() },
             onDayClick = {},
-            isExpanded = { false },
             weekNumbering = WeekNumbering.ISO_8601,
+            eventsDots = { emptyMap() },
         )
     }
 }
@@ -137,10 +154,11 @@ private fun ExpandableCalendarCollapsedPreview() {
 private fun ExpandableCalendarExpandedPreview() {
     Surface {
         ExpandableCalendar(
+            isExpanded = { true },
             selectedDate = { Clock.today() },
             onDayClick = {},
-            isExpanded = { true },
             weekNumbering = WeekNumbering.ISO_8601,
+            eventsDots = { emptyMap() },
         )
     }
 }

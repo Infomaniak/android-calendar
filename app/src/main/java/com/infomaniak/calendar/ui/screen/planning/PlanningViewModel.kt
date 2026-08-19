@@ -23,25 +23,36 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.planning.PlanningRow
-import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.common.utils.today
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.VisibleCalendarColor
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
+import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.YearMonth
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
 @Inject
@@ -61,6 +72,7 @@ class PlanningViewModel(
 
     /** The day the planning is (re)centered on. Changing it rebuilds the pager around that day. */
     private val initialDay = MutableStateFlow(today)
+    private val visibleMonth = MutableStateFlow(today.yearMonth)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val planningRows: Flow<PagingData<PlanningRow>> = initialDay
@@ -96,7 +108,29 @@ class PlanningViewModel(
     fun jumpTo(date: LocalDate): Boolean {
         val changed = initialDay.value != date
         initialDay.value = date
+        onVisibleMonthChanged(date.yearMonth)
         return changed
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val eventDots: StateFlow<Map<LocalDate, List<EventColorsUi>>> = visibleMonth
+        .flatMapLatest { month ->
+            calendarManager.observeMonthlyCalendarColors(
+                startMonth = month.minus(1, DateTimeUnit.MONTH),
+                endMonth = month.plus(1, DateTimeUnit.MONTH),
+                timeZone = timeZone,
+            )
+        }
+        .map { it.toEventDots() }
+        .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
+
+    fun onVisibleMonthChanged(month: YearMonth) {
+        visibleMonth.value = month
+    }
+
+
+    private fun Map<LocalDate, List<VisibleCalendarColor>>.toEventDots(): Map<LocalDate, List<EventColorsUi>> {
+        return mapValues { (_, colors) -> colors.map { EventColors.from(it.colors).toEventColorsUi() } }
     }
 
     companion object {

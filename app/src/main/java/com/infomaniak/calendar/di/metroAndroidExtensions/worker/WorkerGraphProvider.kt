@@ -15,19 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.foundation.theme
+package com.infomaniak.calendar.di.metroAndroidExtensions.worker
 
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.runtime.Composable
-import com.infomaniak.calendar.components.foundation.utils.EsdsTheme
+import android.content.Context
+import androidx.work.ListenableWorker
+import androidx.work.WorkManager
+import dev.zacsweers.metro.Multibinds
+import dev.zacsweers.metro.Provides
+import kotlin.reflect.KClass
 
-object DefaultCalendarButton {
-    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-    @Composable
-    fun shapes() = ButtonDefaults.shapes().let { shapes ->
-        val shape = RoundedCornerShape(EsdsTheme.radius.xl)
-        shapes.copy(shape = shape, pressedShape = shape)
+interface WorkerGraphProvider {
+
+    val workManager: WorkManager
+
+    @Provides
+    fun providesWorkManager(application: Context): WorkManager {
+        return WorkManager.getInstance(application)
     }
+
+    @Multibinds(allowEmpty = true)
+    val workerProviders: Map<KClass<out ListenableWorker>, WorkerInstanceFactory<*>>
+
+    val workerFactory: MetroWorkerFactory
 }

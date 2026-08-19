@@ -19,13 +19,13 @@ package com.infomaniak.calendar.ui.screen.onboarding
 
 import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.BuildConfig
-import com.infomaniak.calendar.di.ViewModelKey
 import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginViewModel
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.binding
+import dev.zacsweers.metrox.viewmodel.ViewModelKey
 
 /**
  * Cross-app login ViewModel used by the onboarding screen to detect Infomaniak accounts that are
@@ -36,7 +36,7 @@ import dev.zacsweers.metro.binding
     AppScope::class,
     binding = binding<ViewModel>(), // binding is required when extending any parent class different from exactly "ViewModel"
 )
-@ViewModelKey(CrossAppLoginViewModel::class)
+@ViewModelKey
 class CrossAppLoginViewModel : BaseCrossAppLoginViewModel(
     applicationId = ConfigUtils.safePackage,
     clientId = BuildConfig.CLIENT_ID,

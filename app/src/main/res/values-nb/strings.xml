@@ -16,13 +16,18 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <string name="accountsTitle">Kontoer</string>
+    <string name="addAccount">Legg til en konto</string>
+    <string name="contentDescriptionBack">Tilbake</string>
     <string name="contentDescriptionInbox">Åpne innboksen</string>
     <string name="contentDescriptionMenuDrawer">Åpne meny</string>
     <string name="contentDescriptionSearch">Søk</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Gjeldende visning: %1$s. Trykk for å endre visning.</string>
     <string name="dayTitle">Dag</string>
+    <string name="helpTitle">Hjelp</string>
     <string name="monthTitle">Måned</string>
     <string name="planningTitle">Planlegging</string>
+    <string name="settingsTitle">Innstillinger</string>
     <string name="syncEventsError">Feil ved henting av hendelser</string>
     <string name="threeDaysTitle">Tre dager</string>
     <string name="weekTitle">Uke</string>

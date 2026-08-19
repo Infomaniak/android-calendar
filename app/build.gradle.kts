@@ -179,6 +179,7 @@ dependencies {
     implementation(core.material)
     implementation(core.okhttp)
     implementation(libs.compose.material3)
+    implementation(libs.metrox.viewmodel.compose)
 
     testImplementation(core.junit)
     androidTestImplementation(platform(core.compose.bom))

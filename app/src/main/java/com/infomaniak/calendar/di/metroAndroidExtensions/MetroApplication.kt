@@ -15,19 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.foundation.utils
+package com.infomaniak.calendar.di.metroAndroidExtensions
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import androidx.work.Configuration
+import com.infomaniak.calendar.di.AppGraph
 
-data class RadiusToken(val xl: Dp = 12.dp)
+interface MetroApplication : Configuration.Provider {
+    val appGraph: AppGraph
 
-object EsdsTheme {
-    private val radiusToken = RadiusToken()
-
-    @get:Composable
-    @get:ReadOnlyComposable
-    val radius get() = radiusToken
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder().setWorkerFactory(appGraph.workerFactory).build()
 }

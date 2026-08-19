@@ -17,15 +17,21 @@
  */
 package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
-import kotlinx.datetime.LocalDate
+import com.infomaniak.core.common.utils.today
+import kotlinx.datetime.YearMonth
 import kotlinx.datetime.number
 import java.time.format.TextStyle
 import java.util.Locale
+import kotlin.time.Clock
 
-fun LocalDate.monthYearLabel(locale: Locale, currentYear: Int): String {
+fun YearMonth.monthYearLabel(locale: Locale, currentYear: Int = Clock.today().year): String {
     val month = java.time.Month.of(month.number)
         .getDisplayName(TextStyle.FULL_STANDALONE, locale)
         .replaceFirstChar { if (it.isLowerCase()) it.titlecase(locale) else it.toString() }
 
     return if (year == currentYear) month else "$month $year"
+}
+
+fun YearMonth.monthDisplayName(locale: Locale): String {
+    return java.time.Month.of(month.number).getDisplayName(TextStyle.SHORT, locale)
 }

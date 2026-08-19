@@ -71,6 +71,7 @@ private fun DayScreen(isLoadingEvents: () -> Boolean, visibleDayState: VisibleDa
                         selectedDate = { visibleDayState.visibleDate },
                         onDayClick = { visibleDayState.jumpTo(it) },
                         weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
+                        eventsDots = { emptyMap() },
                     )
                 },
             )

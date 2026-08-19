@@ -15,20 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.foundation.theme
+package com.infomaniak.calendar.di.metroAndroidExtensions.worker
 
-import androidx.compose.material3.ButtonShapes
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.work.ListenableWorker
+import androidx.work.WorkerParameters
 
-val LocalCalendarComponentsTokens = staticCompositionLocalOf { CalendarComponentsTokens() }
-
-@Immutable
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-class CalendarComponentsTokens(val button: CalendarButtonTokens = CalendarButtonTokens())
-
-@Immutable
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-class CalendarButtonTokens(val shapes: (@Composable () -> ButtonShapes) = { DefaultCalendarButton.shapes() })
+fun interface WorkerInstanceFactory<T : ListenableWorker> {
+    fun create(params: WorkerParameters): T
+}

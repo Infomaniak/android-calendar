@@ -49,6 +49,7 @@ import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
+import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.planning.Planning
 import com.infomaniak.calendar.components.planning.PlanningRow
@@ -64,18 +65,23 @@ import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.YearMonth
+import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
 @Composable
 fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier, viewModel: PlanningViewModel = viewModel()) {
     val planningRows = viewModel.planningRows.collectAsLazyPagingItems()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
+    val eventsDots by viewModel.eventDots.collectAsStateWithLifecycle(initialValue = emptyMap())
 
     PlanningScreen(
         goToEventCreation = goToEventCreation,
         planningRows = planningRows,
         onJumpTo = viewModel::jumpTo,
         isLoadingEvents = { isLoadingEvents },
+        eventsDots = { eventsDots },
+        onVisibleMonthChanged = viewModel::onVisibleMonthChanged,
         modifier = modifier,
     )
 }
@@ -86,6 +92,8 @@ private fun PlanningScreen(
     planningRows: LazyPagingItems<PlanningRow>,
     onJumpTo: (LocalDate) -> Boolean,
     isLoadingEvents: () -> Boolean,
+    eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
+    onVisibleMonthChanged: (YearMonth) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val hazeState = rememberHazeState()
@@ -111,6 +119,7 @@ private fun PlanningScreen(
                 SuccessPlanning(
                     planningRows = planningRows,
                     onJumpTo = onJumpTo,
+                    onVisibleMonthChanged = onVisibleMonthChanged,
                     contentPadding = contentPadding + PaddingValues(Margin.Medium),
                     goToEventCreation = goToEventCreation,
                     modifier = Modifier.hazeSource(hazeState),
@@ -128,8 +137,12 @@ private fun PlanningScreen(
                         ExpandableCalendar(
                             isExpanded = { isCalendarExpanded },
                             selectedDate = { visibleDayState.visibleDate },
-                            onDayClick = { visibleDayState.jumpTo(it) },
+                            onDayClick = {
+                                onVisibleMonthChanged(it.yearMonth)
+                                visibleDayState.jumpTo(it)
+                            },
                             weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
+                            eventsDots = eventsDots,
                         )
                     }
                 },
@@ -147,6 +160,7 @@ private fun PlanningScreen(
 private fun SuccessPlanning(
     planningRows: LazyPagingItems<PlanningRow>,
     onJumpTo: (LocalDate) -> Boolean,
+    onVisibleMonthChanged: (YearMonth) -> Unit,
     contentPadding: PaddingValues,
     goToEventCreation: () -> Unit,
     modifier: Modifier = Modifier,
@@ -155,7 +169,13 @@ private fun SuccessPlanning(
     val lazyListState = rememberLazyListState()
 
     AlignPlanningToDate(lazyListState, planningRows, visibleDayState, onJumpTo)
-    ReportVisibleDate(lazyListState, onVisibleDateChanged = { visibleDayState.onVisibleDateChanged(it) })
+    ReportVisibleDate(
+        lazyListState = lazyListState,
+        onVisibleDateChanged = {
+            onVisibleMonthChanged(it.yearMonth)
+            visibleDayState.onVisibleDateChanged(it)
+        },
+    )
 
     Planning(
         lazyListState = lazyListState,
@@ -188,6 +208,8 @@ private fun Preview(@PreviewParameter(PlanningRowPreviewParameter::class) rows: 
                 onJumpTo = { false },
                 goToEventCreation = {},
                 isLoadingEvents = { false },
+                eventsDots = { emptyMap() },
+                onVisibleMonthChanged = {},
             )
         }
     }

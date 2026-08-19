@@ -41,16 +41,26 @@ dependencyResolutionManagement {
     @Suppress("UnstableApiUsage")
     repositories {
         google()
-        mavenCentral()
+        mavenCentral {
+            content { excludeGroup("com.infomaniak.designsystem") }
+            content { excludeGroup("com.infomaniak.multiplatform_calendar") }
+        }
         // Do not put this in production
         // mavenLocal {
         //     content { includeGroup("com.infomaniak.multiplatform_calendar") }
         //     content { includeGroup("com.infomaniak.designsystem") }
         // }
         maven {
-            url = uri("https://central.sonatype.com/repository/maven-snapshots/")
-            content { includeGroup("com.infomaniak.multiplatform_calendar") }
+            name = "infomaniakReposiliteRepositorySnapshots"
+            url = uri("https://maven.infomaniak.app/snapshots")
             content { includeGroup("com.infomaniak.designsystem") }
+            content { includeGroup("com.infomaniak.multiplatform_calendar") }
+        }
+        maven {
+            name = "infomaniakReposiliteRepository"
+            url = uri("https://maven.infomaniak.app/releases")
+            content { includeGroup("com.infomaniak.designsystem") }
+            content { includeGroup("com.infomaniak.multiplatform_calendar") }
         }
         maven {
             url = uri("https://jitpack.io")
