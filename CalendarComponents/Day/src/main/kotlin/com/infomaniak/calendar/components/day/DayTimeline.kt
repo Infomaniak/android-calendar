@@ -38,7 +38,7 @@ fun DayTimeline(state: DayTimelineState, modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .verticalScroll(state.scrollState)
-            .padding(top = HourLabelOverhang),
+            .padding(top = HourLabelOverhang, bottom = DayTimelineDefaults.BottomPadding),
     ) {
         HourGrid(state = state, modifier = Modifier.fillMaxWidth())
     }

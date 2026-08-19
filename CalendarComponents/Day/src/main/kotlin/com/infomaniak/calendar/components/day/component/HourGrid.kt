@@ -99,7 +99,6 @@ private fun DrawScope.drawHourLines(state: DayTimelineState, color: Color) {
     }
 }
 
-/** Places each label so that its middle sits exactly on the hour line it names. */
 @Composable
 private fun HourLabels(state: DayTimelineState, modifier: Modifier = Modifier) {
     Layout(
