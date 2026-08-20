@@ -64,7 +64,9 @@ fun DayPager(
     }
 
     LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.settledPage }.collect { onVisibleDateChanged(dateRange.dateOf(it)) }
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            onVisibleDateChanged(dateRange.dateOf(page))
+        }
     }
 
     HorizontalPager(state = pagerState, modifier = modifier) { page ->
