@@ -89,6 +89,43 @@ app/
   Android-only equivalents.
 - **KISS / SOLID**: Keep Composables focused; extract reusable pieces into small `@Composable` functions.
 
+### CalDAV client configuration
+
+`MainApplication.initCaldavClient()` installs `CaldavClientConfig` into the Rust CalDAV client at startup
+(`configureCaldavClient()`, from `:CalendarKmpDav`). Today it only sets the `User-Agent`; timeouts and pool
+settings stay at the library defaults until a measurement justifies otherwise.
+
+**Debugging CalDAV traffic**: those requests are issued by Rust, not OkHttp, so they ignore the system proxy
+and `network_security_config.xml`. To route them through Proxyman/Charles/mitmproxy, export the proxy's root CA
+in PEM form to `app/src/debug/assets/certificates/` — any file name works, as long as it ends with `.pem`. That
+directory's content is **git-ignored**: these tools generate one certificate per machine, so they are
+per-developer files, not shared assets — never commit them.
+
+The presence of at least one certificate is what **opts in**: without it HTTPS would fail anyway, since the
+bridge's TLS store ignores user-installed certificates. The proxy address defaults to the host machine as seen
+from an emulator; for a physical device, override it in `local.properties` (git-ignored):
+
+```properties
+caldavDebugProxyUrl=http://<machine LAN address>:9090
+```
+
+See `CaldavDebugConfig`.
+
+Everything about it is **debug-only, by construction** rather than by a runtime `if`:
+
+| Piece | Where |
+|---|---|
+| `CaldavDebugConfig` implementation | `src/debug/java/…` — `src/release/java/…` holds a stub returning `null` |
+| `CALDAV_DEBUG_PROXY_URL` | declared on the `debug` build type only, so it doesn't exist in release |
+| The root CA assets | live in the `debug` source set only, so they are absent from release APKs |
+| Rust interception code | `debug-interception` Cargo feature, enabled only by the Android debug variant |
+
+The Cargo side needs the dedicated `debug-proxy` profile because `cfg(debug_assertions)` cannot be used here —
+the Rust `.so` is compiled with the `release` profile even in debug builds, for APK size.
+
+When touching `CaldavDebugConfig`, keep the debug and release declarations in sync: they are two separate
+files and only the variant being compiled is checked.
+
 ### Commands
 
 ```bash
