@@ -19,9 +19,11 @@ package com.infomaniak.calendar.components.day.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -33,6 +35,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -40,6 +43,7 @@ import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.state.DayTimelineState
+import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.HourFormatter.formatHourLabel
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import java.time.LocalTime
@@ -127,4 +131,12 @@ private fun HourLabel(hour: Int, modifier: Modifier = Modifier) {
         maxLines = 1,
         modifier = modifier.padding(end = EsdsTheme.spacing.lg),
     )
+}
+
+@Preview
+@Composable
+private fun HourGridPreview() {
+    Surface {
+        HourGrid(state = rememberDayTimelineState(), modifier = Modifier.fillMaxWidth())
+    }
 }
