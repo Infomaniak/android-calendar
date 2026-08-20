@@ -31,7 +31,6 @@ import com.infomaniak.calendar.components.day.component.HourLabelOverhang
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 
-/** The hour grid of a single day, scrolling vertically over the whole 24 hours. */
 @Composable
 fun DayTimeline(state: DayTimelineState, modifier: Modifier = Modifier) {
     Box(

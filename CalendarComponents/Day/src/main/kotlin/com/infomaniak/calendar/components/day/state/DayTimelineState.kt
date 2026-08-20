@@ -38,11 +38,8 @@ import kotlinx.coroutines.flow.first
  * had already scrolled to.
  */
 @Composable
-fun rememberDayTimelineState(
-    hourHeight: Dp = DayTimelineDefaults.HourHeight,
-    scrollState: ScrollState = rememberScrollState(),
-): DayTimelineState {
-    val state = remember(scrollState) { DayTimelineState(hourHeight, scrollState) }
+fun rememberDayTimelineState(scrollState: ScrollState = rememberScrollState()): DayTimelineState {
+    val state = remember(scrollState) { DayTimelineState(DayTimelineDefaults.HourHeight, scrollState) }
     val currentDateTime by rememberCurrentDateTime()
     val density = LocalDensity.current
 
