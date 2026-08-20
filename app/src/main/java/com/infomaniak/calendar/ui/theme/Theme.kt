@@ -76,7 +76,9 @@ fun CalendarTheme(
 
     CompositionLocalProvider(
         EsdsTheme.LocalEsdsTheme provides esdsColorScheme,
-        LocalEventColorsUiFactory provides EventColorsUiFactory { EventColors.from(CalendarColors.from(it)).toEventColorsUi() },
+        LocalEventColorsUiFactory provides EventColorsUiFactory {
+            EventColors.from(it, CalendarColors.from(it).sourceColor).toEventColorsUi()
+        },
         LocalIsThemeDarkMode provides isDarkTheme,
         LocalAvatarColors provides AvatarColors(avatarColors.colorList, customColors.avatarInitialsColor),
     ) {
