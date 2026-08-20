@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,8 +37,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
+import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.event.component.cardStripes
 import com.infomaniak.calendar.components.event.toEventItemStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
@@ -105,7 +108,7 @@ private fun AllDayEventChip(event: EventUi.Normal, onClick: () -> Unit, modifier
                 .cardStripes(status)
                 .fillMaxHeight(),
         ) {
-            if (border == null) EventAccentBar(status.eventColors.onDatavizContainerVariant)
+            if (border == null) EventAccentBar(status.eventColors.sourceColor)
 
             Text(
                 text = event.title,
@@ -126,5 +129,14 @@ private fun AllDayEventChip(event: EventUi.Normal, onClick: () -> Unit, modifier
                 modifier = Modifier.padding(end = EsdsTheme.spacing.md),
             )
         }
+    }
+}
+
+/** Four chips: enough to see them fill the rows two at a time on a phone's width. */
+@Preview
+@Composable
+private fun AllDayEventsBandPreview() {
+    Surface {
+        AllDayEventsBand(events = previewDayEvents.allDay, onEventClick = {})
     }
 }
