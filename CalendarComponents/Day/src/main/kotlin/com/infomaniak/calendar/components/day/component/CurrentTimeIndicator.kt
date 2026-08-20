@@ -18,13 +18,18 @@
 package com.infomaniak.calendar.components.day.component
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.components.day.state.DayTimelineState
+import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
 
@@ -52,5 +57,25 @@ internal fun CurrentTimeIndicator(minuteOfDay: Int, state: DayTimelineState, mod
         )
 
         drawCircle(color = color, radius = DotRadius.toPx(), center = Offset(lineStartX, y))
+    }
+}
+
+@Preview(heightDp = 240)
+@Composable
+private fun CurrentTimeIndicatorPreview() {
+    val state = rememberDayTimelineState()
+    CurrentTimeIndicator(minuteOfDay = 90, state = state, modifier = Modifier.fillMaxWidth())
+}
+
+@Preview(heightDp = 240)
+@Composable
+private fun CurrentTimeIndicatorWithBackgroundPreview() {
+    Surface {
+        val state = rememberDayTimelineState()
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            HourGrid(state = state, modifier = Modifier.fillMaxWidth())
+            CurrentTimeIndicator(minuteOfDay = 90, state = state, modifier = Modifier.matchParentSize())
+        }
     }
 }
