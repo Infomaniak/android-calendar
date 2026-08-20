@@ -18,12 +18,17 @@
 package com.infomaniak.calendar.components.day.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 private val AccentBarWidth = 2.dp
@@ -36,4 +41,15 @@ internal fun EventAccentBar(color: Color, modifier: Modifier = Modifier) {
             .fillMaxHeight()
             .background(color),
     )
+}
+
+/** The bar takes the height of whatever holds it, so the preview gives it a card's worth. */
+@Preview
+@Composable
+private fun EventAccentBarPreview() {
+    Surface {
+        Row(modifier = Modifier.height(32.dp)) {
+            EventAccentBar(color = MaterialTheme.colorScheme.primary)
+        }
+    }
 }

@@ -17,17 +17,23 @@
  */
 package com.infomaniak.calendar.components.day.layout
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.components.day.component.TimedEventCard
 import com.infomaniak.calendar.components.day.component.titleSizingFor
+import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.model.TimedEvent
+import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlin.math.roundToInt
@@ -79,5 +85,35 @@ internal fun TimedEventsLayout(
                 )
             }
         }
+    }
+}
+
+/**
+ * The layout only places what the solver hands it, so the preview has to resolve the overlaps
+ * first: it is the morning of [previewDayEvents], where three events run at once.
+ */
+@Preview(widthDp = 320, heightDp = 400)
+@Composable
+private fun TimedEventsLayoutPreview() {
+    Surface {
+        val density = LocalDensity.current
+        val timedEvents = previewDayEvents.timed
+
+        val placements = remember(density) {
+            with(density) {
+                timedEvents.resolveOverlaps(
+                    layoutWidth = 320.dp.toPx(),
+                    pixelsPerMinute = DayTimelineDefaults.HourHeight.toPx() / MINUTES_PER_HOUR,
+                    config = density.eventLayoutConfig(),
+                )
+            }
+        }
+
+        TimedEventsLayout(
+            timedEvents = timedEvents,
+            placements = placements,
+            onEventClick = {},
+            modifier = Modifier.fillMaxSize(),
+        )
     }
 }

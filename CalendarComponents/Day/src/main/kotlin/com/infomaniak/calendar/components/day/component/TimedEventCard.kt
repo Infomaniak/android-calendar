@@ -20,9 +20,11 @@ package com.infomaniak.calendar.components.day.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -34,14 +36,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
-import kotlin.math.roundToInt
+import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.components.day.model.TimedEvent
+import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.event.EventIcons
 import com.infomaniak.calendar.components.event.component.cardStripes
 import com.infomaniak.calendar.components.event.toEventIcons
@@ -49,6 +53,7 @@ import com.infomaniak.calendar.components.event.toEventItemStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.HourFormatter.formatHours
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import kotlin.math.roundToInt
 
 private val MinTitleSize = 11.sp
 private val ReadableTitleSize = 13.sp
@@ -85,7 +90,7 @@ internal fun TimedEventCard(
         modifier = modifier,
     ) {
         Row(modifier = Modifier.cardStripes(status).fillMaxSize()) {
-            if (border == null) EventAccentBar(status.eventColors.onDatavizContainerVariant)
+            if (border == null) EventAccentBar(status.eventColors.sourceColor)
 
             EventDetails(
                 event = timedEvent.event,
@@ -289,3 +294,24 @@ internal fun titleSizingFor(visibleHeight: Dp, width: Dp): TitleSizing = with(Lo
 }
 
 private fun TextUnit.roundedToStep(): TextUnit = ((value / TitleSizeStep.value).roundToInt() * TitleSizeStep.value).sp
+
+/**
+ * A card at the height of a one hour event. Its title size and the lines it shows both follow that
+ * height, so the preview settles it once and hands the same value to both.
+ */
+@Preview(widthDp = 220)
+@Composable
+private fun TimedEventCardPreview() {
+    Surface {
+        val cardHeight = DayTimelineDefaults.HourHeight
+        val cardHeightPx = with(LocalDensity.current) { cardHeight.toPx() }
+
+        TimedEventCard(
+            timedEvent = previewDayEvents.timed.first(),
+            titleSizing = titleSizingFor(visibleHeight = cardHeight, width = 220.dp),
+            visibleHeight = { cardHeightPx },
+            onClick = {},
+            modifier = Modifier.height(cardHeight),
+        )
+    }
+}
