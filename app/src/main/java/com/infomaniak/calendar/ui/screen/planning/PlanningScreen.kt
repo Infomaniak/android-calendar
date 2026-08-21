@@ -45,13 +45,17 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.planning.Planning
+import com.infomaniak.calendar.components.planning.PlanningRow
+import com.infomaniak.calendar.components.planning.preview.PlanningRowPreviewParameter
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
-import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewParameter
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -59,6 +63,7 @@ import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.yearMonth
@@ -66,17 +71,17 @@ import kotlin.time.Clock
 
 @Composable
 fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier, viewModel: PlanningViewModel = viewModel()) {
-    val planningUiState: PlanningUiState by viewModel.planningUiState.collectAsStateWithLifecycle()
+    val planningRows = viewModel.planningRows.collectAsLazyPagingItems()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
     val eventsDots by viewModel.eventDots.collectAsStateWithLifecycle(initialValue = emptyMap())
 
     PlanningScreen(
         goToEventCreation = goToEventCreation,
-        planningUiState = { planningUiState },
+        planningRows = planningRows,
+        onJumpTo = viewModel::jumpTo,
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventsDots },
         onVisibleMonthChanged = viewModel::onVisibleMonthChanged,
-        jumpTo = viewModel::jumpTo,
         modifier = modifier,
     )
 }
@@ -84,11 +89,11 @@ fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier,
 @Composable
 private fun PlanningScreen(
     goToEventCreation: () -> Unit,
-    planningUiState: () -> PlanningUiState,
+    planningRows: LazyPagingItems<PlanningRow>,
+    onJumpTo: (LocalDate) -> Boolean,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     onVisibleMonthChanged: (YearMonth) -> Unit,
-    jumpTo: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val hazeState = rememberHazeState()
@@ -105,19 +110,22 @@ private fun PlanningScreen(
         val contentPadding = scaffoldContentPadding + PaddingValues(top = topBarHeight)
 
         Box(modifier = Modifier.fillMaxSize()) {
-            when (val planningUi = planningUiState()) {
-                is PlanningUiState.Success -> {
-                    SuccessPlanning(
-                        events = planningUi.eventsByWeekAndDay,
-                        contentPadding = contentPadding + PaddingValues(Margin.Medium),
-                        goToEventCreation = goToEventCreation,
-                        jumpTo = jumpTo,
-                        modifier = Modifier.hazeSource(hazeState),
-                    )
-                }
-                is PlanningUiState.Loading -> {
-                    LoadingPlanning(modifier = Modifier.padding(contentPadding))
-                }
+            // Keep the planning mounted once it has shown content, so a far jump's refresh (itemCount
+            // momentarily 0) doesn't tear down the jump/scroll handling — only the very first load shows a spinner.
+            var hasLoadedOnce by rememberSaveable { mutableStateOf(false) }
+            if (planningRows.itemCount > 0) hasLoadedOnce = true
+
+            if (hasLoadedOnce) {
+                SuccessPlanning(
+                    planningRows = planningRows,
+                    onJumpTo = onJumpTo,
+                    onVisibleMonthChanged = onVisibleMonthChanged,
+                    contentPadding = contentPadding + PaddingValues(Margin.Medium),
+                    goToEventCreation = goToEventCreation,
+                    modifier = Modifier.hazeSource(hazeState),
+                )
+            } else {
+                LoadingPlanning(modifier = Modifier.padding(contentPadding))
             }
 
             CalendarTopAppBar(
@@ -150,27 +158,28 @@ private fun PlanningScreen(
 
 @Composable
 private fun SuccessPlanning(
-    events: () -> EventsByWeekAndDay,
+    planningRows: LazyPagingItems<PlanningRow>,
+    onJumpTo: (LocalDate) -> Boolean,
+    onVisibleMonthChanged: (YearMonth) -> Unit,
     contentPadding: PaddingValues,
     goToEventCreation: () -> Unit,
-    jumpTo: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val visibleDayState = LocalVisibleDayState.current ?: return
-    val lazyListState = rememberLazyListState(events().indexOf(visibleDayState.visibleDate))
+    val lazyListState = rememberLazyListState()
 
-    ProcessJumpRequests(lazyListState, visibleDayState, events)
+    AlignPlanningToDate(lazyListState, planningRows, visibleDayState, onJumpTo)
     ReportVisibleDate(
         lazyListState = lazyListState,
         onVisibleDateChanged = {
-            jumpTo(it)
+            onVisibleMonthChanged(it.yearMonth)
             visibleDayState.onVisibleDateChanged(it)
         },
     )
 
     Planning(
         lazyListState = lazyListState,
-        weekEvents = events,
+        rows = planningRows,
         modifier = modifier
             .scrollableToolbar()
             .fillMaxSize(),
@@ -188,18 +197,19 @@ private fun LoadingPlanning(modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class) weekEvents: EventsByWeekAndDay) {
+private fun Preview(@PreviewParameter(PlanningRowPreviewParameter::class) rows: List<PlanningRow>) {
     CalendarThemeForPreview {
         val visibleDate = remember { mutableStateOf(Clock.today()) }
+        val planningRows = flowOf(PagingData.from(rows)).collectAsLazyPagingItems()
 
         CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(visibleDate)) {
             PlanningScreen(
-                planningUiState = { PlanningUiState.Success({ weekEvents }) },
+                planningRows = planningRows,
+                onJumpTo = { false },
                 goToEventCreation = {},
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
                 onVisibleMonthChanged = {},
-                jumpTo = {},
             )
         }
     }

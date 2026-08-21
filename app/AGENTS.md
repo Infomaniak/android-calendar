@@ -43,7 +43,7 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── threeDays/             # ThreeDayScreen — placeholder 3-day view
     │   ├── week/                  # WeekScreen — placeholder week view
     │   ├── month/                 # MonthScreen + MonthViewModel
-    │   ├── planning/              # PlanningScreen + PlanningViewModel + PlanningEventGroupingExt
+    │   ├── planning/              # PlanningScreen + PlanningViewModel + PlanningPagingSource (Paging 3) + PlanningEventGroupingExt
     │   ├── accounts/              # Accounts screen + AccountItem (drawer-backed account list and add account action)
     │   ├── eventCreation/         # EventCreationScreen
     │   └── onboarding/            # OnboardingScreen + CrossAppLoginViewModel
