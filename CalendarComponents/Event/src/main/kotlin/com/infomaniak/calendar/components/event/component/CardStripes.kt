@@ -32,8 +32,8 @@ import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
 
-private val STRIPE_WIDTH = 2.dp
-private val STRIPE_SPACING = 8.dp
+private val STRIPE_WIDTH = 8.dp
+private val STRIPE_SPACING = 4.dp
 
 @Composable
 internal fun Modifier.cardStripes(status: EventItemStatus): Modifier {

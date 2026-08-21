@@ -105,7 +105,7 @@ String resources follow the single-module pattern — all strings consumed by an
 |-----------------------------------|--------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
 | `:CalendarComponents:Foundation`  | `com.infomaniak.calendar.components.foundation`  | Shared models (`EventUi`, `YearWeek`, `WeekNumbering`) and base Compose components (`DayCircle`, `DateState`) used by all other CalendarComponents modules. |
 | `:CalendarComponents:Resources`   | `com.infomaniak.calendar.components.resources`   | String-only module: `res/values/strings.xml` (+ translations). No Kotlin code, no Compose. Centralises all CalendarComponents string resources. |
-| `:CalendarComponents:Event`       | `com.infomaniak.calendar.components.event`       | `EventItem` Composable — renders a single event row. Re-exports Foundation via `api`. **Placeholder UI** — visual design is not final. |
+| `:CalendarComponents:Event`       | `com.infomaniak.calendar.components.event`       | `EventItem` Composable — renders a single event row. Re-exports Foundation via `api`. |
 | `:CalendarComponents:Planning`    | `com.infomaniak.calendar.components.planning`    | `Planning` Composable — a `LazyColumn` with ISO week headers and per-day event lists. Also provides the `stickyWithinItem` `Modifier` extension. Re-exports Event, Foundation, and Resources via `api`. Week header design is a **placeholder**. |
 
 ### Dependency graph
@@ -126,7 +126,7 @@ consumers: `implementation(project(":CalendarComponents:Planning"))` transitivel
 |---------------------------------------|-------------------------------|
 | `DayCircle` + `DateState` (Foundation)| ✅ Final UI                   |
 | `DayIndicator` (Planning)             | ✅ Final UI                   |
-| `EventItem` (Event)                   | 🚧 Placeholder — design TBD   |
+| `EventItem` (Event)                   | ✅ Final UI                   |
 | Week header in `Planning`             | 🚧 Placeholder — design TBD   |
 
 ### External dependencies used
