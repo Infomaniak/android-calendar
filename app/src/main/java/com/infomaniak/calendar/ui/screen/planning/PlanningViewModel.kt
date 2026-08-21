@@ -23,7 +23,6 @@ import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.common.utils.today
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.VisibleCalendarColor
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
@@ -106,7 +105,7 @@ class PlanningViewModel(
     }
 
     private fun Map<LocalDate, List<VisibleCalendarColor>>.toEventDots(): Map<LocalDate, List<EventColorsUi>> {
-        return mapValues { (_, colors) -> colors.map { EventColors.from(it.colors).toEventColorsUi() } }
+        return mapValues { (_, colors) -> colors.map { EventColors.from(null, it.colors.sourceColor).toEventColorsUi() } }
     }
 
     companion object {
