@@ -1,5 +1,5 @@
 [versions]
-calendarCore = "0.6.0-SNAPSHOT"
+calendarCore = "0.6.0"
 designsystem = "0.1.2"
 haze = "2.0.0-alpha03"
 kizitonwoseCalendar = "2.10.1"
