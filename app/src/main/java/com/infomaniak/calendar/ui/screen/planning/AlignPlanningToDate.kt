@@ -58,8 +58,6 @@ fun AlignPlanningToDate(
     visibleDayState: VisibleDayState,
     onJumpTo: (LocalDate) -> Boolean,
 ) {
-    // Survives config changes: the initial centering must run only once per process, so a recomposition
-    // or rotation never re-centers over the user's (or restored) scroll.
     var hasCentered by rememberSaveable { mutableStateOf(false) }
 
     // The date the planning stays glued to; `null` once the user drags (pin released). Kept separate
