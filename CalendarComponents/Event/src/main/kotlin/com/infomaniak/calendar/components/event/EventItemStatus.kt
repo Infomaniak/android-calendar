@@ -18,7 +18,6 @@
 package com.infomaniak.calendar.components.event
 
 import android.content.res.Configuration
-import androidx.annotation.FloatRange
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -61,6 +60,7 @@ internal fun EventUi.Normal.toEventItemStatus(): EventItemStatus {
 
 @Immutable
 sealed class EventItemStatus(
+    val sourceColor: @Composable () -> Color?,
     val cardColors: @Composable () -> CardColors,
     val cardBorder: @Composable () -> BorderStroke? = { null },
     val stripesColor: @Composable () -> Color? = { null },
@@ -69,46 +69,43 @@ sealed class EventItemStatus(
     abstract val eventColors: EventColorsUi
 
     data class Default(override val eventColors: EventColorsUi) : EventItemStatus(
+        sourceColor = { eventColors.sourceColor },
         cardColors = { containerColors(eventColors) },
     )
 
     data class Maybe(override val eventColors: EventColorsUi) : EventItemStatus(
+        sourceColor = { eventColors.sourceColor },
         cardColors = { containerColors(eventColors) },
-        stripesColor = { eventColors.onDatavizContainerVariant.copy(alpha = 0.1f) },
+        stripesColor = { eventColors.containerColor },
     )
 
     data class Declined(override val eventColors: EventColorsUi) : EventItemStatus(
-        cardColors = { containerColors(eventColors, contentAlpha = 0.5f) },
+        sourceColor = { eventColors.sourceColor },
+        cardColors = { containerColors(eventColors) },
         textDecoration = TextDecoration.LineThrough,
     )
 
     data class Pending(override val eventColors: EventColorsUi) : EventItemStatus(
+        sourceColor = { eventColors.sourceColor },
         cardColors = { containerVariantColors(eventColors) },
-        cardBorder = { BorderStroke(2.dp, eventColors.onDatavizContainer) },
+        cardBorder = { BorderStroke(2.dp, eventColors.sourceColor) },
     )
 
     companion object {
         @Composable
-        private fun containerVariantColors(eventColors: EventColorsUi): CardColors = CardDefaults.cardColors(
-            containerColor = eventColors.datavizContainer,
-            contentColor = eventColors.onDatavizContainer,
-        )
+        private fun containerColors(eventColors: EventColorsUi): CardColors {
+            return CardDefaults.cardColors(
+                containerColor = eventColors.containerColor,
+                contentColor = eventColors.onContainerColor,
+            )
+        }
 
         @Composable
-        private fun containerColors(
-            eventColors: EventColorsUi,
-            @FloatRange(0.0, 1.0) contentAlpha: Float = 1f,
-        ): CardColors = CardDefaults.cardColors(
-            containerColor = eventColors.datavizContainerVariant,
-            contentColor = eventColors.onDatavizContainerVariant.copyIfNeeded(contentAlpha),
-        )
-
-        /**
-         * Skips instantiations caused by copy if we're modifying alpha to be the same value as it already was. Useful for all
-         * common cases where we set alpha to 1.
-         */
-        private fun Color.copyIfNeeded(@FloatRange(0.0, 1.0) alpha: Float): Color {
-            return if (alpha == this.alpha) this else copy(alpha)
+        private fun containerVariantColors(eventColors: EventColorsUi): CardColors {
+            return CardDefaults.cardColors(
+                containerColor = eventColors.containerVariantColor,
+                contentColor = eventColors.onContainerVariantColor,
+            )
         }
     }
 }
@@ -124,6 +121,7 @@ private fun Preview() {
             end = Clock.System.now() + 15.minutes,
             isAllDay = false,
             title = "Event title",
+            location = "Salle Tokyo",
             status = status,
             trailingIcons = EventIcons.entries.toSet(),
             modifier = modifier,

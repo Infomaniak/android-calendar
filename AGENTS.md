@@ -126,7 +126,7 @@ consumers: `implementation(project(":CalendarComponents:Planning"))` transitivel
 |---------------------------------------|-------------------------------|
 | `DayCircle` + `DateState` (Foundation)| ✅ Final UI                   |
 | `DayIndicator` (Planning)             | ✅ Final UI                   |
-| `EventItem` (Event)                   | 🚧 Placeholder — design TBD   |
+| `EventItem` (Event)                   | ✅ Final UI                   |
 | Week header in `Planning`             | 🚧 Placeholder — design TBD   |
 
 ### External dependencies used

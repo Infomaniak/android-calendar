@@ -19,13 +19,20 @@ package com.infomaniak.calendar.components.event
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +41,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,7 +54,7 @@ import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.HourFormatter.formatHours
 import com.infomaniak.calendar.components.resources.R
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Instant
@@ -57,6 +65,7 @@ fun EventItem(event: EventUi.Normal, modifier: Modifier = Modifier) {
         start = event.start,
         end = event.end,
         title = event.title,
+        location = event.location,
         status = event.toEventItemStatus(),
         trailingIcons = event.toEventIcons(),
         isAllDay = event.isAllDay,
@@ -69,6 +78,7 @@ internal fun EventItem(
     start: Instant,
     end: Instant,
     title: String,
+    location: String?,
     status: EventItemStatus,
     trailingIcons: Set<EventIcons>,
     isAllDay: Boolean,
@@ -78,32 +88,47 @@ internal fun EventItem(
         if (isAllDay) {
             AllDayContent(title)
         } else {
-            PartialDayContent(start, end, title, trailingIcons, status.textDecoration)
+            PartialDayContent(start, end, title, location, trailingIcons, status.textDecoration)
         }
     }
 }
 
 @Composable
 private fun EventItemCard(status: EventItemStatus, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+    val cardLine = status.sourceColor() ?: status.cardColors().containerColor
+
     Card(
         colors = status.cardColors(),
         border = status.cardBorder(),
         shape = MaterialTheme.shapes.small,
         modifier = modifier,
     ) {
-        Column(
+        Row(
             modifier = Modifier
-                .cardStripes(status)
-                .padding(Margin.Mini),
-            content = content,
-        )
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min), // makes the line match card height
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(4.dp)
+                    .clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp))
+                    .background(cardLine),
+            )
+            Column(
+                modifier = Modifier
+                    .cardStripes(status)
+                    .padding(EsdsTheme.spacing.sm),
+                content = content,
+            )
+        }
     }
 }
 
 @Composable
 private fun AllDayContent(title: String, modifier: Modifier = Modifier) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(Margin.Micro),
+        horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -125,31 +150,45 @@ private fun PartialDayContent(
     start: Instant,
     end: Instant,
     title: String,
+    location: String?,
     trailingIcons: Set<EventIcons>,
     textDecoration: TextDecoration?,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier,
-        horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
+        horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.sm),
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(Margin.Micro),
+            verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.twoXs),
             modifier = Modifier.weight(1f),
         ) {
             Text(
-                text = formatDisplayedHour(start, end),
-                style = MaterialTheme.typography.labelSmall,
-                textDecoration = textDecoration,
-            )
-            Text(
                 text = title,
-                style = MaterialTheme.typography.bodySmallEmphasized,
-                fontWeight = FontWeight.Medium,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
                 textDecoration = textDecoration,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+            Text(
+                text = formatDisplayedHour(start, end),
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Medium,
+                textDecoration = textDecoration,
+            )
+
+            if (location != null) {
+                Text(
+                    text = location,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Medium,
+                    textDecoration = textDecoration,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+
         }
 
         if (trailingIcons.isNotEmpty()) TrailingIcons(trailingIcons)
@@ -163,7 +202,7 @@ private fun formatDisplayedHour(start: Instant, end: Instant): String = "${start
 
 @Composable
 private fun TrailingIcons(trailingIcons: Set<EventIcons>) {
-    Row(horizontalArrangement = Arrangement.spacedBy(Margin.Micro)) {
+    Row(horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs)) {
         EventIcons.entries.forEach {
             if (it in trailingIcons) it.TrailingIcon()
         }
@@ -197,6 +236,7 @@ private fun Preview() {
     fun EventItemForStatus(
         status: EventItemStatus,
         title: String = "Event title",
+        location: String? = null,
         isAllDay: Boolean = false,
         modifier: Modifier = Modifier,
     ) {
@@ -205,6 +245,7 @@ private fun Preview() {
             end = Clock.System.now() + 1.hours,
             isAllDay = isAllDay,
             title = title,
+            location = location,
             status = status,
             trailingIcons = EventIcons.entries.toSet(),
             modifier = modifier,
@@ -213,13 +254,14 @@ private fun Preview() {
 
     MaterialTheme {
         Surface {
-            Column(verticalArrangement = Arrangement.spacedBy(Margin.Mini)) {
+            Column(verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.sm)) {
                 val eventColors = LocalEventColorsUiFactory.current.create(0x0)
 
                 EventItemForStatus(EventItemStatus.Default(eventColors), isAllDay = true, modifier = Modifier.fillMaxWidth())
                 EventItemForStatus(
                     status = EventItemStatus.Default(eventColors),
                     title = "How to not get fired. An important guide on how to navigate the workspace",
+                    location = "Salle Tokyo",
                 )
                 EventItemForStatus(EventItemStatus.Maybe(eventColors))
                 EventItemForStatus(EventItemStatus.Declined(eventColors))

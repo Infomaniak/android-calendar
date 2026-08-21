@@ -130,7 +130,7 @@ class PlanningViewModel(
 
 
     private fun Map<LocalDate, List<VisibleCalendarColor>>.toEventDots(): Map<LocalDate, List<EventColorsUi>> {
-        return mapValues { (_, colors) -> colors.map { EventColors.from(it.colors).toEventColorsUi() } }
+        return mapValues { (_, colors) -> colors.map { EventColors.from(null, it.colors.sourceColor).toEventColorsUi() } }
     }
 
     companion object {

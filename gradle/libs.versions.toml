@@ -1,11 +1,11 @@
 [versions]
-calendarCore = "0.3.0"
+calendarCore = "0.6.0-SNAPSHOT"
 designsystem = "0.1.2"
 haze = "2.0.0-alpha03"
 kizitonwoseCalendar = "2.10.1"
 material3 = "1.5.0-alpha18" # Remove when composeBom use same version or higher
-paging3 = "3.5.0"
 metrox = "1.2.1"
+paging3 = "3.5.0"
 
 [libraries]
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
