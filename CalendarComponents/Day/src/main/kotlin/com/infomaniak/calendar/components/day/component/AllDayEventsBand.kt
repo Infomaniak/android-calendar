@@ -93,12 +93,11 @@ internal fun AllDayEventsBand(
 @Composable
 private fun AllDayEventChip(event: EventUi.Normal, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val status = event.toEventItemStatus()
-    val border = status.cardBorder()
 
     Card(
         onClick = onClick,
         colors = status.cardColors(),
-        border = border,
+        border = status.cardBorder(),
         shape = EsdsTheme.radius.sm,
         modifier = modifier.height(ChipHeight),
     ) {
@@ -109,7 +108,7 @@ private fun AllDayEventChip(event: EventUi.Normal, onClick: () -> Unit, modifier
                 .cardStripes(status)
                 .fillMaxHeight(),
         ) {
-            if (border == null) EventAccentBar(status.eventColors.sourceColor)
+            EventAccentBar(status.sourceColor() ?: status.cardColors().containerColor)
 
             Text(
                 text = event.title,
