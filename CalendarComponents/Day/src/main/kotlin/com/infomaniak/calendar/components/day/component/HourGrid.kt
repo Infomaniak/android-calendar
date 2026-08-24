@@ -44,7 +44,6 @@ import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.HourFormatter.formatHourLabel
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 import java.time.LocalTime
 
 private val HourLineWidth = 1.dp
@@ -65,7 +64,7 @@ internal val HourLabelOverhang: Dp
 @Composable
 internal fun HourGrid(state: DayTimelineState, modifier: Modifier = Modifier) {
     val hourLineColor = MaterialTheme.colorScheme.outlineVariant
-    val hourLineEndPadding = EsdsTheme.spacing.xl
+    val hourLineEndPadding = DayTimelineDefaults.TimelineEndPadding
 
     Box(
         modifier = modifier
