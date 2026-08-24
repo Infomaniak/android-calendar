@@ -119,14 +119,7 @@ private fun AllDayEventChip(event: EventUi.Normal, onClick: () -> Unit, modifier
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = EsdsTheme.spacing.md),
-            )
-
-            Text(
-                text = stringResource(R.string.allDayLabel),
-                style = MaterialTheme.typography.bodySmall,
-                maxLines = 1,
-                modifier = Modifier.padding(end = EsdsTheme.spacing.md),
+                    .padding(horizontal = EsdsTheme.spacing.md),
             )
         }
     }
