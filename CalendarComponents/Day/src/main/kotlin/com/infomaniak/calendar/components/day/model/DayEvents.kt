@@ -21,7 +21,7 @@ import androidx.compose.runtime.Immutable
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
 const val HOURS_PER_DAY: Int = 24
@@ -53,8 +53,20 @@ fun EventUi.Normal.toTimedEvent(date: LocalDate, timeZone: TimeZone): TimedEvent
     endMinuteOfDay = end.minuteOfDayWithin(date, timeZone),
 )
 
+/**
+ * Where the instant reads on [date]'s clock, or the edge of the day it falls beyond, for the days
+ * of a multi-day event that only hold one of its two ends.
+ *
+ * The grid draws a plain 24-hour clock, so this has to be the time the event shows on that clock,
+ * not the time elapsed since midnight: the two differ by an hour for the rest of a day the clocks
+ * changed on, which would draw every event after the change one hour off the line naming its time.
+ */
 private fun Instant.minuteOfDayWithin(date: LocalDate, timeZone: TimeZone): Int {
-    val minutesSinceMidnight = (this - date.atStartOfDayIn(timeZone)).inWholeMinutes
+    val localDateTime = toLocalDateTime(timeZone)
 
-    return minutesSinceMidnight.coerceIn(0L, MINUTES_PER_DAY.toLong()).toInt()
+    return when {
+        localDateTime.date < date -> 0
+        localDateTime.date > date -> MINUTES_PER_DAY
+        else -> localDateTime.hour * MINUTES_PER_HOUR + localDateTime.minute
+    }
 }
