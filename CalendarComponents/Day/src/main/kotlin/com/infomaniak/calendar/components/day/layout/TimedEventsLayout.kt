@@ -17,7 +17,12 @@
  */
 package com.infomaniak.calendar.components.day.layout
 
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -27,10 +32,10 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.components.day.component.TimedEventCard
 import com.infomaniak.calendar.components.day.component.titleSizingFor
+import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.model.TimedEvent
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
@@ -90,31 +95,51 @@ internal fun TimedEventsLayout(
 
 /**
  * The layout only places what the solver hands it, so the preview has to resolve the overlaps
- * first: it is the morning of [previewDayEvents], where three events run at once.
+ * first, over the whole day the way the timeline does.
+ *
+ * A card sits at the hour it starts, and [previewDayEvents] starts at 7 in the morning, hours below
+ * the top of the day: the preview opens scrolled to the first of them, or it would show the empty
+ * night.
  */
-@Preview(widthDp = 320, heightDp = 400)
+@Preview
 @Composable
 private fun TimedEventsLayoutPreview() {
     Surface {
         val density = LocalDensity.current
         val timedEvents = previewDayEvents.timed
         val config = eventLayoutConfig()
+        val pixelsPerMinute = with(density) { DayTimelineDefaults.HourHeight.toPx() } / MINUTES_PER_HOUR
 
-        val placements = remember(density, config) {
-            with(density) {
-                timedEvents.resolveOverlaps(
-                    layoutWidth = 320.dp.toPx(),
-                    pixelsPerMinute = DayTimelineDefaults.HourHeight.toPx() / MINUTES_PER_HOUR,
-                    config = config,
+        BoxWithConstraints {
+            // The layout draws the events past the hour gutter, so it gets the width left after it.
+            val eventsAreaEndPadding = DayTimelineDefaults.TimelineEndPadding - EventLayoutDefaults.HorizontalSpacing
+            val eventsAreaWidth = maxWidth - DayTimelineDefaults.HourGutterWidth - eventsAreaEndPadding
+
+            val placements = remember(density, config, eventsAreaWidth) {
+                with(density) {
+                    timedEvents.resolveOverlaps(
+                        layoutWidth = eventsAreaWidth.toPx(),
+                        pixelsPerMinute = pixelsPerMinute,
+                        config = config,
+                    )
+                }
+            }
+
+            val firstEventMinute = timedEvents.minOf { it.startMinuteOfDay }
+
+            Box(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState(initial = (firstEventMinute * pixelsPerMinute).roundToInt()))
+                    .fillMaxWidth()
+                    .height(DayTimelineDefaults.HourHeight * HOURS_PER_DAY),
+            ) {
+                TimedEventsLayout(
+                    timedEvents = timedEvents,
+                    placements = placements,
+                    onEventClick = {},
+                    modifier = Modifier.matchParentSize(),
                 )
             }
         }
-
-        TimedEventsLayout(
-            timedEvents = timedEvents,
-            placements = placements,
-            onEventClick = {},
-            modifier = Modifier.fillMaxSize(),
-        )
     }
 }
