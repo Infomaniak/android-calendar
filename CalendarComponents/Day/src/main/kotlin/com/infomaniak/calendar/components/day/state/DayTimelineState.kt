@@ -22,7 +22,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.LocalDensity
@@ -33,14 +32,16 @@ import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import kotlinx.coroutines.flow.first
 
+/** The hour a day opens on: early enough to have the morning in view, late enough to skip the night. */
+private const val INITIAL_VISIBLE_HOUR = 8
+
 /**
- * The timeline opens on the current time, unless [scrollState] was restored to a position the user
- * had already scrolled to.
+ * The timeline opens on [INITIAL_VISIBLE_HOUR], unless [scrollState] was restored to a position the
+ * user had already scrolled to.
  */
 @Composable
 fun rememberDayTimelineState(scrollState: ScrollState = rememberScrollState()): DayTimelineState {
     val state = remember(scrollState) { DayTimelineState(DayTimelineDefaults.HourHeight, scrollState) }
-    val currentDateTime by rememberCurrentDateTime()
     val density = LocalDensity.current
 
     LaunchedEffect(state) {
@@ -48,7 +49,7 @@ fun rememberDayTimelineState(scrollState: ScrollState = rememberScrollState()): 
 
         // Scrolling before the timeline has been measured would be clamped to a scroll range of zero.
         snapshotFlow { scrollState.maxValue }.first { it > 0 }
-        state.scrollToMinuteOfDay(currentDateTime.minuteOfDay, density)
+        state.scrollToMinuteOfDay(INITIAL_VISIBLE_HOUR * MINUTES_PER_HOUR, density)
     }
 
     return state
