@@ -25,8 +25,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -87,7 +88,13 @@ internal fun AllDayEventsBand(
                 .padding(end = DayTimelineDefaults.TimelineEndPadding)
                 .heightIn(max = ChipHeight * WHOLE_ROWS + spacing * WHOLE_ROWS + NextRowPeek),
         ) {
-            items(events, key = { it.id }) { event ->
+            itemsIndexed(
+                items = events,
+                key = { _, event -> event.id },
+                // Only the last chip can end up alone on its row, and it takes the whole of it
+                // rather than leaving the half it does not use empty.
+                span = { index, _ -> GridItemSpan(if (index == events.lastIndex) maxCurrentLineSpan else 1) },
+            ) { _, event ->
                 AllDayEventChip(event, onClick = { onEventClick(event) })
             }
         }
