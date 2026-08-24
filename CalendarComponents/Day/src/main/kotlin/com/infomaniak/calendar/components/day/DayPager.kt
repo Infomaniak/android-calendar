@@ -22,7 +22,10 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,16 +59,28 @@ fun DayPager(
     val pageCount = remember(dateRange) { dateRange.dayCount }
     val pagerState = rememberPagerState(initialPage = dateRange.pageOf(selectedDate())) { pageCount }
 
+    // The page a jump is travelling to, while it travels. The pager reports every page it crosses on
+    // the way, and those are the jump's own doing: reported back as a date the user moved to, they
+    // would end the jump at the first day it passes over.
+    var travellingTo by remember(pagerState) { mutableStateOf<Int?>(null) }
+
     LaunchedEffect(pagerState) {
         snapshotFlow { selectedDate() }.collectLatest { date ->
             val page = dateRange.pageOf(date)
-            if (page != pagerState.currentPage) pagerState.animateScrollToPage(page)
+            if (page == pagerState.currentPage) return@collectLatest
+
+            travellingTo = page
+            try {
+                pagerState.animateScrollToPage(page)
+            } finally {
+                travellingTo = null
+            }
         }
     }
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
-            onVisibleDateChanged(dateRange.dateOf(page))
+            if (travellingTo == null) onVisibleDateChanged(dateRange.dateOf(page))
         }
     }
 
