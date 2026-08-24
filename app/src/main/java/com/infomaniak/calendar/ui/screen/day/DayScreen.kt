@@ -52,31 +52,25 @@ import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.utils.today
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlin.time.Clock
-import kotlin.time.Duration.Companion.milliseconds
-
-private val HourHeightSaveDelay = 500.milliseconds
 
 @Composable
 fun DayScreen(modifier: Modifier = Modifier, dayViewModel: DayViewModel = viewModel()) {
     val dayUiState by dayViewModel.dayUiState.collectAsStateWithLifecycle()
     val isLoadingEvents by dayViewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
     val visibleDayState = LocalVisibleDayState.current ?: return
-    val timelineState = rememberDayTimelineState()
+    // The timeline scrolls to its opening hour as soon as it is measured, and counts that scroll in
+    // hour heights: it is built once the stored height is known, or it would open hours off.
+    val storedHourHeight by dayViewModel.hourHeight.collectAsStateWithLifecycle(initialValue = null)
+    val timelineState = rememberDayTimelineState(initialHourHeight = storedHourHeight ?: return)
 
-    RestoreThenSaveHourHeight(
-        timelineState = timelineState,
-        storedHourHeight = dayViewModel.hourHeight,
-        onHourHeightChanged = dayViewModel::saveHourHeight,
-    )
+    SaveHourHeight(timelineState, onHourHeightChanged = dayViewModel::saveHourHeight)
     ApplyJumpRequests(visibleDayState)
 
     DayScreen(
@@ -101,22 +95,18 @@ private fun ApplyJumpRequests(visibleDayState: VisibleDayState) {
 }
 
 /**
- * Brings back the zoom level the user left the day view on, then keeps it stored as they pinch.
- * Writes are debounced so a pinch does not hit the disk on every frame.
+ * Stores the zoom level the user leaves the day view on.
+ *
+ * A pinch changes the height on every frame, so the height is stored once the gesture ends: one
+ * write per pinch, and nothing left waiting on a timer that leaving the screen would cancel.
  */
-@OptIn(FlowPreview::class)
 @Composable
-private fun RestoreThenSaveHourHeight(
-    timelineState: DayTimelineState,
-    storedHourHeight: Flow<Dp>,
-    onHourHeightChanged: suspend (Dp) -> Unit,
-) {
+private fun SaveHourHeight(timelineState: DayTimelineState, onHourHeightChanged: suspend (Dp) -> Unit) {
     LaunchedEffect(timelineState) {
-        timelineState.hourHeight = storedHourHeight.first()
-
-        snapshotFlow { timelineState.hourHeight }
-            .debounce(HourHeightSaveDelay)
-            .collect(onHourHeightChanged)
+        snapshotFlow { timelineState.isPinching }
+            .dropWhile { isPinching -> !isPinching }
+            .filterNot { isPinching -> isPinching }
+            .collect { onHourHeightChanged(timelineState.hourHeight) }
     }
 }
 
