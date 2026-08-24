@@ -44,6 +44,7 @@ import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.HourFormatter.formatHourLabel
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import java.time.LocalTime
 
 private val HourLineWidth = 1.dp
@@ -64,11 +65,12 @@ internal val HourLabelOverhang: Dp
 @Composable
 internal fun HourGrid(state: DayTimelineState, modifier: Modifier = Modifier) {
     val hourLineColor = MaterialTheme.colorScheme.outlineVariant
+    val hourLineEndPadding = EsdsTheme.spacing.xl
 
     Box(
         modifier = modifier
             .timelineHeight(state)
-            .drawBehind { drawHourLines(state, hourLineColor) },
+            .drawBehind { drawHourLines(state, hourLineColor, hourLineEndPadding) },
     ) {
         HourLabels(
             state = state,
@@ -86,7 +88,7 @@ private fun Modifier.timelineHeight(state: DayTimelineState): Modifier = layout 
     layout(placeable.width, placeable.height) { placeable.place(x = 0, y = 0) }
 }
 
-private fun DrawScope.drawHourLines(state: DayTimelineState, color: Color) {
+private fun DrawScope.drawHourLines(state: DayTimelineState, color: Color, endPadding: Dp) {
     val lineStartX = DayTimelineDefaults.HourGutterWidth.toPx()
 
     for (hour in FIRST_LABELLED_HOUR until HOURS_PER_DAY) {
@@ -95,7 +97,7 @@ private fun DrawScope.drawHourLines(state: DayTimelineState, color: Color) {
         drawLine(
             color = color,
             start = Offset(lineStartX, y),
-            end = Offset(size.width, y),
+            end = Offset(size.width - endPadding.toPx(), y),
             strokeWidth = HourLineWidth.toPx(),
         )
     }
