@@ -44,6 +44,7 @@ private val LineWidth = 1.dp
 internal fun CurrentTimeIndicator(minuteOfDay: Int, state: DayTimelineState, modifier: Modifier = Modifier) {
     val color = MaterialTheme.extendedColorScheme.datavizPink
     val spacingMd = EsdsTheme.spacing.md
+    val endPadding = DayTimelineDefaults.TimelineEndPadding
 
     Canvas(modifier = modifier) {
         val y = state.verticalOffsetOf(minuteOfDay).toPx()
@@ -52,7 +53,7 @@ internal fun CurrentTimeIndicator(minuteOfDay: Int, state: DayTimelineState, mod
         drawLine(
             color = color,
             start = Offset(lineStartX, y),
-            end = Offset(size.width, y),
+            end = Offset(size.width - endPadding.toPx(), y),
             strokeWidth = LineWidth.toPx(),
         )
 
