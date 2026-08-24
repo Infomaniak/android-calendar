@@ -149,13 +149,19 @@ private fun alignGroup(frames: List<EventFrame>, from: Int, until: Int, layoutWi
 
     distributeAmongContainers(group, containers).forEach { (containerIndex, groupIndices) ->
         val container = containers[containerIndex]
-        val eventWidth = ((container.width - container.padding) / groupIndices.size).coerceAtLeast(config.minEventWidth)
+        val fairShare = (container.width - container.padding) / groupIndices.size
+        // The frame still carries the trailing spacing toPlacement() strips, so the floor includes
+        // it to keep the drawn card at least minEventWidth wide.
+        val eventWidth = fairShare.coerceAtLeast(config.minEventWidth + config.horizontalSpacing)
+        // An even split fills the container exactly, so crossing maxX can only be float rounding
+        // noise: events can genuinely run out of room only once the floor overrides the split.
+        val isFloored = eventWidth > fairShare
 
         groupIndices.forEachIndexed { slot, groupIndex ->
             val x = container.x + eventWidth * slot + container.padding
             val frame = group[groupIndex]
 
-            if (x + eventWidth > container.maxX) frame.collapse() else frame.moveTo(x, eventWidth)
+            if (isFloored && x + eventWidth > container.maxX) frame.collapse() else frame.moveTo(x, eventWidth)
         }
     }
 }
