@@ -18,9 +18,12 @@
 package com.infomaniak.calendar.ui.screen.day
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -85,6 +88,9 @@ private fun DayScreen(
                 },
             )
         },
+        // The bottom insets stay out so the timeline can run under the navigation bar; it makes
+        // room for it in its own scrolled content instead.
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
         modifier = modifier,
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {

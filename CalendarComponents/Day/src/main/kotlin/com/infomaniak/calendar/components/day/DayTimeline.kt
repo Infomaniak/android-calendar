@@ -18,7 +18,10 @@
 package com.infomaniak.calendar.components.day
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -33,11 +36,15 @@ import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 
 @Composable
 fun DayTimeline(state: DayTimelineState, modifier: Modifier = Modifier) {
+    // The timeline runs under the navigation bar, and the toolbar floats above it: the end of
+    // the day has to clear the two of them stacked.
+    val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
     Box(
         modifier = modifier
             .fillMaxWidth()
             .verticalScroll(state.scrollState)
-            .padding(top = HourLabelOverhang, bottom = DayTimelineDefaults.BottomPadding),
+            .padding(top = HourLabelOverhang, bottom = DayTimelineDefaults.BottomPadding + navigationBarPadding),
     ) {
         HourGrid(state = state, modifier = Modifier.fillMaxWidth())
     }
