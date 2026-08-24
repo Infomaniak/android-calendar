@@ -89,8 +89,7 @@ internal fun TimedEventCard(
         modifier = modifier,
     ) {
         Row(modifier = Modifier.cardStripes(status).fillMaxSize()) {
-            // Every card carries its bar, bordered or not, as the planning's cards do.
-            EventAccentBar(status.sourceColor() ?: status.cardColors().containerColor)
+            EventAccentBar(status.accentBarColor())
 
             EventDetails(
                 event = timedEvent.event,

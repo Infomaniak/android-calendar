@@ -96,7 +96,7 @@ internal fun EventItem(
 
 @Composable
 private fun EventItemCard(status: EventItemStatus, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
-    val cardLine = status.sourceColor() ?: status.cardColors().containerColor
+    val cardLine = status.accentBarColor()
 
     Card(
         colors = status.cardColors(),

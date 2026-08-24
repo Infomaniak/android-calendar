@@ -68,6 +68,14 @@ sealed class EventItemStatus(
 ) {
     abstract val eventColors: EventColorsUi
 
+    /**
+     * The colour of the bar running down the leading edge of a card, which every view draws whether
+     * or not the card also has a border. An event with no colour of its own falls back to the card's
+     * own background, so the bar keeps its width without reading as a mark the event never carried.
+     */
+    @Composable
+    fun accentBarColor(): Color = sourceColor() ?: cardColors().containerColor
+
     data class Default(override val eventColors: EventColorsUi) : EventItemStatus(
         sourceColor = { eventColors.sourceColor },
         cardColors = { containerColors(eventColors) },
