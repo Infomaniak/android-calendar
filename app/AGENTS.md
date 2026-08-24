@@ -41,7 +41,7 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── MainNavHost.kt          # Top-level NavDisplay with entryProvider
     │   └── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, Accounts, Onboarding)
     ├── screen/
-    │   ├── day/                   # DayScreen + DayViewModel
+    │   ├── day/                   # DayScreen + DayViewModel + DayUiState + DayEventGroupingExt
     │   ├── threeDays/             # ThreeDayScreen — placeholder 3-day view
     │   ├── week/                  # WeekScreen — placeholder week view
     │   ├── month/                 # MonthScreen + MonthViewModel
