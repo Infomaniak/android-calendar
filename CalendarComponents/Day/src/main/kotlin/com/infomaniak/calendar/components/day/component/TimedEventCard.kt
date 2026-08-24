@@ -32,7 +32,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -70,6 +72,7 @@ private val ReadableTitleHeight = 20.dp
 private val TitleSizeStep = 0.5.sp
 private const val MinTitleWrapEms = 2f
 private const val MaxDetailLines = 2
+private const val ELLIPSIS = "…"
 
 @Composable
 internal fun TimedEventCard(
@@ -122,6 +125,10 @@ private fun EventDetails(
     val spacing = with(density) { EsdsTheme.spacing.twoXs.roundToPx() }
     val maxPadding = with(density) { EsdsTheme.spacing.lg.toPx() }
 
+    val textMeasurer = rememberTextMeasurer()
+    val detailStyle = MaterialTheme.typography.bodySmall
+    val hours = "${event.start.formatHours()} - ${event.end.formatHours()}"
+
     Layout(
         modifier = modifier,
         contents = listOf(
@@ -134,22 +141,36 @@ private fun EventDetails(
                 )
             },
             { event.location?.let { DetailLine(it, textDecoration) } },
-            { DetailLine("${event.start.formatHours()} - ${event.end.formatHours()}", textDecoration) },
+            { DetailLine(hours, textDecoration) },
         ),
     ) { (titleMeasurables, locationMeasurables, timeMeasurables), constraints ->
         val available = visibleHeight()
         val childConstraints = Constraints(maxWidth = constraints.maxWidth)
 
-        val title = titleMeasurables.single().measure(childConstraints)
-        val details = ArrayList<Placeable>(MaxDetailLines)
-        var linesHeight = title.height.toFloat()
+        // The width a line has is only known here, once the accent bar and the padding have taken
+        // their share of the card.
+        fun saysSomething(text: String?, style: TextStyle): Boolean {
+            return text != null && textMeasurer.saysSomethingIn(constraints.maxWidth, text, style)
+        }
 
-        for (detailMeasurables in listOf(locationMeasurables, timeMeasurables)) {
+        val lines = ArrayList<Placeable>(1 + MaxDetailLines)
+        var linesHeight = 0f
+
+        if (saysSomething(event.title, titleSizing.style)) {
+            val title = titleMeasurables.single().measure(childConstraints)
+            lines.add(title)
+            linesHeight = title.height.toFloat()
+        }
+
+        for ((detailMeasurables, text) in listOf(locationMeasurables to event.location, timeMeasurables to hours)) {
+            if (!saysSomething(text, detailStyle)) continue
             val detail = detailMeasurables.firstOrNull()?.measure(childConstraints) ?: continue
-            if (linesHeight + spacing + detail.height > available) break
 
-            linesHeight += spacing + detail.height
-            details.add(detail)
+            val gap = if (lines.isEmpty()) 0 else spacing
+            if (linesHeight + gap + detail.height > available) break
+
+            linesHeight += gap + detail.height
+            lines.add(detail)
         }
 
         // Padding is what the lines leave over, never what they are charged: a card with the height
@@ -158,15 +179,33 @@ private fun EventDetails(
 
         layout(constraints.maxWidth, linesHeight.roundToInt() + padding * 2) {
             var y = padding
-            title.place(x = 0, y = y)
-            y += title.height + spacing
 
-            details.forEach { detail ->
-                detail.place(x = 0, y = y)
-                y += detail.height + spacing
+            lines.forEach { line ->
+                line.place(x = 0, y = y)
+                y += line.height + spacing
             }
         }
     }
+}
+
+/**
+ * Whether [text] has room to say anything in [maxWidth] pixels: all of it, or a first letter with
+ * the ellipsis trailing it.
+ *
+ * A card too narrow for that writes nothing at all. An ellipsis on its own names no event and reads
+ * as content that was never there, where the bare card at least reads as the block of time it is.
+ */
+private fun TextMeasurer.saysSomethingIn(maxWidth: Int, text: String, style: TextStyle): Boolean {
+    if (text.isEmpty() || maxWidth <= 0) return false
+
+    // By code point, or a title opening on an emoji would be measured on half of one.
+    val firstCharacter = text.substring(0, text.offsetByCodePoints(0, 1))
+
+    val letterAndEllipsis = measure(firstCharacter + ELLIPSIS, style, maxLines = 1).size.width
+    if (letterAndEllipsis <= maxWidth) return true
+
+    // Only a text no longer than the ellipsis it would be cut down to can still fit whole here.
+    return measure(text, style, maxLines = 1).size.width <= maxWidth
 }
 
 @Composable
