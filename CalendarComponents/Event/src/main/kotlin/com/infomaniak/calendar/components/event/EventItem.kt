@@ -165,7 +165,7 @@ private fun PartialDayContent(
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.SemiBold,
                 textDecoration = textDecoration,
                 maxLines = 1,
@@ -173,7 +173,7 @@ private fun PartialDayContent(
             )
             Text(
                 text = formatDisplayedHour(start, end),
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Medium,
                 textDecoration = textDecoration,
             )
@@ -181,7 +181,7 @@ private fun PartialDayContent(
             if (location != null) {
                 Text(
                     text = location,
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Medium,
                     textDecoration = textDecoration,
                     maxLines = 1,
