@@ -91,8 +91,10 @@ fun DayTimeline(
         Box(
             modifier = Modifier
                 .verticalScroll(state.scrollState, enabled = !state.isPinching)
-                .pinchToZoom(state)
-                .padding(top = HourLabelOverhang, bottom = DayTimelineDefaults.BottomPadding + navigationBarPadding),
+                .padding(top = HourLabelOverhang, bottom = DayTimelineDefaults.BottomPadding + navigationBarPadding)
+                // Inside the padding: a pinch reads its own y as an hour, so it has to start
+                // counting where the first hour line is drawn, not where the padding begins.
+                .pinchToZoom(state),
         ) {
             HourGrid(state = state, modifier = Modifier.fillMaxWidth())
 
