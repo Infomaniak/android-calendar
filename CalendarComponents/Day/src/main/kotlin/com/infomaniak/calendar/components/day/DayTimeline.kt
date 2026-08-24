@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.component.CurrentTimeIndicator
 import com.infomaniak.calendar.components.day.component.HourGrid
 import com.infomaniak.calendar.components.day.component.HourLabelOverhang
+import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults
 import com.infomaniak.calendar.components.day.layout.TimedEventsLayout
 import com.infomaniak.calendar.components.day.layout.eventLayoutConfig
 import com.infomaniak.calendar.components.day.layout.resolveOverlaps
@@ -68,7 +69,10 @@ fun DayTimeline(
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
         val density = LocalDensity.current
         val config = remember(density) { density.eventLayoutConfig() }
-        val eventsAreaWidth = maxWidth - DayTimelineDefaults.HourGutterWidth
+        // The solver strips horizontalSpacing off the end of every card, so the area runs that far
+        // past the timeline's end padding for the last column of cards to stop exactly on it.
+        val eventsAreaEndPadding = DayTimelineDefaults.TimelineEndPadding - EventLayoutDefaults.HorizontalSpacing
+        val eventsAreaWidth = maxWidth - DayTimelineDefaults.HourGutterWidth - eventsAreaEndPadding
 
         val placements = remember(events, eventsAreaWidth, state.hourHeight, config) {
             with(density) {
