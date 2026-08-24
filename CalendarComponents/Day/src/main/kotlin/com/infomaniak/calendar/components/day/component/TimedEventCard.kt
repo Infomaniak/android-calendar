@@ -34,8 +34,8 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -91,7 +91,9 @@ internal fun TimedEventCard(
         shape = EsdsTheme.radius.sm,
         modifier = modifier,
     ) {
-        Row(modifier = Modifier.cardStripes(status).fillMaxSize()) {
+        Row(modifier = Modifier
+            .cardStripes(status)
+            .fillMaxSize()) {
             EventAccentBar(status.accentBarColor())
 
             EventDetails(
@@ -149,21 +151,21 @@ private fun EventDetails(
 
         // The width a line has is only known here, once the accent bar and the padding have taken
         // their share of the card.
-        fun saysSomething(text: String?, style: TextStyle): Boolean {
-            return text != null && textMeasurer.saysSomethingIn(constraints.maxWidth, text, style)
+        fun isTextDisplayed(text: String?, style: TextStyle): Boolean {
+            return text != null && textMeasurer.hasRoomForText(constraints.maxWidth, text, style)
         }
 
         val lines = ArrayList<Placeable>(1 + MaxDetailLines)
         var linesHeight = 0f
 
-        if (saysSomething(event.title, titleSizing.style)) {
+        if (isTextDisplayed(event.title, titleSizing.style)) {
             val title = titleMeasurables.single().measure(childConstraints)
             lines.add(title)
             linesHeight = title.height.toFloat()
         }
 
         for ((detailMeasurables, text) in listOf(locationMeasurables to event.location, timeMeasurables to hours)) {
-            if (!saysSomething(text, detailStyle)) continue
+            if (!isTextDisplayed(text, detailStyle)) continue
             val detail = detailMeasurables.firstOrNull()?.measure(childConstraints) ?: continue
 
             val gap = if (lines.isEmpty()) 0 else spacing
@@ -189,13 +191,13 @@ private fun EventDetails(
 }
 
 /**
- * Whether [text] has room to say anything in [maxWidth] pixels: all of it, or a first letter with
+ * Whether [text] has room to show anything in [maxWidth] pixels: all of it, or a first letter with
  * the ellipsis trailing it.
  *
  * A card too narrow for that writes nothing at all. An ellipsis on its own names no event and reads
  * as content that was never there, where the bare card at least reads as the block of time it is.
  */
-private fun TextMeasurer.saysSomethingIn(maxWidth: Int, text: String, style: TextStyle): Boolean {
+private fun TextMeasurer.hasRoomForText(maxWidth: Int, text: String, style: TextStyle): Boolean {
     if (text.isEmpty() || maxWidth <= 0) return false
 
     // By code point, or a title opening on an emoji would be measured on half of one.
@@ -204,7 +206,7 @@ private fun TextMeasurer.saysSomethingIn(maxWidth: Int, text: String, style: Tex
     val letterAndEllipsis = measure(firstCharacter + ELLIPSIS, style, maxLines = 1).size.width
     if (letterAndEllipsis <= maxWidth) return true
 
-    // Only a text no longer than the ellipsis it would be cut down to can still fit whole here.
+    // Only a text not longer than the ellipsis it would be cut down to can still fit whole here.
     return measure(text, style, maxLines = 1).size.width <= maxWidth
 }
 
@@ -250,7 +252,7 @@ private fun TitleRow(
 
         val widthLeftForTitle = constraints.maxWidth - iconsPlaceable.width - iconsSpacing
         val showsIcons = iconsPlaceable.width > 0 &&
-            titleMeasurable.maxIntrinsicWidth(constraints.maxHeight) <= widthLeftForTitle
+                titleMeasurable.maxIntrinsicWidth(constraints.maxHeight) <= widthLeftForTitle
 
         val titlePlaceable = titleMeasurable.measure(
             constraints.copy(
