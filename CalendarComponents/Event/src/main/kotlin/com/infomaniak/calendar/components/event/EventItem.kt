@@ -48,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.component.cardStripes
 import com.infomaniak.calendar.components.foundation.models.EventUi
@@ -95,7 +96,7 @@ internal fun EventItem(
 
 @Composable
 private fun EventItemCard(status: EventItemStatus, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
-    val cardLine = status.sourceColor() ?: status.cardColors().containerColor
+    val cardLine = status.accentBarColor()
 
     Card(
         colors = status.cardColors(),
@@ -209,7 +210,7 @@ private fun TrailingIcons(trailingIcons: Set<EventIcons>) {
     }
 }
 
-private fun EventUi.Normal.toEventIcons(): Set<EventIcons> = buildSet {
+fun EventUi.Normal.toEventIcons(): Set<EventIcons> = buildSet {
     if (location != null) add(EventIcons.Location)
     if (attendees.all.isNotEmpty()) add(EventIcons.Attendees)
     // TODO: Detect kMeet links
@@ -224,8 +225,13 @@ enum class EventIcons(
     Attendees(R.drawable.ic_users_stacked, R.string.contentDescriptionHasAttendees);
 
     @Composable
-    internal fun TrailingIcon(modifier: Modifier = Modifier) {
-        Icon(painterResource(icon), stringResource(contentDescription), modifier = modifier.size(16.dp))
+    fun TrailingIcon(modifier: Modifier = Modifier, size: Dp = TrailingIconSize) {
+        Icon(painterResource(icon), stringResource(contentDescription), modifier = modifier.size(size))
+    }
+
+    companion object {
+        /** An icon trails a title, so a card shrinking its title scales its icons down with it. */
+        val TrailingIconSize: Dp = 16.dp
     }
 }
 

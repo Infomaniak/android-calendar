@@ -20,6 +20,7 @@ android-calendar/
 ├── CalendarComponents/             # Portable Android UI component library (this repo)
 │   ├── Foundation/                 # Shared models + base Compose components
 │   ├── Event/                      # EventItem Composable
+│   ├── Day/                        # Day Composable (hour grid, timed events, all-day band)
 │   ├── Planning/                   # Planning Composable (week/day/event list)
 │   ├── Calendar/                   # Calendar Composable (expanded, unexpanded)
 │   └── Resources/                  # Centralised string resources (no code)
@@ -107,18 +108,21 @@ String resources follow the single-module pattern — all strings consumed by an
 | `:CalendarComponents:Resources`   | `com.infomaniak.calendar.components.resources`   | String-only module: `res/values/strings.xml` (+ translations). No Kotlin code, no Compose. Centralises all CalendarComponents string resources. |
 | `:CalendarComponents:Event`       | `com.infomaniak.calendar.components.event`       | `EventItem` Composable — renders a single event row. Re-exports Foundation via `api`. |
 | `:CalendarComponents:Planning`    | `com.infomaniak.calendar.components.planning`    | `Planning` Composable — a `LazyColumn` with ISO week headers and per-day event lists. Also provides the `stickyWithinItem` `Modifier` extension. Re-exports Event, Foundation, and Resources via `api`. Week header design is a **placeholder**. |
+| `:CalendarComponents:Day`         | `com.infomaniak.calendar.components.day`         | Day view — a day's header, its all-day band, and the scrollable hour grid carrying its timed events, with the current time indicator and pinch-to-zoom over it. Holds `resolveOverlaps`, the pure-Kotlin solver placing concurrent events, ported from the [Eventually](https://github.com/claustrofob/Eventually) SwiftUI layout the iOS calendar uses so both platforms arrange a day identically. Reusable by the future 3-day / week views. Re-exports Foundation via `api`. |
 
 ### Dependency graph
 
 ```
 Planning ──api──► Event ──api──► Foundation
-    │                                 ▲
-    ├──api──────────────────────────► Foundation
-    └──api──► Resources
+    │                 ▲               ▲
+    ├──api────────────┼───────────────┤
+    └──api──► Resources               │
+                      │               │
+Day ──────────────────┴───api─────────┘
 ```
 
-`Foundation` is the only module with no CalendarComponents dependency. `Planning` is the top-level entry point for
-consumers: `implementation(project(":CalendarComponents:Planning"))` transitively brings in the whole stack.
+`Foundation` is the only module with no CalendarComponents dependency. `Planning` and `Day` are the two top-level
+entry points for consumers, one per calendar view; each transitively brings in the stack it needs.
 
 ### What is final vs placeholder
 

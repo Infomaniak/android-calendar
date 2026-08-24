@@ -17,18 +17,14 @@
  */
 package com.infomaniak.calendar.ui.screen.planning
 
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
-import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
-import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
-import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
+import com.infomaniak.calendar.utils.toEventUi
 import com.infomaniak.calendar.utils.toThemedColorUi
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
 import kotlinx.coroutines.Dispatchers
@@ -38,11 +34,8 @@ import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
-import kotlinx.datetime.toInstant
 import java.util.SortedMap
 import kotlin.time.Clock
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventStatus as KmpEventStatus
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationStatus as KmpParticipationStatus
 
 /**
  * Events grouped by week, then by day.
@@ -82,7 +75,7 @@ suspend fun Map<LocalDate, List<EventDaySlice>>.groupByWeekAndDay(
         var date = week.firstDay
         while (date <= week.lastDay) {
             days[date] = this@groupByWeekAndDay[date]
-                ?.mapTo(mutableListOf()) { it.toEventUi(emailsByUserId, timeZone) }
+                ?.mapTo(mutableListOf<EventUi>()) { it.toEventUi(emailsByUserId, timeZone) }
                 .ensureHasEntry(date, timeZone)
             date = date.plus(DatePeriod(days = 1))
         }
@@ -97,34 +90,6 @@ private fun MutableList<EventUi>?.ensureHasEntry(date: LocalDate, timeZone: Time
     return events
 }
 
-private fun EventDaySlice.toEventUi(emailsByUserId: Map<AccountId, String>, timeZone: TimeZone): EventUi = EventUi.Normal(
-    id = "${event.occurrenceId.value}@$date",
-    masterEventId = event.masterEventId.url,
-    title = event.title,
-    location = event.location,
-    status = event.status.toEventStatus(),
-    start = displayStart.toInstant(timeZone),
-    end = displayEnd.toInstant(timeZone),
-    isAllDay = isAllDay,
-    colors = event.colors.toEventColorsUi(),
-    attendees = toAttendees(event.attendees, emailsByUserId),
-)
-
-private fun EventDaySlice.toAttendees(attendees: List<Attendee>, emailsByUserId: Map<AccountId, String>): Attendees {
-    val all = attendees.map(Attendee::toAttendeeUi)
-    val me = all.find { it.email == emailsByUserId[event.accountId] }
-
-    return Attendees(all, me)
-}
-
-private fun KmpEventStatus?.toEventStatus(): EventStatus {
-    return when (this) {
-        KmpEventStatus.TENTATIVE -> EventStatus.Tentative
-        KmpEventStatus.CANCELLED -> EventStatus.Cancelled
-        else -> EventStatus.Confirmed
-    }
-}
-
 fun EventColors.toEventColorsUi(): EventColorsUi = EventColorsUi(
     _sourceColor = sourceColor,
     _containerColor = containerColor,
@@ -132,19 +97,6 @@ fun EventColors.toEventColorsUi(): EventColorsUi = EventColorsUi(
     _containerVariantColor = containerVariantColor,
     _onContainerVariantColor = onContainerVariantColor.toThemedColorUi(),
 )
-
-private fun Attendee.toAttendeeUi(): AttendeeUi = AttendeeUi(
-    email = email,
-    displayName = displayName,
-    status = status.toParticipationStatus(),
-)
-
-private fun KmpParticipationStatus.toParticipationStatus(): ParticipationStatus = when (this) {
-    KmpParticipationStatus.Accepted -> ParticipationStatus.Accepted
-    KmpParticipationStatus.Declined -> ParticipationStatus.Declined
-    KmpParticipationStatus.Tentative -> ParticipationStatus.Tentative
-    KmpParticipationStatus.NeedsAction -> ParticipationStatus.NeedsAction
-}
 
 fun EventsByWeekAndDay.indexOf(date: LocalDate): Int {
     var index = 0

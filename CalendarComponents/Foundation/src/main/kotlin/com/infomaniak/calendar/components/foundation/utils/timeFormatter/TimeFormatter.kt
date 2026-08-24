@@ -32,26 +32,38 @@ object HourFormatter {
     private val format24Hours by lazy { DateTimeFormatter.ofPattern("HH:mm") }
     private val format12Hours by lazy { DateTimeFormatter.ofPattern("hh:mm a") }
 
+    private val labelFormat24Hours by lazy { DateTimeFormatter.ofPattern("HH:mm") }
+    private val labelFormat12Hours by lazy { DateTimeFormatter.ofPattern("h a") }
+
     //region Kotlin
     @Composable
     fun Instant.formatHours(): String = toJavaInstant()
         .atZone(ZoneId.systemDefault())
-        .format(getHourMinuteFormatter())
+        .format(selectFormatter(format24Hours, format12Hours))
     //endregion
 
     //region Java
     @Composable
-    fun LocalTime.formatHours(): String = getHourMinuteFormatter().format(this)
+    fun LocalTime.formatHours(): String = selectFormatter(format24Hours, format12Hours).format(this)
 
     @Composable
     fun LocalDateTime.formatHours(): String = toLocalTime().formatHours()
+
+    /**
+     * Compact form used to label the hour lines of a timeline, such as `06:00` or `6 AM`.
+     *
+     * Whole hours drop the minutes in 12 hours format, which keeps the label narrow enough for the
+     * timeline's hour gutter.
+     */
+    @Composable
+    fun LocalTime.formatHourLabel(): String = selectFormatter(labelFormat24Hours, labelFormat12Hours).format(this)
     //endregion
 
     /**
-     * Formats a date according to the user settings for 24 hours format.
+     * Picks between the two formats according to the user settings for 24 hours format.
      */
     @Composable
-    private fun getHourMinuteFormatter(): DateTimeFormatter {
+    private fun selectFormatter(format24Hours: DateTimeFormatter, format12Hours: DateTimeFormatter): DateTimeFormatter {
         val currentLocale = LocalLocale.current.platformLocale
 
         return if (DateFormat.is24HourFormat(LocalContext.current)) {

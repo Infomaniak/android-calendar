@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.data
 
 import android.content.Context
+import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.secured.EncryptedDavCredentialSerializer
 import com.infomaniak.calendar.secured.KeystoreCipher
 import com.infomaniak.core.datavalue.DataValues
@@ -40,4 +41,7 @@ class CalendarDataValues @Inject constructor(
         key = "expandedDrawerAccountIds",
         defaultValue = emptySet<Int>(),
     )
+
+    /** Height of one hour on the day timeline, in dp, as last zoomed to by the user. */
+    val dayViewHourHeight = dataValue(key = "dayViewHourHeight", defaultValue = DayTimelineDefaults.HourHeight.value)
 }

@@ -36,7 +36,7 @@ private val STRIPE_WIDTH = 8.dp
 private val STRIPE_SPACING = 4.dp
 
 @Composable
-internal fun Modifier.cardStripes(status: EventItemStatus): Modifier {
+fun Modifier.cardStripes(status: EventItemStatus): Modifier {
     val stripesColor = status.stripesColor()
     return then(if (stripesColor != null) Modifier.diagonalStripes(stripesColor) else Modifier)
 }

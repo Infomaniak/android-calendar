@@ -46,7 +46,7 @@ import com.infomaniak.core.ui.compose.theme.LocalIsThemeDarkMode
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
 
-internal fun EventUi.Normal.toEventItemStatus(): EventItemStatus {
+fun EventUi.Normal.toEventItemStatus(): EventItemStatus {
     if (status == EventStatus.Cancelled) return EventItemStatus.Declined(colors)
     val me = attendees.me ?: return EventItemStatus.Default(colors)
 
@@ -67,6 +67,14 @@ sealed class EventItemStatus(
     val textDecoration: TextDecoration? = null,
 ) {
     abstract val eventColors: EventColorsUi
+
+    /**
+     * The colour of the bar running down the leading edge of a card, which every view draws whether
+     * or not the card also has a border. An event with no colour of its own falls back to the card's
+     * own background, so the bar keeps its width without reading as a mark the event never carried.
+     */
+    @Composable
+    fun accentBarColor(): Color = sourceColor() ?: cardColors().containerColor
 
     data class Default(override val eventColors: EventColorsUi) : EventItemStatus(
         sourceColor = { eventColors.sourceColor },

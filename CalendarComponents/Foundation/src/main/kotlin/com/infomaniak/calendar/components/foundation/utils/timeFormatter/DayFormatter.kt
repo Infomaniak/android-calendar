@@ -27,8 +27,21 @@ import java.util.Locale
 
 object DayFormatter {
     private val formatShortDayName by lazy { DateTimeFormatter.ofPattern("EEE") }
+    private val formatFullDayAndDate by lazy { DateTimeFormatter.ofPattern("EEEE - d MMM") }
 
-    fun LocalDate.toShortDayName(): String = toJavaLocalDate().format(formatShortDayName)
+    fun LocalDate.toShortDayName(locale: Locale): String = toJavaLocalDate().format(formatShortDayName.withLocale(locale))
+
+    /**
+     * Full weekday followed by the day and short month, as shown in the day view header.
+     *
+     * The pattern is built once but worn in the [locale] the caller reads from the composition:
+     * a formatter keeps the locale it was built with, which is the process default at the time, and
+     * would go on naming days in the language the app opened in after the user changes it.
+     */
+    fun LocalDate.toFullDayAndDateName(locale: Locale): String {
+        return toJavaLocalDate().format(formatFullDayAndDate.withLocale(locale))
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(locale) else it.toString() }
+    }
 
     fun DayOfWeek.toNarrowDayName(locale: Locale): String = toJavaDayOfWeek().getDisplayName(TextStyle.NARROW_STANDALONE, locale)
 }
