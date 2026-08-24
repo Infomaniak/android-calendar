@@ -108,7 +108,7 @@ private fun AllDayEventChip(event: EventUi.Normal, onClick: () -> Unit, modifier
                 .cardStripes(status)
                 .fillMaxHeight(),
         ) {
-            EventAccentBar(status.sourceColor() ?: status.cardColors().containerColor)
+            EventAccentBar(status.accentBarColor())
 
             Text(
                 text = event.title,
