@@ -80,17 +80,17 @@ internal fun TimedEventCard(
     modifier: Modifier = Modifier,
 ) {
     val status = timedEvent.event.toEventItemStatus()
-    val border = status.cardBorder()
 
     Card(
         onClick = onClick,
         colors = status.cardColors(),
-        border = border,
+        border = status.cardBorder(),
         shape = EsdsTheme.radius.sm,
         modifier = modifier,
     ) {
         Row(modifier = Modifier.cardStripes(status).fillMaxSize()) {
-            if (border == null) EventAccentBar(status.eventColors.sourceColor)
+            // Every card carries its bar, bordered or not, as the planning's cards do.
+            EventAccentBar(status.sourceColor() ?: status.cardColors().containerColor)
 
             EventDetails(
                 event = timedEvent.event,
