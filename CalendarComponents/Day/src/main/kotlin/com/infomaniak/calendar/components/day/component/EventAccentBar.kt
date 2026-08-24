@@ -31,7 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-private val AccentBarWidth = 2.dp
+private val AccentBarWidth = 4.dp
 
 @Composable
 internal fun EventAccentBar(color: Color, modifier: Modifier = Modifier) {
