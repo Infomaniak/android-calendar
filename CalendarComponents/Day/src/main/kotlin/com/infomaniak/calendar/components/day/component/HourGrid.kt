@@ -20,7 +20,6 @@ package com.infomaniak.calendar.components.day.component
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -45,7 +44,6 @@ import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.HourFormatter.formatHourLabel
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 import java.time.LocalTime
 
 private val HourLineWidth = 1.dp
@@ -116,7 +114,7 @@ private fun HourLabels(state: DayTimelineState, modifier: Modifier = Modifier) {
                 val hour = index + FIRST_LABELLED_HOUR
                 val hourLineY = state.verticalOffsetOf(hour * MINUTES_PER_HOUR).roundToPx()
 
-                label.place(x = constraints.maxWidth - label.width, y = hourLineY - label.height / 2)
+                label.place(x = (constraints.maxWidth - label.width) / 2, y = hourLineY - label.height / 2)
             }
         }
     }
@@ -129,7 +127,7 @@ private fun HourLabel(hour: Int, modifier: Modifier = Modifier) {
         style = HourLabelStyle,
         color = MaterialTheme.colorScheme.onSurface,
         maxLines = 1,
-        modifier = modifier.padding(end = EsdsTheme.spacing.lg),
+        modifier = modifier,
     )
 }
 
