@@ -63,6 +63,12 @@ fun rememberDayTimelineState(
         state.scrollToMinuteOfDay(INITIAL_VISIBLE_HOUR * MINUTES_PER_HOUR, density)
     }
 
+    // A new scroll range is the timeline reporting the height a zoom asked it for, which is the
+    // first moment the zoom's own scroll can be honoured in full.
+    LaunchedEffect(state, density) {
+        snapshotFlow { scrollState.maxValue }.collect { state.reanchorAfterZoom(density) }
+    }
+
     return state
 }
 
@@ -77,6 +83,9 @@ class DayTimelineState(initialHourHeight: Dp, val scrollState: ScrollState) {
 
     var isPinching: Boolean by mutableStateOf(false)
         internal set
+
+    /** The anchor of the zoom that is still waiting for the timeline to be measured at its new height. */
+    private var heldAnchor: PinchAnchor? = null
 
     var hourHeight: Dp
         get() = clampedHourHeight
@@ -95,10 +104,30 @@ class DayTimelineState(initialHourHeight: Dp, val scrollState: ScrollState) {
 
     internal fun zoomAround(anchor: PinchAnchor, zoom: Float, density: Density) {
         hourHeight *= zoom
+        heldAnchor = anchor
 
+        holdAnchor(anchor, density)
+    }
+
+    /**
+     * Puts the anchored hour back under the fingers once the timeline has been measured at its new
+     * height.
+     *
+     * Zooming only asks for that measure, so the scroll range is still the previous, shorter one
+     * while the pinch is being handled: near the end of the day a scroll towards it is clipped to
+     * that range, and what was clipped off would never be asked for again.
+     */
+    internal fun reanchorAfterZoom(density: Density) {
+        val anchor = heldAnchor ?: return
+        heldAnchor = null
+
+        holdAnchor(anchor, density)
+    }
+
+    private fun holdAnchor(anchor: PinchAnchor, density: Density) {
         val anchorY = anchor.hourOfDay * with(density) { hourHeight.toPx() }
-        val delta = anchorY - anchor.viewportY - scrollState.value
-        scrollState.dispatchRawDelta(delta)
+
+        scrollState.dispatchRawDelta(anchorY - anchor.viewportY - scrollState.value)
     }
 
     suspend fun scrollToMinuteOfDay(minuteOfDay: Int, density: Density) {
