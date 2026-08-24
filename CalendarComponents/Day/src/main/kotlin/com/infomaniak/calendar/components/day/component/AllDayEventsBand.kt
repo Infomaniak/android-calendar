@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -69,9 +70,12 @@ internal fun AllDayEventsBand(
             text = stringResource(R.string.allDayLabel),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            // Held against the chips it names, at the gutter's end rather than at the screen's edge.
+            textAlign = TextAlign.End,
+            // The label stays inside the gutter so the chips still begin where the events do.
             modifier = Modifier
                 .width(DayTimelineDefaults.HourGutterWidth)
-                .padding(end = spacing),
+                .padding(end = EsdsTheme.spacing.lg),
         )
 
         LazyVerticalGrid(
