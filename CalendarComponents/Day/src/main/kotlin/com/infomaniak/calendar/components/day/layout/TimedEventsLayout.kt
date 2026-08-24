@@ -98,13 +98,14 @@ private fun TimedEventsLayoutPreview() {
     Surface {
         val density = LocalDensity.current
         val timedEvents = previewDayEvents.timed
+        val config = eventLayoutConfig()
 
-        val placements = remember(density) {
+        val placements = remember(density, config) {
             with(density) {
                 timedEvents.resolveOverlaps(
                     layoutWidth = 320.dp.toPx(),
                     pixelsPerMinute = DayTimelineDefaults.HourHeight.toPx() / MINUTES_PER_HOUR,
-                    config = density.eventLayoutConfig(),
+                    config = config,
                 )
             }
         }

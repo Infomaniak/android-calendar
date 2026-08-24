@@ -68,7 +68,7 @@ fun DayTimeline(
 
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
         val density = LocalDensity.current
-        val config = remember(density) { density.eventLayoutConfig() }
+        val config = eventLayoutConfig()
         // The solver strips horizontalSpacing off the end of every card, so the area runs that far
         // past the timeline's end padding for the last column of cards to stop exactly on it.
         val eventsAreaEndPadding = DayTimelineDefaults.TimelineEndPadding - EventLayoutDefaults.HorizontalSpacing
