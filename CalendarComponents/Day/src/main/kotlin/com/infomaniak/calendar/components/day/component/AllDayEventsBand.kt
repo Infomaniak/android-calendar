@@ -64,7 +64,7 @@ internal fun AllDayEventsBand(
 
     val spacing = EsdsTheme.spacing.xs
 
-    Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(spacing)) {
+    Row(modifier = modifier) {
         Text(
             text = stringResource(R.string.allDayLabel),
             style = MaterialTheme.typography.bodySmall,
@@ -80,6 +80,7 @@ internal fun AllDayEventsBand(
             horizontalArrangement = Arrangement.spacedBy(spacing),
             modifier = Modifier
                 .weight(1f)
+                .padding(end = DayTimelineDefaults.TimelineEndPadding)
                 .heightIn(max = ChipHeight * WHOLE_ROWS + spacing * WHOLE_ROWS + NextRowPeek),
         ) {
             items(events, key = { it.id }) { event ->
