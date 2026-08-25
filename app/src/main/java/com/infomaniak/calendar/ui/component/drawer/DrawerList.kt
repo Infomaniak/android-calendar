@@ -63,7 +63,7 @@ private fun LazyListScope.calendarSection(
             modifier = Modifier
                 .padding(horizontal = Margin.Medium, vertical = Margin.Mini)
                 .clip(EsdsTheme.radius.twoXl)
-                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
                 .animateContentSize(),
         ) {
             DrawerAccountItem(

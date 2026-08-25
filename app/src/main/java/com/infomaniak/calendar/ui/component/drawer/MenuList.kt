@@ -20,8 +20,11 @@ package com.infomaniak.calendar.ui.component.drawer
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -32,17 +35,16 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MenuList(
     menuOptions: List<MenuOption>,
     modifier: Modifier = Modifier,
 ) {
     Column(
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
         modifier = modifier
             .padding(start = Margin.Medium, end = Margin.Medium, top = Margin.Mini, bottom = Margin.Large)
-            .clip(shape = EsdsTheme.radius.twoXl)
-            .background(color = MaterialTheme.colorScheme.surfaceContainer)
-            .padding(vertical = Margin.Mini, horizontal = Margin.Micro),
     ) {
         menuOptions.forEach { menuOption ->
             MenuItem(menuOption = menuOption)
@@ -56,15 +58,16 @@ private fun MenuListPreview() {
     CalendarThemeForPreview {
         MenuList(
             menuOptions = listOf(
-                MenuOption(R.string.accountsTitle, R.drawable.ic_circle_user, {}),
-                MenuOption(R.string.settingsTitle, R.drawable.ic_cog, {}),
-                MenuOption(R.string.helpTitle, R.drawable.ic_headset, {}),
+                MenuOption(0, R.string.accountsTitle,  R.drawable.ic_circle_user, {}),
+                MenuOption(1, R.string.settingsTitle, R.drawable.ic_cog, {}),
+                MenuOption(2, R.string.helpTitle, R.drawable.ic_headset, {}),
             ),
         )
     }
 }
 
 data class MenuOption(
+    val index: Int,
     @StringRes val itemNameRes: Int,
     @DrawableRes val itemIcon: Int,
     val itemAction: () -> Unit,
