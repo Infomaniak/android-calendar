@@ -128,16 +128,19 @@ private fun drawerMenuOptions(
 ): List<MenuOption> {
     return listOf(
         MenuOption(
+            index = 0,
             itemNameRes = R.string.accountsTitle,
             itemIcon = R.drawable.ic_circle_user,
             itemAction = onManageAccounts,
         ),
         MenuOption(
+            index = 1,
             itemNameRes = R.string.settingsTitle,
             itemIcon = R.drawable.ic_cog,
             itemAction = onSettings,
         ),
         MenuOption(
+            index = 2,
             itemNameRes = R.string.helpTitle,
             itemIcon = R.drawable.ic_headset,
             itemAction = onHelp,
