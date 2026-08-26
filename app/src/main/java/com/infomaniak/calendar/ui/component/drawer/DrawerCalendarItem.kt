@@ -17,28 +17,22 @@
  */
 package com.infomaniak.calendar.ui.component.drawer
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.ui.component.drawer.model.CalendarUi
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.utils.toCalendarColorsUi
-import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
@@ -49,35 +43,29 @@ fun DrawerCalendarItem(
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isChecked by remember(calendar.isVisible) { mutableStateOf(calendar.isVisible) }
-
-    Row(
+    ListItem(
         modifier = modifier
-            .fillMaxWidth()
             .toggleable(
-                value = isChecked,
-                onValueChange = {
-                    isChecked = it
-                    onCalendarVisibilityChange(calendar.id, it)
-                },
-                role = Role.Checkbox,
+            value = calendar.isVisible,
+            onValueChange = { onCalendarVisibilityChange(calendar.id, it) },
+            role = Role.Checkbox,
+        ),
+        colors = ListItemDefaults.colors(Color.Transparent),
+        headlineContent = {
+            Text(calendar.displayName)
+        },
+        leadingContent = {
+            Checkbox(
+                checked = calendar.isVisible,
+                onCheckedChange = null,
+                colors = CheckboxDefaults.colors(
+                    checkedColor = calendar.colors.sourceColor,
+                    checkmarkColor = calendar.colors.onSourceColor,
+                    uncheckedColor = calendar.colors.sourceColor,
+                ),
             )
-            .padding(all = Margin.Small),
-        horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Checkbox(
-            checked = isChecked,
-            onCheckedChange = null,
-            colors = CheckboxDefaults.colors(
-                checkedColor = calendar.colors.sourceColor,
-                checkmarkColor = calendar.colors.onSourceColor,
-                uncheckedColor = calendar.colors.sourceColor,
-            ),
-        )
-
-        Text(text = calendar.displayName, style = MaterialTheme.typography.bodyMedium)
-    }
+        },
+    )
 }
 
 @Preview
