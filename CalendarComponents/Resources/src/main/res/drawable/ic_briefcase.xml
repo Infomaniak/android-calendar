@@ -1,0 +1,30 @@
+<!--
+  ~ Infomaniak Calendar - Android
+  ~ Copyright (C) 2026 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M12,12H12.01M16,6V4C16,3.47 15.789,2.961 15.414,2.586C15.039,2.211 14.53,2 14,2H10C9.47,2 8.961,2.211 8.586,2.586C8.211,2.961 8,3.47 8,4V6M22,13C19.033,14.959 15.556,16.003 12,16.003C8.444,16.003 4.967,14.959 2,13M4,6H20C21.105,6 22,6.895 22,8V18C22,19.105 21.105,20 20,20H4C2.895,20 2,19.105 2,18V8C2,6.895 2.895,6 4,6Z"
+        android:strokeWidth="1.75"
+        android:strokeColor="#000000"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>
