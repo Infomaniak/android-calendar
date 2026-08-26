@@ -18,13 +18,9 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
@@ -36,22 +32,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.ui.compose.margin.Margin
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun MenuItem(menuOption: MenuOption, modifier: Modifier = Modifier) {
+fun MenuItem(
+    menuOption: MenuOption,
+    index: Int,
+    count: Int,
+    modifier: Modifier = Modifier,
+) {
     Surface(
         modifier = modifier.fillMaxWidth(),
     ) {
         SegmentedListItem(
             onClick = menuOption.itemAction,
             shapes = ListItemDefaults.segmentedShapes(
-                index = menuOption.index,
-                count = 3
+                index = index,
+                count = count,
             ),
             leadingContent = {
                 Icon(
@@ -88,8 +87,9 @@ private fun MenuItemPreview() {
                 itemNameRes = R.string.accountsTitle,
                 itemIcon = R.drawable.ic_circle_user,
                 itemAction = {},
-                index = 1,
             ),
+            index = 0,
+            count = 1,
         )
     }
 }
