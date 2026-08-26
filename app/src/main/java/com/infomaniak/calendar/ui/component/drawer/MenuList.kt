@@ -46,8 +46,8 @@ fun MenuList(
         modifier = modifier
             .padding(start = Margin.Medium, end = Margin.Medium, top = Margin.Mini, bottom = Margin.Large)
     ) {
-        menuOptions.forEach { menuOption ->
-            MenuItem(menuOption = menuOption)
+        menuOptions.forEachIndexed { index, menuOption ->
+            MenuItem(menuOption = menuOption, index = index, count = menuOptions.size)
         }
     }
 }
@@ -58,16 +58,15 @@ private fun MenuListPreview() {
     CalendarThemeForPreview {
         MenuList(
             menuOptions = listOf(
-                MenuOption(0, R.string.accountsTitle,  R.drawable.ic_circle_user, {}),
-                MenuOption(1, R.string.settingsTitle, R.drawable.ic_cog, {}),
-                MenuOption(2, R.string.helpTitle, R.drawable.ic_headset, {}),
+                MenuOption( R.string.accountsTitle,  R.drawable.ic_circle_user, {}),
+                MenuOption( R.string.settingsTitle, R.drawable.ic_cog, {}),
+                MenuOption( R.string.helpTitle, R.drawable.ic_headset, {}),
             ),
         )
     }
 }
 
 data class MenuOption(
-    val index: Int,
     @StringRes val itemNameRes: Int,
     @DrawableRes val itemIcon: Int,
     val itemAction: () -> Unit,
