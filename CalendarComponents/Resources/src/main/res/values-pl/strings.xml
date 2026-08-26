@@ -29,6 +29,8 @@
     <string name="contentDescriptionHasKMeetLink">Zawiera link do kMeet</string>
     <string name="contentDescriptionHasLocation">Ma lokalizację</string>
     <string name="contentDescriptionToday">Dziś</string>
+    <string name="notificationTypeEmail">E-mail</string>
+    <string name="notificationTypePush">Powiadomienie</string>
     <string name="planningNothingPlanned">Nic zaplanowanego</string>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">Tydz.%d</string>

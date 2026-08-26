@@ -27,6 +27,8 @@
     <string name="contentDescriptionHasKMeetLink">Διαθέτει σύνδεσμο kMeet</string>
     <string name="contentDescriptionHasLocation">Έχει τοποθεσία</string>
     <string name="contentDescriptionToday">Σήμερα</string>
+    <string name="notificationTypeEmail">Email</string>
+    <string name="notificationTypePush">Ειδοποίηση</string>
     <string name="planningNothingPlanned">Τίποτα προγραμματισμένο</string>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">Εβδ.%d</string>
