@@ -27,9 +27,9 @@ data class EventColorsUi(
     private val _containerVariantColor: Int,
     private val _onContainerVariantColor: ThemedColorUi,
 ) {
-    val sourceColor: Color @Composable get() = Color(_sourceColor)
-    val containerColor: Color @Composable get() = Color(_containerColor)
+    val sourceColor: Color get() = Color(_sourceColor)
+    val containerColor: Color get() = Color(_containerColor)
     val onContainerColor: Color @Composable get() = _onContainerColor.toColor()
-    val containerVariantColor: Color @Composable get() = Color(_containerVariantColor)
+    val containerVariantColor: Color get() = Color(_containerVariantColor)
     val onContainerVariantColor: Color @Composable get() = _onContainerVariantColor.toColor()
 }
