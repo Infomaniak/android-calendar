@@ -18,6 +18,7 @@
 <resources>
     <string name="accountsTitle">Λογαριασμοί</string>
     <string name="addAccount">Προσθήκη λογαριασμού</string>
+    <string name="buttonLogOut">Αποσύνδεση</string>
     <string name="contentDescriptionBack">Πίσω</string>
     <string name="contentDescriptionInbox">Άνοιγμα εισερχομένων</string>
     <string name="contentDescriptionMenuDrawer">Άνοιγμα μενού</string>
@@ -28,6 +29,9 @@
     <string name="monthTitle">Μήνας</string>
     <string name="planningTitle">Προγραμματισμός</string>
     <string name="settingsTitle">Ρυθμίσεις</string>
+    <string name="signOutAccountAlertConfirm">Αποσύνδεση από τον λογαριασμό</string>
+    <string name="signOutAccountAlertDescription">Αυτός ο λογαριασμός και τα σχετικά ημερολόγια θα αποσυνδεθούν από την εφαρμογή «Ημερολόγιο». Θα παραμείνουν διαθέσιμα στον διαδικτυακό λογαριασμό σας στην Infomaniak.</string>
+    <string name="signOutAccountAlertTitle">Αποσύνδεση από τον λογαριασμό «%s»</string>
     <string name="syncEventsError">Σφάλμα κατά την ανάκτηση των συμβάντων</string>
     <string name="threeDaysTitle">Τρεις ημέρες</string>
     <string name="weekTitle">Εβδομάδα</string>
