@@ -36,7 +36,7 @@ fun EventDetailScreen() {
             )
         },
     ) {
-        TODO(it)
+        // TODO(it)
     }
 }
 
