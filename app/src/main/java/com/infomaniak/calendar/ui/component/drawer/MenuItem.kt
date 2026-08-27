@@ -23,7 +23,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -43,38 +42,37 @@ fun MenuItem(
     count: Int,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
+    SegmentedListItem(
+        onClick = menuOption.itemAction,
         modifier = modifier.fillMaxWidth(),
-    ) {
-        SegmentedListItem(
-            onClick = menuOption.itemAction,
-            shapes = ListItemDefaults.segmentedShapes(
-                index = index,
-                count = count,
-            ),
-            leadingContent = {
-                Icon(
-                    painter = painterResource(menuOption.itemIcon),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-            },
-            trailingContent = {
-                Icon(
-                    painter = painterResource(R.drawable.ic_chevron_right),
-                    contentDescription = null,
-                )
-            },
-            verticalAlignment = Alignment.CenterVertically,
-            colors = ListItemDefaults.colors(MaterialTheme.colorScheme.surfaceContainerLowest),
-        ) {
-            Text(
-                text = stringResource(menuOption.itemNameRes),
-                style = MaterialTheme.typography.bodyLarge,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+        shapes = ListItemDefaults.segmentedShapes(
+            index = index,
+            count = count,
+        ),
+        leadingContent = {
+            Icon(
+                painter = painterResource(menuOption.itemIcon),
+                contentDescription = null,
             )
-        }
+        },
+        trailingContent = {
+            Icon(
+                painter = painterResource(R.drawable.ic_chevron_right),
+                contentDescription = null,
+            )
+        },
+        verticalAlignment = Alignment.CenterVertically,
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+            leadingIconColor = MaterialTheme.colorScheme.primary,
+        ),
+    ) {
+        Text(
+            text = stringResource(menuOption.itemNameRes),
+            style = MaterialTheme.typography.bodyLarge,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
