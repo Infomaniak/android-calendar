@@ -1,5 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-    
+
 plugins {
     alias(core.plugins.android.library)
     alias(core.plugins.compose.compiler)
@@ -39,6 +39,7 @@ dependencies {
     implementation(project(":CalendarComponents:Resources"))
 
     implementation(core.infomaniak.core.filetypes)
+    implementation(core.infomaniak.core.ui.compose.basics)
     implementation(core.infomaniak.core.ui.compose.margin)
 
     implementation(platform(core.compose.bom))
