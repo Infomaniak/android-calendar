@@ -18,6 +18,7 @@
 <resources>
     <string name="accountsTitle">Conti</string>
     <string name="addAccount">Aggiungi un account</string>
+    <string name="buttonLogOut">Esci</string>
     <string name="contentDescriptionBack">Indietro</string>
     <string name="contentDescriptionInbox">Apri la posta in arrivo</string>
     <string name="contentDescriptionMenuDrawer">Apri menu</string>
@@ -28,6 +29,9 @@
     <string name="monthTitle">Mese</string>
     <string name="planningTitle">Pianificazione</string>
     <string name="settingsTitle">Impostazioni</string>
+    <string name="signOutAccountAlertConfirm">Esci dall’account</string>
+    <string name="signOutAccountAlertDescription">Questo account e i calendari ad esso associati verranno disconnessi dall’app “Calendario”. Rimarranno comunque disponibili nel tuo account online Infomaniak.</string>
+    <string name="signOutAccountAlertTitle">Esci dall’account “%s“</string>
     <string name="syncEventsError">Errore durante il recupero degli eventi</string>
     <string name="threeDaysTitle">Tre giorni</string>
     <string name="weekTitle">Settimana</string>

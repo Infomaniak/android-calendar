@@ -18,6 +18,7 @@
 <resources>
     <string name="accountsTitle">Konti</string>
     <string name="addAccount">Tilføj en konto</string>
+    <string name="buttonLogOut">Log ud</string>
     <string name="contentDescriptionBack">Tilbage</string>
     <string name="contentDescriptionInbox">Åbn indbakken</string>
     <string name="contentDescriptionMenuDrawer">Åbn menu</string>
@@ -28,6 +29,9 @@
     <string name="monthTitle">Måned</string>
     <string name="planningTitle">Planlægning</string>
     <string name="settingsTitle">Indstillinger</string>
+    <string name="signOutAccountAlertConfirm">Log ud af kontoen</string>
+    <string name="signOutAccountAlertDescription">Denne konto og de tilknyttede kalendere vil blive afkoblet fra appen »Kalender«. De vil fortsat være tilgængelige på din Infomaniak-onlinekonto.</string>
+    <string name="signOutAccountAlertTitle">Log ud af kontoen »%s«</string>
     <string name="syncEventsError">Fejl ved hentning af begivenheder</string>
     <string name="threeDaysTitle">Tre dage</string>
     <string name="weekTitle">Uge</string>

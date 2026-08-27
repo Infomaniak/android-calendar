@@ -18,6 +18,7 @@
 <resources>
     <string name="accountsTitle">Konten</string>
     <string name="addAccount">Konto hinzufügen</string>
+    <string name="buttonLogOut">Abmelden</string>
     <string name="contentDescriptionBack">Zurück</string>
     <string name="contentDescriptionInbox">Posteingang öffnen</string>
     <string name="contentDescriptionMenuDrawer">Menü öffnen</string>
@@ -28,6 +29,9 @@
     <string name="monthTitle">Monat</string>
     <string name="planningTitle">Planung</string>
     <string name="settingsTitle">Einstellungen</string>
+    <string name="signOutAccountAlertConfirm">Sich aus dem Konto abmelden</string>
+    <string name="signOutAccountAlertDescription">Dieses Konto und die dazugehörigen Kalender werden von der App „Kalender“ getrennt. Sie bleiben in Ihrem Infomaniak-Online-Konto weiterhin verfügbar.</string>
+    <string name="signOutAccountAlertTitle">Sich vom Konto „%s“ abmelden</string>
     <string name="syncEventsError">Fehler beim Abrufen der Termine</string>
     <string name="threeDaysTitle">Drei Tage</string>
     <string name="weekTitle">Woche</string>

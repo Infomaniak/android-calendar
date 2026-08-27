@@ -18,6 +18,7 @@
 <resources>
     <string name="accountsTitle">Tilit</string>
     <string name="addAccount">Lisää tili</string>
+    <string name="buttonLogOut">Kirjaudu ulos</string>
     <string name="contentDescriptionBack">Takaisin</string>
     <string name="contentDescriptionInbox">Avaa saapuneet</string>
     <string name="contentDescriptionMenuDrawer">Avaa valikko</string>
@@ -28,6 +29,9 @@
     <string name="monthTitle">Kuukausi</string>
     <string name="planningTitle">Suunnittelu</string>
     <string name="settingsTitle">Asetukset</string>
+    <string name="signOutAccountAlertConfirm">Kirjaudu ulos tililtä</string>
+    <string name="signOutAccountAlertDescription">Tämä tili ja siihen liittyvät kalenterit irrotetaan ”Kalenteri”-sovelluksesta. Ne ovat edelleen käytettävissä Infomaniak-verkkotililläsi.</string>
+    <string name="signOutAccountAlertTitle">Kirjaudu ulos tililtä ”%s”</string>
     <string name="syncEventsError">Virhe noudettaessa tapahtumia</string>
     <string name="threeDaysTitle">Kolme päivää</string>
     <string name="weekTitle">Viikko</string>
