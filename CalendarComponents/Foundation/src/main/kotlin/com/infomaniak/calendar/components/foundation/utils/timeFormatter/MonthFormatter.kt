@@ -17,21 +17,25 @@
  */
 package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
+import androidx.compose.runtime.Composable
 import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.number
+import java.time.Month
 import java.time.format.TextStyle
-import java.util.Locale
 import kotlin.time.Clock
 
-fun YearMonth.monthYearLabel(locale: Locale, currentYear: Int = Clock.today().year): String {
-    val month = java.time.Month.of(month.number)
-        .getDisplayName(TextStyle.FULL_STANDALONE, locale)
-        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(locale) else it.toString() }
+/** `May` */
+@Composable
+fun YearMonth.formatShortMonth(): String = javaMonth().getDisplayName(TextStyle.SHORT, currentLocale())
 
-    return if (year == currentYear) month else "$month $year"
+/** `May` or `May 2024`, gaining the year when the month leaves [currentYear]. */
+@Composable
+fun YearMonth.formatMonthAndOptionalYear(currentYear: Int = Clock.today().year): String {
+    val locale = currentLocale()
+    val monthName = javaMonth().getDisplayName(TextStyle.FULL_STANDALONE, locale).titlecaseFirstChar(locale)
+
+    return if (year == currentYear) monthName else "$monthName $year"
 }
 
-fun YearMonth.monthDisplayName(locale: Locale): String {
-    return java.time.Month.of(month.number).getDisplayName(TextStyle.SHORT, locale)
-}
+private fun YearMonth.javaMonth(): Month = Month.of(month.number)

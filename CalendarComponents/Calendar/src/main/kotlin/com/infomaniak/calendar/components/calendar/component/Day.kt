@@ -45,7 +45,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -61,13 +60,11 @@ import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.component.DayCircle
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatFullDateWithYear
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.toJavaLocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import kotlin.time.Clock
 
 private const val MAX_DOTS = 3
@@ -81,10 +78,7 @@ internal fun Day(
     dotsFor: () -> List<EventColorsUi>,
     modifier: Modifier = Modifier,
 ) {
-    val locale = LocalLocale.current.platformLocale
-    val fullDate = remember(date, locale) {
-        date.toJavaLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(locale))
-    }
+    val fullDate = date.formatFullDateWithYear()
 
     val dots = dotsFor()
     val eventsDescription = if (dots.isEmpty()) {

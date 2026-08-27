@@ -34,15 +34,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.foundation.utils.timeFormatter.monthDisplayName
-import com.infomaniak.calendar.components.foundation.utils.timeFormatter.monthYearLabel
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatMonthAndOptionalYear
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortMonth
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -52,7 +51,6 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.number
 import kotlinx.datetime.yearMonth
-import java.util.Locale
 import kotlin.time.Clock
 
 private const val CENTER_INDEX = Int.MAX_VALUE / 2
@@ -87,7 +85,6 @@ fun HorizontalMonthSelector(
     onMonthSelected: (YearMonth) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val locale = LocalLocale.current.platformLocale
     val anchorMonth = remember { selectedMonth() }
     val anchorYear = anchorMonth.year
     val listState = rememberLazyListState(
@@ -130,7 +127,6 @@ fun HorizontalMonthSelector(
                 is SelectorItem.Month -> MonthButton(
                     month = item.yearMonth,
                     isSelected = item.yearMonth == selectedMonth(),
-                    locale = locale,
                     onMonthClick = { onMonthSelected(item.yearMonth) },
                     modifier = Modifier
                         .padding(horizontal = Margin.Mini)
@@ -146,11 +142,11 @@ fun HorizontalMonthSelector(
 private fun MonthButton(
     month: YearMonth,
     isSelected: Boolean,
-    locale: Locale,
     onMonthClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val monthName = month.monthDisplayName(locale)
+    val monthName = month.formatShortMonth()
+    val monthDescription = month.formatMonthAndOptionalYear()
 
     val backgroundColor = if (isSelected) {
         MaterialTheme.colorScheme.primary
@@ -169,7 +165,7 @@ private fun MonthButton(
         shape = EsdsTheme.radius.full,
         modifier = modifier
             .clearAndSetSemantics {
-                contentDescription = month.monthYearLabel(locale)
+                contentDescription = monthDescription
                 selected = isSelected
             },
         contentPadding = PaddingValues(0.dp),

@@ -26,14 +26,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
-import com.infomaniak.calendar.components.foundation.utils.timeFormatter.DayFormatter.toFullDayAndDateName
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDayWithShortMonth
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -47,8 +46,6 @@ internal fun DayHeader(
     modifier: Modifier = Modifier,
     trailing: @Composable () -> Unit = {},
 ) {
-    val locale = LocalLocale.current.platformLocale
-
     Row(
         // Starts where the events do, past the gutter the hours and the all-day label sit in.
         modifier = modifier.padding(start = DayTimelineDefaults.HourGutterWidth),
@@ -62,7 +59,7 @@ internal fun DayHeader(
         )
 
         Text(
-            text = date.toFullDayAndDateName(locale),
+            text = date.formatDayWithShortMonth(),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium,
             maxLines = 1,
