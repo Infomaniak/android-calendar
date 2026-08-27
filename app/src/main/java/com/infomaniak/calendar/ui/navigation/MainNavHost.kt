@@ -21,7 +21,10 @@ import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -30,6 +33,7 @@ import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.ui.NavDisplay
 import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.component.drawer.CalendarDrawer
+import com.infomaniak.calendar.ui.component.drawer.DrawerViewModel
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.component.CalendarHorizontalFloatingToolbar
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.DrawerDecoratorStrategy
@@ -37,7 +41,8 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Metada
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
-import com.infomaniak.calendar.ui.screen.accounts.Accounts
+import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
+import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventCreation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
@@ -82,10 +87,20 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
     entry<NavDestination.EventCreation> {
         EventCreationScreen()
     }
-    entry<NavDestination.Accounts> {
-        Accounts(
+    entry<NavDestination.Accounts.ListScreen> {
+        AccountsListScreen(
             onBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
             onAddAccount = { backStack.add(NavDestination.Onboarding(onlyLogin = true)) },
+            onAccountsActions = { userId -> backStack.add(NavDestination.Accounts.ActionsScreen(userId)) },
+        )
+    }
+    entry<NavDestination.Accounts.ActionsScreen> { destination ->
+        val drawerViewModel: DrawerViewModel = viewModel()
+        val calendarsUsers by drawerViewModel.calendarsUsers.collectAsStateWithLifecycle()
+        val user = calendarsUsers.find { it.user.id == destination.userId }?.user ?: return@entry
+        AccountActionsScreen(
+            onBack = { backStack.popOrReplaceRoot(NavDestination.Accounts.ListScreen) },
+            user = user,
         )
     }
     entry<NavDestination.Onboarding> { destination ->
@@ -126,7 +141,7 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
             CalendarDrawer(
                 content = content,
                 onManageAccounts = {
-                    backStack.add(NavDestination.Accounts)
+                    backStack.add(NavDestination.Accounts.ListScreen)
                 },
             )
         },
