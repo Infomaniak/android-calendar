@@ -46,9 +46,14 @@ import com.infomaniak.core.ui.compose.preview.previewparameter.dummyUserOf
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
-fun AccountItem(user: User, modifier: Modifier = Modifier) {
+fun AccountItem(
+    user: User,
+    onClick: (User) -> Unit,
+    hasAction: () -> Boolean,
+    modifier: Modifier = Modifier,
+) {
     Surface(
-        onClick = {},
+        onClick = { if (hasAction()) onClick(user) },
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = Margin.Medium)
@@ -77,10 +82,12 @@ fun AccountItem(user: User, modifier: Modifier = Modifier) {
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            Icon(
-                painter = painterResource(R.drawable.ic_chevron_right),
-                contentDescription = null,
-            )
+            if (hasAction()) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_chevron_right),
+                    contentDescription = null,
+                )
+            }
         }
     }
 }
@@ -88,5 +95,5 @@ fun AccountItem(user: User, modifier: Modifier = Modifier) {
 @Composable
 @Preview(showBackground = true)
 private fun AccountItemPreview() {
-    AccountItem(user = dummyUserOf(1, "John", "Doe"))
+    AccountItem(user = dummyUserOf(1, "John", "Doe"), onClick = {}, hasAction = { true })
 }
