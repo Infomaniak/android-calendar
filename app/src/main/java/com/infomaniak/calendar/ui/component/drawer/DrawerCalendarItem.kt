@@ -17,13 +17,11 @@
  */
 package com.infomaniak.calendar.ui.component.drawer
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -46,10 +44,10 @@ fun DrawerCalendarItem(
     ListItem(
         modifier = modifier
             .toggleable(
-            value = calendar.isVisible,
-            onValueChange = { onCalendarVisibilityChange(calendar.id, it) },
-            role = Role.Checkbox,
-        ),
+                value = calendar.isVisible,
+                onValueChange = { onCalendarVisibilityChange(calendar.id, it) },
+                role = Role.Checkbox,
+            ),
         colors = ListItemDefaults.colors(Color.Transparent),
         headlineContent = {
             Text(calendar.displayName)
