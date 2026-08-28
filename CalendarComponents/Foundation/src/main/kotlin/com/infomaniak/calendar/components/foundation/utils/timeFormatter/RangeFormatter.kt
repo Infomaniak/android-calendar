@@ -39,17 +39,20 @@ fun formatTimeRange(start: Instant, end: Instant, timeZone: TimeZone = TimeZone.
 /** `Wednesday, May 20, 08:00 - 09:00`, repeating the date on the end when the range spans several days. */
 @Composable
 fun formatDateTimeRange(
-    start: Instant,
-    end: Instant,
+    start: LocalDateTime,
+    end: LocalDateTime,
     timeZone: TimeZone = TimeZone.currentSystemDefault(),
     currentYear: Int = Clock.today(timeZone).year,
-): String = formatDateTimeRange(start, end, currentLocale(), timeZone, isUsing24HourFormat(), currentYear)
+): String = formatDateTimeRange(start, end, currentLocale(), isUsing24HourFormat(), currentYear)
 
 /** `Wednesday, May 20 - Friday, May 22`, or a single date when both bounds land on the same day. Both are inclusive. */
 @Composable
-fun formatDateRange(startDate: LocalDate, endDate: LocalDate, currentYear: Int = Clock.today().year): String {
-    return formatDateRange(startDate, endDate, currentLocale(), currentYear)
-}
+fun formatDateRange(
+    start: LocalDateTime,
+    end: LocalDateTime,
+    timeZone: TimeZone = TimeZone.currentSystemDefault(),
+    currentYear: Int = Clock.today(timeZone).year,
+): String = formatDateRange(start.date, end.date, currentLocale(), currentYear)
 //endregion
 
 //region Underlying testable logic
@@ -67,23 +70,19 @@ internal fun formatTimeRange(
 }
 
 internal fun formatDateTimeRange(
-    start: Instant,
-    end: Instant,
+    start: LocalDateTime,
+    end: LocalDateTime,
     locale: Locale,
-    timeZone: TimeZone,
     use24HourFormat: Boolean,
     currentYear: Int,
 ): String {
-    val startDateTime = start.toLocalDateTime(timeZone)
-    val endDateTime = end.toLocalDateTime(timeZone)
-
-    val formattedEnd = if (startDateTime.date == endDateTime.date) {
-        endDateTime.time.formatTime(locale, use24HourFormat)
+    val formattedEnd = if (start.date == end.date) {
+        end.time.formatTime(locale, use24HourFormat)
     } else {
-        endDateTime.formatDateAndTime(locale, use24HourFormat, currentYear)
+        end.formatDateAndTime(locale, use24HourFormat, currentYear)
     }
 
-    return startDateTime.formatDateAndTime(locale, use24HourFormat, currentYear) + RANGE_SEPARATOR + formattedEnd
+    return start.formatDateAndTime(locale, use24HourFormat, currentYear) + RANGE_SEPARATOR + formattedEnd
 }
 
 private fun LocalDateTime.formatDateAndTime(locale: Locale, use24HourFormat: Boolean, currentYear: Int): String {

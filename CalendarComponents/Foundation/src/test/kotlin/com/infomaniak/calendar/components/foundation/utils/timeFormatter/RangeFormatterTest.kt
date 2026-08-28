@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -59,18 +60,6 @@ class RangeFormatterTest {
     fun `range spanning two days repeats the date`() {
         val formatted = formatDateTime("2026-05-20T08:00:00Z", "2026-05-21T09:00:00Z")
         assertEquals("Wednesday, May 20, 08:00 - Thursday, May 21, 09:00", formatted)
-    }
-
-    @Test
-    fun `range shifted into the next day by the time zone shows that day`() {
-        val formatted = formatDateTime("2026-05-20T20:00:00Z", "2026-05-20T22:00:00Z", timeZone = TimeZone.of("UTC+05:00"))
-        assertEquals("Thursday, May 21, 01:00 - 03:00", formatted)
-    }
-
-    @Test
-    fun `range collapsed by the given time zone shows the date once`() {
-        val formatted = formatDateTime("2026-05-20T22:00:00Z", "2026-05-21T02:00:00Z", timeZone = TimeZone.of("UTC-05:00"))
-        assertEquals("Wednesday, May 20, 17:00 - 21:00", formatted)
     }
 
     @Test
@@ -126,19 +115,15 @@ class RangeFormatterTest {
         private fun formatDateTime(
             start: String,
             end: String,
-            timeZone: TimeZone = TimeZone.UTC,
             use24HourFormat: Boolean = true,
             locale: Locale = LOCALE,
-        ): String {
-            return formatDateTimeRange(
-                start = Instant.parse(start),
-                end = Instant.parse(end),
-                locale = locale,
-                timeZone = timeZone,
-                use24HourFormat = use24HourFormat,
-                currentYear = CURRENT_YEAR,
-            )
-        }
+        ): String = formatDateTimeRange(
+            start = LocalDateTime.parse(start),
+            end = LocalDateTime.parse(end),
+            locale = locale,
+            use24HourFormat = use24HourFormat,
+            currentYear = CURRENT_YEAR,
+        )
 
         private fun formatDate(startDate: LocalDate, endDate: LocalDate): String {
             return formatDateRange(startDate, endDate, LOCALE, CURRENT_YEAR)
