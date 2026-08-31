@@ -19,39 +19,25 @@ package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
 import androidx.compose.runtime.Composable
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalTime
-import kotlinx.datetime.toLocalDateTime
 import java.util.Locale
-import kotlin.time.Instant
 
 private const val TIME_24_HOURS_PATTERN = "HH:mm"
 private const val TIME_12_HOURS_PATTERN = "hh:mm a"
-
-private const val HOUR_LABEL_24_HOURS_PATTERN = "HH:mm"
-private const val HOUR_LABEL_12_HOURS_PATTERN = "h a"
+private const val SHORT_TIME_12_HOURS_PATTERN = "h a"
 
 //region Exposed formatting methods
-/** `08:00`, or `08:00 AM` when the user is not on 24 hours format. */
-@Composable
-fun Instant.formatTime(timeZone: TimeZone = TimeZone.currentSystemDefault()): String {
-    return toLocalDateTime(timeZone).time.formatTime()
-}
-
-/** `08:00`, or `08:00 AM` when the user is not on 24 hours format. */
-@Composable
-fun LocalTime.formatTime(): String = formatTime(currentLocale(), isUsing24HourFormat())
-
 /** `06:00` or `6 AM`, narrow enough for the timeline's hour gutter. */
 @Composable
-fun LocalTime.formatHourLabel(): String {
-    val pattern = if (isUsing24HourFormat()) HOUR_LABEL_24_HOURS_PATTERN else HOUR_LABEL_12_HOURS_PATTERN
+fun LocalTime.formatShortTimeLabel(): String {
+    val pattern = if (isUsing24HourFormat()) TIME_24_HOURS_PATTERN else SHORT_TIME_12_HOURS_PATTERN
 
     return toJavaLocalTime().format(fixedFormatter(pattern, currentLocale()))
 }
 //endregion
 
 //region Underlying testable logic
+/** `08:00`, or `08:00 AM` when the user is not on 24 hours format. */
 internal fun LocalTime.formatTime(locale: Locale, use24HourFormat: Boolean): String {
     val pattern = if (use24HourFormat) TIME_24_HOURS_PATTERN else TIME_12_HOURS_PATTERN
 
