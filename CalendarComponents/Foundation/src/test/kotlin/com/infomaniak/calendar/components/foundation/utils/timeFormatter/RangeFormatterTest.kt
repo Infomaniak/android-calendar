@@ -46,31 +46,31 @@ class RangeFormatterTest {
 
     @Test
     fun `same day range shows the date once`() {
-        val formatted = formatDateTime("2026-05-20T08:00:00Z", "2026-05-20T09:00:00Z")
+        val formatted = formatDateTime("2026-05-20T08:00:00", "2026-05-20T09:00:00")
         assertEquals("Wednesday, May 20, 08:00 - 09:00", formatted)
     }
 
     @Test
     fun `same day range honours the 12 hours format`() {
-        val formatted = formatDateTime("2026-05-20T08:00:00Z", "2026-05-20T20:30:00Z", use24HourFormat = false)
+        val formatted = formatDateTime("2026-05-20T08:00:00", "2026-05-20T20:30:00", use24HourFormat = false)
         assertEquals("Wednesday, May 20, 08:00 AM - 08:30 PM", formatted)
     }
 
     @Test
     fun `range spanning two days repeats the date`() {
-        val formatted = formatDateTime("2026-05-20T08:00:00Z", "2026-05-21T09:00:00Z")
+        val formatted = formatDateTime("2026-05-20T08:00:00", "2026-05-21T09:00:00")
         assertEquals("Wednesday, May 20, 08:00 - Thursday, May 21, 09:00", formatted)
     }
 
     @Test
     fun `bounds outside the current year carry it`() {
-        val formatted = formatDateTime("2027-05-20T08:00:00Z", "2027-05-21T09:00:00Z")
+        val formatted = formatDateTime("2027-05-20T08:00:00", "2027-05-21T09:00:00")
         assertEquals("Thursday, May 20, 2027, 08:00 - Friday, May 21, 2027, 09:00", formatted)
     }
 
     @Test
     fun `range crossing into the next year carries the year on that bound only`() {
-        val formatted = formatDateTime("2026-12-31T23:00:00Z", "2027-01-01T01:00:00Z")
+        val formatted = formatDateTime("2026-12-31T23:00:00", "2027-01-01T01:00:00")
         assertEquals("Thursday, December 31, 23:00 - Friday, January 1, 2027, 01:00", formatted)
     }
 
@@ -99,8 +99,8 @@ class RangeFormatterTest {
 
         expectedPerLanguage.forEach { (language, expected) ->
             val formatted = formatDateTime(
-                start = "2026-05-20T08:00:00Z",
-                end = "2026-05-20T09:00:00Z",
+                start = "2026-05-20T08:00:00",
+                end = "2026-05-20T09:00:00",
                 locale = Locale.forLanguageTag(language),
             )
 
