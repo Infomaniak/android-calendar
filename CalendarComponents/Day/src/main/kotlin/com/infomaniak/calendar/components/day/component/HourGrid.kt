@@ -43,8 +43,8 @@ import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
-import com.infomaniak.calendar.components.foundation.utils.timeFormatter.HourFormatter.formatHourLabel
-import java.time.LocalTime
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortTimeLabel
+import kotlinx.datetime.LocalTime
 
 private val HourLineWidth = 1.dp
 private const val FIRST_LABELLED_HOUR = 0
@@ -124,7 +124,7 @@ private fun HourLabels(state: DayTimelineState, modifier: Modifier = Modifier) {
 @Composable
 private fun HourLabel(hour: Int, modifier: Modifier = Modifier) {
     Text(
-        text = LocalTime.of(hour, 0).formatHourLabel(),
+        text = LocalTime(hour, 0).formatShortTimeLabel(),
         style = HourLabelStyle,
         color = MaterialTheme.colorScheme.onSurface,
         maxLines = 1,

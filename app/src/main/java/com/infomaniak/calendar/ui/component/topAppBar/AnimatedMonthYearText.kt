@@ -41,12 +41,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.foundation.state.rememberToday
-import com.infomaniak.calendar.components.foundation.utils.timeFormatter.monthYearLabel
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatMonthAndOptionalYear
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate
@@ -60,7 +59,6 @@ fun AnimatedMonthYearText(
     isExpanded: () -> Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val locale = LocalConfiguration.current.locales[0]
     val currentYear by rememberCurrentYear()
     val chevronRotation by animateFloatAsState(
         targetValue = if (isExpanded()) -180f else 0f,
@@ -80,7 +78,7 @@ fun AnimatedMonthYearText(
             horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(text = targetDate.yearMonth.monthYearLabel(locale, currentYear))
+            Text(text = targetDate.yearMonth.formatMonthAndOptionalYear(currentYear))
             Icon(
                 painter = painterResource(R.drawable.ic_chevron_down),
                 contentDescription = null,

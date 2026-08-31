@@ -53,7 +53,7 @@ import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.component.cardStripes
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
-import com.infomaniak.calendar.components.foundation.utils.timeFormatter.HourFormatter.formatHours
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatTimeRange
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlin.time.Clock
@@ -173,7 +173,7 @@ private fun PartialDayContent(
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                text = formatDisplayedHour(start, end),
+                text = formatTimeRange(start, end),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Medium,
                 textDecoration = textDecoration,
@@ -197,9 +197,6 @@ private fun PartialDayContent(
 
     EventSizeSpacer(end - start)
 }
-
-@Composable
-private fun formatDisplayedHour(start: Instant, end: Instant): String = "${start.formatHours()} - ${end.formatHours()}"
 
 @Composable
 private fun TrailingIcons(trailingIcons: Set<EventIcons>) {

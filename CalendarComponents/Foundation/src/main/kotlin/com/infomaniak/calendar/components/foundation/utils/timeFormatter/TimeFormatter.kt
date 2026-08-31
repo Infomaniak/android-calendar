@@ -17,59 +17,30 @@
  */
 package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
-import android.text.format.DateFormat
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLocale
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import kotlin.time.Instant
-import kotlin.time.toJavaInstant
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.toJavaLocalTime
+import java.util.Locale
 
-object HourFormatter {
-    private val format24Hours by lazy { DateTimeFormatter.ofPattern("HH:mm") }
-    private val format12Hours by lazy { DateTimeFormatter.ofPattern("hh:mm a") }
+private const val TIME_24_HOURS_PATTERN = "HH:mm"
+private const val TIME_12_HOURS_PATTERN = "hh:mm a"
+private const val SHORT_TIME_12_HOURS_PATTERN = "h a"
 
-    private val labelFormat24Hours by lazy { DateTimeFormatter.ofPattern("HH:mm") }
-    private val labelFormat12Hours by lazy { DateTimeFormatter.ofPattern("h a") }
+//region Exposed formatting methods
+/** `06:00` or `6 AM`, narrow enough for the timeline's hour gutter. */
+@Composable
+fun LocalTime.formatShortTimeLabel(): String {
+    val pattern = if (isUsing24HourFormat()) TIME_24_HOURS_PATTERN else SHORT_TIME_12_HOURS_PATTERN
 
-    //region Kotlin
-    @Composable
-    fun Instant.formatHours(): String = toJavaInstant()
-        .atZone(ZoneId.systemDefault())
-        .format(selectFormatter(format24Hours, format12Hours))
-    //endregion
-
-    //region Java
-    @Composable
-    fun LocalTime.formatHours(): String = selectFormatter(format24Hours, format12Hours).format(this)
-
-    @Composable
-    fun LocalDateTime.formatHours(): String = toLocalTime().formatHours()
-
-    /**
-     * Compact form used to label the hour lines of a timeline, such as `06:00` or `6 AM`.
-     *
-     * Whole hours drop the minutes in 12 hours format, which keeps the label narrow enough for the
-     * timeline's hour gutter.
-     */
-    @Composable
-    fun LocalTime.formatHourLabel(): String = selectFormatter(labelFormat24Hours, labelFormat12Hours).format(this)
-    //endregion
-
-    /**
-     * Picks between the two formats according to the user settings for 24 hours format.
-     */
-    @Composable
-    private fun selectFormatter(format24Hours: DateTimeFormatter, format12Hours: DateTimeFormatter): DateTimeFormatter {
-        val currentLocale = LocalLocale.current.platformLocale
-
-        return if (DateFormat.is24HourFormat(LocalContext.current)) {
-            format24Hours.withLocale(currentLocale)
-        } else {
-            format12Hours.withLocale(currentLocale)
-        }
-    }
+    return toJavaLocalTime().format(fixedFormatter(pattern, currentLocale()))
 }
+//endregion
+
+//region Underlying testable logic
+/** `08:00`, or `08:00 AM` when the user is not on 24 hours format. */
+internal fun LocalTime.formatTime(locale: Locale, use24HourFormat: Boolean): String {
+    val pattern = if (use24HourFormat) TIME_24_HOURS_PATTERN else TIME_12_HOURS_PATTERN
+
+    return toJavaLocalTime().format(fixedFormatter(pattern, locale))
+}
+//endregion

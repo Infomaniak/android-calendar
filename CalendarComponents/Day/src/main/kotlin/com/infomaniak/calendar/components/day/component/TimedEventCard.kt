@@ -53,7 +53,7 @@ import com.infomaniak.calendar.components.event.component.cardStripes
 import com.infomaniak.calendar.components.event.toEventIcons
 import com.infomaniak.calendar.components.event.toEventItemStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
-import com.infomaniak.calendar.components.foundation.utils.timeFormatter.HourFormatter.formatHours
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatTimeRange
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlin.math.roundToInt
 
@@ -129,7 +129,7 @@ private fun EventDetails(
 
     val textMeasurer = rememberTextMeasurer()
     val detailStyle = MaterialTheme.typography.bodySmall
-    val hours = "${event.start.formatHours()} - ${event.end.formatHours()}"
+    val hours = formatTimeRange(event.start, event.end)
 
     Layout(
         modifier = modifier,
