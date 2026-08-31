@@ -59,7 +59,7 @@ fun DrawerAccountItem(user: User, isExpanded: () -> Boolean, onAccountExpanded: 
     Row(
         modifier = modifier
             .clip(shape = EsdsTheme.radius.twoXl)
-            .background(color = MaterialTheme.colorScheme.surfaceContainerLowest)
+            .background(color = MaterialTheme.colorScheme.surfaceBright)
             .fillMaxWidth()
             .toggleable(
                 value = isExpanded(),
