@@ -17,6 +17,8 @@
  */
 package com.infomaniak.calendar.ui.theme
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
@@ -25,3 +27,7 @@ val White = Color(0xFFFFFFFF)
 
 @Immutable
 data class CustomColorScheme(val avatarInitialsColor: Color = Color.Unspecified)
+
+object CustomColors {
+    val menuDrawerContainerBackground @Composable get() = MaterialTheme.colorScheme.surfaceBright
+}

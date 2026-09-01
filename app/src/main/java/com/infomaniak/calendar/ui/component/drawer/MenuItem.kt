@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.calendar.ui.theme.CustomColors
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -63,7 +64,7 @@ fun MenuItem(
         },
         verticalAlignment = Alignment.CenterVertically,
         colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright,
+            containerColor = CustomColors.menuDrawerContainerBackground,
             leadingIconColor = MaterialTheme.colorScheme.primary,
         ),
     ) {
