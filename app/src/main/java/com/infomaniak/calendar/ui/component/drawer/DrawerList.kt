@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.calendar.ui.theme.CustomColors
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
@@ -63,7 +63,7 @@ private fun LazyListScope.calendarSection(
             modifier = Modifier
                 .padding(horizontal = Margin.Medium, vertical = Margin.Mini)
                 .clip(EsdsTheme.radius.twoXl)
-                .background(MaterialTheme.colorScheme.surfaceBright)
+                .background(CustomColors.menuDrawerContainerBackground)
                 .animateContentSize(),
         ) {
             DrawerAccountItem(
