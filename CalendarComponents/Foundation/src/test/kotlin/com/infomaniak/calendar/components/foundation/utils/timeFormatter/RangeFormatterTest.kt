@@ -46,19 +46,19 @@ class RangeFormatterTest {
 
     @Test
     fun `same day range shows the date once`() {
-        val formatted = formatDateTime("2026-05-20T08:00:00", "2026-05-20T09:00:00")
+        val formatted = formatDateTime(TODAY, LATER_TODAY)
         assertEquals("Wednesday, May 20, 08:00 - 09:00", formatted)
     }
 
     @Test
     fun `same day range honours the 12 hours format`() {
-        val formatted = formatDateTime("2026-05-20T08:00:00", "2026-05-20T20:30:00", use24HourFormat = false)
+        val formatted = formatDateTime(TODAY, "2026-05-20T20:30:00", use24HourFormat = false)
         assertEquals("Wednesday, May 20, 08:00 AM - 08:30 PM", formatted)
     }
 
     @Test
     fun `range spanning two days repeats the date`() {
-        val formatted = formatDateTime("2026-05-20T08:00:00", "2026-05-21T09:00:00")
+        val formatted = formatDateTime(TODAY, "2026-05-21T09:00:00")
         assertEquals("Wednesday, May 20, 08:00 - Thursday, May 21, 09:00", formatted)
     }
 
@@ -87,6 +87,15 @@ class RangeFormatterTest {
     }
 
     @Test
+    fun `date range over several years shows years`() {
+        val formattedSecondYearDiffers = formatDate(LocalDate(2026, 5, 20), LocalDate(2027, 5, 22))
+        assertEquals("Wednesday, May 20 - Saturday, May 22, 2027", formattedSecondYearDiffers)
+
+        val formattedFirstYearDiffers = formatDate(LocalDate(2025, 5, 20), LocalDate(2026, 5, 22))
+        assertEquals("Tuesday, May 20, 2025 - Friday, May 22", formattedFirstYearDiffers)
+    }
+
+    @Test
     fun `each shipped locale orders and words the range its own way`() {
         val expectedPerLanguage = mapOf(
             "de" to "Mittwoch, 20. Mai, 08:00 - 09:00",
@@ -99,8 +108,8 @@ class RangeFormatterTest {
 
         expectedPerLanguage.forEach { (language, expected) ->
             val formatted = formatDateTime(
-                start = "2026-05-20T08:00:00",
-                end = "2026-05-20T09:00:00",
+                start = TODAY,
+                end = LATER_TODAY,
                 locale = Locale.forLanguageTag(language),
             )
 
@@ -108,9 +117,46 @@ class RangeFormatterTest {
         }
     }
 
+    @Test
+    fun `zoned range on a single day only displays the hours and collapses the zone indicator`() {
+        val formatted = formatZoned()
+        assertEquals("08:00 - 09:00 (GMT+2)", formatted)
+    }
+
+    @Test
+    fun `zoned range repeats the date and offset when it spans several days`() {
+        val formatted = formatZoned(end = "2026-05-21T09:00:00")
+        assertEquals("Wednesday, May 20, 08:00 (GMT+2) - Thursday, May 21, 09:00 (GMT+2)", formatted)
+    }
+
+    @Test
+    fun `each bound carries its own offset`() {
+        val formatted = formatZoned(endTimeZone = TimeZone.of("Asia/Tokyo"))
+        assertEquals("08:00 (GMT+2) - 09:00 (GMT+9)", formatted)
+    }
+
+    @Test
+    fun `zoned range words the offset the way each locale does`() {
+        val expectedPerLanguage = mapOf(
+            "de" to "Mittwoch, 20. Mai, 08:00 (GMT+2) - Donnerstag, 21. Mai, 09:00 (GMT+2)",
+            "fi" to "Keskiviikko 20. toukokuuta klo 08:00 (UTC+2) - Torstai 21. toukokuuta klo 09:00 (UTC+2)",
+            "fr" to "Mercredi 20 mai, 08:00 (UTC+2) - Jeudi 21 mai, 09:00 (UTC+2)",
+            "nl" to "Woensdag 20 mei 08:00 (GMT+2) - Donderdag 21 mei 09:00 (GMT+2)",
+        )
+
+        expectedPerLanguage.forEach { (language, expected) ->
+            assertEquals(language, expected, formatZoned(end = TOMORROW, locale = Locale.forLanguageTag(language)))
+        }
+    }
+
     companion object {
         private val LOCALE = Locale.ENGLISH
+        private val PARIS = TimeZone.of("Europe/Paris")
         private const val CURRENT_YEAR = 2026
+
+        private const val TODAY = "2026-05-20T08:00:00"
+        private const val LATER_TODAY = "2026-05-20T09:00:00"
+        private const val TOMORROW = "2026-05-21T09:00:00"
 
         private fun formatDateTime(
             start: String,
@@ -128,5 +174,21 @@ class RangeFormatterTest {
         private fun formatDate(startDate: LocalDate, endDate: LocalDate): String {
             return formatDateRange(startDate, endDate, LOCALE, CURRENT_YEAR)
         }
+
+        private fun formatZoned(
+            locale: Locale = LOCALE,
+            start: String = TODAY,
+            end: String = LATER_TODAY,
+            startTimeZone: TimeZone = PARIS,
+            endTimeZone: TimeZone = PARIS,
+        ): String = formatDateTimeRangeWithZone(
+            start = LocalDateTime.parse(start),
+            startTimeZone = startTimeZone,
+            end = LocalDateTime.parse(end),
+            endTimeZone = endTimeZone,
+            locale = locale,
+            use24HourFormat = true,
+            currentYear = CURRENT_YEAR,
+        )
     }
 }
