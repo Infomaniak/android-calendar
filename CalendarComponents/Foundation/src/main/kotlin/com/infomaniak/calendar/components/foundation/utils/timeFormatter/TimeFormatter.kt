@@ -51,7 +51,6 @@ internal fun LocalTime.formatTime(locale: Locale, use24HourFormat: Boolean): Str
     return toJavaLocalTime().format(fixedFormatter(pattern, locale))
 }
 
-
 /** `GMT+2`, resolved at this exact date and time so both sides of a DST change are correct. */
 internal fun LocalDateTime.formatZoneOffset(timeZone: TimeZone, locale: Locale): String {
     return toJavaLocalDateTime().atZone(timeZone.toJavaZoneId()).format(fixedFormatter(ZONE_PATTERN, locale))

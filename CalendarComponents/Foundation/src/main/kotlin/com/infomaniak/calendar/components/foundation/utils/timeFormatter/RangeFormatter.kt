@@ -139,7 +139,7 @@ internal fun formatDateTimeRangeWithZone(
     }
 }
 
-/** Dates the start bound, and the end bound too as soon as the range leaves the starting day. */
+/** Only add the whole "date" information to the end date if it's different from the start date */
 private fun assembleDateTimeRange(
     start: LocalDateTime,
     end: LocalDateTime,
@@ -153,7 +153,6 @@ private fun assembleDateTimeRange(
     }
 
     val formattedStart = start.withFormattedTime(formattedStartTime)
-    // Only add the whole "date" information to the end date if it's different from the start date
     val formattedEnd = if (start.date == end.date) formattedEndTime else end.withFormattedTime(formattedEndTime)
 
     return joinRange(formattedStart, formattedEnd)
