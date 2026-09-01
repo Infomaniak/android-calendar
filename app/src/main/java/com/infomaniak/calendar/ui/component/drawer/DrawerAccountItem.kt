@@ -80,8 +80,7 @@ fun DrawerAccountItem(user: User, isExpanded: () -> Boolean, onAccountExpanded: 
             overflow = TextOverflow.Ellipsis,
         )
         Box(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface, CircleShape),
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface, CircleShape),
         ) {
             Icon(
                 modifier = Modifier
