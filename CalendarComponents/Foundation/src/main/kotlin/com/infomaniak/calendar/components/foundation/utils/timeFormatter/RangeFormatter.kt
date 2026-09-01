@@ -52,9 +52,9 @@ fun formatDateTimeRange(
  */
 @Composable
 fun formatDateTimeRangeWithZone(
-    start: LocalDateTime,
+    start: Instant,
     startTimeZone: TimeZone,
-    end: LocalDateTime,
+    end: Instant,
     endTimeZone: TimeZone,
     currentYear: Int = Clock.today(startTimeZone).year,
 ): String = formatDateTimeRangeWithZone(
@@ -107,26 +107,29 @@ internal fun formatDateTimeRange(
 )
 
 internal fun formatDateTimeRangeWithZone(
-    start: LocalDateTime,
+    start: Instant,
     startTimeZone: TimeZone,
-    end: LocalDateTime,
+    end: Instant,
     endTimeZone: TimeZone,
     locale: Locale,
     use24HourFormat: Boolean,
     currentYear: Int,
 ): String {
-    val startTime = start.time.formatTime(locale, use24HourFormat)
-    val endTime = end.time.formatTime(locale, use24HourFormat)
+    val startDateTime = start.toLocalDateTime(startTimeZone)
+    val endDateTime = end.toLocalDateTime(endTimeZone)
+
+    val startTime = startDateTime.time.formatTime(locale, use24HourFormat)
+    val endTime = endDateTime.time.formatTime(locale, use24HourFormat)
     val startOffset = start.formatZoneOffset(startTimeZone, locale)
     val endOffset = end.formatZoneOffset(endTimeZone, locale)
 
-    val isSingleDay = start.date == end.date
+    val isSingleDay = startDateTime.date == endDateTime.date
     val hasSingleOffset = isSingleDay && startOffset == endOffset
 
     fun assembleDateTimeRangeWithZone(formattedStartTime: String, formattedEndTime: String): String = if (isSingleDay) {
         joinRange(formattedStartTime, formattedEndTime)
     } else {
-        assembleDateTimeRange(start, end, formattedStartTime, formattedEndTime, locale, currentYear)
+        assembleDateTimeRange(startDateTime, endDateTime, formattedStartTime, formattedEndTime, locale, currentYear)
     }
 
     return if (hasSingleOffset) {

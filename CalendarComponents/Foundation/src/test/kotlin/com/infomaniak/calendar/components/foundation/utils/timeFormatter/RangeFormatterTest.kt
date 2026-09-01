@@ -18,8 +18,8 @@
 package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,25 +52,25 @@ class RangeFormatterTest {
 
     @Test
     fun `same day range honours the 12 hours format`() {
-        val formatted = formatDateTime(TODAY, "2026-05-20T20:30:00", use24HourFormat = false)
+        val formatted = formatDateTime(TODAY, "2026-05-20T20:30:00+02:00", use24HourFormat = false)
         assertEquals("Wednesday, May 20, 08:00 AM - 08:30 PM", formatted)
     }
 
     @Test
     fun `range spanning two days repeats the date`() {
-        val formatted = formatDateTime(TODAY, "2026-05-21T09:00:00")
+        val formatted = formatDateTime(TODAY, TOMORROW)
         assertEquals("Wednesday, May 20, 08:00 - Thursday, May 21, 09:00", formatted)
     }
 
     @Test
     fun `bounds outside the current year carry it`() {
-        val formatted = formatDateTime("2027-05-20T08:00:00", "2027-05-21T09:00:00")
+        val formatted = formatDateTime("2027-05-20T08:00:00+02:00", "2027-05-21T09:00:00+02:00")
         assertEquals("Thursday, May 20, 2027, 08:00 - Friday, May 21, 2027, 09:00", formatted)
     }
 
     @Test
     fun `range crossing into the next year carries the year on that bound only`() {
-        val formatted = formatDateTime("2026-12-31T23:00:00", "2027-01-01T01:00:00")
+        val formatted = formatDateTime("2026-12-31T23:00:00+01:00", "2027-01-01T01:00:00+01:00")
         assertEquals("Thursday, December 31, 23:00 - Friday, January 1, 2027, 01:00", formatted)
     }
 
@@ -107,11 +107,7 @@ class RangeFormatterTest {
         )
 
         expectedPerLanguage.forEach { (language, expected) ->
-            val formatted = formatDateTime(
-                start = TODAY,
-                end = LATER_TODAY,
-                locale = Locale.forLanguageTag(language),
-            )
+            val formatted = formatDateTime(start = TODAY, end = LATER_TODAY, locale = Locale.forLanguageTag(language))
 
             assertEquals(language, expected, formatted)
         }
@@ -125,14 +121,24 @@ class RangeFormatterTest {
 
     @Test
     fun `zoned range repeats the date and offset when it spans several days`() {
-        val formatted = formatZoned(end = "2026-05-21T09:00:00")
+        val formatted = formatZoned(end = TOMORROW)
         assertEquals("Wednesday, May 20, 08:00 (GMT+2) - Thursday, May 21, 09:00 (GMT+2)", formatted)
     }
 
     @Test
     fun `each bound carries its own offset`() {
         val formatted = formatZoned(endTimeZone = TimeZone.of("Asia/Tokyo"))
-        assertEquals("08:00 (GMT+2) - 09:00 (GMT+9)", formatted)
+        assertEquals("08:00 (GMT+2) - 16:00 (GMT+9)", formatted)
+    }
+
+    @Test
+    fun `bounds inside the repeated hour of a DST overlap keep the offset they happened at`() {
+        val formatted = formatZoned(
+            start = "2026-10-25T00:30:00Z", // 02:30 in Paris, first pass through the hour it repeats
+            end = "2026-10-25T01:30:00Z", // 02:30 in Paris again, an hour later
+        )
+
+        assertEquals("02:30 (GMT+2) - 02:30 (GMT+1)", formatted)
     }
 
     @Test
@@ -154,9 +160,9 @@ class RangeFormatterTest {
         private val PARIS = TimeZone.of("Europe/Paris")
         private const val CURRENT_YEAR = 2026
 
-        private const val TODAY = "2026-05-20T08:00:00"
-        private const val LATER_TODAY = "2026-05-20T09:00:00"
-        private const val TOMORROW = "2026-05-21T09:00:00"
+        private const val TODAY = "2026-05-20T08:00:00+02:00"
+        private const val LATER_TODAY = "2026-05-20T09:00:00+02:00"
+        private const val TOMORROW = "2026-05-21T09:00:00+02:00"
 
         private fun formatDateTime(
             start: String,
@@ -164,8 +170,8 @@ class RangeFormatterTest {
             use24HourFormat: Boolean = true,
             locale: Locale = LOCALE,
         ): String = formatDateTimeRange(
-            start = LocalDateTime.parse(start),
-            end = LocalDateTime.parse(end),
+            start = Instant.parse(start).toLocalDateTime(PARIS),
+            end = Instant.parse(end).toLocalDateTime(PARIS),
             locale = locale,
             use24HourFormat = use24HourFormat,
             currentYear = CURRENT_YEAR,
@@ -182,9 +188,9 @@ class RangeFormatterTest {
             startTimeZone: TimeZone = PARIS,
             endTimeZone: TimeZone = PARIS,
         ): String = formatDateTimeRangeWithZone(
-            start = LocalDateTime.parse(start),
+            start = Instant.parse(start),
             startTimeZone = startTimeZone,
-            end = LocalDateTime.parse(end),
+            end = Instant.parse(end),
             endTimeZone = endTimeZone,
             locale = locale,
             use24HourFormat = true,

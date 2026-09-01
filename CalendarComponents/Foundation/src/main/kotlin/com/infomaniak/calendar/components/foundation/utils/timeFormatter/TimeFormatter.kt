@@ -18,13 +18,13 @@
 package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
 import androidx.compose.runtime.Composable
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toJavaLocalTime
 import kotlinx.datetime.toJavaZoneId
 import java.util.Locale
+import kotlin.time.Instant
+import kotlin.time.toJavaInstant
 
 private const val TIME_24_HOURS_PATTERN = "HH:mm"
 private const val TIME_12_HOURS_PATTERN = "hh:mm a"
@@ -51,8 +51,8 @@ internal fun LocalTime.formatTime(locale: Locale, use24HourFormat: Boolean): Str
     return toJavaLocalTime().format(fixedFormatter(pattern, locale))
 }
 
-/** `GMT+2`, resolved at this exact date and time so both sides of a DST change are correct. */
-internal fun LocalDateTime.formatZoneOffset(timeZone: TimeZone, locale: Locale): String {
-    return toJavaLocalDateTime().atZone(timeZone.toJavaZoneId()).format(fixedFormatter(ZONE_PATTERN, locale))
+/** `GMT+2`. Resolved at this exact instant so both sides of a DST change are correct. */
+internal fun Instant.formatZoneOffset(timeZone: TimeZone, locale: Locale): String {
+    return toJavaInstant().atZone(timeZone.toJavaZoneId()).format(fixedFormatter(ZONE_PATTERN, locale))
 }
 //endregion
