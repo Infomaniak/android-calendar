@@ -31,6 +31,10 @@ val appCompileSdk: Int by rootProject.extra
 val appMinSdk: Int by rootProject.extra
 val javaVersion: JavaVersion by rootProject.extra
 
+val localProperties = Properties().also { props ->
+    rootProject.file("local.properties").takeIf { it.exists() }?.reader()?.use(props::load)
+}
+
 android {
     compileSdk = appCompileSdk
     namespace = "com.infomaniak.calendar"
@@ -69,6 +73,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Declared here rather than in defaultConfig, so it doesn't exist at all in release.
+            // Optional: empty means the platform default proxy address. See CaldavDebugConfig.
+            val caldavDebugProxyUrl = localProperties.getProperty("caldavDebugProxyUrl").orEmpty()
+            buildConfigField("String", "CALDAV_DEBUG_PROXY_URL", "\"$caldavDebugProxyUrl\"")
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
