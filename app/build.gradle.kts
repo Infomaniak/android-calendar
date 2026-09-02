@@ -20,7 +20,6 @@ import java.util.Properties
 plugins {
     alias(core.plugins.android.application)
     alias(core.plugins.compose.compiler)
-    alias(core.plugins.kotlin.android)
     alias(core.plugins.kotlin.parcelize)
     alias(core.plugins.kotlin.serialization)
     alias(core.plugins.sentry.plugin)
@@ -41,8 +40,6 @@ android {
         targetSdk = appCompileSdk
         versionCode = 2
         versionName = "0.1-dev"
-
-        setProperty("archivesBaseName", "calendar-$versionName ($versionCode)")
 
         buildConfigField("String", "CLIENT_ID", "\"019ED5E7-47D9-7C02-A0C0-F5EF862DB5A1\"")
 
@@ -76,19 +73,24 @@ android {
         }
     }
 
-    composeCompiler {
-        stabilityConfigurationFiles = listOf(rootProject.layout.projectDirectory.file("stability_config.conf"))
-    }
-
     compileOptions {
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion
     }
 }
+
+composeCompiler {
+    stabilityConfigurationFiles = listOf(rootProject.layout.projectDirectory.file("stability_config.conf"))
+}
+
 kotlin {
     compilerOptions {
         freeCompilerArgs.add("-XXLanguage:+ExplicitBackingFields")
     }
+}
+
+base {
+    archivesName.set("calendar-${android.defaultConfig.versionName} (${android.defaultConfig.versionCode})")
 }
 
 val isRelease = gradle.startParameter.taskNames.any { it.contains("release", ignoreCase = true) }
@@ -141,6 +143,7 @@ dependencies {
     implementation(project(":CalendarComponents:Day"))
     implementation(project(":CalendarComponents:Planning"))
     implementation(project(":CalendarComponents:Foundation"))
+    implementation(project(":CalendarComponents:Resources"))
 
     if (useCalendarCoreCompositeBuild) {
         implementation(libs.infomaniak.multiplatform.calendar.core.submodule)

@@ -107,22 +107,23 @@ String resources follow the single-module pattern — all strings consumed by an
 | `:CalendarComponents:Foundation`  | `com.infomaniak.calendar.components.foundation`  | Shared models (`EventUi`, `YearWeek`, `WeekNumbering`) and base Compose components (`DayCircle`, `DateState`) used by all other CalendarComponents modules. |
 | `:CalendarComponents:Resources`   | `com.infomaniak.calendar.components.resources`   | String-only module: `res/values/strings.xml` (+ translations). No Kotlin code, no Compose. Centralises all CalendarComponents string resources. |
 | `:CalendarComponents:Event`       | `com.infomaniak.calendar.components.event`       | `EventItem` Composable — renders a single event row. Re-exports Foundation via `api`. |
-| `:CalendarComponents:Planning`    | `com.infomaniak.calendar.components.planning`    | `Planning` Composable — a `LazyColumn` with ISO week headers and per-day event lists. Also provides the `stickyWithinItem` `Modifier` extension. Re-exports Event, Foundation, and Resources via `api`. Week header design is a **placeholder**. |
+| `:CalendarComponents:Planning`    | `com.infomaniak.calendar.components.planning`    | `Planning` Composable — a `LazyColumn` with ISO week headers and per-day event lists. Also provides the `stickyWithinItem` `Modifier` extension. Re-exports Foundation via `api` (its types appear in `Planning`'s public signature); Event and Resources are internal implementation details and stay `implementation`. Week header design is a **placeholder**. |
 | `:CalendarComponents:Day`         | `com.infomaniak.calendar.components.day`         | Day view — a day's header, its all-day band, and the scrollable hour grid carrying its timed events, with the current time indicator and pinch-to-zoom over it. Holds `resolveOverlaps`, the pure-Kotlin solver placing concurrent events, ported from the [Eventually](https://github.com/claustrofob/Eventually) SwiftUI layout the iOS calendar uses so both platforms arrange a day identically. Reusable by the future 3-day / week views. Re-exports Foundation via `api`. |
 
 ### Dependency graph
 
-```
-Planning ──api──► Event ──api──► Foundation
-    │                 ▲               ▲
-    ├──api────────────┼───────────────┤
-    └──api──► Resources               │
-                      │               │
-Day ──────────────────┴───api─────────┘
-```
+| Module     | `api` dependency | `implementation` dependencies |
+|------------|-------------------|--------------------------------|
+| `Event`    | `Foundation`      | —                              |
+| `Planning` | `Foundation`      | `Event`, `Resources`           |
+| `Day`      | `Foundation`      | `Event`, `Resources`           |
 
-`Foundation` is the only module with no CalendarComponents dependency. `Planning` and `Day` are the two top-level
-entry points for consumers, one per calendar view; each transitively brings in the stack it needs.
+`Foundation` is the only module with no CalendarComponents dependency. `Event` re-exports `Foundation` via `api` since its
+public `EventItem` signature exposes `Foundation` types. `Planning` and `Day` each declare their own **direct** `api`
+dependency on `Foundation` (its types appear in their own public signatures) and depend on `Event` and `Resources` as
+`implementation` only (internal implementation details, not part of their own public API surface — not re-exported).
+`Planning` and `Day` are the two top-level entry points for consumers, one per calendar view; each transitively brings
+in the stack it needs.
 
 ### What is final vs placeholder
 
@@ -205,18 +206,25 @@ All CalendarComponents source lives **in this repository**. Changes to these mod
 2. **CalendarComponents ownership**: All `CalendarComponents/` source lives in **this** repository. Changes go here, not
    in a consuming app or a submodule. The group is designed to be portable — keep it free of `:app` dependencies and DI
    framework references so it can be extracted in the future.
-3. **Norm separation**:
+3. **Version alignment**: Since `Core` is always included as a composite build (regardless of
+   `useCalendarCoreCompositeBuild`), the root project's own Gradle wrapper and `appCompileSdk` (in root `build.gradle.kts`)
+   must stay compatible with `Core`'s AGP version (`Core/gradle/core.versions.toml` → `agp`) and `compileSdk`
+   (`Core/build-logic/convention/.../AndroidModuleConfig.kt`), and with `multiplatform-calendar`'s `kmp.compileSdk` /
+   `kmp.minSdk` (`multiplatform-calendar/gradle.properties`) and its own Gradle wrapper version. When bumping AGP major
+   versions, also check the required minimum Gradle version for that AGP release. AGP 9's built-in Kotlin support means
+   `core.plugins.kotlin.android` must not be applied anywhere (see `app/AGENTS.md`).
+4. **Norm separation**:
     - App norms → `app/AGENTS.md`
     - Multi-module / build / submodule / CalendarComponents norms → this file
     - KMP library norms → `multiplatform-calendar` submodule repository
     - Core library norms → `Core` submodule repository (`Core/AGENTS.md`)
-4. **When working on**:
+5. **When working on**:
     - `app/src/...` → read `app/AGENTS.md`
     - `CalendarComponents/...` → read the CalendarComponents section in this file
     - Build files / submodule pointer → read this file
     - KMP shared code → switch to the `multiplatform-calendar` repository
     - Core shared code → switch to the `Core` (`android-core`) repository
-5. **Keep AGENTS.md up to date**: For every change to the architecture, build layout, module structure, conventions,
+6. **Keep AGENTS.md up to date**: For every change to the architecture, build layout, module structure, conventions,
    commands, or anything else that should be reflected in AGENTS.md, you **must** update the relevant AGENTS.md file
    (this one for cross-cutting/build/submodule changes, `app/AGENTS.md` for app-specific changes) as part of the same
    change. If a change is worth notifying agents about, it belongs in AGENTS.md.
