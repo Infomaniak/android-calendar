@@ -112,20 +112,18 @@ String resources follow the single-module pattern — all strings consumed by an
 
 ### Dependency graph
 
-```
-Planning ──impl──► Event ──api──► Foundation
-    │                 ▲               ▲
-    ├──impl───────────┼───────────────┤
-    └──impl─► Resources               │
-                      │               │
-Day ──────────────────┴───api─────────┘
-```
+| Module     | `api` dependency | `implementation` dependencies |
+|------------|-------------------|--------------------------------|
+| `Event`    | `Foundation`      | —                              |
+| `Planning` | `Foundation`      | `Event`, `Resources`           |
+| `Day`      | `Foundation`      | `Event`, `Resources`           |
 
 `Foundation` is the only module with no CalendarComponents dependency. `Event` re-exports `Foundation` via `api` since its
-public `EventItem` signature exposes `Foundation` types. `Planning` and `Day` depend on `Event` and `Resources` as
-`implementation` only (internal implementation details, not part of their own public API surface) while re-exporting
-`Foundation` via `api` (its types appear in their own public signatures). `Planning` and `Day` are the two top-level
-entry points for consumers, one per calendar view; each transitively brings in the stack it needs.
+public `EventItem` signature exposes `Foundation` types. `Planning` and `Day` each declare their own **direct** `api`
+dependency on `Foundation` (its types appear in their own public signatures) and depend on `Event` and `Resources` as
+`implementation` only (internal implementation details, not part of their own public API surface — not re-exported).
+`Planning` and `Day` are the two top-level entry points for consumers, one per calendar view; each transitively brings
+in the stack it needs.
 
 ### What is final vs placeholder
 
