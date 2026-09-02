@@ -19,7 +19,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(core.plugins.android.library)
-    alias(core.plugins.kotlin.android)
     alias(core.plugins.compose.compiler)
 }
 

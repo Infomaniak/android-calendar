@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(core.plugins.android.library)
     alias(core.plugins.compose.compiler)
-    alias(core.plugins.kotlin.android)
     alias(core.plugins.kotlin.parcelize)
 }
 
