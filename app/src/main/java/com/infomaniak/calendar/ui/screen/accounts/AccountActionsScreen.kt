@@ -146,11 +146,7 @@ private fun LogoutDialog(
             }
         },
         dismissButton = {
-            TextButton(
-                onClick = onDismiss,
-            ) {
-                Text(stringResource(RCore.string.buttonCancel))
-            }
+            TextButton(onClick = onDismiss) { Text(stringResource(RCore.string.buttonCancel)) }
         },
     )
 }
