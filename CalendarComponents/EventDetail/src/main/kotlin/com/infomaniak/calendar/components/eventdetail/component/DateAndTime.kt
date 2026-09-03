@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,44 +42,38 @@ import kotlin.time.Clock
 
 @Composable
 internal fun DateAndTime(
-    startAtLocale: @Composable () -> LocalDateTime,
-    endAtLocale: @Composable () -> LocalDateTime,
-    startUtcOffsetAtLocale: @Composable () -> UtcOffset?,
-    endUtcOffsetAtLocale: @Composable () -> UtcOffset?,
-    startAtTimeZone: LocalDateTime,
-    endAtTimeZone: LocalDateTime,
-    startUtcOffsetAtTimeZone: @Composable () -> UtcOffset?,
-    endUtcOffsetAtTimeZone: @Composable () -> UtcOffset?,
+    start: DateTimeInput,
+    end: DateTimeInput,
     isAllDay: Boolean,
     modifier: Modifier = Modifier,
 ) {
     ListItem(
         leadingContent = { Icon(painterResource(R.drawable.ic_clock), contentDescription = null) },
         headlineContent = {
-            val startLocale = startAtLocale()
-            val endLocale = endAtLocale()
+            val startAtLocale = start.atLocale()
+            val endAtLocale = end.atLocale()
             Text(
                 text = if (isAllDay) {
-                    formatDateRange(startLocale.date, endLocale.date)
+                    formatDateRange(startAtLocale.date, endAtLocale.date)
                 } else {
-                    formatDateTimeRange(startLocale, endLocale)
+                    formatDateTimeRange(startAtLocale, endAtLocale)
                 },
                 style = MaterialTheme.typography.bodyLarge,
             )
         },
         supportingContent = {
-            val startUtcOffsetAtTimeZone = startUtcOffsetAtTimeZone()
-            val endUtcOffsetAtTimeZone = endUtcOffsetAtTimeZone()
+            val startUtcOffsetAtTimeZone = start.utcOffsetAtTimeZone()
+            val endUtcOffsetAtTimeZone = end.utcOffsetAtTimeZone()
 
             // Floating events and all day events never need to display UTC offset
             if (startUtcOffsetAtTimeZone == null || endUtcOffsetAtTimeZone == null || isAllDay) return@ListItem
 
-            if (startUtcOffsetAtTimeZone != startUtcOffsetAtLocale() || endUtcOffsetAtTimeZone != endUtcOffsetAtLocale()) {
+            if (startUtcOffsetAtTimeZone != start.utcOffsetAtLocale() || endUtcOffsetAtTimeZone != end.utcOffsetAtLocale()) {
                 Text(
                     text = formatDateTimeRangeWithZone(
-                        start = startAtTimeZone,
+                        start = start.atTimeZone,
                         startUtcOffset = startUtcOffsetAtTimeZone,
-                        end = endAtTimeZone,
+                        end = end.atTimeZone,
                         endUtcOffset = endUtcOffsetAtTimeZone,
                     ),
                     style = MaterialTheme.typography.bodyMedium,
@@ -88,6 +83,14 @@ internal fun DateAndTime(
         modifier = modifier,
     )
 }
+
+@Immutable
+data class DateTimeInput(
+    val atLocale: @Composable () -> LocalDateTime,
+    val utcOffsetAtLocale: @Composable () -> UtcOffset?,
+    val atTimeZone: LocalDateTime,
+    val utcOffsetAtTimeZone: @Composable () -> UtcOffset?,
+)
 
 @Preview
 @Composable
@@ -110,14 +113,18 @@ private fun PreviewDateAndTime() {
         isAllDay: Boolean = false,
     ) {
         DateAndTime(
-            startAtLocale = { start },
-            endAtLocale = { end },
-            startAtTimeZone = start,
-            endAtTimeZone = end,
-            startUtcOffsetAtTimeZone = { startUtcOffset },
-            endUtcOffsetAtTimeZone = { endUtcOffset },
-            startUtcOffsetAtLocale = { startUtcOffsetAtLocale },
-            endUtcOffsetAtLocale = { endUtcOffsetAtLocale },
+            start = DateTimeInput(
+                atLocale = { start },
+                utcOffsetAtLocale = { startUtcOffsetAtLocale },
+                atTimeZone = start,
+                utcOffsetAtTimeZone = { startUtcOffset },
+            ),
+            end = DateTimeInput(
+                atLocale = { end },
+                utcOffsetAtLocale = { endUtcOffsetAtLocale },
+                atTimeZone = end,
+                utcOffsetAtTimeZone = { endUtcOffset },
+            ),
             isAllDay = isAllDay,
         )
     }
