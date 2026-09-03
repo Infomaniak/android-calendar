@@ -29,7 +29,6 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlin.coroutines.coroutineContext
 
 typealias DayEventsByDate = Map<LocalDate, DayEvents>
 

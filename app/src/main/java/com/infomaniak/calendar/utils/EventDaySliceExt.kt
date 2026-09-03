@@ -19,14 +19,12 @@ package com.infomaniak.calendar.utils
 
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
-import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.ui.screen.planning.toEventColorsUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
