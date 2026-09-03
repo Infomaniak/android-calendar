@@ -16,7 +16,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -25,45 +24,20 @@ import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.models.Room
-import com.infomaniak.calendar.components.foundation.state.rememberCurrentTimeZone
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.filetypes.FileType
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.offsetAt
-import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
-
-@Immutable
-sealed interface Timing {
-    @get:Composable
-    val instant: Instant
-
-    @Immutable
-    data class Precised(private val _instant: Instant, val timeZone: TimeZone) : Timing {
-        override val instant: Instant @Composable get() = _instant
-    }
-
-    @Immutable
-    class Floating(val date: LocalDateTime) : Timing {
-        override val instant: Instant @Composable get() = date.toInstant(rememberCurrentTimeZone().value)
-    }
-}
 
 @Immutable
 data class EventDetail(
     val eventColor: Color,
     val calendarColor: Color,
     val title: String,
-    val startAtTimeZone: LocalDateTime,
-    val startTimeZone: TimeZone?,
-    val endAtTimeZone: LocalDateTime,
-    val endTimeZone: TimeZone?,
-    val start: Timing,
-    val end: Timing,
+    val start: EventDetailTiming,
+    val end: EventDetailTiming,
     val isAllDay: Boolean,
     val attendees: Attendees,
     val kMeetUrl: String?,
@@ -73,21 +47,7 @@ data class EventDetail(
     val description: String?,
     val files: List<EventFile>,
     val notifications: List<Notification>,
-) {
-    @get:Composable
-    val startAtLocale: LocalDateTime
-        get() {
-            val currentSystemTimeZone by rememberCurrentTimeZone()
-            return startAtTimeZone.toInstant(startTimeZone ?: currentSystemTimeZone).toLocalDateTime(currentSystemTimeZone)
-        }
-
-    @get:Composable
-    val endAtLocale: LocalDateTime
-        get() {
-            val currentSystemTimeZone by rememberCurrentTimeZone()
-            return endAtTimeZone.toInstant(endTimeZone ?: currentSystemTimeZone).toLocalDateTime(currentSystemTimeZone)
-        }
-}
+)
 
 @Immutable
 data class EventFile(val name: String) {
@@ -119,20 +79,9 @@ fun EventDetail(
     ) {
         Title(color = eventDetail.eventColor, title = eventDetail.title)
 
-        val currentTimeZone by rememberCurrentTimeZone()
         DateAndTime(
-            start = DateTimeInput(
-                atLocale = { eventDetail.startAtLocale },
-                utcOffsetAtLocale = { (eventDetail.start as? Timing.Precised)?.let { currentTimeZone.offsetAt(it.instant) } },
-                atTimeZone = eventDetail.startAtTimeZone,
-                utcOffsetAtTimeZone = { (eventDetail.start as? Timing.Precised)?.let { it.timeZone.offsetAt(it.instant) } },
-            ),
-            end = DateTimeInput(
-                atLocale = { eventDetail.endAtLocale },
-                utcOffsetAtLocale = { (eventDetail.end as? Timing.Precised)?.let { currentTimeZone.offsetAt(it.instant) } },
-                atTimeZone = eventDetail.endAtTimeZone,
-                utcOffsetAtTimeZone = { (eventDetail.end as? Timing.Precised)?.let { it.timeZone.offsetAt(it.instant) } },
-            ),
+            start = eventDetail.start.toDateTimeInput(),
+            end = eventDetail.end.toDateTimeInput(),
             isAllDay = eventDetail.isAllDay,
         )
     }
@@ -162,12 +111,8 @@ private fun PreviewEventDetail() {
         eventColor = Color.Red,
         calendarColor = Color.Blue,
         title = "Event Title",
-        startAtTimeZone = LocalDateTime.parse("2026-05-20T08:00:00"),
-        startTimeZone = TimeZone.of("Europe/Paris"),
-        endAtTimeZone = LocalDateTime.parse("2026-05-20T09:00:00"),
-        endTimeZone = TimeZone.of("Europe/Paris"),
-        start = Timing.Precised(Instant.parse("2026-05-20T08:00:00"), TimeZone.of("Europe/Paris")),
-        end = Timing.Precised(Instant.parse("2026-05-20T09:00:00"), TimeZone.of("Europe/Paris")),
+        start = EventDetailTiming.Precised(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
+        end = EventDetailTiming.Precised(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
         isAllDay = false,
         attendees = Attendees(emptyList(), null),
         kMeetUrl = null,
