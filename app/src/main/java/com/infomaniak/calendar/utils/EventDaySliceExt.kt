@@ -17,21 +17,14 @@
  */
 package com.infomaniak.calendar.utils
 
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
-import com.infomaniak.calendar.components.foundation.models.Attendees
-import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
-import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.ui.screen.planning.toEventColorsUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventStatus as KmpEventStatus
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationStatus as KmpParticipationStatus
 
 /**
  * Translation of the KMP event model into the UI model consumed by CalendarComponents, shared by
@@ -50,15 +43,8 @@ fun EventDaySlice.toEventUi(emailsByUserId: Map<AccountId, String>, timeZone: Ti
     end = displayEnd.toInstant(timeZone),
     isAllDay = isAllDay,
     colors = event.colors.toEventColorsUi(),
-    attendees = toAttendees(event.attendees, emailsByUserId),
+    attendees = event.attendees.toAttendees(event.accountId, emailsByUserId),
 )
-
-private fun EventDaySlice.toAttendees(attendees: List<Attendee>, emailsByUserId: Map<AccountId, String>): Attendees {
-    val all = attendees.map(Attendee::toAttendeeUi)
-    val me = all.find { it.email == emailsByUserId[event.accountId] }
-
-    return Attendees(all, me)
-}
 
 private fun KmpEventStatus?.toEventStatus(): EventStatus {
     return when (this) {
@@ -66,17 +52,4 @@ private fun KmpEventStatus?.toEventStatus(): EventStatus {
         KmpEventStatus.CANCELLED -> EventStatus.Cancelled
         else -> EventStatus.Confirmed
     }
-}
-
-private fun Attendee.toAttendeeUi(): AttendeeUi = AttendeeUi(
-    email = email,
-    displayName = displayName,
-    status = status.toParticipationStatus(),
-)
-
-private fun KmpParticipationStatus.toParticipationStatus(): ParticipationStatus = when (this) {
-    KmpParticipationStatus.Accepted -> ParticipationStatus.Accepted
-    KmpParticipationStatus.Declined -> ParticipationStatus.Declined
-    KmpParticipationStatus.Tentative -> ParticipationStatus.Tentative
-    KmpParticipationStatus.NeedsAction -> ParticipationStatus.NeedsAction
 }
