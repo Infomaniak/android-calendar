@@ -19,6 +19,7 @@ package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.offsetAt
 import kotlinx.datetime.toLocalDateTime
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -187,14 +188,18 @@ class RangeFormatterTest {
             end: String = LATER_TODAY,
             startTimeZone: TimeZone = PARIS,
             endTimeZone: TimeZone = PARIS,
-        ): String = formatDateTimeRangeWithZone(
-            start = Instant.parse(start),
-            startTimeZone = startTimeZone,
-            end = Instant.parse(end),
-            endTimeZone = endTimeZone,
-            locale = locale,
-            use24HourFormat = true,
-            currentYear = CURRENT_YEAR,
-        )
+        ): String {
+            val startInstant = Instant.parse(start)
+            val endInstant = Instant.parse(end)
+            return formatDateTimeRangeWithZone(
+                start = startInstant.toLocalDateTime(startTimeZone),
+                startUtcOffset = startTimeZone.offsetAt(startInstant),
+                end = endInstant.toLocalDateTime(endTimeZone),
+                endUtcOffset = endTimeZone.offsetAt(endInstant),
+                locale = locale,
+                use24HourFormat = true,
+                currentYear = CURRENT_YEAR,
+            )
+        }
     }
 }
