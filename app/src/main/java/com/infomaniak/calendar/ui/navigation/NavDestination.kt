@@ -44,10 +44,10 @@ sealed interface NavDestination : NavKey {
 
     sealed interface Accounts : NavDestination {
         @Serializable
-        data object ListScreen : Accounts
+        data object List : Accounts
 
         @Serializable
-        data class ActionsScreen(val userId: Int) : Accounts
+        data class Actions(val userId: Int) : Accounts
     }
 
     @Serializable
