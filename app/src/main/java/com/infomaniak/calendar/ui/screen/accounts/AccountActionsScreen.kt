@@ -29,49 +29,54 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.component.drawer.DrawerPreviewProvider
+import com.infomaniak.calendar.ui.component.drawer.DrawerViewModel
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.designsystem.core.theme.EsdsTheme
-import kotlinx.coroutines.launch
+import com.infomaniak.core.common.R as RCore
 
 @Composable
 fun AccountActionsScreen(
-    user: User,
+    userId: Int,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     accountsViewModel: AccountsViewModel = viewModel(),
+    drawerViewModel: DrawerViewModel = viewModel(),
 ) {
-    val scope = rememberCoroutineScope()
+    val calendarsUsers by drawerViewModel.calendarsUsers.collectAsStateWithLifecycle()
+    val user = calendarsUsers.firstOrNull { it.user.id == userId }?.user ?: return
 
-    AccountsActionsContent(
+    LaunchedEffect(accountsViewModel) {
+        for (event in accountsViewModel.navigateBack) {
+            onBack()
+        }
+    }
+
+    AccountsActionsScreen(
         user = user,
         onBack = onBack,
-        removeUser = {
-            scope.launch {
-                val hasOtherUsers = accountsViewModel.removeUser(user.id)
-                if (hasOtherUsers) onBack()
-            }
-        },
+        removeUser = { accountsViewModel.removeUser(user.id) },
         modifier = modifier,
     )
 }
 
 @Composable
-private fun AccountsActionsContent(
+private fun AccountsActionsScreen(
     user: User,
     onBack: () -> Unit,
     removeUser: () -> Unit,
@@ -93,7 +98,7 @@ private fun AccountsActionsContent(
                 .padding(paddingValues)
                 .fillMaxHeight(),
         ) {
-            AccountItem(user = user, onClick = {}, hasAction = { false })
+            AccountItem(user = user, onClick = null)
             OutlinedButton(
                 onClick = { showLogoutDialog = true },
                 shape = EsdsTheme.radius.full,
@@ -127,7 +132,7 @@ private fun LogoutDialog(
 ) {
 
     AlertDialog(
-        onDismissRequest = { onDismiss() },
+        onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.signOutAccountAlertTitle, "${user.firstname} ${user.lastname}")) },
         text = { Text(stringResource(R.string.signOutAccountAlertDescription)) },
         confirmButton = {
@@ -142,9 +147,9 @@ private fun LogoutDialog(
         },
         dismissButton = {
             TextButton(
-                onClick = { onDismiss() },
+                onClick = onDismiss,
             ) {
-                Text(stringResource(android.R.string.cancel))
+                Text(stringResource(RCore.string.buttonCancel))
             }
         },
     )
@@ -156,6 +161,6 @@ private fun AccountsPreview(
     @PreviewParameter(DrawerPreviewProvider::class) calendarsUsers: List<UserCalendarsUi>,
 ) {
     CalendarThemeForPreview {
-        AccountsActionsContent(user = calendarsUsers.first().user, onBack = {}, removeUser = {})
+        AccountsActionsScreen(user = calendarsUsers.first().user, onBack = {}, removeUser = {})
     }
 }
