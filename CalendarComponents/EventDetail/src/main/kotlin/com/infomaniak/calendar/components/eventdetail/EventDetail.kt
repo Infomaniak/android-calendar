@@ -1,8 +1,5 @@
 package com.infomaniak.calendar.components.eventdetail
 
-import android.app.Notification
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +12,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -23,52 +19,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.foundation.models.Attendees
-import com.infomaniak.calendar.components.foundation.models.Room
-import com.infomaniak.calendar.components.resources.R
-import com.infomaniak.core.filetypes.FileType
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
-@Immutable
-data class EventDetail(
-    val eventColor: Color,
-    val calendarColor: Color,
-    val title: String,
-    val start: EventDetailTiming,
-    val end: EventDetailTiming,
-    val isAllDay: Boolean,
-    val attendees: Attendees,
-    val kMeetUrl: String?,
-    val location: String?,
-    val room: Room?,
-    val urlLink: String?,
-    val description: String?,
-    val files: List<EventFile>,
-    val notifications: List<Notification>,
-)
-
-@Immutable
-data class EventFile(val name: String) {
-    val fileType: FileType by lazy { FileType.guessFromFileName(name) }
-}
-
-@Immutable
-data class Notification(
-    val notificationType: NotificationType,
-    val executionTime: Instant,
-)
-
-@Immutable
-enum class NotificationType(@DrawableRes val icon: Int, @StringRes val label: Int) {
-    Email(R.drawable.ic_bell, R.string.notificationTypeEmail),
-    Push(R.drawable.ic_bubble_top_right_circle, R.string.notificationTypePush),
-}
-
 @Composable
 fun EventDetail(
-    eventDetail: EventDetail,
+    eventDetail: EventDetailUi,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -107,7 +65,7 @@ private fun Title(color: Color, title: String, modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun PreviewEventDetail() {
-    val eventDetail = EventDetail(
+    val eventDetail = EventDetailUi(
         eventColor = Color.Red,
         calendarColor = Color.Blue,
         title = "Event Title",
