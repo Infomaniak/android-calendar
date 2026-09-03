@@ -60,9 +60,7 @@ fun AccountItem(
         ListItem(
             modifier = Modifier.fillMaxWidth(),
             colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-            leadingContent = {
-                Avatar(avatarType = AvatarType.fromUser(user), modifier = Modifier.size(32.dp))
-            },
+            leadingContent = { Avatar(avatarType = AvatarType.fromUser(user), modifier = Modifier.size(32.dp)) },
             headlineContent = {
                 Text(
                     text = user.displayName.toString(),
