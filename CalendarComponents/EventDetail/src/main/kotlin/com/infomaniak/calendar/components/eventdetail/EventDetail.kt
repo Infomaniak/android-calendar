@@ -121,14 +121,18 @@ fun EventDetail(
 
         val currentTimeZone by rememberCurrentTimeZone()
         DateAndTime(
-            startAtLocale = { eventDetail.startAtLocale },
-            endAtLocale = { eventDetail.endAtLocale },
-            startUtcOffsetAtLocale = { (eventDetail.start as? Timing.Precised)?.let { currentTimeZone.offsetAt(it.instant) } },
-            endUtcOffsetAtLocale = { (eventDetail.end as? Timing.Precised)?.let { currentTimeZone.offsetAt(it.instant) } },
-            startAtTimeZone = eventDetail.startAtTimeZone,
-            endAtTimeZone = eventDetail.endAtTimeZone,
-            startUtcOffsetAtTimeZone = { (eventDetail.start as? Timing.Precised)?.let { it.timeZone.offsetAt(it.instant) } },
-            endUtcOffsetAtTimeZone = { (eventDetail.end as? Timing.Precised)?.let { it.timeZone.offsetAt(it.instant) } },
+            start = DateTimeInput(
+                atLocale = { eventDetail.startAtLocale },
+                utcOffsetAtLocale = { (eventDetail.start as? Timing.Precised)?.let { currentTimeZone.offsetAt(it.instant) } },
+                atTimeZone = eventDetail.startAtTimeZone,
+                utcOffsetAtTimeZone = { (eventDetail.start as? Timing.Precised)?.let { it.timeZone.offsetAt(it.instant) } },
+            ),
+            end = DateTimeInput(
+                atLocale = { eventDetail.endAtLocale },
+                utcOffsetAtLocale = { (eventDetail.end as? Timing.Precised)?.let { currentTimeZone.offsetAt(it.instant) } },
+                atTimeZone = eventDetail.endAtTimeZone,
+                utcOffsetAtTimeZone = { (eventDetail.end as? Timing.Precised)?.let { it.timeZone.offsetAt(it.instant) } },
+            ),
             isAllDay = eventDetail.isAllDay,
         )
     }
