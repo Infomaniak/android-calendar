@@ -142,7 +142,7 @@ private fun LogoutDialog(
                     onDismiss()
                 },
             ) {
-                Text(stringResource(RCore.string.buttonLoginOut), color = MaterialTheme.colorScheme.error)
+                Text(stringResource(RCore.string.buttonLogOut), color = MaterialTheme.colorScheme.error)
             }
         },
         dismissButton = {
