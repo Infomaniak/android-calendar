@@ -17,18 +17,16 @@
  */
 package com.infomaniak.calendar.ui.screen.accounts
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -48,27 +46,24 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 @Composable
 fun AccountItem(
     user: User,
-    onClick: (User) -> Unit,
-    hasAction: () -> Boolean,
     modifier: Modifier = Modifier,
+    onClick: ((User) -> Unit)? = null,
 ) {
     Surface(
-        onClick = { if (hasAction()) onClick(user) },
+        onClick = { onClick?.invoke(user) },
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = Margin.Medium)
             .clip(EsdsTheme.radius.twoXl),
         color = Color.Transparent,
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = Margin.Small, vertical = Margin.Small),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Margin.Medium),
-        ) {
-            Avatar(avatarType = AvatarType.fromUser(user), Modifier.size(32.dp))
-            Column(
-                modifier = Modifier.weight(1f),
-            ) {
+        ListItem(
+            modifier = Modifier.fillMaxWidth(),
+            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+            leadingContent = {
+                Avatar(avatarType = AvatarType.fromUser(user), modifier = Modifier.size(32.dp))
+            },
+            headlineContent = {
                 Text(
                     text = user.displayName.toString(),
                     style = MaterialTheme.typography.bodyLarge,
@@ -76,24 +71,28 @@ fun AccountItem(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
+            },
+            supportingContent = {
                 Text(
                     text = user.email,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-            }
-            if (hasAction()) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_chevron_right),
-                    contentDescription = null,
-                )
-            }
-        }
+            },
+            trailingContent = {
+                if (onClick != null) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_chevron_right),
+                        contentDescription = null,
+                    )
+                }
+            },
+        )
     }
 }
 
 @Composable
 @Preview(showBackground = true)
 private fun AccountItemPreview() {
-    AccountItem(user = dummyUserOf(1, "John", "Doe"), onClick = {}, hasAction = { true })
+    AccountItem(user = dummyUserOf(1, "John", "Doe"), onClick = {})
 }
