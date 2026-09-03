@@ -63,8 +63,8 @@ fun EventItem(
         status = event.toEventItemStatus(),
         trailingIcons = event.toEventIcons(),
         isAllDay = event.isAllDay,
-        modifier = modifier,
         onClick = onClick,
+        modifier = modifier,
         allDayTrailingContent = allDayTrailingContent,
     )
 }

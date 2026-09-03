@@ -61,7 +61,11 @@ import kotlinx.datetime.plus
 import kotlin.time.Clock
 
 @Composable
-fun DayScreen(modifier: Modifier = Modifier, dayViewModel: DayViewModel = viewModel()) {
+fun DayScreen(
+    goToEventDetail: (masterEventId: String) -> Unit,
+    modifier: Modifier = Modifier,
+    dayViewModel: DayViewModel = viewModel(),
+) {
     val dayUiState by dayViewModel.dayUiState.collectAsStateWithLifecycle()
     val isLoadingEvents by dayViewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
     val visibleDayState = LocalVisibleDayState.current ?: return
@@ -75,6 +79,7 @@ fun DayScreen(modifier: Modifier = Modifier, dayViewModel: DayViewModel = viewMo
 
     DayScreen(
         modifier = modifier,
+        goToEventDetail = goToEventDetail,
         dayUiState = { dayUiState },
         visibleDayState = visibleDayState,
         timelineState = timelineState,
@@ -112,6 +117,7 @@ private fun SaveHourHeight(timelineState: DayTimelineState, onHourHeightChanged:
 
 @Composable
 private fun DayScreen(
+    goToEventDetail: (masterEventId: String) -> Unit,
     dayUiState: () -> DayUiState,
     isLoadingEvents: () -> Boolean,
     visibleDayState: VisibleDayState,
@@ -147,7 +153,9 @@ private fun DayScreen(
         Box(modifier = Modifier.padding(paddingValues)) {
             when (val state = dayUiState()) {
                 is DayUiState.Loading -> LoadingDay()
-                is DayUiState.Success -> SuccessDay(visibleDayState, timelineState, dateRange, state.eventsByDate)
+                is DayUiState.Success -> {
+                    SuccessDay(visibleDayState, timelineState, dateRange, state.eventsByDate, goToEventDetail)
+                }
             }
         }
     }
@@ -159,6 +167,7 @@ private fun SuccessDay(
     timelineState: DayTimelineState,
     dateRange: ClosedRange<LocalDate>,
     eventsByDate: () -> DayEventsByDate,
+    goToEventDetail: (masterEventId: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     DayPager(
@@ -168,7 +177,7 @@ private fun SuccessDay(
         state = timelineState,
         weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
         onVisibleDateChanged = { visibleDayState.onVisibleDateChanged(it) },
-        onEventClick = {}, //TODO[eventDetail]: Open the event detail screen
+        onEventClick = { goToEventDetail(it.masterEventId) },
         modifier = modifier.fillMaxSize(),
     )
 }
@@ -188,6 +197,7 @@ private fun DayScreenPreview() {
 
         CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(visibleDate)) {
             DayScreen(
+                goToEventDetail = {},
                 dayUiState = { DayUiState.Success({ emptyMap() }) },
                 isLoadingEvents = { false },
                 visibleDayState = rememberVisibleDayState(visibleDate),
