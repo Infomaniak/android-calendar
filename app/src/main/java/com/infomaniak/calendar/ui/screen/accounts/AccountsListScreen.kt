@@ -45,7 +45,7 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 fun AccountsListScreen(
     onAddAccount: () -> Unit,
     onBack: () -> Unit,
-    onAccountsActions: (Int) -> Unit,
+    onAccountClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     drawerViewModel: DrawerViewModel = viewModel(),
 ) {
@@ -56,7 +56,7 @@ fun AccountsListScreen(
         modifier = modifier,
         onAddAccount = onAddAccount,
         onBack = onBack,
-        onAccountsActions = onAccountsActions,
+        onAccountClick = onAccountClick,
     )
 }
 
@@ -64,9 +64,9 @@ fun AccountsListScreen(
 private fun AccountsListContent(
     calendarsUsers: () -> List<UserCalendarsUi>,
     onAddAccount: () -> Unit,
+    onAccountClick: (Int) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    onAccountsActions: (Int) -> Unit,
 ) {
 
     Scaffold(
@@ -85,8 +85,7 @@ private fun AccountsListContent(
             ) { userCalendars ->
                 AccountItem(
                     user = userCalendars.user,
-                    onClick = { user -> onAccountsActions(user.id) },
-                    hasAction = { true },
+                    onClick = { onAccountClick(userCalendars.user.id) },
                 )
             }
 
@@ -111,6 +110,6 @@ private fun AccountsListPreview(
     @PreviewParameter(DrawerPreviewProvider::class) calendarsUsers: List<UserCalendarsUi>,
 ) {
     CalendarThemeForPreview {
-        AccountsListContent(calendarsUsers = { calendarsUsers }, onBack = {}, onAddAccount = {}, onAccountsActions = {})
+        AccountsListContent(calendarsUsers = { calendarsUsers }, onBack = {}, onAddAccount = {}, onAccountClick = {})
     }
 }
