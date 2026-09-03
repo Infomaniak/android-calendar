@@ -133,8 +133,8 @@ private fun LogoutDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.signOutAccountAlertTitle, "${user.firstname} ${user.lastname}")) },
-        text = { Text(stringResource(R.string.signOutAccountAlertDescription)) },
+        title = { Text(stringResource(RCore.string.confirmLogoutTitle)) },
+        text = { Text(stringResource(RCore.string.confirmLogoutDescription, "${user.firstname} ${user.lastname}")) },
         confirmButton = {
             TextButton(
                 onClick = {
@@ -142,7 +142,7 @@ private fun LogoutDialog(
                     onDismiss()
                 },
             ) {
-                Text(stringResource(R.string.signOutAccountAlertConfirm), color = MaterialTheme.colorScheme.error)
+                Text(stringResource(RCore.string.buttonLoginOut), color = MaterialTheme.colorScheme.error)
             }
         },
         dismissButton = {
