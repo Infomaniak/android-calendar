@@ -22,7 +22,6 @@ import com.infomaniak.calendar.MainApplication
 import com.infomaniak.calendar.secured.DavCredentialsManager
 import com.infomaniak.core.auth.PersistedCurrentUserAccountUtils
 import com.infomaniak.core.auth.models.user.User
-import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
@@ -33,7 +32,7 @@ import kotlinx.coroutines.flow.map
 class AccountUtils(
     appContext: Context,
     private val davCredentialsManager: DavCredentialsManager,
-) : PersistedCurrentUserAccountUtils(appContext, MainApplication.userDataCleanableList) {
+) : PersistedCurrentUserAccountUtils(appContext, { MainApplication.userDataCleanableList }) {
     val emailsByUserId = users.map { user ->
         user.associateBy({ it.accountId }, { it.email })
     }
