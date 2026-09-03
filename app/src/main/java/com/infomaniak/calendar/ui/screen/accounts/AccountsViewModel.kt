@@ -18,12 +18,16 @@
 package com.infomaniak.calendar.ui.screen.accounts
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.utils.account.AccountUtils
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @Inject
 @ContributesIntoMap(AppScope::class)
@@ -31,12 +35,16 @@ import kotlinx.coroutines.flow.first
 class AccountsViewModel(
     private val accountUtils: AccountUtils,
 ) : ViewModel() {
+    private val _navigateBack = Channel<Unit>(Channel.CONFLATED)
+    val navigateBack: ReceiveChannel<Unit> = _navigateBack
 
-    // Returns true if there are other users left after removing the current user.
-    // If there are, we need to call onBack after removing the user. If there isn't,
-    // the app will handle the case where there isn't any user left.
-    suspend fun removeUser(userId: Int): Boolean {
-        accountUtils.removeUser(userId)
-        return accountUtils.users.first().isNotEmpty()
+    fun removeUser(userId: Int) {
+        viewModelScope.launch {
+            accountUtils.removeUser(userId)
+            val hasOtherUsers = accountUtils.users.first().isNotEmpty()
+            if (hasOtherUsers) {
+                _navigateBack.trySend(Unit)
+            }
+        }
     }
 }
