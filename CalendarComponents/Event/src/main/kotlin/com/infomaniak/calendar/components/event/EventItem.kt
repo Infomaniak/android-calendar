@@ -35,10 +35,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,7 +63,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Instant
 
 @Composable
-fun EventItem(event: EventUi.Normal, modifier: Modifier = Modifier) {
+fun EventItem(event: EventUi.Normal, onClick: () -> Unit, modifier: Modifier = Modifier) {
     EventItem(
         start = event.start,
         end = event.end,
@@ -70,6 +72,7 @@ fun EventItem(event: EventUi.Normal, modifier: Modifier = Modifier) {
         status = event.toEventItemStatus(),
         trailingIcons = event.toEventIcons(),
         isAllDay = event.isAllDay,
+        onClick = onClick,
         modifier = modifier,
     )
 }
@@ -83,9 +86,10 @@ internal fun EventItem(
     status: EventItemStatus,
     trailingIcons: Set<EventIcons>,
     isAllDay: Boolean,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    EventItemCard(status, modifier = modifier) {
+    EventItemCard(status, onClick = onClick, modifier = modifier) {
         if (isAllDay) {
             AllDayContent(title)
         } else {
@@ -95,33 +99,42 @@ internal fun EventItem(
 }
 
 @Composable
-private fun EventItemCard(status: EventItemStatus, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+private fun EventItemCard(
+    status: EventItemStatus,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     val cardLine = status.accentBarColor()
 
-    Card(
-        colors = status.cardColors(),
-        border = status.cardBorder(),
-        shape = MaterialTheme.shapes.small,
-        modifier = modifier,
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min), // makes the line match card height
+    // Card with onClick enforces minimumInteractiveComponentSize() which makes small events too big compared to the design.
+    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
+        Card(
+            onClick = onClick,
+            colors = status.cardColors(),
+            border = status.cardBorder(),
+            shape = MaterialTheme.shapes.small,
+            modifier = modifier,
         ) {
-            Box(
+            Row(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .width(4.dp)
-                    .clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp))
-                    .background(cardLine),
-            )
-            Column(
-                modifier = Modifier
-                    .cardStripes(status)
-                    .padding(EsdsTheme.spacing.sm),
-                content = content,
-            )
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min), // makes the line match card height
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(4.dp)
+                        .clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp))
+                        .background(cardLine),
+                )
+                Column(
+                    modifier = Modifier
+                        .cardStripes(status)
+                        .padding(EsdsTheme.spacing.sm),
+                    content = content,
+                )
+            }
         }
     }
 }
@@ -251,6 +264,7 @@ private fun Preview() {
             location = location,
             status = status,
             trailingIcons = EventIcons.entries.toSet(),
+            onClick = {},
             modifier = modifier,
         )
     }

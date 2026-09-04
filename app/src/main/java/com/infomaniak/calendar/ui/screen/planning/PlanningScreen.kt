@@ -65,13 +65,19 @@ import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
 @Composable
-fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier, viewModel: PlanningViewModel = viewModel()) {
+fun PlanningScreen(
+    goToEventCreation: () -> Unit,
+    goToEventDetail: (masterEventId: String) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: PlanningViewModel = viewModel(),
+) {
     val planningUiState: PlanningUiState by viewModel.planningUiState.collectAsStateWithLifecycle()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
     val eventsDots by viewModel.eventDots.collectAsStateWithLifecycle(initialValue = emptyMap())
 
     PlanningScreen(
         goToEventCreation = goToEventCreation,
+        goToEventDetail = goToEventDetail,
         planningUiState = { planningUiState },
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventsDots },
@@ -84,6 +90,7 @@ fun PlanningScreen(goToEventCreation: () -> Unit, modifier: Modifier = Modifier,
 @Composable
 private fun PlanningScreen(
     goToEventCreation: () -> Unit,
+    goToEventDetail: (masterEventId: String) -> Unit,
     planningUiState: () -> PlanningUiState,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
@@ -111,6 +118,7 @@ private fun PlanningScreen(
                         events = planningUi.eventsByWeekAndDay,
                         contentPadding = contentPadding + PaddingValues(Margin.Medium),
                         goToEventCreation = goToEventCreation,
+                        goToEventDetail = goToEventDetail,
                         jumpTo = jumpTo,
                         modifier = Modifier.hazeSource(hazeState),
                     )
@@ -153,6 +161,7 @@ private fun SuccessPlanning(
     events: () -> EventsByWeekAndDay,
     contentPadding: PaddingValues,
     goToEventCreation: () -> Unit,
+    goToEventDetail: (masterEventId: String) -> Unit,
     jumpTo: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -176,6 +185,7 @@ private fun SuccessPlanning(
             .fillMaxSize(),
         contentPadding = contentPadding,
         goToEventCreation = goToEventCreation,
+        onEventClick = { goToEventDetail(it.masterEventId) },
     )
 }
 
@@ -196,6 +206,7 @@ private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class)
             PlanningScreen(
                 planningUiState = { PlanningUiState.Success({ weekEvents }) },
                 goToEventCreation = {},
+                goToEventDetail = {},
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
                 onVisibleMonthChanged = {},
