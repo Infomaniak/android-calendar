@@ -133,8 +133,8 @@ private fun EventDetails(
                     textDecoration = textDecoration,
                 )
             },
-            { event.location?.let { DetailLine(it, textDecoration) } },
             { DetailLine(hours, textDecoration) },
+            { event.location?.let { DetailLine(it, textDecoration) } },
         ),
     ) { (titleMeasurables, locationMeasurables, timeMeasurables), constraints ->
         val available = visibleHeight()
