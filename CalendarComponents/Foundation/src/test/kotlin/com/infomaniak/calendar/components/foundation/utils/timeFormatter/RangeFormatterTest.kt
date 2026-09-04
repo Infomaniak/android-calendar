@@ -120,6 +120,9 @@ class RangeFormatterTest {
         assertEquals("08:00 - 09:00 (GMT+2)", formatted)
     }
 
+    // This test displays the (GMT+2) twice, once for the start of the event once for the end of the event even though this is the
+    // same UTC offset because the whole day `Wednesday, May 20` is displayed and only displaying
+    // `Wednesday, May 20, 08:00 - Thursday, May 21, 09:00 (GMT+2)` is ambiguous.
     @Test
     fun `zoned range repeats the date and offset when it spans several days`() {
         val formatted = formatZoned(end = TOMORROW)
@@ -134,9 +137,10 @@ class RangeFormatterTest {
 
     @Test
     fun `bounds inside the repeated hour of a DST overlap keep the offset they happened at`() {
+        // The 2:30 AM wall-clock happens twice in some conditions which is what's modeled on this star and end dates.
         val formatted = formatZoned(
-            start = "2026-10-25T00:30:00Z", // 02:30 in Paris, first pass through the hour it repeats
-            end = "2026-10-25T01:30:00Z", // 02:30 in Paris again, an hour later
+            start = "2026-10-25T00:30:00Z", // 02:30 in Paris, first occurrence
+            end = "2026-10-25T01:30:00Z", // 02:30 in Paris, second occurrence 1 hour later
         )
 
         assertEquals("02:30 (GMT+2) - 02:30 (GMT+1)", formatted)

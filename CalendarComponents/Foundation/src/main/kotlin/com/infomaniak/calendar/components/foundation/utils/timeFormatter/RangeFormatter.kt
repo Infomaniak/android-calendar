@@ -125,7 +125,7 @@ internal fun formatDateTimeRangeWithZone(
     val endOffset = end.formatZoneOffset(endUtcOffset, locale)
 
     val isSingleDay = start.date == end.date
-    val hasSingleOffset = isSingleDay && startOffset == endOffset
+    val showSingleUtcOffset = isSingleDay && startOffset == endOffset
 
     fun assembleDateTimeRangeWithZone(formattedStartTime: String, formattedEndTime: String): String = if (isSingleDay) {
         joinRange(formattedStartTime, formattedEndTime)
@@ -133,7 +133,7 @@ internal fun formatDateTimeRangeWithZone(
         assembleDateTimeRange(start, end, formattedStartTime, formattedEndTime, locale, currentYear)
     }
 
-    return if (hasSingleOffset) {
+    return if (showSingleUtcOffset) {
         assembleDateTimeRangeWithZone(formattedStartTime = startTime, formattedEndTime = endTime).withOffset(startOffset)
     } else {
         assembleDateTimeRangeWithZone(
