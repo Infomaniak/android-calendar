@@ -25,15 +25,11 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.UtcOffset
 import kotlinx.datetime.offsetAt
-import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
 @Immutable
 sealed interface EventDetailTiming {
-    @get:Composable
-    val instant: Instant
-
     val atTimeZone: LocalDateTime
     @get:Composable
     val atLocale: LocalDateTime
@@ -44,8 +40,6 @@ sealed interface EventDetailTiming {
 
     @Immutable
     data class Precised(private val _instant: Instant, val timeZone: TimeZone) : EventDetailTiming {
-        override val instant: Instant @Composable get() = _instant
-
         override val atTimeZone: LocalDateTime = _instant.toLocalDateTime(timeZone)
         override val atLocale: LocalDateTime @Composable get() = _instant.toLocalDateTime(rememberCurrentTimeZone().value)
 
@@ -55,8 +49,6 @@ sealed interface EventDetailTiming {
 
     @Immutable
     class Floating(val date: LocalDateTime) : EventDetailTiming {
-        override val instant: Instant @Composable get() = date.toInstant(rememberCurrentTimeZone().value)
-
         override val atTimeZone: LocalDateTime = date
         override val atLocale: LocalDateTime @Composable get() = date
 
