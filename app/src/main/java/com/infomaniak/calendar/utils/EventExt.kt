@@ -22,7 +22,6 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.EventAlarm
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -31,13 +30,8 @@ import kotlinx.datetime.toInstant
 /**
  * Translation of the KMP event model into the UI model consumed by the EventDetail component,
  * shared by every view that opens an event so they all display it identically.
- *
- * [timeZone] anchors the wall-clocks the event leaves unanchored (floating and all-day ones).
  */
-fun Event.toEventDetailUi(
-    emailsByUserId: Map<AccountId, String>,
-    timeZone: TimeZone = TimeZone.currentSystemDefault(),
-): EventDetailUi = EventDetailUi(
+fun Event.toEventDetailUi(emailsByUserId: Map<AccountId, String>): EventDetailUi = EventDetailUi(
     eventColor = Color(colors.sourceColor),
     calendarColor = Color(colors.calendarSourceColor.argb),
     title = title,
@@ -51,7 +45,7 @@ fun Event.toEventDetailUi(
     urlLink = null, // TODO[eventDetail]: Not carried by the KMP model yet
     description = description,
     files = emptyList(), // TODO[eventDetail]: Not carried by the KMP model yet
-    notifications = alarms.mapNotNull { it.toNotification(timing, timeZone) },
+    notifications = alarms.mapNotNull { it.toNotification() },
 )
 
 /**
@@ -66,6 +60,6 @@ private fun getDetailTiming(wallClock: LocalDateTime, timeZone: TimeZone?): Even
     else -> EventDetailTiming.Precised(wallClock.toInstant(timeZone), timeZone)
 }
 
-private fun EventAlarm.toNotification(timing: EventTiming, timeZone: TimeZone): EventDetailUi.Notification? {
+private fun EventAlarm.toNotification(): EventDetailUi.Notification? {
     return null
 }
