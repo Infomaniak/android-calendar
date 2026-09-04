@@ -18,6 +18,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import kotlinx.datetime.TimeZone

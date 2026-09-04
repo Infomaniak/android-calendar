@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.eventdetail.EventDetailTiming
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRangeWithZone

@@ -15,14 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail
+package com.infomaniak.calendar.components.eventdetail.models
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.foundation.models.Attendees
-import com.infomaniak.calendar.components.foundation.models.Room
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.filetypes.FileType
 import kotlin.time.Instant
@@ -44,6 +43,8 @@ data class EventDetailUi(
     val files: List<File>,
     val notifications: List<Notification>,
 ) {
+    data class Room(val title: String, val capacity: Int, val floor: Int)
+
     @Immutable
     data class File(val name: String) {
         val fileType: FileType by lazy { FileType.guessFromFileName(name) }
@@ -51,6 +52,7 @@ data class EventDetailUi(
 
     @Immutable
     data class Notification(val type: Type, val executionTime: Instant) {
+
         @Immutable
         enum class Type(@DrawableRes val icon: Int, @StringRes val label: Int) {
             Email(R.drawable.ic_bell, R.string.notificationTypeEmail),

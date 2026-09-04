@@ -18,19 +18,15 @@
 package com.infomaniak.calendar.utils
 
 import androidx.compose.ui.graphics.Color
-import com.infomaniak.calendar.components.eventdetail.EventDetailTiming
-import com.infomaniak.calendar.components.eventdetail.EventDetailUi
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.AlarmAction
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.AlarmTrigger
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.EventAlarm
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.TriggerRelation
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import kotlin.time.Instant
 
 /**
  * Translation of the KMP event model into the UI model consumed by the EventDetail component,

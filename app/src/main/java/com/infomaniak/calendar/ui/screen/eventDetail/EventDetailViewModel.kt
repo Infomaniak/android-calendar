@@ -18,7 +18,7 @@
 package com.infomaniak.calendar.ui.screen.eventDetail
 
 import androidx.lifecycle.ViewModel
-import com.infomaniak.calendar.components.eventdetail.EventDetailUi
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.toEventDetailUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
