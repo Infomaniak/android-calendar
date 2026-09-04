@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.accounts
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -49,48 +50,87 @@ fun AccountItem(
     modifier: Modifier = Modifier,
     onClick: ((User) -> Unit)? = null,
 ) {
+    if (onClick != null) {
+        AccountClickableItem(user = user, onClick = onClick, modifier = modifier)
+    } else {
+        AccountInformationItem(user = user, modifier = modifier)
+    }
+}
+
+@Composable
+fun AccountClickableItem(
+    user: User,
+    onClick: (User) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Surface(
-        onClick = { onClick?.invoke(user) },
+        onClick = { onClick(user) },
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = Margin.Medium)
             .clip(EsdsTheme.radius.twoXl),
         color = Color.Transparent,
     ) {
-        ListItem(
-            modifier = Modifier.fillMaxWidth(),
-            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-            leadingContent = { Avatar(avatarType = AvatarType.fromUser(user), modifier = Modifier.size(32.dp)) },
-            headlineContent = {
-                Text(
-                    text = user.displayName.toString(),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            },
-            supportingContent = {
-                Text(
-                    text = user.email,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            },
-            trailingContent = {
-                if (onClick != null) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_chevron_right),
-                        contentDescription = null,
-                    )
-                }
-            },
-        )
+        AccountItemContent(user = user, isClickable = true)
     }
 }
 
 @Composable
+fun AccountInformationItem(
+    user: User,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = Margin.Medium)
+            .clip(EsdsTheme.radius.twoXl),
+    ) {
+        AccountItemContent(user = user, isClickable = false)
+    }
+}
+
+@Composable
+fun AccountItemContent(user: User, isClickable: Boolean, modifier: Modifier = Modifier) {
+    ListItem(
+        modifier = modifier.fillMaxWidth(),
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        leadingContent = { Avatar(avatarType = AvatarType.fromUser(user), modifier = Modifier.size(32.dp)) },
+        headlineContent = {
+            Text(
+                text = user.displayName.toString(),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        supportingContent = {
+            Text(
+                text = user.email,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        trailingContent = {
+            if (isClickable) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_chevron_right),
+                    contentDescription = null,
+                )
+            }
+        },
+    )
+}
+
+@Composable
 @Preview(showBackground = true)
-private fun AccountItemPreview() {
-    AccountItem(user = dummyUserOf(1, "John", "Doe"), onClick = {})
+private fun AccountItemInformationPreview() {
+    AccountInformationItem(user = dummyUserOf(1, "John", "Doe"))
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun AccountItemClickablePreview() {
+    AccountClickableItem(user = dummyUserOf(1, "John", "Doe"), onClick = {})
 }
