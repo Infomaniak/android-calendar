@@ -19,7 +19,6 @@ package com.infomaniak.calendar.components.eventdetail
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import com.infomaniak.calendar.components.eventdetail.component.DateTimeInput
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentTimeZone
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -34,32 +33,18 @@ sealed interface EventDetailTiming {
     @get:Composable
     val atLocale: LocalDateTime
 
-    val utcOffsetAtTimeZone: UtcOffset?
-    @get:Composable
-    val utcOffsetAtLocale: UtcOffset?
-
     @Immutable
     data class Precised(private val _instant: Instant, val timeZone: TimeZone) : EventDetailTiming {
         override val atTimeZone: LocalDateTime = _instant.toLocalDateTime(timeZone)
         override val atLocale: LocalDateTime @Composable get() = _instant.toLocalDateTime(rememberCurrentTimeZone().value)
 
-        override val utcOffsetAtTimeZone: UtcOffset = timeZone.offsetAt(_instant)
-        override val utcOffsetAtLocale: UtcOffset @Composable get() = rememberCurrentTimeZone().value.offsetAt(_instant)
+        val utcOffsetAtTimeZone: UtcOffset = timeZone.offsetAt(_instant)
+        val utcOffsetAtLocale: UtcOffset @Composable get() = rememberCurrentTimeZone().value.offsetAt(_instant)
     }
 
     @Immutable
     class Floating(val date: LocalDateTime) : EventDetailTiming {
         override val atTimeZone: LocalDateTime = date
         override val atLocale: LocalDateTime @Composable get() = date
-
-        override val utcOffsetAtTimeZone: UtcOffset? = null
-        override val utcOffsetAtLocale: UtcOffset? @Composable get() = null
     }
-
-    fun toDateTimeInput(): DateTimeInput = DateTimeInput(
-        atLocale = { atLocale },
-        utcOffsetAtLocale = { utcOffsetAtLocale },
-        atTimeZone = atTimeZone,
-        utcOffsetAtTimeZone = utcOffsetAtTimeZone,
-    )
 }

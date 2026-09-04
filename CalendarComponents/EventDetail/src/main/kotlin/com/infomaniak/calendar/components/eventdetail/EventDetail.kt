@@ -38,8 +38,8 @@ fun EventDetail(
         Title(color = eventDetail.eventColor, title = eventDetail.title)
 
         DateAndTime(
-            start = eventDetail.start.toDateTimeInput(),
-            end = eventDetail.end.toDateTimeInput(),
+            start = eventDetail.start,
+            end = eventDetail.end,
             isAllDay = eventDetail.isAllDay,
         )
     }
