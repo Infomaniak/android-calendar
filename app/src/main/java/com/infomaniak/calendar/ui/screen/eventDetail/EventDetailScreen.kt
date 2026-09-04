@@ -62,7 +62,7 @@ private fun EventDetailScreen(eventDetail: () -> EventDetailUi?, onBack: () -> U
         eventDetail()?.let { event ->
             EventDetail(
                 eventDetail = event,
-                contentPadding = PaddingValues(horizontal = Margin.Large),
+                contentPadding = PaddingValues(horizontal = Margin.Small),
                 modifier = Modifier.padding(scaffoldContentPadding),
             )
         }
