@@ -58,7 +58,7 @@ fun Event.toEventDetailUi(
  *  A wall-clock without a time zone is floating: it is read in whatever zone the reader is in.
  *
  *  A wall-clock + a time zone is ambiguous during DST repeated hours. During such a day, like the 25th of oct. 2026,
- *  2:30 PM occurs twice at the Europe/Paris time zone. This conversion method handles the collapsing of the both possibile
+ *  2:30 AM occurs twice at the Europe/Paris time zone. This conversion method handles the collapsing of the both possibile
  *  instants into a single one.
  **/
 private fun getDetailTiming(wallClock: LocalDateTime, timeZone: TimeZone?): EventDetailTiming = when (timeZone) {
