@@ -46,8 +46,8 @@ sealed interface NavDestination : NavKey {
     data object Accounts : NavDestination
 
     @Serializable
-    data object EventCreation : NavDestination
+    data class EventDetail(val masterEventId: String) : NavDestination
 
     @Serializable
-    data class EventDetail(val masterEventId: String) : NavDestination
+    data object EventCreation : NavDestination
 }
