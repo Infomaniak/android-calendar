@@ -18,13 +18,20 @@
 package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
 import androidx.compose.runtime.Composable
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.UtcOffset
+import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toJavaLocalTime
+import kotlinx.datetime.toJavaZoneOffset
 import java.util.Locale
 
 private const val TIME_24_HOURS_PATTERN = "HH:mm"
 private const val TIME_12_HOURS_PATTERN = "hh:mm a"
 private const val SHORT_TIME_12_HOURS_PATTERN = "h a"
+
+/** Localised GMT offset, e.g. `GMT+2` or `UTC+2` depending on the locale. */
+private const val ZONE_PATTERN = "O"
 
 //region Exposed formatting methods
 /** `06:00` or `6 AM`, narrow enough for the timeline's hour gutter. */
@@ -42,5 +49,10 @@ internal fun LocalTime.formatTime(locale: Locale, use24HourFormat: Boolean): Str
     val pattern = if (use24HourFormat) TIME_24_HOURS_PATTERN else TIME_12_HOURS_PATTERN
 
     return toJavaLocalTime().format(fixedFormatter(pattern, locale))
+}
+
+/** `GMT+2` */
+internal fun LocalDateTime.formatZoneOffset(offset: UtcOffset, locale: Locale): String {
+    return toJavaLocalDateTime().atOffset(offset.toJavaZoneOffset()).format(fixedFormatter(ZONE_PATTERN, locale))
 }
 //endregion

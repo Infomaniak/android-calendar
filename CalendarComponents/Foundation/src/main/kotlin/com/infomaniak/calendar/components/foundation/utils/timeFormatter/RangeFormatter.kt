@@ -22,7 +22,11 @@ import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.UtcOffset
+import kotlinx.datetime.toKotlinTimeZone
 import kotlinx.datetime.toLocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.Locale
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -45,14 +49,36 @@ fun formatDateTimeRange(
     currentYear: Int = Clock.today(timeZone).year,
 ): String = formatDateTimeRange(start, end, currentLocale(), isUsing24HourFormat(), currentYear)
 
+/**
+ * `Wednesday, May 20, 08:00 - 09:00 (GMT+2)`, dropping the date when the range is on a single day, and repeating the offset on
+ * each bound when the two differ. Differs from [formatDateTimeRange] as it will drop the day of week and month/day if [start]
+ * and [end] are on the same day.
+ */
+@Composable
+fun formatDateTimeRangeWithZone(
+    start: LocalDateTime,
+    startUtcOffset: UtcOffset,
+    end: LocalDateTime,
+    endUtcOffset: UtcOffset,
+    currentYear: Int = Clock.today(ZoneId.ofOffset("UTC", ZoneOffset.ofTotalSeconds(startUtcOffset.totalSeconds)).toKotlinTimeZone()).year,
+): String = formatDateTimeRangeWithZone(
+    start = start,
+    startUtcOffset = startUtcOffset,
+    end = end,
+    endUtcOffset = endUtcOffset,
+    locale = currentLocale(),
+    use24HourFormat = isUsing24HourFormat(),
+    currentYear = currentYear,
+)
+
 /** `Wednesday, May 20 - Friday, May 22`, or a single date when both bounds land on the same day. Both are inclusive. */
 @Composable
 fun formatDateRange(
-    start: LocalDateTime,
-    end: LocalDateTime,
+    startDate: LocalDate,
+    endDate: LocalDate,
     timeZone: TimeZone = TimeZone.currentSystemDefault(),
     currentYear: Int = Clock.today(timeZone).year,
-): String = formatDateRange(start.date, end.date, currentLocale(), currentYear)
+): String = formatDateRange(startDate, endDate, currentLocale(), currentYear)
 //endregion
 
 //region Underlying testable logic
@@ -66,7 +92,7 @@ internal fun formatTimeRange(
     val formattedStart = start.toLocalDateTime(timeZone).time.formatTime(locale, use24HourFormat)
     val formattedEnd = end.toLocalDateTime(timeZone).time.formatTime(locale, use24HourFormat)
 
-    return formattedStart + RANGE_SEPARATOR + formattedEnd
+    return joinRange(formattedStart, formattedEnd)
 }
 
 internal fun formatDateTimeRange(
@@ -75,18 +101,65 @@ internal fun formatDateTimeRange(
     locale: Locale,
     use24HourFormat: Boolean,
     currentYear: Int,
+): String = assembleDateTimeRange(
+    start = start,
+    end = end,
+    formattedStartTime = start.time.formatTime(locale, use24HourFormat),
+    formattedEndTime = end.time.formatTime(locale, use24HourFormat),
+    locale = locale,
+    currentYear = currentYear,
+)
+
+internal fun formatDateTimeRangeWithZone(
+    start: LocalDateTime,
+    startUtcOffset: UtcOffset,
+    end: LocalDateTime,
+    endUtcOffset: UtcOffset,
+    locale: Locale,
+    use24HourFormat: Boolean,
+    currentYear: Int,
 ): String {
-    val formattedEnd = if (start.date == end.date) {
-        end.time.formatTime(locale, use24HourFormat)
+    val startTime = start.time.formatTime(locale, use24HourFormat)
+    val endTime = end.time.formatTime(locale, use24HourFormat)
+    val startOffset = start.formatZoneOffset(startUtcOffset, locale)
+    val endOffset = end.formatZoneOffset(endUtcOffset, locale)
+
+    val isSingleDay = start.date == end.date
+    val showSingleUtcOffset = isSingleDay && startOffset == endOffset
+
+    fun assembleDateTimeRangeWithZone(formattedStartTime: String, formattedEndTime: String): String = if (isSingleDay) {
+        joinRange(formattedStartTime, formattedEndTime)
     } else {
-        end.formatDateAndTime(locale, use24HourFormat, currentYear)
+        assembleDateTimeRange(start, end, formattedStartTime, formattedEndTime, locale, currentYear)
     }
 
-    return start.formatDateAndTime(locale, use24HourFormat, currentYear) + RANGE_SEPARATOR + formattedEnd
+    return if (showSingleUtcOffset) {
+        assembleDateTimeRangeWithZone(formattedStartTime = startTime, formattedEndTime = endTime).withOffset(startOffset)
+    } else {
+        assembleDateTimeRangeWithZone(
+            formattedStartTime = startTime.withOffset(startOffset),
+            formattedEndTime = endTime.withOffset(endOffset),
+        )
+    }
 }
 
-private fun LocalDateTime.formatDateAndTime(locale: Locale, use24HourFormat: Boolean, currentYear: Int): String {
-    return joinDateAndTime(date.formatFullDate(locale, currentYear), time.formatTime(locale, use24HourFormat), locale)
+/** Only add the whole "date" information to the end date if it's different from the start date */
+private fun assembleDateTimeRange(
+    start: LocalDateTime,
+    end: LocalDateTime,
+    formattedStartTime: String,
+    formattedEndTime: String,
+    locale: Locale,
+    currentYear: Int,
+): String {
+    fun LocalDateTime.withFormattedTime(formattedTime: String): String {
+        return joinDateAndTime(date.formatFullDate(locale, currentYear), formattedTime, locale)
+    }
+
+    val formattedStart = start.withFormattedTime(formattedStartTime)
+    val formattedEnd = if (start.date == end.date) formattedEndTime else end.withFormattedTime(formattedEndTime)
+
+    return joinRange(formattedStart, formattedEnd)
 }
 
 internal fun formatDateRange(startDate: LocalDate, endDate: LocalDate, locale: Locale, currentYear: Int): String {
@@ -95,7 +168,11 @@ internal fun formatDateRange(startDate: LocalDate, endDate: LocalDate, locale: L
     return if (startDate == endDate) {
         formattedStart
     } else {
-        formattedStart + RANGE_SEPARATOR + endDate.formatFullDate(locale, currentYear)
+        joinRange(formattedStart, endDate.formatFullDate(locale, currentYear))
     }
 }
 //endregion
+
+private fun joinRange(start: String, end: String) = start + RANGE_SEPARATOR + end
+
+private fun String.withOffset(offset: String) = "$this ($offset)"
