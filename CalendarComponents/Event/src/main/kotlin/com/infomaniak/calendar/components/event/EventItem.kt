@@ -58,7 +58,12 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Instant
 
 @Composable
-fun EventItem(event: EventUi.Normal, modifier: Modifier = Modifier) {
+fun EventItem(
+    event: EventUi.Normal,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    allDayTrailingContent: @Composable () -> Unit = {},
+) {
     EventItem(
         start = event.start,
         end = event.end,
@@ -68,6 +73,8 @@ fun EventItem(event: EventUi.Normal, modifier: Modifier = Modifier) {
         trailingIcons = event.toEventIcons(),
         isAllDay = event.isAllDay,
         modifier = modifier,
+        onClick = onClick,
+        allDayTrailingContent = allDayTrailingContent,
     )
 }
 
@@ -80,11 +87,17 @@ internal fun EventItem(
     status: EventItemStatus,
     trailingIcons: Set<EventIcons>,
     isAllDay: Boolean,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    allDayTrailingContent: @Composable () -> Unit = {},
 ) {
-    EventItemCard(status, onClick = {}, modifier = modifier) {
+    EventItemCard(status, onClick = onClick, modifier = modifier) {
         if (isAllDay) {
-            AllDayContent(title)
+            AllDayContent(
+                title = title,
+                textDecoration = status.textDecoration,
+                trailingContent = allDayTrailingContent,
+            )
         } else {
             PartialDayContent(start, end, title, location, trailingIcons, status.textDecoration)
         }
@@ -111,7 +124,7 @@ fun EventItemCard(
                 Column(
                     modifier = Modifier
                         .cardStripes(status)
-                        .padding(EsdsTheme.spacing.sm),
+                        .padding(horizontal = Margin.Small, vertical = Margin.Mini),
                     content = content,
                 )
             }
@@ -127,7 +140,12 @@ fun EventItemCard(
 }
 
 @Composable
-private fun AllDayContent(title: String, modifier: Modifier = Modifier) {
+private fun AllDayContent(
+    title: String,
+    textDecoration: TextDecoration?,
+    modifier: Modifier = Modifier,
+    trailingContent: @Composable () -> Unit = {},
+) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
         modifier = Modifier.fillMaxWidth(),
@@ -137,12 +155,12 @@ private fun AllDayContent(title: String, modifier: Modifier = Modifier) {
             title,
             style = MaterialTheme.typography.bodySmallEmphasized,
             fontWeight = FontWeight.Medium,
+            textDecoration = textDecoration,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = modifier.weight(1f),
         )
-
-        Text(stringResource(R.string.allDayLabel), style = MaterialTheme.typography.bodySmall)
+        trailingContent()
     }
 }
 
@@ -232,6 +250,15 @@ enum class EventIcons(
     }
 }
 
+object EventItemDefaults {
+    val AllDayLabel = @Composable {
+        Text(
+            stringResource(R.string.allDayLabel),
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun Preview() {
@@ -251,7 +278,9 @@ private fun Preview() {
             location = location,
             status = status,
             trailingIcons = EventIcons.entries.toSet(),
+            onClick = {},
             modifier = modifier,
+            allDayTrailingContent = EventItemDefaults.AllDayLabel,
         )
     }
 
