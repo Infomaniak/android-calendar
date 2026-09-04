@@ -91,6 +91,7 @@ private fun MutableList<EventUi>?.ensureHasEntry(date: LocalDate, timeZone: Time
 }
 
 fun EventColors.toEventColorsUi(): EventColorsUi = EventColorsUi(
+    _calendarSourceColor = calendarSourceColor.argb,
     _sourceColor = sourceColor,
     _containerColor = containerColor,
     _onContainerColor = onContainerColor.toThemedColorUi(),
