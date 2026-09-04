@@ -41,7 +41,7 @@
 
         <meta-data
             android:name="io.sentry.dsn"
-            android:value="https://afcc80384a2911f1a5c6de3982f677f1@sentry-mobile.infomaniak.com/25" />
+            android:value="https://9663506262a0682be1d5f6222aeed762@sentry-mobile.infomaniak.com/25" />
 
         <!--
           Disable WorkManager's default startup initializer so the on-demand initialization
