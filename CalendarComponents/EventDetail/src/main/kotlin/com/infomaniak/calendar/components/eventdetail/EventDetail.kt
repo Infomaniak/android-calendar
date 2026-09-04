@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
-import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
@@ -35,13 +34,10 @@ fun EventDetail(
     Column(
         modifier = modifier.padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding()),
     ) {
-        Title(color = eventDetail.eventColor, title = eventDetail.title)
-
-        DateAndTime(
-            start = eventDetail.start,
-            end = eventDetail.end,
-            isAllDay = eventDetail.isAllDay,
-        )
+        with(eventDetail) {
+            Title(eventColor, title, Modifier.padding(horizontalContentPadding))
+            DateAndTime(start, end, isAllDay, Modifier.padding(horizontalContentPadding))
+        }
     }
 }
 
@@ -82,7 +78,9 @@ private fun PreviewEventDetail() {
         notifications = emptyList(),
     )
 
-    Surface {
-        EventDetail(eventDetail, contentPadding = PaddingValues(horizontal = Margin.Large))
+    MaterialTheme {
+        Surface {
+            EventDetail(eventDetail)
+        }
     }
 }
