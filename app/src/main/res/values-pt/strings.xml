@@ -18,6 +18,7 @@
 <resources>
     <string name="accountsTitle">Contas</string>
     <string name="addAccount">Adicionar uma conta</string>
+    <string name="buttonLogOut">Sair</string>
     <string name="contentDescriptionBack">Voltar</string>
     <string name="contentDescriptionInbox">Abrir a caixa de entrada</string>
     <string name="contentDescriptionMenuDrawer">Abrir menu</string>
@@ -28,6 +29,9 @@
     <string name="monthTitle">Mês</string>
     <string name="planningTitle">Planeamento</string>
     <string name="settingsTitle">Definições</string>
+    <string name="signOutAccountAlertConfirm">Sair da conta</string>
+    <string name="signOutAccountAlertDescription">Esta conta e os calendários associados serão desligados da aplicação «Calendário». Continuarão disponíveis na sua conta online da Infomaniak.</string>
+    <string name="signOutAccountAlertTitle">Sair da conta «%s»</string>
     <string name="syncEventsError">Erro ao recuperar os eventos</string>
     <string name="threeDaysTitle">Três dias</string>
     <string name="weekTitle">Semana</string>

@@ -46,7 +46,8 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── week/                  # WeekScreen — placeholder week view
     │   ├── month/                 # MonthScreen + MonthViewModel
     │   ├── planning/              # PlanningScreen + PlanningViewModel + PlanningEventGroupingExt
-    │   ├── accounts/              # Accounts screen + AccountItem (drawer-backed account list and add account action)
+    │   ├── accounts/              # AccountsListScreen + AccountActionsScreen + AccountsViewModel + AccountItem
+    │                              # Drawer-backed account list, per-account detail/logout screen, and remove-account flow
     │   ├── eventCreation/         # EventCreationScreen
     │   └── onboarding/            # OnboardingScreen + CrossAppLoginViewModel
     └── theme/

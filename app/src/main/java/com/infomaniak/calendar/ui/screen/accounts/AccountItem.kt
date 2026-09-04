@@ -17,18 +17,17 @@
  */
 package com.infomaniak.calendar.ui.screen.accounts
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -46,47 +45,92 @@ import com.infomaniak.core.ui.compose.preview.previewparameter.dummyUserOf
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
-fun AccountItem(user: User, modifier: Modifier = Modifier) {
+fun AccountItem(
+    user: User,
+    modifier: Modifier = Modifier,
+    onClick: ((User) -> Unit)? = null,
+) {
+    if (onClick != null) {
+        AccountClickableItem(user = user, onClick = onClick, modifier = modifier)
+    } else {
+        AccountInformationItem(user = user, modifier = modifier)
+    }
+}
+
+@Composable
+fun AccountClickableItem(
+    user: User,
+    onClick: (User) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Surface(
-        onClick = {},
+        onClick = { onClick(user) },
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = Margin.Medium)
             .clip(EsdsTheme.radius.twoXl),
         color = Color.Transparent,
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = Margin.Small, vertical = Margin.Small),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Margin.Medium),
-        ) {
-            Avatar(avatarType = AvatarType.fromUser(user), Modifier.size(32.dp))
-            Column(
-                modifier = Modifier.weight(1f),
-            ) {
-                Text(
-                    text = user.displayName.toString(),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    text = user.email,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-            Icon(
-                painter = painterResource(R.drawable.ic_chevron_right),
-                contentDescription = null,
-            )
-        }
+        AccountItemContent(user = user, isClickable = true)
     }
 }
 
 @Composable
+fun AccountInformationItem(
+    user: User,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = Margin.Medium)
+            .clip(EsdsTheme.radius.twoXl),
+    ) {
+        AccountItemContent(user = user, isClickable = false)
+    }
+}
+
+@Composable
+fun AccountItemContent(user: User, isClickable: Boolean, modifier: Modifier = Modifier) {
+    ListItem(
+        modifier = modifier.fillMaxWidth(),
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        leadingContent = { Avatar(avatarType = AvatarType.fromUser(user), modifier = Modifier.size(32.dp)) },
+        headlineContent = {
+            Text(
+                text = user.displayName.toString(),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        supportingContent = {
+            Text(
+                text = user.email,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        trailingContent = {
+            if (isClickable) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_chevron_right),
+                    contentDescription = null,
+                )
+            }
+        },
+    )
+}
+
+@Composable
 @Preview(showBackground = true)
-private fun AccountItemPreview() {
-    AccountItem(user = dummyUserOf(1, "John", "Doe"))
+private fun AccountItemInformationPreview() {
+    AccountInformationItem(user = dummyUserOf(1, "John", "Doe"))
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun AccountItemClickablePreview() {
+    AccountClickableItem(user = dummyUserOf(1, "John", "Doe"), onClick = {})
 }

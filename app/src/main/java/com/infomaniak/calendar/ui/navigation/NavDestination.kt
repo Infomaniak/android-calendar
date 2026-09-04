@@ -42,8 +42,13 @@ sealed interface NavDestination : NavKey {
         data object Month : CalendarView
     }
 
-    @Serializable
-    data object Accounts : NavDestination
+    sealed interface Accounts : NavDestination {
+        @Serializable
+        data object List : Accounts
+
+        @Serializable
+        data class Actions(val userId: Int) : Accounts
+    }
 
     @Serializable
     data object EventCreation : NavDestination
