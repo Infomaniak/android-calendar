@@ -19,10 +19,8 @@ package com.infomaniak.calendar.components.day.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -49,7 +47,7 @@ import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.components.day.model.TimedEvent
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.event.EventIcons
-import com.infomaniak.calendar.components.event.component.cardStripes
+import com.infomaniak.calendar.components.event.EventItemCard
 import com.infomaniak.calendar.components.event.toEventIcons
 import com.infomaniak.calendar.components.event.toEventItemStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
@@ -75,7 +73,7 @@ private const val MaxDetailLines = 2
 private const val ELLIPSIS = "…"
 
 @Composable
-internal fun TimedEventCard(
+internal fun ResizableEventItem(
     timedEvent: TimedEvent,
     titleSizing: TitleSizing,
     visibleHeight: () -> Float,
@@ -84,26 +82,14 @@ internal fun TimedEventCard(
 ) {
     val status = timedEvent.event.toEventItemStatus()
 
-    Card(
-        onClick = onClick,
-        colors = status.cardColors(),
-        border = status.cardBorder(),
-        shape = EsdsTheme.radius.sm,
-        modifier = modifier,
-    ) {
-        Row(modifier = Modifier
-            .cardStripes(status)
-            .fillMaxSize()) {
-            EventAccentBar(status.accentBarColor())
-
-            EventDetails(
-                event = timedEvent.event,
-                titleSizing = titleSizing,
-                visibleHeight = visibleHeight,
-                textDecoration = status.textDecoration,
-                modifier = Modifier.padding(horizontal = EsdsTheme.spacing.lg),
-            )
-        }
+    EventItemCard(status, onClick, modifier) {
+        EventDetails(
+            event = timedEvent.event,
+            titleSizing = titleSizing,
+            visibleHeight = visibleHeight,
+            textDecoration = status.textDecoration,
+            modifier = Modifier.padding(horizontal = EsdsTheme.spacing.lg),
+        )
     }
 }
 
@@ -341,12 +327,12 @@ private fun TextUnit.roundedToStep(): TextUnit = ((value / TitleSizeStep.value).
  */
 @Preview(widthDp = 220)
 @Composable
-private fun TimedEventCardPreview() {
+private fun ResizableEventItemPreview() {
     Surface {
         val cardHeight = DayTimelineDefaults.HourHeight
         val cardHeightPx = with(LocalDensity.current) { cardHeight.toPx() }
 
-        TimedEventCard(
+        ResizableEventItem(
             timedEvent = previewDayEvents.timed.first(),
             titleSizing = titleSizingFor(visibleHeight = cardHeight, width = 220.dp),
             visibleHeight = { cardHeightPx },

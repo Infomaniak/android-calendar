@@ -15,11 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.day.component
+package com.infomaniak.calendar.components.event
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -34,22 +33,25 @@ import androidx.compose.ui.unit.dp
 private val AccentBarWidth = 4.dp
 
 @Composable
-internal fun EventAccentBar(color: Color, modifier: Modifier = Modifier) {
-    Spacer(
-        modifier = modifier
-            .width(AccentBarWidth)
-            .fillMaxHeight()
-            .background(color),
-    )
+internal fun AccentBar(color: Color, modifier: Modifier = Modifier) {
+    Box(modifier = modifier) {
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .width(AccentBarWidth)
+                .background(color),
+        )
+    }
 }
 
-/** The bar takes the height of whatever holds it, so the preview gives it a card's worth. */
 @Preview
 @Composable
-private fun EventAccentBarPreview() {
-    Surface {
-        Row(modifier = Modifier.height(32.dp)) {
-            EventAccentBar(color = MaterialTheme.colorScheme.primary)
+private fun Preview() {
+    MaterialTheme {
+        Surface {
+            Box {
+                AccentBar(color = MaterialTheme.colorScheme.primary, modifier = Modifier.height(32.dp))
+            }
         }
     }
 }
