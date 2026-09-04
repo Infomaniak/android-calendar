@@ -35,7 +35,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -87,8 +86,8 @@ internal fun EventItem(
     status: EventItemStatus,
     trailingIcons: Set<EventIcons>,
     isAllDay: Boolean,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
 ) {
     EventItemCard(status, onClick = onClick, modifier = modifier) {
         if (isAllDay) {
@@ -265,6 +264,7 @@ private fun Preview() {
             location = location,
             status = status,
             trailingIcons = EventIcons.entries.toSet(),
+            onClick = {},
             modifier = modifier,
         )
     }

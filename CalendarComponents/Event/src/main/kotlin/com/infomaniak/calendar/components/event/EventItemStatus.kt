@@ -132,6 +132,7 @@ private fun Preview() {
             location = "Salle Tokyo",
             status = status,
             trailingIcons = EventIcons.entries.toSet(),
+            onClick = {},
             modifier = modifier,
         )
     }
