@@ -37,7 +37,7 @@ import com.infomaniak.calendar.components.day.component.CurrentTimeIndicator
 import com.infomaniak.calendar.components.day.component.HourGrid
 import com.infomaniak.calendar.components.day.component.HourLabelOverhang
 import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults
-import com.infomaniak.calendar.components.day.layout.TimedEventsLayout
+import com.infomaniak.calendar.components.day.layout.ResizableEventLayout
 import com.infomaniak.calendar.components.day.layout.eventLayoutConfig
 import com.infomaniak.calendar.components.day.layout.resolveOverlaps
 import com.infomaniak.calendar.components.day.model.DayEvents
@@ -98,7 +98,7 @@ fun DayTimeline(
         ) {
             HourGrid(state = state, modifier = Modifier.fillMaxWidth())
 
-            TimedEventsLayout(
+            ResizableEventLayout(
                 timedEvents = events.timed,
                 placements = placements,
                 onEventClick = onEventClick,
