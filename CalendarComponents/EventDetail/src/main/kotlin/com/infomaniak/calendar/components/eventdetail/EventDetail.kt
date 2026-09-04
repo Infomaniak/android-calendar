@@ -22,6 +22,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
+import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
@@ -82,7 +83,7 @@ private fun PreviewEventDetail() {
 
     MaterialTheme {
         Surface {
-            EventDetail(eventDetail)
+            EventDetail(eventDetail, contentPadding = PaddingValues(horizontal = Margin.Small))
         }
     }
 }
