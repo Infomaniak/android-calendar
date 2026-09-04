@@ -17,21 +17,19 @@
  */
 package com.infomaniak.calendar.ui.screen.accounts
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -89,16 +87,14 @@ private fun AccountsContent(
             }
 
             item {
-                TextButton(
+                FilledTonalButton(
                     onClick = onAddAccount,
-                    contentPadding = PaddingValues(0.dp),
-                    colors = ButtonDefaults.textButtonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+                    shape = EsdsTheme.radius.full,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(all = Margin.Medium)
-                        .clip(EsdsTheme.radius.full),
+                        .padding(all = EsdsTheme.spacing.xl),
                 ) {
-                    Text(stringResource(R.string.addAccount), modifier = Modifier.padding(vertical = Margin.Medium))
+                    Text(stringResource(R.string.addAccount), modifier = Modifier.padding(vertical = EsdsTheme.spacing.md))
                 }
             }
         }
@@ -108,9 +104,9 @@ private fun AccountsContent(
 @Preview
 @Composable
 private fun AccountsPreview(
-    @PreviewParameter(DrawerPreviewProvider::class) calendarsUsers: () -> List<UserCalendarsUi>,
+    @PreviewParameter(DrawerPreviewProvider::class) calendarsUsers: List<UserCalendarsUi>,
 ) {
     CalendarThemeForPreview {
-        AccountsContent(calendarsUsers = { calendarsUsers() }, onBack = {}, onAddAccount = {})
+        AccountsContent(calendarsUsers = { calendarsUsers }, onBack = {}, onAddAccount = {})
     }
 }
