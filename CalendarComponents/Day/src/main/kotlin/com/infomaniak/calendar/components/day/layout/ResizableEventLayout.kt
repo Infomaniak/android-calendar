@@ -33,18 +33,17 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
-import com.infomaniak.calendar.components.day.component.TimedEventCard
+import com.infomaniak.calendar.components.day.component.ResizableEventItem
 import com.infomaniak.calendar.components.day.component.titleSizingFor
 import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.model.TimedEvent
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.foundation.models.EventUi
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlin.math.roundToInt
 
 @Composable
-internal fun TimedEventsLayout(
+internal fun ResizableEventLayout(
     timedEvents: List<TimedEvent>,
     placements: List<EventPlacement>,
     onEventClick: (EventUi.Normal) -> Unit,
@@ -60,7 +59,7 @@ internal fun TimedEventsLayout(
             timedEvents.forEachIndexed { index, timedEvent ->
                 val placement = placements[index]
 
-                TimedEventCard(
+                ResizableEventItem(
                     timedEvent = timedEvent,
                     titleSizing = titleSizingFor(
                         visibleHeight = with(density) { placement.visibleHeight.toDp() },
@@ -103,7 +102,7 @@ internal fun TimedEventsLayout(
  */
 @Preview
 @Composable
-private fun TimedEventsLayoutPreview() {
+private fun ResizableEventLayoutPreview() {
     Surface {
         val density = LocalDensity.current
         val timedEvents = previewDayEvents.timed
@@ -133,7 +132,7 @@ private fun TimedEventsLayoutPreview() {
                     .fillMaxWidth()
                     .height(DayTimelineDefaults.HourHeight * HOURS_PER_DAY),
             ) {
-                TimedEventsLayout(
+                ResizableEventLayout(
                     timedEvents = timedEvents,
                     placements = placements,
                     onEventClick = {},

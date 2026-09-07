@@ -19,21 +19,11 @@ package com.infomaniak.calendar.components.event
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -41,7 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,7 +39,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.event.component.cardStripes
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatTimeRange
@@ -61,7 +49,12 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Instant
 
 @Composable
-fun EventItem(event: EventUi.Normal, modifier: Modifier = Modifier) {
+fun EventItem(
+    event: EventUi.Normal,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    allDayTrailingContent: @Composable () -> Unit = {},
+) {
     EventItem(
         start = event.start,
         end = event.end,
@@ -71,6 +64,8 @@ fun EventItem(event: EventUi.Normal, modifier: Modifier = Modifier) {
         trailingIcons = event.toEventIcons(),
         isAllDay = event.isAllDay,
         modifier = modifier,
+        onClick = onClick,
+        allDayTrailingContent = allDayTrailingContent,
     )
 }
 
@@ -83,11 +78,17 @@ internal fun EventItem(
     status: EventItemStatus,
     trailingIcons: Set<EventIcons>,
     isAllDay: Boolean,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    allDayTrailingContent: @Composable () -> Unit = {},
 ) {
-    EventItemCard(status, modifier = modifier) {
+    EventItemCard(status, onClick = onClick, modifier = modifier) {
         if (isAllDay) {
-            AllDayContent(title)
+            AllDayContent(
+                title = title,
+                textDecoration = status.textDecoration,
+                trailingContent = allDayTrailingContent,
+            )
         } else {
             PartialDayContent(start, end, title, location, trailingIcons, status.textDecoration)
         }
@@ -95,39 +96,12 @@ internal fun EventItem(
 }
 
 @Composable
-private fun EventItemCard(status: EventItemStatus, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
-    val cardLine = status.accentBarColor()
-
-    Card(
-        colors = status.cardColors(),
-        border = status.cardBorder(),
-        shape = MaterialTheme.shapes.small,
-        modifier = modifier,
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min), // makes the line match card height
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(4.dp)
-                    .clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp))
-                    .background(cardLine),
-            )
-            Column(
-                modifier = Modifier
-                    .cardStripes(status)
-                    .padding(EsdsTheme.spacing.sm),
-                content = content,
-            )
-        }
-    }
-}
-
-@Composable
-private fun AllDayContent(title: String, modifier: Modifier = Modifier) {
+private fun AllDayContent(
+    title: String,
+    textDecoration: TextDecoration?,
+    modifier: Modifier = Modifier,
+    trailingContent: @Composable () -> Unit = {},
+) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
         modifier = Modifier.fillMaxWidth(),
@@ -137,12 +111,12 @@ private fun AllDayContent(title: String, modifier: Modifier = Modifier) {
             title,
             style = MaterialTheme.typography.bodySmallEmphasized,
             fontWeight = FontWeight.Medium,
+            textDecoration = textDecoration,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = modifier.weight(1f),
         )
-
-        Text(stringResource(R.string.allDayLabel), style = MaterialTheme.typography.bodySmall)
+        trailingContent()
     }
 }
 
@@ -232,6 +206,12 @@ enum class EventIcons(
     }
 }
 
+object EventItemDefaults {
+    val AllDayLabel = @Composable {
+        Text(stringResource(R.string.allDayLabel), style = MaterialTheme.typography.bodySmall)
+    }
+}
+
 @Preview
 @Composable
 private fun Preview() {
@@ -251,7 +231,9 @@ private fun Preview() {
             location = location,
             status = status,
             trailingIcons = EventIcons.entries.toSet(),
+            onClick = {},
             modifier = modifier,
+            allDayTrailingContent = EventItemDefaults.AllDayLabel,
         )
     }
 

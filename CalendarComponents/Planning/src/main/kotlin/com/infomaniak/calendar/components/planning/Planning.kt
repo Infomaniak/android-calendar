@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.EventItem
+import com.infomaniak.calendar.components.event.EventItemDefaults
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.YearWeek
@@ -142,7 +143,14 @@ private fun Event(
         )
 
         when (event) {
-            is EventUi.Normal -> EventItem(event, Modifier.fillMaxWidth())
+            is EventUi.Normal -> {
+                EventItem(
+                    event = event,
+                    onClick = {},
+                    modifier = Modifier.fillMaxWidth(),
+                    allDayTrailingContent = EventItemDefaults.AllDayLabel,
+                )
+            }
             is EventUi.TodayEmptyState -> TodayEmptyState(onClick = goToEventCreation, Modifier.fillMaxWidth())
             is EventUi.EmptyState -> OtherDayEmptyState(onClick = goToEventCreation, Modifier.fillMaxWidth())
         }

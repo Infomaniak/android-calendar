@@ -120,6 +120,7 @@ private fun EventSizeSpacerStackedPreview() {
                         start = now,
                         end = now + duration,
                         isAllDay = false,
+                        onClick = {},
                         trailingIcons = emptySet(),
                     )
                 }
