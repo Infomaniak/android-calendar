@@ -18,9 +18,9 @@
 package com.infomaniak.calendar.components.day.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -48,6 +48,7 @@ import com.infomaniak.calendar.components.day.model.TimedEvent
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.event.EventIcons
 import com.infomaniak.calendar.components.event.EventItemCard
+import com.infomaniak.calendar.components.event.EventItemCardDefaults
 import com.infomaniak.calendar.components.event.toEventIcons
 import com.infomaniak.calendar.components.event.toEventItemStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
@@ -82,13 +83,17 @@ internal fun ResizableEventItem(
 ) {
     val status = timedEvent.event.toEventItemStatus()
 
-    EventItemCard(status, onClick, modifier) {
+    EventItemCard(
+        status = status,
+        onClick = onClick,
+        modifier = modifier,
+        contentPadding = PaddingValues(horizontal = EventItemCardDefaults.HorizontalPaddingValue),
+    ) {
         EventDetails(
             event = timedEvent.event,
             titleSizing = titleSizing,
             visibleHeight = visibleHeight,
             textDecoration = status.textDecoration,
-            modifier = Modifier.padding(horizontal = EsdsTheme.spacing.lg),
         )
     }
 }
@@ -111,7 +116,7 @@ private fun EventDetails(
 ) {
     val density = LocalDensity.current
     val spacing = with(density) { EsdsTheme.spacing.twoXs.roundToPx() }
-    val maxPadding = with(density) { EsdsTheme.spacing.lg.toPx() }
+    val maxVerticalPadding = with(density) { EsdsTheme.spacing.lg.toPx() }
 
     val textMeasurer = rememberTextMeasurer()
     val detailStyle = MaterialTheme.typography.bodySmall
@@ -163,10 +168,10 @@ private fun EventDetails(
 
         // Padding is what the lines leave over, never what they are charged: a card with the height
         // for one more line spends it on that line, and only a card with height to spare breathes.
-        val padding = ((available - linesHeight) / 2f).coerceIn(0f, maxPadding).roundToInt()
+        val verticalPadding = ((available - linesHeight) / 2f).coerceIn(0f, maxVerticalPadding).roundToInt()
 
-        layout(constraints.maxWidth, linesHeight.roundToInt() + padding * 2) {
-            var y = padding
+        layout(constraints.maxWidth, linesHeight.roundToInt() + verticalPadding * 2) {
+            var y = verticalPadding
 
             lines.forEach { line ->
                 line.place(x = 0, y = y)

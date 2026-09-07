@@ -23,8 +23,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
@@ -109,9 +113,10 @@ fun EventItemCard(
     status: EventItemStatus,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = EventItemCardDefaults.ContentPadding,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Box(modifier = modifier) {
+    Box(modifier = modifier.height(IntrinsicSize.Min), propagateMinConstraints = true) {
         // Card with onClick enforces minimumInteractiveComponentSize() which makes small events too big compared to the design.
         CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
             Card(
@@ -119,12 +124,11 @@ fun EventItemCard(
                 colors = status.cardColors(),
                 border = status.cardBorder(),
                 shape = MaterialTheme.shapes.small,
-                modifier = Modifier,
             ) {
                 Column(
                     modifier = Modifier
                         .cardStripes(status)
-                        .padding(horizontal = Margin.Small, vertical = Margin.Mini),
+                        .padding(contentPadding),
                     content = content,
                 )
             }
@@ -134,7 +138,7 @@ fun EventItemCard(
             color = status.accentBarColor(),
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
-                .matchParentSize(),
+                .fillMaxWidth(),
         )
     }
 }
@@ -257,6 +261,13 @@ object EventItemDefaults {
             style = MaterialTheme.typography.bodySmall,
         )
     }
+}
+
+object EventItemCardDefaults {
+    val HorizontalPaddingValue = Margin.Small
+    val VerticalPaddingValue = Margin.Mini
+
+    val ContentPadding = PaddingValues(horizontal = HorizontalPaddingValue, vertical = VerticalPaddingValue)
 }
 
 @Preview
