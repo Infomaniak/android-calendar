@@ -19,33 +19,30 @@ package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MenuList(
     menuOptions: List<MenuOption>,
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .padding(start = Margin.Medium, end = Margin.Medium, top = Margin.Mini, bottom = Margin.Large)
-            .clip(shape = EsdsTheme.radius.twoXl)
-            .background(color = MaterialTheme.colorScheme.surfaceContainer)
-            .padding(vertical = Margin.Mini, horizontal = Margin.Micro),
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+        modifier = modifier.padding(start = Margin.Medium, end = Margin.Medium, top = Margin.Mini, bottom = Margin.Large),
     ) {
-        menuOptions.forEach { menuOption ->
-            MenuItem(menuOption = menuOption)
+        menuOptions.forEachIndexed { index, menuOption ->
+            MenuItem(menuOption = menuOption, index = index, count = menuOptions.size)
         }
     }
 }

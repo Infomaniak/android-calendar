@@ -17,59 +17,63 @@
  */
 package com.infomaniak.calendar.ui.component.drawer
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.ui.compose.margin.Margin
-import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.calendar.ui.theme.CustomColors
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun MenuItem(menuOption: MenuOption, modifier: Modifier = Modifier) {
-    Surface(
+fun MenuItem(
+    menuOption: MenuOption,
+    index: Int,
+    count: Int,
+    modifier: Modifier = Modifier,
+) {
+    SegmentedListItem(
         onClick = menuOption.itemAction,
-        shape = EsdsTheme.radius.twoXl,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = Margin.Micro),
-        color = Color.Transparent,
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Margin.Medium),
-            modifier = Modifier.padding(all = Margin.Small),
-        ) {
+        modifier = modifier.fillMaxWidth(),
+        shapes = ListItemDefaults.segmentedShapes(
+            index = index,
+            count = count,
+        ),
+        leadingContent = {
             Icon(
                 painter = painterResource(menuOption.itemIcon),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
             )
-            Text(
-                modifier = Modifier.weight(1f),
-                text = stringResource(menuOption.itemNameRes),
-                style = MaterialTheme.typography.bodyLarge,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+        },
+        trailingContent = {
             Icon(
                 painter = painterResource(R.drawable.ic_chevron_right),
                 contentDescription = null,
             )
-        }
+        },
+        verticalAlignment = Alignment.CenterVertically,
+        colors = ListItemDefaults.colors(
+            containerColor = CustomColors.menuDrawerContainerBackground,
+            leadingIconColor = MaterialTheme.colorScheme.primary,
+        ),
+    ) {
+        Text(
+            text = stringResource(menuOption.itemNameRes),
+            style = MaterialTheme.typography.bodyLarge,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
@@ -83,6 +87,8 @@ private fun MenuItemPreview() {
                 itemIcon = R.drawable.ic_circle_user,
                 itemAction = {},
             ),
+            index = 0,
+            count = 1,
         )
     }
 }
