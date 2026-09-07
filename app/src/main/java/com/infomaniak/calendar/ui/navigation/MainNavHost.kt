@@ -52,20 +52,30 @@ import io.sentry.Breadcrumb.user
 import kotlin.time.Clock
 
 @Composable
-fun MainNavHost(backStack: NavBackStack<NavKey>) {
+fun MainNavHost(
+    backStack: NavBackStack<NavKey>,
+    defaultCalendarView: NavDestination.CalendarView,
+    onCalendarViewSelected: (NavDestination.CalendarView) -> Unit,
+) {
     SharedTransitionLayout {
         CompositionLocalProvider(LocalSharedTransitionScope provides this@SharedTransitionLayout) {
             NavDisplay(
                 backStack = backStack,
-                entryProvider = baseEntryProvider(backStack = backStack),
-                sceneDecoratorStrategies = sceneDecoratorStrategies(backStack = backStack),
+                entryProvider = baseEntryProvider(backStack = backStack, defaultCalendarView = defaultCalendarView),
+                sceneDecoratorStrategies = sceneDecoratorStrategies(
+                    backStack = backStack,
+                    onCalendarViewSelected = onCalendarViewSelected,
+                ),
                 sharedTransitionScope = this@SharedTransitionLayout,
             )
         }
     }
 }
 
-private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> = entryProvider {
+private fun baseEntryProvider(
+    backStack: NavBackStack<NavKey>,
+    defaultCalendarView: NavDestination.CalendarView,
+): (NavKey) -> NavEntry<NavKey> = entryProvider {
     entry<NavDestination.CalendarView.Planning>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         PlanningScreen(goToEventCreation = { backStack.add(NavDestination.EventCreation) })
     }
@@ -86,7 +96,7 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
     }
     entry<NavDestination.Accounts.List> {
         AccountsListScreen(
-            onBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
+            onBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
             onAddAccount = { backStack.add(NavDestination.Onboarding(onlyLogin = true)) },
             onAccountClick = { userId -> backStack.add(NavDestination.Accounts.Actions(userId)) },
         )
@@ -101,14 +111,17 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
         OnboardingScreen(
             onlyLogin = destination.onlyLogin,
             goToCalendarView = {
-                backStack.replaceRoot(NavDestination.CalendarView.Planning)
+                backStack.replaceRoot(defaultCalendarView)
             },
-            onPopBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
+            onPopBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
         )
     }
 }
 
-private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<SceneDecoratorStrategy<NavKey>> {
+private fun sceneDecoratorStrategies(
+    backStack: NavBackStack<NavKey>,
+    onCalendarViewSelected: (NavDestination.CalendarView) -> Unit,
+): List<SceneDecoratorStrategy<NavKey>> {
     val navigationStrategy: NavigationDecoratorStrategy<NavKey> =
         NavigationDecoratorStrategy(
             floatingToolbar = {
@@ -116,6 +129,7 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
 
                 CalendarHorizontalFloatingToolbar(
                     onNavigationButtonClicked = { destination ->
+                        onCalendarViewSelected(destination)
                         backStack.replaceRoot(destination)
                     },
                     onCurrentDayClicked = { visibleDayState?.jumpTo(Clock.today()) },

@@ -32,6 +32,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -76,6 +77,8 @@ class MainActivity : ComponentActivity() {
                             userLoadState = userLoadState,
                             visibleDayState = rememberVisibleDayState(mainViewModel.visibleDay),
                             loadingEventsError = mainViewModel.loadingEventsError,
+                            lastCalendarView = mainViewModel.lastCalendarView.collectAsStateWithLifecycle().value,
+                            onCalendarViewSelected = mainViewModel::saveCalendarView,
                         )
                     }
                 }
@@ -89,8 +92,15 @@ private fun MainContent(
     userLoadState: UserLoadState.Loaded,
     visibleDayState: VisibleDayState,
     loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError>,
+    lastCalendarView: NavDestination.CalendarView?,
+    onCalendarViewSelected: (NavDestination.CalendarView) -> Unit,
 ) {
-    val startDestination = if (userLoadState.user == null) NavDestination.Onboarding() else NavDestination.CalendarView.Planning
+    val startDestination = if (userLoadState.user == null) {
+        NavDestination.Onboarding()
+    } else {
+        // Blank surface while the last selected calendar view is being read from the disk
+        lastCalendarView ?: return
+    }
     val backStack = rememberNavBackStack(startDestination)
 
     CompositionLocalProvider(
@@ -102,7 +112,11 @@ private fun MainContent(
     ) {
         ObserveSyncError(loadingEventsError)
         NavigateToOnboardingIfLastUserIsDisconnected(backStack, userLoadState.user)
-        MainNavHost(backStack)
+        MainNavHost(
+            backStack = backStack,
+            defaultCalendarView = lastCalendarView ?: NavDestination.CalendarView.Default,
+            onCalendarViewSelected = onCalendarViewSelected,
+        )
     }
 }
 

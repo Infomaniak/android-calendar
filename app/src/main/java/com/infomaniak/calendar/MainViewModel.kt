@@ -26,7 +26,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
+import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.SyncEventsManager
+import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.common.utils.today
@@ -38,9 +40,12 @@ import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
@@ -50,8 +55,14 @@ class MainViewModel(
     @Assisted savedStateHandle: SavedStateHandle,
     private val accountUtils: AccountUtils,
     private val syncEventsManager: SyncEventsManager,
+    private val calendarDataValues: CalendarDataValues,
 ) : ViewModel() {
     val loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError> = syncEventsManager.loadingError
+
+    /** `null` until the persisted value has been read from the disk. */
+    val lastCalendarView: StateFlow<NavDestination.CalendarView?> = calendarDataValues.lastCalendarView.flow
+        .map(NavDestination.CalendarView::fromStorageKey)
+        .stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
 
     @OptIn(SavedStateHandleSaveableApi::class)
     val visibleDay: MutableState<LocalDate> = savedStateHandle.saveable("visibleDay") {
@@ -60,6 +71,10 @@ class MainViewModel(
 
     init {
         syncEventsForConnectedUsers()
+    }
+
+    fun saveCalendarView(calendarView: NavDestination.CalendarView) {
+        viewModelScope.launch { calendarDataValues.lastCalendarView.setValue(calendarView.storageKey) }
     }
 
     private fun syncEventsForConnectedUsers() {
