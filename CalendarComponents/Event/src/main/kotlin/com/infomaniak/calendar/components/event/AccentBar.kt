@@ -21,20 +21,23 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 private val AccentBarWidth = 4.dp
 
 @Composable
-internal fun AccentBar(color: Color, modifier: Modifier = Modifier) {
-    Box(modifier = modifier) {
+internal fun AccentBar(color: Color, shape: Shape, modifier: Modifier = Modifier) {
+    Box(modifier = modifier.clip(shape)) {
         Box(
             modifier = Modifier
                 .fillMaxHeight()
@@ -49,8 +52,15 @@ internal fun AccentBar(color: Color, modifier: Modifier = Modifier) {
 private fun Preview() {
     MaterialTheme {
         Surface {
-            Box {
-                AccentBar(color = MaterialTheme.colorScheme.primary, modifier = Modifier.height(32.dp))
+            Box(Modifier.padding(16.dp)) {
+                AccentBar(
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier
+                        .height(32.dp)
+                        .width(100.dp)
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                )
             }
         }
     }

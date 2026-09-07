@@ -32,7 +32,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.component.cardStripes
@@ -43,10 +42,12 @@ import com.infomaniak.core.ui.compose.margin.Margin
 fun EventItemCard(
     status: EventItemStatus,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
     contentPadding: PaddingValues = EventItemCardDefaults.ContentPadding,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val cardShape = MaterialTheme.shapes.small
+
     Box(modifier = modifier.height(IntrinsicSize.Min), propagateMinConstraints = true) {
         // Card with onClick enforces minimumInteractiveComponentSize() which makes small events too big compared to the design.
         CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
@@ -54,7 +55,7 @@ fun EventItemCard(
                 onClick = onClick,
                 colors = status.cardColors(),
                 border = status.cardBorder(),
-                shape = MaterialTheme.shapes.small,
+                shape = cardShape,
             ) {
                 Column(
                     modifier = Modifier
@@ -67,9 +68,8 @@ fun EventItemCard(
 
         AccentBar(
             color = status.accentBarColor(),
-            modifier = Modifier
-                .clip(MaterialTheme.shapes.small)
-                .fillMaxWidth(),
+            shape = cardShape,
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
