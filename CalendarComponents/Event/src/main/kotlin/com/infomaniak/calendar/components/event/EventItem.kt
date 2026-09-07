@@ -208,10 +208,7 @@ enum class EventIcons(
 
 object EventItemDefaults {
     val AllDayLabel = @Composable {
-        Text(
-            stringResource(R.string.allDayLabel),
-            style = MaterialTheme.typography.bodySmall,
-        )
+        Text(stringResource(R.string.allDayLabel), style = MaterialTheme.typography.bodySmall)
     }
 }
 
