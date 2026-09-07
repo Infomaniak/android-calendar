@@ -20,28 +20,17 @@ package com.infomaniak.calendar.components.event
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,12 +39,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.event.component.cardStripes
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatTimeRange
 import com.infomaniak.calendar.components.resources.R
-import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
@@ -105,41 +92,6 @@ internal fun EventItem(
         } else {
             PartialDayContent(start, end, title, location, trailingIcons, status.textDecoration)
         }
-    }
-}
-
-@Composable
-fun EventItemCard(
-    status: EventItemStatus,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = EventItemCardDefaults.ContentPadding,
-    content: @Composable ColumnScope.() -> Unit,
-) {
-    Box(modifier = modifier.height(IntrinsicSize.Min), propagateMinConstraints = true) {
-        // Card with onClick enforces minimumInteractiveComponentSize() which makes small events too big compared to the design.
-        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
-            Card(
-                onClick = onClick,
-                colors = status.cardColors(),
-                border = status.cardBorder(),
-                shape = MaterialTheme.shapes.small,
-            ) {
-                Column(
-                    modifier = Modifier
-                        .cardStripes(status)
-                        .padding(contentPadding),
-                    content = content,
-                )
-            }
-        }
-
-        AccentBar(
-            color = status.accentBarColor(),
-            modifier = Modifier
-                .clip(MaterialTheme.shapes.small)
-                .fillMaxWidth(),
-        )
     }
 }
 
@@ -261,13 +213,6 @@ object EventItemDefaults {
             style = MaterialTheme.typography.bodySmall,
         )
     }
-}
-
-object EventItemCardDefaults {
-    val HorizontalPaddingValue = Margin.Small
-    val VerticalPaddingValue = Margin.Mini
-
-    val ContentPadding = PaddingValues(horizontal = HorizontalPaddingValue, vertical = VerticalPaddingValue)
 }
 
 @Preview
