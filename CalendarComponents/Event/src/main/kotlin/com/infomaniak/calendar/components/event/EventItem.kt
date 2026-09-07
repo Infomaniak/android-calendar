@@ -131,7 +131,7 @@ fun EventItemCard(
         }
 
         AccentBar(
-            color = status.cardColors().contentColor,
+            color = status.accentBarColor(),
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .matchParentSize(),
