@@ -19,6 +19,7 @@ package com.infomaniak.calendar.manager
 
 import androidx.annotation.StringRes
 import com.infomaniak.calendar.R
+import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
@@ -64,7 +65,7 @@ class SyncEventsManager @Inject constructor(private val calendarManager: Calenda
                 start = firstDay.atStartOfDayIn(timeZone),
                 end = lastDay.atStartOfDayIn(timeZone),
             )
-        }.onFailure {
+        }.cancellable().onFailure {
             _loadingError.trySend(SyncError.ErrorRetrieveEvents)
         }
 
