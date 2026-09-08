@@ -37,7 +37,8 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Metada
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
-import com.infomaniak.calendar.ui.screen.accounts.Accounts
+import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
+import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventCreation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
@@ -47,6 +48,7 @@ import com.infomaniak.calendar.ui.screen.threeDays.ThreeDayScreen
 import com.infomaniak.calendar.ui.screen.week.WeekScreen
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.core.common.utils.today
+import io.sentry.Breadcrumb.user
 import kotlin.time.Clock
 
 @Composable
@@ -82,10 +84,17 @@ private fun baseEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
     entry<NavDestination.EventCreation> {
         EventCreationScreen()
     }
-    entry<NavDestination.Accounts> {
-        Accounts(
+    entry<NavDestination.Accounts.List> {
+        AccountsListScreen(
             onBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
             onAddAccount = { backStack.add(NavDestination.Onboarding(onlyLogin = true)) },
+            onAccountClick = { userId -> backStack.add(NavDestination.Accounts.Actions(userId)) },
+        )
+    }
+    entry<NavDestination.Accounts.Actions> { destination ->
+        AccountActionsScreen(
+            userId = destination.userId,
+            onBack = { backStack.popOrReplaceRoot(NavDestination.Accounts.List) },
         )
     }
     entry<NavDestination.Onboarding> { destination ->
@@ -126,7 +135,7 @@ private fun sceneDecoratorStrategies(backStack: NavBackStack<NavKey>): List<Scen
             CalendarDrawer(
                 content = content,
                 onManageAccounts = {
-                    backStack.add(NavDestination.Accounts)
+                    backStack.add(NavDestination.Accounts.List)
                 },
             )
         },

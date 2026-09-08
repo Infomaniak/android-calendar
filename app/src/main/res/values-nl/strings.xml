@@ -18,6 +18,7 @@
 <resources>
     <string name="accountsTitle">Accounts</string>
     <string name="addAccount">Een account toevoegen</string>
+    <string name="buttonLogOut">Uitloggen</string>
     <string name="contentDescriptionBack">Terug</string>
     <string name="contentDescriptionInbox">Postvak IN openen</string>
     <string name="contentDescriptionMenuDrawer">Menu openen</string>
@@ -28,6 +29,9 @@
     <string name="monthTitle">Maand</string>
     <string name="planningTitle">Planning</string>
     <string name="settingsTitle">Instellingen</string>
+    <string name="signOutAccountAlertConfirm">Meld je af bij het account</string>
+    <string name="signOutAccountAlertDescription">Dit account en de bijbehorende agenda’s worden losgekoppeld van de app ‘Agenda’. Ze blijven beschikbaar in uw online Infomaniak-account.</string>
+    <string name="signOutAccountAlertTitle">Meld je af bij het account “%s“</string>
     <string name="syncEventsError">Fout bij het ophalen van gebeurtenissen</string>
     <string name="threeDaysTitle">Drie dagen</string>
     <string name="weekTitle">Week</string>
