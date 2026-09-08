@@ -34,7 +34,7 @@ sealed interface EventDetailTiming {
     val atLocale: LocalDateTime
 
     @Immutable
-    data class Precised(private val _instant: Instant, val timeZone: TimeZone) : EventDetailTiming {
+    data class Precise(private val _instant: Instant, val timeZone: TimeZone) : EventDetailTiming {
         override val atTimeZone: LocalDateTime = _instant.toLocalDateTime(timeZone)
         override val atLocale: LocalDateTime @Composable get() = _instant.toLocalDateTime(rememberCurrentTimeZone().value)
 

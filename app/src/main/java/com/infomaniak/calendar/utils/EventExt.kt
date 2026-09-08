@@ -57,7 +57,7 @@ fun Event.toEventDetailUi(emailsByUserId: Map<AccountId, String>): EventDetailUi
  **/
 private fun getDetailTiming(wallClock: LocalDateTime, timeZone: TimeZone?): EventDetailTiming = when (timeZone) {
     null -> EventDetailTiming.Floating(wallClock)
-    else -> EventDetailTiming.Precised(wallClock.toInstant(timeZone), timeZone)
+    else -> EventDetailTiming.Precise(wallClock.toInstant(timeZone), timeZone)
 }
 
 private fun EventAlarm.toNotification(): EventDetailUi.Notification? {

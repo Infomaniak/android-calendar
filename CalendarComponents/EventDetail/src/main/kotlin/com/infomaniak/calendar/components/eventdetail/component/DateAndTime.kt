@@ -67,7 +67,7 @@ internal fun DateAndTime(
         },
         supportingContent = {
             // Floating events and all day events never need to display UTC offset
-            if (isAllDay || start !is EventDetailTiming.Precised || end !is EventDetailTiming.Precised) return@ListItem
+            if (isAllDay || start !is EventDetailTiming.Precise || end !is EventDetailTiming.Precise) return@ListItem
 
             if (start.utcOffsetAtTimeZone != start.utcOffsetAtLocale || end.utcOffsetAtTimeZone != end.utcOffsetAtLocale) {
                 Text(
@@ -108,12 +108,12 @@ private fun PreviewDateAndTime() {
             start = if (isAllDay || startTimeZone == null) {
                 EventDetailTiming.Floating(start)
             } else {
-                EventDetailTiming.Precised(start.toInstant(startTimeZone), startTimeZone)
+                EventDetailTiming.Precise(start.toInstant(startTimeZone), startTimeZone)
             },
             end = if (isAllDay || endTimeZone == null) {
                 EventDetailTiming.Floating(end)
             } else {
-                EventDetailTiming.Precised(end.toInstant(endTimeZone), endTimeZone)
+                EventDetailTiming.Precise(end.toInstant(endTimeZone), endTimeZone)
             },
             isAllDay = isAllDay,
         )
