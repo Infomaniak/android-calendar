@@ -97,7 +97,7 @@ private fun baseEntryProvider(
     }
     entry<NavDestination.EventDetail> { destination ->
         EventDetailScreen(
-            masterEventId = destination.masterEventId,
+            eventId = destination.eventId,
             onBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
         )
     }

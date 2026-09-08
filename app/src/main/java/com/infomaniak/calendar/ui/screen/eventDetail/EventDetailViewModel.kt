@@ -36,8 +36,8 @@ class EventDetailViewModel(
     private val accountUtils: AccountUtils,
     private val calendarManager: CalendarManager,
 ) : ViewModel() {
-    fun observeEventDetail(masterEventId: String): Flow<EventDetailUiState> = combine(
-        calendarManager.observeEvent(EventId(masterEventId)),
+    fun observeEventDetail(eventId: String): Flow<EventDetailUiState> = combine(
+        calendarManager.observeEvent(EventId(eventId)),
         accountUtils.emailsByUserId,
     ) { event, emailsByUserId ->
         event?.toEventDetailUi(emailsByUserId)?.let(EventDetailUiState::Success) ?: EventDetailUiState.Deleted

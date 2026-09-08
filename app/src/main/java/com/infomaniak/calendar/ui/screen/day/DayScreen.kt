@@ -62,7 +62,7 @@ import kotlin.time.Clock
 
 @Composable
 fun DayScreen(
-    goToEventDetail: (masterEventId: String) -> Unit,
+    goToEventDetail: (eventId: String) -> Unit,
     modifier: Modifier = Modifier,
     dayViewModel: DayViewModel = viewModel(),
 ) {
@@ -117,7 +117,7 @@ private fun SaveHourHeight(timelineState: DayTimelineState, onHourHeightChanged:
 
 @Composable
 private fun DayScreen(
-    goToEventDetail: (masterEventId: String) -> Unit,
+    goToEventDetail: (eventId: String) -> Unit,
     dayUiState: () -> DayUiState,
     isLoadingEvents: () -> Boolean,
     visibleDayState: VisibleDayState,
@@ -167,7 +167,7 @@ private fun SuccessDay(
     timelineState: DayTimelineState,
     dateRange: ClosedRange<LocalDate>,
     eventsByDate: () -> DayEventsByDate,
-    goToEventDetail: (masterEventId: String) -> Unit,
+    goToEventDetail: (eventId: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     DayPager(
@@ -177,7 +177,7 @@ private fun SuccessDay(
         state = timelineState,
         weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
         onVisibleDateChanged = { visibleDayState.onVisibleDateChanged(it) },
-        onEventClick = { goToEventDetail(it.masterEventId) },
+        onEventClick = { goToEventDetail(it.masterEventId) }, // TODO[eventDetail]: Send id over masterEventId when we can load it
         modifier = modifier.fillMaxSize(),
     )
 }

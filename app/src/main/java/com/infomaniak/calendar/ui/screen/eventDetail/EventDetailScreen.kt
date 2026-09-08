@@ -46,12 +46,12 @@ private val LOADING_INDICATOR_DELAY = 600.milliseconds
 
 @Composable
 fun EventDetailScreen(
-    masterEventId: String,
+    eventId: String,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),
 ) {
-    val eventDetailFlow = remember(masterEventId) { viewModel.observeEventDetail(masterEventId) }
+    val eventDetailFlow = remember(eventId) { viewModel.observeEventDetail(eventId) }
     val uiState by eventDetailFlow.collectAsStateWithLifecycle(initialValue = EventDetailUiState.Loading)
 
     EventDetailScreen(uiState = { uiState }, onBack = onBack, modifier = modifier)
