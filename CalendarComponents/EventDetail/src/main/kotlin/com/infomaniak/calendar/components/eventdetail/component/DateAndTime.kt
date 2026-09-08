@@ -35,9 +35,11 @@ import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatD
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRangeWithZone
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
+import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
+import kotlinx.datetime.minus
 import kotlinx.datetime.toInstant
 import kotlin.time.Clock
 
@@ -55,7 +57,8 @@ internal fun DateAndTime(
             val endAtLocale = end.atLocale
             Text(
                 text = if (isAllDay) {
-                    formatDateRange(startAtLocale.date, endAtLocale.date)
+                    // Dates coming from KMP are exclusive so we need to subtract one day from the date to make it inclusive
+                    formatDateRange(startAtLocale.date, endAtLocale.date - DatePeriod(days = 1))
                 } else {
                     formatDateTimeRange(startAtLocale, endAtLocale)
                 },
