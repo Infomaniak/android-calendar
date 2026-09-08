@@ -38,7 +38,9 @@ import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.yearMonth
+import uniffi.caldav_bridge.CaldavException
 import kotlin.time.Duration.Companion.milliseconds
+import com.infomaniak.core.common.R as RCore
 
 @SingleIn(AppScope::class)
 class SyncEventsManager @Inject constructor(private val calendarManager: CalendarManager) {
@@ -66,15 +68,31 @@ class SyncEventsManager @Inject constructor(private val calendarManager: Calenda
                 end = lastDay.atStartOfDayIn(timeZone),
             )
         }.cancellable().onFailure {
-            _loadingError.trySend(SyncError.ErrorRetrieveEvents)
+            if (it is CaldavException.RustNetworkException) {
+                _loadingError.trySend(SyncError.ErrorNoConnection)
+            } else {
+                _loadingError.trySend(SyncError.ErrorRetrieveEvents)
+            }
+            _isLoadingEvents.value = false
+            return
         }
 
         _isLoadingEvents.value = false
-        calendarManager.syncEvents()
+
+        runCatching {
+            calendarManager.syncEvents()
+        }.cancellable().onFailure {
+            if (it is CaldavException.RustNetworkException) {
+                _loadingError.trySend(SyncError.ErrorNoConnection)
+            } else {
+                _loadingError.trySend(SyncError.ErrorRetrieveEvents)
+            }
+        }
     }
 
     enum class SyncError(@StringRes val errorRes: Int) {
-        ErrorRetrieveEvents(errorRes = R.string.syncEventsError)
+        ErrorRetrieveEvents(errorRes = R.string.syncEventsError),
+        ErrorNoConnection(errorRes = RCore.string.connectionError)
     }
 
     companion object {
