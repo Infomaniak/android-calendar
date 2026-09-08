@@ -61,25 +61,31 @@ class SyncEventsManager @Inject constructor(private val calendarManager: Calenda
         val lastDay = visibleDate.yearMonth.plus(SYNC_WINDOW_MONTHS_AFTER, DateTimeUnit.MONTH).lastDay.plus(1, DateTimeUnit.DAY)
 
         _isLoadingEvents.value = true
+        val result = downloadEventByRange(firstDay, timeZone, lastDay)
+        _isLoadingEvents.value = false
 
-        runCatching {
-            calendarManager.downloadEventsByRange(
-                start = firstDay.atStartOfDayIn(timeZone),
-                end = lastDay.atStartOfDayIn(timeZone),
-            )
-        }.cancellable().onFailure {
-            _loadingError.trySend(it.toSyncError())
-        }.onSuccess {
-            _isLoadingEvents.value = false
+        if (result.isFailure) return
 
-            runCatching {
-                calendarManager.syncEvents()
-            }.cancellable().onFailure {
-                _loadingError.trySend(it.toSyncError())
-            }
-        }
+        syncEvents()
+    }
 
-        if (_isLoadingEvents.value) _isLoadingEvents.value = false
+    private suspend fun downloadEventByRange(
+        firstDay: LocalDate,
+        timeZone: TimeZone,
+        lastDay: LocalDate,
+    ) = runCatching {
+        calendarManager.downloadEventsByRange(
+            start = firstDay.atStartOfDayIn(timeZone),
+            end = lastDay.atStartOfDayIn(timeZone),
+        )
+    }.cancellable().onFailure {
+        _loadingError.trySend(it.toSyncError())
+    }
+
+    private suspend fun syncEvents() = runCatching {
+        calendarManager.syncEvents()
+    }.cancellable().onFailure {
+        _loadingError.trySend(it.toSyncError())
     }
 
     enum class SyncError(@StringRes val errorRes: Int) {
@@ -88,11 +94,10 @@ class SyncEventsManager @Inject constructor(private val calendarManager: Calenda
     }
 
     private fun Throwable.toSyncError(): SyncError {
-        return if (this.cause is RustNetworkException) {
+        return if (cause is RustNetworkException) {
             SyncError.ErrorNoConnection
         } else {
             SyncError.ErrorRetrieveEvents
-
         }
     }
 
