@@ -21,6 +21,7 @@ import androidx.annotation.StringRes
 import com.infomaniak.calendar.R
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
+import com.infomaniak.multiplatform_calendar.data.remote.caldav.RustNetworkException
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
@@ -39,6 +40,7 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.yearMonth
 import kotlin.time.Duration.Companion.milliseconds
+import com.infomaniak.core.common.R as RCore
 
 @SingleIn(AppScope::class)
 class SyncEventsManager @Inject constructor(private val calendarManager: CalendarManager) {
@@ -59,22 +61,44 @@ class SyncEventsManager @Inject constructor(private val calendarManager: Calenda
         val lastDay = visibleDate.yearMonth.plus(SYNC_WINDOW_MONTHS_AFTER, DateTimeUnit.MONTH).lastDay.plus(1, DateTimeUnit.DAY)
 
         _isLoadingEvents.value = true
-
-        runCatching {
-            calendarManager.downloadEventsByRange(
-                start = firstDay.atStartOfDayIn(timeZone),
-                end = lastDay.atStartOfDayIn(timeZone),
-            )
-        }.cancellable().onFailure {
-            _loadingError.trySend(SyncError.ErrorRetrieveEvents)
-        }
-
+        val result = downloadEventByRange(firstDay, timeZone, lastDay)
         _isLoadingEvents.value = false
+
+        if (result.isFailure) return
+
+        syncEvents()
+    }
+
+    private suspend fun downloadEventByRange(
+        firstDay: LocalDate,
+        timeZone: TimeZone,
+        lastDay: LocalDate,
+    ) = runCatching {
+        calendarManager.downloadEventsByRange(
+            start = firstDay.atStartOfDayIn(timeZone),
+            end = lastDay.atStartOfDayIn(timeZone),
+        )
+    }.cancellable().onFailure {
+        _loadingError.trySend(it.toSyncError())
+    }
+
+    private suspend fun syncEvents() = runCatching {
         calendarManager.syncEvents()
+    }.cancellable().onFailure {
+        _loadingError.trySend(it.toSyncError())
     }
 
     enum class SyncError(@StringRes val errorRes: Int) {
-        ErrorRetrieveEvents(errorRes = R.string.syncEventsError)
+        ErrorRetrieveEvents(errorRes = R.string.syncEventsError),
+        ErrorNoConnection(errorRes = RCore.string.connectionError)
+    }
+
+    private fun Throwable.toSyncError(): SyncError {
+        return if (cause is RustNetworkException) {
+            SyncError.ErrorNoConnection
+        } else {
+            SyncError.ErrorRetrieveEvents
+        }
     }
 
     companion object {
