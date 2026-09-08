@@ -18,7 +18,6 @@
 package com.infomaniak.calendar.ui.screen.eventDetail
 
 import androidx.lifecycle.ViewModel
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.toEventDetailUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
@@ -37,12 +36,10 @@ class EventDetailViewModel(
     private val accountUtils: AccountUtils,
     private val calendarManager: CalendarManager,
 ) : ViewModel() {
-
-    /** Emits `null` while the event is unknown, and again if it gets deleted. */
-    fun observeEventDetail(masterEventId: String): Flow<EventDetailUi?> {
-        return combine(
-            calendarManager.observeEvent(EventId(masterEventId)),
-            accountUtils.emailsByUserId,
-        ) { event, emailsByUserId -> event?.toEventDetailUi(emailsByUserId) }
+    fun observeEventDetail(masterEventId: String): Flow<EventDetailUiState> = combine(
+        calendarManager.observeEvent(EventId(masterEventId)),
+        accountUtils.emailsByUserId,
+    ) { event, emailsByUserId ->
+        event?.toEventDetailUi(emailsByUserId)?.let(EventDetailUiState::Success) ?: EventDetailUiState.Deleted
     }
 }

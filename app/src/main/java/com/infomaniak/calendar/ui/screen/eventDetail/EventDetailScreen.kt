@@ -18,11 +18,12 @@
 package com.infomaniak.calendar.ui.screen.eventDetail
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -38,7 +39,10 @@ import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
+
+private val LOADING_INDICATOR_DELAY = 600.milliseconds
 
 @Composable
 fun EventDetailScreen(
@@ -48,23 +52,26 @@ fun EventDetailScreen(
     viewModel: EventDetailViewModel = viewModel(),
 ) {
     val eventDetailFlow = remember(masterEventId) { viewModel.observeEventDetail(masterEventId) }
-    val eventDetail by eventDetailFlow.collectAsStateWithLifecycle(initialValue = null)
+    val uiState by eventDetailFlow.collectAsStateWithLifecycle(initialValue = EventDetailUiState.Loading)
 
-    EventDetailScreen(eventDetail = { eventDetail }, onBack = onBack, modifier = modifier)
+    EventDetailScreen(uiState = { uiState }, onBack = onBack, modifier = modifier)
 }
 
 @Composable
-private fun EventDetailScreen(eventDetail: () -> EventDetailUi?, onBack: () -> Unit, modifier: Modifier = Modifier) {
+private fun EventDetailScreen(uiState: () -> EventDetailUiState, onBack: () -> Unit, modifier: Modifier = Modifier) {
     Scaffold(
         topBar = { TopAppBar(navigationIcon = { TopAppBarButtons.BackButton(onClick = onBack) }, title = {}) },
         modifier = modifier,
     ) { scaffoldContentPadding ->
-        eventDetail()?.let { event ->
-            EventDetail(
-                eventDetail = event,
-                contentPadding = PaddingValues(horizontal = Margin.Small),
-                modifier = Modifier.padding(scaffoldContentPadding),
-            )
+        when (val state = uiState()) {
+            EventDetailUiState.Loading -> Unit // Loaded locally, always fast, no need for a specific progress indicator UI
+            is EventDetailUiState.Success -> {
+                EventDetail(
+                    eventDetail = state.eventDetail,
+                    contentPadding = scaffoldContentPadding + PaddingValues(horizontal = Margin.Small),
+                )
+            }
+            EventDetailUiState.Deleted -> LaunchedEffect(Unit) { onBack() }
         }
     }
 }
@@ -72,26 +79,26 @@ private fun EventDetailScreen(eventDetail: () -> EventDetailUi?, onBack: () -> U
 @Preview
 @Composable
 private fun Preview() {
+    val previewEventDetail = EventDetailUi(
+        eventColor = Color.Red,
+        calendarColor = Color.Blue,
+        title = "Event title",
+        start = EventDetailTiming.Precised(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
+        end = EventDetailTiming.Precised(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
+        isAllDay = false,
+        attendees = Attendees(all = emptyList(), me = null),
+        kMeetUrl = null,
+        location = "Salle Tokyo",
+        room = null,
+        urlLink = null,
+        description = "Description",
+        files = emptyList(),
+        notifications = emptyList(),
+    )
+
     CalendarThemeForPreview {
         Surface {
-            EventDetailScreen(eventDetail = { previewEventDetail }, onBack = {})
+            EventDetailScreen(uiState = { EventDetailUiState.Success(previewEventDetail) }, onBack = {})
         }
     }
 }
-
-private val previewEventDetail = EventDetailUi(
-    eventColor = Color.Red,
-    calendarColor = Color.Blue,
-    title = "Event title",
-    start = EventDetailTiming.Precised(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
-    end = EventDetailTiming.Precised(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
-    isAllDay = false,
-    attendees = Attendees(all = emptyList(), me = null),
-    kMeetUrl = null,
-    location = "Salle Tokyo",
-    room = null,
-    urlLink = null,
-    description = "Description",
-    files = emptyList(),
-    notifications = emptyList(),
-)
