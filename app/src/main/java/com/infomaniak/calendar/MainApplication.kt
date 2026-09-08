@@ -71,6 +71,8 @@ class MainApplication : Application(), MetroApplication {
 
     // Timeouts and connection pool are left to the library defaults, for lack of a measurement.
     private fun initCaldavClient() {
+        val debugInterception = CaldavDebugConfig.interception(context = this)
+
         configureCaldavClient(
             CaldavClientConfig(
                 userAgent = buildUserAgent(
@@ -78,9 +80,12 @@ class MainApplication : Application(), MetroApplication {
                     appVersionCode = BuildConfig.VERSION_CODE,
                     appVersionName = BuildConfig.VERSION_NAME,
                 ),
-                debugInterception = CaldavDebugConfig.interception(context = this),
+                debugInterception = debugInterception,
             ),
         )
+
+        // Off the main thread and after the fact: this only reports, it never gates the configuration.
+        applicationScope.launch { CaldavDebugConfig.warnIfProxyUnreachable(debugInterception) }
     }
 
     /**

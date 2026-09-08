@@ -22,6 +22,11 @@ import android.content.res.AssetManager
 import android.util.Log
 import com.infomaniak.calendar.BuildConfig
 import com.infomaniak.multiplatform_calendar.data.remote.caldav.CaldavDebugInterception
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.net.InetSocketAddress
+import java.net.Socket
+import java.net.URI
 
 /**
  * Opt-in routing of CalDAV traffic through an intercepting proxy (Proxyman, Charles, mitmproxy, …).
@@ -39,6 +44,30 @@ object CaldavDebugConfig {
     private const val TAG = "CaldavDebugConfig"
     private const val CERTIFICATES_ASSETS_DIR = "certificates"
     private const val PEM_EXTENSION = ".pem"
+    private const val REACHABILITY_TIMEOUT_MS = 1_000
+
+    /**
+     * Once a proxy is configured every CalDAV request goes through it, so an unreachable proxy fails the
+     * whole sync with an opaque connection error. Say so out loud, because the cause is nowhere near the
+     * symptom. Purely advisory: nothing is bypassed, since silently falling back to a direct connection
+     * would leave the interception you asked for quietly disabled.
+     */
+    suspend fun warnIfProxyUnreachable(interception: CaldavDebugInterception?) {
+        val proxyUrl = interception?.proxyUrl ?: return
+        if (isReachable(proxyUrl)) return
+
+        Log.e(TAG, "CalDAV proxy at $proxyUrl is unreachable: every sync will fail until it is started.")
+        Log.e(TAG, "Start your intercepting proxy, or remove the .pem from $CERTIFICATES_ASSETS_DIR/ to opt out.")
+    }
+
+    private suspend fun isReachable(proxyUrl: String): Boolean = withContext(Dispatchers.IO) {
+        runCatching {
+            val uri = URI(proxyUrl)
+            val port = uri.port.takeIf { it != -1 } ?: return@runCatching false
+            Socket().use { it.connect(InetSocketAddress(uri.host, port), REACHABILITY_TIMEOUT_MS) }
+            true
+        }.getOrDefault(false)
+    }
 
     fun interception(context: Context): CaldavDebugInterception? {
         val rootCertificates = readRootCertificates(context)

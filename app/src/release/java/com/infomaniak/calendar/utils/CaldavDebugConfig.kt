@@ -23,4 +23,7 @@ import com.infomaniak.multiplatform_calendar.data.remote.caldav.CaldavDebugInter
 /** Release stub: proxy interception exists in the `debug` source set only. */
 object CaldavDebugConfig {
     fun interception(context: Context): CaldavDebugInterception? = null
+
+    @Suppress("UNUSED_PARAMETER")
+    suspend fun warnIfProxyUnreachable(interception: CaldavDebugInterception?) = Unit
 }
