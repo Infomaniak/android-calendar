@@ -48,7 +48,7 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 fun AccountItem(
     user: User,
     modifier: Modifier = Modifier,
-    onClick: ((User) -> Unit)? = null,
+    onClick: (() -> Unit)? = null,
 ) {
     if (onClick != null) {
         AccountClickableItem(user = user, onClick = onClick, modifier = modifier)
@@ -60,11 +60,11 @@ fun AccountItem(
 @Composable
 fun AccountClickableItem(
     user: User,
-    onClick: (User) -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        onClick = { onClick(user) },
+        onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = Margin.Medium)

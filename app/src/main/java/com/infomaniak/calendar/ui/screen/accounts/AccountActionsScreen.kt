@@ -98,7 +98,7 @@ private fun AccountsActionsScreen(
                 .padding(paddingValues)
                 .fillMaxHeight(),
         ) {
-            AccountItem(user = user, onClick = null)
+            AccountItem(user = user)
             OutlinedButton(
                 onClick = { showLogoutDialog = true },
                 shape = EsdsTheme.radius.full,
