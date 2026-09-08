@@ -32,7 +32,7 @@ import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -145,7 +145,7 @@ private fun DropdownIconButton(
     modifier: Modifier = Modifier,
     isExpanded: Boolean = false,
 ) {
-    var menuExpanded by remember { mutableStateOf(isExpanded) }
+    var menuExpanded by rememberSaveable { mutableStateOf(isExpanded) }
 
     Box(modifier = modifier) {
         currentDestination()?.let { destination ->

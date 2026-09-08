@@ -28,6 +28,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorPosition
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
@@ -50,6 +51,8 @@ fun FloatingToolbarDropdownMenu(
     currentDestination: () -> NavDestination.CalendarView?,
     modifier: Modifier = Modifier,
 ) {
+    val containerColor = MaterialTheme.colorScheme.surfaceContainer
+
     DropdownMenuPopup(
         expanded = isExpanded,
         onDismissRequest = { onMenuExpanded(false) },
@@ -63,6 +66,7 @@ fun FloatingToolbarDropdownMenu(
         val currentDestination = currentDestination()
 
         DropdownMenuGroup(
+            containerColor = containerColor,
             shapes = MenuDefaults.groupShape(index = 0, count = 1),
             contentPadding = MenuDefaults.DropdownMenuGroupContentPadding + PaddingValues(vertical = 2.dp),
         ) {
@@ -76,6 +80,7 @@ fun FloatingToolbarDropdownMenu(
                         onMenuExpanded(false)
                         onNavigationButtonClicked(item.destination)
                     },
+                    colors = MenuDefaults.selectableItemColors(containerColor = containerColor),
                     modifier = Modifier.widthIn(min = 180.dp),
                 )
             }
