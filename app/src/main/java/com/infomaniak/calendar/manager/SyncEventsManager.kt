@@ -26,7 +26,9 @@ import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.mapLatest
@@ -58,18 +60,29 @@ class SyncEventsManager @Inject constructor(private val calendarManager: Calenda
         val lastDay = visibleDate.yearMonth.plus(SYNC_WINDOW_MONTHS_AFTER, DateTimeUnit.MONTH).lastDay.plus(1, DateTimeUnit.DAY)
 
         _isLoadingEvents.value = true
-
-        runCatching {
-            calendarManager.downloadEventsByRange(
-                start = firstDay.atStartOfDayIn(timeZone),
-                end = lastDay.atStartOfDayIn(timeZone),
-            )
-        }.onFailure {
-            _loadingError.trySend(SyncError.ErrorRetrieveEvents)
+        try {
+            runCatching {
+                calendarManager.downloadEventsByRange(
+                    start = firstDay.atStartOfDayIn(timeZone),
+                    end = lastDay.atStartOfDayIn(timeZone),
+                )
+            }.onFailure { reportSyncFailure() }
+        } finally {
+            _isLoadingEvents.value = false
         }
 
-        _isLoadingEvents.value = false
-        calendarManager.syncEvents()
+        runCatching { calendarManager.syncEvents() }.onFailure { reportSyncFailure() }
+    }
+
+    /**
+     * Both calls above are declared `@Throws(CancellationException::class, …)`, and `runCatching` catches
+     * everything, so the cancellation has to be rethrown by hand to keep structured concurrency intact.
+     * Without this, cancelling a sync (which `collectLatest` does on every user change) would be reported
+     * to the user as a failure.
+     */
+    private suspend fun reportSyncFailure() {
+        currentCoroutineContext().ensureActive()
+        _loadingError.trySend(SyncError.ErrorRetrieveEvents)
     }
 
     enum class SyncError(@StringRes val errorRes: Int) {
