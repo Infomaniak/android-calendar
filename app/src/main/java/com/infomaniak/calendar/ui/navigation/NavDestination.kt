@@ -25,39 +25,27 @@ sealed interface NavDestination : NavKey {
     @Serializable
     data class Onboarding(val onlyLogin: Boolean = false) : NavDestination
 
-    sealed interface CalendarView : NavDestination {
-
-        /**
-         * Stable identifier used to persist the last selected calendar view.
-         *
-         * It is written to disk, so it must never change, even if the destination is renamed.
-         */
-        val storageKey: String
+    /**
+     * @param storageKey Stable identifier used to persist the last selected calendar view in a data value. Must never change even
+     * if the destination is renamed.
+     */
+    @Serializable
+    sealed class CalendarView(val storageKey: String) : NavDestination {
 
         @Serializable
-        data object Planning : CalendarView {
-            override val storageKey get() = "planning"
-        }
+        data object Planning : CalendarView("planning")
 
         @Serializable
-        data object Day : CalendarView {
-            override val storageKey get() = "day"
-        }
+        data object Day : CalendarView("day")
 
         @Serializable
-        data object ThreeDays : CalendarView {
-            override val storageKey get() = "threeDays"
-        }
+        data object ThreeDays : CalendarView("threeDays")
 
         @Serializable
-        data object Week : CalendarView {
-            override val storageKey get() = "week"
-        }
+        data object Week : CalendarView("week")
 
         @Serializable
-        data object Month : CalendarView {
-            override val storageKey get() = "month"
-        }
+        data object Month : CalendarView("month")
 
         companion object {
             val Default: CalendarView = Planning

@@ -59,7 +59,6 @@ class MainViewModel(
 ) : ViewModel() {
     val loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError> = syncEventsManager.loadingError
 
-    /** `null` until the persisted value has been read from the disk. */
     val lastCalendarView: StateFlow<NavDestination.CalendarView?> = calendarDataValues.lastCalendarView.flow
         .map(NavDestination.CalendarView::fromStorageKey)
         .stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
