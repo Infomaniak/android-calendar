@@ -61,11 +61,8 @@ fun MainNavHost(
         CompositionLocalProvider(LocalSharedTransitionScope provides this@SharedTransitionLayout) {
             NavDisplay(
                 backStack = backStack,
-                entryProvider = baseEntryProvider(backStack = backStack, defaultCalendarView = defaultCalendarView),
-                sceneDecoratorStrategies = sceneDecoratorStrategies(
-                    backStack = backStack,
-                    onCalendarViewSelected = onCalendarViewSelected,
-                ),
+                entryProvider = baseEntryProvider(backStack, defaultCalendarView),
+                sceneDecoratorStrategies = sceneDecoratorStrategies(backStack, onCalendarViewSelected),
                 sharedTransitionScope = this@SharedTransitionLayout,
             )
         }
@@ -110,9 +107,7 @@ private fun baseEntryProvider(
     entry<NavDestination.Onboarding> { destination ->
         OnboardingScreen(
             onlyLogin = destination.onlyLogin,
-            goToCalendarView = {
-                backStack.replaceRoot(defaultCalendarView)
-            },
+            goToCalendarView = { backStack.replaceRoot(defaultCalendarView) },
             onPopBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
         )
     }
