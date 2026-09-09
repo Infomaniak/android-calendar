@@ -30,8 +30,10 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -68,6 +70,8 @@ class MainActivity : ComponentActivity() {
         if (SDK_INT >= 29) window.isNavigationBarContrastEnforced = false
 
         setContent {
+            val lastCalendarView by mainViewModel.lastCalendarView.collectAsStateWithLifecycle()
+
             CalendarTheme {
                 Surface {
                     when (val userLoadState = appGraph.accountUtils.rememberUserLoadState().value) {
@@ -76,6 +80,8 @@ class MainActivity : ComponentActivity() {
                             userLoadState = userLoadState,
                             visibleDayState = rememberVisibleDayState(mainViewModel.visibleDay),
                             loadingEventsError = mainViewModel.loadingEventsError,
+                            lastCalendarView = { lastCalendarView },
+                            onCalendarViewSelected = mainViewModel::saveCalendarView,
                         )
                     }
                 }
@@ -89,8 +95,12 @@ private fun MainContent(
     userLoadState: UserLoadState.Loaded,
     visibleDayState: VisibleDayState,
     loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError>,
+    lastCalendarView: () -> NavDestination.CalendarView?,
+    onCalendarViewSelected: (NavDestination.CalendarView) -> Unit,
 ) {
-    val startDestination = if (userLoadState.user == null) NavDestination.Onboarding() else NavDestination.CalendarView.Planning
+    val lastCalendarView = lastCalendarView()
+    // Blank surface while the last selected calendar view is being read from the data value which is instantaneous
+    val startDestination = if (userLoadState.user == null) NavDestination.Onboarding() else (lastCalendarView ?: return)
     val backStack = rememberNavBackStack(startDestination)
 
     CompositionLocalProvider(
@@ -102,7 +112,11 @@ private fun MainContent(
     ) {
         ObserveSyncError(loadingEventsError)
         NavigateToOnboardingIfLastUserIsDisconnected(backStack, userLoadState.user)
-        MainNavHost(backStack)
+        MainNavHost(
+            backStack = backStack,
+            defaultCalendarView = lastCalendarView ?: NavDestination.CalendarView.Default,
+            onCalendarViewSelected = onCalendarViewSelected,
+        )
     }
 }
 
