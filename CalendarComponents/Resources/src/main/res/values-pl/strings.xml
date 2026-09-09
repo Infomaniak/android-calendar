@@ -18,6 +18,18 @@
 <resources>
     <string name="addEventLabel">Dodaj</string>
     <string name="allDayLabel">Przez cały dzień</string>
+    <plurals name="attendeesAcceptedCount">
+        <item quantity="one">%1$d zaakceptowany</item>
+        <item quantity="few">%1$d zaakceptowani</item>
+        <item quantity="many">%1$d zaakceptowanych</item>
+        <item quantity="other">%1$d zaakceptowanych</item>
+    </plurals>
+    <plurals name="attendeesCount">
+        <item quantity="one">%1$d gość</item>
+        <item quantity="few">%1$d gości</item>
+        <item quantity="many">%1$d gości</item>
+        <item quantity="other">%1$d gościa</item>
+    </plurals>
     <string name="contentDescriptionCreateEvent">Utwórz wydarzenie</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d wydarzenie</item>

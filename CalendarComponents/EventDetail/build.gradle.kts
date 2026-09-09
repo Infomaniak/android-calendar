@@ -38,6 +38,7 @@ dependencies {
     implementation(project(":CalendarComponents:Resources"))
 
     api(core.infomaniak.core.filetypes)
+    implementation(core.infomaniak.core.avatar)
     implementation(core.infomaniak.core.ui.compose.basics)
     implementation(core.infomaniak.core.ui.compose.margin)
 

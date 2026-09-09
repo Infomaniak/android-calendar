@@ -18,6 +18,14 @@
 <resources>
     <string name="addEventLabel">Hinzufügen</string>
     <string name="allDayLabel">Den ganzen Tag</string>
+    <plurals name="attendeesAcceptedCount">
+        <item quantity="one">%1$d akzeptiert</item>
+        <item quantity="other">%1$d akzeptiert</item>
+    </plurals>
+    <plurals name="attendeesCount">
+        <item quantity="one">%1$d Gast</item>
+        <item quantity="other">%1$d Gäste</item>
+    </plurals>
     <string name="contentDescriptionCreateEvent">Anlass erstellen</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d Termin</item>
