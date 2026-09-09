@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(core.plugins.android.library)
+    alias(core.plugins.infomaniak.android.library.flavor.aware)
     alias(core.plugins.compose.compiler)
     alias(core.plugins.kotlin.parcelize)
 }
@@ -35,6 +35,7 @@ android {
 }
 
 dependencies {
+    implementation(core.infomaniak.core.avatar)
     implementation(core.infomaniak.core.common)
     implementation(core.infomaniak.core.ui.compose.theme)
 

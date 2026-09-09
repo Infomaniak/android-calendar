@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(core.plugins.android.library)
+    alias(core.plugins.infomaniak.android.library.flavor.aware)
     alias(core.plugins.compose.compiler)
 }
 

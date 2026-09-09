@@ -18,13 +18,16 @@
 package com.infomaniak.calendar.components.foundation.models
 
 import androidx.compose.runtime.Immutable
+import com.infomaniak.core.avatar.computeInitials
 
 @Immutable
 data class AttendeeUi(
     val email: String,
     val displayName: String? = null,
     val status: ParticipationStatus,
-)
+) {
+    fun initials(): String? = displayName?.computeInitials()
+}
 
 enum class ParticipationStatus {
     Accepted,

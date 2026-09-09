@@ -34,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.CustomColors
+import com.infomaniak.calendar.components.resources.R as RComponents
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -58,7 +59,7 @@ fun MenuItem(
         },
         trailingContent = {
             Icon(
-                painter = painterResource(R.drawable.ic_chevron_right),
+                painter = painterResource(RComponents.drawable.ic_chevron_right),
                 contentDescription = null,
             )
         },
