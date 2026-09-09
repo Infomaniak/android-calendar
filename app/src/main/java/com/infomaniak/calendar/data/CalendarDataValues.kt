@@ -21,7 +21,8 @@ import android.content.Context
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.secured.EncryptedDavCredentialSerializer
 import com.infomaniak.calendar.secured.KeystoreCipher
-import com.infomaniak.calendar.ui.navigation.NavDestination
+import com.infomaniak.calendar.ui.navigation.NavDestination.CalendarView
+import com.infomaniak.core.datavalue.DataValueSerializer
 import com.infomaniak.core.datavalue.DataValues
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
@@ -46,9 +47,15 @@ class CalendarDataValues @Inject constructor(
     /** Height of one hour on the day timeline, in dp, as last zoomed to by the user. */
     val dayViewHourHeight = dataValue(key = "dayViewHourHeight", defaultValue = DayTimelineDefaults.HourHeight.value)
 
-    /** [NavDestination.CalendarView.storageKey] of the calendar view the user last selected, restored at app launch. */
+    /** Calendar view the user last selected, restored at app launch. */
     val lastCalendarView = dataValue(
         key = "lastCalendarView",
-        defaultValue = NavDestination.CalendarView.Default.storageKey,
+        defaultValue = CalendarView.Default,
+        serializer = CalendarViewSerializer,
     )
+}
+
+private object CalendarViewSerializer : DataValueSerializer<CalendarView> {
+    override suspend fun serialize(value: CalendarView): String = value.storageKey
+    override suspend fun deserialize(value: String): CalendarView = CalendarView.fromStorageKey(value)
 }

@@ -60,7 +60,6 @@ class MainViewModel(
     val loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError> = syncEventsManager.loadingError
 
     val lastCalendarView: StateFlow<NavDestination.CalendarView?> = calendarDataValues.lastCalendarView.flow
-        .map(NavDestination.CalendarView::fromStorageKey)
         .stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
 
     @OptIn(SavedStateHandleSaveableApi::class)
@@ -73,7 +72,7 @@ class MainViewModel(
     }
 
     fun saveCalendarView(calendarView: NavDestination.CalendarView) {
-        viewModelScope.launch { calendarDataValues.lastCalendarView.setValue(calendarView.storageKey) }
+        viewModelScope.launch { calendarDataValues.lastCalendarView.setValue(calendarView) }
     }
 
     private fun syncEventsForConnectedUsers() {
