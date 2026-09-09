@@ -18,6 +18,14 @@
 <resources>
     <string name="addEventLabel">Lägg till</string>
     <string name="allDayLabel">Hela dagen</string>
+    <plurals name="attendeesAcceptedCount">
+        <item quantity="one">%1$d accepterad</item>
+        <item quantity="other">%1$d accepterade</item>
+    </plurals>
+    <plurals name="attendeesCount">
+        <item quantity="one">%1$d gäst</item>
+        <item quantity="other">%1$d gäster</item>
+    </plurals>
     <string name="contentDescriptionCreateEvent">Skapa ett evenemang</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d händelse</item>

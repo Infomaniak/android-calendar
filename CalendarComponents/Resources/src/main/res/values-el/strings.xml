@@ -18,6 +18,14 @@
 <resources>
     <string name="addEventLabel">Προσθήκη</string>
     <string name="allDayLabel">Όλη την ημέρα</string>
+    <plurals name="attendeesAcceptedCount">
+        <item quantity="one">%1$d αποδεκτός</item>
+        <item quantity="other">%1$d αποδεκτοί</item>
+    </plurals>
+    <plurals name="attendeesCount">
+        <item quantity="one">%1$d καλεσμένος</item>
+        <item quantity="other">%1$d καλεσμένοι</item>
+    </plurals>
     <string name="contentDescriptionCreateEvent">Δημιουργία εκδήλωσης</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d γεγονός</item>
