@@ -18,6 +18,14 @@
 <resources>
     <string name="addEventLabel">Tilføj</string>
     <string name="allDayLabel">Hele dagen</string>
+    <plurals name="attendeesAcceptedCount">
+        <item quantity="one">%1$d accepteret</item>
+        <item quantity="other">%1$d accepterede</item>
+    </plurals>
+    <plurals name="attendeesCount">
+        <item quantity="one">%1$d gæst</item>
+        <item quantity="other">%1$d gæster</item>
+    </plurals>
     <string name="contentDescriptionCreateEvent">Opret en begivenhed</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d begivenhed</item>
