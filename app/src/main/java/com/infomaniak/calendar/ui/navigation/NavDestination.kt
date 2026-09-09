@@ -26,7 +26,7 @@ sealed interface NavDestination : NavKey {
     data class Onboarding(val onlyLogin: Boolean = false) : NavDestination
 
     /**
-     * @param storageKey Stable identifier used to persist the last selected calendar view in a data value. Must never change even
+     * @param storageKey Stable identifier used to store the last selected calendar view in a data value. Must never change even
      * if the destination is renamed.
      */
     @Serializable
