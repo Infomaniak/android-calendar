@@ -133,10 +133,10 @@ private fun EventDetails(
                     textDecoration = textDecoration,
                 )
             },
-            { event.location?.let { DetailLine(it, textDecoration) } },
             { DetailLine(hours, textDecoration) },
+            { event.location?.let { DetailLine(it, textDecoration) } },
         ),
-    ) { (titleMeasurables, locationMeasurables, timeMeasurables), constraints ->
+    ) { (titleMeasurables, timeMeasurables, locationMeasurables), constraints ->
         val available = visibleHeight()
         val childConstraints = Constraints(maxWidth = constraints.maxWidth)
 

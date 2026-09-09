@@ -21,12 +21,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 data class EventColorsUi(
+    private val _calendarSourceColor: Int,
     private val _sourceColor: Int,
     private val _containerColor: Int,
     private val _onContainerColor: ThemedColorUi,
     private val _containerVariantColor: Int,
     private val _onContainerVariantColor: ThemedColorUi,
 ) {
+    val calendarSourceColor: Color get() = Color(_calendarSourceColor)
     val sourceColor: Color get() = Color(_sourceColor)
     val containerColor: Color get() = Color(_containerColor)
     val onContainerColor: Color @Composable get() = _onContainerColor.toColor()

@@ -32,6 +32,7 @@ fun interface EventColorsUiFactory {
         val dummyEventColorsUiFactory by lazy {
             EventColorsUiFactory {
                 EventColorsUi(
+                    _calendarSourceColor = 0xFFF60303.toInt(),
                     _sourceColor = 0xFF6750A4.toInt(),
                     _containerColor = 0x206750A4,
                     _onContainerColor = ThemedColorUi(light = 0xFF21005D.toInt(), dark = 0xFFEADDFF.toInt()),

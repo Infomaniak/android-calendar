@@ -67,7 +67,7 @@ fun EventItemCard(
         }
 
         AccentBar(
-            color = status.accentBarColor(),
+            color = status.eventColors.calendarSourceColor,
             shape = cardShape,
             modifier = Modifier.fillMaxWidth(),
         )
