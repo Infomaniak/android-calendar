@@ -18,27 +18,39 @@
 package com.infomaniak.calendar.components.eventdetail
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
+import com.infomaniak.calendar.components.foundation.utils.RectangleShapes
+import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
@@ -49,6 +61,7 @@ internal val LIST_ITEM_HORIZONTAL_PADDING = Margin.Medium
 @Composable
 fun EventDetail(
     eventDetail: EventDetailUi,
+    onKMeetClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -61,12 +74,34 @@ fun EventDetail(
             Title(eventColor, title, Modifier.padding(horizontalContentPadding))
             DateAndTime(start, end, isAllDay, Modifier.padding(horizontalContentPadding))
 
-            if (eventDetail.attendees.all.isNotEmpty()) {
-                Divider(modifier = Modifier.padding(horizontalContentPadding))
-                AttendeesButton(eventDetail.attendees.all, onClick = {}, contentPadding = horizontalContentPadding)
+            Section(contentPadding = horizontalContentPadding) {
+                if (eventDetail.attendees.all.isNotEmpty()) {
+                    AttendeesButton(eventDetail.attendees.all, onClick = {}, contentPadding = horizontalContentPadding)
+                }
+
+                if (kMeetUrl != null) KMeetButton(onClick = onKMeetClick, contentPadding = horizontalContentPadding)
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun KMeetButton(onClick: () -> Unit, modifier: Modifier = Modifier, contentPadding: PaddingValues = PaddingValues()) {
+    ListItem(
+        modifier = modifier.padding(horizontal = LIST_ITEM_HORIZONTAL_PADDING),
+        content = { Text(text = stringResource(R.string.participateKMeetTitle)) },
+        leadingContent = { Icon(painterResource(R.drawable.ic_product_kmeet), contentDescription = null) },
+        trailingContent = {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
+                Text(stringResource(R.string.buttonJoin), style = MaterialTheme.typography.labelLarge)
+                Icon(painterResource(R.drawable.ic_squares_stacked), contentDescription = null, modifier = Modifier.size(20.dp))
+            }
+        },
+        onClick = onClick,
+        contentPadding = contentPadding,
+        shapes = ListItemDefaults.RectangleShapes,
+    )
 }
 
 @Composable
@@ -86,6 +121,37 @@ private fun Title(color: Color, title: String, modifier: Modifier = Modifier) {
     )
 }
 
+/**
+ * Automatically shows or hides divider based on if any content is composed or not. This layout acts like a column.
+ */
+@Composable
+private fun Section(
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
+    content: @Composable () -> Unit,
+) {
+    Layout(
+        contents = listOf({ Divider(modifier = Modifier.padding(contentPadding)) }, content),
+        modifier = modifier,
+    ) { (dividerMeasurables, contentMeasurables), constraints ->
+        if (contentMeasurables.isEmpty()) return@Layout layout(0, 0) {}
+
+        val childConstraints = constraints.copy(minHeight = 0)
+        val placeables = (dividerMeasurables + contentMeasurables).map { it.measure(childConstraints) }
+
+        val width = placeables.maxOf { it.width }.coerceIn(constraints.minWidth, constraints.maxWidth)
+        val height = placeables.sumOf { it.height }.coerceIn(constraints.minHeight, constraints.maxHeight)
+
+        layout(width, height) {
+            var y = 0
+            placeables.forEach { placeable ->
+                placeable.place(0, y)
+                y += placeable.height
+            }
+        }
+    }
+}
+
 @Composable
 private fun Divider(modifier: Modifier = Modifier) {
     HorizontalDivider(modifier = modifier.padding(LIST_ITEM_HORIZONTAL_PADDING))
@@ -102,7 +168,7 @@ private fun PreviewEventDetail() {
         end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
         isAllDay = false,
         attendees = Attendees(all = previewAttendees, me = null),
-        kMeetUrl = null,
+        kMeetUrl = "test urlc",
         location = "Location",
         room = null,
         urlLink = null,
@@ -113,7 +179,7 @@ private fun PreviewEventDetail() {
 
     MaterialTheme {
         Surface {
-            EventDetail(eventDetail, contentPadding = PaddingValues(horizontal = Margin.Small))
+            EventDetail(eventDetail, onKMeetClick = {}, contentPadding = PaddingValues(horizontal = Margin.Small))
         }
     }
 }

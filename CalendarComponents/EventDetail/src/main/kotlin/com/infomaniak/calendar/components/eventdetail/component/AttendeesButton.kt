@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail
+package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -39,14 +39,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.infomaniak.calendar.components.eventdetail.LIST_ITEM_HORIZONTAL_PADDING
+import com.infomaniak.calendar.components.eventdetail.previewAttendees
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
+import com.infomaniak.calendar.components.foundation.utils.RectangleShapes
 import com.infomaniak.calendar.components.foundation.utils.fromAttendee
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.components.Avatar
@@ -58,7 +60,7 @@ import com.infomaniak.core.ui.compose.margin.Margin
 internal fun AttendeesButton(
     attendees: List<AttendeeUi>,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     ListItem(
@@ -95,7 +97,7 @@ private fun StackedAvatars(attendees: List<AttendeeUi>) {
 }
 
 @Composable
-private fun ExtraCountIndicator(extraCount: Int, border: BorderStroke, modifier: Modifier = Modifier.Companion) {
+private fun ExtraCountIndicator(extraCount: Int, border: BorderStroke, modifier: Modifier = Modifier) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
@@ -114,18 +116,6 @@ private fun ExtraCountIndicator(extraCount: Int, border: BorderStroke, modifier:
         )
     }
 }
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-private val ListItemDefaults.RectangleShapes
-    @Composable
-    get() = shapes(
-        shape = RectangleShape,
-        selectedShape = RectangleShape,
-        pressedShape = RectangleShape,
-        focusedShape = RectangleShape,
-        hoveredShape = RectangleShape,
-        draggedShape = RectangleShape,
-    )
 
 @Preview
 @Composable
