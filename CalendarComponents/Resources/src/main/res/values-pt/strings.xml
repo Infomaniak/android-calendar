@@ -26,6 +26,7 @@
         <item quantity="one">%1$d convidado</item>
         <item quantity="other">%1$d convidados</item>
     </plurals>
+    <string name="buttonJoin">Juntar</string>
     <string name="contentDescriptionCreateEvent">Criar um evento</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d evento</item>
@@ -37,6 +38,7 @@
     <string name="contentDescriptionToday">Hoje</string>
     <string name="notificationTypeEmail">Email</string>
     <string name="notificationTypePush">Notificação</string>
+    <string name="participateKMeetTitle">Participar no kMeet</string>
     <string name="planningNothingPlanned">Nada planeado</string>
     <string name="weekHeaderDateRange">%d–%d de %s de %d</string>
     <string name="weekHeaderWeekNumber">Sem.%d</string>

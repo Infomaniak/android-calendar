@@ -26,6 +26,7 @@
         <item quantity="one">%1$d gæst</item>
         <item quantity="other">%1$d gæster</item>
     </plurals>
+    <string name="buttonJoin">Tilmeld dig</string>
     <string name="contentDescriptionCreateEvent">Opret en begivenhed</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d begivenhed</item>
@@ -37,6 +38,7 @@
     <string name="contentDescriptionToday">I dag</string>
     <string name="notificationTypeEmail">E-mail</string>
     <string name="notificationTypePush">Meddelelse</string>
+    <string name="participateKMeetTitle">Deltag i kMeet</string>
     <string name="planningNothingPlanned">Intet planlagt</string>
     <string name="weekHeaderDateRange">%d.–%d. %s %d</string>
     <string name="weekHeaderWeekNumber">U%d</string>

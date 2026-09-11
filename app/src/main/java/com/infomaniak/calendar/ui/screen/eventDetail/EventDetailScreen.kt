@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
+import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.Scaffold
@@ -39,7 +40,6 @@ import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
 
 @Composable
@@ -66,6 +66,7 @@ private fun EventDetailScreen(uiState: () -> EventDetailUiState, onBack: () -> U
             is EventDetailUiState.Success -> {
                 EventDetail(
                     eventDetail = state.eventDetail,
+                    onKMeetClick = { Log.e("test", "Clicked on kMeet: ${state.eventDetail.kMeetUrl}") },
                     contentPadding = scaffoldContentPadding + PaddingValues(horizontal = Margin.Small),
                 )
             }
