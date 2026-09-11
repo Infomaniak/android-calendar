@@ -60,6 +60,7 @@ private fun getDetailTiming(wallClock: LocalDateTime, timeZone: TimeZone?): Even
     else -> EventDetailTiming.Precise(wallClock.toInstant(timeZone), timeZone)
 }
 
+// TODO[eventDetail]: Handle notifications
 private fun EventAlarm.toNotification(): EventDetailUi.Notification? {
     return null
 }
