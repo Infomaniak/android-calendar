@@ -26,6 +26,7 @@
         <item quantity="one">%1$d vieras</item>
         <item quantity="other">%1$d vierasta</item>
     </plurals>
+    <string name="buttonJoin">Liity mukaan</string>
     <string name="contentDescriptionCreateEvent">Luo tapahtuma</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d tapahtuma</item>
@@ -37,6 +38,7 @@
     <string name="contentDescriptionToday">Tänään</string>
     <string name="notificationTypeEmail">Sähköposti</string>
     <string name="notificationTypePush">Ilmoitus</string>
+    <string name="participateKMeetTitle">Osallistu kMeet-tapahtumaan</string>
     <string name="planningNothingPlanned">Ei suunnitelmia</string>
     <string name="weekHeaderDateRange">%d.–%d. %s %d</string>
     <string name="weekHeaderWeekNumber">V%d</string>
