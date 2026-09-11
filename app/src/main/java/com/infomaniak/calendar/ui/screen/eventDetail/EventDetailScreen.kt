@@ -42,8 +42,6 @@ import kotlinx.datetime.TimeZone
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
 
-private val LOADING_INDICATOR_DELAY = 600.milliseconds
-
 @Composable
 fun EventDetailScreen(
     eventId: String,
