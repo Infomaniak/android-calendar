@@ -40,6 +40,11 @@
     <string name="notificationTypePush">Ilmoitus</string>
     <string name="participateKMeetTitle">Osallistu kMeet-tapahtumaan</string>
     <string name="planningNothingPlanned">Ei suunnitelmia</string>
+    <string name="roomFloorLabel">%s kerros</string>
+    <plurals name="roomSeatsLabel">
+        <item quantity="one">%d paikkaa</item>
+        <item quantity="other">%d paikkaa</item>
+    </plurals>
     <string name="weekHeaderDateRange">%d.–%d. %s %d</string>
     <string name="weekHeaderWeekNumber">V%d</string>
 </resources>

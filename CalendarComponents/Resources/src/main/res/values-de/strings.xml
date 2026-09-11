@@ -40,6 +40,11 @@
     <string name="notificationTypePush">Benachrichtigung</string>
     <string name="participateKMeetTitle">Am kMeet teilnehmen</string>
     <string name="planningNothingPlanned">Nichts geplant</string>
+    <string name="roomFloorLabel">%s Etage</string>
+    <plurals name="roomSeatsLabel">
+        <item quantity="one">%d Sitzplatz</item>
+        <item quantity="other">%d Plätze</item>
+    </plurals>
     <string name="weekHeaderDateRange">%d.–%d. %s %d</string>
     <string name="weekHeaderWeekNumber">KW%d</string>
 </resources>

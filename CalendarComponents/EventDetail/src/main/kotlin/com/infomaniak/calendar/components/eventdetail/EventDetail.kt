@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.eventdetail
 
+import android.icu.text.MessageFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,7 +40,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,12 +57,15 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
+import java.util.Locale
 import kotlin.time.Instant
 
 @Composable
 fun EventDetail(
     eventDetail: EventDetailUi,
     onKMeetClick: () -> Unit,
+    onLocationClick: () -> Unit,
+    onRoomClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -78,6 +84,12 @@ fun EventDetail(
                 }
 
                 if (kMeetUrl != null) KMeetButton(onClick = onKMeetClick, contentPadding = horizontalContentPadding)
+
+                if (location != null) {
+                    LocationButton(location = location, onClick = onLocationClick, contentPadding = horizontalContentPadding)
+                }
+
+                if (room != null) RoomButton(room = room, onClick = onRoomClick, contentPadding = horizontalContentPadding)
             }
         }
     }
@@ -117,6 +129,52 @@ fun KMeetButton(onClick: () -> Unit, modifier: Modifier = Modifier, contentPaddi
         contentPadding = contentPadding,
     )
 }
+
+@Composable
+private fun LocationButton(
+    location: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
+    ClickableItem(
+        text = location,
+        leadingIconRes = R.drawable.ic_map_pin,
+        onClick = onClick,
+        contentPadding = contentPadding,
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun RoomButton(
+    room: EventDetailUi.Room,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
+    ClickableItem(
+        text = room.title,
+        leadingIconRes = R.drawable.ic_door_open,
+        supportingContent = {
+            val locale = LocalLocale.current.platformLocale
+
+            val roomSeats = pluralStringResource(R.plurals.roomSeatsLabel, room.seats, room.seats)
+            val roomFloor = stringResource(R.string.roomFloorLabel, room.floor.formatToOrdinal(locale))
+
+            Text(text = "$roomSeats, $roomFloor")
+        },
+        onClick = onClick,
+        contentPadding = contentPadding,
+        modifier = modifier,
+    )
+}
+
+private fun Int.formatToOrdinal(locale: Locale): String {
+    val formatter = MessageFormat("{0, ordinal}", locale)
+    return formatter.format(arrayOf(this))
+}
+
 
 /**
  * Automatically shows or hides divider based on if any content is composed or not. This layout acts like a column.
@@ -167,7 +225,7 @@ private fun PreviewEventDetail() {
         attendees = Attendees(all = previewAttendees, me = null),
         kMeetUrl = "test urlc",
         location = "Location",
-        room = null,
+        room = EventDetailUi.Room("Japan room", 5, 3),
         urlLink = null,
         description = "Description",
         files = emptyList(),
@@ -176,7 +234,13 @@ private fun PreviewEventDetail() {
 
     MaterialTheme {
         Surface {
-            EventDetail(eventDetail, onKMeetClick = {}, contentPadding = PaddingValues(horizontal = Margin.Small))
+            EventDetail(
+                eventDetail = eventDetail,
+                onKMeetClick = {},
+                onLocationClick = {},
+                onRoomClick = {},
+                contentPadding = PaddingValues(horizontal = Margin.Small),
+            )
         }
     }
 }
