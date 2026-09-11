@@ -40,6 +40,11 @@
     <string name="notificationTypePush">Varsel</string>
     <string name="participateKMeetTitle">Delta på kMeet</string>
     <string name="planningNothingPlanned">Ingenting planlagt</string>
+    <string name="roomFloorLabel">%s etasjen</string>
+    <plurals name="roomSeatsLabel">
+        <item quantity="one">%d sete</item>
+        <item quantity="other">%d seter</item>
+    </plurals>
     <string name="weekHeaderDateRange">%d.–%d. %s %d</string>
     <string name="weekHeaderWeekNumber">U%d</string>
 </resources>
