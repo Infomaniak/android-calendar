@@ -30,7 +30,6 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -45,18 +44,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
+import com.infomaniak.calendar.components.eventdetail.component.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
+import com.infomaniak.calendar.components.eventdetail.component.LIST_ITEM_HORIZONTAL_PADDING
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
-import com.infomaniak.calendar.components.foundation.utils.RectangleShapes
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
-
-internal val LIST_ITEM_HORIZONTAL_PADDING = Margin.Medium
 
 @Composable
 fun EventDetail(
@@ -85,25 +83,6 @@ fun EventDetail(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-fun KMeetButton(onClick: () -> Unit, modifier: Modifier = Modifier, contentPadding: PaddingValues = PaddingValues()) {
-    ListItem(
-        modifier = modifier.padding(horizontal = LIST_ITEM_HORIZONTAL_PADDING),
-        content = { Text(text = stringResource(R.string.participateKMeetTitle)) },
-        leadingContent = { Icon(painterResource(R.drawable.ic_product_kmeet), contentDescription = null) },
-        trailingContent = {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
-                Text(stringResource(R.string.buttonJoin), style = MaterialTheme.typography.labelLarge)
-                Icon(painterResource(R.drawable.ic_squares_stacked), contentDescription = null, modifier = Modifier.size(20.dp))
-            }
-        },
-        onClick = onClick,
-        contentPadding = contentPadding,
-        shapes = ListItemDefaults.RectangleShapes,
-    )
-}
-
 @Composable
 private fun Title(color: Color, title: String, modifier: Modifier = Modifier) {
     ListItem(
@@ -118,6 +97,24 @@ private fun Title(color: Color, title: String, modifier: Modifier = Modifier) {
             )
         },
         modifier = modifier,
+    )
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun KMeetButton(onClick: () -> Unit, modifier: Modifier = Modifier, contentPadding: PaddingValues = PaddingValues()) {
+    ClickableItem(
+        text = stringResource(id = R.string.participateKMeetTitle),
+        leadingIconRes = R.drawable.ic_product_kmeet,
+        trailingContent = {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
+                Text(stringResource(R.string.buttonJoin), style = MaterialTheme.typography.labelLarge)
+                Icon(painterResource(R.drawable.ic_squares_stacked), contentDescription = null, modifier = Modifier.size(20.dp))
+            }
+        },
+        onClick = onClick,
+        modifier = modifier,
+        contentPadding = contentPadding,
     )
 }
 
