@@ -34,6 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -41,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
@@ -124,3 +126,13 @@ private val ListItemDefaults.RectangleShapes
         hoveredShape = RectangleShape,
         draggedShape = RectangleShape,
     )
+
+@Preview
+@Composable
+private fun PreviewAttendeesButton() {
+    MaterialTheme {
+        Surface {
+            AttendeesButton(previewAttendees, onClick = {})
+        }
+    }
+}
