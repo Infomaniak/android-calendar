@@ -22,11 +22,15 @@ import android.os.StrictMode
 import com.infomaniak.calendar.crossAppLogin.DeviceInfoUpdateWorker
 import com.infomaniak.calendar.di.AppGraph
 import com.infomaniak.calendar.di.metroAndroidExtensions.MetroApplication
+import com.infomaniak.calendar.utils.CaldavDebugConfig
 import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.core.common.AssociatedUserDataCleanable
+import com.infomaniak.core.common.utils.buildUserAgent
 import com.infomaniak.core.crossapplogin.back.internal.deviceinfo.DeviceInfoUpdateManager
 import com.infomaniak.core.network.NetworkConfiguration
 import com.infomaniak.core.sentry.SentryConfig.configureSentry
+import com.infomaniak.multiplatform_calendar.data.remote.caldav.CaldavClientConfig
+import com.infomaniak.multiplatform_calendar.data.remote.caldav.configureCaldavClient
 import dev.zacsweers.metro.createGraphFactory
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -48,6 +52,8 @@ class MainApplication : Application(), MetroApplication {
             appVersionName = BuildConfig.VERSION_NAME,
         )
 
+        initCaldavClient()
+
         configureSentry()
 
         MatomoCalendar.addTrackingCallbackForDebugLog()
@@ -60,6 +66,25 @@ class MainApplication : Application(), MetroApplication {
         applicationScope.launch {
             appGraph.davCredentialsManager.initStoredCredentials()
         }
+    }
+
+    // Timeouts and connection pool are left to the library defaults, for lack of a measurement.
+    private fun initCaldavClient() {
+        val debugInterception = CaldavDebugConfig.interception(context = this)
+
+        configureCaldavClient(
+            CaldavClientConfig(
+                userAgent = buildUserAgent(
+                    appId = ConfigUtils.safePackage,
+                    appVersionCode = BuildConfig.VERSION_CODE,
+                    appVersionName = BuildConfig.VERSION_NAME,
+                ),
+                debugInterception = debugInterception,
+            ),
+        )
+
+        // Off the main thread and after the fact: this only reports, it never gates the configuration.
+        applicationScope.launch { CaldavDebugConfig.warnIfProxyUnreachable(debugInterception) }
     }
 
     /**
