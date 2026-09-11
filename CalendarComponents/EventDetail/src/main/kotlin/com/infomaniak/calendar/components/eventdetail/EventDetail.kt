@@ -38,9 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
-import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
@@ -103,15 +101,7 @@ private fun PreviewEventDetail() {
         start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
         end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
         isAllDay = false,
-        attendees = Attendees(
-            all = listOf(
-                AttendeeUi(email = "alice@example.com", displayName = "Alice Martin", status = ParticipationStatus.Accepted),
-                AttendeeUi(email = "bob@example.com", displayName = "Bob Durand", status = ParticipationStatus.Tentative),
-                AttendeeUi(email = "carla@example.com", displayName = "Carla Dupont", status = ParticipationStatus.Declined),
-                AttendeeUi(email = "denis@example.com", displayName = "Denis Bernard", status = ParticipationStatus.NeedsAction),
-            ),
-            me = null,
-        ),
+        attendees = Attendees(all = previewAttendees, me = null),
         kMeetUrl = null,
         location = "Location",
         room = null,
