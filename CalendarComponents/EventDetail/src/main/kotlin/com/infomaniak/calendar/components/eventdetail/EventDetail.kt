@@ -83,9 +83,9 @@ fun EventDetail(
                     AttendeesButton(eventDetail.attendees.all, onClick = {}, contentPadding = horizontalContentPadding)
                 }
 
-                if (kMeetUrl != null) KMeetButton(onClick = onKMeetClick, contentPadding = horizontalContentPadding)
+                if (kMeetUrl?.isNotBlank() == true) KMeetButton(onClick = onKMeetClick, contentPadding = horizontalContentPadding)
 
-                if (location != null) {
+                if (location?.isNotBlank() == true) {
                     LocationButton(location = location, onClick = onLocationClick, contentPadding = horizontalContentPadding)
                 }
 
@@ -114,7 +114,7 @@ private fun Title(color: Color, title: String, modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun KMeetButton(onClick: () -> Unit, modifier: Modifier = Modifier, contentPadding: PaddingValues = PaddingValues()) {
+private fun KMeetButton(onClick: () -> Unit, modifier: Modifier = Modifier, contentPadding: PaddingValues = PaddingValues()) {
     ClickableItem(
         text = stringResource(id = R.string.participateKMeetTitle),
         leadingIconRes = R.drawable.ic_product_kmeet,
@@ -147,7 +147,7 @@ private fun LocationButton(
 }
 
 @Composable
-fun RoomButton(
+private fun RoomButton(
     room: EventDetailUi.Room,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
