@@ -23,10 +23,13 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.utils.RectangleShapes
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
@@ -62,4 +65,17 @@ object ClickableItemDefaults {
     }
 }
 
-// TODO: Add preview
+@Preview
+@Composable
+private fun Preview() {
+    MaterialTheme {
+        Surface {
+            ClickableItem(
+                text = "Clickable item",
+                leadingIconRes = R.drawable.ic_product_kmeet,
+                supportingContent = { Text("Supporting content") },
+                onClick = {},
+            )
+        }
+    }
+}
