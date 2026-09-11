@@ -35,11 +35,13 @@ app/src/main/java/com/infomaniak/calendar/
 │       │   └── CalendarViewModelFactory.kt # Concrete metrox MetroViewModelFactory binding (multibinding maps)
 │       └── worker/                 # MetroWorker key, MetroWorkerFactory, WorkerGraphProvider, WorkerInstanceFactory
 ├── utils/
-│   └── EventDaySliceExt.kt         # KMP EventDaySlice → EventUi mapping, shared by every calendar view
+│   ├── AttendeeExt.kt              # KMP Attendee → Attendees mapping, shared by the two event UI models below
+│   ├── EventDaySliceExt.kt         # KMP EventDaySlice → EventUi mapping, shared by every calendar view
+│   └── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
 └── ui/
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay with entryProvider
-    │   └── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, Accounts, Onboarding)
+    │   └── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, Accounts, Onboarding)
     ├── screen/
     │   ├── day/                   # DayScreen + DayViewModel + DayUiState + DayEventGroupingExt
     │   ├── threeDays/             # ThreeDayScreen — placeholder 3-day view
@@ -49,6 +51,7 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── accounts/              # AccountsListScreen + AccountActionsScreen + AccountsViewModel + AccountItem
     │                              # Drawer-backed account list, per-account detail/logout screen, and remove-account flow
     │   ├── eventCreation/         # EventCreationScreen
+    │   ├── eventDetail/           # EventDetailScreen + EventDetailViewModel
     │   └── onboarding/            # OnboardingScreen + CrossAppLoginViewModel
     └── theme/
         ├── Theme.kt                # CalendarTheme Composable (Material 3 color schemes)

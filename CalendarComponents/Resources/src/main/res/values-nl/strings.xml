@@ -27,6 +27,8 @@
     <string name="contentDescriptionHasKMeetLink">Bevat een kMeet-link</string>
     <string name="contentDescriptionHasLocation">Heeft een locatie</string>
     <string name="contentDescriptionToday">Vandaag</string>
+    <string name="notificationTypeEmail">E-mail</string>
+    <string name="notificationTypePush">Melding</string>
     <string name="planningNothingPlanned">Niets gepland</string>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">W%d</string>
