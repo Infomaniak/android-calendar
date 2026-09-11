@@ -24,15 +24,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -44,11 +41,9 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.infomaniak.calendar.components.eventdetail.LIST_ITEM_HORIZONTAL_PADDING
 import com.infomaniak.calendar.components.eventdetail.previewAttendees
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
-import com.infomaniak.calendar.components.foundation.utils.RectangleShapes
 import com.infomaniak.calendar.components.foundation.utils.fromAttendee
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.components.Avatar
@@ -63,12 +58,11 @@ internal fun AttendeesButton(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    ListItem(
-        contentPadding = contentPadding + PaddingValues(horizontal = LIST_ITEM_HORIZONTAL_PADDING),
+    ClickableItem(
+        contentPadding = contentPadding,
         onClick = onClick,
-        shapes = ListItemDefaults.RectangleShapes,
-        leadingContent = { Icon(painterResource(R.drawable.ic_users_stacked), contentDescription = null) },
-        content = { Text(text = pluralStringResource(R.plurals.attendeesCount, attendees.size, attendees.size)) },
+        leadingIconRes = R.drawable.ic_users_stacked,
+        text = pluralStringResource(R.plurals.attendeesCount, attendees.size, attendees.size),
         supportingContent = {
             val acceptedCount = attendees.count { it.status == ParticipationStatus.Accepted }
             Text(text = pluralStringResource(R.plurals.attendeesAcceptedCount, acceptedCount, acceptedCount))
