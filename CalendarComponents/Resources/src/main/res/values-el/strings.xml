@@ -40,6 +40,11 @@
     <string name="notificationTypePush">Ειδοποίηση</string>
     <string name="participateKMeetTitle">Συμμετοχή στο kMeet</string>
     <string name="planningNothingPlanned">Τίποτα προγραμματισμένο</string>
+    <string name="roomFloorLabel">%s όροφος</string>
+    <plurals name="roomSeatsLabel">
+        <item quantity="one">%d θέση</item>
+        <item quantity="other">%d θέσεις</item>
+    </plurals>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">Εβδ.%d</string>
 </resources>
