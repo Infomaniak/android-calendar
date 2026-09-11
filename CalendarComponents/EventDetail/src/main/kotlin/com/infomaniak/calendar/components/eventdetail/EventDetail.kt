@@ -25,13 +25,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
+import com.infomaniak.calendar.components.eventdetail.component.DescriptionCollapsableButton
 import com.infomaniak.calendar.components.eventdetail.component.LIST_ITEM_HORIZONTAL_PADDING
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
@@ -90,6 +95,12 @@ fun EventDetail(
                 }
 
                 if (room != null) RoomButton(room = room, onClick = onRoomClick, contentPadding = horizontalContentPadding)
+            }
+
+            Section(contentPadding = horizontalContentPadding) {
+                if (description?.isNotBlank() == true) {
+                    DescriptionCollapsableButton(description = description, contentPadding = horizontalContentPadding)
+                }
             }
         }
     }
@@ -175,7 +186,6 @@ private fun Int.formatToOrdinal(locale: Locale): String {
     return formatter.format(arrayOf(this))
 }
 
-
 /**
  * Automatically shows or hides divider based on if any content is composed or not. This layout acts like a column.
  */
@@ -227,20 +237,24 @@ private fun PreviewEventDetail() {
         location = "Location",
         room = EventDetailUi.Room("Japan room", 5, 3),
         urlLink = null,
-        description = "Description",
+        description = "Description Description Description Description Description Description Description Description Description Description Description Description ",
         files = emptyList(),
         notifications = emptyList(),
     )
 
     MaterialTheme {
         Surface {
-            EventDetail(
-                eventDetail = eventDetail,
-                onKMeetClick = {},
-                onLocationClick = {},
-                onRoomClick = {},
-                contentPadding = PaddingValues(horizontal = Margin.Small),
-            )
+            Scaffold {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    EventDetail(
+                        eventDetail = eventDetail,
+                        onKMeetClick = {},
+                        onLocationClick = {},
+                        onRoomClick = {},
+                        contentPadding = PaddingValues(horizontal = Margin.Small) + it,
+                    )
+                }
+            }
         }
     }
 }
