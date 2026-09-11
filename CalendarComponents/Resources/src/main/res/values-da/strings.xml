@@ -36,6 +36,7 @@
     <string name="contentDescriptionHasKMeetLink">Indeholder et kMeet-link</string>
     <string name="contentDescriptionHasLocation">Har en placering</string>
     <string name="contentDescriptionToday">I dag</string>
+    <string name="descriptionTitle">Beskrivelse</string>
     <string name="notificationTypeEmail">E-mail</string>
     <string name="notificationTypePush">Meddelelse</string>
     <string name="participateKMeetTitle">Deltag i kMeet</string>

@@ -36,6 +36,7 @@
     <string name="contentDescriptionHasKMeetLink">Har en kMeet-länk</string>
     <string name="contentDescriptionHasLocation">Har en plats</string>
     <string name="contentDescriptionToday">Idag</string>
+    <string name="descriptionTitle">Beskrivning</string>
     <string name="notificationTypeEmail">E-post</string>
     <string name="notificationTypePush">Avisering</string>
     <string name="participateKMeetTitle">Delta i kMeet</string>

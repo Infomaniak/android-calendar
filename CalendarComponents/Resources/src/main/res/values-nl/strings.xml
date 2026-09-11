@@ -36,6 +36,7 @@
     <string name="contentDescriptionHasKMeetLink">Bevat een kMeet-link</string>
     <string name="contentDescriptionHasLocation">Heeft een locatie</string>
     <string name="contentDescriptionToday">Vandaag</string>
+    <string name="descriptionTitle">Beschrijving</string>
     <string name="notificationTypeEmail">E-mail</string>
     <string name="notificationTypePush">Melding</string>
     <string name="participateKMeetTitle">Deelneemen aan de kMeet</string>

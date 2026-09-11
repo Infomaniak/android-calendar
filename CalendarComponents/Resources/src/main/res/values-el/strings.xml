@@ -36,6 +36,7 @@
     <string name="contentDescriptionHasKMeetLink">Διαθέτει σύνδεσμο kMeet</string>
     <string name="contentDescriptionHasLocation">Έχει τοποθεσία</string>
     <string name="contentDescriptionToday">Σήμερα</string>
+    <string name="descriptionTitle">Περιγραφή</string>
     <string name="notificationTypeEmail">Email</string>
     <string name="notificationTypePush">Ειδοποίηση</string>
     <string name="participateKMeetTitle">Συμμετοχή στο kMeet</string>
