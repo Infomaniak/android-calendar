@@ -41,6 +41,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.component.DescriptionCollapsibleButton
@@ -53,6 +54,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
@@ -96,6 +98,8 @@ fun EventDetail(
                 if (description?.isNotBlank() == true) {
                     DescriptionCollapsibleButton(description = description, contentPadding = horizontalContentPadding)
                 }
+
+                AttachmentFiles(files, onFileClick = {}, contentPadding = horizontalContentPadding)
             }
         }
     }
@@ -165,12 +169,16 @@ private fun PreviewEventDetail() {
         end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
         isAllDay = false,
         attendees = Attendees(all = previewAttendees, me = null),
-        kMeetUrl = "test urlc",
+        kMeetUrl = "test url",
         location = "Location",
         room = EventDetailUi.Room("Japan room", 5, 3),
         urlLink = null,
         description = LoremIpsum(30).values.first(),
-        files = emptyList(),
+        files = listOf(
+            EventDetailUi.File("1", "How to not get fired.pdf"),
+            EventDetailUi.File("2", "Bob.txt"),
+            EventDetailUi.File("3", "Next loto results.png"),
+        ),
         notifications = emptyList(),
     )
 

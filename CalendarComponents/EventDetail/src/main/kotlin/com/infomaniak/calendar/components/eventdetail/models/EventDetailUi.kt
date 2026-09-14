@@ -46,7 +46,7 @@ data class EventDetailUi(
     data class Room(val title: String, val seats: Int, val floor: Int)
 
     @Immutable
-    data class File(val name: String) {
+    data class File(val id: String, val name: String) {
         val fileType: FileType by lazy { FileType.guessFromFileName(name) }
     }
 
