@@ -65,9 +65,7 @@ internal fun DescriptionCollapsableButton(description: String, contentPadding: P
         ListItem(
             modifier = Modifier.animateContentSize(),
             content = { Text(stringResource(descriptionTitle)) },
-            supportingContent = {
-                Text(text = description, maxLines = maxLines, overflow = TextOverflow.Ellipsis, onTextLayout = updateOverflow)
-            },
+            supportingContent = { DescriptionContent(description, maxLines, updateOverflow) },
             leadingContent = { Icon(painterResource(leadingIconRes), contentDescription = null) },
             trailingContent = { AnimatedChevron({ isCollapsed }) },
             onClick = { isCollapsed = !isCollapsed },
@@ -76,12 +74,21 @@ internal fun DescriptionCollapsableButton(description: String, contentPadding: P
     } else {
         ListItem(
             headlineContent = { Text(stringResource(descriptionTitle)) },
-            supportingContent = {
-                Text(description, maxLines = maxLines, overflow = TextOverflow.Ellipsis, onTextLayout = updateOverflow)
-            },
+            supportingContent = { DescriptionContent(description, maxLines, updateOverflow) },
             leadingContent = { Icon(painterResource(leadingIconRes), contentDescription = null) },
             modifier = Modifier.padding(contentPadding),
         )
+    }
+}
+
+@Composable
+private fun DescriptionContent(
+    description: String,
+    maxLines: Int,
+    updateOverflow: (TextLayoutResult) -> Unit,
+) {
+    SelectionContainer {
+        Text(description, maxLines = maxLines, overflow = TextOverflow.Ellipsis, onTextLayout = updateOverflow)
     }
 }
 
