@@ -28,9 +28,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.foundation.utils.RectangleShapes
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
 
@@ -64,6 +64,18 @@ object ClickableItemDefaults {
         Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null)
     }
 }
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+private val ListItemDefaults.RectangleShapes
+    @Composable
+    get() = shapes(
+        shape = RectangleShape,
+        selectedShape = RectangleShape,
+        pressedShape = RectangleShape,
+        focusedShape = RectangleShape,
+        hoveredShape = RectangleShape,
+        draggedShape = RectangleShape,
+    )
 
 @Preview
 @Composable
