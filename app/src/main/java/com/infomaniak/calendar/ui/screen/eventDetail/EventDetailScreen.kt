@@ -18,8 +18,11 @@
 package com.infomaniak.calendar.ui.screen.eventDetail
 
 import android.util.Log
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
@@ -64,13 +67,15 @@ private fun EventDetailScreen(uiState: () -> EventDetailUiState, onBack: () -> U
         when (val state = uiState()) {
             EventDetailUiState.Loading -> Unit // Loaded locally, always fast, no need for a specific progress indicator UI
             is EventDetailUiState.Success -> {
-                EventDetail(
-                    eventDetail = state.eventDetail,
-                    onKMeetClick = { Log.e("test", "Clicked on kMeet: ${state.eventDetail.kMeetUrl}") },
-                    onLocationClick = { Log.e("test", "Clicked on location: ${state.eventDetail.location}") },
-                    onRoomClick = { Log.e("test", "Clicked on room: ${state.eventDetail.room}") },
-                    contentPadding = scaffoldContentPadding + PaddingValues(horizontal = Margin.Small),
-                )
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    EventDetail(
+                        eventDetail = state.eventDetail,
+                        onKMeetClick = { Log.e("test", "Clicked on kMeet: ${state.eventDetail.kMeetUrl}") },
+                        onLocationClick = { Log.e("test", "Clicked on location: ${state.eventDetail.location}") },
+                        onRoomClick = { Log.e("test", "Clicked on room: ${state.eventDetail.room}") },
+                        contentPadding = scaffoldContentPadding + PaddingValues(horizontal = Margin.Small),
+                    )
+                }
             }
             EventDetailUiState.Deleted -> LaunchedEffect(Unit) { onBack() }
         }
