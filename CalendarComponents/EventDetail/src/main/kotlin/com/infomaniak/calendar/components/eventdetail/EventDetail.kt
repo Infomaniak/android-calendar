@@ -237,7 +237,7 @@ private fun PreviewEventDetail() {
         location = "Location",
         room = EventDetailUi.Room("Japan room", 5, 3),
         urlLink = null,
-        description = "Description Description Description Description Description Description Description Description Description Description Description Description ",
+        description = "Description Description Description Description Description Description Description Description Description Description Description DescriptionDescription Description Description Description Description Description Description Description Description Description Description Description ",
         files = emptyList(),
         notifications = emptyList(),
     )

@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -38,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,24 +47,17 @@ private const val COLLAPSED_MAX_LINES = 3
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun DescriptionCollapsableButton(description: String, contentPadding: PaddingValues) {
-    var isDescriptionOverflowing by rememberSaveable { mutableStateOf(false) }
     var isCollapsed by rememberSaveable { mutableStateOf(true) }
-    val maxLines = if (isCollapsed) COLLAPSED_MAX_LINES else Int.MAX_VALUE
+    val descriptionState = rememberCollapsibleTextState(isCollapsed, COLLAPSED_MAX_LINES)
 
     val descriptionTitle = R.string.descriptionTitle
     val leadingIconRes = R.drawable.ic_list_left
-    val updateOverflow: (TextLayoutResult) -> Unit = {
-        val isOverflowingDetectedWhenCollapsed = it.hasVisualOverflow
-        val isOverflowingDetectedWhenExpanded = it.lineCount > COLLAPSED_MAX_LINES
-        isDescriptionOverflowing = isOverflowingDetectedWhenCollapsed || isOverflowingDetectedWhenExpanded
-    }
 
     // Shows or hides the button to toggle the description based on if the text is actually overflowing when collapsed or not.
-    if (isDescriptionOverflowing) {
+    if (descriptionState.isOverflowing) {
         ListItem(
-            modifier = Modifier.animateContentSize(),
             content = { Text(stringResource(descriptionTitle)) },
-            supportingContent = { DescriptionContent(description, maxLines, updateOverflow) },
+            supportingContent = { DescriptionContent(description, descriptionState) },
             leadingContent = { Icon(painterResource(leadingIconRes), contentDescription = null) },
             trailingContent = { AnimatedChevron({ isCollapsed }) },
             onClick = { isCollapsed = !isCollapsed },
@@ -75,7 +66,7 @@ internal fun DescriptionCollapsableButton(description: String, contentPadding: P
     } else {
         ListItem(
             headlineContent = { Text(stringResource(descriptionTitle)) },
-            supportingContent = { DescriptionContent(description, maxLines, updateOverflow) },
+            supportingContent = { DescriptionContent(description, descriptionState) },
             leadingContent = { Icon(painterResource(leadingIconRes), contentDescription = null) },
             modifier = Modifier.padding(contentPadding),
         )
@@ -83,13 +74,15 @@ internal fun DescriptionCollapsableButton(description: String, contentPadding: P
 }
 
 @Composable
-private fun DescriptionContent(
-    description: String,
-    maxLines: Int,
-    updateOverflow: (TextLayoutResult) -> Unit,
-) {
+private fun DescriptionContent(description: String, state: CollapsibleTextState) {
     SelectionContainer {
-        Text(description, maxLines = maxLines, overflow = TextOverflow.Ellipsis, onTextLayout = updateOverflow)
+        Text(
+            text = description,
+            maxLines = state.maxLines,
+            overflow = TextOverflow.Ellipsis,
+            onTextLayout = state::onTextLayout,
+            modifier = Modifier.animateCollapse(state),
+        )
     }
 }
 
