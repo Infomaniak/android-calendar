@@ -84,17 +84,21 @@ fun EventDetail(
             DateAndTime(start, end, isAllDay, Modifier.padding(horizontalContentPadding))
 
             Section(contentPadding = horizontalContentPadding) {
-                if (eventDetail.attendees.all.isNotEmpty()) {
-                    AttendeesButton(eventDetail.attendees.all, onClick = {}, contentPadding = horizontalContentPadding)
+                if (attendees.all.isNotEmpty()) {
+                    AttendeesButton(attendees.all, onClick = {}, contentPadding = horizontalContentPadding)
                 }
 
-                if (kMeetUrl?.isNotBlank() == true) KMeetButton(onClick = onKMeetClick, contentPadding = horizontalContentPadding)
+                if (kMeetUrl?.isNotBlank() == true) {
+                    KMeetButton(onClick = onKMeetClick, contentPadding = horizontalContentPadding)
+                }
 
                 if (location?.isNotBlank() == true) {
                     LocationButton(location = location, onClick = onLocationClick, contentPadding = horizontalContentPadding)
                 }
 
-                if (room != null) RoomButton(room = room, onClick = onRoomClick, contentPadding = horizontalContentPadding)
+                if (room != null) {
+                    RoomButton(room = room, onClick = onRoomClick, contentPadding = horizontalContentPadding)
+                }
             }
 
             Section(contentPadding = horizontalContentPadding) {
