@@ -55,6 +55,7 @@ import kotlinx.datetime.LocalDate
 fun Planning(
     weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
     goToEventCreation: () -> Unit,
+    onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(),
@@ -63,6 +64,7 @@ fun Planning(
         lazyListState = lazyListState,
         weekEvents = weekEvents,
         goToEventCreation = goToEventCreation,
+        onEventClick = onEventClick,
         contentPadding = contentPadding,
         modifier = modifier,
     )
@@ -73,6 +75,7 @@ private fun Timeline(
     lazyListState: LazyListState,
     weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
     goToEventCreation: () -> Unit,
+    onEventClick: (EventUi.Normal) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
@@ -107,6 +110,7 @@ private fun Timeline(
                         itemKey = itemKey,
                         sectionItemKeys = sectionItemKeys,
                         goToEventCreation = goToEventCreation,
+                        onEventClick = onEventClick,
                         modifier = Modifier
                             .ensureSectionMinHeight(sectionSizing, sectionItemKeys, itemKey)
                             .padding(bottom = bottomPadding),
@@ -127,6 +131,7 @@ private fun Event(
     itemKey: PlanningItemKey,
     sectionItemKeys: List<PlanningItemKey>,
     goToEventCreation: () -> Unit,
+    onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -146,7 +151,7 @@ private fun Event(
             is EventUi.Normal -> {
                 EventItem(
                     event = event,
-                    onClick = {},
+                    onClick = { onEventClick(event) },
                     modifier = Modifier.fillMaxWidth(),
                     allDayTrailingContent = EventItemDefaults.AllDayLabel,
                 )
@@ -170,6 +175,6 @@ private fun EventUi.toItemKey(date: LocalDate): PlanningItemKey = PlanningItemKe
 @Composable
 private fun PreviewPlanning(@PreviewParameter(WeekEventsPreviewParameter::class) weekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>>) {
     Surface {
-        Planning(goToEventCreation = {}, weekEvents = { weekEvents })
+        Planning(goToEventCreation = {}, onEventClick = {}, weekEvents = { weekEvents })
     }
 }

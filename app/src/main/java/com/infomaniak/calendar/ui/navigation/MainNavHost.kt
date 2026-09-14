@@ -41,6 +41,7 @@ import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
 import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventCreation.EventCreationScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
@@ -74,10 +75,13 @@ private fun baseEntryProvider(
     defaultCalendarView: NavDestination.CalendarView,
 ): (NavKey) -> NavEntry<NavKey> = entryProvider {
     entry<NavDestination.CalendarView.Planning>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-        PlanningScreen(goToEventCreation = { backStack.add(NavDestination.EventCreation) })
+        PlanningScreen(
+            goToEventCreation = { backStack.add(NavDestination.EventCreation) },
+            goToEventDetail = { backStack.add(NavDestination.EventDetail(it)) },
+        )
     }
     entry<NavDestination.CalendarView.Day>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-        DayScreen()
+        DayScreen(goToEventDetail = { backStack.add(NavDestination.EventDetail(it)) })
     }
     entry<NavDestination.CalendarView.ThreeDays>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         ThreeDayScreen()
@@ -90,6 +94,12 @@ private fun baseEntryProvider(
     }
     entry<NavDestination.EventCreation> {
         EventCreationScreen()
+    }
+    entry<NavDestination.EventDetail> { destination ->
+        EventDetailScreen(
+            eventId = destination.eventId,
+            onBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
+        )
     }
     entry<NavDestination.Accounts.List> {
         AccountsListScreen(

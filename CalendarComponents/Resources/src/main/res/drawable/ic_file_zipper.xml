@@ -1,0 +1,30 @@
+<!--
+  ~ Infomaniak Calendar - Android
+  ~ Copyright (C) 2026 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M13.659,22H18C18.53,22 19.039,21.789 19.414,21.414C19.789,21.039 20,20.53 20,20V8M20,8C20.001,7.683 19.939,7.369 19.818,7.076C19.696,6.784 19.518,6.518 19.294,6.294L15.706,2.706C15.482,2.482 15.216,2.304 14.924,2.182C14.631,2.061 14.317,1.999 14,2M20,8H15C14.735,8 14.48,7.895 14.293,7.707C14.105,7.52 14,7.265 14,7V2M14,2H6C5.47,2 4.961,2.211 4.586,2.586C4.211,2.961 4,3.47 4,4V15.5M8,12V11M8,18V16M8,18C6.895,18 6,18.895 6,20C6,21.105 6.895,22 8,22C9.105,22 10,21.105 10,20C10,18.895 9.105,18 8,18ZM8,7V6"
+        android:strokeWidth="1.75"
+        android:strokeColor="#000000"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>
