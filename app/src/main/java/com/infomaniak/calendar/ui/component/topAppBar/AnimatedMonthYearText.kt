@@ -43,9 +43,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatMonthAndOptionalYear
+import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate

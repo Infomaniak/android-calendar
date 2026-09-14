@@ -67,6 +67,8 @@ private fun EventDetailScreen(uiState: () -> EventDetailUiState, onBack: () -> U
                 EventDetail(
                     eventDetail = state.eventDetail,
                     onKMeetClick = { Log.e("test", "Clicked on kMeet: ${state.eventDetail.kMeetUrl}") },
+                    onLocationClick = { Log.e("test", "Clicked on location: ${state.eventDetail.location}") },
+                    onRoomClick = { Log.e("test", "Clicked on room: ${state.eventDetail.room}") },
                     contentPadding = scaffoldContentPadding + PaddingValues(horizontal = Margin.Small),
                 )
             }
