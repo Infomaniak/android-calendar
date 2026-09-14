@@ -19,6 +19,7 @@ package com.infomaniak.calendar.ui.navigation
 
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -26,12 +27,16 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.scene.SceneDecoratorStrategy
+import androidx.navigation3.scene.SceneStrategy
 import androidx.navigation3.ui.NavDisplay
+import androidx.window.core.layout.WindowSizeClass
 import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.component.drawer.CalendarDrawer
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.component.CalendarHorizontalFloatingToolbar
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.AdaptiveDialogSceneStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.DrawerDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.Drawer
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
@@ -49,7 +54,6 @@ import com.infomaniak.calendar.ui.screen.threeDays.ThreeDayScreen
 import com.infomaniak.calendar.ui.screen.week.WeekScreen
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.core.common.utils.today
-import io.sentry.Breadcrumb.user
 import kotlin.time.Clock
 
 @Composable
@@ -60,10 +64,13 @@ fun MainNavHost(
 ) {
     SharedTransitionLayout {
         CompositionLocalProvider(LocalSharedTransitionScope provides this@SharedTransitionLayout) {
+            val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+
             NavDisplay(
                 backStack = backStack,
                 entryProvider = baseEntryProvider(backStack, defaultCalendarView),
                 sceneDecoratorStrategies = sceneDecoratorStrategies(backStack, onCalendarViewSelected),
+                sceneStrategies = sceneStrategies(windowSizeClass),
                 sharedTransitionScope = this@SharedTransitionLayout,
             )
         }
@@ -95,7 +102,7 @@ private fun baseEntryProvider(
     entry<NavDestination.EventCreation> {
         EventCreationScreen()
     }
-    entry<NavDestination.EventDetail> { destination ->
+    entry<NavDestination.EventDetail>(metadata = DialogSceneStrategy.dialog()) { destination ->
         EventDetailScreen(
             eventId = destination.eventId,
             onBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
@@ -121,6 +128,11 @@ private fun baseEntryProvider(
             onPopBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
         )
     }
+}
+
+private fun sceneStrategies(windowSizeClass: WindowSizeClass): List<SceneStrategy<NavKey>> {
+    val dialogStrategy = AdaptiveDialogSceneStrategy<NavKey>(windowSizeClass)
+    return listOf(dialogStrategy)
 }
 
 private fun sceneDecoratorStrategies(
