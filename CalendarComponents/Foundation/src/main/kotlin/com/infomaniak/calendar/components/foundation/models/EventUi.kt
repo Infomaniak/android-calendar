@@ -26,9 +26,10 @@ sealed interface EventUi {
     val id: String
 
     @Immutable
-    data class Normal(
+    data class Normal<T>(
         override val id: String,
         val masterEventId: String,
+        val occurrenceId: T,
         val title: String,
         val location: String?,
         val status: EventStatus,

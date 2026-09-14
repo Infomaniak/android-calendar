@@ -57,6 +57,7 @@ import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.datetime.LocalDate
@@ -177,13 +178,14 @@ private fun SuccessPlanning(
         },
     )
 
-    Planning(
+    Planning<OccurrenceId>(
         lazyListState = lazyListState,
         weekEvents = events,
         modifier = modifier
             .scrollableToolbar()
             .fillMaxSize(),
         contentPadding = contentPadding,
+        onEventClicked = { occurrence -> },
         goToEventCreation = goToEventCreation,
         onEventClick = { goToEventDetail(it.masterEventId) }, // TODO[eventDetail]: Send id over masterEventId when we can load it
     )

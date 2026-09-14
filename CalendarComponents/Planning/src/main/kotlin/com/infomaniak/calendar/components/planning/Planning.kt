@@ -52,12 +52,13 @@ import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate
 
 @Composable
-fun Planning(
+fun <T> Planning(
     weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
     goToEventCreation: () -> Unit,
     onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
+    onEventClicked: (event: EventUi.Normal<T>) -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     Timeline(
