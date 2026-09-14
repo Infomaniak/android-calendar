@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.component
+package com.infomaniak.calendar.components.eventdetail.state
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
@@ -45,7 +45,7 @@ import kotlin.math.roundToInt
  * text until the whole collapsing animation is finished. This also means we now need to handle the animation of the collapsing
  * height manually.
  *
- * Wire it to a `Text` through [maxLines], [onTextLayout] and [Modifier.animateCollapse].
+ * Wire it to a `Text` through [maxLines], [onTextLayout] and [animateCollapse].
  */
 @Stable
 internal class CollapsibleTextState(
@@ -53,7 +53,6 @@ internal class CollapsibleTextState(
     private val expandProgress: State<Float>,
     private val isOverflowingState: MutableState<Boolean>,
 ) {
-
     /** `null` until the text has been laid out whole once. */
     private var collapsedLinesHeight by mutableStateOf<Int?>(null)
     private val isFullyCollapsed by derivedStateOf { expandProgress.value == 0f }
