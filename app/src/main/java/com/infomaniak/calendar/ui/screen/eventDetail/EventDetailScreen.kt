@@ -17,8 +17,11 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
@@ -39,7 +42,6 @@ import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
 
 @Composable
@@ -64,10 +66,15 @@ private fun EventDetailScreen(uiState: () -> EventDetailUiState, onBack: () -> U
         when (val state = uiState()) {
             EventDetailUiState.Loading -> Unit // Loaded locally, always fast, no need for a specific progress indicator UI
             is EventDetailUiState.Success -> {
-                EventDetail(
-                    eventDetail = state.eventDetail,
-                    contentPadding = scaffoldContentPadding + PaddingValues(horizontal = Margin.Small),
-                )
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    EventDetail(
+                        eventDetail = state.eventDetail,
+                        onKMeetClick = { /*TODO[eventDetail]*/ },
+                        onLocationClick = { /*TODO[eventDetail]*/ },
+                        onRoomClick = { /*TODO[eventDetail]*/ },
+                        contentPadding = scaffoldContentPadding + PaddingValues(horizontal = Margin.Small),
+                    )
+                }
             }
             EventDetailUiState.Deleted -> LaunchedEffect(Unit) { onBack() }
         }

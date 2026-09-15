@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(core.plugins.android.library)
+    alias(core.plugins.infomaniak.android.library.flavor.aware)
     alias(core.plugins.compose.compiler)
 }
 
@@ -38,8 +38,11 @@ dependencies {
     implementation(project(":CalendarComponents:Resources"))
 
     api(core.infomaniak.core.filetypes)
+    implementation(core.infomaniak.core.avatar)
     implementation(core.infomaniak.core.ui.compose.basics)
     implementation(core.infomaniak.core.ui.compose.margin)
+
+    implementation(libs.infomaniak.designsystem.foundation)
 
     implementation(platform(core.compose.bom))
     implementation(core.compose.foundation)

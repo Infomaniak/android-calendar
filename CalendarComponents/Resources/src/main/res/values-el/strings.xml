@@ -18,6 +18,15 @@
 <resources>
     <string name="addEventLabel">Προσθήκη</string>
     <string name="allDayLabel">Όλη την ημέρα</string>
+    <plurals name="attendeesAcceptedCount">
+        <item quantity="one">%1$d αποδεκτός</item>
+        <item quantity="other">%1$d αποδεκτοί</item>
+    </plurals>
+    <plurals name="attendeesCount">
+        <item quantity="one">%1$d καλεσμένος</item>
+        <item quantity="other">%1$d καλεσμένοι</item>
+    </plurals>
+    <string name="buttonJoin">Εγγραφή</string>
     <string name="contentDescriptionCreateEvent">Δημιουργία εκδήλωσης</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d γεγονός</item>
@@ -27,9 +36,16 @@
     <string name="contentDescriptionHasKMeetLink">Διαθέτει σύνδεσμο kMeet</string>
     <string name="contentDescriptionHasLocation">Έχει τοποθεσία</string>
     <string name="contentDescriptionToday">Σήμερα</string>
+    <string name="descriptionTitle">Περιγραφή</string>
     <string name="notificationTypeEmail">Email</string>
     <string name="notificationTypePush">Ειδοποίηση</string>
+    <string name="participateKMeetTitle">Συμμετοχή στο kMeet</string>
     <string name="planningNothingPlanned">Τίποτα προγραμματισμένο</string>
+    <string name="roomFloorLabel">%s όροφος</string>
+    <plurals name="roomSeatsLabel">
+        <item quantity="one">%d θέση</item>
+        <item quantity="other">%d θέσεις</item>
+    </plurals>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">Εβδ.%d</string>
 </resources>

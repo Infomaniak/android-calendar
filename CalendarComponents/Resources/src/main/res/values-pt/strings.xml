@@ -18,6 +18,15 @@
 <resources>
     <string name="addEventLabel">Adicionar</string>
     <string name="allDayLabel">O dia todo</string>
+    <plurals name="attendeesAcceptedCount">
+        <item quantity="one">%1$d aceite</item>
+        <item quantity="other">%1$d aceites</item>
+    </plurals>
+    <plurals name="attendeesCount">
+        <item quantity="one">%1$d convidado</item>
+        <item quantity="other">%1$d convidados</item>
+    </plurals>
+    <string name="buttonJoin">Juntar</string>
     <string name="contentDescriptionCreateEvent">Criar um evento</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d evento</item>
@@ -27,9 +36,16 @@
     <string name="contentDescriptionHasKMeetLink">Tem um link do kMeet</string>
     <string name="contentDescriptionHasLocation">Tem uma localização</string>
     <string name="contentDescriptionToday">Hoje</string>
+    <string name="descriptionTitle">Descrição</string>
     <string name="notificationTypeEmail">Email</string>
     <string name="notificationTypePush">Notificação</string>
+    <string name="participateKMeetTitle">Participar no kMeet</string>
     <string name="planningNothingPlanned">Nada planeado</string>
+    <string name="roomFloorLabel">Piso %s</string>
+    <plurals name="roomSeatsLabel">
+        <item quantity="one">%d lugar</item>
+        <item quantity="other">%d lugares</item>
+    </plurals>
     <string name="weekHeaderDateRange">%d–%d de %s de %d</string>
     <string name="weekHeaderWeekNumber">Sem.%d</string>
 </resources>
