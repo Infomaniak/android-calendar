@@ -49,7 +49,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
@@ -230,7 +229,7 @@ private fun Divider(modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-private fun PreviewEventDetail(@PreviewParameter(LoremIpsum::class, 80) lorem: String) {
+private fun PreviewEventDetail() {
     val eventDetail = EventDetailUi(
         eventColor = Color.Red,
         calendarColor = Color.Blue,
@@ -243,7 +242,7 @@ private fun PreviewEventDetail(@PreviewParameter(LoremIpsum::class, 80) lorem: S
         location = "Location",
         room = EventDetailUi.Room("Japan room", 5, 3),
         urlLink = null,
-        description = lorem,
+        description = LoremIpsum(30).values.first(),
         files = emptyList(),
         notifications = emptyList(),
     )

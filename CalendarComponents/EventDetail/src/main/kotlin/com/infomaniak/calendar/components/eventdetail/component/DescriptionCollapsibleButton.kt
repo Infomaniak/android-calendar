@@ -39,7 +39,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.state.CollapsibleTextState
@@ -104,11 +103,11 @@ private fun AnimatedChevron(isCollapsed: () -> Boolean) {
 
 @Preview
 @Composable
-private fun Preview(@PreviewParameter(LoremIpsum::class, 40) lorem: String) {
+private fun Preview() {
     MaterialTheme {
         Surface {
             DescriptionCollapsibleButton(
-                description = lorem,
+                description = LoremIpsum(15).values.first(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             )
         }
