@@ -21,7 +21,10 @@ import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.Classification
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.TimeBlocking
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.EventAlarm
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -31,9 +34,10 @@ import kotlinx.datetime.toInstant
  * Translation of the KMP event model into the UI model consumed by the EventDetail component,
  * shared by every view that opens an event so they all display it identically.
  */
-fun Event.toEventDetailUi(emailsByUserId: Map<AccountId, String>): EventDetailUi = EventDetailUi(
+fun Event.toEventDetailUi(calendar: Calendar, emailsByUserId: Map<AccountId, String>): EventDetailUi = EventDetailUi(
     eventColor = Color(colors.sourceColor),
     calendarColor = Color(colors.calendarSourceColor.argb),
+    calendarName = calendar.displayName,
     title = title,
     start = getDetailTiming(timing.start, timing.startTimeZone),
     end = getDetailTiming(timing.end, timing.endTimeZone),
@@ -46,6 +50,8 @@ fun Event.toEventDetailUi(emailsByUserId: Map<AccountId, String>): EventDetailUi
     description = description,
     files = emptyList(), // TODO[eventDetail]: Not carried by the KMP model yet
     notifications = alarms.mapNotNull { it.toNotification() },
+    isOccupied = timeBlocking == TimeBlocking.Blocks,
+    classification = classification?.toClassification(),
 )
 
 /**
@@ -63,4 +69,11 @@ private fun getDetailTiming(wallClock: LocalDateTime, timeZone: TimeZone?): Even
 // TODO[eventDetail]: Handle notifications
 private fun EventAlarm.toNotification(): EventDetailUi.Notification? {
     return null
+}
+
+private fun Classification.toClassification(): EventDetailUi.Classification? = when (this) {
+    Classification.Public -> EventDetailUi.Classification.Public
+    Classification.Private -> EventDetailUi.Classification.Private
+    Classification.Confidential -> EventDetailUi.Classification.Confidential
+    is Classification.Custom -> null
 }

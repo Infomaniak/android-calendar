@@ -26,7 +26,9 @@
         <item quantity="one">%1$d vieras</item>
         <item quantity="other">%1$d vierasta</item>
     </plurals>
+    <string name="availableLabel">Vapaa</string>
     <string name="buttonJoin">Liity mukaan</string>
+    <string name="confidentialLabel">Luottamuksellinen</string>
     <string name="contentDescriptionCreateEvent">Luo tapahtuma</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d tapahtuma</item>
@@ -39,8 +41,11 @@
     <string name="descriptionTitle">Kuvaus</string>
     <string name="notificationTypeEmail">Sähköposti</string>
     <string name="notificationTypePush">Ilmoitus</string>
+    <string name="occupiedLabel">Varattu</string>
     <string name="participateKMeetTitle">Osallistu kMeet-tapahtumaan</string>
     <string name="planningNothingPlanned">Ei suunnitelmia</string>
+    <string name="privateLabel">Yksityinen</string>
+    <string name="publicLabel">Julkinen</string>
     <string name="roomFloorLabel">%s kerros</string>
     <plurals name="roomSeatsLabel">
         <item quantity="one">%d paikkaa</item>
