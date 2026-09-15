@@ -51,6 +51,7 @@
         <item quantity="one">%d θέση</item>
         <item quantity="other">%d θέσεις</item>
     </plurals>
+    <string name="sectionCalendarHeader">Ημερολόγιο</string>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">Εβδ.%d</string>
 </resources>

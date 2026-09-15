@@ -51,6 +51,7 @@
         <item quantity="one">%d lugar</item>
         <item quantity="other">%d lugares</item>
     </plurals>
+    <string name="sectionCalendarHeader">Calendário</string>
     <string name="weekHeaderDateRange">%d–%d de %s de %d</string>
     <string name="weekHeaderWeekNumber">Sem.%d</string>
 </resources>

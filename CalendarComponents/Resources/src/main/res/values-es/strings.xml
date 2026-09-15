@@ -51,6 +51,7 @@
         <item quantity="one">%d asiento</item>
         <item quantity="other">%d asientos</item>
     </plurals>
+    <string name="sectionCalendarHeader">Calendario</string>
     <string name="weekHeaderDateRange">%d–%d de %s de %d</string>
     <string name="weekHeaderWeekNumber">Sem.%d</string>
 </resources>

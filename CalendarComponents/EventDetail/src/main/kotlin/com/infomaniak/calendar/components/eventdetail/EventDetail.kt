@@ -59,6 +59,7 @@ import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
@@ -116,9 +117,29 @@ fun EventDetail(
                 if (classification != null) {
                     ClassificationStatus(classification, modifier = Modifier.padding(horizontalContentPadding))
                 }
+
+                Calendar(calendarColor, calendarName, modifier = Modifier.padding(horizontalContentPadding))
             }
         }
     }
+}
+
+@Composable
+private fun Calendar(calendarColor: Color, calendarName: String, modifier: Modifier = Modifier) {
+    ListItem(
+        headlineContent = { Text(stringResource(id = R.string.sectionCalendarHeader)) },
+        leadingContent = {
+            Box(
+                modifier = Modifier
+                    .size(EsdsTheme.icon.sizeSm)
+                    .padding(2.dp)
+                    .clip(CircleShape)
+                    .background(calendarColor),
+            )
+        },
+        trailingContent = { Text(text = calendarName, style = MaterialTheme.typography.labelLarge) },
+        modifier = modifier,
+    )
 }
 
 @Composable
@@ -192,7 +213,7 @@ private fun Divider(modifier: Modifier = Modifier) {
     HorizontalDivider(modifier = modifier.padding(LIST_ITEM_HORIZONTAL_PADDING))
 }
 
-@Preview(device = "spec:width=1080px,height=4340px,dpi=440")
+@Preview(device = "spec:width=1080px,height=3340px,dpi=440")
 @Composable
 private fun PreviewEventDetail() {
     val eventDetail = EventDetailUi(
