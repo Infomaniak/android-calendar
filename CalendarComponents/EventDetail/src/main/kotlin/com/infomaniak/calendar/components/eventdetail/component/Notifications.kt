@@ -49,7 +49,7 @@ internal fun Notifications(
             contentPadding = contentPadding,
             trailingContent = {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
-                    // TODO[eventDetai]: Format the notification time
+                    // TODO[eventDetail]: Format the notification time
                     Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null)
                 }
             },
