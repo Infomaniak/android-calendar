@@ -26,7 +26,9 @@
         <item quantity="one">%1$d καλεσμένος</item>
         <item quantity="other">%1$d καλεσμένοι</item>
     </plurals>
+    <string name="availableLabel">Διαθέσιμο</string>
     <string name="buttonJoin">Εγγραφή</string>
+    <string name="confidentialLabel">Εμπιστευτικό</string>
     <string name="contentDescriptionCreateEvent">Δημιουργία εκδήλωσης</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d γεγονός</item>
@@ -39,8 +41,11 @@
     <string name="descriptionTitle">Περιγραφή</string>
     <string name="notificationTypeEmail">Email</string>
     <string name="notificationTypePush">Ειδοποίηση</string>
+    <string name="occupiedLabel">Κατειλημμένο</string>
     <string name="participateKMeetTitle">Συμμετοχή στο kMeet</string>
     <string name="planningNothingPlanned">Τίποτα προγραμματισμένο</string>
+    <string name="privateLabel">Ιδιωτικό</string>
+    <string name="publicLabel">Δημόσιο</string>
     <string name="roomFloorLabel">%s όροφος</string>
     <plurals name="roomSeatsLabel">
         <item quantity="one">%d θέση</item>

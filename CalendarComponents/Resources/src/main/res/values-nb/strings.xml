@@ -26,7 +26,9 @@
         <item quantity="one">%1$d gjest</item>
         <item quantity="other">%1$d gjester</item>
     </plurals>
+    <string name="availableLabel">Ledig</string>
     <string name="buttonJoin">Bli med</string>
+    <string name="confidentialLabel">Konfidensiell</string>
     <string name="contentDescriptionCreateEvent">Opprett en hendelse</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d hendelse</item>
@@ -39,8 +41,11 @@
     <string name="descriptionTitle">Beskrivelse</string>
     <string name="notificationTypeEmail">E-post</string>
     <string name="notificationTypePush">Varsel</string>
+    <string name="occupiedLabel">Opptatt</string>
     <string name="participateKMeetTitle">Delta på kMeet</string>
     <string name="planningNothingPlanned">Ingenting planlagt</string>
+    <string name="privateLabel">Privat</string>
+    <string name="publicLabel">Offentlig</string>
     <string name="roomFloorLabel">%s etasjen</string>
     <plurals name="roomSeatsLabel">
         <item quantity="one">%d sete</item>

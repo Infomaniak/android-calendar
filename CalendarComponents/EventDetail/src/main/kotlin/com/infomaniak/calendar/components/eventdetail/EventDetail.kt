@@ -28,6 +28,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -38,6 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
@@ -53,6 +56,7 @@ import com.infomaniak.calendar.components.eventdetail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
+import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
@@ -105,6 +109,14 @@ fun EventDetail(
             Section(contentPadding = horizontalContentPadding) {
                 Notifications(notifications, onNotificationClick = {}, contentPadding = horizontalContentPadding)
             }
+
+            Section(contentPadding = horizontalContentPadding) {
+                OccupiedStatus(isOccupied, modifier = Modifier.padding(horizontalContentPadding))
+
+                if (classification != null) {
+                    ClassificationStatus(classification, modifier = Modifier.padding(horizontalContentPadding))
+                }
+            }
         }
     }
 }
@@ -122,6 +134,24 @@ private fun Title(color: Color, title: String, modifier: Modifier = Modifier) {
                     .background(color),
             )
         },
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun OccupiedStatus(isOccupied: Boolean, modifier: Modifier = Modifier) {
+    ListItem(
+        headlineContent = { Text(text = stringResource(if (isOccupied) R.string.occupiedLabel else R.string.availableLabel)) },
+        leadingContent = { Icon(painter = painterResource(R.drawable.ic_briefcase), contentDescription = null) },
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun ClassificationStatus(classification: EventDetailUi.Classification, modifier: Modifier = Modifier) {
+    ListItem(
+        headlineContent = { Text(text = stringResource(classification.label)) },
+        leadingContent = { Icon(painter = painterResource(R.drawable.ic_lock), contentDescription = null) },
         modifier = modifier,
     )
 }
@@ -162,12 +192,13 @@ private fun Divider(modifier: Modifier = Modifier) {
     HorizontalDivider(modifier = modifier.padding(LIST_ITEM_HORIZONTAL_PADDING))
 }
 
-@Preview
+@Preview(device = "spec:width=1080px,height=4340px,dpi=440")
 @Composable
 private fun PreviewEventDetail() {
     val eventDetail = EventDetailUi(
         eventColor = Color.Red,
         calendarColor = Color.Blue,
+        calendarName = "Vacation",
         title = "Event Title",
         start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
         end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
@@ -187,6 +218,8 @@ private fun PreviewEventDetail() {
             EventDetailUi.Notification("1", EventDetailUi.Notification.Type.Email, Instant.parse("2026-05-20T07:00:00Z")),
             EventDetailUi.Notification("2", EventDetailUi.Notification.Type.Push, Instant.parse("2026-05-20T07:30:00Z")),
         ),
+        isOccupied = true,
+        classification = EventDetailUi.Classification.Public,
     )
 
     MaterialTheme {

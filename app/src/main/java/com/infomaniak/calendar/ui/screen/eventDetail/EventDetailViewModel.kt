@@ -26,8 +26,12 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 
 @Inject
 @ContributesIntoMap(AppScope::class)
@@ -36,10 +40,23 @@ class EventDetailViewModel(
     private val accountUtils: AccountUtils,
     private val calendarManager: CalendarManager,
 ) : ViewModel() {
-    fun observeEventDetail(eventId: String): Flow<EventDetailUiState> = combine(
-        calendarManager.observeEvent(EventId(eventId)),
-        accountUtils.emailsByUserId,
-    ) { event, emailsByUserId ->
-        event?.toEventDetailUi(emailsByUserId)?.let(EventDetailUiState::Success) ?: EventDetailUiState.Deleted
-    }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun observeEventDetail(eventId: String): Flow<EventDetailUiState> = calendarManager.observeEvent(EventId(eventId))
+        .flatMapLatest { event ->
+            if (event == null) {
+                flowOf(null)
+            } else {
+                calendarManager
+                    .observeCalendars()
+                    .map { it.find { calendar -> calendar.id == event.calendarId } }
+                    .map { calendar -> calendar?.let { event to it } }
+            }
+        }
+        .combine(accountUtils.emailsByUserId) { eventAndCalendar, emailsByUserId ->
+            val (event, calendar) = eventAndCalendar ?: return@combine EventDetailUiState.Deleted
+
+            event
+                .toEventDetailUi(calendar, emailsByUserId)
+                .let(EventDetailUiState::Success)
+        }
 }
