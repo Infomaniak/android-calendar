@@ -49,7 +49,7 @@ private const val COLLAPSED_MAX_LINES = 3
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-internal fun DescriptionCollapsableButton(description: String, contentPadding: PaddingValues) {
+internal fun DescriptionCollapsibleButton(description: String, contentPadding: PaddingValues) {
     var isCollapsed by rememberSaveable { mutableStateOf(true) }
     val descriptionState = rememberCollapsibleTextState(isCollapsed, COLLAPSED_MAX_LINES)
 
@@ -105,7 +105,7 @@ private fun AnimatedChevron(isCollapsed: () -> Boolean) {
 private fun Preview() {
     MaterialTheme {
         Surface {
-            DescriptionCollapsableButton(
+            DescriptionCollapsibleButton(
                 description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             )

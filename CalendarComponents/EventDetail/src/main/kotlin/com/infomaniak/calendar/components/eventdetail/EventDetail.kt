@@ -55,7 +55,7 @@ import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
-import com.infomaniak.calendar.components.eventdetail.component.DescriptionCollapsableButton
+import com.infomaniak.calendar.components.eventdetail.component.DescriptionCollapsibleButton
 import com.infomaniak.calendar.components.eventdetail.component.LIST_ITEM_HORIZONTAL_PADDING
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
@@ -105,7 +105,7 @@ fun EventDetail(
 
             Section(contentPadding = horizontalContentPadding) {
                 if (description?.isNotBlank() == true) {
-                    DescriptionCollapsableButton(description = description, contentPadding = horizontalContentPadding)
+                    DescriptionCollapsibleButton(description = description, contentPadding = horizontalContentPadding)
                 }
             }
         }
