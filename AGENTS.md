@@ -101,6 +101,20 @@ The group is intentionally **self-contained**: no dependency on `:app`, no DI fr
 String resources follow the single-module pattern — all strings consumed by any CalendarComponents module are declared in 
 `:CalendarComponents:Resources` so consumers never have to manage per-module string tags.
 
+### Flavors
+
+Every CalendarComponents module that contains **code** (`Foundation`, `Event`, `Planning`, `Day`, `Calendar`, `EventDetail`)
+applies the `core.plugins.infomaniak.android.library.flavor.aware` convention plugin instead of the plain
+`core.plugins.android.library`. That plugin declares the same `distribution` flavor dimension (`standard` default /
+`fdroid`) as the app. It is required because `Foundation` depends on `core.infomaniak.core.avatar`, which is itself
+flavor-aware (see `Core/Avatar/build.gradle.kts`) — AGP requires a consumer module to declare matching product flavors
+to resolve a flavored dependency's variants, so `Foundation` had to become flavor-aware, and every module that depends on
+it (directly or transitively via `api`) had to follow so the variant graph resolves end to end. `:CalendarComponents:Resources`
+stays on plain `core.plugins.android.library`: it holds only `res/values*/strings.xml`, has no Kotlin code and no
+dependency on `Foundation` or any flavored library, so there is nothing that needs a `standard`/`fdroid` split.
+When adding a new CalendarComponents module, apply the flavor-aware plugin if it depends (even transitively) on
+`Foundation` or another flavored library; keep the plain plugin only for modules with no such dependency (like `Resources`).
+
 ### Modules
 
 | Gradle path                       | Package                                          | Purpose                                                                                                                   |
@@ -139,6 +153,9 @@ in the stack it needs.
 ### External dependencies used
 
 - `core.compose.bom` / `core.compose.*` — Compose BOM and UI primitives (from `core` catalog).
+- `core.infomaniak.core.avatar` — flavor-aware avatar rendering, used by `Foundation`; this is the dependency that makes
+  `Foundation` (and every module depending on it) require the `core.plugins.infomaniak.android.library.flavor.aware`
+  plugin instead of `core.plugins.android.library` (see the "Flavors" section above).
 - `core.infomaniak.common` — `KotlinDateUtils` date helpers (`Clock.today()`, `LocalDate.isToday()`, …) (from `core` catalog).
 - `core.infomaniak.core.ui.compose.margin` — `Margin` spacing constants (from `core` catalog, Planning only).
 - `kmpCalendar.kotlinx.datetime` — `kotlinx-datetime` types (`LocalDate`, `TimeZone`, …) (Foundation + Planning).
@@ -235,6 +252,8 @@ All CalendarComponents source lives **in this repository**. Changes to these mod
 
 1. **Stale map**: Update this file when new top-level modules, catalogs, or submodules are added.
 2. **CalendarComponents growth**: When a new module is added under `CalendarComponents/`, add it to the table and
-   dependency graph in the CalendarComponents section. When placeholder UI is finalised, update the status table.
+   dependency graph in the CalendarComponents section, and pick the right plugin per the "Flavors" section (flavor-aware
+   if it depends on `Foundation` or another flavored library, plain otherwise). When placeholder UI is finalised, update
+   the status table.
 3. **New norms**: Add cross-cutting build/submodule conventions here as they appear.
 4. **Reference app**: For any change touching `app/`, also consult `app/AGENTS.md`.
