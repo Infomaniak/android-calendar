@@ -45,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -56,6 +57,7 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
 import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.component.DayCircle
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
@@ -69,6 +71,7 @@ import kotlin.time.Clock
 
 private const val MAX_DOTS = 3
 private val DOT_SIZE = 6.dp
+private const val OTHER_MONTH_ALPHA = 0.38f
 
 @Composable
 internal fun Day(
@@ -77,6 +80,7 @@ internal fun Day(
     onClick: () -> Unit,
     dotsFor: () -> List<EventColorsUi>,
     modifier: Modifier = Modifier,
+    otherMonthProgress: (() -> Float)? = null,
 ) {
     val fullDate = date.formatFullDateWithYear()
 
@@ -95,6 +99,7 @@ internal fun Day(
 
     Box(
         modifier = modifier
+            .dimAsOtherMonth(otherMonthProgress)
             .fillMaxWidth()
             .height(LocalViewConfiguration.current.minimumTouchTargetSize.height)
             .clickable(
@@ -135,7 +140,16 @@ internal fun Day(
                         dots = dotsFor(),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = Margin.Micro),
+                            .padding(bottom = Margin.Micro)
+                            // Dots are the one thing a day of another month does not keep at all, so they
+                            // fade out on their own on top of the dimming the whole cell is already taking.
+                            .then(
+                                if (otherMonthProgress == null) {
+                                    Modifier
+                                } else {
+                                    Modifier.graphicsLayer { alpha = 1f - otherMonthProgress() }
+                                },
+                            ),
                     )
                 } else {
                     Spacer(modifier = Modifier.height(DOT_SIZE))
@@ -143,6 +157,12 @@ internal fun Day(
             }
         }
     }
+}
+
+private fun Modifier.dimAsOtherMonth(otherMonthProgress: (() -> Float)?): Modifier {
+    if (otherMonthProgress == null) return this
+
+    return graphicsLayer { alpha = lerp(1f, OTHER_MONTH_ALPHA, otherMonthProgress()) }
 }
 
 @Composable
@@ -221,6 +241,17 @@ private fun DayPreview() {
                         modifier = Modifier.size(previewDaySize),
                     )
                 }
+            }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Other month", style = MaterialTheme.typography.labelSmall)
+                Day(
+                    dateState = DateState.None,
+                    date = today,
+                    onClick = {},
+                    dotsFor = { listOf(eventColors, eventColors, eventColors) },
+                    otherMonthProgress = { 1f },
+                    modifier = Modifier.size(previewDaySize),
+                )
             }
         }
     }
