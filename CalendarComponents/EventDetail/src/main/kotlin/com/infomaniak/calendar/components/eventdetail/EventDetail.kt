@@ -99,7 +99,7 @@ fun EventDetail(
                     DescriptionCollapsibleButton(description = description, contentPadding = horizontalContentPadding)
                 }
 
-                AttachmentFiles(files, onFileClick = {}, contentPadding = horizontalContentPadding)
+                AttachmentFiles(files, onFileClick = { /*TODO[eventDetail]*/ }, contentPadding = horizontalContentPadding)
             }
         }
     }
