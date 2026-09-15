@@ -29,6 +29,7 @@ import androidx.lifecycle.viewmodel.compose.saveable
 import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.ui.navigation.NavDestination
+import com.infomaniak.calendar.utils.UserLoadState
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.common.utils.today
@@ -61,6 +62,10 @@ class MainViewModel(
 
     val lastCalendarView: StateFlow<NavDestination.CalendarView?> = calendarDataValues.lastCalendarView.flow
         .stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
+
+    val userLoadState: StateFlow<UserLoadState> = accountUtils.currentUserFlow
+        .map(UserLoadState::Loaded)
+        .stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = UserLoadState.Awaiting)
 
     @OptIn(SavedStateHandleSaveableApi::class)
     val visibleDay: MutableState<LocalDate> = savedStateHandle.saveable("visibleDay") {

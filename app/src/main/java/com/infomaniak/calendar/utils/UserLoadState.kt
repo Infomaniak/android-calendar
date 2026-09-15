@@ -17,21 +17,9 @@
  */
 package com.infomaniak.calendar.utils
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.remember
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.auth.models.user.User
-import kotlinx.coroutines.flow.map
 
 sealed interface UserLoadState {
     object Awaiting : UserLoadState
     data class Loaded(val user: User?) : UserLoadState
-}
-
-@Composable
-fun AccountUtils.rememberUserLoadState(): State<UserLoadState> {
-    val userLoadStateFlow = remember { currentUserFlow.map(UserLoadState::Loaded) }
-    return userLoadStateFlow.collectAsStateWithLifecycle(initialValue = UserLoadState.Awaiting)
 }

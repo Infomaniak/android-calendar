@@ -53,7 +53,6 @@ import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.utils.UserLoadState
-import com.infomaniak.calendar.utils.rememberUserLoadState
 import com.infomaniak.core.auth.models.user.User
 import kotlinx.coroutines.channels.ReceiveChannel
 
@@ -71,10 +70,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val lastCalendarView by mainViewModel.lastCalendarView.collectAsStateWithLifecycle()
+            val currentUserLoadState by mainViewModel.userLoadState.collectAsStateWithLifecycle()
 
             CalendarTheme {
                 Surface {
-                    when (val userLoadState = appGraph.accountUtils.rememberUserLoadState().value) {
+                    when (val userLoadState = currentUserLoadState) {
                         UserLoadState.Awaiting -> Unit // Blank surface while waiting for first result
                         is UserLoadState.Loaded -> MainContent(
                             userLoadState = userLoadState,
