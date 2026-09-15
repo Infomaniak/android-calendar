@@ -21,7 +21,6 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -53,18 +52,16 @@ import kotlinx.datetime.yearMonth
 
 private const val DURATION_TWEEN = 150
 
+/** How far the chevron has turned once the calendar is fully expanded. */
+private const val CHEVRON_EXPANDED_ROTATION = -180f
+
 @Composable
 fun AnimatedMonthYearText(
     date: () -> LocalDate,
-    isExpanded: () -> Boolean,
+    expansionProgress: () -> Float,
     modifier: Modifier = Modifier,
 ) {
     val currentYear by rememberCurrentYear()
-    val chevronRotation by animateFloatAsState(
-        targetValue = if (isExpanded()) -180f else 0f,
-        animationSpec = dateAnimationSpec(),
-        label = "ChevronRotation",
-    )
 
     AnimatedContent(
         modifier = modifier,
@@ -82,7 +79,8 @@ fun AnimatedMonthYearText(
             Icon(
                 painter = painterResource(R.drawable.ic_chevron_down),
                 contentDescription = null,
-                modifier = Modifier.graphicsLayer { rotationZ = chevronRotation },
+                // Read at draw time so the chevron turns with the finger, not one recomposition behind it.
+                modifier = Modifier.graphicsLayer { rotationZ = CHEVRON_EXPANDED_ROTATION * expansionProgress() },
             )
         }
     }
@@ -110,7 +108,7 @@ private fun <T> dateAnimationSpec(): TweenSpec<T> = tween(DURATION_TWEEN)
 @Composable
 private fun AnimatedMonthYearTextPreview() {
     CalendarThemeForPreview {
-        AnimatedMonthYearText(date = { LocalDate(2026, 7, 8) }, isExpanded = { false })
+        AnimatedMonthYearText(date = { LocalDate(2026, 7, 8) }, expansionProgress = { 0f })
     }
 }
 
@@ -118,6 +116,6 @@ private fun AnimatedMonthYearTextPreview() {
 @Composable
 private fun AnimatedMonthYearTextPastYearPreview() {
     CalendarThemeForPreview {
-        AnimatedMonthYearText(date = { LocalDate(2025, 12, 25) }, isExpanded = { false })
+        AnimatedMonthYearText(date = { LocalDate(2025, 12, 25) }, expansionProgress = { 0f })
     }
 }

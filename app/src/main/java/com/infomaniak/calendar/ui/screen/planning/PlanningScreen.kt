@@ -149,7 +149,7 @@ private fun PlanningScreen(
                         )
                     }
                 },
-                isCalendarExpanded = { calendarExpansion.isExpanded },
+                calendarExpansionProgress = { calendarExpansion.progress },
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.TopCenter)
