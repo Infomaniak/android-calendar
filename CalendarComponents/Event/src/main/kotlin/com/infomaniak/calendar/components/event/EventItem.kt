@@ -52,7 +52,7 @@ import kotlin.time.Instant
 
 @Composable
 fun EventItem(
-    event: EventUi.Normal,
+    event: EventUi.Normal<*>,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     allDayTrailingContent: @Composable () -> Unit = {},
@@ -183,7 +183,7 @@ private fun TrailingIcons(trailingIcons: Set<EventIcons>) {
     }
 }
 
-fun EventUi.Normal.toEventIcons(): Set<EventIcons> = buildSet {
+fun EventUi.Normal<*>.toEventIcons(): Set<EventIcons> = buildSet {
     if (location != null) add(EventIcons.Location)
     if (attendees.all.isNotEmpty()) add(EventIcons.Attendees)
     // TODO: Detect kMeet links

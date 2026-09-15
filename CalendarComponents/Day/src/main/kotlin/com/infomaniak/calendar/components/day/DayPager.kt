@@ -45,14 +45,14 @@ import kotlinx.datetime.plus
 import kotlin.time.Clock
 
 @Composable
-fun DayPager(
+fun <T> DayPager(
     dateRange: ClosedRange<LocalDate>,
     selectedDate: () -> LocalDate,
-    eventsOf: (LocalDate) -> DayEvents,
+    eventsOf: (LocalDate) -> DayEvents<T>,
     state: DayTimelineState,
     weekNumbering: WeekNumbering,
     onVisibleDateChanged: (LocalDate) -> Unit,
-    onEventClick: (EventUi.Normal) -> Unit,
+    onEventClick: (EventUi.Normal<T>) -> Unit,
     modifier: Modifier = Modifier,
     headerTrailingContent: @Composable () -> Unit = {},
 ) {

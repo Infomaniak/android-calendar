@@ -29,25 +29,25 @@ const val MINUTES_PER_HOUR: Int = 60
 const val MINUTES_PER_DAY: Int = HOURS_PER_DAY * MINUTES_PER_HOUR
 
 @Immutable
-data class DayEvents(
-    val allDay: List<EventUi.Normal>,
-    val timed: List<TimedEvent>,
+data class DayEvents<out T>(
+    val allDay: List<EventUi.Normal<T>>,
+    val timed: List<TimedEvent<T>>,
 ) {
     companion object {
-        val Empty = DayEvents(allDay = emptyList(), timed = emptyList())
+        val Empty = DayEvents<Nothing>(allDay = emptyList(), timed = emptyList())
     }
 }
 
 @Immutable
-data class TimedEvent(
-    val event: EventUi.Normal,
+data class TimedEvent<out T>(
+    val event: EventUi.Normal<T>,
     val startMinuteOfDay: Int,
     val endMinuteOfDay: Int,
 ) {
     val durationMinutes: Int get() = endMinuteOfDay - startMinuteOfDay
 }
 
-fun EventUi.Normal.toTimedEvent(date: LocalDate, timeZone: TimeZone): TimedEvent = TimedEvent(
+fun <T> EventUi.Normal<T>.toTimedEvent(date: LocalDate, timeZone: TimeZone): TimedEvent<T> = TimedEvent(
     event = this,
     startMinuteOfDay = start.minuteOfDayWithin(date, timeZone),
     endMinuteOfDay = end.minuteOfDayWithin(date, timeZone),

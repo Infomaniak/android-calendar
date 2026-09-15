@@ -39,8 +39,8 @@ import kotlinx.datetime.toInstant
 import kotlin.time.Clock
 import kotlin.time.Instant
 
-class WeekEventsPreviewParameter : PreviewParameterProvider<Map<YearWeek, Map<LocalDate, List<EventUi>>>> {
-    override val values: Sequence<Map<YearWeek, Map<LocalDate, List<EventUi>>>> = sequenceOf(
+class WeekEventsPreviewParameter : PreviewParameterProvider<Map<YearWeek, Map<LocalDate, List<EventUi<String>>>>> {
+    override val values: Sequence<Map<YearWeek, Map<LocalDate, List<EventUi<String>>>>> = sequenceOf(
         todayPreviewWeekEvents,
         passingYearPreviewWeekEvents,
     )
@@ -62,7 +62,7 @@ private val dummyAttendees = listOf(
     AttendeeUi("carol@example.com", "Carol", ParticipationStatus.NeedsAction),
 )
 
-private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalDate, List<EventUi>>> {
+private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalDate, List<EventUi<String>>>> {
     val timeZone = TimeZone.currentSystemDefault()
 
     val pastDay = targetDay.minus(5, DateTimeUnit.DAY)
@@ -72,10 +72,10 @@ private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalD
         return LocalDateTime(date.year, date.month.ordinal + 1, date.day, hour, minute).toInstant(timeZone)
     }
 
-    fun event(date: LocalDate, hour: Int, title: String, location: String? = null, color: Color = Color(0xFF4285F4)): EventUi {
+    fun event(date: LocalDate, hour: Int, title: String, location: String? = null, color: Color = Color(0xFF4285F4)): EventUi<String> {
         return EventUi.Normal(
             id = "$date-$hour",
-            masterEventId = "$date-$hour",
+            occurrenceId = "$date-$hour",
             title = title,
             location = location,
             status = EventStatus.Confirmed,
@@ -101,6 +101,6 @@ private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalD
     ).groupForPlanning()
 }
 
-private fun List<Pair<LocalDate, List<EventUi>>>.groupForPlanning(): Map<YearWeek, Map<LocalDate, List<EventUi>>> =
+private fun List<Pair<LocalDate, List<EventUi<String>>>>.groupForPlanning(): Map<YearWeek, Map<LocalDate, List<EventUi<String>>>> =
     groupBy { (date, _) -> WeekNumbering.ISO_8601.weekOf(date) }
         .mapValues { (_, pairs) -> pairs.associate { (date, events) -> date to events } }

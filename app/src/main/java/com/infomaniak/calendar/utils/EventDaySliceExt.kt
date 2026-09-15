@@ -22,6 +22,7 @@ import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.ui.screen.planning.toEventColorsUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventStatus as KmpEventStatus
@@ -33,9 +34,12 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventStatus
  * The resulting [EventUi.Normal] carries the slice's own day-clamped bounds, converted to an
  * absolute instant in [timeZone].
  */
-fun EventDaySlice.toEventUi(emailsByUserId: Map<AccountId, String>, timeZone: TimeZone): EventUi.Normal = EventUi.Normal(
+fun EventDaySlice.toEventUi(
+    emailsByUserId: Map<AccountId, String>,
+    timeZone: TimeZone,
+): EventUi.Normal<OccurrenceId> = EventUi.Normal(
     id = "${event.occurrenceId.value}@$date",
-    masterEventId = event.masterEventId.url,
+    occurrenceId = event.occurrenceId,
     title = event.title,
     location = event.location,
     status = event.status.toEventStatus(),

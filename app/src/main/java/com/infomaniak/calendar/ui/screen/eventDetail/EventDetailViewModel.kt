@@ -20,7 +20,7 @@ package com.infomaniak.calendar.ui.screen.eventDetail
 import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.toEventDetailUi
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
@@ -42,18 +42,18 @@ class EventDetailViewModel(
     accountUtils: AccountUtils,
     private val calendarManager: CalendarManager,
 ) : ViewModel() {
-    private val eventIdFlow: MutableSharedFlow<String> = MutableSharedFlow(
+    private val occurrenceIdFlow: MutableSharedFlow<OccurrenceId> = MutableSharedFlow(
         replay = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val eventFlow = eventIdFlow
+    private val eventFlow = occurrenceIdFlow
         .distinctUntilChanged()
-        .flatMapLatest { eventId -> calendarManager.observeEvent(EventId(eventId)) }
+        .flatMapLatest { occurrenceId -> calendarManager.observeOccurrence(occurrenceId) }
 
-    fun setEventId(eventId: String) {
-        eventIdFlow.tryEmit(eventId)
+    fun setOccurrenceId(occurrenceId: OccurrenceId) {
+        occurrenceIdFlow.tryEmit(occurrenceId)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

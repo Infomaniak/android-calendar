@@ -43,12 +43,12 @@ import kotlin.time.Clock
  * carrying the timed events.
  */
 @Composable
-fun DayView(
+fun <T> DayView(
     date: LocalDate,
-    events: DayEvents,
+    events: DayEvents<T>,
     state: DayTimelineState,
     weekNumbering: WeekNumbering,
-    onEventClick: (EventUi.Normal) -> Unit,
+    onEventClick: (EventUi.Normal<T>) -> Unit,
     modifier: Modifier = Modifier,
     headerTrailingContent: @Composable () -> Unit = {},
 ) {

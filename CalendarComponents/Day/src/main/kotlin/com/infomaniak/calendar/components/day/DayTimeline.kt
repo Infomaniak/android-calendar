@@ -57,11 +57,11 @@ import kotlin.time.Clock
  * arrangement only changes when one of the two does.
  */
 @Composable
-fun DayTimeline(
+fun <T> DayTimeline(
     date: LocalDate,
-    events: DayEvents,
+    events: DayEvents<T>,
     state: DayTimelineState,
-    onEventClick: (EventUi.Normal) -> Unit,
+    onEventClick: (EventUi.Normal<T>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val currentDateTime by rememberCurrentDateTime()

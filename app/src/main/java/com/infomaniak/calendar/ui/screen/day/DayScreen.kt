@@ -52,6 +52,7 @@ import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.utils.today
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.datetime.DateTimeUnit
@@ -62,7 +63,7 @@ import kotlin.time.Clock
 
 @Composable
 fun DayScreen(
-    goToEventDetail: (eventId: String) -> Unit,
+    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     modifier: Modifier = Modifier,
     dayViewModel: DayViewModel = viewModel(),
 ) {
@@ -117,7 +118,7 @@ private fun SaveHourHeight(timelineState: DayTimelineState, onHourHeightChanged:
 
 @Composable
 private fun DayScreen(
-    goToEventDetail: (eventId: String) -> Unit,
+    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     dayUiState: () -> DayUiState,
     isLoadingEvents: () -> Boolean,
     visibleDayState: VisibleDayState,
@@ -167,7 +168,7 @@ private fun SuccessDay(
     timelineState: DayTimelineState,
     dateRange: ClosedRange<LocalDate>,
     eventsByDate: () -> DayEventsByDate,
-    goToEventDetail: (eventId: String) -> Unit,
+    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     DayPager(
@@ -177,7 +178,7 @@ private fun SuccessDay(
         state = timelineState,
         weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
         onVisibleDateChanged = { visibleDayState.onVisibleDateChanged(it) },
-        onEventClick = { goToEventDetail(it.masterEventId) }, // TODO[eventDetail]: Send id over masterEventId when we can load it
+        onEventClick = { goToEventDetail(it.occurrenceId) },
         modifier = modifier.fillMaxSize(),
     )
 }

@@ -53,12 +53,11 @@ import kotlinx.datetime.LocalDate
 
 @Composable
 fun <T> Planning(
-    weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
+    weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi<T>>>>,
     goToEventCreation: () -> Unit,
-    onEventClick: (EventUi.Normal) -> Unit,
+    onEventClick: (EventUi.Normal<T>) -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
-    onEventClicked: (event: EventUi.Normal<T>) -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     Timeline(
@@ -72,11 +71,11 @@ fun <T> Planning(
 }
 
 @Composable
-private fun Timeline(
+private fun <T> Timeline(
     lazyListState: LazyListState,
-    weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
+    weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi<T>>>>,
     goToEventCreation: () -> Unit,
-    onEventClick: (EventUi.Normal) -> Unit,
+    onEventClick: (EventUi.Normal<T>) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
@@ -123,8 +122,8 @@ private fun Timeline(
 }
 
 @Composable
-private fun Event(
-    event: EventUi,
+private fun <T> Event(
+    event: EventUi<T>,
     date: LocalDate,
     today: LocalDate,
     lazyListState: LazyListState,
@@ -132,7 +131,7 @@ private fun Event(
     itemKey: PlanningItemKey,
     sectionItemKeys: List<PlanningItemKey>,
     goToEventCreation: () -> Unit,
-    onEventClick: (EventUi.Normal) -> Unit,
+    onEventClick: (EventUi.Normal<T>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -170,11 +169,11 @@ private val YearWeek.label: String
         return "$week - $dateRange"
     }
 
-private fun EventUi.toItemKey(date: LocalDate): PlanningItemKey = PlanningItemKey.Event(date = date, id = id)
+private fun EventUi<*>.toItemKey(date: LocalDate): PlanningItemKey = PlanningItemKey.Event(date = date, id = id)
 
 @Preview
 @Composable
-private fun PreviewPlanning(@PreviewParameter(WeekEventsPreviewParameter::class) weekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>>) {
+private fun PreviewPlanning(@PreviewParameter(WeekEventsPreviewParameter::class) weekEvents: Map<YearWeek, Map<LocalDate, List<EventUi<String>>>>) {
     Surface {
         Planning(goToEventCreation = {}, onEventClick = {}, weekEvents = { weekEvents })
     }

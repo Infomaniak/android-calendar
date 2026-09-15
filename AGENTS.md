@@ -101,6 +101,11 @@ The group is intentionally **self-contained**: no dependency on `:app`, no DI fr
 String resources follow the single-module pattern — all strings consumed by any CalendarComponents module are declared in 
 `:CalendarComponents:Resources` so consumers never have to manage per-module string tags.
 
+`EventUi<out T>` — and everything carrying it (`Planning`, `DayView`, `DayEvents`, …) — is generic over the type that
+identifies an occurrence. The components never look inside `T`; they only hand it back through their click callbacks.
+That is what lets the app pass the KMP `OccurrenceId` straight through without the type leaking into these modules, and
+lets previews use a plain `String`.
+
 ### Flavors
 
 Every CalendarComponents module that contains **code** (`Foundation`, `Event`, `Planning`, `Day`, `Calendar`, `EventDetail`)

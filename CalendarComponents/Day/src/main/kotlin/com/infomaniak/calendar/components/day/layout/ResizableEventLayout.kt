@@ -43,10 +43,10 @@ import com.infomaniak.calendar.components.foundation.models.EventUi
 import kotlin.math.roundToInt
 
 @Composable
-internal fun ResizableEventLayout(
-    timedEvents: List<TimedEvent>,
+internal fun <T> ResizableEventLayout(
+    timedEvents: List<TimedEvent<T>>,
     placements: List<EventPlacement>,
-    onEventClick: (EventUi.Normal) -> Unit,
+    onEventClick: (EventUi.Normal<T>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
 

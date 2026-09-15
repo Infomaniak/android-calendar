@@ -50,9 +50,9 @@ private const val WHOLE_ROWS = 2
 private val NextRowPeek = 12.dp
 
 @Composable
-internal fun AllDayEventsBand(
-    events: List<EventUi.Normal>,
-    onEventClick: (EventUi.Normal) -> Unit,
+internal fun <T> AllDayEventsBand(
+    events: List<EventUi.Normal<T>>,
+    onEventClick: (EventUi.Normal<T>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (events.isEmpty()) return

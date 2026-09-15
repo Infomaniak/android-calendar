@@ -75,7 +75,7 @@ private const val ELLIPSIS = "…"
 
 @Composable
 internal fun ResizableEventItem(
-    timedEvent: TimedEvent,
+    timedEvent: TimedEvent<*>,
     titleSizing: TitleSizing,
     visibleHeight: () -> Float,
     onClick: () -> Unit,
@@ -108,7 +108,7 @@ internal fun ResizableEventItem(
  */
 @Composable
 private fun EventDetails(
-    event: EventUi.Normal,
+    event: EventUi.Normal<*>,
     titleSizing: TitleSizing,
     visibleHeight: () -> Float,
     textDecoration: TextDecoration?,

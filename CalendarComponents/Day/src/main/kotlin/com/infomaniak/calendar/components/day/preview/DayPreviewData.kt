@@ -45,7 +45,7 @@ private val declinedByMe = Attendees(
     me = AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Declined),
 )
 
-internal val previewDayEvents: DayEvents by lazy {
+internal val previewDayEvents: DayEvents<String> by lazy {
     DayEvents(
         allDay = listOf(
             previewEvent("Tennis", 0, 0, 0, 0, isAllDay = true, color = Color(0xFFE5B94E)),
@@ -74,7 +74,7 @@ private fun previewTimedEvent(
     location: String?,
     color: Color,
     attendees: Attendees = acceptedByMe,
-): TimedEvent = TimedEvent(
+): TimedEvent<String> = TimedEvent(
     event = previewEvent(title, startHour, startMinute, endHour, endMinute, false, color, location, attendees),
     startMinuteOfDay = startHour * 60 + startMinute,
     endMinuteOfDay = endHour * 60 + endMinute,
@@ -90,12 +90,12 @@ private fun previewEvent(
     color: Color,
     location: String? = null,
     attendees: Attendees = acceptedByMe,
-): EventUi.Normal {
+): EventUi.Normal<String> {
     val today = Clock.today(previewTimeZone)
 
     return EventUi.Normal(
         id = "$title-$startHour:$startMinute",
-        masterEventId = "$title-$startHour:$startMinute",
+        occurrenceId = "$title-$startHour:$startMinute",
         title = title,
         location = location,
         status = EventStatus.Confirmed,

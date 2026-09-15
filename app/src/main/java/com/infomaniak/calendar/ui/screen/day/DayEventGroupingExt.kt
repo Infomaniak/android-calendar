@@ -24,13 +24,14 @@ import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.utils.toEventUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 
-typealias DayEventsByDate = Map<LocalDate, DayEvents>
+typealias DayEventsByDate = Map<LocalDate, DayEvents<OccurrenceId>>
 
 /**
  * Splits already day-sliced events into what the day view draws in each of its two areas.
@@ -53,9 +54,9 @@ private fun List<EventDaySlice>.toDayEvents(
     date: LocalDate,
     emailsByUserId: Map<AccountId, String>,
     timeZone: TimeZone,
-): DayEvents {
-    val allDay = mutableListOf<EventUi.Normal>()
-    val timed = mutableListOf<TimedEvent>()
+): DayEvents<OccurrenceId> {
+    val allDay = mutableListOf<EventUi.Normal<OccurrenceId>>()
+    val timed = mutableListOf<TimedEvent<OccurrenceId>>()
 
     forEach { slice ->
         val event = slice.toEventUi(emailsByUserId, timeZone)

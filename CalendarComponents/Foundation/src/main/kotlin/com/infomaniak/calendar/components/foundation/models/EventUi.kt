@@ -21,14 +21,18 @@ import androidx.compose.runtime.Immutable
 import kotlinx.datetime.LocalDate
 import kotlin.time.Instant
 
+/**
+ * @param T the type identifying an occurrence, left to the consumer so this module stays free of any
+ * domain model. It is handed back untouched by every click callback.
+ */
 @Immutable
-sealed interface EventUi {
+sealed interface EventUi<out T> {
     val id: String
 
     @Immutable
-    data class Normal<T>(
+    data class Normal<out T>(
         override val id: String,
-        val masterEventId: String,
+        /** The displayed occurrence, never the master event of the series it belongs to. */
         val occurrenceId: T,
         val title: String,
         val location: String?,
@@ -38,15 +42,15 @@ sealed interface EventUi {
         val isAllDay: Boolean,
         val colors: EventColorsUi,
         val attendees: Attendees,
-    ) : EventUi
+    ) : EventUi<T>
 
     @Immutable
-    data object TodayEmptyState : EventUi {
+    data object TodayEmptyState : EventUi<Nothing> {
         override val id: String = TODAY_EMPTY_STATE_ID
     }
 
     @Immutable
-    data class EmptyState(val date: LocalDate) : EventUi {
+    data class EmptyState(val date: LocalDate) : EventUi<Nothing> {
         override val id: String = "${date}_$EMPTY_STATE_ID"
     }
 

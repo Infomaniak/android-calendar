@@ -68,7 +68,7 @@ import kotlin.time.Clock
 @Composable
 fun PlanningScreen(
     goToEventCreation: () -> Unit,
-    goToEventDetail: (eventId: String) -> Unit,
+    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PlanningViewModel = viewModel(),
 ) {
@@ -91,7 +91,7 @@ fun PlanningScreen(
 @Composable
 private fun PlanningScreen(
     goToEventCreation: () -> Unit,
-    goToEventDetail: (eventId: String) -> Unit,
+    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     planningUiState: () -> PlanningUiState,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
@@ -162,7 +162,7 @@ private fun SuccessPlanning(
     events: () -> EventsByWeekAndDay,
     contentPadding: PaddingValues,
     goToEventCreation: () -> Unit,
-    goToEventDetail: (eventId: String) -> Unit,
+    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     jumpTo: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -178,16 +178,15 @@ private fun SuccessPlanning(
         },
     )
 
-    Planning<OccurrenceId>(
+    Planning(
         lazyListState = lazyListState,
         weekEvents = events,
         modifier = modifier
             .scrollableToolbar()
             .fillMaxSize(),
         contentPadding = contentPadding,
-        onEventClicked = { occurrence -> },
         goToEventCreation = goToEventCreation,
-        onEventClick = { goToEventDetail(it.masterEventId) }, // TODO[eventDetail]: Send id over masterEventId when we can load it
+        onEventClick = { goToEventDetail(it.occurrenceId) },
     )
 }
 

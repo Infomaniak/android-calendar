@@ -58,7 +58,7 @@ data class EventPlacement(
  *
  * Placements come back in the order of the receiver.
  */
-internal fun List<TimedEvent>.resolveOverlaps(
+internal fun List<TimedEvent<*>>.resolveOverlaps(
     layoutWidth: Float,
     pixelsPerMinute: Float,
     config: EventLayoutConfig,
@@ -123,7 +123,7 @@ private fun EventPlacement.overlaps(other: EventPlacement): Boolean {
     return sharedWidth > 1f && sharedHeight > 1f
 }
 
-private fun TimedEvent.toFullWidthFrame(
+private fun TimedEvent<*>.toFullWidthFrame(
     layoutWidth: Float,
     pixelsPerMinute: Float,
     timelineHeight: Float,

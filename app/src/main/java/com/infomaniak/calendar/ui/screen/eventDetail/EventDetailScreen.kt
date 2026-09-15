@@ -28,7 +28,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,20 +40,21 @@ import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
 @Composable
 fun EventDetailScreen(
-    eventId: String,
+    occurrenceId: OccurrenceId,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),
 ) {
     val uiState by viewModel.eventDetailUi.collectAsStateWithLifecycle(initialValue = EventDetailUiState.Loading)
 
-    LaunchedEffect(eventId) {
-        viewModel.setEventId(eventId)
+    LaunchedEffect(occurrenceId) {
+        viewModel.setOccurrenceId(occurrenceId)
     }
 
     EventDetailScreen(uiState = { uiState }, onBack = onBack, modifier = modifier)
