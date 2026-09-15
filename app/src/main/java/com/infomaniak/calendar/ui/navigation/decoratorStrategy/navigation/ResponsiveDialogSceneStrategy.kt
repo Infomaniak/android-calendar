@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.navigation3.runtime.NavEntry
@@ -27,10 +28,8 @@ import androidx.navigation3.scene.SceneStrategy
 import androidx.navigation3.scene.SceneStrategyScope
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 
-data class AdaptiveDialogSceneStrategy<T : Any>(val windowSizeClass: WindowSizeClass) : SceneStrategy<T> {
-
+data class ResponsiveDialogSceneStrategy<T : Any>(val windowSizeClass: WindowSizeClass) : SceneStrategy<T> {
     private val dialogSceneStrategy = DialogSceneStrategy<T>()
 
     override fun SceneStrategyScope<T>.calculateScene(entries: List<NavEntry<T>>): Scene<T>? {
@@ -45,7 +44,7 @@ data class AdaptiveDialogSceneStrategy<T : Any>(val windowSizeClass: WindowSizeC
         val lastEntry = lastOrNull() ?: return this
 
         return dropLast(1) + NavEntry(navEntry = lastEntry) {
-            Box(modifier = Modifier.clip(EsdsTheme.radius.xl)) { lastEntry.Content() }
+            Box(modifier = Modifier.clip(AlertDialogDefaults.shape)) { lastEntry.Content() }
         }
     }
 }

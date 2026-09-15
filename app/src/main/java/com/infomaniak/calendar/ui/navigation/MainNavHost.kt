@@ -27,7 +27,6 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.scene.SceneStrategy
 import androidx.navigation3.ui.NavDisplay
@@ -36,11 +35,12 @@ import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.component.drawer.CalendarDrawer
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.component.CalendarHorizontalFloatingToolbar
-import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.AdaptiveDialogSceneStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.DrawerDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.Drawer
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.ResponsiveDialog
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.ResponsiveDialogSceneStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
 import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
 import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
@@ -102,7 +102,7 @@ private fun baseEntryProvider(
     entry<NavDestination.EventCreation> {
         EventCreationScreen()
     }
-    entry<NavDestination.EventDetail>(metadata = DialogSceneStrategy.dialog()) { destination ->
+    entry<NavDestination.EventDetail>(metadata = metaDataOf(ResponsiveDialog)) { destination ->
         EventDetailScreen(
             eventId = destination.eventId,
             onBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
@@ -111,8 +111,8 @@ private fun baseEntryProvider(
     entry<NavDestination.Accounts.List> {
         AccountsListScreen(
             onBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
-            onAddAccount = { backStack.add(NavDestination.Onboarding(onlyLogin = true)) },
-            onAccountClick = { userId -> backStack.add(NavDestination.Accounts.Actions(userId)) },
+            onAddAccount = { backStack.addOnce(NavDestination.Onboarding(onlyLogin = true)) },
+            onAccountClick = { userId -> backStack.addOnce(NavDestination.Accounts.Actions(userId)) },
         )
     }
     entry<NavDestination.Accounts.Actions> { destination ->
@@ -131,7 +131,7 @@ private fun baseEntryProvider(
 }
 
 private fun sceneStrategies(windowSizeClass: WindowSizeClass): List<SceneStrategy<NavKey>> {
-    val dialogStrategy = AdaptiveDialogSceneStrategy<NavKey>(windowSizeClass)
+    val dialogStrategy = ResponsiveDialogSceneStrategy<NavKey>(windowSizeClass)
     return listOf(dialogStrategy)
 }
 
