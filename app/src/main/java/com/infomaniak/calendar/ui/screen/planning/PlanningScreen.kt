@@ -34,10 +34,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
+import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.planning.Planning
@@ -102,7 +103,7 @@ private fun PlanningScreen(
     val density = LocalDensity.current
     var topBarHeight by remember { mutableStateOf(0.dp) }
 
-    var isCalendarExpanded by rememberSaveable { mutableStateOf(false) }
+    val calendarExpansion = rememberCalendarExpansionState()
     val visibleDayState = LocalVisibleDayState.current
 
     Scaffold(
@@ -120,7 +121,9 @@ private fun PlanningScreen(
                         goToEventCreation = goToEventCreation,
                         goToEventDetail = goToEventDetail,
                         jumpTo = jumpTo,
-                        modifier = Modifier.hazeSource(hazeState),
+                        modifier = Modifier
+                            .hazeSource(hazeState)
+                            .nestedScroll(calendarExpansion.nestedScrollConnection),
                     )
                 }
                 is PlanningUiState.Loading -> {
@@ -131,11 +134,11 @@ private fun PlanningScreen(
             CalendarTopAppBar(
                 isLoadingEvents = isLoadingEvents,
                 hazeState = hazeState,
-                onToggleCalendar = { isCalendarExpanded = !isCalendarExpanded },
+                onToggleCalendar = calendarExpansion::toggle,
                 calendar = {
                     if (visibleDayState != null) {
                         ExpandableCalendar(
-                            isExpanded = { isCalendarExpanded },
+                            expansionState = calendarExpansion,
                             selectedDate = { visibleDayState.visibleDate },
                             onDayClick = {
                                 onVisibleMonthChanged(it.yearMonth)
@@ -146,7 +149,7 @@ private fun PlanningScreen(
                         )
                     }
                 },
-                isCalendarExpanded = { isCalendarExpanded },
+                isCalendarExpanded = { calendarExpansion.isExpanded },
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.TopCenter)

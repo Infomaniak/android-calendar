@@ -31,7 +31,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -41,6 +40,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
+import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
 import com.infomaniak.calendar.components.day.DayPager
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
@@ -125,18 +125,18 @@ private fun DayScreen(
     dateRange: ClosedRange<LocalDate>,
     modifier: Modifier = Modifier,
 ) {
-    var isCalendarExpanded by rememberSaveable { mutableStateOf(false) }
+    val calendarExpansion = rememberCalendarExpansionState()
 
     Scaffold(
         topBar = {
             CalendarTopAppBar(
                 isLoadingEvents = isLoadingEvents,
-                onToggleCalendar = { isCalendarExpanded = !isCalendarExpanded },
-                isCalendarExpanded = { isCalendarExpanded },
+                onToggleCalendar = calendarExpansion::toggle,
+                isCalendarExpanded = { calendarExpansion.isExpanded },
                 hazeState = null,
                 calendar = {
                     ExpandableCalendar(
-                        isExpanded = { isCalendarExpanded },
+                        expansionState = calendarExpansion,
                         selectedDate = { visibleDayState.visibleDate },
                         onDayClick = { visibleDayState.jumpTo(it) },
                         weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
