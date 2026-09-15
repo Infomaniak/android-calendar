@@ -22,8 +22,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -99,17 +100,20 @@ private fun AccountsActionsScreen(
                 .fillMaxHeight(),
         ) {
             AccountItem(user = user)
-            OutlinedButton(
+            FilledTonalButton(
                 onClick = { showLogoutDialog = true },
                 shape = EsdsTheme.radius.full,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(all = EsdsTheme.spacing.xl),
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                ),
             ) {
                 Text(
                     stringResource(R.string.buttonLogOut),
                     modifier = Modifier.padding(vertical = EsdsTheme.spacing.md),
-                    color = MaterialTheme.colorScheme.error,
                 )
             }
         }
