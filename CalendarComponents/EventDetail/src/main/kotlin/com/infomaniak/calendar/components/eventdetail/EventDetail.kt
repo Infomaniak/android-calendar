@@ -17,53 +17,43 @@
  */
 package com.infomaniak.calendar.components.eventdetail
 
-import android.icu.text.MessageFormat
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.LocalLocale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
-import com.infomaniak.calendar.components.eventdetail.component.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.component.DescriptionCollapsibleButton
+import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
 import com.infomaniak.calendar.components.eventdetail.component.LIST_ITEM_HORIZONTAL_PADDING
+import com.infomaniak.calendar.components.eventdetail.component.LocationButton
+import com.infomaniak.calendar.components.eventdetail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
-import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
-import java.util.Locale
 import kotlin.time.Instant
 
 @Composable
@@ -126,69 +116,6 @@ private fun Title(color: Color, title: String, modifier: Modifier = Modifier) {
         },
         modifier = modifier,
     )
-}
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-private fun KMeetButton(onClick: () -> Unit, modifier: Modifier = Modifier, contentPadding: PaddingValues = PaddingValues()) {
-    ClickableItem(
-        text = stringResource(id = R.string.participateKMeetTitle),
-        leadingIconRes = R.drawable.ic_product_kmeet,
-        trailingContent = {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
-                Text(stringResource(R.string.buttonJoin), style = MaterialTheme.typography.labelLarge)
-                Icon(painterResource(R.drawable.ic_squares_stacked), contentDescription = null, modifier = Modifier.size(20.dp))
-            }
-        },
-        onClick = onClick,
-        modifier = modifier,
-        contentPadding = contentPadding,
-    )
-}
-
-@Composable
-private fun LocationButton(
-    location: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(),
-) {
-    ClickableItem(
-        text = location,
-        leadingIconRes = R.drawable.ic_map_pin,
-        onClick = onClick,
-        contentPadding = contentPadding,
-        modifier = modifier,
-    )
-}
-
-@Composable
-private fun RoomButton(
-    room: EventDetailUi.Room,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(),
-) {
-    ClickableItem(
-        text = room.title,
-        leadingIconRes = R.drawable.ic_door_open,
-        supportingContent = {
-            val locale = LocalLocale.current.platformLocale
-
-            val roomSeats = pluralStringResource(R.plurals.roomSeatsLabel, room.seats, room.seats)
-            val roomFloor = stringResource(R.string.roomFloorLabel, room.floor.formatToOrdinal(locale))
-
-            Text(text = "$roomSeats, $roomFloor")
-        },
-        onClick = onClick,
-        contentPadding = contentPadding,
-        modifier = modifier,
-    )
-}
-
-private fun Int.formatToOrdinal(locale: Locale): String {
-    val formatter = MessageFormat("{0, ordinal}", locale)
-    return formatter.format(arrayOf(this))
 }
 
 /**
