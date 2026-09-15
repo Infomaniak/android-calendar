@@ -59,6 +59,7 @@
         <item quantity="many">%d miejsc</item>
         <item quantity="other">%d miejsc</item>
     </plurals>
+    <string name="sectionCalendarHeader">Kalendarz</string>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">Tydz.%d</string>
 </resources>

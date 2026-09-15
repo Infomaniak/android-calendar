@@ -51,6 +51,7 @@
         <item quantity="one">%d sete</item>
         <item quantity="other">%d seter</item>
     </plurals>
+    <string name="sectionCalendarHeader">Kalender</string>
     <string name="weekHeaderDateRange">%d.–%d. %s %d</string>
     <string name="weekHeaderWeekNumber">U%d</string>
 </resources>

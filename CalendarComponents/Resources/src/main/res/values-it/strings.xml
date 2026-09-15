@@ -51,6 +51,7 @@
         <item quantity="one">%d posto</item>
         <item quantity="other">%d posti</item>
     </plurals>
+    <string name="sectionCalendarHeader">Calendario</string>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">S%d</string>
 </resources>

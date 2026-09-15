@@ -51,6 +51,7 @@
         <item quantity="one">%d seat</item>
         <item quantity="other">%d seats</item>
     </plurals>
+    <string name="sectionCalendarHeader">Calendar</string>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">W%d</string>
 </resources>
