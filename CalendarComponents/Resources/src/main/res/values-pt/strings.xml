@@ -26,7 +26,9 @@
         <item quantity="one">%1$d convidado</item>
         <item quantity="other">%1$d convidados</item>
     </plurals>
+    <string name="availableLabel">Disponível</string>
     <string name="buttonJoin">Juntar</string>
+    <string name="confidentialLabel">Confidencial</string>
     <string name="contentDescriptionCreateEvent">Criar um evento</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d evento</item>
@@ -39,13 +41,17 @@
     <string name="descriptionTitle">Descrição</string>
     <string name="notificationTypeEmail">Email</string>
     <string name="notificationTypePush">Notificação</string>
+    <string name="occupiedLabel">Ocupado</string>
     <string name="participateKMeetTitle">Participar no kMeet</string>
     <string name="planningNothingPlanned">Nada planeado</string>
+    <string name="privateLabel">Privado</string>
+    <string name="publicLabel">Público</string>
     <string name="roomFloorLabel">Piso %s</string>
     <plurals name="roomSeatsLabel">
         <item quantity="one">%d lugar</item>
         <item quantity="other">%d lugares</item>
     </plurals>
+    <string name="sectionCalendarHeader">Calendário</string>
     <string name="weekHeaderDateRange">%d–%d de %s de %d</string>
     <string name="weekHeaderWeekNumber">Sem.%d</string>
 </resources>

@@ -87,6 +87,7 @@ private fun Preview() {
     val previewEventDetail = EventDetailUi(
         eventColor = Color.Red,
         calendarColor = Color.Blue,
+        calendarName = "Vacation",
         title = "Event title",
         start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
         end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
@@ -99,6 +100,8 @@ private fun Preview() {
         description = "Description",
         files = emptyList(),
         notifications = emptyList(),
+        isOccupied = true,
+        classification = EventDetailUi.Classification.Public,
     )
 
     CalendarThemeForPreview {
