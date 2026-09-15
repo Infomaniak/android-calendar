@@ -102,9 +102,8 @@ private fun EventDetailScreen(
 private fun openLocationInMapApp(context: Context, location: String) {
     val geoUri = "geo:0,0?q=${Uri.encode(location)}".toUri()
     val mapIntent = Intent(Intent.ACTION_VIEW, geoUri)
-    val chooserIntent = Intent.createChooser(mapIntent, null)
 
-    context.safeStartActivity(chooserIntent)
+    context.safeStartActivity(mapIntent)
 }
 
 @Preview
