@@ -113,3 +113,16 @@ private fun Preview() {
         }
     }
 }
+
+@Preview
+@Composable
+private fun PreviewOverflow() {
+    MaterialTheme {
+        Surface {
+            DescriptionCollapsibleButton(
+                description = LoremIpsum(35).values.first(),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            )
+        }
+    }
+}
