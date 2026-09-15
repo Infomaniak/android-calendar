@@ -49,6 +49,9 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
+
+private const val AVATAR_STACK_LIMIT = 3
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -81,12 +84,12 @@ internal fun AttendeesButton(
 private fun StackedAvatars(attendees: List<AttendeeUi>) {
     Row(horizontalArrangement = Arrangement.spacedBy((-8).dp), verticalAlignment = Alignment.CenterVertically) {
         val border = BorderStroke(1.dp, MaterialTheme.colorScheme.surface)
-        val size = 32.dp
+        val size = EsdsTheme.icon.sizeLg
 
-        attendees.take(3).forEach { attendee ->
+        attendees.take(AVATAR_STACK_LIMIT).forEach { attendee ->
             Avatar(AvatarType.fromAttendee(attendee), Modifier.size(size), border)
         }
-        if (attendees.size > 3) ExtraCountIndicator(attendees.size, border, Modifier.size(size))
+        if (attendees.size > AVATAR_STACK_LIMIT) ExtraCountIndicator(attendees.size, border, Modifier.size(size))
     }
 }
 
@@ -102,7 +105,7 @@ private fun ExtraCountIndicator(extraCount: Int, border: BorderStroke, modifier:
         val textStyle = MaterialTheme.typography.labelLargeEmphasized
 
         BasicText(
-            text = "+${extraCount - 3}",
+            text = "+${extraCount - AVATAR_STACK_LIMIT}",
             style = textStyle,
             color = { onPrimaryContainer },
             autoSize = TextAutoSize.StepBased(minFontSize = 8.sp, maxFontSize = textStyle.fontSize),
