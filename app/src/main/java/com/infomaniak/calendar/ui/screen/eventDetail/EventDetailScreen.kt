@@ -17,6 +17,10 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
@@ -31,7 +35,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.eventdetail.EventDetail
@@ -51,14 +57,25 @@ fun EventDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),
 ) {
+    val context = LocalContext.current
     val eventDetailFlow = remember(eventId) { viewModel.observeEventDetail(eventId) }
     val uiState by eventDetailFlow.collectAsStateWithLifecycle(initialValue = EventDetailUiState.Loading)
 
-    EventDetailScreen(uiState = { uiState }, onBack = onBack, modifier = modifier)
+    EventDetailScreen(
+        uiState = { uiState },
+        onBack = onBack,
+        onLocationClick = { location -> openLocationInMapApp(context, location) },
+        modifier = modifier,
+    )
 }
 
 @Composable
-private fun EventDetailScreen(uiState: () -> EventDetailUiState, onBack: () -> Unit, modifier: Modifier = Modifier) {
+private fun EventDetailScreen(
+    uiState: () -> EventDetailUiState,
+    onBack: () -> Unit,
+    onLocationClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         topBar = { TopAppBar(navigationIcon = { TopAppBarButtons.BackButton(onClick = onBack) }, title = {}) },
         modifier = modifier,
@@ -70,7 +87,7 @@ private fun EventDetailScreen(uiState: () -> EventDetailUiState, onBack: () -> U
                     EventDetail(
                         eventDetail = state.eventDetail,
                         onKMeetClick = { /*TODO[eventDetail]*/ },
-                        onLocationClick = { /*TODO[eventDetail]*/ },
+                        onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
                         onRoomClick = { /*TODO[eventDetail]*/ },
                         contentPadding = scaffoldContentPadding + PaddingValues(horizontal = Margin.Small),
                     )
@@ -79,6 +96,14 @@ private fun EventDetailScreen(uiState: () -> EventDetailUiState, onBack: () -> U
             EventDetailUiState.Deleted -> LaunchedEffect(Unit) { onBack() }
         }
     }
+}
+
+private fun openLocationInMapApp(context: Context, location: String) {
+    val geoUri = "geo:0,0?q=${Uri.encode(location)}".toUri()
+    val mapIntent = Intent(Intent.ACTION_VIEW, geoUri)
+    val chooserIntent = Intent.createChooser(mapIntent, null)
+
+    context.startActivity(chooserIntent)
 }
 
 @Preview
@@ -103,7 +128,7 @@ private fun Preview() {
 
     CalendarThemeForPreview {
         Surface {
-            EventDetailScreen(uiState = { EventDetailUiState.Success(previewEventDetail) }, onBack = {})
+            EventDetailScreen(uiState = { EventDetailUiState.Success(previewEventDetail) }, onBack = {}, onLocationClick = {})
         }
     }
 }
