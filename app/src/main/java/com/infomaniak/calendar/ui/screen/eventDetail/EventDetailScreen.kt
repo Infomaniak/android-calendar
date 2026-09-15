@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
@@ -70,9 +69,9 @@ private fun EventDetailScreen(uiState: () -> EventDetailUiState, onBack: () -> U
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     EventDetail(
                         eventDetail = state.eventDetail,
-                        onKMeetClick = { Log.e("test", "Clicked on kMeet: ${state.eventDetail.kMeetUrl}") },
-                        onLocationClick = { Log.e("test", "Clicked on location: ${state.eventDetail.location}") },
-                        onRoomClick = { Log.e("test", "Clicked on room: ${state.eventDetail.room}") },
+                        onKMeetClick = { /*TODO[eventDetail]*/ },
+                        onLocationClick = { /*TODO[eventDetail]*/ },
+                        onRoomClick = { /*TODO[eventDetail]*/ },
                         contentPadding = scaffoldContentPadding + PaddingValues(horizontal = Margin.Small),
                     )
                 }
