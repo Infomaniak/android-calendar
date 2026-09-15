@@ -153,7 +153,7 @@ private fun DayScreen(
             CalendarTopAppBar(
                 isLoadingEvents = isLoadingEvents,
                 onToggleCalendar = calendarExpansion::toggle,
-                isCalendarExpanded = { calendarExpansion.isExpanded },
+                calendarExpansionProgress = { calendarExpansion.progress },
                 hazeState = hazeState,
                 calendar = {
                     ExpandableCalendar(
