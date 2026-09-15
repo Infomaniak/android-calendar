@@ -57,6 +57,11 @@ import kotlin.time.Clock
 /** Margins held on each side at startup, so the first swipes never have to grow the range. */
 private const val INITIAL_MARGINS = 2
 
+/**
+ * @param otherMonthProgress how much the days borrowed from the neighbouring months are told apart from the
+ * others, from not at all to fully dimmed. It is a fraction rather than a fixed state so that a month shown
+ * at less than its full height can stop telling them apart as it shrinks.
+ */
 @Composable
 internal fun ExpandedCalendar(
     monthMargin: Int,
@@ -68,6 +73,7 @@ internal fun ExpandedCalendar(
     headerState: CalendarHeaderState = rememberCalendarHeaderState(),
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    otherMonthProgress: () -> Float = { 1f },
 ) {
     val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
     val initialMonth = remember { selectedDate().yearMonth }
@@ -114,6 +120,7 @@ internal fun ExpandedCalendar(
                 animatedVisibilityScope = animatedVisibilityScope,
                 isSharedElementEnabled = day in sharedElementDays,
                 dotsFor = { eventsDots()[day.date].orEmpty() },
+                otherMonthProgress = otherMonthProgress,
             )
         },
         modifier = modifier
@@ -132,15 +139,17 @@ private fun DayContent(
     animatedVisibilityScope: AnimatedVisibilityScope?,
     isSharedElementEnabled: Boolean,
     dotsFor: () -> List<EventColorsUi>,
+    otherMonthProgress: () -> Float,
 ) {
+    val isInMonth = day.position == DayPosition.MonthDate
+
     val dateState by remember(day) {
         derivedStateOf {
-            val isInMonth = day.position == DayPosition.MonthDate
             when {
-                isInMonth && day.date == selectedDate() -> DateState.Selected
-                isInMonth && day.date == today() -> DateState.Today
-                isInMonth -> DateState.None
-                else -> DateState.NotMonth
+                !isInMonth -> DateState.None
+                day.date == selectedDate() -> DateState.Selected
+                day.date == today() -> DateState.Today
+                else -> DateState.None
             }
         }
     }
@@ -156,6 +165,7 @@ private fun DayContent(
             enabled = isSharedElementEnabled,
         ),
         dotsFor = dotsFor,
+        otherMonthProgress = if (isInMonth) null else otherMonthProgress,
     )
 }
 
