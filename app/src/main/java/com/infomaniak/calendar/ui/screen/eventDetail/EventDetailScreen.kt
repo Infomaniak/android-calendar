@@ -46,6 +46,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.core.common.extensions.safeStartActivity
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
@@ -103,7 +104,7 @@ private fun openLocationInMapApp(context: Context, location: String) {
     val mapIntent = Intent(Intent.ACTION_VIEW, geoUri)
     val chooserIntent = Intent.createChooser(mapIntent, null)
 
-    context.startActivity(chooserIntent)
+    context.safeStartActivity(chooserIntent)
 }
 
 @Preview
