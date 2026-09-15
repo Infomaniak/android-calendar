@@ -83,12 +83,12 @@ private fun baseEntryProvider(
 ): (NavKey) -> NavEntry<NavKey> = entryProvider {
     entry<NavDestination.CalendarView.Planning>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         PlanningScreen(
-            goToEventCreation = { backStack.add(NavDestination.EventCreation) },
-            goToEventDetail = { backStack.add(NavDestination.EventDetail(it)) },
+            goToEventCreation = { backStack.addOnce(NavDestination.EventCreation) },
+            goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) },
         )
     }
     entry<NavDestination.CalendarView.Day>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-        DayScreen(goToEventDetail = { backStack.add(NavDestination.EventDetail(it)) })
+        DayScreen(goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) })
     }
     entry<NavDestination.CalendarView.ThreeDays>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         ThreeDayScreen()
