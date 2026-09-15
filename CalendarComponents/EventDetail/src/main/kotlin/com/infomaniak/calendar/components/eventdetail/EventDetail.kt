@@ -28,7 +28,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -39,27 +38,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
+import com.infomaniak.calendar.components.eventdetail.component.Calendar
+import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatus
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.component.DescriptionCollapsibleButton
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
 import com.infomaniak.calendar.components.eventdetail.component.LIST_ITEM_HORIZONTAL_PADDING
 import com.infomaniak.calendar.components.eventdetail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.component.Notifications
+import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatus
 import com.infomaniak.calendar.components.eventdetail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
-import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
@@ -125,24 +123,6 @@ fun EventDetail(
 }
 
 @Composable
-private fun Calendar(calendarColor: Color, calendarName: String, modifier: Modifier = Modifier) {
-    ListItem(
-        headlineContent = { Text(stringResource(id = R.string.sectionCalendarHeader)) },
-        leadingContent = {
-            Box(
-                modifier = Modifier
-                    .size(EsdsTheme.icon.sizeSm)
-                    .padding(2.dp)
-                    .clip(CircleShape)
-                    .background(calendarColor),
-            )
-        },
-        trailingContent = { Text(text = calendarName, style = MaterialTheme.typography.labelLarge) },
-        modifier = modifier,
-    )
-}
-
-@Composable
 private fun Title(color: Color, title: String, modifier: Modifier = Modifier) {
     ListItem(
         headlineContent = { Text(text = title, style = MaterialTheme.typography.titleLargeEmphasized) },
@@ -155,24 +135,6 @@ private fun Title(color: Color, title: String, modifier: Modifier = Modifier) {
                     .background(color),
             )
         },
-        modifier = modifier,
-    )
-}
-
-@Composable
-private fun OccupiedStatus(isOccupied: Boolean, modifier: Modifier = Modifier) {
-    ListItem(
-        headlineContent = { Text(text = stringResource(if (isOccupied) R.string.occupiedLabel else R.string.availableLabel)) },
-        leadingContent = { Icon(painter = painterResource(R.drawable.ic_briefcase), contentDescription = null) },
-        modifier = modifier,
-    )
-}
-
-@Composable
-private fun ClassificationStatus(classification: EventDetailUi.Classification, modifier: Modifier = Modifier) {
-    ListItem(
-        headlineContent = { Text(text = stringResource(classification.label)) },
-        leadingContent = { Icon(painter = painterResource(R.drawable.ic_lock), contentDescription = null) },
         modifier = modifier,
     )
 }
