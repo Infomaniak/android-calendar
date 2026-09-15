@@ -43,7 +43,7 @@ internal fun Calendar(calendarColor: Color, calendarName: String, modifier: Modi
         leadingContent = {
             Box(
                 modifier = Modifier
-                    .size(EsdsTheme.icon.sizeSm)
+                    .size(EsdsTheme.icon.sizeMd)
                     .padding(2.dp)
                     .clip(CircleShape)
                     .background(calendarColor),
