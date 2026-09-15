@@ -51,8 +51,11 @@ fun EventDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),
 ) {
-    val eventDetailFlow = remember(eventId) { viewModel.observeEventDetail(eventId) }
-    val uiState by eventDetailFlow.collectAsStateWithLifecycle(initialValue = EventDetailUiState.Loading)
+    val uiState by viewModel.eventDetailUi.collectAsStateWithLifecycle(initialValue = EventDetailUiState.Loading)
+
+    LaunchedEffect(Unit) {
+        viewModel.setEventId(eventId)
+    }
 
     EventDetailScreen(uiState = { uiState }, onBack = onBack, modifier = modifier)
 }
