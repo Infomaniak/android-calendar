@@ -17,9 +17,12 @@
  */
 package com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation
 
+import androidx.navigation3.scene.DialogSceneStrategy
+
 enum class MetadataSceneStrategy(val metadata: Map<String, Any>) {
     FloatingToolbarWithFab(metadata = mapOf(SHOULD_SHOW_FLOATING_TOOLBAR_WITH_FAB to true)),
     Drawer(metadata = mapOf(SHOULD_SHOW_DRAWER to true)),
+    ResponsiveDialog(metadata = DialogSceneStrategy.dialog()),
 }
 
 fun metaDataOf(vararg strategies: MetadataSceneStrategy): Map<String, Any> {
