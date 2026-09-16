@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,9 +25,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,12 +41,22 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.utils.toAttendeeUi
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.AttendeeRole
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationStatus
 
 @Composable
 fun EventDetailAttendeesScreen(
@@ -78,12 +93,25 @@ fun EventDetailAttendeesScreen(attendees: () -> List<Attendee>?, onBack: () -> U
                 .fillMaxSize()
                 .padding(paddingValues),
         ) {
-            OutlinedTextField(
+            TextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                ),
                 modifier = Modifier
+                    .padding(horizontal = Margin.Small, vertical = Margin.Small)
                     .fillMaxWidth()
-                    .padding(horizontal = Margin.Medium, vertical = Margin.Small),
+                    .clip(MaterialTheme.shapes.extraLarge)
+                    .background(color = MaterialTheme.colorScheme.surfaceContainerHigh),
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_magnifying_glass),
+                        contentDescription = stringResource(R.string.contentDescriptionSearch),
+                    )
+                },
                 singleLine = true,
                 placeholder = { Text("Recherche des invités") },
             )
@@ -97,7 +125,9 @@ fun EventDetailAttendeesScreen(attendees: () -> List<Attendee>?, onBack: () -> U
                 }
             } else {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = EsdsTheme.spacing.md),
                 ) {
                     items(
                         items = allAttendees,
@@ -107,6 +137,41 @@ fun EventDetailAttendeesScreen(attendees: () -> List<Attendee>?, onBack: () -> U
                     }
                 }
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun EventDetailAttendeesScreenPreview() {
+    val previewAttendees = listOf(
+        Attendee(
+            email = "alice@example.com",
+            displayName = "Alice Johnson",
+            status = ParticipationStatus.Accepted,
+            role = AttendeeRole.Chair,
+            isOrganizer = true,
+        ),
+        Attendee(
+            email = "bob@example.com",
+            displayName = "Bob Smith",
+            status = ParticipationStatus.Tentative,
+            role = AttendeeRole.Optional,
+        ),
+        Attendee(
+            email = "charlie@example.com",
+            displayName = "Charlie Brown",
+            status = ParticipationStatus.Declined,
+            role = AttendeeRole.Optional,
+        ),
+    )
+
+    CalendarThemeForPreview {
+        Surface {
+            EventDetailAttendeesScreen(
+                attendees = { previewAttendees },
+                onBack = {},
+            )
         }
     }
 }

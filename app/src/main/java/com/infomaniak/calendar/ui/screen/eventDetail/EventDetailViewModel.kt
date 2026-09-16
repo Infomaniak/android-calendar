@@ -78,6 +78,6 @@ class EventDetailViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val eventAttendees = eventFlow.flatMapLatest { event ->
-        flowOf(event?.attendees)
+        flowOf(event?.attendees ?: emptyList())
     }
 }
