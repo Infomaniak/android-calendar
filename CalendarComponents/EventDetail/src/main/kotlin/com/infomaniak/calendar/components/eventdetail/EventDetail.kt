@@ -58,6 +58,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
@@ -133,7 +134,7 @@ private fun Title(color: Color, title: String, modifier: Modifier = Modifier) {
         leadingContent = {
             Box(
                 modifier = Modifier
-                    .size(20.dp)
+                    .size(EsdsTheme.icon.sizeMd)
                     .padding(2.dp)
                     .clip(CircleShape)
                     .background(color),
