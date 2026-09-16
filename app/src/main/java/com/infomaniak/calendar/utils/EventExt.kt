@@ -50,7 +50,7 @@ fun Event.toEventDetailUi(calendar: Calendar, emailsByUserId: Map<AccountId, Str
     description = description,
     files = emptyList(), // TODO[eventDetail]: Not carried by the KMP model yet
     notifications = alarms.mapNotNull { it.toNotification() },
-    isOccupied = timeBlocking == TimeBlocking.Blocks,
+    isOccupied = timeBlocking != TimeBlocking.DoesNotBlock, // null is considered as occupied
     classification = classification?.toClassification(),
 )
 
