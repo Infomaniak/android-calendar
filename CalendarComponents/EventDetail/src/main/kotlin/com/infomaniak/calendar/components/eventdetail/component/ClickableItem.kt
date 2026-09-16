@@ -47,11 +47,33 @@ internal fun ClickableItem(
     trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
     supportingContent: @Composable (() -> Unit)? = null,
 ) {
+    ClickableItem(
+        text = text,
+        supportingContent = supportingContent,
+        leadingContent = { Icon(painterResource(leadingIconRes), contentDescription = null) },
+        trailingContent = trailingContent,
+        onClick = onClick,
+        contentPadding = contentPadding,
+        modifier = modifier,
+    )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+internal fun ClickableItem(
+    text: String,
+    leadingContent: @Composable () -> Unit,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
+    trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
+    supportingContent: @Composable (() -> Unit)? = null,
+) {
     ListItem(
         modifier = modifier,
         content = { Text(text = text) },
         supportingContent = supportingContent,
-        leadingContent = { Icon(painterResource(leadingIconRes), contentDescription = null) },
+        leadingContent = leadingContent,
         trailingContent = trailingContent,
         onClick = onClick,
         contentPadding = contentPadding + PaddingValues(horizontal = LIST_ITEM_HORIZONTAL_PADDING),
