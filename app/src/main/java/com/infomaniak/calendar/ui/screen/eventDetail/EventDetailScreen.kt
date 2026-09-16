@@ -53,7 +53,7 @@ fun EventDetailScreen(
 ) {
     val uiState by viewModel.eventDetailUi.collectAsStateWithLifecycle(initialValue = EventDetailUiState.Loading)
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(eventId) {
         viewModel.setEventId(eventId)
     }
 
