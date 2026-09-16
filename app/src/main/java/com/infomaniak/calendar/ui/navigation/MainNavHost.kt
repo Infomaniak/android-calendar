@@ -19,6 +19,7 @@ package com.infomaniak.calendar.ui.navigation
 
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -27,7 +28,9 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.scene.SceneDecoratorStrategy
+import androidx.navigation3.scene.SceneStrategy
 import androidx.navigation3.ui.NavDisplay
+import androidx.window.core.layout.WindowSizeClass
 import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.component.drawer.CalendarDrawer
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
@@ -35,7 +38,9 @@ import com.infomaniak.calendar.ui.navigation.component.CalendarHorizontalFloatin
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.DrawerDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.Drawer
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.ResponsiveDialog
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.ResponsiveDialogSceneStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
 import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
 import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
@@ -49,7 +54,6 @@ import com.infomaniak.calendar.ui.screen.threeDays.ThreeDayScreen
 import com.infomaniak.calendar.ui.screen.week.WeekScreen
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.core.common.utils.today
-import io.sentry.Breadcrumb.user
 import kotlin.time.Clock
 
 @Composable
@@ -60,10 +64,13 @@ fun MainNavHost(
 ) {
     SharedTransitionLayout {
         CompositionLocalProvider(LocalSharedTransitionScope provides this@SharedTransitionLayout) {
+            val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+
             NavDisplay(
                 backStack = backStack,
                 entryProvider = baseEntryProvider(backStack, defaultCalendarView),
                 sceneDecoratorStrategies = sceneDecoratorStrategies(backStack, onCalendarViewSelected),
+                sceneStrategies = sceneStrategies(windowSizeClass),
                 sharedTransitionScope = this@SharedTransitionLayout,
             )
         }
@@ -76,12 +83,12 @@ private fun baseEntryProvider(
 ): (NavKey) -> NavEntry<NavKey> = entryProvider {
     entry<NavDestination.CalendarView.Planning>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         PlanningScreen(
-            goToEventCreation = { backStack.add(NavDestination.EventCreation) },
-            goToEventDetail = { backStack.add(NavDestination.EventDetail(it)) },
+            goToEventCreation = { backStack.addOnce(NavDestination.EventCreation) },
+            goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) },
         )
     }
     entry<NavDestination.CalendarView.Day>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-        DayScreen(goToEventDetail = { backStack.add(NavDestination.EventDetail(it)) })
+        DayScreen(goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) })
     }
     entry<NavDestination.CalendarView.ThreeDays>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         ThreeDayScreen()
@@ -95,7 +102,7 @@ private fun baseEntryProvider(
     entry<NavDestination.EventCreation> {
         EventCreationScreen()
     }
-    entry<NavDestination.EventDetail> { destination ->
+    entry<NavDestination.EventDetail>(metadata = metaDataOf(ResponsiveDialog)) { destination ->
         EventDetailScreen(
             eventId = destination.eventId,
             onBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
@@ -104,8 +111,8 @@ private fun baseEntryProvider(
     entry<NavDestination.Accounts.List> {
         AccountsListScreen(
             onBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
-            onAddAccount = { backStack.add(NavDestination.Onboarding(onlyLogin = true)) },
-            onAccountClick = { userId -> backStack.add(NavDestination.Accounts.Actions(userId)) },
+            onAddAccount = { backStack.addOnce(NavDestination.Onboarding(onlyLogin = true)) },
+            onAccountClick = { userId -> backStack.addOnce(NavDestination.Accounts.Actions(userId)) },
         )
     }
     entry<NavDestination.Accounts.Actions> { destination ->
@@ -121,6 +128,11 @@ private fun baseEntryProvider(
             onPopBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
         )
     }
+}
+
+private fun sceneStrategies(windowSizeClass: WindowSizeClass): List<SceneStrategy<NavKey>> {
+    val dialogStrategy = ResponsiveDialogSceneStrategy<NavKey>(windowSizeClass)
+    return listOf(dialogStrategy)
 }
 
 private fun sceneDecoratorStrategies(

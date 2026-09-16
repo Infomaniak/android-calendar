@@ -33,3 +33,7 @@ fun NavBackStack<NavKey>.replaceRoot(destination: NavKey) {
 fun NavBackStack<NavKey>.popOrReplaceRoot(fallback: NavKey) {
     if (size <= 1) replaceRoot(fallback) else removeLastOrNull()
 }
+
+fun NavBackStack<NavKey>.addOnce(destination: NavKey) {
+    if (lastOrNull() != destination) add(destination)
+}
