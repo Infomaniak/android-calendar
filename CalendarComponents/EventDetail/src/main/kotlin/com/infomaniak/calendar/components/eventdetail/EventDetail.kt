@@ -103,7 +103,7 @@ fun EventDetail(
             }
 
             Section(contentPadding = horizontalContentPadding) {
-                Notifications(notifications, onNotificationClick = {}, contentPadding = horizontalContentPadding)
+                Notifications(notifications, onNotificationClick = { /*TODO[eventDetail]*/ }, contentPadding = horizontalContentPadding)
             }
         }
     }
