@@ -21,10 +21,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.manager.SyncEventsManager
+import com.infomaniak.calendar.utils.observeEventDots
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.common.utils.today
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.DotColor
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
@@ -36,8 +35,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
@@ -81,16 +78,8 @@ class PlanningViewModel(
     private val visibleMonth = MutableStateFlow(today.yearMonth)
     private val initialDay = MutableStateFlow(today)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val eventDots: StateFlow<Map<LocalDate, List<EventColorsUi>>> = visibleMonth
-        .flatMapLatest { month ->
-            calendarManager.observeMonthlyDotColors(
-                startMonth = month.minus(1, DateTimeUnit.MONTH),
-                endMonth = month.plus(1, DateTimeUnit.MONTH),
-                timeZone = timeZone,
-            )
-        }
-        .map { it.toEventDots() }
+    val eventDots: StateFlow<Map<LocalDate, List<EventColorsUi>>> = calendarManager
+        .observeEventDots(visibleMonth, timeZone)
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
 
     fun onVisibleMonthChanged(month: YearMonth) {
@@ -102,10 +91,6 @@ class PlanningViewModel(
         initialDay.value = date
         onVisibleMonthChanged(date.yearMonth)
         return changed
-    }
-
-    private fun Map<LocalDate, List<DotColor>>.toEventDots(): Map<LocalDate, List<EventColorsUi>> {
-        return mapValues { (_, colors) -> colors.map { EventColors.from(null, it.sourceColor).toEventColorsUi() } }
     }
 
     companion object {
