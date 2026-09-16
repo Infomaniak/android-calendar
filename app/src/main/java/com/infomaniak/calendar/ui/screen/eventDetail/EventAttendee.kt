@@ -65,7 +65,7 @@ fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
         leadingContent = {
             Avatar(
                 avatarType = AvatarType.fromAttendee(attendee),
-                modifier = Modifier.size(32.dp),
+                modifier = Modifier.size(40.dp),
             )
         },
     )
