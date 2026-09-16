@@ -30,6 +30,7 @@ import kotlin.time.Instant
 data class EventDetailUi(
     val eventColor: Color,
     val calendarColor: Color,
+    val calendarName: String,
     val title: String,
     val start: EventDetailTiming,
     val end: EventDetailTiming,
@@ -42,6 +43,8 @@ data class EventDetailUi(
     val description: String?,
     val files: List<File>,
     val notifications: List<Notification>,
+    val isOccupied: Boolean,
+    val classification: Classification?,
 ) {
     data class Room(val title: String, val seats: Int, val floor: Int)
 
@@ -58,5 +61,12 @@ data class EventDetailUi(
             Email(R.drawable.ic_bell, R.string.notificationTypeEmail),
             Push(R.drawable.ic_bubble_top_right_circle, R.string.notificationTypePush),
         }
+    }
+
+    @Immutable
+    enum class Classification(@StringRes val label: Int) {
+        Public(R.string.publicLabel),
+        Private(R.string.privateLabel),
+        Confidential(R.string.confidentialLabel),
     }
 }

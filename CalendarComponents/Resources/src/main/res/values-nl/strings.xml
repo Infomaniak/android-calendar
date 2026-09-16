@@ -26,7 +26,9 @@
         <item quantity="one">%1$d gast</item>
         <item quantity="other">%1$d gasten</item>
     </plurals>
+    <string name="availableLabel">Beschikbaar</string>
     <string name="buttonJoin">Lid worden</string>
+    <string name="confidentialLabel">Vertrouwelijk</string>
     <string name="contentDescriptionCreateEvent">Een evenement maken</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d evenement</item>
@@ -39,13 +41,17 @@
     <string name="descriptionTitle">Beschrijving</string>
     <string name="notificationTypeEmail">E-mail</string>
     <string name="notificationTypePush">Melding</string>
+    <string name="occupiedLabel">Bezet</string>
     <string name="participateKMeetTitle">Deelnemen aan de kMeet</string>
     <string name="planningNothingPlanned">Niets gepland</string>
+    <string name="privateLabel">Privé</string>
+    <string name="publicLabel">Openbaar</string>
     <string name="roomFloorLabel">%s verdieping</string>
     <plurals name="roomSeatsLabel">
         <item quantity="one">%d plaats</item>
         <item quantity="other">%d plaatsen</item>
     </plurals>
+    <string name="sectionCalendarHeader">Kalender</string>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">W%d</string>
 </resources>

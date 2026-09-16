@@ -43,12 +43,15 @@ import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
+import com.infomaniak.calendar.components.eventdetail.component.Calendar
+import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatus
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.component.DescriptionCollapsibleButton
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
 import com.infomaniak.calendar.components.eventdetail.component.LIST_ITEM_HORIZONTAL_PADDING
 import com.infomaniak.calendar.components.eventdetail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.component.Notifications
+import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatus
 import com.infomaniak.calendar.components.eventdetail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
@@ -103,7 +106,21 @@ fun EventDetail(
             }
 
             Section(contentPadding = horizontalContentPadding) {
-                Notifications(notifications, onNotificationClick = { /*TODO[eventDetail]*/ }, contentPadding = horizontalContentPadding)
+                Notifications(
+                    notifications,
+                    onNotificationClick = { /*TODO[eventDetail]*/ },
+                    contentPadding = horizontalContentPadding,
+                )
+            }
+
+            Section(contentPadding = horizontalContentPadding) {
+                OccupiedStatus(isOccupied, modifier = Modifier.padding(horizontalContentPadding))
+
+                if (classification != null) {
+                    ClassificationStatus(classification, modifier = Modifier.padding(horizontalContentPadding))
+                }
+
+                Calendar(calendarColor, calendarName, modifier = Modifier.padding(horizontalContentPadding))
             }
         }
     }
@@ -162,12 +179,13 @@ private fun Divider(modifier: Modifier = Modifier) {
     HorizontalDivider(modifier = modifier.padding(LIST_ITEM_HORIZONTAL_PADDING))
 }
 
-@Preview
+@Preview(heightDp = 1200)
 @Composable
 private fun PreviewEventDetail() {
     val eventDetail = EventDetailUi(
         eventColor = Color.Red,
         calendarColor = Color.Blue,
+        calendarName = "Vacation",
         title = "Event Title",
         start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
         end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
@@ -187,6 +205,8 @@ private fun PreviewEventDetail() {
             EventDetailUi.Notification("1", EventDetailUi.Notification.Type.Email, Instant.parse("2026-05-20T07:00:00Z")),
             EventDetailUi.Notification("2", EventDetailUi.Notification.Type.Push, Instant.parse("2026-05-20T07:30:00Z")),
         ),
+        isOccupied = true,
+        classification = EventDetailUi.Classification.Public,
     )
 
     MaterialTheme {
