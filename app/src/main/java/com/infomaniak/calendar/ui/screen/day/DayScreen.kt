@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
+import com.infomaniak.calendar.components.calendar.component.collapsesCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
 import com.infomaniak.calendar.components.day.DayPager
 import com.infomaniak.calendar.components.day.model.DayEvents
@@ -179,6 +180,9 @@ private fun DayScreen(
                     goToEventDetail = goToEventDetail,
                     hazeState = hazeState,
                     contentPadding = contentPadding,
+                    // Above the pager rather than inside it: every day shares one hour grid scroll, and the
+                    // horizontal paging never dispatches the vertical scroll the calendar is listening for.
+                    modifier = Modifier.collapsesCalendarOnScroll(calendarExpansion),
                 )
             }
         }
