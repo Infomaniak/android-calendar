@@ -48,13 +48,13 @@ import com.infomaniak.calendar.components.eventdetail.component.DescriptionColla
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
 import com.infomaniak.calendar.components.eventdetail.component.LIST_ITEM_HORIZONTAL_PADDING
 import com.infomaniak.calendar.components.eventdetail.component.LocationButton
+import com.infomaniak.calendar.components.eventdetail.component.Notifications
 import com.infomaniak.calendar.components.eventdetail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
@@ -100,6 +100,10 @@ fun EventDetail(
                 }
 
                 AttachmentFiles(files, onFileClick = { /*TODO[eventDetail]*/ }, contentPadding = horizontalContentPadding)
+            }
+
+            Section(contentPadding = horizontalContentPadding) {
+                Notifications(notifications, onNotificationClick = { /*TODO[eventDetail]*/ }, contentPadding = horizontalContentPadding)
             }
         }
     }
@@ -179,7 +183,10 @@ private fun PreviewEventDetail() {
             EventDetailUi.File("2", "Bob.txt"),
             EventDetailUi.File("3", "Next loto results.png"),
         ),
-        notifications = emptyList(),
+        notifications = listOf(
+            EventDetailUi.Notification("1", EventDetailUi.Notification.Type.Email, Instant.parse("2026-05-20T07:00:00Z")),
+            EventDetailUi.Notification("2", EventDetailUi.Notification.Type.Push, Instant.parse("2026-05-20T07:30:00Z")),
+        ),
     )
 
     MaterialTheme {
