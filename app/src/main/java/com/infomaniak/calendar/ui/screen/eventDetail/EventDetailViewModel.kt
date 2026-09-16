@@ -27,8 +27,10 @@ import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -37,11 +39,25 @@ import kotlinx.coroutines.flow.map
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
 class EventDetailViewModel(
-    private val accountUtils: AccountUtils,
+    accountUtils: AccountUtils,
     private val calendarManager: CalendarManager,
 ) : ViewModel() {
+    private val eventIdFlow: MutableSharedFlow<String> = MutableSharedFlow(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun observeEventDetail(eventId: String): Flow<EventDetailUiState> = calendarManager.observeEvent(EventId(eventId))
+    private val eventFlow = eventIdFlow
+        .distinctUntilChanged()
+        .flatMapLatest { eventId -> calendarManager.observeEvent(EventId(eventId)) }
+
+    fun setEventId(eventId: String) {
+        eventIdFlow.tryEmit(eventId)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val eventDetailUi = eventFlow
         .flatMapLatest { event ->
             if (event == null) {
                 flowOf(null)
