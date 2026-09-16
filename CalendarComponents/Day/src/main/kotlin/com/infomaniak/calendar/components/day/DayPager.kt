@@ -56,9 +56,9 @@ fun DayPager(
     onVisibleDateChanged: (LocalDate) -> Unit,
     onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
-    topContentPadding: Dp = 0.dp,
     headerModifier: Modifier = Modifier,
     timelineModifier: Modifier = Modifier,
+    topContentPadding: Dp = 0.dp,
     headerTrailingContent: @Composable () -> Unit = {},
 ) {
     val pageCount = remember(dateRange) { dateRange.dayCount }
