@@ -29,9 +29,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
@@ -62,18 +64,17 @@ private val SettleSpec = spring<Float>(dampingRatio = Spring.DampingRatioNoBounc
 @Stable
 class CalendarExpansionState internal constructor(initiallyExpanded: Boolean, private val coroutineScope: CoroutineScope) {
 
-    var progress: Float by mutableFloatStateOf(if (initiallyExpanded) EXPANDED else COLLAPSED)
-        private set
+    private val _progress = mutableFloatStateOf(if (initiallyExpanded) EXPANDED else COLLAPSED)
+
+    var progress: Float
+        get() = _progress.floatValue
+        private set(value) {
+            _progress.floatValue = value.coerceIn(COLLAPSED, EXPANDED)
+        }
+
     var isExpanded: Boolean by mutableStateOf(initiallyExpanded)
         private set
 
-    /**
-     * How many pixels of drag separate the two states, and how fast a release has to be to count as a flick.
-     *
-     * Published by the layout, which is the only place both heights are known. Deliberately kept out of the
-     * snapshot system: only gestures read them, always outside composition, and writing a state from a
-     * measure pass is a good way to invalidate the pass that wrote it.
-     */
     private var dragRange = 0f
     private var flickVelocity = Float.MAX_VALUE
 
@@ -87,11 +88,6 @@ class CalendarExpansionState internal constructor(initiallyExpanded: Boolean, pr
         flickVelocity = with(density) { FLICK_VELOCITY.toPx() }
     }
 
-    /**
-     * Moves the expansion by [delta] pixels of scroll.
-     *
-     * @return how much of [delta] the calendar took for itself, which is what the content below may no longer use.
-     */
     private fun drag(delta: Float): Float {
         if (dragRange <= 0f) return 0f
 
@@ -144,7 +140,6 @@ class CalendarExpansionState internal constructor(initiallyExpanded: Boolean, pr
             return Offset(x = 0f, y = drag(available.y))
         }
 
-        // The settle is launched rather than awaited: the fling of the content below must not wait on it.
         override suspend fun onPreFling(available: Velocity): Velocity {
             if (progress != COLLAPSED && progress != EXPANDED) settle(available.y)
 
@@ -158,6 +153,10 @@ class CalendarExpansionState internal constructor(initiallyExpanded: Boolean, pr
             restore = { CalendarExpansionState(initiallyExpanded = it, coroutineScope = coroutineScope) },
         )
     }
+}
+
+fun Modifier.collapsesCalendarOnScroll(expansionState: CalendarExpansionState): Modifier {
+    return nestedScroll(expansionState.nestedScrollConnection)
 }
 
 @Composable
