@@ -33,7 +33,7 @@ fun List<Attendee>.toAttendees(accountId: AccountId, emailsByUserId: Map<Account
     return Attendees(all = all, me = all.find { it.email == emailsByUserId[accountId] })
 }
 
-private fun Attendee.toAttendeeUi(): AttendeeUi = AttendeeUi(
+fun Attendee.toAttendeeUi(): AttendeeUi = AttendeeUi(
     email = email,
     displayName = displayName,
     status = status.toParticipationStatus(),

@@ -25,6 +25,7 @@ data class AttendeeUi(
     val email: String,
     val displayName: String? = null,
     val status: ParticipationStatus,
+    val isOrganizer: Boolean = false,
 ) {
     fun initials(): String? = displayName?.computeInitials()
 }
