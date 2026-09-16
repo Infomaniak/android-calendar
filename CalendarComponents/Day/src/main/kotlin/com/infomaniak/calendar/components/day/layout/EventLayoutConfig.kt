@@ -42,7 +42,7 @@ object EventLayoutDefaults {
     val MinEventHeight: Dp @Composable get() = EsdsTheme.spacing.xl
 
     /** A hairline keeping two events from touching, finer than the smallest step the scale has. */
-    val VerticalSpacing: Dp = 1.dp
+    val DividerHeight: Dp = 0.5.dp
 }
 
 @Composable
@@ -53,6 +53,6 @@ fun eventLayoutConfig(): EventLayoutConfig = with(LocalDensity.current) {
         titleHeight = EventLayoutDefaults.TitleHeight.toPx(),
         minEventWidth = EventLayoutDefaults.MinEventWidth.toPx(),
         minEventHeight = EventLayoutDefaults.MinEventHeight.toPx(),
-        verticalSpacing = EventLayoutDefaults.VerticalSpacing.toPx(),
+        verticalSpacing = EventLayoutDefaults.DividerHeight.toPx(),
     )
 }
