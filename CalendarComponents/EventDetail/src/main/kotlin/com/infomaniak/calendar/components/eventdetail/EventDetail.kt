@@ -106,7 +106,11 @@ fun EventDetail(
             }
 
             Section(contentPadding = horizontalContentPadding) {
-                Notifications(notifications, onNotificationClick = { /*TODO[eventDetail]*/ }, contentPadding = horizontalContentPadding)
+                Notifications(
+                    notifications,
+                    onNotificationClick = { /*TODO[eventDetail]*/ },
+                    contentPadding = horizontalContentPadding,
+                )
             }
 
             Section(contentPadding = horizontalContentPadding) {
@@ -175,7 +179,7 @@ private fun Divider(modifier: Modifier = Modifier) {
     HorizontalDivider(modifier = modifier.padding(LIST_ITEM_HORIZONTAL_PADDING))
 }
 
-@Preview(device = "spec:width=1080px,height=3340px,dpi=440")
+@Preview(heightDp = 1200)
 @Composable
 private fun PreviewEventDetail() {
     val eventDetail = EventDetailUi(
