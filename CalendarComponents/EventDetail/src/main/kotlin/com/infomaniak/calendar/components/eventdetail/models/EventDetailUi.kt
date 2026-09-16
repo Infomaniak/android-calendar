@@ -43,7 +43,7 @@ data class EventDetailUi(
     val files: List<File>,
     val notifications: List<Notification>,
 ) {
-    data class Room(val title: String, val capacity: Int, val floor: Int)
+    data class Room(val title: String, val seats: Int, val floor: Int)
 
     @Immutable
     data class File(val name: String) {

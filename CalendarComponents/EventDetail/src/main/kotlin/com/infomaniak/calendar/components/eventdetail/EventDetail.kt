@@ -22,19 +22,32 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
+import com.infomaniak.calendar.components.eventdetail.component.DescriptionCollapsibleButton
+import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
+import com.infomaniak.calendar.components.eventdetail.component.LIST_ITEM_HORIZONTAL_PADDING
+import com.infomaniak.calendar.components.eventdetail.component.LocationButton
+import com.infomaniak.calendar.components.eventdetail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
@@ -46,6 +59,9 @@ import kotlin.time.Instant
 @Composable
 fun EventDetail(
     eventDetail: EventDetailUi,
+    onKMeetClick: () -> Unit,
+    onLocationClick: () -> Unit,
+    onRoomClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -57,6 +73,30 @@ fun EventDetail(
         with(eventDetail) {
             Title(eventColor, title, Modifier.padding(horizontalContentPadding))
             DateAndTime(start, end, isAllDay, Modifier.padding(horizontalContentPadding))
+
+            Section(contentPadding = horizontalContentPadding) {
+                if (attendees.all.isNotEmpty()) {
+                    AttendeesButton(attendees.all, onClick = {}, contentPadding = horizontalContentPadding)
+                }
+
+                if (kMeetUrl?.isNotBlank() == true) {
+                    KMeetButton(onClick = onKMeetClick, contentPadding = horizontalContentPadding)
+                }
+
+                if (location?.isNotBlank() == true) {
+                    LocationButton(location = location, onClick = onLocationClick, contentPadding = horizontalContentPadding)
+                }
+
+                if (room != null) {
+                    RoomButton(room = room, onClick = onRoomClick, contentPadding = horizontalContentPadding)
+                }
+            }
+
+            Section(contentPadding = horizontalContentPadding) {
+                if (description?.isNotBlank() == true) {
+                    DescriptionCollapsibleButton(description = description, contentPadding = horizontalContentPadding)
+                }
+            }
         }
     }
 }
@@ -78,6 +118,42 @@ private fun Title(color: Color, title: String, modifier: Modifier = Modifier) {
     )
 }
 
+/**
+ * Automatically shows or hides divider based on if any content is composed or not. This layout acts like a column.
+ */
+@Composable
+private fun Section(
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
+    content: @Composable () -> Unit,
+) {
+    Layout(
+        contents = listOf({ Divider(modifier = Modifier.padding(contentPadding)) }, content),
+        modifier = modifier,
+    ) { (dividerMeasurables, contentMeasurables), constraints ->
+        if (contentMeasurables.isEmpty()) return@Layout layout(0, 0) {}
+
+        val childConstraints = constraints.copy(minHeight = 0)
+        val placeables = (dividerMeasurables + contentMeasurables).map { it.measure(childConstraints) }
+
+        val width = placeables.maxOf { it.width }.coerceIn(constraints.minWidth, constraints.maxWidth)
+        val height = placeables.sumOf { it.height }.coerceIn(constraints.minHeight, constraints.maxHeight)
+
+        layout(width, height) {
+            var y = 0
+            placeables.forEach { placeable ->
+                placeable.place(0, y)
+                y += placeable.height
+            }
+        }
+    }
+}
+
+@Composable
+private fun Divider(modifier: Modifier = Modifier) {
+    HorizontalDivider(modifier = modifier.padding(LIST_ITEM_HORIZONTAL_PADDING))
+}
+
 @Preview
 @Composable
 private fun PreviewEventDetail() {
@@ -88,19 +164,29 @@ private fun PreviewEventDetail() {
         start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
         end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
         isAllDay = false,
-        attendees = Attendees(emptyList(), null),
-        kMeetUrl = null,
+        attendees = Attendees(all = previewAttendees, me = null),
+        kMeetUrl = "test urlc",
         location = "Location",
-        room = null,
+        room = EventDetailUi.Room("Japan room", 5, 3),
         urlLink = null,
-        description = "Description",
+        description = LoremIpsum(30).values.first(),
         files = emptyList(),
         notifications = emptyList(),
     )
 
     MaterialTheme {
         Surface {
-            EventDetail(eventDetail, contentPadding = PaddingValues(horizontal = Margin.Small))
+            Scaffold {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    EventDetail(
+                        eventDetail = eventDetail,
+                        onKMeetClick = {},
+                        onLocationClick = {},
+                        onRoomClick = {},
+                        contentPadding = PaddingValues(horizontal = Margin.Small) + it,
+                    )
+                }
+            }
         }
     }
 }

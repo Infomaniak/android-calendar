@@ -18,6 +18,15 @@
 <resources>
     <string name="addEventLabel">Lisää</string>
     <string name="allDayLabel">Koko päivän</string>
+    <plurals name="attendeesAcceptedCount">
+        <item quantity="one">%1$d hyväksytty</item>
+        <item quantity="other">%1$d hyväksyttyä</item>
+    </plurals>
+    <plurals name="attendeesCount">
+        <item quantity="one">%1$d vieras</item>
+        <item quantity="other">%1$d vierasta</item>
+    </plurals>
+    <string name="buttonJoin">Liity mukaan</string>
     <string name="contentDescriptionCreateEvent">Luo tapahtuma</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d tapahtuma</item>
@@ -27,9 +36,16 @@
     <string name="contentDescriptionHasKMeetLink">Sisältää kMeet-linkin</string>
     <string name="contentDescriptionHasLocation">On sijainti</string>
     <string name="contentDescriptionToday">Tänään</string>
+    <string name="descriptionTitle">Kuvaus</string>
     <string name="notificationTypeEmail">Sähköposti</string>
     <string name="notificationTypePush">Ilmoitus</string>
+    <string name="participateKMeetTitle">Osallistu kMeet-tapahtumaan</string>
     <string name="planningNothingPlanned">Ei suunnitelmia</string>
+    <string name="roomFloorLabel">%s kerros</string>
+    <plurals name="roomSeatsLabel">
+        <item quantity="one">%d paikkaa</item>
+        <item quantity="other">%d paikkaa</item>
+    </plurals>
     <string name="weekHeaderDateRange">%d.–%d. %s %d</string>
     <string name="weekHeaderWeekNumber">V%d</string>
 </resources>
