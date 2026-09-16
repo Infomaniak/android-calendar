@@ -33,6 +33,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.component.CurrentTimeIndicator
 import com.infomaniak.calendar.components.day.component.HourGrid
 import com.infomaniak.calendar.components.day.component.HourLabelOverhang
@@ -57,6 +59,9 @@ private val LocalDateTime.minuteOfDay: Int get() = hour * MINUTES_PER_HOUR + min
 /**
  * Overlaps are resolved once per width and zoom level rather than on every frame, since the
  * arrangement only changes when one of the two does.
+ *
+ * [topContentPadding] is room kept at the top of the scrolled content, for whatever floats over the
+ * timeline: the hours start below it, and scroll under it rather than being clipped by it.
  */
 @Composable
 fun DayTimeline(
@@ -65,6 +70,7 @@ fun DayTimeline(
     state: DayTimelineState,
     onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
+    topContentPadding: Dp = 0.dp,
 ) {
     val currentDateTime by rememberCurrentDateTime()
 
@@ -93,7 +99,10 @@ fun DayTimeline(
         Box(
             modifier = Modifier
                 .verticalScroll(state.scrollState, enabled = !state.isPinching)
-                .padding(top = HourLabelOverhang, bottom = DayTimelineDefaults.BottomPadding + navigationBarPadding)
+                .padding(
+                    top = HourLabelOverhang + topContentPadding,
+                    bottom = DayTimelineDefaults.BottomPadding + navigationBarPadding,
+                )
                 // Inside the padding: a pinch reads its own y as an hour, so it has to start
                 // counting where the first hour line is drawn, not where the padding begins.
                 .pinchToZoom(state),
