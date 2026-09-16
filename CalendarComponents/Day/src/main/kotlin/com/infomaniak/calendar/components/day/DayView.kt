@@ -17,14 +17,29 @@
  */
 package com.infomaniak.calendar.components.day
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.component.AllDayEventsBand
 import com.infomaniak.calendar.components.day.component.DayHeader
 import com.infomaniak.calendar.components.day.model.DayEvents
@@ -39,8 +54,13 @@ import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
 
 /**
- * A single day: its header, the all-day events pinned at the top, and the scrollable hour grid
- * carrying the timed events.
+ * A single day: the scrollable hour grid carrying the timed events, with its header and the all-day
+ * events pinned over the top of it.
+ *
+ * The header floats rather than sitting above the grid, so the hours pass under it, and under
+ * whatever the caller floats over the day: [topContentPadding] is the room that caller needs, and
+ * [headerModifier] is where it hands in the background the header is read against. [timelineModifier]
+ * reaches the grid alone, for the callers that blur what scrolls under them.
  */
 @Composable
 fun DayView(
@@ -50,29 +70,58 @@ fun DayView(
     weekNumbering: WeekNumbering,
     onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
+    topContentPadding: Dp = 0.dp,
+    headerModifier: Modifier = Modifier,
+    timelineModifier: Modifier = Modifier,
     headerTrailingContent: @Composable () -> Unit = {},
 ) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md)) {
-        DayHeader(
-            date = date,
-            weekNumbering = weekNumbering,
-            trailing = headerTrailingContent,
-            modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md),
-        )
+    val density = LocalDensity.current
+    // The header is measured rather than given a height: the all-day band grows with the events it
+    // holds, and the hours have to start under whatever it ends up being.
+    var headerHeight by remember { mutableStateOf(0.dp) }
 
-        AllDayEventsBand(
-            events = events.allDay,
-            onEventClick = onEventClick,
-            modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md),
-        )
-
+    Box(modifier = modifier) {
         DayTimeline(
             date = date,
             events = events,
             state = state,
             onEventClick = onEventClick,
-            modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md),
+            topContentPadding = headerHeight + EsdsTheme.spacing.md,
+            modifier = timelineModifier
+                .fillMaxSize()
+                .padding(horizontal = EsdsTheme.spacing.md),
         )
+
+        Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),
+                modifier = headerModifier
+                    .fillMaxWidth()
+                    .onSizeChanged { headerHeight = with(density) { it.height.toDp() } }
+                    .padding(top = topContentPadding),
+            ) {
+                DayHeader(
+                    date = date,
+                    weekNumbering = weekNumbering,
+                    trailing = headerTrailingContent,
+                    modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md),
+                )
+
+                AllDayEventsBand(
+                    events = events.allDay,
+                    onEventClick = onEventClick,
+                    modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md),
+                )
+
+            }
+
+            Spacer(
+                modifier = Modifier
+                    .height(1.dp)
+                    .fillMaxWidth()
+                    .background(color = Color.LightGray.copy(alpha = 0.3f)),
+            )
+        }
     }
 }
 
