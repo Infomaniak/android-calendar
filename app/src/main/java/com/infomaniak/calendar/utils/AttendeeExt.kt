@@ -37,6 +37,7 @@ fun Attendee.toAttendeeUi(): AttendeeUi = AttendeeUi(
     email = email,
     displayName = displayName,
     status = status.toParticipationStatus(),
+    isOrganizer = isOrganizer,
 )
 
 private fun KmpParticipationStatus.toParticipationStatus(): ParticipationStatus = when (this) {

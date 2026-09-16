@@ -18,7 +18,9 @@
 package com.infomaniak.calendar.ui.screen.eventDetail
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +37,7 @@ import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.utils.fromAttendee
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
 
 @Composable
@@ -44,13 +47,14 @@ fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
         headlineContent = {
             Column() {
                 // had to add this here and not overline content to center the avatar vertically
-                AttendeeParticipationStatus(attendee.status)
+                AttendeeParticipationStatus(attendee.status, attendee.isOrganizer)
                 Text(
                     text = attendee.displayName.toString(),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Normal,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = EsdsTheme.spacing.twoXs)
                 )
             }
 
@@ -72,51 +76,67 @@ fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun AttendeeParticipationStatus(status: ParticipationStatus, modifier: Modifier = Modifier) {
+fun AttendeeParticipationStatus(status: ParticipationStatus, isOrganizer: Boolean, modifier: Modifier = Modifier) {
     return when (status) {
         ParticipationStatus.Accepted -> {
             ParticipationStatusText(
                 text = "Accepted",
                 color = MaterialTheme.extendedColorScheme.success,
+                isOrganizer = isOrganizer,
             )
         }
         ParticipationStatus.Declined -> {
             ParticipationStatusText(
                 text = "Declined",
                 color = MaterialTheme.colorScheme.error, //TODO: check correct color
+                isOrganizer = isOrganizer,
             )
         }
         ParticipationStatus.Tentative -> {
             ParticipationStatusText(
                 text = "Maybe",
                 color = MaterialTheme.extendedColorScheme.datavizYellow,  //TODO: check correct color
+                isOrganizer = isOrganizer,
             )
         }
         ParticipationStatus.NeedsAction -> {
             ParticipationStatusText(
                 text = "Pending",
                 color = MaterialTheme.extendedColorScheme.warning,
+                isOrganizer = isOrganizer,
             )
         }
     }
 }
 
 @Composable
-fun ParticipationStatusText(text: String, color: Color, modifier: Modifier = Modifier) {
-    Text(
-        text = text,
-        maxLines = 1,
-        style = MaterialTheme.typography.bodyMedium,
-        overflow = TextOverflow.Ellipsis,
-        color = color,
-        fontWeight = FontWeight.Medium,
-    )
+fun ParticipationStatusText(text: String, color: Color, isOrganizer: Boolean, modifier: Modifier = Modifier) {
+    Row(modifier = modifier) {
+        Text(
+            text = text,
+            maxLines = 1,
+            style = MaterialTheme.typography.bodyMedium,
+            overflow = TextOverflow.Ellipsis,
+            color = color,
+            fontWeight = FontWeight.Medium,
+        )
+        if (isOrganizer) {
+            Text(
+                text = " · Organisateur",
+                maxLines = 1,
+                style = MaterialTheme.typography.bodyMedium,
+                overflow = TextOverflow.Ellipsis,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Medium,
+            )
+        }
+    }
 }
 
 @Preview
 @Composable
 private fun PreviewAttendeeAccepted() {
-    EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted))
+    EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted, true))
 }
 
 @Preview
