@@ -37,6 +37,7 @@ app/src/main/java/com/infomaniak/calendar/
 ├── utils/
 │   ├── AttendeeExt.kt              # KMP Attendee → Attendees mapping, shared by the two event UI models below
 │   ├── EventDaySliceExt.kt         # KMP EventDaySlice → EventUi mapping, shared by every calendar view
+│   ├── EventDotsExt.kt             # KMP monthly calendar colors → calendar day dots, shared by every view showing the calendar
 │   └── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
 └── ui/
     ├── navigation/
