@@ -67,8 +67,6 @@ import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.YearMonth
-import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
 @Composable
@@ -87,9 +85,9 @@ fun PlanningScreen(
         goToEventDetail = goToEventDetail,
         planningRows = planningRows,
         onJumpTo = viewModel::jumpTo,
+        onVisibleDateChanged = viewModel::onVisibleDateChanged,
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventsDots },
-        onVisibleMonthChanged = viewModel::onVisibleMonthChanged,
         modifier = modifier,
     )
 }
@@ -100,9 +98,9 @@ private fun PlanningScreen(
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     planningRows: LazyPagingItems<PlanningRow>,
     onJumpTo: (LocalDate) -> Boolean,
+    onVisibleDateChanged: (LocalDate) -> Unit,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
-    onVisibleMonthChanged: (YearMonth) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val hazeState = rememberHazeState()
@@ -128,10 +126,10 @@ private fun PlanningScreen(
                 SuccessPlanning(
                     planningRows = planningRows,
                     onJumpTo = onJumpTo,
+                    onVisibleDateChanged = onVisibleDateChanged,
                     contentPadding = contentPadding + PaddingValues(Margin.Medium),
                     goToEventCreation = goToEventCreation,
                     goToEventDetail = goToEventDetail,
-                    onVisibleMonthChanged = onVisibleMonthChanged,
                     modifier = Modifier.hazeSource(hazeState),
                 )
             } else {
@@ -147,10 +145,7 @@ private fun PlanningScreen(
                         ExpandableCalendar(
                             isExpanded = { isCalendarExpanded },
                             selectedDate = { visibleDayState.visibleDate },
-                            onDayClick = {
-                                onVisibleMonthChanged(it.yearMonth)
-                                visibleDayState.jumpTo(it)
-                            },
+                            onDayClick = { visibleDayState.jumpTo(it) },
                             weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
                             eventsDots = eventsDots,
                         )
@@ -170,10 +165,10 @@ private fun PlanningScreen(
 private fun SuccessPlanning(
     planningRows: LazyPagingItems<PlanningRow>,
     onJumpTo: (LocalDate) -> Boolean,
+    onVisibleDateChanged: (LocalDate) -> Unit,
     contentPadding: PaddingValues,
     goToEventCreation: () -> Unit,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
-    onVisibleMonthChanged: (YearMonth) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val visibleDayState = LocalVisibleDayState.current ?: return
@@ -183,7 +178,7 @@ private fun SuccessPlanning(
     ReportVisibleDate(
         lazyListState = lazyListState,
         onVisibleDateChanged = {
-            onVisibleMonthChanged(it.yearMonth)
+            onVisibleDateChanged(it)
             visibleDayState.onVisibleDateChanged(it)
         },
     )
@@ -218,11 +213,11 @@ private fun Preview(@PreviewParameter(PlanningRowPreviewParameter::class) rows: 
             PlanningScreen(
                 planningRows = planningRows,
                 onJumpTo = { false },
+                onVisibleDateChanged = {},
                 goToEventCreation = {},
                 goToEventDetail = {},
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
-                onVisibleMonthChanged = {},
             )
         }
     }
