@@ -83,27 +83,31 @@ fun AttendeeParticipationStatus(status: ParticipationStatus, isOrganizer: Boolea
                 text = "Accepted",
                 color = MaterialTheme.extendedColorScheme.success,
                 isOrganizer = isOrganizer,
+                modifier = modifier,
             )
         }
         ParticipationStatus.Declined -> {
             ParticipationStatusText(
                 text = "Declined",
-                color = MaterialTheme.colorScheme.error, //TODO: check correct color
+                color = MaterialTheme.colorScheme.error,
                 isOrganizer = isOrganizer,
+                modifier = modifier,
             )
         }
         ParticipationStatus.Tentative -> {
             ParticipationStatusText(
                 text = "Maybe",
-                color = MaterialTheme.extendedColorScheme.datavizYellow,  //TODO: check correct color
+                color = MaterialTheme.extendedColorScheme.warning,  //TODO: check correct color
                 isOrganizer = isOrganizer,
+                modifier = modifier,
             )
         }
         ParticipationStatus.NeedsAction -> {
             ParticipationStatusText(
                 text = "Pending",
-                color = MaterialTheme.extendedColorScheme.warning,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 isOrganizer = isOrganizer,
+                modifier = modifier,
             )
         }
     }
