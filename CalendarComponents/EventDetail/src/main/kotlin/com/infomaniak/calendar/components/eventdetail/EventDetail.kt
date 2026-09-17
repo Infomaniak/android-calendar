@@ -52,10 +52,13 @@ import com.infomaniak.calendar.components.eventdetail.component.LIST_ITEM_HORIZO
 import com.infomaniak.calendar.components.eventdetail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.component.Notifications
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatus
+import com.infomaniak.calendar.components.eventdetail.component.PresenceStatusButtons
 import com.infomaniak.calendar.components.eventdetail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
+import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -123,6 +126,14 @@ fun EventDetail(
                 }
 
                 Calendar(calendarColor, calendarName, modifier = Modifier.padding(horizontalContentPadding))
+            }
+
+            attendees.me?.let { me ->
+                PresenceStatusButtons(
+                    presenceStatus = me.status,
+                    modifier = Modifier.padding(top = EsdsTheme.spacing.fourXl),
+                    onPresenceStatusChange = { /*TODO[eventDetail]*/ },
+                )
             }
         }
     }
@@ -192,7 +203,10 @@ private fun PreviewEventDetail() {
         start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
         end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
         isAllDay = false,
-        attendees = Attendees(all = previewAttendees, me = null),
+        attendees = Attendees(
+            all = previewAttendees,
+            me = AttendeeUi(email = "alice@example.com", displayName = "Alice Johnson", status = ParticipationStatus.Accepted),
+        ),
         kMeetUrl = "test url",
         location = "Location",
         room = EventDetailUi.Room("Japan room", 5, 3),
