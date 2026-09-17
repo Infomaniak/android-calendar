@@ -51,7 +51,7 @@ import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
-private const val AVATAR_STACK_LIMIT = 3
+private const val AVATAR_STACK_LIMIT = 4
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
