@@ -28,7 +28,7 @@ import com.infomaniak.core.avatar.models.AvatarType
 fun AvatarType.Companion.fromAttendee(attendee: AttendeeUi): AvatarType {
     val avatarColors = LocalAvatarColors.current
     return AvatarType.WithInitials.Initials(
-        initials = attendee.initials() ?: "",
+        initials = attendee.initials(),
         colors = AvatarColors(
             containerColor = getBackgroundColorResBasedOnId(attendee.email.hashCode(), avatarColors.containerColors),
             contentColor = avatarColors.contentColor,

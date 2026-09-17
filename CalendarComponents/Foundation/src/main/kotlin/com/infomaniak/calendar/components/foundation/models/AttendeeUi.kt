@@ -26,7 +26,7 @@ data class AttendeeUi(
     val displayName: String? = null,
     val status: ParticipationStatus,
 ) {
-    fun initials(): String? = displayName?.computeInitials()
+    fun initials(): String = (displayName ?: email).computeInitials()
 }
 
 enum class ParticipationStatus {
