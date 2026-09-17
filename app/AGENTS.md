@@ -34,10 +34,12 @@ app/src/main/java/com/infomaniak/calendar/
 │       ├── viewModel/
 │       │   └── CalendarViewModelFactory.kt # Concrete metrox MetroViewModelFactory binding (multibinding maps)
 │       └── worker/                 # MetroWorker key, MetroWorkerFactory, WorkerGraphProvider, WorkerInstanceFactory
+├── manager/
+│   ├── SyncEventsManager.kt        # App-scoped: downloads + syncs the events of the months around the visible date
+│   └── VisibleMonthManager.kt      # App-scoped: the month the calendar shows + its event dots, shared by every calendar view
 ├── utils/
 │   ├── AttendeeExt.kt              # KMP Attendee → Attendees mapping, shared by the two event UI models below
 │   ├── EventDaySliceExt.kt         # KMP EventDaySlice → EventUi mapping, shared by every calendar view
-│   ├── EventDotsExt.kt             # KMP monthly calendar colors → calendar day dots, shared by every view showing the calendar
 │   └── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
 └── ui/
     ├── navigation/
