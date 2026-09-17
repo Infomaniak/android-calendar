@@ -20,11 +20,9 @@ package com.infomaniak.calendar.ui.screen.eventDetail
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.plus
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
@@ -90,18 +88,18 @@ private fun EventDetailScreen(
         when (val state = uiState()) {
             EventDetailUiState.Loading -> Unit // Loaded locally, always fast, no need for a specific progress indicator UI
             is EventDetailUiState.Success -> {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    val copyFeedbackMessage = stringResource(RCommon.string.linkCopied)
+                val copyFeedbackMessage = stringResource(RCommon.string.linkCopied)
 
-                    EventDetail(
-                        eventDetail = state.eventDetail,
-                        onJoinKMeet = { /*TODO[eventDetail]*/ },
-                        onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
-                        onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
-                        onRoomClick = { /*TODO[eventDetail]*/ },
-                        contentPadding = scaffoldContentPadding + PaddingValues(horizontal = Margin.Small),
-                    )
-                }
+                EventDetail(
+                    eventDetail = state.eventDetail,
+                    onJoinKMeet = { /*TODO[eventDetail]*/ },
+                    onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
+                    onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
+                    onRoomClick = { /*TODO[eventDetail]*/ },
+                    // EventDetail owns its scroll now, so it needs a bounded height to pin its footer.
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = scaffoldContentPadding + PaddingValues(horizontal = Margin.Small),
+                )
             }
             EventDetailUiState.Deleted -> LaunchedEffect(Unit) { onBack() }
         }
