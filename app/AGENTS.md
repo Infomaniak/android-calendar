@@ -58,7 +58,7 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── threeDays/             # ThreeDayScreen + ThreeDayViewModel — 3-day view (events via DayEventsLoader)
     │   ├── week/                  # WeekScreen + WeekViewModel — week view (events via DayEventsLoader)
     │   ├── month/                 # MonthScreen + MonthViewModel
-    │   ├── planning/              # PlanningScreen + PlanningViewModel + PlanningPagingSource (Paging 3) + PlanningEventGroupingExt
+    │   ├── planning/              # PlanningScreen + PlanningViewModel + PlanningPagingSource (snapshot pages; refresh after visible-range download and after full sync) + PlanningEventGroupingExt
     │   ├── accounts/              # AccountsListScreen + AccountActionsScreen + AccountsViewModel + AccountItem
     │                              # Drawer-backed account list, per-account detail/logout screen, and remove-account flow
     │   ├── eventCreation/         # EventCreationScreen

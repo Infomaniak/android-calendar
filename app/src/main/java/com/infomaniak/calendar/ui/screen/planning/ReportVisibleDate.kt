@@ -17,23 +17,49 @@
  */
 package com.infomaniak.calendar.ui.screen.planning
 
+import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import com.infomaniak.calendar.components.planning.PlanningItemKey
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
 @Composable
 fun ReportVisibleDate(lazyListState: LazyListState, onVisibleDateChanged: (LocalDate) -> Unit) {
     LaunchedEffect(lazyListState) {
-        snapshotFlow { (lazyListState.firstVisibleItemKey() as? PlanningItemKey)?.date }
-            .filterNotNull()
-            .distinctUntilChanged()
-            .collect { onVisibleDateChanged(it) }
+        var isUserScroll = false
+        var hasScrolled = false
+
+        launch {
+            lazyListState.interactionSource.interactions.collect { interaction ->
+                when (interaction) {
+                    is DragInteraction.Start -> {
+                        isUserScroll = true
+                        hasScrolled = lazyListState.isScrollInProgress
+                    }
+                    is DragInteraction.Stop, is DragInteraction.Cancel -> {
+                        if (!hasScrolled) isUserScroll = false
+                    }
+                    else -> Unit
+                }
+            }
+        }
+
+        snapshotFlow { lazyListState.isScrollInProgress }.collect { isScrolling ->
+            if (isScrolling && isUserScroll) {
+                hasScrolled = true
+            } else if (!isScrolling && isUserScroll && hasScrolled) {
+                lazyListState.firstVisibleDate()?.let(onVisibleDateChanged)
+                isUserScroll = false
+                hasScrolled = false
+            }
+        }
     }
 }
 
-private fun LazyListState.firstVisibleItemKey(): Any? = layoutInfo.visibleItemsInfo.firstOrNull { it.offset + it.size > 0 }?.key
+private fun LazyListState.firstVisibleDate(): LocalDate? {
+    return (layoutInfo.visibleItemsInfo.firstOrNull { it.offset + it.size > 0 }?.key as? PlanningItemKey)?.date
+}

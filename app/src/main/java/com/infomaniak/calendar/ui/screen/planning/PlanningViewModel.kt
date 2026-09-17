@@ -24,40 +24,67 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.planning.PlanningRow
 import com.infomaniak.calendar.manager.SyncEventsManager
+import com.infomaniak.calendar.manager.SyncEventsManager.SyncPhase
 import com.infomaniak.calendar.manager.VisibleMonthManager
 import com.infomaniak.core.common.utils.today
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
 
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
 class PlanningViewModel(
-    calendarManager: CalendarManager,
-    syncEventsManager: SyncEventsManager,
+    private val calendarManager: CalendarManager,
+    private val syncEventsManager: SyncEventsManager,
     visibleMonthManager: VisibleMonthManager,
 ) : ViewModel() {
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
 
     private val timeZone = TimeZone.currentSystemDefault()
     private val today = Clock.today(timeZone)
+    private val weekNumbering = WeekNumbering.ISO_8601
+
+    private val observedWeek = MutableStateFlow(weekNumbering.weekOf(today))
 
     /** The day the planning is (re)centered on. Changing it rebuilds the pager around that day. */
     private val initialDay = MutableStateFlow(today)
+    private val activePagingSource = AtomicReference<PlanningPagingSource?>()
+    private var refreshJob: Job? = null
+    private var previousSyncPhase = SyncPhase.Idle
+
+    init {
+        observePlanningChanges()
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val planningRows: Flow<PagingData<PlanningRow>> = initialDay
@@ -75,18 +102,17 @@ class PlanningViewModel(
                     enablePlaceholders = false,
                 ),
             ) {
-                PlanningPagingSource(
-                    initialDay = day,
-                    calendarManager = calendarManager,
-                    timeZone = timeZone,
-                    weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
-                )
+                createPagingSource(day)
             }.flow
         }
         .cachedIn(viewModelScope)
 
     val eventDots = visibleMonthManager.eventDots
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
+
+    fun onVisibleDateChanged(date: LocalDate) {
+        observedWeek.value = weekNumbering.weekOf(date)
+    }
 
     /**
      * Recenters the planning on [date] by rebuilding the pager. Returns `true` if this actually changed
@@ -95,7 +121,92 @@ class PlanningViewModel(
     fun jumpTo(date: LocalDate): Boolean {
         val changed = initialDay.value != date
         initialDay.value = date
+        onVisibleDateChanged(date)
         return changed
+    }
+
+    private fun createPagingSource(day: LocalDate): PlanningPagingSource {
+        return PlanningPagingSource(
+            initialDay = day,
+            calendarManager = calendarManager,
+            timeZone = timeZone,
+            weekNumbering = weekNumbering, //TODO[weekNumbering]: Use week numbering from LocalSettings
+            onInvalidated = { source -> activePagingSource.compareAndSet(source, null) },
+        ).also { source ->
+            activePagingSource.set(source)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun observePlanningChanges() {
+        viewModelScope.launch {
+            combine(observedWeek, syncEventsManager.syncPhase) { week, syncPhase -> week to syncPhase }
+                .onEach { (_, syncPhase) -> onSyncPhaseChanged(syncPhase) }
+                .flatMapLatest { (week, syncPhase) ->
+                    if (syncPhase == SyncPhase.Idle) observeWeekChanges(week).drop(1) else emptyFlow()
+                }
+                .collect { requestRefresh(RefreshReason.LocalChange) }
+        }
+    }
+
+    private fun observeWeekChanges(week: YearWeek): Flow<Map<LocalDate, List<EventDaySlice>>> {
+        return calendarManager.observeDaySlices(
+            start = week.firstDay.minus(DAYS_PER_WEEK, DateTimeUnit.DAY).atStartOfDayIn(timeZone),
+            end = week.lastDay.plus(DAYS_PER_WEEK + 1, DateTimeUnit.DAY).atStartOfDayIn(timeZone),
+            timeZone = timeZone,
+        ).distinctUntilChanged()
+    }
+
+    private fun onSyncPhaseChanged(syncPhase: SyncPhase) {
+        if (syncPhase == previousSyncPhase) return
+
+        when (syncPhase) {
+            SyncPhase.DownloadingVisibleRange -> {
+                cancelRefresh()
+            }
+            SyncPhase.SyncingEvents -> {
+                if (previousSyncPhase == SyncPhase.DownloadingVisibleRange) {
+                    requestRefresh(RefreshReason.VisibleRangeDownloaded)
+                }
+            }
+            SyncPhase.Idle -> {
+                when (previousSyncPhase) {
+                    SyncPhase.DownloadingVisibleRange -> requestRefresh(RefreshReason.VisibleRangeDownloadFailed)
+                    SyncPhase.SyncingEvents -> requestRefresh(RefreshReason.SyncCompleted)
+                    SyncPhase.Idle -> Unit
+                }
+            }
+        }
+        previousSyncPhase = syncPhase
+    }
+
+    private fun requestRefresh(reason: RefreshReason) {
+        cancelRefresh()
+        if (reason == RefreshReason.VisibleRangeDownloaded) {
+            activePagingSource.get()?.invalidate()
+            return
+        }
+
+        refreshJob = viewModelScope.launch {
+            delay(REFRESH_SETTLE_DELAY_MILLIS)
+            if (syncEventsManager.syncPhase.value != SyncPhase.Idle) {
+                return@launch
+            }
+
+            activePagingSource.get()?.invalidate()
+        }
+    }
+
+    private enum class RefreshReason {
+        LocalChange,
+        VisibleRangeDownloaded,
+        VisibleRangeDownloadFailed,
+        SyncCompleted,
+    }
+
+    private fun cancelRefresh() {
+        refreshJob?.cancel()
+        refreshJob = null
     }
 
     companion object {
@@ -110,5 +221,8 @@ class PlanningViewModel(
         // Upper bound on the rows Paging keeps in memory (must be >= pageSize + 2 * prefetchDistance).
         // Roughly a couple of dozen weeks, enough for smooth back-scrolling while capping growth.
         private const val MAX_ROWS_IN_MEMORY = 250
+
+        private const val DAYS_PER_WEEK = 7
+        private val REFRESH_SETTLE_DELAY_MILLIS = 250.milliseconds
     }
 }

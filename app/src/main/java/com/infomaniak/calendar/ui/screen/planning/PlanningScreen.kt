@@ -77,6 +77,7 @@ fun PlanningScreen(
         goToEventDetail = goToEventDetail,
         planningRows = planningRows,
         onJumpTo = viewModel::jumpTo,
+        onVisibleDateChanged = viewModel::onVisibleDateChanged,
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventsDots },
         visibleDayState = visibleDayState,
@@ -90,6 +91,7 @@ private fun PlanningScreen(
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     planningRows: LazyPagingItems<PlanningRow>,
     onJumpTo: (LocalDate) -> Boolean,
+    onVisibleDateChanged: (LocalDate) -> Unit,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     visibleDayState: VisibleDayState,
@@ -126,6 +128,7 @@ private fun PlanningScreen(
             SuccessPlanning(
                 planningRows = planningRows,
                 onJumpTo = onJumpTo,
+                onVisibleDateChanged = onVisibleDateChanged,
                 contentPadding = contentPadding + PaddingValues(Margin.Medium),
                 goToEventCreation = goToEventCreation,
                 goToEventDetail = goToEventDetail,
@@ -144,6 +147,7 @@ private fun PlanningScreen(
 private fun SuccessPlanning(
     planningRows: LazyPagingItems<PlanningRow>,
     onJumpTo: (LocalDate) -> Boolean,
+    onVisibleDateChanged: (LocalDate) -> Unit,
     contentPadding: PaddingValues,
     goToEventCreation: (LocalDate) -> Unit,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
@@ -153,7 +157,13 @@ private fun SuccessPlanning(
     val lazyListState = rememberLazyListState()
 
     AlignPlanningToDate(lazyListState, planningRows, visibleDayState, onJumpTo)
-    ReportVisibleDate(lazyListState, onVisibleDateChanged = visibleDayState::updateVisibleDate)
+    ReportVisibleDate(
+        lazyListState = lazyListState,
+        onVisibleDateChanged = {
+            onVisibleDateChanged(it)
+            visibleDayState.updateVisibleDate(it)
+        },
+    )
 
     Planning(
         lazyListState = lazyListState,
@@ -178,6 +188,7 @@ private fun Preview(@PreviewParameter(PlanningRowPreviewParameter::class) rows: 
             PlanningScreen(
                 planningRows = planningRows,
                 onJumpTo = { false },
+                onVisibleDateChanged = {},
                 goToEventCreation = {},
                 goToEventDetail = {},
                 isLoadingEvents = { false },
