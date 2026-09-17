@@ -46,7 +46,7 @@ import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
 import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventCreation.EventCreationScreen
-import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailAttendeesScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.EventAttendeesScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
@@ -107,11 +107,11 @@ private fun baseEntryProvider(
         EventDetailScreen(
             eventId = destination.eventId,
             onBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
-            onAttendeesClick = {backStack.add(NavDestination.EventDetailAttendees(destination.eventId))},
+            onAttendeesClick = { backStack.add(NavDestination.EventAttendees(destination.eventId)) },
         )
     }
-    entry<NavDestination.EventDetailAttendees> { destination ->
-        EventDetailAttendeesScreen(
+    entry<NavDestination.EventAttendees> { destination ->
+        EventAttendeesScreen(
             eventId = destination.eventId,
             onBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
         )

@@ -41,7 +41,7 @@ app/src/main/java/com/infomaniak/calendar/
 └── ui/
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay with entryProvider
-    │   └── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, Accounts, Onboarding)
+    │   └── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventAttendees, Accounts, Onboarding)
     ├── screen/
     │   ├── day/                   # DayScreen + DayViewModel + DayUiState + DayEventGroupingExt
     │   ├── threeDays/             # ThreeDayScreen — placeholder 3-day view
@@ -51,7 +51,7 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── accounts/              # AccountsListScreen + AccountActionsScreen + AccountsViewModel + AccountItem
     │                              # Drawer-backed account list, per-account detail/logout screen, and remove-account flow
     │   ├── eventCreation/         # EventCreationScreen
-    │   ├── eventDetail/           # EventDetailScreen + EventDetailViewModel
+    │   ├── eventDetail/           # EventDetailScreen + EventAttendeesScreen + EventAttendee + EventDetailViewModel
     │   └── onboarding/            # OnboardingScreen + CrossAppLoginViewModel
     └── theme/
         ├── Theme.kt                # CalendarTheme Composable (Material 3 color schemes)

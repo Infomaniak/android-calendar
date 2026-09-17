@@ -59,7 +59,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.AttendeeRol
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationStatus
 
 @Composable
-fun EventDetailAttendeesScreen(
+fun EventAttendeesScreen(
     eventId: String,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -71,11 +71,11 @@ fun EventDetailAttendeesScreen(
         viewModel.setEventId(eventId)
     }
 
-    EventDetailAttendeesScreen({ attendees }, onBack, modifier)
+    EventAttendeesScreen({ attendees }, onBack, modifier)
 }
 
 @Composable
-fun EventDetailAttendeesScreen(attendees: () -> List<Attendee>?, onBack: () -> Unit, modifier: Modifier = Modifier) {
+fun EventAttendeesScreen(attendees: () -> List<Attendee>?, onBack: () -> Unit, modifier: Modifier = Modifier) {
     var searchQuery by rememberSaveable { mutableStateOf("") }
     val allAttendees = attendees().orEmpty().map(Attendee::toAttendeeUi)
 
@@ -144,7 +144,7 @@ fun EventDetailAttendeesScreen(attendees: () -> List<Attendee>?, onBack: () -> U
 
 @Preview
 @Composable
-private fun EventDetailAttendeesScreenPreview() {
+private fun EventAttendeesScreenPreview() {
     val previewAttendees = listOf(
         Attendee(
             email = "alice@example.com",
@@ -169,7 +169,7 @@ private fun EventDetailAttendeesScreenPreview() {
 
     CalendarThemeForPreview {
         Surface {
-            EventDetailAttendeesScreen(
+            EventAttendeesScreen(
                 attendees = { previewAttendees },
                 onBack = {},
             )
