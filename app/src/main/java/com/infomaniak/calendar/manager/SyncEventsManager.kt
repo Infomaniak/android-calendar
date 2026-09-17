@@ -31,6 +31,10 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -45,12 +49,17 @@ import com.infomaniak.core.common.R as RCore
 @SingleIn(AppScope::class)
 class SyncEventsManager @Inject constructor(private val calendarManager: CalendarManager) {
 
-    private val _isLoadingEvents = MutableStateFlow(false)
+    private val _syncPhase = MutableStateFlow(SyncPhase.Idle)
+    internal val syncPhase: StateFlow<SyncPhase> = _syncPhase.asStateFlow()
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    val isLoadingEvents: Flow<Boolean> = _isLoadingEvents.mapLatest { isLoading ->
-        if (isLoading) delay(LOADING_INDICATOR_DELAY)
-        isLoading
-    }
+    val isLoadingEvents: Flow<Boolean> = syncPhase
+        .map { it != SyncPhase.Idle }
+        .distinctUntilChanged()
+        .mapLatest { isLoading ->
+            if (isLoading) delay(LOADING_INDICATOR_DELAY)
+            isLoading
+        }
 
     private val _loadingError = Channel<SyncError>(Channel.CONFLATED)
     val loadingError: ReceiveChannel<SyncError> = _loadingError
@@ -59,14 +68,15 @@ class SyncEventsManager @Inject constructor(private val calendarManager: Calenda
         val timeZone = TimeZone.currentSystemDefault()
         val firstDay = visibleDate.yearMonth.minus(SYNC_WINDOW_MONTHS_BEFORE, DateTimeUnit.MONTH).firstDay
         val lastDay = visibleDate.yearMonth.plus(SYNC_WINDOW_MONTHS_AFTER, DateTimeUnit.MONTH).lastDay.plus(1, DateTimeUnit.DAY)
+        _syncPhase.value = SyncPhase.DownloadingVisibleRange
+        try {
+            if (downloadEventByRange(firstDay, timeZone, lastDay).isFailure) return
 
-        _isLoadingEvents.value = true
-        val result = downloadEventByRange(firstDay, timeZone, lastDay)
-        _isLoadingEvents.value = false
-
-        if (result.isFailure) return
-
-        syncEvents()
+            _syncPhase.value = SyncPhase.SyncingEvents
+            syncEvents()
+        } finally {
+            _syncPhase.value = SyncPhase.Idle
+        }
     }
 
     private suspend fun downloadEventByRange(
@@ -91,6 +101,12 @@ class SyncEventsManager @Inject constructor(private val calendarManager: Calenda
     enum class SyncError(@StringRes val errorRes: Int) {
         ErrorRetrieveEvents(errorRes = R.string.syncEventsError),
         ErrorNoConnection(errorRes = RCore.string.connectionError)
+    }
+
+    internal enum class SyncPhase {
+        Idle,
+        DownloadingVisibleRange,
+        SyncingEvents,
     }
 
     private fun Throwable.toSyncError(): SyncError {

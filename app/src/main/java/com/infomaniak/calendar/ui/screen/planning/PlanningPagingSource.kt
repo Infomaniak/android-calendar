@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.planning
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
@@ -25,16 +26,8 @@ import com.infomaniak.calendar.components.planning.PlanningRow
 import com.infomaniak.calendar.components.planning.planningRows
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collectIndexed
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -52,19 +45,14 @@ import kotlinx.datetime.plus
  *   already has trailing (and leading) content to scroll against;
  * - the previous/next weeks are **preloaded by construction**, independent of prefetch timing.
  *
- * The leading week matters even for the initial today-centered generation: it keeps the aligned target
- * away from the leading edge, so prefetch doesn't prepend endlessly (which would otherwise scroll the
- * list back to the start of time). Alignment is handled by re-scrolling until settled (see
- * `AlignPlanningToDate`), never by opening the window at the target's week.
+ * The leading week keeps the target away from the leading edge, so prefetch does not immediately
+ * prepend after [AlignPlanningToDate] performs its one-time alignment.
  *
  * Subsequent append and prepend loads fetch a single week at a time, keeping page drops fine-grained.
  *
- * [initialDay] resolves the very first refresh key ([initialWeek]). Because
- * [CalendarManager.observeDaySlices] is reactive but a [PagingSource] load is one-shot, each loaded
- * range keeps observing **its own** slice of data and calls [invalidate] on the first change *within
- * that range*, so a change on whichever page the user is looking at reloads the currently loaded pages
- * (mirroring Room's PagingSource behaviour). The number of live observers is bounded by the Pager's
- * `maxSize`.
+ * [initialDay] resolves the very first refresh key ([initialWeek]). A page only reads the current
+ * snapshot; [PlanningViewModel] owns the single reactive observation of the visible window and
+ * invalidates the active source after coalescing changes.
  */
 internal class PlanningPagingSource(
     private val initialDay: LocalDate,
@@ -72,15 +60,13 @@ internal class PlanningPagingSource(
     private val emailsByUserId: suspend () -> Map<AccountId, String>,
     private val timeZone: TimeZone,
     private val weekNumbering: WeekNumbering = WeekNumbering.ISO_8601,
+    private val onInvalidated: (PlanningPagingSource) -> Unit = {},
 ) : PagingSource<YearWeek, PlanningRow>() {
 
     private val initialWeek: YearWeek = weekNumbering.weekOf(initialDay)
 
-    // Hosts the per-loaded-range data observers; cancelled once the source is invalidated.
-    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-
     init {
-        registerInvalidatedCallback { coroutineScope.cancel() }
+        registerInvalidatedCallback { onInvalidated(this) }
     }
 
     override suspend fun load(params: LoadParams<YearWeek>): LoadResult<YearWeek, PlanningRow> {
@@ -102,23 +88,9 @@ internal class PlanningPagingSource(
         val start = firstWeek.firstDay.atStartOfDayIn(timeZone)
         val endExclusive = lastWeek.lastDay.plus(1, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
 
-        val slices = calendarManager.observeDaySlices(start = start, end = endExclusive, timeZone = timeZone)
-            .distinctUntilChanged()
-
-        // Single subscription per loaded range: the first emission is the current DB snapshot we page
-        // now; the first *later, distinct* change to THIS range invalidates so Paging reloads the pages
-        // (invalidate() cancels this scope, ending the collection). No drop(1): a range already in the DB
-        // only emits once, so dropping it would hang firstSlices.await() and freeze the load (jumps).
-        val firstSlices = CompletableDeferred<Map<LocalDate, List<EventDaySlice>>>()
-        coroutineScope.launch {
-            runCatching {
-                slices.collectIndexed { index, value ->
-                    if (index == 0) firstSlices.complete(value) else invalidate()
-                }
-            }.cancellable().onFailure(firstSlices::completeExceptionally)
-        }
-
-        val slicesByDay = firstSlices.await()
+        val slicesByDay = calendarManager
+            .observeDaySlices(start = start, end = endExclusive, timeZone = timeZone)
+            .first()
         val emails = emailsByUserId()
         val data = buildList {
             for (week in weekNumbering.weeksBetween(firstWeek.firstDay, lastWeek.firstDay)) {

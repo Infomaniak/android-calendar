@@ -53,5 +53,8 @@ class VisibleDayState(private val _visibleDate: MutableState<LocalDate>) {
         _visibleDate.value = date
     }
 
-    fun jumpTo(date: LocalDate) = _scrollCommand.trySend(date)
+    fun jumpTo(date: LocalDate) {
+        _visibleDate.value = date
+        _scrollCommand.trySend(date)
+    }
 }
