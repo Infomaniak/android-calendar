@@ -50,17 +50,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.utils.toAttendeeUi
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.AttendeeRole
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationStatus
 
 @Composable
-fun EventDetailAttendeesScreen(
-    eventId: String,
+fun EventAttendeesScreen(
+    occurrenceId: OccurrenceId,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),
@@ -68,14 +70,14 @@ fun EventDetailAttendeesScreen(
     val attendees by viewModel.eventAttendees.collectAsStateWithLifecycle(initialValue = emptyList())
 
     LaunchedEffect(Unit) {
-        viewModel.setEventId(eventId)
+        viewModel.setOccurrenceId(occurrenceId)
     }
 
-    EventDetailAttendeesScreen({ attendees }, onBack, modifier)
+    EventAttendeesScreen({ attendees }, onBack, modifier)
 }
 
 @Composable
-fun EventDetailAttendeesScreen(attendees: () -> List<Attendee>?, onBack: () -> Unit, modifier: Modifier = Modifier) {
+fun EventAttendeesScreen(attendees: () -> List<Attendee>?, onBack: () -> Unit, modifier: Modifier = Modifier) {
     var searchQuery by rememberSaveable { mutableStateOf("") }
     val allAttendees = attendees().orEmpty().map(Attendee::toAttendeeUi)
 
@@ -144,7 +146,7 @@ fun EventDetailAttendeesScreen(attendees: () -> List<Attendee>?, onBack: () -> U
 
 @Preview
 @Composable
-private fun EventDetailAttendeesScreenPreview() {
+private fun EventAttendeesScreenPreview() {
     val previewAttendees = listOf(
         Attendee(
             email = "alice@example.com",
@@ -169,7 +171,7 @@ private fun EventDetailAttendeesScreenPreview() {
 
     CalendarThemeForPreview {
         Surface {
-            EventDetailAttendeesScreen(
+            EventAttendeesScreen(
                 attendees = { previewAttendees },
                 onBack = {},
             )
