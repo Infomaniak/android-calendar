@@ -28,6 +28,8 @@
     <string name="helpTitle">Hjælp</string>
     <string name="monthTitle">Måned</string>
     <string name="planningTitle">Planlægning</string>
+    <string name="searchForAttendees">Søgning efter gæster</string>
+    <string name="sectionOrganizerHeader">Arrangør</string>
     <string name="settingsTitle">Indstillinger</string>
     <string name="signOutAccountAlertConfirm">Log ud af kontoen</string>
     <string name="signOutAccountAlertDescription">Denne konto og de tilknyttede kalendere vil blive afkoblet fra appen »Kalender«. De vil fortsat være tilgængelige på din Infomaniak-onlinekonto.</string>
