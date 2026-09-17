@@ -65,7 +65,8 @@ import kotlin.time.Instant
 @Composable
 fun EventDetail(
     eventDetail: EventDetailUi,
-    onKMeetClick: () -> Unit,
+    onJoinKMeet: () -> Unit,
+    onCopyKMeet: () -> Unit,
     onLocationClick: () -> Unit,
     onRoomClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -86,7 +87,7 @@ fun EventDetail(
                 }
 
                 if (kMeetUrl?.isNotBlank() == true) {
-                    KMeetButton(onClick = onKMeetClick, contentPadding = horizontalContentPadding)
+                    KMeetButton(onJoin = onJoinKMeet, onCopy = onCopyKMeet, modifier = Modifier.padding(horizontalContentPadding))
                 }
 
                 if (location?.isNotBlank() == true) {
@@ -216,7 +217,8 @@ private fun PreviewEventDetail() {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     EventDetail(
                         eventDetail = eventDetail,
-                        onKMeetClick = {},
+                        onJoinKMeet = {},
+                        onCopyKMeet = {},
                         onLocationClick = {},
                         onRoomClick = {},
                         contentPadding = PaddingValues(horizontal = Margin.Small) + it,

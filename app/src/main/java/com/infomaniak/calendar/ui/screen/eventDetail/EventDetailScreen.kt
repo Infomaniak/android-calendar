@@ -88,7 +88,8 @@ private fun EventDetailScreen(
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     EventDetail(
                         eventDetail = state.eventDetail,
-                        onKMeetClick = { /*TODO[eventDetail]*/ },
+                        onJoinKMeet = { /*TODO[eventDetail]*/ },
+                        onCopyKMeet = { /*TODO[eventDetail]*/ },
                         onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
                         onRoomClick = { /*TODO[eventDetail]*/ },
                         contentPadding = scaffoldContentPadding + PaddingValues(horizontal = Margin.Small),
