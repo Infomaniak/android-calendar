@@ -35,6 +35,10 @@ import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonColors
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -57,14 +61,21 @@ internal fun PresenceStatusButtons(
     onPresenceStatusChange: (ParticipationStatus) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var selectedStatus by remember(presenceStatus) { mutableStateOf(presenceStatus) }
+
     Row(
         horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xl, Alignment.CenterHorizontally),
-        modifier = modifier.fillMaxWidth().selectableGroup(),
+        modifier = modifier
+            .fillMaxWidth()
+            .selectableGroup(),
     ) {
         PresenceStatusButton.entries.forEach { presenceStatusButton ->
             ToggleButton(
-                checked = presenceStatus == presenceStatusButton.status,
-                onCheckedChange = { onPresenceStatusChange(presenceStatusButton.status) },
+                checked = selectedStatus == presenceStatusButton.status,
+                onCheckedChange = {
+                    selectedStatus = presenceStatusButton.status
+                    onPresenceStatusChange(presenceStatusButton.status)
+                },
                 colors = presenceStatusButton.colors(),
                 modifier = Modifier.semantics { role = Role.RadioButton },
             ) {
