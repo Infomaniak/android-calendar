@@ -28,10 +28,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.utils.fromAttendee
@@ -80,7 +82,7 @@ fun AttendeeParticipationStatus(status: ParticipationStatus, isOrganizer: Boolea
     return when (status) {
         ParticipationStatus.Accepted -> {
             ParticipationStatusText(
-                text = "Accepted",
+                text = stringResource(R.string.statusAcceptedLabel),
                 color = MaterialTheme.extendedColorScheme.success,
                 isOrganizer = isOrganizer,
                 modifier = modifier,
@@ -88,7 +90,7 @@ fun AttendeeParticipationStatus(status: ParticipationStatus, isOrganizer: Boolea
         }
         ParticipationStatus.Declined -> {
             ParticipationStatusText(
-                text = "Declined",
+                text = stringResource(R.string.statusDeclinedLabel),
                 color = MaterialTheme.colorScheme.error,
                 isOrganizer = isOrganizer,
                 modifier = modifier,
@@ -96,15 +98,15 @@ fun AttendeeParticipationStatus(status: ParticipationStatus, isOrganizer: Boolea
         }
         ParticipationStatus.Tentative -> {
             ParticipationStatusText(
-                text = "Maybe",
-                color = MaterialTheme.extendedColorScheme.warning,  //TODO: check correct color
+                text = stringResource(R.string.statusTentativeLabel),
+                color = MaterialTheme.extendedColorScheme.warning,
                 isOrganizer = isOrganizer,
                 modifier = modifier,
             )
         }
         ParticipationStatus.NeedsAction -> {
             ParticipationStatusText(
-                text = "Pending",
+                text = stringResource(R.string.statusNeedsActionLabel),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 isOrganizer = isOrganizer,
                 modifier = modifier,
@@ -126,7 +128,7 @@ fun ParticipationStatusText(text: String, color: Color, isOrganizer: Boolean, mo
         )
         if (isOrganizer) {
             Text(
-                text = " · Organisateur",
+                text = " · ${stringResource(R.string.sectionOrganizerHeader)}",
                 maxLines = 1,
                 style = MaterialTheme.typography.bodyMedium,
                 overflow = TextOverflow.Ellipsis,

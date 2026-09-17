@@ -83,7 +83,7 @@ fun EventDetailAttendeesScreen(attendees: () -> List<Attendee>?, onBack: () -> U
         topBar = {
             TopAppBar(
                 navigationIcon = { TopAppBarButtons.BackButton(onClick = onBack) },
-                title = { Text(text = "Invités") },
+                title = { Text(text = stringResource(R.string.attendeesTitle)) },
             )
         },
         modifier = modifier,
@@ -113,9 +113,10 @@ fun EventDetailAttendeesScreen(attendees: () -> List<Attendee>?, onBack: () -> U
                     )
                 },
                 singleLine = true,
-                placeholder = { Text("Recherche des invités") },
+                placeholder = { Text(stringResource(R.string.searchForAttendees)) },
             )
 
+            // TODO: check if the empty state could happen if the user deletes all the attendees
             if (allAttendees.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
