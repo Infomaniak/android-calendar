@@ -17,30 +17,22 @@
  */
 package com.infomaniak.calendar.components.eventdetail.detail
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
-import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
 import com.infomaniak.calendar.components.eventdetail.detail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Calendar
@@ -59,7 +51,6 @@ import com.infomaniak.calendar.components.eventdetail.previewAttendees
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
@@ -79,7 +70,6 @@ fun EventDetail(
         modifier = modifier.padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding()),
     ) {
         with(eventDetail) {
-            Title(eventColor, title, Modifier.padding(horizontalContentPadding))
             DateAndTime(start, end, isAllDay, Modifier.padding(horizontalContentPadding))
 
             Section(contentPadding = horizontalContentPadding) {
@@ -127,23 +117,6 @@ fun EventDetail(
             }
         }
     }
-}
-
-@Composable
-private fun Title(color: Color, title: String, modifier: Modifier = Modifier) {
-    ListItem(
-        headlineContent = { Text(text = title, style = MaterialTheme.typography.titleLargeEmphasized) },
-        leadingContent = {
-            Box(
-                modifier = Modifier
-                    .size(EsdsTheme.icon.sizeMd)
-                    .padding(2.dp)
-                    .clip(CircleShape)
-                    .background(color),
-            )
-        },
-        modifier = modifier,
-    )
 }
 
 /**
