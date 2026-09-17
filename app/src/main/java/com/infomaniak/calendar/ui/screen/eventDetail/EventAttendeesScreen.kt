@@ -93,6 +93,7 @@ fun EventAttendeesScreen(attendees: () -> List<Attendee>?, onBack: () -> Unit, m
                 .fillMaxSize()
                 .padding(paddingValues),
         ) {
+            // TODO: add search contacts functionality
             TextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
@@ -116,7 +117,7 @@ fun EventAttendeesScreen(attendees: () -> List<Attendee>?, onBack: () -> Unit, m
                 placeholder = { Text(stringResource(R.string.searchForAttendees)) },
             )
 
-            // TODO: check if the empty state could happen if the user deletes all the attendees
+            // TODO: do a proper empty state view
             if (allAttendees.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
