@@ -34,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,9 +46,11 @@ import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.extensions.safeStartActivity
+import com.infomaniak.core.ui.compose.basics.rememberClipboardCopyManager
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
+import com.infomaniak.core.common.R as RCommon
 
 @Composable
 fun EventDetailScreen(
@@ -78,6 +81,8 @@ private fun EventDetailScreen(
     onLocationClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val clipboardManager = rememberClipboardCopyManager()
+
     Scaffold(
         topBar = { TopAppBar(navigationIcon = { TopAppBarButtons.BackButton(onClick = onBack) }, title = {}) },
         modifier = modifier,
@@ -86,10 +91,12 @@ private fun EventDetailScreen(
             EventDetailUiState.Loading -> Unit // Loaded locally, always fast, no need for a specific progress indicator UI
             is EventDetailUiState.Success -> {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    val copyFeedbackMessage = stringResource(RCommon.string.linkCopied)
+
                     EventDetail(
                         eventDetail = state.eventDetail,
                         onJoinKMeet = { /*TODO[eventDetail]*/ },
-                        onCopyKMeet = { /*TODO[eventDetail]*/ },
+                        onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
                         onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
                         onRoomClick = { /*TODO[eventDetail]*/ },
                         contentPadding = scaffoldContentPadding + PaddingValues(horizontal = Margin.Small),
