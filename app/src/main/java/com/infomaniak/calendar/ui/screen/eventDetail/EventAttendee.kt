@@ -17,6 +17,8 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
+import android.R.attr.fontWeight
+import android.R.attr.maxLines
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -51,22 +53,24 @@ fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
                 // had to add this here and not overline content to center the avatar vertically
                 AttendeeParticipationStatus(attendee.status, attendee.isOrganizer)
                 Text(
-                    text = attendee.displayName.toString(),
+                    text = attendee.displayName ?: attendee.email,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Normal,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = EsdsTheme.spacing.twoXs)
+                    modifier = Modifier.padding(top = EsdsTheme.spacing.twoXs),
                 )
             }
 
         },
         supportingContent = {
-            Text(
-                text = attendee.email,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            if (!attendee.displayName.isNullOrEmpty()) {
+                Text(
+                    text = attendee.email,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         },
         leadingContent = {
             Avatar(
@@ -148,7 +152,7 @@ private fun PreviewAttendeeAccepted() {
 @Preview
 @Composable
 private fun PreviewAttendeeDeclined() {
-    EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Declined))
+    EventAttendee(AttendeeUi("alice@example.com", null, ParticipationStatus.Declined))
 }
 
 @Preview
