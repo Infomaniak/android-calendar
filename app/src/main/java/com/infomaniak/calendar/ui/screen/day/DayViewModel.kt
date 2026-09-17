@@ -21,10 +21,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.SyncEventsManager
-import com.infomaniak.calendar.utils.observeEventDots
+import com.infomaniak.calendar.manager.VisibleMonthManager
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
@@ -34,7 +33,6 @@ import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -49,7 +47,6 @@ import kotlinx.datetime.YearMonth
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
 @Inject
@@ -60,6 +57,7 @@ class DayViewModel(
     calendarManager: CalendarManager,
     syncEventsManager: SyncEventsManager,
     private val calendarDataValues: CalendarDataValues,
+    private val visibleMonthManager: VisibleMonthManager,
 ) : ViewModel() {
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
 
@@ -87,15 +85,9 @@ class DayViewModel(
         }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = DayUiState.Loading)
 
-    private val visibleMonth = MutableStateFlow(today.yearMonth)
+    val eventDots = visibleMonthManager.eventDots
 
-    val eventDots: StateFlow<Map<LocalDate, List<EventColorsUi>>> = calendarManager
-        .observeEventDots(visibleMonth, timeZone)
-        .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
-
-    fun onVisibleMonthChanged(month: YearMonth) {
-        visibleMonth.value = month
-    }
+    fun onVisibleMonthChanged(month: YearMonth) = visibleMonthManager.onVisibleMonthChanged(month)
 
     companion object {
         const val DAY_RANGE_DAYS = 250

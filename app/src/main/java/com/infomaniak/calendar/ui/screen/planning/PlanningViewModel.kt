@@ -19,9 +19,8 @@ package com.infomaniak.calendar.ui.screen.planning
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.manager.SyncEventsManager
-import com.infomaniak.calendar.utils.observeEventDots
+import com.infomaniak.calendar.manager.VisibleMonthManager
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
@@ -53,8 +52,9 @@ import kotlin.time.Clock
 @ViewModelKey
 class PlanningViewModel(
     accountUtils: AccountUtils,
-    private val calendarManager: CalendarManager,
+    calendarManager: CalendarManager,
     syncEventsManager: SyncEventsManager,
+    private val visibleMonthManager: VisibleMonthManager,
 ) : ViewModel() {
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
 
@@ -75,16 +75,11 @@ class PlanningViewModel(
         }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = PlanningUiState.Loading)
 
-    private val visibleMonth = MutableStateFlow(today.yearMonth)
     private val initialDay = MutableStateFlow(today)
 
-    val eventDots: StateFlow<Map<LocalDate, List<EventColorsUi>>> = calendarManager
-        .observeEventDots(visibleMonth, timeZone)
-        .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
+    val eventDots = visibleMonthManager.eventDots
 
-    fun onVisibleMonthChanged(month: YearMonth) {
-        visibleMonth.value = month
-    }
+    fun onVisibleMonthChanged(month: YearMonth) = visibleMonthManager.onVisibleMonthChanged(month)
 
     fun jumpTo(date: LocalDate): Boolean {
         val changed = initialDay.value != date
