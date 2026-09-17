@@ -21,6 +21,7 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
@@ -29,8 +30,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
@@ -78,75 +86,91 @@ fun EventDetail(
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
     val horizontalContentPadding = contentPadding.onlyHorizontal()
 
-    Column(
-        modifier = modifier.padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding()),
-    ) {
+    // The sticky footer floats over the content, so the scroll needs to clear its height at the bottom.
+    var stickyFooterHeight by remember { mutableStateOf(0.dp) }
+    val density = LocalDensity.current
+
+    Box(modifier = modifier) {
         with(eventDetail) {
-            Title(
-                dotColor = eventColor,
-                title = title,
+            Column(
                 modifier = Modifier
-                    .padding(horizontalContentPadding)
-                    .eventSharedElement(EventSharedElement.Title),
-            )
-            DateAndTime(start, end, isAllDay, Modifier.padding(horizontalContentPadding))
-
-            Section(contentPadding = horizontalContentPadding) {
-                if (attendees.all.isNotEmpty()) {
-                    AttendeesButton(attendees.all, onClick = {}, contentPadding = horizontalContentPadding)
-                }
-
-                if (kMeetUrl?.isNotBlank() == true) {
-                    KMeetButton(onJoin = onJoinKMeet, onCopy = onCopyKMeet, modifier = Modifier.padding(horizontalContentPadding))
-                }
-
-                if (location?.isNotBlank() == true) {
-                    LocationButton(location = location, onClick = onLocationClick, contentPadding = horizontalContentPadding)
-                }
-
-                if (room != null) {
-                    RoomButton(room = room, onClick = onRoomClick, contentPadding = horizontalContentPadding)
-                }
-            }
-
-            Section(contentPadding = horizontalContentPadding) {
-                if (description?.isNotBlank() == true) {
-                    DescriptionCollapsibleButton(description = description, contentPadding = horizontalContentPadding)
-                }
-
-                AttachmentFiles(files, onFileClick = { /*TODO[eventDetail]*/ }, contentPadding = horizontalContentPadding)
-            }
-
-            Section(contentPadding = horizontalContentPadding) {
-                Notifications(
-                    notifications,
-                    onNotificationClick = { /*TODO[eventDetail]*/ },
-                    contentPadding = horizontalContentPadding,
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = contentPadding.calculateTopPadding(), bottom = stickyFooterHeight),
+            ) {
+                Title(
+                    dotColor = eventColor,
+                    title = title,
+                    modifier = Modifier
+                        .padding(horizontalContentPadding)
+                        .eventSharedElement(EventSharedElement.Title),
                 )
-            }
+                DateAndTime(start, end, isAllDay, Modifier.padding(horizontalContentPadding))
 
-            Section(contentPadding = horizontalContentPadding) {
-                OccupiedStatus(isOccupied, modifier = Modifier.padding(horizontalContentPadding))
+                Section(contentPadding = horizontalContentPadding) {
+                    if (attendees.all.isNotEmpty()) {
+                        AttendeesButton(attendees.all, onClick = {}, contentPadding = horizontalContentPadding)
+                    }
 
-                if (classification != null) {
-                    ClassificationStatus(classification, modifier = Modifier.padding(horizontalContentPadding))
+                    if (kMeetUrl?.isNotBlank() == true) {
+                        KMeetButton(onJoin = onJoinKMeet, onCopy = onCopyKMeet, modifier = Modifier.padding(horizontalContentPadding))
+                    }
+
+                    if (location?.isNotBlank() == true) {
+                        LocationButton(location = location, onClick = onLocationClick, contentPadding = horizontalContentPadding)
+                    }
+
+                    if (room != null) {
+                        RoomButton(room = room, onClick = onRoomClick, contentPadding = horizontalContentPadding)
+                    }
                 }
 
-                Calendar(calendarColor, calendarName, modifier = Modifier.padding(horizontalContentPadding))
+                Section(contentPadding = horizontalContentPadding) {
+                    if (description?.isNotBlank() == true) {
+                        DescriptionCollapsibleButton(description = description, contentPadding = horizontalContentPadding)
+                    }
+
+                    AttachmentFiles(files, onFileClick = { /*TODO[eventDetail]*/ }, contentPadding = horizontalContentPadding)
+                }
+
+                Section(contentPadding = horizontalContentPadding) {
+                    Notifications(
+                        notifications,
+                        onNotificationClick = { /*TODO[eventDetail]*/ },
+                        contentPadding = horizontalContentPadding,
+                    )
+                }
+
+                Section(contentPadding = horizontalContentPadding) {
+                    OccupiedStatus(isOccupied, modifier = Modifier.padding(horizontalContentPadding))
+
+                    if (classification != null) {
+                        ClassificationStatus(classification, modifier = Modifier.padding(horizontalContentPadding))
+                    }
+
+                    Calendar(calendarColor, calendarName, modifier = Modifier.padding(horizontalContentPadding))
+                }
+
             }
 
             attendees.me?.let { me ->
                 PresenceStatusButtons(
                     presenceStatus = me.status,
-                    modifier = Modifier.padding(top = EsdsTheme.spacing.fourXl),
                     onPresenceStatusChange = { /*TODO[eventDetail]*/ },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .onSizeChanged { stickyFooterHeight = with(density) { it.height.toDp() } }
+                        .padding(
+                            top = EsdsTheme.spacing.xl,
+                            bottom = EsdsTheme.spacing.xl + contentPadding.calculateBottomPadding(),
+                        ),
                 )
             }
         }
     }
 }
 
-@Preview(heightDp = 1200)
+@Preview
 @Composable
 private fun PreviewEventDetail() {
     val eventDetail = EventDetailUi(
@@ -183,16 +207,14 @@ private fun PreviewEventDetail() {
     MaterialTheme {
         Surface {
             Scaffold {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    EventDetail(
-                        eventDetail = eventDetail,
-                        onJoinKMeet = {},
-                        onCopyKMeet = {},
-                        onLocationClick = {},
-                        onRoomClick = {},
-                        contentPadding = PaddingValues(horizontal = Margin.Small) + it,
-                    )
-                }
+                EventDetail(
+                    eventDetail = eventDetail,
+                    onJoinKMeet = {},
+                    onCopyKMeet = {},
+                    onLocationClick = {},
+                    onRoomClick = {},
+                    contentPadding = PaddingValues(horizontal = Margin.Small) + it,
+                )
             }
         }
     }

@@ -22,11 +22,9 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.plus
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
@@ -114,20 +112,19 @@ private fun EventDetailScreen(
         when (state) {
             EventDetailUiState.Loading -> Unit // Loaded locally, always fast, no need for a specific progress indicator UI
             is EventDetailUiState.Success -> {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    val copyFeedbackMessage = stringResource(RCommon.string.linkCopied)
+                val copyFeedbackMessage = stringResource(RCommon.string.linkCopied)
 
-                    EventDetail(
-                        eventDetail = state.eventDetail,
-                        onJoinKMeet = { /*TODO[eventDetail]*/ },
-                        onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
-                        onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
-                        onRoomClick = { /*TODO[eventDetail]*/ },
-                        contentPadding = scaffoldContentPadding + Dimens.EventDetailScreensHorizontalPadding,
-                        sharedTransitionScope = sharedTransitionScope,
-                        animatedVisibilityScope = animatedVisibilityScope,
-                    )
-                }
+                EventDetail(
+                    eventDetail = state.eventDetail,
+                    onJoinKMeet = { /*TODO[eventDetail]*/ },
+                    onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
+                    onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
+                    onRoomClick = { /*TODO[eventDetail]*/ },
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = scaffoldContentPadding + Dimens.EventDetailScreensHorizontalPadding,
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope,
+                )
             }
             EventDetailUiState.Unavailable -> LaunchedEffect(Unit) { goBack() }
         }
