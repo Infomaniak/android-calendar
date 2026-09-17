@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
@@ -26,8 +25,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.core.common.R as RCommon
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -60,17 +65,31 @@ internal fun KMeetButton(
                 Button(onClick = onJoin) {
                     Text(stringResource(R.string.buttonJoin))
                 }
-                IconButton(onClick = onCopy) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_squares_stacked),
-                        contentDescription = null,
-                        modifier = Modifier.size(EsdsTheme.icon.sizeSm),
-                    )
-                }
+
+                CopyButton(onClick = onCopy)
             }
         },
         modifier = modifier,
     )
+}
+
+@Composable
+private fun CopyButton(onClick: () -> Unit) {
+    val contentDescription = stringResource(RCommon.string.buttonCopy)
+
+    TooltipBox(
+        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
+        state = rememberTooltipState(),
+        tooltip = { PlainTooltip { Text(contentDescription) } },
+    ) {
+        IconButton(onClick = onClick) {
+            Icon(
+                painter = painterResource(R.drawable.ic_squares_stacked),
+                contentDescription = contentDescription,
+                modifier = Modifier.size(EsdsTheme.icon.sizeSm),
+            )
+        }
+    }
 }
 
 @Preview
