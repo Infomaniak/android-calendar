@@ -68,8 +68,8 @@ fun EventDetailScreen(
         uiState = { uiState },
         onBack = onBack,
         onLocationClick = { location -> openLocationInMapApp(context, location) },
-        onAttendeesClick = onAttendeesClick, 
-		modifier = modifier,
+        onAttendeesClick = onAttendeesClick,
+        modifier = modifier,
     )
 }
 
@@ -136,7 +136,12 @@ private fun Preview() {
 
     CalendarThemeForPreview {
         Surface {
-            EventDetailScreen(uiState = { EventDetailUiState.Success(previewEventDetail) }, onBack = {}, onAttendeesClick = {}, onLocationClick = {})
+            EventDetailScreen(
+                uiState = { EventDetailUiState.Success(previewEventDetail) },
+                onBack = {},
+                onAttendeesClick = {},
+                onLocationClick = {},
+            )
         }
     }
 }
