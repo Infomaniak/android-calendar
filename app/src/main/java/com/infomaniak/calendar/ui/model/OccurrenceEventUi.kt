@@ -25,17 +25,9 @@ import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlin.time.Instant
 
-/**
- * The [EventUi.Normal] every calendar view is given, carrying the [occurrenceId] of the occurrence it displays.
- *
- * CalendarComponents never reads [occurrenceId]: it only hands the event back when it is clicked, which is where we
- * read it to open the detail of the very occurrence the user tapped. This is what keeps the KMP [OccurrenceId] out
- * of those modules entirely.
- */
 @Immutable
 data class OccurrenceEventUi(
     override val id: String,
-    /** The displayed occurrence, never the master event of the series it belongs to. */
     val occurrenceId: OccurrenceId,
     override val title: String,
     override val location: String?,
@@ -47,5 +39,5 @@ data class OccurrenceEventUi(
     override val attendees: Attendees,
 ) : EventUi.Normal
 
-/** The occurrence [this] displays, every event handed to a calendar view being an [OccurrenceEventUi]. */
+/** All [EventUi.Normal] used in the app are [OccurrenceEventUi] and we need to cast it to get the occurrence id back */
 val EventUi.Normal.occurrenceId: OccurrenceId get() = (this as OccurrenceEventUi).occurrenceId

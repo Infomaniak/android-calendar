@@ -25,13 +25,6 @@ import kotlin.time.Instant
 sealed interface EventUi {
     val id: String
 
-    /**
-     * A single event, described by everything the components need to draw it.
-     *
-     * Implemented by the consumer so it can carry its own identity alongside — these modules only ever read
-     * the properties declared here, and hand the instance itself back through their click callbacks.
-     * Use [SimpleEventUi] when there is nothing extra to carry.
-     */
     @Immutable
     interface Normal : EventUi {
         val title: String
@@ -60,7 +53,12 @@ sealed interface EventUi {
     }
 }
 
-/** Ready-made [EventUi.Normal] for consumers with no identity of their own to carry. */
+enum class EventStatus {
+    Confirmed,
+    Tentative,
+    Cancelled,
+}
+
 @Immutable
 data class SimpleEventUi(
     override val id: String,
@@ -73,9 +71,3 @@ data class SimpleEventUi(
     override val colors: EventColorsUi,
     override val attendees: Attendees,
 ) : EventUi.Normal
-
-enum class EventStatus {
-    Confirmed,
-    Tentative,
-    Cancelled,
-}
