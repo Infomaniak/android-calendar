@@ -22,6 +22,7 @@ import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 
 internal val previewAttendees = listOf(
     AttendeeUi(email = "alice@example.com", displayName = "Alice Johnson", status = ParticipationStatus.Accepted),
+    AttendeeUi(email = "ellen@example.com", displayName = "Ellen Joe", status = ParticipationStatus.NeedsAction),
     AttendeeUi(email = "bob@example.com", displayName = "Bob Smith", status = ParticipationStatus.Tentative),
     AttendeeUi(email = "carla@example.com", displayName = "Carla Lopez", status = ParticipationStatus.Declined),
     AttendeeUi(email = "denis@example.com", displayName = "Denis Brown", status = ParticipationStatus.NeedsAction),

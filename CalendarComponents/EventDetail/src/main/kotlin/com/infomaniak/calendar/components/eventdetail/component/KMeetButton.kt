@@ -17,15 +17,21 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,29 +39,57 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.resources.R
-import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.core.common.R as RCommon
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-internal fun KMeetButton(onClick: () -> Unit, modifier: Modifier = Modifier, contentPadding: PaddingValues = PaddingValues()) {
-    ClickableItem(
-        text = stringResource(id = R.string.participateKMeetTitle),
-        leadingIconRes = R.drawable.ic_product_kmeet,
+internal fun KMeetButton(
+    onJoin: () -> Unit,
+    onCopy: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    ListItem(
+        headlineContent = {
+            Text(stringResource(id = R.string.participateKMeetTitle), style = MaterialTheme.typography.bodyLarge)
+        },
+        leadingContent = {
+            Icon(
+                painter = painterResource(R.drawable.ic_product_kmeet),
+                contentDescription = null,
+                modifier = Modifier.size(EsdsTheme.icon.sizeSm),
+            )
+        },
         trailingContent = {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
-                Text(stringResource(R.string.buttonJoin), style = MaterialTheme.typography.labelLarge)
-                Icon(
-                    painter = painterResource(R.drawable.ic_squares_stacked),
-                    contentDescription = null,
-                    modifier = Modifier.size(EsdsTheme.icon.sizeSm),
-                )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Button(onClick = onJoin) {
+                    Text(stringResource(R.string.buttonJoin))
+                }
+
+                CopyButton(onClick = onCopy)
             }
         },
-        onClick = onClick,
         modifier = modifier,
-        contentPadding = contentPadding,
     )
+}
+
+@Composable
+private fun CopyButton(onClick: () -> Unit) {
+    val contentDescription = stringResource(RCommon.string.buttonCopy)
+
+    TooltipBox(
+        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
+        state = rememberTooltipState(),
+        tooltip = { PlainTooltip { Text(contentDescription) } },
+    ) {
+        IconButton(onClick = onClick) {
+            Icon(
+                painter = painterResource(R.drawable.ic_squares_stacked),
+                contentDescription = contentDescription,
+                modifier = Modifier.size(EsdsTheme.icon.sizeSm),
+            )
+        }
+    }
 }
 
 @Preview
@@ -63,7 +97,7 @@ internal fun KMeetButton(onClick: () -> Unit, modifier: Modifier = Modifier, con
 private fun PreviewKMeetButton() {
     MaterialTheme {
         Surface {
-            KMeetButton(onClick = {})
+            KMeetButton(onJoin = {}, onCopy = {})
         }
     }
 }
