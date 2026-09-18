@@ -18,11 +18,13 @@
 package com.infomaniak.calendar.ui.screen.day
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
@@ -143,18 +145,14 @@ private fun DayScreen(
     var topBarHeight by remember { mutableStateOf(0.dp) }
 
     Scaffold(
-        // The top bar floats over the day, blurring what passes under it, and the timeline runs
-        // under the navigation bar: both insets stay out, and each of the two makes its own room.
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Horizontal),
         modifier = modifier,
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-        ) {
+    ) { scaffoldContentPadding ->
+        Box(modifier = Modifier.fillMaxSize()) {
+            val contentPadding = scaffoldContentPadding + PaddingValues(top = topBarHeight)
+
             when (val state = dayUiState()) {
-                is DayUiState.Loading -> LoadingDay(modifier = Modifier.padding(top = topBarHeight))
+                is DayUiState.Loading -> LoadingDay(modifier = Modifier.padding(contentPadding))
                 is DayUiState.Success -> {
                     SuccessDay(
                         visibleDayState = visibleDayState,
@@ -163,7 +161,7 @@ private fun DayScreen(
                         eventsByDate = state.eventsByDate,
                         goToEventDetail = goToEventDetail,
                         hazeState = hazeState,
-                        topContentPadding = topBarHeight,
+                        contentPadding = contentPadding,
                     )
                 }
             }
@@ -199,7 +197,7 @@ private fun SuccessDay(
     eventsByDate: () -> DayEventsByDate,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     hazeState: HazeState,
-    topContentPadding: Dp,
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
     DayPager(
@@ -210,12 +208,9 @@ private fun SuccessDay(
         weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
         onVisibleDateChanged = { visibleDayState.onVisibleDateChanged(it) },
         onEventClick = { goToEventDetail(it.occurrenceId) },
-        topContentPadding = topContentPadding,
-        // The day header wears the same material as the top bar, so the two read as one panel the
-        // hours scroll under. Only the timeline feeds the blur: a source holding the effects that
-        // read it would draw itself, over and over.
         headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
         timelineModifier = Modifier.hazeSource(hazeState),
+        contentPadding = contentPadding,
         modifier = modifier.fillMaxSize(),
     )
 }
