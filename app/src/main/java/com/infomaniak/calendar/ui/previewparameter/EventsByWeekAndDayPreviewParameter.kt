@@ -51,7 +51,7 @@ private fun eventUi(
 
     return EventUi.Normal(
         id = id,
-        masterEventId = id,
+        occurrenceId = id,
         title = title,
         location = location,
         status = EventStatus.Confirmed,

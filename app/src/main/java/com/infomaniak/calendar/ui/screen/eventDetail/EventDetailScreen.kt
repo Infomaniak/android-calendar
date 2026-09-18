@@ -54,7 +54,7 @@ import com.infomaniak.core.common.R as RCommon
 
 @Composable
 fun EventDetailScreen(
-    eventId: String,
+    occurrenceId: String,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),
@@ -62,8 +62,8 @@ fun EventDetailScreen(
     val context = LocalContext.current
     val uiState by viewModel.eventDetailUi.collectAsStateWithLifecycle(initialValue = EventDetailUiState.Loading)
 
-    LaunchedEffect(eventId) {
-        viewModel.setEventId(eventId)
+    LaunchedEffect(occurrenceId) {
+        viewModel.setOccurrenceId(occurrenceId)
     }
 
     EventDetailScreen(

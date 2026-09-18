@@ -95,7 +95,7 @@ private fun previewEvent(
 
     return EventUi.Normal(
         id = "$title-$startHour:$startMinute",
-        masterEventId = "$title-$startHour:$startMinute",
+        occurrenceId = "$title-$startHour:$startMinute",
         title = title,
         location = location,
         status = EventStatus.Confirmed,

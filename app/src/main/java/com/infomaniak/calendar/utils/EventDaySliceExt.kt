@@ -35,7 +35,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventStatus
  */
 fun EventDaySlice.toEventUi(emailsByUserId: Map<AccountId, String>, timeZone: TimeZone): EventUi.Normal = EventUi.Normal(
     id = "${event.occurrenceId.value}@$date",
-    masterEventId = event.masterEventId.url,
+    occurrenceId = event.occurrenceId.value,
     title = event.title,
     location = event.location,
     status = event.status.toEventStatus(),

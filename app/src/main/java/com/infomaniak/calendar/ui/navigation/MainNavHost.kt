@@ -104,7 +104,7 @@ private fun baseEntryProvider(
     }
     entry<NavDestination.EventDetail>(metadata = metaDataOf(ResponsiveDialog)) { destination ->
         EventDetailScreen(
-            eventId = destination.eventId,
+            occurrenceId = destination.occurrenceId,
             onBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
         )
     }

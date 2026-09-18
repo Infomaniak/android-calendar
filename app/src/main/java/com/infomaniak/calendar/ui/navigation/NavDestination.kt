@@ -67,8 +67,9 @@ sealed interface NavDestination : NavKey {
         data class Actions(val userId: Int) : Accounts
     }
 
+    /** Carries the clicked occurrence, so a recurring series opens on the instance the user tapped. */
     @Serializable
-    data class EventDetail(val eventId: String) : NavDestination
+    data class EventDetail(val occurrenceId: String) : NavDestination
 
     @Serializable
     data object EventCreation : NavDestination
