@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.SyncEventsManager
+import com.infomaniak.calendar.manager.VisibleMonthManager
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
@@ -42,6 +43,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.YearMonth
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
@@ -55,6 +57,7 @@ class DayViewModel(
     calendarManager: CalendarManager,
     syncEventsManager: SyncEventsManager,
     private val calendarDataValues: CalendarDataValues,
+    private val visibleMonthManager: VisibleMonthManager,
 ) : ViewModel() {
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
 
@@ -81,6 +84,11 @@ class DayViewModel(
             DayUiState.Success({ eventsByDate })
         }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = DayUiState.Loading)
+
+    val eventDots = visibleMonthManager.eventDots
+        .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
+
+    fun onVisibleMonthChanged(month: YearMonth) = visibleMonthManager.onVisibleMonthChanged(month)
 
     companion object {
         const val DAY_RANGE_DAYS = 250

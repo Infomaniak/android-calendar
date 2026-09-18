@@ -45,6 +45,7 @@ import com.infomaniak.calendar.components.day.DayPager
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
@@ -58,8 +59,10 @@ import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.YearMonth
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
+import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
 @Composable
@@ -70,6 +73,7 @@ fun DayScreen(
 ) {
     val dayUiState by dayViewModel.dayUiState.collectAsStateWithLifecycle()
     val isLoadingEvents by dayViewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
+    val eventsDots by dayViewModel.eventDots.collectAsStateWithLifecycle(initialValue = emptyMap())
     val visibleDayState = LocalVisibleDayState.current ?: return
     // The timeline scrolls to its opening hour as soon as it is measured, and counts that scroll in
     // hour heights: it is built once the stored height is known, or it would open hours off.
@@ -78,6 +82,7 @@ fun DayScreen(
 
     SaveHourHeight(timelineState, onHourHeightChanged = dayViewModel::saveHourHeight)
     ApplyJumpRequests(visibleDayState)
+    ReportVisibleMonth(visibleDayState, onVisibleMonthChanged = dayViewModel::onVisibleMonthChanged)
 
     DayScreen(
         modifier = modifier,
@@ -87,7 +92,15 @@ fun DayScreen(
         timelineState = timelineState,
         dateRange = dayViewModel.dateRange,
         isLoadingEvents = { isLoadingEvents },
+        eventsDots = { eventsDots },
     )
+}
+
+@Composable
+private fun ReportVisibleMonth(visibleDayState: VisibleDayState, onVisibleMonthChanged: (YearMonth) -> Unit) {
+    LaunchedEffect(visibleDayState) {
+        snapshotFlow { visibleDayState.visibleDate.yearMonth }.collect(onVisibleMonthChanged)
+    }
 }
 
 /**
@@ -122,6 +135,7 @@ private fun DayScreen(
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     dayUiState: () -> DayUiState,
     isLoadingEvents: () -> Boolean,
+    eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     visibleDayState: VisibleDayState,
     timelineState: DayTimelineState,
     dateRange: ClosedRange<LocalDate>,
@@ -142,7 +156,7 @@ private fun DayScreen(
                         selectedDate = { visibleDayState.visibleDate },
                         onDayClick = { visibleDayState.jumpTo(it) },
                         weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
-                        eventsDots = { emptyMap() },
+                        eventsDots = eventsDots,
                     )
                 },
             )
@@ -202,6 +216,7 @@ private fun DayScreenPreview() {
                 goToEventDetail = {},
                 dayUiState = { DayUiState.Success({ emptyMap() }) },
                 isLoadingEvents = { false },
+                eventsDots = { emptyMap() },
                 visibleDayState = rememberVisibleDayState(visibleDate),
                 timelineState = rememberDayTimelineState(),
                 dateRange = visibleDate.value.minus(1, DateTimeUnit.DAY)..visibleDate.value.plus(1, DateTimeUnit.DAY),

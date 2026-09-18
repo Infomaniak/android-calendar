@@ -36,6 +36,10 @@ import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metrox.viewmodel.ViewModelGraph
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 
 val ComposeAppGraph: AppGraph
     @Composable get() {
@@ -79,6 +83,16 @@ interface AppGraph : AndroidComponentProvider, ViewModelGraph {
     @Provides
     @SingleIn(AppScope::class)
     fun provideCrashReportInterface(): CrashReport = AndroidCrashReport
+
+    /**
+     * Scope for work that belongs to the application rather than to any one screen, such as state kept warm across
+     * navigations. A [SupervisorJob] keeps one failing consumer from taking the scope down for all the others.
+     */
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideApplicationScope(): CoroutineScope {
+        return CoroutineScope(SupervisorJob() + Dispatchers.Default + CoroutineName("ApplicationScope"))
+    }
 
     @DependencyGraph.Factory
     fun interface Factory {
