@@ -33,6 +33,7 @@ import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.SearchBut
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.coroutines.launch
+import com.infomaniak.calendar.components.resources.R as RComponents
 
 object TopAppBarButtons {
     @Composable
@@ -79,6 +80,16 @@ object TopAppBarButtons {
             Icon(
                 painter = painterResource(R.drawable.ic_arrow_back),
                 contentDescription = stringResource(R.string.contentDescriptionBack),
+            )
+        }
+    }
+
+    @Composable
+    fun EditButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
+        IconButton(onClick = onClick, modifier = modifier) {
+            Icon(
+                painter = painterResource(RComponents.drawable.ic_pen),
+                contentDescription = "TODO Edit",
             )
         }
     }

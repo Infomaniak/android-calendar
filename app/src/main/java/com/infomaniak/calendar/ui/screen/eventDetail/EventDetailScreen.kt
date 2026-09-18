@@ -56,7 +56,8 @@ import com.infomaniak.core.common.R as RCommon
 @Composable
 fun EventDetailScreen(
     occurrenceId: OccurrenceId,
-    onBack: () -> Unit,
+    goBack: () -> Unit,
+    goToEdit: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),
 ) {
@@ -69,7 +70,8 @@ fun EventDetailScreen(
 
     EventDetailScreen(
         uiState = { uiState },
-        onBack = onBack,
+        goBack = goBack,
+        goToEdit = goToEdit,
         onLocationClick = { location -> openLocationInMapApp(context, location) },
         modifier = modifier,
     )
@@ -78,14 +80,21 @@ fun EventDetailScreen(
 @Composable
 private fun EventDetailScreen(
     uiState: () -> EventDetailUiState,
-    onBack: () -> Unit,
+    goBack: () -> Unit,
+    goToEdit: () -> Unit,
     onLocationClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val clipboardManager = rememberClipboardCopyManager()
 
     Scaffold(
-        topBar = { TopAppBar(navigationIcon = { TopAppBarButtons.BackButton(onClick = onBack) }, title = {}) },
+        topBar = {
+            TopAppBar(
+                navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
+                title = {},
+                actions = { TopAppBarButtons.EditButton(onClick = goToEdit) },
+            )
+        },
         modifier = modifier,
     ) { scaffoldContentPadding ->
         when (val state = uiState()) {
@@ -104,7 +113,7 @@ private fun EventDetailScreen(
                     )
                 }
             }
-            EventDetailUiState.Deleted -> LaunchedEffect(Unit) { onBack() }
+            EventDetailUiState.Deleted -> LaunchedEffect(Unit) { goBack() }
         }
     }
 }
@@ -141,7 +150,12 @@ private fun Preview() {
 
     CalendarThemeForPreview {
         Surface {
-            EventDetailScreen(uiState = { EventDetailUiState.Success(previewEventDetail) }, onBack = {}, onLocationClick = {})
+            EventDetailScreen(
+                uiState = { EventDetailUiState.Success(previewEventDetail) },
+                goBack = {},
+                goToEdit = {},
+                onLocationClick = {},
+            )
         }
     }
 }

@@ -17,23 +17,42 @@
  */
 package com.infomaniak.calendar.components.eventdetail.edit
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
+import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 
 @Composable
 fun EventEdit(
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
-    Box(modifier) {
-        Text(text = "EventEdit")
+    val horizontalContentPadding = contentPadding.onlyHorizontal()
+
+    Column(
+        modifier.padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding()),
+    ) {
+        TitleEditable(
+            color = MaterialTheme.colorScheme.primary,
+            title = "",
+            modifier = Modifier.padding(horizontalContentPadding),
+        )
     }
 }
 
 @Preview
 @Composable
 private fun Preview() {
-    EventEdit()
+    MaterialTheme {
+        Surface {
+            EventEdit(contentPadding = PaddingValues(16.dp))
+        }
+    }
 }
