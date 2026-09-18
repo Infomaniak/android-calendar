@@ -78,6 +78,7 @@ class PlanningViewModel(
     private val initialDay = MutableStateFlow(today)
 
     val eventDots = visibleMonthManager.eventDots
+        .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
 
     fun onVisibleMonthChanged(month: YearMonth) = visibleMonthManager.onVisibleMonthChanged(month)
 

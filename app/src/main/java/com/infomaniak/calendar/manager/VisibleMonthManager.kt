@@ -26,16 +26,12 @@ import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -44,18 +40,15 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
-import kotlin.time.Duration.Companion.seconds
 
 @Inject
 @SingleIn(AppScope::class)
 class VisibleMonthManager(private val calendarManager: CalendarManager) {
-
-    private val scope = CoroutineScope(Dispatchers.Default + CoroutineName(this::class.java.simpleName))
     private val timeZone = TimeZone.currentSystemDefault()
     private val visibleMonth = MutableStateFlow(Clock.today(timeZone).yearMonth)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val eventDots: StateFlow<Map<LocalDate, List<EventColorsUi>>> = visibleMonth
+    val eventDots: Flow<Map<LocalDate, List<EventColorsUi>>> = visibleMonth
         .flatMapLatest { month ->
             calendarManager.observeMonthlyDotColors(
                 startMonth = month.minus(MONTH_MARGIN, DateTimeUnit.MONTH),
@@ -64,7 +57,6 @@ class VisibleMonthManager(private val calendarManager: CalendarManager) {
             )
         }
         .map { it.toEventDots() }
-        .stateIn(scope = scope, started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), initialValue = emptyMap())
 
     fun onVisibleMonthChanged(month: YearMonth) {
         visibleMonth.value = month
@@ -77,7 +69,5 @@ class VisibleMonthManager(private val calendarManager: CalendarManager) {
     companion object {
         /** Months kept loaded on each side of the visible one, so a swipe lands on a month that already has its dots. */
         private const val MONTH_MARGIN = 1
-
-        private val STOP_TIMEOUT_MS = 5.seconds.inWholeMilliseconds
     }
 }
