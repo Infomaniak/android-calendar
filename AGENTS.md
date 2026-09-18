@@ -101,6 +101,19 @@ The group is intentionally **self-contained**: no dependency on `:app`, no DI fr
 String resources follow the single-module pattern — all strings consumed by any CalendarComponents module are declared in 
 `:CalendarComponents:Resources` so consumers never have to manage per-module string tags.
 
+`EventUi.Normal` is an **interface**, not a data class: it declares only what the components need to draw an event.
+The consumer implements it and is free to carry its own identity alongside — the components never read anything beyond
+the declared properties, and hand the instance itself back through their click callbacks. That is how the app attaches
+the KMP `OccurrenceId` to every event (`OccurrenceEventUi`) and recovers it on click, without `OccurrenceId` ever
+appearing in these modules. `SimpleEventUi` is the ready-made implementation for consumers with nothing extra to carry
+(previews, simple hosts).
+
+The consequence is that reading consumer-specific data back out of a clicked event requires a cast on the consumer's
+side (the app does it once, in the `EventUi.Normal.occurrenceId` extension). Prefer this over making `EventUi.Normal`
+generic: a type parameter there would have to be threaded through every type that transports an event (`DayEvents`,
+`TimedEvent`, `Planning`, `DayView`, …), and since `Planning` dispatches over the sealed `EventUi` hierarchy it could
+only narrow to `Normal<*>` and would still need an unchecked cast — an unsafe one, this time inside the library.
+
 ### Flavors
 
 Every CalendarComponents module that contains **code** (`Foundation`, `Event`, `Planning`, `Day`, `Calendar`, `EventDetail`)

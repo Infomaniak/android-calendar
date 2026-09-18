@@ -18,43 +18,17 @@
 package com.infomaniak.calendar.components.foundation.models
 
 import androidx.compose.runtime.Immutable
-import kotlinx.datetime.LocalDate
 import kotlin.time.Instant
 
 @Immutable
-sealed interface EventUi {
-    val id: String
-
-    @Immutable
-    interface Normal : EventUi {
-        val title: String
-        val location: String?
-        val status: EventStatus
-        val start: Instant
-        val end: Instant
-        val isAllDay: Boolean
-        val colors: EventColorsUi
-        val attendees: Attendees
-    }
-
-    @Immutable
-    data object TodayEmptyState : EventUi {
-        override val id: String = TODAY_EMPTY_STATE_ID
-    }
-
-    @Immutable
-    data class EmptyState(val date: LocalDate) : EventUi {
-        override val id: String = "${date}_$EMPTY_STATE_ID"
-    }
-
-    companion object {
-        private const val TODAY_EMPTY_STATE_ID = "todayEmptyState"
-        private const val EMPTY_STATE_ID = "emptyState"
-    }
-}
-
-enum class EventStatus {
-    Confirmed,
-    Tentative,
-    Cancelled,
-}
+data class SimpleEventUi(
+    override val id: String,
+    override val title: String,
+    override val location: String?,
+    override val status: EventStatus,
+    override val start: Instant,
+    override val end: Instant,
+    override val isAllDay: Boolean,
+    override val colors: EventColorsUi,
+    override val attendees: Attendees,
+) : EventUi.Normal
