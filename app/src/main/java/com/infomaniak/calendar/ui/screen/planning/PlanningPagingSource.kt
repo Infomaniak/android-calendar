@@ -1,0 +1,118 @@
+/*
+ * Infomaniak Calendar - Android
+ * Copyright (C) 2026 Infomaniak Network SA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.infomaniak.calendar.ui.screen.planning
+
+import android.util.Log
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
+import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.calendar.components.foundation.models.YearWeek
+import com.infomaniak.calendar.components.planning.PlanningRow
+import com.infomaniak.calendar.components.planning.planningRows
+import com.infomaniak.core.common.cancellable
+import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
+import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
+import kotlinx.coroutines.flow.first
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+
+/**
+ * Pages the planning by ISO week, presenting a *flat* [PlanningRow] stream (`WeekHeader` + one row
+ * per event). The key is a [YearWeek]; the value is that/those week(s)' rows.
+ *
+ * The initial **refresh** loads three weeks at once — the target week plus its neighbours — as a
+ * single page, so:
+ * - jumping onto any day (even a week's last day) can be **top-aligned in one shot**, since the page
+ *   already has trailing (and leading) content to scroll against;
+ * - the previous/next weeks are **preloaded by construction**, independent of prefetch timing.
+ *
+ * The leading week keeps the target away from the leading edge, so prefetch does not immediately
+ * prepend after [AlignPlanningToDate] performs its one-time alignment.
+ *
+ * Subsequent append and prepend loads fetch a single week at a time, keeping page drops fine-grained.
+ *
+ * [initialDay] resolves the very first refresh key ([initialWeek]). A page only reads the current
+ * snapshot; [PlanningViewModel] owns the single reactive observation of the visible window and
+ * invalidates the active source after coalescing changes.
+ */
+internal class PlanningPagingSource(
+    private val initialDay: LocalDate,
+    private val calendarManager: CalendarManager,
+    private val emailsByUserId: suspend () -> Map<AccountId, String>,
+    private val timeZone: TimeZone,
+    private val weekNumbering: WeekNumbering = WeekNumbering.ISO_8601,
+    private val onInvalidated: (PlanningPagingSource) -> Unit = {},
+) : PagingSource<YearWeek, PlanningRow>() {
+
+    private val initialWeek: YearWeek = weekNumbering.weekOf(initialDay)
+
+    init {
+        registerInvalidatedCallback { onInvalidated(this) }
+    }
+
+    override suspend fun load(params: LoadParams<YearWeek>): LoadResult<YearWeek, PlanningRow> {
+        return runCatching {
+            when (params) {
+                is LoadParams.Refresh -> {
+                    val center = params.key ?: initialWeek
+                    loadWeeks(firstWeek = center.previousWeek(), lastWeek = center.nextWeek())
+                }
+                is LoadParams.Append -> loadWeeks(firstWeek = params.key, lastWeek = params.key)
+                is LoadParams.Prepend -> loadWeeks(firstWeek = params.key, lastWeek = params.key)
+            }
+        }.cancellable().getOrElse {
+            LoadResult.Error(it)
+        }
+    }
+
+    private suspend fun loadWeeks(firstWeek: YearWeek, lastWeek: YearWeek): LoadResult.Page<YearWeek, PlanningRow> {
+        val start = firstWeek.firstDay.atStartOfDayIn(timeZone)
+        val endExclusive = lastWeek.lastDay.plus(1, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
+
+        val slicesByDay = calendarManager
+            .observeDaySlices(start = start, end = endExclusive, timeZone = timeZone)
+            .first()
+        val emails = emailsByUserId()
+        val data = buildList {
+            for (week in weekNumbering.weeksBetween(firstWeek.firstDay, lastWeek.firstDay)) {
+                addAll(planningRows(week = week, days = slicesByDay.groupWeekDays(week, emails, timeZone)))
+            }
+        }
+
+        return LoadResult.Page(
+            data = data,
+            prevKey = firstWeek.previousWeek(),
+            nextKey = lastWeek.nextWeek(),
+        )
+    }
+
+    override fun getRefreshKey(state: PagingState<YearWeek, PlanningRow>): YearWeek {
+        val anchorPosition = state.anchorPosition ?: return initialWeek
+        val anchorDate = state.closestItemToPosition(anchorPosition)?.key?.date ?: return initialWeek
+        return weekNumbering.weekOf(anchorDate)
+    }
+
+    // Recompute through WeekNumbering so the week number stays correct across year boundaries.
+    private fun YearWeek.previousWeek(): YearWeek = weekNumbering.weekOf(firstDay.minus(1, DateTimeUnit.DAY))
+
+    private fun YearWeek.nextWeek(): YearWeek = weekNumbering.weekOf(lastDay.plus(1, DateTimeUnit.DAY))
+}
