@@ -18,13 +18,17 @@
 package com.infomaniak.calendar.ui.screen.day
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -36,8 +40,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
@@ -47,6 +54,7 @@ import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
+import com.infomaniak.calendar.ui.modifier.backgroundBlur
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.state.VisibleDayState
@@ -54,6 +62,9 @@ import com.infomaniak.calendar.ui.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.datetime.DateTimeUnit
@@ -129,13 +140,37 @@ private fun DayScreen(
 ) {
     var isCalendarExpanded by rememberSaveable { mutableStateOf(false) }
 
+    val hazeState = rememberHazeState()
+    val density = LocalDensity.current
+    var topBarHeight by remember { mutableStateOf(0.dp) }
+
     Scaffold(
-        topBar = {
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Horizontal),
+        modifier = modifier,
+    ) { scaffoldContentPadding ->
+        Box(modifier = Modifier.fillMaxSize()) {
+            val contentPadding = scaffoldContentPadding + PaddingValues(top = topBarHeight)
+
+            when (val state = dayUiState()) {
+                is DayUiState.Loading -> LoadingDay(modifier = Modifier.padding(contentPadding))
+                is DayUiState.Success -> {
+                    SuccessDay(
+                        visibleDayState = visibleDayState,
+                        timelineState = timelineState,
+                        dateRange = dateRange,
+                        eventsByDate = state.eventsByDate,
+                        goToEventDetail = goToEventDetail,
+                        hazeState = hazeState,
+                        contentPadding = contentPadding,
+                    )
+                }
+            }
+
             CalendarTopAppBar(
                 isLoadingEvents = isLoadingEvents,
                 onToggleCalendar = { isCalendarExpanded = !isCalendarExpanded },
                 isCalendarExpanded = { isCalendarExpanded },
-                hazeState = null,
+                hazeState = hazeState,
                 calendar = {
                     ExpandableCalendar(
                         isExpanded = { isCalendarExpanded },
@@ -145,20 +180,11 @@ private fun DayScreen(
                         eventsDots = { emptyMap() },
                     )
                 },
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .fillMaxWidth()
+                    .onSizeChanged { topBarHeight = with(density) { it.height.toDp() } },
             )
-        },
-        // The bottom insets stay out so the timeline can run under the navigation bar; it makes
-        // room for it in its own scrolled content instead.
-        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
-        modifier = modifier,
-    ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
-            when (val state = dayUiState()) {
-                is DayUiState.Loading -> LoadingDay()
-                is DayUiState.Success -> {
-                    SuccessDay(visibleDayState, timelineState, dateRange, state.eventsByDate, goToEventDetail)
-                }
-            }
         }
     }
 }
@@ -170,6 +196,8 @@ private fun SuccessDay(
     dateRange: ClosedRange<LocalDate>,
     eventsByDate: () -> DayEventsByDate,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
+    hazeState: HazeState,
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
     DayPager(
@@ -180,6 +208,9 @@ private fun SuccessDay(
         weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
         onVisibleDateChanged = { visibleDayState.onVisibleDateChanged(it) },
         onEventClick = { goToEventDetail(it.occurrenceId) },
+        headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
+        timelineModifier = Modifier.hazeSource(hazeState),
+        contentPadding = contentPadding,
         modifier = modifier.fillMaxSize(),
     )
 }
