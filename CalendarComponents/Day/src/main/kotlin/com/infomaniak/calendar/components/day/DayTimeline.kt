@@ -19,8 +19,11 @@ package com.infomaniak.calendar.components.day
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
@@ -32,9 +35,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.component.CurrentTimeIndicator
 import com.infomaniak.calendar.components.day.component.HourGrid
 import com.infomaniak.calendar.components.day.component.HourLabelOverhang
@@ -59,9 +61,6 @@ private val LocalDateTime.minuteOfDay: Int get() = hour * MINUTES_PER_HOUR + min
 /**
  * Overlaps are resolved once per width and zoom level rather than on every frame, since the
  * arrangement only changes when one of the two does.
- *
- * [topContentPadding] is room kept at the top of the scrolled content, for whatever floats over the
- * timeline: the hours start below it, and scroll under it rather than being clipped by it.
  */
 @Composable
 fun DayTimeline(
@@ -70,11 +69,19 @@ fun DayTimeline(
     state: DayTimelineState,
     onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
-    topContentPadding: Dp = 0.dp,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     val currentDateTime by rememberCurrentDateTime()
+    val layoutDirection = LocalLayoutDirection.current
 
-    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+    BoxWithConstraints(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                start = contentPadding.calculateStartPadding(layoutDirection),
+                end = contentPadding.calculateEndPadding(layoutDirection),
+            ),
+    ) {
         val density = LocalDensity.current
         val config = eventLayoutConfig()
         // The solver strips horizontalSpacing off the end of every card, so the area runs that far
@@ -100,8 +107,8 @@ fun DayTimeline(
             modifier = Modifier
                 .verticalScroll(state.scrollState, enabled = !state.isPinching)
                 .padding(
-                    top = HourLabelOverhang + topContentPadding,
-                    bottom = DayTimelineDefaults.BottomPadding + navigationBarPadding,
+                    top = HourLabelOverhang + contentPadding.calculateTopPadding(),
+                    bottom = DayTimelineDefaults.BottomPadding + navigationBarPadding + contentPadding.calculateBottomPadding(),
                 )
                 // Inside the padding: a pinch reads its own y as an hour, so it has to start
                 // counting where the first hour line is drawn, not where the padding begins.

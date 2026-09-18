@@ -21,11 +21,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -38,7 +40,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.component.AllDayEventsBand
 import com.infomaniak.calendar.components.day.component.DayHeader
@@ -55,13 +56,8 @@ import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
 
 /**
- * A single day: the scrollable hour grid carrying the timed events, with its header and the all-day
- * events pinned over the top of it.
- *
- * The header floats rather than sitting above the grid, so the hours pass under it, and under
- * whatever the caller floats over the day: [topContentPadding] is the room that caller needs, and
- * [headerModifier] is where it hands in the background the header is read against. [timelineModifier]
- * reaches the grid alone, for the callers that blur what scrolls under them.
+ * A single day: its header, the all-day events pinned at the top, and the scrollable hour grid
+ * carrying the timed events.
  */
 @Composable
 fun DayView(
@@ -73,13 +69,12 @@ fun DayView(
     modifier: Modifier = Modifier,
     headerModifier: Modifier = Modifier,
     timelineModifier: Modifier = Modifier,
-    topContentPadding: Dp = 0.dp,
+    contentPadding: PaddingValues = PaddingValues(),
     headerTrailingContent: @Composable () -> Unit = {},
 ) {
     val density = LocalDensity.current
-    // The header is measured rather than given a height: the all-day band grows with the events it
-    // holds, and the hours have to start under whatever it ends up being.
     var headerHeight by remember { mutableStateOf(0.dp) }
+    val dayPadding = contentPadding + PaddingValues(horizontal = EsdsTheme.spacing.md)
 
     Box(modifier = modifier) {
         DayTimeline(
@@ -87,19 +82,18 @@ fun DayView(
             events = events,
             state = state,
             onEventClick = onEventClick,
-            topContentPadding = headerHeight + EsdsTheme.spacing.md,
-            modifier = timelineModifier
-                .fillMaxSize()
-                .padding(horizontal = EsdsTheme.spacing.md),
+            contentPadding = dayPadding + PaddingValues(top = headerHeight + EsdsTheme.spacing.md),
+            modifier = timelineModifier.fillMaxSize(),
         )
 
         Column {
             Column(
                 verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),
-                modifier = headerModifier
+                modifier = Modifier
                     .fillMaxWidth()
+                    .padding(top = contentPadding.calculateTopPadding())
                     .onSizeChanged { headerHeight = with(density) { it.height.toDp() } }
-                    .padding(top = topContentPadding),
+                    .then(headerModifier),
             ) {
                 DayHeader(
                     date = date,
@@ -113,7 +107,6 @@ fun DayView(
                     onEventClick = onEventClick,
                     modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md),
                 )
-
             }
 
             Spacer(
