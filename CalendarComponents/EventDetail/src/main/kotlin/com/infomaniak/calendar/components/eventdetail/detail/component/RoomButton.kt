@@ -15,39 +15,58 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.component
+package com.infomaniak.calendar.components.eventdetail.detail.component
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
+import android.icu.text.MessageFormat
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalLocale
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.resources.R
+import java.util.Locale
 
 @Composable
-internal fun ClassificationStatus(classification: EventDetailUi.Classification, modifier: Modifier = Modifier) {
-    ListItem(
-        headlineContent = { Text(text = stringResource(classification.label)) },
-        leadingContent = { Icon(painter = painterResource(R.drawable.ic_lock), contentDescription = null) },
+internal fun RoomButton(
+    room: EventDetailUi.Room,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
+    ClickableItem(
+        text = room.title,
+        leadingIconRes = R.drawable.ic_door_open,
+        supportingContent = {
+            val locale = LocalLocale.current.platformLocale
+
+            val roomSeats = pluralStringResource(R.plurals.roomSeatsLabel, room.seats, room.seats)
+            val roomFloor = stringResource(R.string.roomFloorLabel, room.floor.formatToOrdinal(locale))
+
+            Text(text = "$roomSeats, $roomFloor")
+        },
+        onClick = onClick,
+        contentPadding = contentPadding,
         modifier = modifier,
     )
 }
 
+private fun Int.formatToOrdinal(locale: Locale): String {
+    val formatter = MessageFormat("{0, ordinal}", locale)
+    return formatter.format(arrayOf(this))
+}
+
 @Preview
 @Composable
-private fun PreviewClassificationStatus() {
+private fun PreviewRoomButton() {
     MaterialTheme {
         Surface {
-            Column {
-                EventDetailUi.Classification.entries.forEach { ClassificationStatus(classification = it) }
-            }
+            RoomButton(room = EventDetailUi.Room("Japan room", seats = 5, floor = 3), onClick = {})
         }
     }
 }

@@ -15,38 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.component
+package com.infomaniak.calendar.components.eventdetail.edit
 
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.resources.R
 
 @Composable
-internal fun LocationButton(
-    location: String,
-    onClick: () -> Unit,
+fun EventEdit(
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(),
 ) {
-    ClickableItem(
-        text = location,
-        leadingIconRes = R.drawable.ic_map_pin,
-        onClick = onClick,
-        contentPadding = contentPadding,
-        modifier = modifier,
-    )
+    Box(modifier) {
+        Text(text = "EventEdit")
+    }
 }
 
 @Preview
 @Composable
-private fun PreviewLocationButton() {
-    MaterialTheme {
-        Surface {
-            LocationButton(location = "742 Evergreen Terrace, Springfield", onClick = {})
-        }
-    }
+private fun Preview() {
+    EventEdit()
 }

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail
+package com.infomaniak.calendar.components.eventdetail.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -42,19 +42,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
-import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
-import com.infomaniak.calendar.components.eventdetail.component.Calendar
-import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatus
-import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
-import com.infomaniak.calendar.components.eventdetail.component.DescriptionCollapsibleButton
-import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
-import com.infomaniak.calendar.components.eventdetail.component.LIST_ITEM_HORIZONTAL_PADDING
-import com.infomaniak.calendar.components.eventdetail.component.LocationButton
-import com.infomaniak.calendar.components.eventdetail.component.Notifications
-import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatus
-import com.infomaniak.calendar.components.eventdetail.component.RoomButton
+import com.infomaniak.calendar.components.eventdetail.detail.component.AttendeesButton
+import com.infomaniak.calendar.components.eventdetail.detail.component.Calendar
+import com.infomaniak.calendar.components.eventdetail.detail.component.ClassificationStatus
+import com.infomaniak.calendar.components.eventdetail.detail.component.DateAndTime
+import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
+import com.infomaniak.calendar.components.eventdetail.detail.component.KMeetButton
+import com.infomaniak.calendar.components.eventdetail.detail.component.LIST_ITEM_HORIZONTAL_PADDING
+import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
+import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
+import com.infomaniak.calendar.components.eventdetail.detail.component.OccupiedStatus
+import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.eventdetail.previewAttendees
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin

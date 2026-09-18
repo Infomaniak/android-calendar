@@ -25,6 +25,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.eventdetail.detail.component.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.core.ui.compose.theme.LocalIsThemeDarkMode
 import com.infomaniak.designsystem.core.theme.EsdsTheme
