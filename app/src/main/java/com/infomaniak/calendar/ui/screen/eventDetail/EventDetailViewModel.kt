@@ -75,4 +75,9 @@ class EventDetailViewModel(
                 .toEventDetailUi(calendar, emailsByUserId)
                 .let(EventDetailUiState::Success)
         }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val eventAttendees = eventFlow.flatMapLatest { event ->
+        flowOf(event?.attendees ?: emptyList())
+    }
 }

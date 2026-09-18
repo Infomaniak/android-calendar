@@ -28,6 +28,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -38,6 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
@@ -56,6 +59,7 @@ import com.infomaniak.calendar.components.eventdetail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
+import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -68,6 +72,7 @@ fun EventDetail(
     onJoinKMeet: () -> Unit,
     onCopyKMeet: () -> Unit,
     onLocationClick: () -> Unit,
+    onAttendeesClick: () -> Unit,
     onRoomClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
@@ -83,7 +88,7 @@ fun EventDetail(
 
             Section(contentPadding = horizontalContentPadding) {
                 if (attendees.all.isNotEmpty()) {
-                    AttendeesButton(attendees.all, onClick = {}, contentPadding = horizontalContentPadding)
+                    AttendeesButton(attendees.all, onClick = onAttendeesClick, contentPadding = horizontalContentPadding)
                 }
 
                 if (kMeetUrl?.isNotBlank() == true) {
@@ -124,6 +129,14 @@ fun EventDetail(
 
                 Calendar(calendarColor, calendarName, modifier = Modifier.padding(horizontalContentPadding))
             }
+
+            Section(contentPadding = horizontalContentPadding) {
+                OccupiedStatus(isOccupied, modifier = Modifier.padding(horizontalContentPadding))
+
+                if (classification != null) {
+                    ClassificationStatus(classification, modifier = Modifier.padding(horizontalContentPadding))
+                }
+            }
         }
     }
 }
@@ -141,6 +154,24 @@ private fun Title(color: Color, title: String, modifier: Modifier = Modifier) {
                     .background(color),
             )
         },
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun OccupiedStatus(isOccupied: Boolean, modifier: Modifier = Modifier) {
+    ListItem(
+        headlineContent = { Text(text = stringResource(if (isOccupied) R.string.occupiedLabel else R.string.availableLabel)) },
+        leadingContent = { Icon(painter = painterResource(R.drawable.ic_briefcase), contentDescription = null) },
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun ClassificationStatus(classification: EventDetailUi.Classification, modifier: Modifier = Modifier) {
+    ListItem(
+        headlineContent = { Text(text = stringResource(classification.label)) },
+        leadingContent = { Icon(painter = painterResource(R.drawable.ic_lock), contentDescription = null) },
         modifier = modifier,
     )
 }
@@ -221,6 +252,7 @@ private fun PreviewEventDetail() {
                         onCopyKMeet = {},
                         onLocationClick = {},
                         onRoomClick = {},
+                        onAttendeesClick = {},
                         contentPadding = PaddingValues(horizontal = Margin.Small) + it,
                     )
                 }
