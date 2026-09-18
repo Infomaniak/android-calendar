@@ -23,12 +23,14 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.models.EventStatus
-import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.calendar.ui.model.OccurrenceEventUi
 import com.infomaniak.calendar.ui.screen.planning.EventsByWeekAndDay
 import com.infomaniak.calendar.ui.screen.planning.toEventColorsUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.datetime.LocalDate
 import kotlin.time.Instant
 
@@ -43,15 +45,15 @@ private fun eventUi(
     end: String,
     location: String? = null,
     color: Color = Color(0xFF2196F3),
-): EventUi.Normal {
+): OccurrenceEventUi {
     val attendees = listOf(
         AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted),
         AttendeeUi("bob@example.com", "Bob", ParticipationStatus.Tentative),
     )
 
-    return EventUi.Normal(
+    return OccurrenceEventUi(
         id = id,
-        occurrenceId = id,
+        occurrenceId = OccurrenceId.Master(EventId(id)),
         title = title,
         location = location,
         status = EventStatus.Confirmed,

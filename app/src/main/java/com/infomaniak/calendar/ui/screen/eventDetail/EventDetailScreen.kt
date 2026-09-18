@@ -48,13 +48,14 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.extensions.safeStartActivity
 import com.infomaniak.core.ui.compose.basics.rememberClipboardCopyManager
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 import com.infomaniak.core.common.R as RCommon
 
 @Composable
 fun EventDetailScreen(
-    occurrenceId: String,
+    occurrenceId: OccurrenceId,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),

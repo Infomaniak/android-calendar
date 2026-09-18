@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.ui.navigation
 
 import androidx.navigation3.runtime.NavKey
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -69,7 +70,7 @@ sealed interface NavDestination : NavKey {
 
     /** Carries the clicked occurrence, so a recurring series opens on the instance the user tapped. */
     @Serializable
-    data class EventDetail(val occurrenceId: String) : NavDestination
+    data class EventDetail(val occurrenceId: OccurrenceId) : NavDestination
 
     @Serializable
     data object EventCreation : NavDestination

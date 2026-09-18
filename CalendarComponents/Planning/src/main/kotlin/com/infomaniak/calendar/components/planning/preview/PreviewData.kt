@@ -24,6 +24,7 @@ import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.SimpleEventUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
@@ -73,9 +74,8 @@ private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalD
     }
 
     fun event(date: LocalDate, hour: Int, title: String, location: String? = null, color: Color = Color(0xFF4285F4)): EventUi {
-        return EventUi.Normal(
+        return SimpleEventUi(
             id = "$date-$hour",
-            occurrenceId = "$date-$hour",
             title = title,
             location = location,
             status = EventStatus.Confirmed,

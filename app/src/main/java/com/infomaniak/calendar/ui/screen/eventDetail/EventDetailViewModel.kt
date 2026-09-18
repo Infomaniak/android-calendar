@@ -20,7 +20,6 @@ package com.infomaniak.calendar.ui.screen.eventDetail
 import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.toEventDetailUi
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
@@ -43,7 +42,7 @@ class EventDetailViewModel(
     accountUtils: AccountUtils,
     private val calendarManager: CalendarManager,
 ) : ViewModel() {
-    private val occurrenceIdFlow: MutableSharedFlow<String> = MutableSharedFlow(
+    private val occurrenceIdFlow: MutableSharedFlow<OccurrenceId> = MutableSharedFlow(
         replay = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
@@ -53,7 +52,7 @@ class EventDetailViewModel(
         .distinctUntilChanged()
         .flatMapLatest { occurrenceId -> calendarManager.observeOccurrence(occurrenceId) }
 
-    fun setOccurrenceId(occurrenceId: String) {
+    fun setOccurrenceId(occurrenceId: OccurrenceId) {
         occurrenceIdFlow.tryEmit(occurrenceId)
     }
 
@@ -77,10 +76,3 @@ class EventDetailViewModel(
                 .let(EventDetailUiState::Success)
         }
 }
-
-/**
- * TODO[occurrenceId]: [OccurrenceId.Recurrence] is internal to the KMP module, so a serialized occurrence id cannot be
- *  parsed back and every id is read as a master. Occurrences of a recurring series therefore still resolve to their
- *  master event.
- */
-private fun CalendarManager.observeOccurrence(occurrenceId: String) = observeOccurrence(OccurrenceId.Master(EventId(occurrenceId)))

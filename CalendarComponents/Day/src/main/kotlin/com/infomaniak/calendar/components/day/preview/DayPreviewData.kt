@@ -25,6 +25,7 @@ import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.SimpleEventUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.preview.EventColorsUiFactory
 import com.infomaniak.core.common.utils.today
@@ -93,9 +94,8 @@ private fun previewEvent(
 ): EventUi.Normal {
     val today = Clock.today(previewTimeZone)
 
-    return EventUi.Normal(
+    return SimpleEventUi(
         id = "$title-$startHour:$startMinute",
-        occurrenceId = "$title-$startHour:$startMinute",
         title = title,
         location = location,
         status = EventStatus.Confirmed,

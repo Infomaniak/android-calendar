@@ -25,20 +25,24 @@ import kotlin.time.Instant
 sealed interface EventUi {
     val id: String
 
+    /**
+     * A single event, described by everything the components need to draw it.
+     *
+     * Implemented by the consumer so it can carry its own identity alongside — these modules only ever read
+     * the properties declared here, and hand the instance itself back through their click callbacks.
+     * Use [SimpleEventUi] when there is nothing extra to carry.
+     */
     @Immutable
-    data class Normal(
-        override val id: String,
-        /** The displayed occurrence, never the master event of the series it belongs to. */
-        val occurrenceId: String,
-        val title: String,
-        val location: String?,
-        val status: EventStatus,
-        val start: Instant,
-        val end: Instant,
-        val isAllDay: Boolean,
-        val colors: EventColorsUi,
-        val attendees: Attendees,
-    ) : EventUi
+    interface Normal : EventUi {
+        val title: String
+        val location: String?
+        val status: EventStatus
+        val start: Instant
+        val end: Instant
+        val isAllDay: Boolean
+        val colors: EventColorsUi
+        val attendees: Attendees
+    }
 
     @Immutable
     data object TodayEmptyState : EventUi {
@@ -55,6 +59,20 @@ sealed interface EventUi {
         private const val EMPTY_STATE_ID = "emptyState"
     }
 }
+
+/** Ready-made [EventUi.Normal] for consumers with no identity of their own to carry. */
+@Immutable
+data class SimpleEventUi(
+    override val id: String,
+    override val title: String,
+    override val location: String?,
+    override val status: EventStatus,
+    override val start: Instant,
+    override val end: Instant,
+    override val isAllDay: Boolean,
+    override val colors: EventColorsUi,
+    override val attendees: Attendees,
+) : EventUi.Normal
 
 enum class EventStatus {
     Confirmed,

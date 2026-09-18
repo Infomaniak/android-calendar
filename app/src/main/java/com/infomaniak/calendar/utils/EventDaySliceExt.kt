@@ -19,6 +19,7 @@ package com.infomaniak.calendar.utils
 
 import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.ui.model.OccurrenceEventUi
 import com.infomaniak.calendar.ui.screen.planning.toEventColorsUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
@@ -30,12 +31,12 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventStatus
  * Translation of the KMP event model into the UI model consumed by CalendarComponents, shared by
  * every calendar view so they all render the same event identically.
  *
- * The resulting [EventUi.Normal] carries the slice's own day-clamped bounds, converted to an
+ * The resulting [OccurrenceEventUi] carries the slice's own day-clamped bounds, converted to an
  * absolute instant in [timeZone].
  */
-fun EventDaySlice.toEventUi(emailsByUserId: Map<AccountId, String>, timeZone: TimeZone): EventUi.Normal = EventUi.Normal(
+fun EventDaySlice.toEventUi(emailsByUserId: Map<AccountId, String>, timeZone: TimeZone): OccurrenceEventUi = OccurrenceEventUi(
     id = "${event.occurrenceId.value}@$date",
-    occurrenceId = event.occurrenceId.value,
+    occurrenceId = event.occurrenceId,
     title = event.title,
     location = event.location,
     status = event.status.toEventStatus(),
