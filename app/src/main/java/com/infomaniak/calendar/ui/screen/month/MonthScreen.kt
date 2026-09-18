@@ -49,7 +49,7 @@ private fun MonthScreen(modifier: Modifier = Modifier, isLoadingEvents: () -> Bo
             CalendarTopAppBar(
                 onToggleCalendar = {},
                 isLoadingEvents = isLoadingEvents,
-                isCalendarExpanded = { false },
+                calendarExpansionProgress = { 0f },
                 hazeState = hazeState,
             )
         },

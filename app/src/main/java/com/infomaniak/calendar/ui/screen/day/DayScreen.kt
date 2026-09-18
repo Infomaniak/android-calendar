@@ -31,8 +31,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +39,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
+import com.infomaniak.calendar.components.calendar.component.collapsesCalendarOnScroll
+import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
 import com.infomaniak.calendar.components.day.DayPager
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
@@ -127,18 +127,18 @@ private fun DayScreen(
     dateRange: ClosedRange<LocalDate>,
     modifier: Modifier = Modifier,
 ) {
-    var isCalendarExpanded by rememberSaveable { mutableStateOf(false) }
+    val calendarExpansion = rememberCalendarExpansionState()
 
     Scaffold(
         topBar = {
             CalendarTopAppBar(
                 isLoadingEvents = isLoadingEvents,
-                onToggleCalendar = { isCalendarExpanded = !isCalendarExpanded },
-                isCalendarExpanded = { isCalendarExpanded },
+                onToggleCalendar = calendarExpansion::toggle,
+                calendarExpansionProgress = { calendarExpansion.progress },
                 hazeState = null,
                 calendar = {
                     ExpandableCalendar(
-                        isExpanded = { isCalendarExpanded },
+                        expansionState = calendarExpansion,
                         selectedDate = { visibleDayState.visibleDate },
                         onDayClick = { visibleDayState.jumpTo(it) },
                         weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
@@ -152,7 +152,13 @@ private fun DayScreen(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
         modifier = modifier,
     ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
+        // Above the pager rather than inside it: every day shares one hour grid scroll, and the
+        // horizontal paging never dispatches the vertical scroll the calendar is listening for.
+        Box(
+            modifier = Modifier
+                .padding(paddingValues)
+                .collapsesCalendarOnScroll(calendarExpansion),
+        ) {
             when (val state = dayUiState()) {
                 is DayUiState.Loading -> LoadingDay()
                 is DayUiState.Success -> {
