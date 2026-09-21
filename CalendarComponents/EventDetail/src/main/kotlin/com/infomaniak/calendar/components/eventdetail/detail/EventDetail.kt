@@ -19,11 +19,8 @@ package com.infomaniak.calendar.components.eventdetail.detail
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
@@ -32,17 +29,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
-import com.infomaniak.calendar.components.eventdetail.component.PresenceStatusButtons
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
-import com.infomaniak.calendar.components.eventdetail.component.rememberPresenceStatusToolbarState
 import com.infomaniak.calendar.components.eventdetail.detail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Calendar
 import com.infomaniak.calendar.components.eventdetail.detail.component.ClassificationStatus
@@ -59,9 +52,7 @@ import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElemen
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.eventdetail.previewAttendees
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
-import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
@@ -83,93 +74,73 @@ fun EventDetail(
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
     val horizontalContentPadding = contentPadding.onlyHorizontal()
-    val scrollState = rememberScrollState()
-    val presenceToolbarState = rememberPresenceStatusToolbarState(scrollState)
 
-    Box(modifier = modifier.nestedScroll(presenceToolbarState.nestedScrollConnection)) {
+    Column(
+        modifier = modifier
+            .padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding()),
+    ) {
         with(eventDetail) {
-            Column(
+            Title(
+                dotColor = eventColor,
+                title = title,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
-                    .padding(
-                        top = contentPadding.calculateTopPadding(),
-                        bottom = presenceToolbarState.height.coerceAtLeast(contentPadding.calculateBottomPadding()),
-                    ),
-            ) {
-                Title(
-                    dotColor = eventColor,
-                    title = title,
-                    modifier = Modifier
-                        .padding(horizontalContentPadding)
-                        .eventSharedElement(EventSharedElement.Title),
-                )
-                DateAndTime(start, end, isAllDay, Modifier.padding(horizontalContentPadding))
+                    .padding(horizontalContentPadding)
+                    .eventSharedElement(EventSharedElement.Title),
+            )
+            DateAndTime(start, end, isAllDay, Modifier.padding(horizontalContentPadding))
 
-                Section(contentPadding = horizontalContentPadding) {
-                    if (attendees.all.isNotEmpty()) {
-                        AttendeesButton(attendees.all, onClick = {}, contentPadding = horizontalContentPadding)
-                    }
-
-                    if (kMeetUrl?.isNotBlank() == true) {
-                        KMeetButton(
-                            onJoin = onJoinKMeet,
-                            onCopy = onCopyKMeet,
-                            modifier = Modifier.padding(horizontalContentPadding),
-                        )
-                    }
-
-                    if (location?.isNotBlank() == true) {
-                        LocationButton(location = location, onClick = onLocationClick, contentPadding = horizontalContentPadding)
-                    }
-
-                    if (room != null) {
-                        RoomButton(room = room, onClick = onRoomClick, contentPadding = horizontalContentPadding)
-                    }
+            Section(contentPadding = horizontalContentPadding) {
+                if (attendees.all.isNotEmpty()) {
+                    AttendeesButton(attendees.all, onClick = {}, contentPadding = horizontalContentPadding)
                 }
 
-                Section(contentPadding = horizontalContentPadding) {
-                    if (description?.isNotBlank() == true) {
-                        DescriptionCollapsibleButton(description = description, contentPadding = horizontalContentPadding)
-                    }
-
-                    AttachmentFiles(files, onFileClick = { /*TODO[eventDetail]*/ }, contentPadding = horizontalContentPadding)
-                }
-
-                Section(contentPadding = horizontalContentPadding) {
-                    Notifications(
-                        notifications,
-                        onNotificationClick = { /*TODO[eventDetail]*/ },
-                        contentPadding = horizontalContentPadding,
+                if (kMeetUrl?.isNotBlank() == true) {
+                    KMeetButton(
+                        onJoin = onJoinKMeet,
+                        onCopy = onCopyKMeet,
+                        modifier = Modifier.padding(horizontalContentPadding),
                     )
                 }
 
-                Section(contentPadding = horizontalContentPadding) {
-                    OccupiedStatus(isOccupied, modifier = Modifier.padding(horizontalContentPadding))
-
-                    if (classification != null) {
-                        ClassificationStatus(classification, modifier = Modifier.padding(horizontalContentPadding))
-                    }
-
-                    Calendar(calendarColor, calendarName, modifier = Modifier.padding(horizontalContentPadding))
+                if (location?.isNotBlank() == true) {
+                    LocationButton(location = location, onClick = onLocationClick, contentPadding = horizontalContentPadding)
                 }
 
+                if (room != null) {
+                    RoomButton(room = room, onClick = onRoomClick, contentPadding = horizontalContentPadding)
+                }
             }
 
-            attendees.me?.let { me ->
-                PresenceStatusButtons(
-                    presenceStatus = me.status,
-                    onPresenceStatusChange = { /*TODO[eventDetail]*/ },
-                    toolbarState = presenceToolbarState,
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                    bottomInset = contentPadding.calculateBottomPadding(),
+            Section(contentPadding = horizontalContentPadding) {
+                if (description?.isNotBlank() == true) {
+                    DescriptionCollapsibleButton(description = description, contentPadding = horizontalContentPadding)
+                }
+
+                AttachmentFiles(files, onFileClick = { /*TODO[eventDetail]*/ }, contentPadding = horizontalContentPadding)
+            }
+
+            Section(contentPadding = horizontalContentPadding) {
+                Notifications(
+                    notifications,
+                    onNotificationClick = { /*TODO[eventDetail]*/ },
+                    contentPadding = horizontalContentPadding,
                 )
+            }
+
+            Section(contentPadding = horizontalContentPadding) {
+                OccupiedStatus(isOccupied, modifier = Modifier.padding(horizontalContentPadding))
+
+                if (classification != null) {
+                    ClassificationStatus(classification, modifier = Modifier.padding(horizontalContentPadding))
+                }
+
+                Calendar(calendarColor, calendarName, modifier = Modifier.padding(horizontalContentPadding))
             }
         }
     }
 }
 
-@Preview
+@Preview(heightDp = 1200)
 @Composable
 private fun PreviewEventDetail() {
     val eventDetail = EventDetailUi(
@@ -182,7 +153,7 @@ private fun PreviewEventDetail() {
         isAllDay = false,
         attendees = Attendees(
             all = previewAttendees,
-            me = AttendeeUi(email = "alice@example.com", displayName = "Alice Johnson", status = ParticipationStatus.Accepted),
+            me = previewAttendees.first(),
         ),
         kMeetUrl = "test url",
         location = "Location",
@@ -206,14 +177,16 @@ private fun PreviewEventDetail() {
     MaterialTheme {
         Surface {
             Scaffold {
-                EventDetail(
-                    eventDetail = eventDetail,
-                    onJoinKMeet = {},
-                    onCopyKMeet = {},
-                    onLocationClick = {},
-                    onRoomClick = {},
-                    contentPadding = PaddingValues(horizontal = Margin.Small) + it,
-                )
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    EventDetail(
+                        eventDetail = eventDetail,
+                        onJoinKMeet = {},
+                        onCopyKMeet = {},
+                        onLocationClick = {},
+                        onRoomClick = {},
+                        contentPadding = PaddingValues(horizontal = Margin.Small) + it,
+                    )
+                }
             }
         }
     }
