@@ -92,7 +92,10 @@ fun EventDetail(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
-                    .padding(top = contentPadding.calculateTopPadding(), bottom = presenceToolbarState.height),
+                    .padding(
+                        top = contentPadding.calculateTopPadding(),
+                        bottom = presenceToolbarState.height.coerceAtLeast(contentPadding.calculateBottomPadding()),
+                    ),
             ) {
                 Title(
                     dotColor = eventColor,
