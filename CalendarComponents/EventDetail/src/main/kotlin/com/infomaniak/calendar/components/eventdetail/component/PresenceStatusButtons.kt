@@ -17,15 +17,22 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
+import android.content.res.Configuration
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.animate
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingToolbarDefaults
+import androidx.compose.material3.FloatingToolbarExitDirection
 import androidx.compose.material3.FloatingToolbarScrollBehavior
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
@@ -36,17 +43,24 @@ import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonColors
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.resources.R
@@ -56,22 +70,64 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
 import com.infomaniak.core.common.R as RCore
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Stable
+internal class PresenceStatusToolbarState(
+    internal val scrollBehavior: FloatingToolbarScrollBehavior,
+    internal val collapsesWhileScrolling: Boolean,
+) {
+    val nestedScrollConnection: NestedScrollConnection get() = scrollBehavior
+
+    var height: Dp by mutableStateOf(0.dp)
+        private set
+
+    internal fun updateHeight(height: Dp) {
+        this.height = height
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+internal fun rememberPresenceStatusToolbarState(scrollState: ScrollState): PresenceStatusToolbarState {
+    val scrollBehavior = FloatingToolbarDefaults.exitAlwaysScrollBehavior(
+        exitDirection = FloatingToolbarExitDirection.Bottom,
+    )
+    val collapsesWhileScrolling = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    val isScrolledToBottom = !scrollState.canScrollForward
+    LaunchedEffect(isScrolledToBottom) {
+        if (isScrolledToBottom) {
+            val toolbarState = scrollBehavior.state
+            animate(initialValue = toolbarState.offset, targetValue = 0f) { value, _ -> toolbarState.offset = value }
+        }
+    }
+
+    return remember(scrollBehavior, collapsesWhileScrolling) {
+        PresenceStatusToolbarState(scrollBehavior, collapsesWhileScrolling)
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun PresenceStatusButtons(
     presenceStatus: ParticipationStatus,
     onPresenceStatusChange: (ParticipationStatus) -> Unit,
+    toolbarState: PresenceStatusToolbarState,
     modifier: Modifier = Modifier,
-    scrollBehavior: FloatingToolbarScrollBehavior? = null,
+    bottomInset: Dp = 0.dp,
 ) {
     var selectedStatus by remember(presenceStatus) { mutableStateOf(presenceStatus) }
+    val density = LocalDensity.current
 
     HorizontalFloatingToolbar(
         expanded = true,
-        scrollBehavior = scrollBehavior,
+        scrollBehavior = toolbarState.scrollBehavior.takeIf { toolbarState.collapsesWhileScrolling },
         shape = MaterialTheme.shapes.large,
         expandedShadowElevation = TOOLBAR_ELEVATION,
         collapsedShadowElevation = TOOLBAR_ELEVATION,
-        modifier = modifier.selectableGroup(),
+        modifier = modifier
+            .onSizeChanged { toolbarState.updateHeight(with(density) { it.height.toDp() }) }
+            .padding(top = EsdsTheme.spacing.xl, bottom = FloatingToolbarDefaults.ScreenOffset + bottomInset)
+            .selectableGroup(),
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md)) {
             PresenceStatusButton.entries.forEach { presenceStatusButton ->
@@ -134,7 +190,11 @@ private fun PresenceStatusButtonsPreview() {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(Margin.Medium)) {
                 ParticipationStatus.entries.forEach { participationStatus ->
-                    PresenceStatusButtons(presenceStatus = participationStatus, onPresenceStatusChange = {})
+                    PresenceStatusButtons(
+                        presenceStatus = participationStatus,
+                        onPresenceStatusChange = {},
+                        toolbarState = rememberPresenceStatusToolbarState(rememberScrollState()),
+                    )
                 }
             }
         }

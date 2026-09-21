@@ -17,10 +17,8 @@
  */
 package com.infomaniak.calendar.components.eventdetail.detail
 
-import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.core.animate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,31 +28,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FloatingToolbarDefaults
-import androidx.compose.material3.FloatingToolbarExitDirection
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
 import com.infomaniak.calendar.components.eventdetail.component.PresenceStatusButtons
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
+import com.infomaniak.calendar.components.eventdetail.component.rememberPresenceStatusToolbarState
 import com.infomaniak.calendar.components.eventdetail.detail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Calendar
 import com.infomaniak.calendar.components.eventdetail.detail.component.ClassificationStatus
@@ -82,7 +70,6 @@ import kotlin.time.Instant
 /**
  * [sharedTransitionScope] and [animatedVisibilityScope] animate associated components between detail and editing.
  */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun EventDetail(
     eventDetail: EventDetailUi,
@@ -96,29 +83,16 @@ fun EventDetail(
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
     val horizontalContentPadding = contentPadding.onlyHorizontal()
-    var stickyFooterHeight by remember { mutableStateOf(0.dp) }
-    val density = LocalDensity.current
     val scrollState = rememberScrollState()
-    val toolbarScrollBehavior = FloatingToolbarDefaults.exitAlwaysScrollBehavior(
-        exitDirection = FloatingToolbarExitDirection.Bottom,
-    )
-    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val presenceToolbarState = rememberPresenceStatusToolbarState(scrollState)
 
-    val isScrolledToBottom = !scrollState.canScrollForward
-    LaunchedEffect(isScrolledToBottom) {
-        if (isScrolledToBottom) {
-            val toolbarState = toolbarScrollBehavior.state
-            animate(initialValue = toolbarState.offset, targetValue = 0f) { value, _ -> toolbarState.offset = value }
-        }
-    }
-
-    Box(modifier = modifier.nestedScroll(toolbarScrollBehavior)) {
+    Box(modifier = modifier.nestedScroll(presenceToolbarState.nestedScrollConnection)) {
         with(eventDetail) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
-                    .padding(top = contentPadding.calculateTopPadding(), bottom = stickyFooterHeight),
+                    .padding(top = contentPadding.calculateTopPadding(), bottom = presenceToolbarState.height),
             ) {
                 Title(
                     dotColor = eventColor,
@@ -183,14 +157,9 @@ fun EventDetail(
                 PresenceStatusButtons(
                     presenceStatus = me.status,
                     onPresenceStatusChange = { /*TODO[eventDetail]*/ },
-                    scrollBehavior = toolbarScrollBehavior.takeIf { isLandscape },
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .onSizeChanged { stickyFooterHeight = with(density) { it.height.toDp() } }
-                        .padding(
-                            top = EsdsTheme.spacing.xl,
-                            bottom = FloatingToolbarDefaults.ScreenOffset + contentPadding.calculateBottomPadding(),
-                        ),
+                    toolbarState = presenceToolbarState,
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    bottomInset = contentPadding.calculateBottomPadding(),
                 )
             }
         }
