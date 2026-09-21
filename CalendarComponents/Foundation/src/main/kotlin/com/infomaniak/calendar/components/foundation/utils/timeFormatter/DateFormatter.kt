@@ -60,7 +60,7 @@ internal fun LocalDate.formatFullDate(locale: Locale, currentYear: Int): String 
     return format(if (year == currentYear) FULL_DATE_SKELETON else FULL_DATE_WITH_YEAR_SKELETON, locale)
 }
 
-private fun LocalDate.format(skeleton: String, locale: Locale): String {
+fun LocalDate.format(skeleton: String, locale: Locale): String {
     return toJavaLocalDate().format(localizedFormatter(skeleton, locale)).titlecaseFirstChar(locale)
 }
 //endregion
