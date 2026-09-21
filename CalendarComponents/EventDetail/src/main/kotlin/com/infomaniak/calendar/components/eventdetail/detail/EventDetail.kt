@@ -165,8 +165,14 @@ private fun PreviewEventDetail() {
             EventDetailUi.File("3", "Next loto results.png"),
         ),
         notifications = listOf(
-            EventDetailUi.Notification("1", EventDetailUi.Notification.Type.Email, Instant.parse("2026-05-20T07:00:00Z")),
-            EventDetailUi.Notification("2", EventDetailUi.Notification.Type.Push, Instant.parse("2026-05-20T07:30:00Z")),
+            EventDetailUi.Notification(
+                EventDetailUi.Notification.Type.Email,
+                EventDetailUi.Notification.NotificationTime.Absolute(Instant.parse("2026-05-20T07:00:00Z")),
+            ),
+            EventDetailUi.Notification(
+                EventDetailUi.Notification.Type.Push,
+                EventDetailUi.Notification.NotificationTime.Absolute(Instant.parse("2026-05-20T07:00:00Z")),
+            ),
         ),
         isOccupied = true,
         classification = EventDetailUi.Classification.Public,
