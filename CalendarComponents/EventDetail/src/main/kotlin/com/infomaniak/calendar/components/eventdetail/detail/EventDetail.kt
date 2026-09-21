@@ -159,6 +159,8 @@ fun EventDetail(
                     onPresenceStatusChange = { /*TODO[eventDetail]*/ },
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
+                        // Opaque, so the content scrolling underneath stops showing through the footer.
+                        .background(MaterialTheme.colorScheme.surface)
                         .onSizeChanged { stickyFooterHeight = with(density) { it.height.toDp() } }
                         .padding(
                             top = EsdsTheme.spacing.xl,
