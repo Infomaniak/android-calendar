@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.eventEdit
+package com.infomaniak.calendar.ui.screen.eventDetail.edit
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
@@ -23,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,7 +41,11 @@ fun EventEditScreen(
     modifier: Modifier = Modifier,
     viewModel: EventEditViewModel = viewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.eventDetail.collectAsStateWithLifecycle(null)
+
+    LaunchedEffect(occurrenceId) {
+        viewModel.setOccurrenceId(occurrenceId)
+    }
 
     EventEditScreen(
         uiState = { uiState },

@@ -17,17 +17,14 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
-import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.toEventDetailUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
-import dev.zacsweers.metro.AppScope
-import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
-import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -35,13 +32,16 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
-@Inject
-@ContributesIntoMap(AppScope::class)
-@ViewModelKey
-class EventDetailViewModel(
+/**
+ * Observes the [EventDetailUiState] of the occurrence set through [setOccurrenceId].
+ *
+ * Holds its own occurrence state, so it must not be scoped: every consumer gets its own instance.
+ * Shared by the event detail and the event edit screens.
+ */
+class GetEventDetailUiUseCase @Inject constructor(
     accountUtils: AccountUtils,
     private val calendarManager: CalendarManager,
-) : ViewModel() {
+) {
     private val occurrenceIdFlow: MutableSharedFlow<OccurrenceId> = MutableSharedFlow(
         replay = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
@@ -52,12 +52,8 @@ class EventDetailViewModel(
         .distinctUntilChanged()
         .flatMapLatest { occurrenceId -> calendarManager.observeOccurrence(occurrenceId) }
 
-    fun setOccurrenceId(occurrenceId: OccurrenceId) {
-        occurrenceIdFlow.tryEmit(occurrenceId)
-    }
-
     @OptIn(ExperimentalCoroutinesApi::class)
-    val eventDetailUi = eventFlow
+    val eventDetailUi: Flow<EventDetailUiState> = eventFlow
         .flatMapLatest { event ->
             if (event == null) {
                 flowOf(null)
@@ -75,4 +71,8 @@ class EventDetailViewModel(
                 .toEventDetailUi(calendar, emailsByUserId)
                 .let(EventDetailUiState::Success)
         }
+
+    fun setOccurrenceId(occurrenceId: OccurrenceId) {
+        occurrenceIdFlow.tryEmit(occurrenceId)
+    }
 }

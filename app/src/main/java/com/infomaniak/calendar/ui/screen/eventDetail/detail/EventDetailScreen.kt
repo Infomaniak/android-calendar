@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.eventDetail
+package com.infomaniak.calendar.ui.screen.eventDetail.detail
 
 import android.content.Context
 import android.content.Intent
@@ -44,6 +44,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.extensions.safeStartActivity
 import com.infomaniak.core.ui.compose.basics.rememberClipboardCopyManager

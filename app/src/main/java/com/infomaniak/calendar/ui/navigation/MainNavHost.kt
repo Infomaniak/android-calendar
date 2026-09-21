@@ -46,8 +46,8 @@ import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
 import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventCreation.EventCreationScreen
-import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailScreen
-import com.infomaniak.calendar.ui.screen.eventEdit.EventEditScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
