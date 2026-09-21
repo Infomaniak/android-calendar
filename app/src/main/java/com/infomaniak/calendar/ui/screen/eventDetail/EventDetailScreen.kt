@@ -21,9 +21,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -52,14 +49,10 @@ import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.extensions.safeStartActivity
 import com.infomaniak.core.ui.compose.basics.rememberClipboardCopyManager
-import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 import com.infomaniak.core.common.R as RCommon
-
-/** Inset of the detail content, which the expanded top app bar title matches so both align. */
-private val CONTENT_HORIZONTAL_PADDING = Margin.Small
 
 @Composable
 fun EventDetailScreen(
@@ -91,22 +84,19 @@ private fun EventDetailScreen(
     onLocationClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val scrollState = rememberScrollState()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+        canScroll = { scrollState.canScrollForward || scrollState.canScrollBackward },
+    )
     val clipboardManager = rememberClipboardCopyManager()
 
     Scaffold(
         topBar = {
             TwoRowsTopAppBar(
-                title = { expanded ->
+                title = { _ ->
                     val eventDetail = (uiState() as? EventDetailUiState.Success)?.eventDetail
                     if (eventDetail != null) {
-                        EventDetailTitle(
-                            eventColor = eventDetail.eventColor,
-                            title = eventDetail.title,
-                            // Expanded, the title owns its row: inset it like the content so its color dot lines up with the
-                            // icons of the sections below. Collapsed, it follows the back button like any top app bar title.
-                            modifier = if (expanded) Modifier.padding(start = CONTENT_HORIZONTAL_PADDING) else Modifier,
-                        )
+                        EventDetailTitle(eventColor = eventDetail.eventColor, title = eventDetail.title)
                     }
                 },
                 navigationIcon = { TopAppBarButtons.BackButton(onClick = onBack) },
@@ -118,7 +108,7 @@ private fun EventDetailScreen(
         when (val state = uiState()) {
             EventDetailUiState.Loading -> Unit // Loaded locally, always fast, no need for a specific progress indicator UI
             is EventDetailUiState.Success -> {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Column(modifier = Modifier.verticalScroll(scrollState)) {
                     val copyFeedbackMessage = stringResource(RCommon.string.linkCopied)
 
                     EventDetail(
@@ -127,7 +117,7 @@ private fun EventDetailScreen(
                         onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
                         onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
                         onRoomClick = { /*TODO[eventDetail]*/ },
-                        contentPadding = scaffoldContentPadding + PaddingValues(horizontal = CONTENT_HORIZONTAL_PADDING),
+                        contentPadding = scaffoldContentPadding,
                     )
                 }
             }

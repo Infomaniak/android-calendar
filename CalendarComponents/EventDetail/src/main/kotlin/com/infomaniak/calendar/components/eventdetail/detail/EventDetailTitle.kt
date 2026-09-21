@@ -28,45 +28,65 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TwoRowsTopAppBar
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
 fun EventDetailTitle(eventColor: Color, title: String, modifier: Modifier = Modifier) {
     Row(
-        // Same gap as the one a ListItem leaves between its leading content and its text, so the title lines up with the rows
-        // below when the app bar that hosts it is inset like the content.
-        horizontalArrangement = Arrangement.spacedBy(Margin.Medium),
+        horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xl),
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
     ) {
         Box(
             modifier = Modifier
                 .size(EsdsTheme.icon.sizeMd)
-                .padding(2.dp)
+                .padding(1.dp)
                 .clip(CircleShape)
                 .background(eventColor),
         )
-        Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        Text(text = title, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview
 @Composable
-private fun PreviewEventDetailTitle() {
+private fun PreviewEventDetailTitleExpanded() {
     MaterialTheme {
         Surface {
             TwoRowsTopAppBar(title = { EventDetailTitle(eventColor = Color.Red, title = "Event Title") })
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Preview
+@Composable
+private fun PreviewEventDetailTitleCollapsed() {
+    MaterialTheme {
+        Surface {
+            val fullyScrolled = with(LocalDensity.current) {
+                -TopAppBarDefaults.MediumFlexibleAppBarWithoutSubtitleExpandedHeight.toPx()
+            }
+
+            TwoRowsTopAppBar(
+                title = { EventDetailTitle(eventColor = Color.Red, title = "Event Title") },
+                scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+                    state = rememberTopAppBarState(initialHeightOffsetLimit = fullyScrolled, initialHeightOffset = fullyScrolled),
+                ),
+            )
         }
     }
 }
