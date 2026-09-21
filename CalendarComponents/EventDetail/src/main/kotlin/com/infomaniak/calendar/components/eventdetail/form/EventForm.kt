@@ -15,8 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.edit
+package com.infomaniak.calendar.components.eventdetail.form
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -24,25 +26,40 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
+import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
+import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
+import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 
+/**
+ * Reusable component for both the creation and the edition of an event.
+ *
+ * [sharedTransitionScope] and [animatedVisibilityScope] are used to animate associated components between detail and creation.
+ */
 @Composable
-fun EventEdit(
+fun EventForm(
+    eventColor: Color, // TODO: Adapt this when structuring edit/creation and its states correctly
+    title: String, // TODO: Adapt this when structuring edit/creation and its states correctly
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
-) {
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
+) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
     val horizontalContentPadding = contentPadding.onlyHorizontal()
 
     Column(
         modifier.padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding()),
     ) {
         TitleEditable(
-            color = MaterialTheme.colorScheme.primary,
-            title = "",
-            modifier = Modifier.padding(horizontalContentPadding),
+            color = eventColor,
+            title = title,
+            modifier = Modifier
+                .padding(horizontalContentPadding)
+                .eventSharedElement(EventSharedElement.Title),
         )
     }
 }
@@ -52,7 +69,11 @@ fun EventEdit(
 private fun Preview() {
     MaterialTheme {
         Surface {
-            EventEdit(contentPadding = PaddingValues(16.dp))
+            EventForm(
+                eventColor = MaterialTheme.colorScheme.primary,
+                title = "Event title",
+                contentPadding = PaddingValues(16.dp),
+            )
         }
     }
 }

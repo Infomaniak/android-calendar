@@ -17,6 +17,8 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.edit
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.Scaffold
@@ -29,7 +31,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.infomaniak.calendar.components.eventdetail.edit.EventEdit
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
+import com.infomaniak.calendar.components.eventdetail.form.EventForm
+import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
+import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
@@ -41,7 +46,7 @@ fun EventEditScreen(
     modifier: Modifier = Modifier,
     viewModel: EventEditViewModel = viewModel(),
 ) {
-    val uiState by viewModel.eventDetail.collectAsStateWithLifecycle(null)
+    val uiState by viewModel.eventDetail.collectAsStateWithLifecycle()
 
     LaunchedEffect(occurrenceId) {
         viewModel.setOccurrenceId(occurrenceId)
@@ -51,18 +56,36 @@ fun EventEditScreen(
         uiState = { uiState },
         goBack = goBack,
         modifier = modifier,
+        sharedTransitionScope = LocalSharedTransitionScope.current,
+        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
     )
 }
 
 @Composable
-private fun EventEditScreen(uiState: () -> Unit, goBack: () -> Unit, modifier: Modifier = Modifier) {
+private fun EventEditScreen(
+    uiState: () -> EventDetailUiState,
+    goBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
+) {
     Scaffold(
         topBar = { TopAppBar(title = {}) },
-    ) { scaffoldContentPadding ->
-        EventEdit(
-            modifier = modifier,
-            contentPadding = scaffoldContentPadding + PaddingValues(horizontal = Margin.Small),
-        )
+    ) { contentPadding ->
+        when (val state = uiState()) {
+            // Coming from the detail screen, the shared flow is already warm, so this is only hit when entering edit directly or
+            // recreating the activity, but it still will be loaded from disk which is fast enough.
+            EventDetailUiState.Loading -> Unit
+            is EventDetailUiState.Success -> EventForm(
+                eventColor = state.eventDetail.eventColor,
+                title = state.eventDetail.title,
+                modifier = modifier,
+                contentPadding = contentPadding + PaddingValues(horizontal = Margin.Small),
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
+            )
+            EventDetailUiState.Unavailable -> LaunchedEffect(Unit) { goBack() }
+        }
     }
 }
 
@@ -72,7 +95,7 @@ private fun Preview() {
     CalendarTheme {
         Surface {
             EventEditScreen(
-                uiState = {},
+                uiState = { EventDetailUiState.Loading },
                 goBack = {},
             )
         }

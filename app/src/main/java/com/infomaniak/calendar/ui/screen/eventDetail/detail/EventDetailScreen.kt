@@ -20,6 +20,8 @@ package com.infomaniak.calendar.ui.screen.eventDetail.detail
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
@@ -39,11 +41,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.detail.EventDetail
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.extensions.safeStartActivity
@@ -63,7 +67,7 @@ fun EventDetailScreen(
     viewModel: EventDetailViewModel = viewModel(),
 ) {
     val context = LocalContext.current
-    val uiState by viewModel.eventDetailUi.collectAsStateWithLifecycle(initialValue = EventDetailUiState.Loading)
+    val uiState by viewModel.eventDetailUi.collectAsStateWithLifecycle()
 
     LaunchedEffect(occurrenceId) {
         viewModel.setOccurrenceId(occurrenceId)
@@ -71,6 +75,8 @@ fun EventDetailScreen(
 
     EventDetailScreen(
         uiState = { uiState },
+        sharedTransitionScope = LocalSharedTransitionScope.current,
+        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
         goBack = goBack,
         goToEdit = goToEdit,
         onLocationClick = { location -> openLocationInMapApp(context, location) },
@@ -85,6 +91,8 @@ private fun EventDetailScreen(
     goToEdit: () -> Unit,
     onLocationClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val clipboardManager = rememberClipboardCopyManager()
 
@@ -111,10 +119,12 @@ private fun EventDetailScreen(
                         onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
                         onRoomClick = { /*TODO[eventDetail]*/ },
                         contentPadding = scaffoldContentPadding + PaddingValues(horizontal = Margin.Small),
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = animatedVisibilityScope,
                     )
                 }
             }
-            EventDetailUiState.Deleted -> LaunchedEffect(Unit) { goBack() }
+            EventDetailUiState.Unavailable -> LaunchedEffect(Unit) { goBack() }
         }
     }
 }

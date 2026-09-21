@@ -17,6 +17,8 @@
  */
 package com.infomaniak.calendar.components.eventdetail.detail
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -48,6 +50,9 @@ import com.infomaniak.calendar.components.eventdetail.detail.component.OccupiedS
 import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
+import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
+import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.eventdetail.previewAttendees
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
@@ -55,6 +60,9 @@ import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
+/**
+ * [sharedTransitionScope] and [animatedVisibilityScope] are used to animate associated components between detail and creation.
+ */
 @Composable
 fun EventDetail(
     eventDetail: EventDetailUi,
@@ -64,14 +72,22 @@ fun EventDetail(
     onRoomClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
-) {
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
+) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
     val horizontalContentPadding = contentPadding.onlyHorizontal()
 
     Column(
         modifier = modifier.padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding()),
     ) {
         with(eventDetail) {
-            Title(eventColor, title, Modifier.padding(horizontalContentPadding))
+            Title(
+                color = eventColor,
+                title = title,
+                modifier = Modifier
+                    .padding(horizontalContentPadding)
+                    .eventSharedElement(EventSharedElement.Title),
+            )
             DateAndTime(start, end, isAllDay, Modifier.padding(horizontalContentPadding))
 
             Section(contentPadding = horizontalContentPadding) {

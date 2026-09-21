@@ -31,7 +31,5 @@ import dev.zacsweers.metrox.viewmodel.ViewModelKey
 class EventEditViewModel(private val getEventDetailUiUseCase: GetEventDetailUiUseCase) : ViewModel() {
     val eventDetail = getEventDetailUiUseCase.eventDetailUi
 
-    fun setOccurrenceId(occurrenceId: OccurrenceId) {
-        getEventDetailUiUseCase.setOccurrenceId(occurrenceId)
-    }
+    fun setOccurrenceId(occurrenceId: OccurrenceId) = getEventDetailUiUseCase.setOccurrenceId(occurrenceId)
 }

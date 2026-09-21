@@ -17,22 +17,30 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.creation
 
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.plus
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.core.ui.compose.margin.Margin
 
 @Composable
 fun EventCreationScreen(modifier: Modifier = Modifier) {
     Scaffold(
         topBar = { TopAppBar(title = { Text("EventCreationScreen") }) },
         modifier = modifier,
-    ) { paddingValues ->
-        Text("EventCreationScreenContent", modifier = Modifier.padding(paddingValues))
+    ) { contentPadding ->
+        EventForm(
+            eventColor = MaterialTheme.colorScheme.primary,
+            title = "",
+            contentPadding = contentPadding + PaddingValues(horizontal = Margin.Small),
+        )
     }
 }
 
