@@ -95,18 +95,22 @@ private fun EventDetailScreen(
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val clipboardManager = rememberClipboardCopyManager()
+    val state = uiState()
 
     Scaffold(
         topBar = {
             TopAppBar(
                 navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
                 title = {},
-                actions = { TopAppBarButtons.EditButton(onClick = goToEdit) },
+                actions = {
+                    val canEdit = (state as? EventDetailUiState.Success)?.eventDetail?.canEdit == true
+                    TopAppBarButtons.EditButton(onClick = goToEdit, enabled = canEdit)
+                },
             )
         },
         modifier = modifier,
     ) { scaffoldContentPadding ->
-        when (val state = uiState()) {
+        when (state) {
             EventDetailUiState.Loading -> Unit // Loaded locally, always fast, no need for a specific progress indicator UI
             is EventDetailUiState.Success -> {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
@@ -157,6 +161,7 @@ private fun Preview() {
         notifications = emptyList(),
         isOccupied = true,
         classification = EventDetailUi.Classification.Public,
+        canEdit = true,
     )
 
     CalendarThemeForPreview {

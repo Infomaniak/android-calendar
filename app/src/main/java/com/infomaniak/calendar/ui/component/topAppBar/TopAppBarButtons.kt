@@ -87,8 +87,8 @@ object TopAppBarButtons {
     }
 
     @Composable
-    fun EditButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
-        IconButton(onClick = onClick, modifier = modifier) {
+    fun EditButton(modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
+        IconButton(onClick = onClick, modifier = modifier, enabled = enabled) {
             Icon(
                 painter = painterResource(RComponents.drawable.ic_pen),
                 contentDescription = stringResource(RCommon.string.edit),

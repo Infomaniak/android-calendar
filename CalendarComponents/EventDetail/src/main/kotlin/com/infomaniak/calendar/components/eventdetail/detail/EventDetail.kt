@@ -201,6 +201,7 @@ private fun PreviewEventDetail() {
         ),
         isOccupied = true,
         classification = EventDetailUi.Classification.Public,
+        canEdit = true,
     )
 
     MaterialTheme {
