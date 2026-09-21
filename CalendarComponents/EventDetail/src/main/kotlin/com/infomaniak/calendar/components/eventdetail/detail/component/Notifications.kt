@@ -23,33 +23,44 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi.Notification.NotificationTime
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTime
 import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
+import kotlinx.datetime.TimeZone
+import kotlin.time.Clock
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
 @Composable
 internal fun Notifications(
     notifications: List<EventDetailUi.Notification>,
-    onNotificationClick: (String) -> Unit,
+    onNotificationClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     notifications.forEach { notification ->
+        val timeText = notificationTimeText(notification.time)
+
         ClickableItem(
             text = stringResource(notification.type.label),
             leadingIconRes = notification.type.icon,
-            onClick = { onNotificationClick(notification.id) },
+            onClick = { onNotificationClick() },
             contentPadding = contentPadding,
             trailingContent = {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
-                    // TODO[eventDetail]: Format the notification time
+                    Text(timeText)
                     Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null)
                 }
             },
@@ -58,15 +69,89 @@ internal fun Notifications(
     }
 }
 
-@Preview
 @Composable
-private fun PreviewNotifications() {
+private fun notificationTimeText(time: NotificationTime): String {
+    val timeZone = TimeZone.currentSystemDefault()
+    val currentYear = Clock.today(timeZone).year
+
+    return when (time) {
+        is NotificationTime.Offset -> time.duration.formatDurationOffset()
+        is NotificationTime.Absolute -> time.instant.formatDateTime(timeZone = timeZone, currentYear = currentYear)
+    }
+}
+
+@Composable
+fun Duration.formatDurationOffset(): String {
+    val isBefore = isNegative()
+    val absoluteDuration = absoluteValue
+    val totalMinutes = absoluteDuration.inWholeMinutes
+    val weeks = totalMinutes / (7 * 24 * 60)
+    val days = (totalMinutes % (7 * 24 * 60)) / (24 * 60)
+    val hours = (totalMinutes % (24 * 60)) / 60
+    val minutes = totalMinutes % 60
+
+    val parts = buildList {
+        if (weeks > 0) add(pluralStringResource(R.plurals.weekAmount, weeks.toInt(), weeks.toInt()))
+        if (days > 0) add(pluralStringResource(R.plurals.dayAmount, days.toInt(), days.toInt()))
+        if (hours > 0) add(pluralStringResource(R.plurals.hourAmount, hours.toInt(), hours.toInt()))
+        if (minutes > 0) add(pluralStringResource(R.plurals.minuteAmount, minutes.toInt(), minutes.toInt()))
+    }
+
+    val durationText = parts.joinToString(", ")
+    return if (isBefore) {
+        stringResource(R.string.notificationTimeBefore, durationText)
+    } else {
+        stringResource(R.string.notificationTimeAfter, durationText)
+    }
+}
+
+@Preview(name = "Absolute notification")
+@Composable
+private fun PreviewAbsoluteNotification() {
     MaterialTheme {
         Surface {
             Notifications(
                 notifications = listOf(
-                    EventDetailUi.Notification("1", EventDetailUi.Notification.Type.Email, Instant.parse("2026-05-20T07:00:00Z")),
-                    EventDetailUi.Notification("2", EventDetailUi.Notification.Type.Push, Instant.parse("2026-05-20T07:30:00Z")),
+                    EventDetailUi.Notification(
+                        EventDetailUi.Notification.Type.Email,
+                        NotificationTime.Absolute(Instant.parse("2026-05-20T07:00:00Z")),
+                    ),
+                ),
+                onNotificationClick = {},
+            )
+        }
+    }
+}
+
+@Preview(name = "Absolute notification next year")
+@Composable
+private fun PreviewAbsoluteNotificationNextYear() {
+    MaterialTheme {
+        Surface {
+            Notifications(
+                notifications = listOf(
+                    EventDetailUi.Notification(
+                        EventDetailUi.Notification.Type.Email,
+                        NotificationTime.Absolute(Instant.parse("2027-05-20T07:00:00Z")),
+                    ),
+                ),
+                onNotificationClick = {},
+            )
+        }
+    }
+}
+
+@Preview(name = "Offset notification")
+@Composable
+private fun PreviewOffsetNotification() {
+    MaterialTheme {
+        Surface {
+            Notifications(
+                notifications = listOf(
+                    EventDetailUi.Notification(
+                        EventDetailUi.Notification.Type.Push,
+                        NotificationTime.Offset((-90).minutes),
+                    ),
                 ),
                 onNotificationClick = {},
             )
