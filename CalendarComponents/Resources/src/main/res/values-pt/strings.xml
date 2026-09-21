@@ -38,8 +38,22 @@
     <string name="contentDescriptionHasKMeetLink">Tem um link do kMeet</string>
     <string name="contentDescriptionHasLocation">Tem uma localização</string>
     <string name="contentDescriptionToday">Hoje</string>
+    <plurals name="dayAmount">
+        <item quantity="one">%d dia</item>
+        <item quantity="other">%d dias</item>
+    </plurals>
     <string name="descriptionTitle">Descrição</string>
     <string name="eventTitle">Título do evento</string>
+    <plurals name="hourAmount">
+        <item quantity="one">%d hora</item>
+        <item quantity="other">%d horas</item>
+    </plurals>
+    <plurals name="minuteAmount">
+        <item quantity="one">%d minuto</item>
+        <item quantity="other">%d minutos</item>
+    </plurals>
+    <string name="notificationTimeAfter">%1$s depois</string>
+    <string name="notificationTimeBefore">%1$s antes</string>
     <string name="notificationTypeEmail">Email</string>
     <string name="notificationTypePush">Notificação</string>
     <string name="occupiedLabel">Ocupado</string>
@@ -53,6 +67,10 @@
         <item quantity="other">%d lugares</item>
     </plurals>
     <string name="sectionCalendarHeader">Calendário</string>
+    <plurals name="weekAmount">
+        <item quantity="one">%d semana</item>
+        <item quantity="other">%d semanas</item>
+    </plurals>
     <string name="weekHeaderDateRange">%d–%d de %s de %d</string>
     <string name="weekHeaderWeekNumber">Sem.%d</string>
 </resources>

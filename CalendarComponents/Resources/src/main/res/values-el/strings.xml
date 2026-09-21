@@ -38,8 +38,22 @@
     <string name="contentDescriptionHasKMeetLink">Διαθέτει σύνδεσμο kMeet</string>
     <string name="contentDescriptionHasLocation">Έχει τοποθεσία</string>
     <string name="contentDescriptionToday">Σήμερα</string>
+    <plurals name="dayAmount">
+        <item quantity="one">%d hμέρα</item>
+        <item quantity="other">%d ημέρες</item>
+    </plurals>
     <string name="descriptionTitle">Περιγραφή</string>
     <string name="eventTitle">Τίτλος εκδήλωσης</string>
+    <plurals name="hourAmount">
+        <item quantity="one">%d ώρα</item>
+        <item quantity="other">%d ώρες</item>
+    </plurals>
+    <plurals name="minuteAmount">
+        <item quantity="one">%d λεπτό</item>
+        <item quantity="other">%d λεπτά</item>
+    </plurals>
+    <string name="notificationTimeAfter">%1$s μετά</string>
+    <string name="notificationTimeBefore">%1$s πριν</string>
     <string name="notificationTypeEmail">Email</string>
     <string name="notificationTypePush">Ειδοποίηση</string>
     <string name="occupiedLabel">Κατειλημμένο</string>
@@ -53,6 +67,10 @@
         <item quantity="other">%d θέσεις</item>
     </plurals>
     <string name="sectionCalendarHeader">Ημερολόγιο</string>
+    <plurals name="weekAmount">
+        <item quantity="one">%d εβδομάδα</item>
+        <item quantity="other">%d εβδομάδες</item>
+    </plurals>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">Εβδ.%d</string>
 </resources>

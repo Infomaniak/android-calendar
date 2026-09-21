@@ -38,8 +38,22 @@
     <string name="contentDescriptionHasKMeetLink">Indeholder et kMeet-link</string>
     <string name="contentDescriptionHasLocation">Har en placering</string>
     <string name="contentDescriptionToday">I dag</string>
+    <plurals name="dayAmount">
+        <item quantity="one">%d dag</item>
+        <item quantity="other">%d dage</item>
+    </plurals>
     <string name="descriptionTitle">Beskrivelse</string>
     <string name="eventTitle">Arrangementstitel</string>
+    <plurals name="hourAmount">
+        <item quantity="one">%d time</item>
+        <item quantity="other">%d timer</item>
+    </plurals>
+    <plurals name="minuteAmount">
+        <item quantity="one">%d minut</item>
+        <item quantity="other">%d minutter</item>
+    </plurals>
+    <string name="notificationTimeAfter">%1$s efter</string>
+    <string name="notificationTimeBefore">%1$s før</string>
     <string name="notificationTypeEmail">E-mail</string>
     <string name="notificationTypePush">Meddelelse</string>
     <string name="occupiedLabel">Optaget</string>
@@ -53,6 +67,10 @@
         <item quantity="other">%d pladser</item>
     </plurals>
     <string name="sectionCalendarHeader">Kalender</string>
+    <plurals name="weekAmount">
+        <item quantity="one">%d uge</item>
+        <item quantity="other">%d uger</item>
+    </plurals>
     <string name="weekHeaderDateRange">%d.–%d. %s %d</string>
     <string name="weekHeaderWeekNumber">U%d</string>
 </resources>
