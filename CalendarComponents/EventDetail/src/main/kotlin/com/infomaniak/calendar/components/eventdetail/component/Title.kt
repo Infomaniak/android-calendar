@@ -40,19 +40,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
+private const val MAX_LINES = Int.MAX_VALUE
+
 @Composable
 internal fun Title(color: Color, title: String, modifier: Modifier = Modifier) {
     ListItem(
-        content = { Text(text = title, style = MaterialTheme.typography.titleLargeEmphasized) },
-        leadingContent = {
-            Box(
-                modifier = Modifier
-                    .size(EsdsTheme.icon.sizeMd)
-                    .padding(2.dp)
-                    .clip(CircleShape)
-                    .background(color),
-            )
-        },
+        leadingContent = { EventColorDot(color) },
+        content = { Text(text = title, style = MaterialTheme.typography.titleLargeEmphasized, maxLines = MAX_LINES) },
         modifier = modifier,
     )
 }
@@ -62,12 +56,13 @@ internal fun TitleEditable(color: Color, title: String, modifier: Modifier = Mod
     val textFieldState = rememberTextFieldState(title)
 
     ListItem(
+        leadingContent = { EventColorDot(color) },
         content = {
             BasicTextField(
                 state = textFieldState,
                 textStyle = MaterialTheme.typography.titleLargeEmphasized,
-                lineLimits = TextFieldLineLimits.SingleLine,
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = MAX_LINES),
                 modifier = Modifier.fillMaxWidth(),
                 decorator = { innerTextField ->
                     Box {
@@ -83,25 +78,29 @@ internal fun TitleEditable(color: Color, title: String, modifier: Modifier = Mod
                 },
             )
         },
-        leadingContent = {
-            Box(
-                modifier = Modifier
-                    .size(EsdsTheme.icon.sizeMd)
-                    .padding(2.dp)
-                    .clip(CircleShape)
-                    .background(color),
-            )
-        },
         modifier = modifier,
     )
 }
+
+@Composable
+private fun EventColorDot(color: Color) {
+    Box(
+        modifier = Modifier
+            .size(EsdsTheme.icon.sizeMd)
+            .padding(2.dp)
+            .clip(CircleShape)
+            .background(color),
+    )
+}
+
+private const val PREVIEW_TITLE = "End of the year vacations with Santa Claus"
 
 @Preview
 @Composable
 private fun Preview() {
     MaterialTheme {
         Surface {
-            Title(color = Color.Red, title = "Title")
+            Title(color = Color.Red, title = PREVIEW_TITLE)
         }
     }
 }
@@ -111,7 +110,7 @@ private fun Preview() {
 private fun PreviewEditable() {
     MaterialTheme {
         Surface {
-            TitleEditable(color = Color.Red, title = "Title")
+            TitleEditable(color = Color.Red, title = PREVIEW_TITLE)
         }
     }
 }
