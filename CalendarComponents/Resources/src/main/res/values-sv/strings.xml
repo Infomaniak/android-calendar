@@ -53,6 +53,7 @@
         <item quantity="other">%d minuter</item>
     </plurals>
     <string name="notificationTimeAfter">%1$s efter</string>
+    <string name="notificationTimeAtStart">Vid evenemangets tidpunkt</string>
     <string name="notificationTimeBefore">%1$s innan</string>
     <string name="notificationTypeEmail">E-post</string>
     <string name="notificationTypePush">Avisering</string>

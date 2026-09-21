@@ -53,6 +53,7 @@
         <item quantity="other">%d minuten</item>
     </plurals>
     <string name="notificationTimeAfter">%1$s later</string>
+    <string name="notificationTimeAtStart">Op het moment van het evenement</string>
     <string name="notificationTimeBefore">%1$s voor</string>
     <string name="notificationTypeEmail">E-mail</string>
     <string name="notificationTypePush">Melding</string>

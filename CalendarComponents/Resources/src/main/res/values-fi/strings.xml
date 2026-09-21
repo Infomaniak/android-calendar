@@ -53,6 +53,7 @@
         <item quantity="other">%d minuuttia</item>
     </plurals>
     <string name="notificationTimeAfter">%1$s jälkeen</string>
+    <string name="notificationTimeAtStart">Tapahtuman hetkellä</string>
     <string name="notificationTimeBefore">%1$s ennen</string>
     <string name="notificationTypeEmail">Sähköposti</string>
     <string name="notificationTypePush">Ilmoitus</string>

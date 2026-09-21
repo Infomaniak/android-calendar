@@ -53,6 +53,7 @@
         <item quantity="other">%d λεπτά</item>
     </plurals>
     <string name="notificationTimeAfter">%1$s μετά</string>
+    <string name="notificationTimeAtStart">Κατά την ώρα του γεγονότος</string>
     <string name="notificationTimeBefore">%1$s πριν</string>
     <string name="notificationTypeEmail">Email</string>
     <string name="notificationTypePush">Ειδοποίηση</string>

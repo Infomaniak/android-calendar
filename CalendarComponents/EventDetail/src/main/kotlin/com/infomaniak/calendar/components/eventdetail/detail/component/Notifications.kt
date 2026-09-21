@@ -41,6 +41,7 @@ import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 @Composable
@@ -84,6 +85,9 @@ private fun notificationTimeText(time: NotificationTime): String {
 fun Duration.formatDurationOffset(): String {
     val isBefore = isNegative()
     val absoluteDuration = absoluteValue
+    if (absoluteDuration.inWholeSeconds == 0L) {
+        return stringResource(R.string.notificationTimeAtStart)
+    }
     val totalMinutes = absoluteDuration.inWholeMinutes
     val weeks = totalMinutes / (7 * 24 * 60)
     val days = (totalMinutes % (7 * 24 * 60)) / (24 * 60)
@@ -151,6 +155,24 @@ private fun PreviewOffsetNotification() {
                     EventDetailUi.Notification(
                         EventDetailUi.Notification.Type.Push,
                         NotificationTime.Offset((-90).minutes),
+                    ),
+                ),
+                onNotificationClick = {},
+            )
+        }
+    }
+}
+
+@Preview(name = "Offset notification at start")
+@Composable
+private fun PreviewOffsetNotificationAtStart() {
+    MaterialTheme {
+        Surface {
+            Notifications(
+                notifications = listOf(
+                    EventDetailUi.Notification(
+                        EventDetailUi.Notification.Type.Push,
+                        NotificationTime.Offset((0).seconds),
                     ),
                 ),
                 onNotificationClick = {},

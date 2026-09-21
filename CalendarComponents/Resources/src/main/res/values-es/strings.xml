@@ -53,6 +53,7 @@
         <item quantity="other">%d minutos</item>
     </plurals>
     <string name="notificationTimeAfter">%1$s después</string>
+    <string name="notificationTimeAtStart">A la hora del evento</string>
     <string name="notificationTimeBefore">%1$s antes</string>
     <string name="notificationTypeEmail">Correo electrónico</string>
     <string name="notificationTypePush">Notificación</string>
