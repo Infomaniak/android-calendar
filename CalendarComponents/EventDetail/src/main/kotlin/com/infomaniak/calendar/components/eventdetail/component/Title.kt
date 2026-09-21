@@ -36,8 +36,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 private const val MAX_LINES = Int.MAX_VALUE
@@ -68,7 +70,7 @@ internal fun TitleEditable(color: Color, title: String, modifier: Modifier = Mod
                     Box {
                         if (textFieldState.text.isEmpty()) {
                             Text(
-                                text = "TODO Placeholder",
+                                text = stringResource(R.string.eventTitle),
                                 style = MaterialTheme.typography.titleLargeEmphasized,
                                 color = OutlinedTextFieldDefaults.colors().unfocusedPlaceholderColor,
                             )

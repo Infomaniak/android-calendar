@@ -39,6 +39,7 @@
     <string name="contentDescriptionHasLocation">On sijainti</string>
     <string name="contentDescriptionToday">Tänään</string>
     <string name="descriptionTitle">Kuvaus</string>
+    <string name="eventTitle">Tapahtuman nimi</string>
     <string name="notificationTypeEmail">Sähköposti</string>
     <string name="notificationTypePush">Ilmoitus</string>
     <string name="occupiedLabel">Varattu</string>

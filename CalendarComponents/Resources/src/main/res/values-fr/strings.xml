@@ -39,6 +39,7 @@
     <string name="contentDescriptionHasLocation">A un emplacement</string>
     <string name="contentDescriptionToday">Aujourd’hui</string>
     <string name="descriptionTitle">Description</string>
+    <string name="eventTitle">Évènement</string>
     <string name="notificationTypeEmail">E-mail</string>
     <string name="notificationTypePush">Notification</string>
     <string name="occupiedLabel">Occupé</string>

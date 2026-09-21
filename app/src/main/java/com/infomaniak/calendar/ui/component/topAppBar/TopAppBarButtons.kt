@@ -28,12 +28,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.BackButton
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.DrawerIconButton
+import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.EditButton
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.InboxButton
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.SearchButton
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.coroutines.launch
 import com.infomaniak.calendar.components.resources.R as RComponents
+import com.infomaniak.core.common.R as RCommon
 
 object TopAppBarButtons {
     @Composable
@@ -89,7 +91,7 @@ object TopAppBarButtons {
         IconButton(onClick = onClick, modifier = modifier) {
             Icon(
                 painter = painterResource(RComponents.drawable.ic_pen),
-                contentDescription = "TODO Edit",
+                contentDescription = stringResource(RCommon.string.edit),
             )
         }
     }
@@ -124,5 +126,13 @@ private fun DrawerIconButtonPreview() {
 private fun BackButtonPreview() {
     CalendarThemeForPreview {
         BackButton(onClick = {})
+    }
+}
+
+@Preview
+@Composable
+private fun EditButtonPreview() {
+    CalendarThemeForPreview {
+        EditButton(onClick = {})
     }
 }

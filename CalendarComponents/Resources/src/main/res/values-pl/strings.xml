@@ -45,6 +45,7 @@
     <string name="contentDescriptionHasLocation">Ma lokalizację</string>
     <string name="contentDescriptionToday">Dziś</string>
     <string name="descriptionTitle">Opis</string>
+    <string name="eventTitle">Tytuł wydarzenia</string>
     <string name="notificationTypeEmail">E-mail</string>
     <string name="notificationTypePush">Powiadomienie</string>
     <string name="occupiedLabel">Zajęty</string>
