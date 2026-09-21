@@ -17,8 +17,12 @@
  */
 package com.infomaniak.calendar.components.eventdetail.detail
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.animate
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,10 +30,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingToolbarDefaults
+import androidx.compose.material3.FloatingToolbarExitDirection
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,7 +45,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
@@ -72,6 +82,7 @@ import kotlin.time.Instant
 /**
  * [sharedTransitionScope] and [animatedVisibilityScope] animate associated components between detail and editing.
  */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun EventDetail(
     eventDetail: EventDetailUi,
@@ -85,17 +96,28 @@ fun EventDetail(
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
     val horizontalContentPadding = contentPadding.onlyHorizontal()
-
-    // The sticky footer floats over the content, so the scroll needs to clear its height at the bottom.
     var stickyFooterHeight by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
+    val scrollState = rememberScrollState()
+    val toolbarScrollBehavior = FloatingToolbarDefaults.exitAlwaysScrollBehavior(
+        exitDirection = FloatingToolbarExitDirection.Bottom,
+    )
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-    Box(modifier = modifier) {
+    val isScrolledToBottom = !scrollState.canScrollForward
+    LaunchedEffect(isScrolledToBottom) {
+        if (isScrolledToBottom) {
+            val toolbarState = toolbarScrollBehavior.state
+            animate(initialValue = toolbarState.offset, targetValue = 0f) { value, _ -> toolbarState.offset = value }
+        }
+    }
+
+    Box(modifier = modifier.nestedScroll(toolbarScrollBehavior)) {
         with(eventDetail) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(scrollState)
                     .padding(top = contentPadding.calculateTopPadding(), bottom = stickyFooterHeight),
             ) {
                 Title(
@@ -113,7 +135,11 @@ fun EventDetail(
                     }
 
                     if (kMeetUrl?.isNotBlank() == true) {
-                        KMeetButton(onJoin = onJoinKMeet, onCopy = onCopyKMeet, modifier = Modifier.padding(horizontalContentPadding))
+                        KMeetButton(
+                            onJoin = onJoinKMeet,
+                            onCopy = onCopyKMeet,
+                            modifier = Modifier.padding(horizontalContentPadding),
+                        )
                     }
 
                     if (location?.isNotBlank() == true) {
@@ -157,14 +183,13 @@ fun EventDetail(
                 PresenceStatusButtons(
                     presenceStatus = me.status,
                     onPresenceStatusChange = { /*TODO[eventDetail]*/ },
+                    scrollBehavior = toolbarScrollBehavior.takeIf { isLandscape },
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        // Opaque, so the content scrolling underneath stops showing through the footer.
-                        .background(MaterialTheme.colorScheme.surface)
                         .onSizeChanged { stickyFooterHeight = with(density) { it.height.toDp() } }
                         .padding(
                             top = EsdsTheme.spacing.xl,
-                            bottom = EsdsTheme.spacing.xl + contentPadding.calculateBottomPadding(),
+                            bottom = FloatingToolbarDefaults.ScreenOffset + contentPadding.calculateBottomPadding(),
                         ),
                 )
             }

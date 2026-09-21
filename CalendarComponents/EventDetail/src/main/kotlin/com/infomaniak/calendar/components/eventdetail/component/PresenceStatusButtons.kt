@@ -23,10 +23,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingToolbarScrollBehavior
+import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -39,7 +40,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,6 +47,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
@@ -60,36 +61,43 @@ internal fun PresenceStatusButtons(
     presenceStatus: ParticipationStatus,
     onPresenceStatusChange: (ParticipationStatus) -> Unit,
     modifier: Modifier = Modifier,
+    scrollBehavior: FloatingToolbarScrollBehavior? = null,
 ) {
     var selectedStatus by remember(presenceStatus) { mutableStateOf(presenceStatus) }
 
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xl, Alignment.CenterHorizontally),
-        modifier = modifier
-            .fillMaxWidth()
-            .selectableGroup(),
+    HorizontalFloatingToolbar(
+        expanded = true,
+        scrollBehavior = scrollBehavior,
+        shape = MaterialTheme.shapes.large,
+        expandedShadowElevation = TOOLBAR_ELEVATION,
+        collapsedShadowElevation = TOOLBAR_ELEVATION,
+        modifier = modifier.selectableGroup(),
     ) {
-        PresenceStatusButton.entries.forEach { presenceStatusButton ->
-            ToggleButton(
-                checked = selectedStatus == presenceStatusButton.status,
-                onCheckedChange = {
-                    selectedStatus = presenceStatusButton.status
-                    onPresenceStatusChange(presenceStatusButton.status)
-                },
-                colors = presenceStatusButton.colors(),
-                modifier = Modifier.semantics { role = Role.RadioButton },
-            ) {
-                Icon(
-                    painter = painterResource(presenceStatusButton.icon),
-                    contentDescription = null,
-                    modifier = Modifier.size(ToggleButtonDefaults.IconSize),
-                )
-                Spacer(modifier = Modifier.size(ToggleButtonDefaults.IconSpacing))
-                Text(stringResource(presenceStatusButton.label))
+        Row(horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md)) {
+            PresenceStatusButton.entries.forEach { presenceStatusButton ->
+                ToggleButton(
+                    checked = selectedStatus == presenceStatusButton.status,
+                    onCheckedChange = {
+                        selectedStatus = presenceStatusButton.status
+                        onPresenceStatusChange(presenceStatusButton.status)
+                    },
+                    colors = presenceStatusButton.colors(),
+                    modifier = Modifier.semantics { role = Role.RadioButton },
+                ) {
+                    Icon(
+                        painter = painterResource(presenceStatusButton.icon),
+                        contentDescription = null,
+                        modifier = Modifier.size(ToggleButtonDefaults.IconSize),
+                    )
+                    Spacer(modifier = Modifier.size(ToggleButtonDefaults.IconSpacing))
+                    Text(stringResource(presenceStatusButton.label))
+                }
             }
         }
     }
 }
+
+private val TOOLBAR_ELEVATION = 3.dp
 
 private enum class PresenceStatusButton(
     val status: ParticipationStatus,
@@ -118,6 +126,7 @@ private fun PresenceStatusButton.colors(): ToggleButtonColors = when (this) {
     )
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @PreviewLightDark
 @Composable
 private fun PresenceStatusButtonsPreview() {
