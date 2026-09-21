@@ -17,11 +17,19 @@
  */
 package com.infomaniak.calendar.ui.component.topAppBar
 
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,24 +48,22 @@ import com.infomaniak.core.common.R as RCommon
 object TopAppBarButtons {
     @Composable
     fun InboxButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
-        IconButton(onClick = onClick) {
-            Icon(
-                painter = painterResource(R.drawable.ic_inbox),
-                contentDescription = stringResource(R.string.contentDescriptionInbox),
-                modifier = modifier,
-            )
-        }
+        TooltipIconButton(
+            painter = painterResource(R.drawable.ic_inbox),
+            contentDescription = stringResource(R.string.contentDescriptionInbox),
+            onClick = onClick,
+            modifier = modifier,
+        )
     }
 
     @Composable
     fun SearchButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
-        IconButton(onClick = onClick) {
-            Icon(
-                painter = painterResource(R.drawable.ic_magnifying_glass),
-                contentDescription = stringResource(R.string.contentDescriptionSearch),
-                modifier = modifier,
-            )
-        }
+        TooltipIconButton(
+            painter = painterResource(R.drawable.ic_magnifying_glass),
+            contentDescription = stringResource(R.string.contentDescriptionSearch),
+            onClick = onClick,
+            modifier = modifier,
+        )
     }
 
     @Composable
@@ -65,34 +71,53 @@ object TopAppBarButtons {
         val scope = rememberCoroutineScope()
         val calendarDrawerState = LocalDrawerState.current
 
-        IconButton(
+        TooltipIconButton(
+            painter = painterResource(R.drawable.ic_list),
+            contentDescription = stringResource(R.string.contentDescriptionMenuDrawer),
             onClick = { scope.launch { calendarDrawerState?.open() } },
             modifier = modifier,
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_list),
-                contentDescription = stringResource(R.string.contentDescriptionMenuDrawer),
-            )
-        }
+        )
     }
 
     @Composable
     fun BackButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
-        IconButton(onClick = onClick, modifier = modifier) {
-            Icon(
-                painter = painterResource(R.drawable.ic_arrow_back),
-                contentDescription = stringResource(R.string.contentDescriptionBack),
-            )
-        }
+        TooltipIconButton(
+            painter = painterResource(R.drawable.ic_arrow_back),
+            contentDescription = stringResource(R.string.contentDescriptionBack),
+            onClick = onClick,
+            modifier = modifier,
+        )
     }
 
     @Composable
     fun EditButton(modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
-        IconButton(onClick = onClick, modifier = modifier, enabled = enabled) {
-            Icon(
-                painter = painterResource(RComponents.drawable.ic_pen),
-                contentDescription = stringResource(RCommon.string.edit),
-            )
+        TooltipIconButton(
+            painter = painterResource(RComponents.drawable.ic_pen),
+            contentDescription = stringResource(RCommon.string.edit),
+            onClick = onClick,
+            modifier = modifier,
+            enabled = enabled,
+        )
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun TooltipIconButton(
+        painter: Painter,
+        contentDescription: String,
+        onClick: () -> Unit,
+        modifier: Modifier = Modifier,
+        enabled: Boolean = true,
+    ) {
+        TooltipBox(
+            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Below),
+            state = rememberTooltipState(),
+            tooltip = { PlainTooltip { Text(contentDescription) } },
+            modifier = modifier,
+        ) {
+            IconButton(onClick, enabled = enabled) {
+                Icon(painter, contentDescription)
+            }
         }
     }
 }
