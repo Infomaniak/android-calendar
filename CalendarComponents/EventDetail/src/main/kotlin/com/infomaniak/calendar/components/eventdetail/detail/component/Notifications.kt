@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi.Notification.NotificationTime
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTime
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDurationOffset
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
@@ -86,34 +87,6 @@ private fun notificationTimeText(time: NotificationTime): String {
     return when (time) {
         is NotificationTime.Offset -> time.duration.formatDurationOffset()
         is NotificationTime.Absolute -> time.instant.formatDateTime(timeZone = timeZone, currentYear = currentYear)
-    }
-}
-
-@Composable
-fun Duration.formatDurationOffset(): String {
-    val isBefore = isNegative()
-    val absoluteDuration = absoluteValue
-    if (absoluteDuration.inWholeSeconds == 0L) {
-        return stringResource(R.string.notificationTimeAtStart)
-    }
-    val totalMinutes = absoluteDuration.inWholeMinutes
-    val weeks = totalMinutes / (7 * 24 * 60)
-    val days = (totalMinutes % (7 * 24 * 60)) / (24 * 60)
-    val hours = (totalMinutes % (24 * 60)) / 60
-    val minutes = totalMinutes % 60
-
-    val parts = buildList {
-        if (weeks > 0) add(pluralStringResource(R.plurals.weekAmount, weeks.toInt(), weeks.toInt()))
-        if (days > 0) add(pluralStringResource(R.plurals.dayAmount, days.toInt(), days.toInt()))
-        if (hours > 0) add(pluralStringResource(R.plurals.hourAmount, hours.toInt(), hours.toInt()))
-        if (minutes > 0) add(pluralStringResource(R.plurals.minuteAmount, minutes.toInt(), minutes.toInt()))
-    }
-
-    val durationText = parts.joinToString(", ")
-    return if (isBefore) {
-        stringResource(R.string.notificationTimeBefore, durationText)
-    } else {
-        stringResource(R.string.notificationTimeAfter, durationText)
     }
 }
 

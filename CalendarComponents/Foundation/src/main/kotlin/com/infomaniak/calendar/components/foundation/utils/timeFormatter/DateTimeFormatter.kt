@@ -18,10 +18,14 @@
 package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import com.infomaniak.calendar.components.resources.R
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import java.util.Locale
+import kotlin.time.Duration
 import kotlin.time.Instant
 
 private const val SHORT_NUMERIC_DATE_SKELETON = "dM"
@@ -50,4 +54,33 @@ internal fun LocalDate.formatShortNumericDate(locale: Locale, currentYear: Int):
     }
 
     return format(skeleton, locale)
+}
+
+/** `1 hour, 30 minutes before`, `At the event time`, `2 days after`, weeks being the largest unit of duration we display. */
+@Composable
+fun Duration.formatDurationOffset(): String {
+    val isBefore = isNegative()
+    val absoluteDuration = absoluteValue
+    if (absoluteDuration.inWholeSeconds == 0L) {
+        return stringResource(R.string.notificationTimeAtStart)
+    }
+    val totalMinutes = absoluteDuration.inWholeMinutes
+    val weeks = totalMinutes / (7 * 24 * 60)
+    val days = (totalMinutes % (7 * 24 * 60)) / (24 * 60)
+    val hours = (totalMinutes % (24 * 60)) / 60
+    val minutes = totalMinutes % 60
+
+    val parts = buildList {
+        if (weeks > 0) add(pluralStringResource(R.plurals.weekAmount, weeks.toInt(), weeks.toInt()))
+        if (days > 0) add(pluralStringResource(R.plurals.dayAmount, days.toInt(), days.toInt()))
+        if (hours > 0) add(pluralStringResource(R.plurals.hourAmount, hours.toInt(), hours.toInt()))
+        if (minutes > 0) add(pluralStringResource(R.plurals.minuteAmount, minutes.toInt(), minutes.toInt()))
+    }
+
+    val durationText = parts.joinToString(", ")
+    return if (isBefore) {
+        stringResource(R.string.notificationTimeBefore, durationText)
+    } else {
+        stringResource(R.string.notificationTimeAfter, durationText)
+    }
 }
