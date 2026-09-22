@@ -52,8 +52,9 @@ class EventDetailViewModel(
         .distinctUntilChanged()
         .flatMapLatest { eventId -> calendarManager.observeEvent(EventId(eventId)) }
 
-    fun setEventId(eventId: String) {
-        eventIdFlow.tryEmit(eventId)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val eventAttendees = eventFlow.flatMapLatest { event ->
+        flowOf(event?.attendees ?: emptyList())
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -76,8 +77,7 @@ class EventDetailViewModel(
                 .let(EventDetailUiState::Success)
         }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val eventAttendees = eventFlow.flatMapLatest { event ->
-        flowOf(event?.attendees ?: emptyList())
+    fun setEventId(eventId: String) {
+        eventIdFlow.tryEmit(eventId)
     }
 }
