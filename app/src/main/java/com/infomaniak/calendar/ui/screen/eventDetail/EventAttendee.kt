@@ -47,7 +47,7 @@ fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
     ListItem(
         modifier = modifier.fillMaxWidth(),
         headlineContent = {
-            Column() {
+            Column {
                 // had to add this here and not overline content to center the avatar vertically
                 AttendeeParticipationStatus(attendee.status, attendee.isOrganizer)
                 Text(
