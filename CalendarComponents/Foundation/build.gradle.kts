@@ -52,4 +52,5 @@ dependencies {
 
     testImplementation(core.junit)
     testImplementation(core.robolectric)
+    testImplementation(core.activity.compose)
 }
