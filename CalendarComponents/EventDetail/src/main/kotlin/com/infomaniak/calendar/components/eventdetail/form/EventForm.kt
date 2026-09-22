@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -67,7 +68,7 @@ fun rememberSaveableEventFormState(
     initialText: String = "",
 ): EventFormState {
     val textFieldState = rememberTextFieldState(initialText)
-    val colorState = rememberSaveable(initialCalendar == null) { mutableStateOf(initialCalendar?.color) }
+    val colorState = rememberSaveable(initialCalendar == null, stateSaver = ColorSaver) { mutableStateOf(initialCalendar?.color) }
 
     return EventFormState(
         titleTextState = textFieldState,
@@ -103,6 +104,11 @@ fun EventForm(
         )
     }
 }
+
+private val ColorSaver = Saver<Color?, String>(
+    save = { color -> color?.value?.toString() ?: "null" },
+    restore = { stringValue -> if (stringValue == "null") null else Color(stringValue.toULong()) },
+)
 
 @Preview
 @Composable
