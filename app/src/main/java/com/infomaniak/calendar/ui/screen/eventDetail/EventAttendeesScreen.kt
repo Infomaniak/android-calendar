@@ -36,9 +36,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,8 +52,6 @@ import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.core.theme.EsdsTheme
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.AttendeeRole
 
 @Composable
 fun EventAttendeesScreen(
@@ -66,18 +61,23 @@ fun EventAttendeesScreen(
     viewModel: EventDetailViewModel = viewModel(),
 ) {
     val attendees by viewModel.eventAttendees.collectAsStateWithLifecycle(initialValue = emptyList())
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.setEventId(eventId)
     }
 
-    EventAttendeesScreen({ attendees }, onBack, modifier)
+    EventAttendeesScreen({ attendees }, { searchQuery }, viewModel::onSearchQueryChanged, onBack, modifier)
 }
 
 @Composable
-fun EventAttendeesScreen(attendees: () -> List<AttendeeUi>, onBack: () -> Unit, modifier: Modifier = Modifier) {
-    var searchQuery by rememberSaveable { mutableStateOf("") }
-
+fun EventAttendeesScreen(
+    attendees: () -> List<AttendeeUi>,
+    searchQuery: () -> String,
+    onSearchQueryChanged: (String) -> Unit,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -92,10 +92,9 @@ fun EventAttendeesScreen(attendees: () -> List<AttendeeUi>, onBack: () -> Unit, 
                 .fillMaxSize()
                 .padding(paddingValues),
         ) {
-            // TODO: add search contacts functionality
             TextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
+                value = searchQuery(),
+                onValueChange = onSearchQueryChanged,
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
                     focusedIndicatorColor = Color.Transparent,
@@ -168,6 +167,8 @@ private fun EventAttendeesScreenPreview() {
         Surface {
             EventAttendeesScreen(
                 attendees = { previewAttendees },
+                searchQuery = { "" },
+                onSearchQueryChanged = {},
                 onBack = {},
             )
         }

@@ -31,6 +31,8 @@ import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
@@ -48,6 +50,10 @@ class EventDetailViewModel(
         replay = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
+
+    private val searchQueryFlow = MutableStateFlow("")
+
+    val searchQuery: StateFlow<String> = searchQueryFlow
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val eventFlow = eventIdFlow
@@ -80,5 +86,10 @@ class EventDetailViewModel(
 
     fun setEventId(eventId: String) {
         eventIdFlow.tryEmit(eventId)
+    }
+
+    // TODO: add search contacts functionality
+    fun onSearchQueryChanged(query: String) {
+        searchQueryFlow.value = query
     }
 }
