@@ -36,6 +36,7 @@ import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.theme.CalendarTheme
+import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 
@@ -80,7 +81,7 @@ private fun EventEditScreen(
                 eventColor = state.eventDetail.eventColor,
                 title = state.eventDetail.title,
                 modifier = modifier,
-                contentPadding = contentPadding + PaddingValues(horizontal = Margin.Small),
+                contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
             )

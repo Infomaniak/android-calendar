@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.creation
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -28,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.calendar.ui.theme.Dimens
 
 @Composable
 fun EventCreationScreen(modifier: Modifier = Modifier) {
@@ -39,7 +38,7 @@ fun EventCreationScreen(modifier: Modifier = Modifier) {
         EventForm(
             eventColor = MaterialTheme.colorScheme.primary,
             title = "",
-            contentPadding = contentPadding + PaddingValues(horizontal = Margin.Small),
+            contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
         )
     }
 }
