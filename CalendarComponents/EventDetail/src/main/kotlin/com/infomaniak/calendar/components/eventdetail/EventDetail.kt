@@ -71,7 +71,7 @@ fun EventDetail(
     eventDetail: EventDetailUi,
     onKMeetClick: () -> Unit,
     onLocationClick: () -> Unit,
-    onAttendeesClick: () -> Unit,
+    goToEventAttendees: () -> Unit,
     onRoomClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
@@ -87,7 +87,7 @@ fun EventDetail(
 
             Section(contentPadding = horizontalContentPadding) {
                 if (attendees.all.isNotEmpty()) {
-                    AttendeesButton(attendees.all, onClick = onAttendeesClick, contentPadding = horizontalContentPadding)
+                    AttendeesButton(attendees.all, onClick = goToEventAttendees, contentPadding = horizontalContentPadding)
                 }
 
                 if (kMeetUrl?.isNotBlank() == true) {
@@ -250,7 +250,7 @@ private fun PreviewEventDetail() {
                         onKMeetClick = {},
                         onLocationClick = {},
                         onRoomClick = {},
-                        onAttendeesClick = {},
+                        goToEventAttendees = {},
                         contentPadding = PaddingValues(horizontal = Margin.Small) + it,
                     )
                 }

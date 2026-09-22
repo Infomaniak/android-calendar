@@ -53,7 +53,7 @@ import kotlin.time.Instant
 fun EventDetailScreen(
     eventId: String,
     onBack: () -> Unit,
-    onAttendeesClick: () -> Unit,
+    goToEventAttendees: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),
 ) {
@@ -68,7 +68,7 @@ fun EventDetailScreen(
         uiState = { uiState },
         onBack = onBack,
         onLocationClick = { location -> openLocationInMapApp(context, location) },
-        onAttendeesClick = onAttendeesClick,
+        goToEventAttendees = goToEventAttendees,
         modifier = modifier,
     )
 }
@@ -77,7 +77,7 @@ fun EventDetailScreen(
 private fun EventDetailScreen(
     uiState: () -> EventDetailUiState,
     onBack: () -> Unit,
-    onAttendeesClick: () -> Unit,
+    goToEventAttendees: () -> Unit,
     onLocationClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -94,7 +94,7 @@ private fun EventDetailScreen(
                         onKMeetClick = { /*TODO[eventDetail]*/ },
                         onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
                         onRoomClick = { /*TODO[eventDetail]*/ },
-                        onAttendeesClick = { onAttendeesClick() },
+                        goToEventAttendees = { goToEventAttendees() },
                         contentPadding = scaffoldContentPadding + PaddingValues(horizontal = Margin.Small),
                     )
                 }
@@ -139,7 +139,7 @@ private fun Preview() {
             EventDetailScreen(
                 uiState = { EventDetailUiState.Success(previewEventDetail) },
                 onBack = {},
-                onAttendeesClick = {},
+                goToEventAttendees = {},
                 onLocationClick = {},
             )
         }

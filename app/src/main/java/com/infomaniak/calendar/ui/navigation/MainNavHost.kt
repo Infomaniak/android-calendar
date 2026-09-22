@@ -107,7 +107,7 @@ private fun baseEntryProvider(
         EventDetailScreen(
             eventId = destination.eventId,
             onBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
-            onAttendeesClick = { backStack.add(NavDestination.EventAttendees(destination.eventId)) },
+            goToEventAttendees = { backStack.add(NavDestination.EventAttendees(destination.eventId)) },
         )
     }
     entry<NavDestination.EventAttendees> { destination ->
