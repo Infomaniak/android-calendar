@@ -19,7 +19,6 @@ package com.infomaniak.calendar.ui.screen.eventDetail.edit
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -37,7 +36,6 @@ import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
-import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 
 @Composable
