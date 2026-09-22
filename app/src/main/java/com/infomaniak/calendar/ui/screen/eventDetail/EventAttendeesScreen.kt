@@ -127,7 +127,7 @@ fun EventAttendeesScreen(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = EsdsTheme.spacing.md),
+                        .padding(horizontal = EsdsTheme.spacing.md, vertical = EsdsTheme.spacing.sm),
                 ) {
                     items(
                         items = attendees(),
