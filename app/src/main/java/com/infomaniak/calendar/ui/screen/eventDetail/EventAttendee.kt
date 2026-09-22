@@ -19,7 +19,6 @@ package com.infomaniak.calendar.ui.screen.eventDetail
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ListItem
@@ -61,8 +60,10 @@ fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
             }
 
         },
-        supportingContent = {
-            if (!attendee.displayName.isNullOrEmpty()) {
+        supportingContent = if (attendee.displayName.isNullOrEmpty()) {
+            null
+        } else {
+            {
                 Text(
                     text = attendee.email,
                     maxLines = 1,
