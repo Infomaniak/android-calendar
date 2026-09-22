@@ -27,6 +27,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
@@ -37,32 +38,33 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.core.ui.compose.theme.MaterialPreviewTheme
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 private const val MAX_LINES = Int.MAX_VALUE
 
 @Composable
-internal fun Title(color: Color, title: String, modifier: Modifier = Modifier) {
+internal fun Title(dotColor: Color, title: String, modifier: Modifier = Modifier) {
     ListItem(
-        leadingContent = { EventColorDot(color) },
+        leadingContent = { EventColorDot(dotColor) },
         content = { Text(text = title, style = MaterialTheme.typography.titleLargeEmphasized, maxLines = MAX_LINES) },
         modifier = modifier,
     )
 }
 
 @Composable
-internal fun TitleEditable(color: Color, title: String, modifier: Modifier = Modifier) {
+internal fun TitleEditable(dotColor: Color, title: String, modifier: Modifier = Modifier) {
     val textFieldState = rememberTextFieldState(title)
 
     ListItem(
-        leadingContent = { EventColorDot(color) },
+        leadingContent = { EventColorDot(dotColor) },
         content = {
             BasicTextField(
                 state = textFieldState,
-                textStyle = MaterialTheme.typography.titleLargeEmphasized,
+                textStyle = MaterialTheme.typography.titleLargeEmphasized.copy(LocalContentColor.current),
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = MAX_LINES),
                 modifier = Modifier.fillMaxWidth(),
@@ -97,22 +99,22 @@ private fun EventColorDot(color: Color) {
 
 private const val PREVIEW_TITLE = "End of the year vacations with Santa Claus"
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun Preview() {
-    MaterialTheme {
+    MaterialPreviewTheme {
         Surface {
-            Title(color = Color.Red, title = PREVIEW_TITLE)
+            Title(dotColor = Color.Red, title = PREVIEW_TITLE)
         }
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun PreviewEditable() {
-    MaterialTheme {
+    MaterialPreviewTheme {
         Surface {
-            TitleEditable(color = Color.Red, title = PREVIEW_TITLE)
+            TitleEditable(dotColor = Color.Red, title = PREVIEW_TITLE)
         }
     }
 }

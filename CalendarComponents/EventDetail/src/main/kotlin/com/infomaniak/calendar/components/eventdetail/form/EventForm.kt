@@ -55,7 +55,7 @@ fun EventForm(
         modifier.padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding()),
     ) {
         TitleEditable(
-            color = eventColor,
+            dotColor = eventColor,
             title = title,
             modifier = Modifier
                 .padding(horizontalContentPadding)

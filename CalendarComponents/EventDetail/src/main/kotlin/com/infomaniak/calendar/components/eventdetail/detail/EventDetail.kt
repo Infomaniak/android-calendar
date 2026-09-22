@@ -82,7 +82,7 @@ fun EventDetail(
     ) {
         with(eventDetail) {
             Title(
-                color = eventColor,
+                dotColor = eventColor,
                 title = title,
                 modifier = Modifier
                     .padding(horizontalContentPadding)
