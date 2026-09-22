@@ -19,7 +19,9 @@ package com.infomaniak.calendar.ui.screen.eventDetail
 
 import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.calendar.utils.toAttendeeUi
 import com.infomaniak.calendar.utils.toEventDetailUi
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
@@ -53,9 +55,8 @@ class EventDetailViewModel(
         .flatMapLatest { eventId -> calendarManager.observeEvent(EventId(eventId)) }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val eventAttendees = eventFlow.flatMapLatest { event ->
-        flowOf(event?.attendees ?: emptyList())
-    }
+    val eventAttendees = eventFlow
+        .map { event -> event?.attendees.orEmpty().map(Attendee::toAttendeeUi) }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val eventDetailUi = eventFlow

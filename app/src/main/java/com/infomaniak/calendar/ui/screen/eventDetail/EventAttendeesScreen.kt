@@ -49,14 +49,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.calendar.utils.toAttendeeUi
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.AttendeeRole
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationStatus
 
 @Composable
 fun EventAttendeesScreen(
@@ -75,9 +75,8 @@ fun EventAttendeesScreen(
 }
 
 @Composable
-fun EventAttendeesScreen(attendees: () -> List<Attendee>?, onBack: () -> Unit, modifier: Modifier = Modifier) {
+fun EventAttendeesScreen(attendees: () -> List<AttendeeUi>, onBack: () -> Unit, modifier: Modifier = Modifier) {
     var searchQuery by rememberSaveable { mutableStateOf("") }
-    val allAttendees = attendees().orEmpty().map(Attendee::toAttendeeUi)
 
     Scaffold(
         topBar = {
@@ -118,7 +117,7 @@ fun EventAttendeesScreen(attendees: () -> List<Attendee>?, onBack: () -> Unit, m
             )
 
             // TODO: do a proper empty state view
-            if (allAttendees.isEmpty()) {
+            if (attendees().isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
@@ -132,7 +131,7 @@ fun EventAttendeesScreen(attendees: () -> List<Attendee>?, onBack: () -> Unit, m
                         .padding(horizontal = EsdsTheme.spacing.md),
                 ) {
                     items(
-                        items = allAttendees,
+                        items = attendees(),
                         key = { attendee -> attendee.email },
                     ) { attendee ->
                         EventAttendee(attendee = attendee)
@@ -147,24 +146,21 @@ fun EventAttendeesScreen(attendees: () -> List<Attendee>?, onBack: () -> Unit, m
 @Composable
 private fun EventAttendeesScreenPreview() {
     val previewAttendees = listOf(
-        Attendee(
+        AttendeeUi(
             email = "alice@example.com",
             displayName = "Alice Johnson",
-            status = ParticipationStatus.Accepted,
-            role = AttendeeRole.Chair,
             isOrganizer = true,
+            status = ParticipationStatus.Accepted,
         ),
-        Attendee(
+        AttendeeUi(
             email = "bob@example.com",
             displayName = "Bob Smith",
             status = ParticipationStatus.Tentative,
-            role = AttendeeRole.Optional,
         ),
-        Attendee(
+        AttendeeUi(
             email = "charlie@example.com",
             displayName = "Charlie Brown",
             status = ParticipationStatus.Declined,
-            role = AttendeeRole.Optional,
         ),
     )
 
