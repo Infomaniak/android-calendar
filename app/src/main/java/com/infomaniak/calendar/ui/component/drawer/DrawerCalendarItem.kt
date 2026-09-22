@@ -49,7 +49,7 @@ fun DrawerCalendarItem(
                 role = Role.Checkbox,
             ),
         colors = ListItemDefaults.colors(Color.Transparent),
-        headlineContent = {
+        content = {
             Text(calendar.displayName)
         },
         leadingContent = {

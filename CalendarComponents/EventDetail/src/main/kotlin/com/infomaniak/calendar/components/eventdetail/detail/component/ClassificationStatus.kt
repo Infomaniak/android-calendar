@@ -34,7 +34,7 @@ import com.infomaniak.calendar.components.resources.R
 @Composable
 internal fun ClassificationStatus(classification: EventDetailUi.Classification, modifier: Modifier = Modifier) {
     ListItem(
-        headlineContent = { Text(text = stringResource(classification.label)) },
+        content = { Text(text = stringResource(classification.label)) },
         leadingContent = { Icon(painter = painterResource(R.drawable.ic_lock), contentDescription = null) },
         modifier = modifier,
     )

@@ -52,7 +52,7 @@ internal fun DateAndTime(
 ) {
     ListItem(
         leadingContent = { Icon(painterResource(R.drawable.ic_clock), contentDescription = null) },
-        headlineContent = {
+        content = {
             val startAtLocale = start.atLocale
             val endAtLocale = end.atLocale
             Text(

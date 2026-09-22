@@ -51,7 +51,7 @@ internal fun KMeetButton(
     modifier: Modifier = Modifier,
 ) {
     ListItem(
-        headlineContent = {
+        content = {
             Text(stringResource(id = R.string.participateKMeetTitle), style = MaterialTheme.typography.bodyLarge)
         },
         leadingContent = {
