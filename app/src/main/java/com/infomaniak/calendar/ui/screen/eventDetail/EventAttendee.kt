@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -25,6 +26,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -43,41 +45,45 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
 
 @Composable
 fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
-    ListItem(
-        modifier = modifier,
-        headlineContent = {
-            Column {
-                // had to add this here and not overline content to center the avatar vertically
+    Row(
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.background)
+            .padding(start = EsdsTheme.spacing.lg),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Avatar(
+            avatarType = AvatarType.fromAttendee(attendee),
+            modifier = Modifier
+                .padding(start = EsdsTheme.spacing.lg)
+                .size(40.dp),
+        )
+        ListItem(
+            overlineContent = {
                 AttendeeParticipationStatus(attendee.status, attendee.isOrganizer)
-                Text(
-                    text = attendee.displayName ?: attendee.email,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Normal,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = EsdsTheme.spacing.twoXs),
-                )
-            }
+            },
+            headlineContent = {
+                Column {
+                    Text(
+                        text = attendee.displayName ?: attendee.email,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Normal,
+                    )
+                }
 
-        },
-        supportingContent = if (attendee.displayName.isNullOrEmpty()) {
-            null
-        } else {
-            {
-                Text(
-                    text = attendee.email,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-        },
-        leadingContent = {
-            Avatar(
-                avatarType = AvatarType.fromAttendee(attendee),
-                modifier = Modifier.size(40.dp),
-            )
-        },
-    )
+            },
+            supportingContent = if (attendee.displayName.isNullOrEmpty()) {
+                null
+            } else {
+                {
+                    Text(
+                        text = attendee.email,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            },
+        )
+    }
 }
 
 @Composable
