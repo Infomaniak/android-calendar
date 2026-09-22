@@ -45,7 +45,7 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
 @Composable
 fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
     ListItem(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
         headlineContent = {
             Column {
                 // had to add this here and not overline content to center the avatar vertically
