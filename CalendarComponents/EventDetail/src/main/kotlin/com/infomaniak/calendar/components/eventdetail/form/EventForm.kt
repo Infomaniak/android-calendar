@@ -22,18 +22,59 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
+import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
+
+@Stable
+class EventFormState(
+    val titleTextState: TextFieldState,
+    val colorState: MutableState<Color?>,
+    val calendars: List<EventDetailCalendar>,
+) {
+    fun toEventDraft(): EventDraft? = EventDraft(
+        title = titleTextState.text.toString(),
+        color = colorState.value ?: return null,
+    )
+}
+
+data class EventDraft(
+    val title: String,
+    val color: Color,
+)
+
+@Composable
+fun rememberSaveableEventFormState(
+    calendars: List<EventDetailCalendar>,
+    initialCalendar: EventDetailCalendar?,
+    initialText: String = "",
+): EventFormState {
+    val textFieldState = rememberTextFieldState(initialText)
+    val colorState = rememberSaveable(initialCalendar == null) { mutableStateOf(initialCalendar?.color) }
+
+    return EventFormState(
+        titleTextState = textFieldState,
+        colorState = colorState,
+        calendars = calendars,
+    )
+}
 
 /**
  * Reusable component for both the creation and the edition of an event.
@@ -42,8 +83,7 @@ import com.infomaniak.core.ui.compose.basics.onlyHorizontal
  */
 @Composable
 fun EventForm(
-    eventColor: Color, // TODO: Adapt this when structuring edit/creation and its states correctly
-    title: String, // TODO: Adapt this when structuring edit/creation and its states correctly
+    state: EventFormState,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -55,8 +95,8 @@ fun EventForm(
         modifier.padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding()),
     ) {
         TitleEditable(
-            dotColor = eventColor,
-            title = title,
+            dotColor = state.colorState.value ?: Color.Transparent, // Temporarily hide the dot until we get the actual color
+            textFieldState = state.titleTextState,
             modifier = Modifier
                 .padding(horizontalContentPadding)
                 .eventSharedElement(EventSharedElement.Title),
@@ -70,8 +110,11 @@ private fun Preview() {
     MaterialTheme {
         Surface {
             EventForm(
-                eventColor = MaterialTheme.colorScheme.primary,
-                title = "Event title",
+                state = rememberSaveableEventFormState(
+                    calendars = listOf(previewEventDetailCalendar),
+                    initialCalendar = previewEventDetailCalendar,
+                    initialText = "Event title",
+                ),
                 contentPadding = PaddingValues(16.dp),
             )
         }

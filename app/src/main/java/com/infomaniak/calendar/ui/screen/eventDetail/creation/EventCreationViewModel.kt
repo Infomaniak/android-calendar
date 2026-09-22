@@ -15,21 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.eventDetail.edit
+package com.infomaniak.calendar.ui.screen.eventDetail.creation
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
-import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import androidx.lifecycle.viewModelScope
+import com.infomaniak.calendar.components.eventdetail.form.EventDraft
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.stateIn
 
 @Inject
 @ContributesIntoMap(AppScope::class)
-@ViewModelKey
-class EventEditViewModel(private val getEventDetailUiUseCase: GetEventDetailUiUseCase) : ViewModel() {
-    val eventDetailUi = getEventDetailUiUseCase.eventDetailUi
+@ViewModelKey(EventCreationViewModel::class)
+class EventCreationViewModel(appContext: Context) : ViewModel() {
+    val uiState = flowOf(Unit).stateIn(viewModelScope, SharingStarted.Lazily, Unit)
 
-    fun setOccurrenceId(occurrenceId: OccurrenceId) = getEventDetailUiUseCase.setOccurrenceId(occurrenceId)
+    fun submitEvent(eventDraft: EventDraft) {
+        // TODO
+    }
 }
