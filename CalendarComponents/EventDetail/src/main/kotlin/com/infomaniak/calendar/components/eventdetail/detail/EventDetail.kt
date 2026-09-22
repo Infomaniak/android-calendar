@@ -69,7 +69,7 @@ fun EventDetail(
     onJoinKMeet: () -> Unit,
     onCopyKMeet: () -> Unit,
     onLocationClick: () -> Unit,
-    onAttendeesClick: () -> Unit,
+    goToEventAttendees: () -> Unit,
     onRoomClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
@@ -85,7 +85,7 @@ fun EventDetail(
                 if (attendees.all.isNotEmpty()) {
                     AttendeesButton(
                         attendees = attendees.all,
-                        onClick = onAttendeesClick,
+                        onClick = goToEventAttendees,
                         contentPadding = horizontalContentPadding,
                         modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
                     )
@@ -186,7 +186,7 @@ private fun PreviewEventDetail() {
                         onCopyKMeet = {},
                         onLocationClick = {},
                         onRoomClick = {},
-                        onAttendeesClick = {},
+                        goToEventAttendees = {},
                         contentPadding = PaddingValues(horizontal = Margin.Small) + it,
                     )
                 }
