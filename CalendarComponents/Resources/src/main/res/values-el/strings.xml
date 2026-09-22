@@ -39,7 +39,7 @@
     <string name="contentDescriptionHasLocation">Έχει τοποθεσία</string>
     <string name="contentDescriptionToday">Σήμερα</string>
     <plurals name="dayAmount">
-        <item quantity="one">%d hμέρα</item>
+        <item quantity="one">%d ημέρα</item>
         <item quantity="other">%d ημέρες</item>
     </plurals>
     <string name="descriptionTitle">Περιγραφή</string>

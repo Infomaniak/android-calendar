@@ -39,7 +39,7 @@
     <string name="contentDescriptionHasLocation">Hat einen Standort</string>
     <string name="contentDescriptionToday">Heute</string>
     <plurals name="dayAmount">
-        <item quantity="one">%d tag</item>
+        <item quantity="one">%d Tag</item>
         <item quantity="other">%d Tage</item>
     </plurals>
     <string name="descriptionTitle">Beschreibung</string>

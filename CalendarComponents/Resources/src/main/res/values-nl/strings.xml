@@ -46,7 +46,7 @@
     <string name="eventTitle">Titel van het evenement</string>
     <plurals name="hourAmount">
         <item quantity="one">%d uur</item>
-        <item quantity="other">%d uren</item>
+        <item quantity="other">%d uur</item>
     </plurals>
     <plurals name="minuteAmount">
         <item quantity="one">%d minuut</item>
