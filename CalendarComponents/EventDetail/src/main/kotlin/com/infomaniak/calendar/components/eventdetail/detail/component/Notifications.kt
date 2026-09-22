@@ -20,6 +20,7 @@ package com.infomaniak.calendar.components.eventdetail.detail.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi.Notification.NotificationTime
@@ -62,7 +64,12 @@ internal fun Notifications(
             contentPadding = contentPadding,
             trailingContent = {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
-                    Text(timeText, style = MaterialTheme.typography.labelLarge)
+                    Text(
+                        text = timeText,
+                        style = MaterialTheme.typography.labelLarge,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.fillMaxWidth(0.5f),
+                    )
                     Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null)
                 }
             },

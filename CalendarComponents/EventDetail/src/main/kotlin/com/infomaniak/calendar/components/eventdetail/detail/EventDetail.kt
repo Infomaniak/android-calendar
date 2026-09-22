@@ -56,6 +56,8 @@ import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
 /**
@@ -171,7 +173,7 @@ private fun PreviewEventDetail() {
             ),
             EventDetailUi.Notification(
                 EventDetailUi.Notification.Type.Push,
-                EventDetailUi.Notification.NotificationTime.Absolute(Instant.parse("2026-05-20T07:00:00Z")),
+                EventDetailUi.Notification.NotificationTime.Offset(90.days + 30.minutes),
             ),
         ),
         isOccupied = true,

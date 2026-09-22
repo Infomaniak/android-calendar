@@ -69,7 +69,7 @@ internal fun ClickableItem(
 ) {
     ListItem(
         modifier = modifier,
-        content = { Text(text = text, overflow = TextOverflow.Ellipsis, maxLines = 2) },
+        content = { Text(text) },
         supportingContent = supportingContent,
         leadingContent = leadingContent,
         trailingContent = trailingContent,
