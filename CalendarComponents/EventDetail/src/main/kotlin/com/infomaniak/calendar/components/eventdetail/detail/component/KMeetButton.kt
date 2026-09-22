@@ -20,6 +20,7 @@ package com.infomaniak.calendar.components.eventdetail.detail.component
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -73,6 +74,7 @@ internal fun KMeetButton(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CopyButton(onClick: () -> Unit) {
     val contentDescription = stringResource(RCommon.string.buttonCopy)
