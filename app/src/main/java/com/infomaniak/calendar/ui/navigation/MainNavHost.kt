@@ -100,7 +100,7 @@ private fun baseEntryProvider(
     entry<NavDestination.CalendarView.Month>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         MonthScreen()
     }
-    entry<NavDestination.EventCreation> {
+    entry<NavDestination.EventCreation>(metadata = metaDataOf(ResponsiveDialog)) {
         EventCreationScreen()
     }
     entry<NavDestination.EventDetail>(metadata = metaDataOf(ResponsiveDialog)) { destination ->
