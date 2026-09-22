@@ -130,19 +130,17 @@ fun ParticipationStatusText(text: String, color: Color, isOrganizer: Boolean, mo
         Text(
             text = text,
             maxLines = 1,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.labelMedium,
             overflow = TextOverflow.Ellipsis,
             color = color,
-            fontWeight = FontWeight.Medium,
         )
         if (isOrganizer) {
             Text(
                 text = " · ${stringResource(R.string.sectionOrganizerHeader)}",
                 maxLines = 1,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.labelMedium,
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.Medium,
             )
         }
     }
