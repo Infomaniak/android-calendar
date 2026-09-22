@@ -27,6 +27,7 @@ import kotlin.time.Instant
 private const val SHORT_NUMERIC_DATE_SKELETON = "dM"
 private const val SHORT_NUMERIC_DATE_WITH_YEAR_SKELETON = "yMd"
 
+/** `9/17, 05:30PM`, showing the year as well if it's not the current year. */
 @Composable
 fun Instant.formatDateTime(
     timeZone: TimeZone,
