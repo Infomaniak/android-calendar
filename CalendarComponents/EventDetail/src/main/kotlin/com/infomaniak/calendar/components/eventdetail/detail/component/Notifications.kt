@@ -29,12 +29,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi.Notification.NotificationTime
+import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTime
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDurationOffset
 import com.infomaniak.calendar.components.resources.R
@@ -42,7 +41,6 @@ import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds

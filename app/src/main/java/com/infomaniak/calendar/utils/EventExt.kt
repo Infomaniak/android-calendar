@@ -20,6 +20,7 @@ package com.infomaniak.calendar.utils
 import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Classification
@@ -78,8 +79,8 @@ private fun EventAlarm.toNotification(): EventDetailUi.Notification? {
             else -> return null // Other types of alarms are not supported in the UI yet
         },
         time = when (val trigger = trigger) {
-            is AlarmTrigger.Relative -> EventDetailUi.Notification.NotificationTime.Offset(trigger.offset)
-            is AlarmTrigger.Absolute -> EventDetailUi.Notification.NotificationTime.Absolute(trigger.instant)
+            is AlarmTrigger.Relative -> NotificationTime.Offset(trigger.offset)
+            is AlarmTrigger.Absolute -> NotificationTime.Absolute(trigger.instant)
         },
     )
 }

@@ -48,6 +48,7 @@ import com.infomaniak.calendar.components.eventdetail.detail.component.OccupiedS
 import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
@@ -169,11 +170,11 @@ private fun PreviewEventDetail() {
         notifications = listOf(
             EventDetailUi.Notification(
                 EventDetailUi.Notification.Type.Email,
-                EventDetailUi.Notification.NotificationTime.Absolute(Instant.parse("2026-05-20T07:00:00Z")),
+                NotificationTime.Absolute(Instant.parse("2026-05-20T07:00:00Z")),
             ),
             EventDetailUi.Notification(
                 EventDetailUi.Notification.Type.Push,
-                EventDetailUi.Notification.NotificationTime.Offset(90.days + 30.minutes),
+                NotificationTime.Offset(90.days + 30.minutes),
             ),
         ),
         isOccupied = true,
