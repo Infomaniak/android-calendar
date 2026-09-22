@@ -61,7 +61,7 @@ internal fun Notifications(
             contentPadding = contentPadding,
             trailingContent = {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
-                    Text(timeText)
+                    Text(timeText, style = MaterialTheme.typography.labelLarge)
                     Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null)
                 }
             },
