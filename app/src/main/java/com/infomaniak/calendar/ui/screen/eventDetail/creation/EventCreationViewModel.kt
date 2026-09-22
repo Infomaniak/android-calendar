@@ -17,23 +17,27 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.creation
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.components.eventdetail.form.EventDraft
+import com.infomaniak.calendar.ui.screen.eventDetail.model.EventFormCalendars
+import com.infomaniak.calendar.ui.screen.eventDetail.EventFormCalendarsUseCase
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey(EventCreationViewModel::class)
-class EventCreationViewModel(appContext: Context) : ViewModel() {
+class EventCreationViewModel(eventFormCalendarsUseCase: EventFormCalendarsUseCase) : ViewModel() {
     val uiState = flowOf(Unit).stateIn(viewModelScope, SharingStarted.Lazily, Unit)
+
+    val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase.creationCalendars
 
     fun submitEvent(eventDraft: EventDraft) {
         // TODO

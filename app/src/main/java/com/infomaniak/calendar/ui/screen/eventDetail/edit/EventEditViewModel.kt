@@ -18,18 +18,27 @@
 package com.infomaniak.calendar.ui.screen.eventDetail.edit
 
 import androidx.lifecycle.ViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.EventFormCalendarsUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
+import com.infomaniak.calendar.ui.screen.eventDetail.model.EventFormCalendars
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import kotlinx.coroutines.flow.StateFlow
 
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
-class EventEditViewModel(private val getEventDetailUiUseCase: GetEventDetailUiUseCase) : ViewModel() {
+class EventEditViewModel(
+    private val getEventDetailUiUseCase: GetEventDetailUiUseCase,
+    eventFormCalendarsUseCase: EventFormCalendarsUseCase,
+) : ViewModel() {
     val eventDetailUi = getEventDetailUiUseCase.eventDetailUi
+
+    val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase
+        .editionCalendars(getEventDetailUiUseCase.eventCalendar)
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) = getEventDetailUiUseCase.setOccurrenceId(occurrenceId)
 }

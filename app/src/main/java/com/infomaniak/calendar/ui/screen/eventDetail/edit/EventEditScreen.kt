@@ -48,12 +48,13 @@ fun EventEditScreen(
     viewModel: EventEditViewModel = viewModel(),
 ) {
     val eventDetailUiState = viewModel.eventDetailUi.collectAsStateWithLifecycle().value
+    val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
     val uiState = when (eventDetailUiState) {
         EventDetailUiState.Loading -> EventEditScreenState.Loading
         is EventDetailUiState.Success -> EventEditScreenState.Success(
             rememberSaveableEventFormState(
-                emptyList(), // TODO: Provide actual calendars
-                initialCalendar = null,
+                calendars = eventFormCalendars?.calendars ?: emptyList(),
+                initialCalendar = eventFormCalendars?.initialCalendar,
                 initialText = eventDetailUiState.eventDetail.title,
             ),
         )

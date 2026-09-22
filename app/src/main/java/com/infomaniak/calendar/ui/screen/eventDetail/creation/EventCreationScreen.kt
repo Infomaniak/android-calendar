@@ -24,6 +24,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
@@ -34,7 +35,11 @@ import com.infomaniak.calendar.ui.theme.Dimens
 
 @Composable
 fun EventCreationScreen(modifier: Modifier = Modifier, viewModel: EventCreationViewModel = viewModel()) {
-    val state = rememberSaveableEventFormState(calendars = listOf(), initialCalendar = null) // TODO: Provide actual calendars
+    val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
+    val state = rememberSaveableEventFormState(
+        calendars = eventFormCalendars?.calendars ?: emptyList(),
+        initialCalendar = eventFormCalendars?.initialCalendar,
+    )
 
     EventCreationScreen(
         state = state,
