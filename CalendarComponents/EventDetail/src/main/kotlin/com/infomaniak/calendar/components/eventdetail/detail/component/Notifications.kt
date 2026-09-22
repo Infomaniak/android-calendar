@@ -40,6 +40,7 @@ import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
@@ -155,6 +156,24 @@ private fun PreviewOffsetNotification() {
                     EventDetailUi.Notification(
                         EventDetailUi.Notification.Type.Push,
                         NotificationTime.Offset((-90).minutes),
+                    ),
+                ),
+                onNotificationClick = {},
+            )
+        }
+    }
+}
+
+@Preview(name = "Long Offset notification")
+@Composable
+private fun PreviewLongOffsetNotification() {
+    MaterialTheme {
+        Surface {
+            Notifications(
+                notifications = listOf(
+                    EventDetailUi.Notification(
+                        EventDetailUi.Notification.Type.Push,
+                        NotificationTime.Offset(90.days + 30.minutes),
                     ),
                 ),
                 onNotificationClick = {},
