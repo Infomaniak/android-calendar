@@ -26,6 +26,7 @@
         <item quantity="one">%1$d invitado</item>
         <item quantity="other">%1$d invitados</item>
     </plurals>
+    <string name="attendeesEmptyState">No se encontraron participantes</string>
     <string name="availableLabel">Disponible</string>
     <string name="buttonJoin">Unirse</string>
     <string name="confidentialLabel">Confidencial</string>
@@ -37,6 +38,7 @@
     <string name="contentDescriptionHasAttendees">Cuenta con asistentes</string>
     <string name="contentDescriptionHasKMeetLink">Tiene un enlace de kMeet</string>
     <string name="contentDescriptionHasLocation">Tiene una ubicación</string>
+    <string name="contentDescriptionSearch">Buscar</string>
     <string name="contentDescriptionToday">Hoy</string>
     <string name="descriptionTitle">Descripción</string>
     <string name="notificationTypeEmail">Correo electrónico</string>
@@ -51,7 +53,13 @@
         <item quantity="one">%d asiento</item>
         <item quantity="other">%d asientos</item>
     </plurals>
+    <string name="searchForAttendees">Búsqueda de invitados</string>
     <string name="sectionCalendarHeader">Calendario</string>
+    <string name="sectionOrganizerHeader">Organizador</string>
+    <string name="statusAcceptedLabel">Aceptado</string>
+    <string name="statusDeclinedLabel">Rechazado</string>
+    <string name="statusNeedsActionLabel">Pendiente</string>
+    <string name="statusTentativeLabel">Quizás</string>
     <string name="weekHeaderDateRange">%d–%d de %s de %d</string>
     <string name="weekHeaderWeekNumber">Sem.%d</string>
 </resources>

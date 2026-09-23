@@ -26,6 +26,7 @@
         <item quantity="one">%1$d vieras</item>
         <item quantity="other">%1$d vierasta</item>
     </plurals>
+    <string name="attendeesEmptyState">Osallistujia ei löytynyt</string>
     <string name="availableLabel">Vapaa</string>
     <string name="buttonJoin">Liity mukaan</string>
     <string name="confidentialLabel">Luottamuksellinen</string>
@@ -37,6 +38,7 @@
     <string name="contentDescriptionHasAttendees">Onko osallistujia</string>
     <string name="contentDescriptionHasKMeetLink">Sisältää kMeet-linkin</string>
     <string name="contentDescriptionHasLocation">On sijainti</string>
+    <string name="contentDescriptionSearch">Haku</string>
     <string name="contentDescriptionToday">Tänään</string>
     <string name="descriptionTitle">Kuvaus</string>
     <string name="notificationTypeEmail">Sähköposti</string>
@@ -51,7 +53,13 @@
         <item quantity="one">%d paikkaa</item>
         <item quantity="other">%d paikkaa</item>
     </plurals>
+    <string name="searchForAttendees">Vieraiden haku</string>
     <string name="sectionCalendarHeader">Kalenteri</string>
+    <string name="sectionOrganizerHeader">Järjestäjä</string>
+    <string name="statusAcceptedLabel">Hyväksytty</string>
+    <string name="statusDeclinedLabel">Hylätty</string>
+    <string name="statusNeedsActionLabel">Käsiteltävänä</string>
+    <string name="statusTentativeLabel">Ehkä</string>
     <string name="weekHeaderDateRange">%d.–%d. %s %d</string>
     <string name="weekHeaderWeekNumber">V%d</string>
 </resources>

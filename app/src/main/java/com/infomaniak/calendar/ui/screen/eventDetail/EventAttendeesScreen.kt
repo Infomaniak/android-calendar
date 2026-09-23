@@ -17,41 +17,27 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
+import com.infomaniak.calendar.components.eventdetail.AttendeesSearch
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.ui.compose.margin.Margin
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
 fun EventAttendeesScreen(
@@ -70,6 +56,7 @@ fun EventAttendeesScreen(
     EventAttendeesScreen({ attendees }, { searchQuery }, viewModel::onSearchQueryChanged, onBack, modifier)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventAttendeesScreen(
     attendees: () -> List<AttendeeUi>,
@@ -87,57 +74,13 @@ fun EventAttendeesScreen(
         },
         modifier = modifier,
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-        ) {
-            TextField(
-                value = searchQuery(),
-                onValueChange = onSearchQueryChanged,
-                colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                ),
-                modifier = Modifier
-                    .padding(horizontal = Margin.Small, vertical = Margin.Small)
-                    .fillMaxWidth()
-                    .clip(MaterialTheme.shapes.extraLarge)
-                    .background(color = MaterialTheme.colorScheme.surfaceContainerHigh),
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_magnifying_glass),
-                        contentDescription = stringResource(R.string.contentDescriptionSearch),
-                    )
-                },
-                singleLine = true,
-                placeholder = { Text(stringResource(R.string.searchForAttendees)) },
-            )
+        AttendeesSearch(
+            attendees = attendees,
+            modifier = Modifier.padding(paddingValues).fillMaxWidth(),
+            searchQuery = searchQuery,
+            onSearchQueryChanged = onSearchQueryChanged,
 
-            // TODO: do a proper empty state view
-            if (attendees().isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text("No attendees found")
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = EsdsTheme.spacing.md, vertical = EsdsTheme.spacing.sm),
-                ) {
-                    items(
-                        items = attendees(),
-                        key = { attendee -> attendee.email },
-                    ) { attendee ->
-                        EventAttendee(attendee = attendee)
-                    }
-                }
-            }
-        }
+        )
     }
 }
 

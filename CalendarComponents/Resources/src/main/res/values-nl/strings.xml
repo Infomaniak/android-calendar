@@ -26,6 +26,7 @@
         <item quantity="one">%1$d gast</item>
         <item quantity="other">%1$d gasten</item>
     </plurals>
+    <string name="attendeesEmptyState">No attendees found</string>
     <string name="availableLabel">Beschikbaar</string>
     <string name="buttonJoin">Lid worden</string>
     <string name="confidentialLabel">Vertrouwelijk</string>
@@ -37,6 +38,7 @@
     <string name="contentDescriptionHasAttendees">Heeft deelnemers</string>
     <string name="contentDescriptionHasKMeetLink">Bevat een kMeet-link</string>
     <string name="contentDescriptionHasLocation">Heeft een locatie</string>
+    <string name="contentDescriptionSearch">Zoeken</string>
     <string name="contentDescriptionToday">Vandaag</string>
     <string name="descriptionTitle">Beschrijving</string>
     <string name="notificationTypeEmail">E-mail</string>
@@ -51,7 +53,13 @@
         <item quantity="one">%d plaats</item>
         <item quantity="other">%d plaatsen</item>
     </plurals>
+    <string name="searchForAttendees">Zoeken naar gasten</string>
     <string name="sectionCalendarHeader">Kalender</string>
+    <string name="sectionOrganizerHeader">Organisator</string>
+    <string name="statusAcceptedLabel">Geaccepteerd</string>
+    <string name="statusDeclinedLabel">Afgewezen</string>
+    <string name="statusNeedsActionLabel">In behandeling</string>
+    <string name="statusTentativeLabel">Misschien</string>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">W%d</string>
 </resources>

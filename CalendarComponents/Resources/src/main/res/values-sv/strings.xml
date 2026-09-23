@@ -26,6 +26,7 @@
         <item quantity="one">%1$d gäst</item>
         <item quantity="other">%1$d gäster</item>
     </plurals>
+    <string name="attendeesEmptyState">Inga deltagare hittades</string>
     <string name="availableLabel">Ledig</string>
     <string name="buttonJoin">Gå med</string>
     <string name="confidentialLabel">Konfidentiell</string>
@@ -37,6 +38,7 @@
     <string name="contentDescriptionHasAttendees">Har deltagare</string>
     <string name="contentDescriptionHasKMeetLink">Har en kMeet-länk</string>
     <string name="contentDescriptionHasLocation">Har en plats</string>
+    <string name="contentDescriptionSearch">Sök</string>
     <string name="contentDescriptionToday">Idag</string>
     <string name="descriptionTitle">Beskrivning</string>
     <string name="notificationTypeEmail">E-post</string>
@@ -51,7 +53,13 @@
         <item quantity="one">%d plats</item>
         <item quantity="other">%d platser</item>
     </plurals>
+    <string name="searchForAttendees">Sökning efter gäster</string>
     <string name="sectionCalendarHeader">Kalender</string>
+    <string name="sectionOrganizerHeader">Arrangör</string>
+    <string name="statusAcceptedLabel">Godkänt</string>
+    <string name="statusDeclinedLabel">Avvisat</string>
+    <string name="statusNeedsActionLabel">Väntar på beslut</string>
+    <string name="statusTentativeLabel">Kanske</string>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">V%d</string>
 </resources>

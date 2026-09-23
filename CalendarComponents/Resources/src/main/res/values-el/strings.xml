@@ -26,6 +26,7 @@
         <item quantity="one">%1$d καλεσμένος</item>
         <item quantity="other">%1$d καλεσμένοι</item>
     </plurals>
+    <string name="attendeesEmptyState">Δεν βρέθηκαν συμμετέχοντες</string>
     <string name="availableLabel">Διαθέσιμο</string>
     <string name="buttonJoin">Εγγραφή</string>
     <string name="confidentialLabel">Εμπιστευτικό</string>
@@ -37,6 +38,7 @@
     <string name="contentDescriptionHasAttendees">Έχει συμμετέχοντες</string>
     <string name="contentDescriptionHasKMeetLink">Διαθέτει σύνδεσμο kMeet</string>
     <string name="contentDescriptionHasLocation">Έχει τοποθεσία</string>
+    <string name="contentDescriptionSearch">Αναζήτηση</string>
     <string name="contentDescriptionToday">Σήμερα</string>
     <string name="descriptionTitle">Περιγραφή</string>
     <string name="notificationTypeEmail">Email</string>
@@ -51,7 +53,13 @@
         <item quantity="one">%d θέση</item>
         <item quantity="other">%d θέσεις</item>
     </plurals>
+    <string name="searchForAttendees">Αναζήτηση επισκεπτών</string>
     <string name="sectionCalendarHeader">Ημερολόγιο</string>
+    <string name="sectionOrganizerHeader">Διοργανωτής</string>
+    <string name="statusAcceptedLabel">Εγκρίθηκε</string>
+    <string name="statusDeclinedLabel">Απορρίφθηκε</string>
+    <string name="statusNeedsActionLabel">Σε εκκρεμότητα</string>
+    <string name="statusTentativeLabel">Ίσως</string>
     <string name="weekHeaderDateRange">%d–%d %s %d</string>
     <string name="weekHeaderWeekNumber">Εβδ.%d</string>
 </resources>
