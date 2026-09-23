@@ -27,7 +27,7 @@ import dev.zacsweers.metrox.viewmodel.ViewModelKey
 
 @Inject
 @ContributesIntoMap(AppScope::class)
-@ViewModelKey(EventEditViewModel::class)
+@ViewModelKey
 class EventEditViewModel(private val getEventDetailUiUseCase: GetEventDetailUiUseCase) : ViewModel() {
     val eventDetail = getEventDetailUiUseCase.eventDetailUi
 
