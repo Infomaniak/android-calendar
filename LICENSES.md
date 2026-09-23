@@ -24,6 +24,8 @@ This file lists the runtime dependencies added to this project along with their 
 | androidx.navigation:navigation-runtime | 2.9.6 | Apache License 2.0 | https://developer.android.com/jetpack/androidx/releases/navigation |
 | androidx.navigation3:navigation3-runtime | 1.1.1 | Apache License 2.0 | https://developer.android.com/jetpack/androidx/releases/navigation3 |
 | androidx.navigation3:navigation3-ui | 1.1.1 | Apache License 2.0 | https://developer.android.com/jetpack/androidx/releases/navigation3 |
+| androidx.paging:paging-common | 3.5.0 | Apache License 2.0 | https://developer.android.com/jetpack/androidx/releases/paging |
+| androidx.paging:paging-compose | 3.5.0 | Apache License 2.0 | https://developer.android.com/jetpack/androidx/releases/paging |
 | androidx.recyclerview:recyclerview | 1.2.1 | Apache License 2.0 | https://developer.android.com/jetpack/androidx/releases/recyclerview |
 | androidx.room:room-runtime | 2.8.4 | Apache License 2.0 | https://developer.android.com/jetpack/androidx/releases/room |
 | androidx.sqlite:sqlite-bundled | 2.6.2 | Apache License 2.0 | https://developer.android.com/jetpack/androidx/releases/sqlite |

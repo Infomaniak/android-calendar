@@ -17,7 +17,10 @@
  */
 package com.infomaniak.calendar.ui.screen.planning
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,9 +29,13 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -38,32 +45,42 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.LoadState
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.planning.Planning
+import com.infomaniak.calendar.components.planning.PlanningRow
+import com.infomaniak.calendar.components.planning.preview.PlanningRowPreviewParameter
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
-import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
-import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewParameter
-import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.model.occurrenceId
+import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
+import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.core.common.R as RCore
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.YearMonth
-import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
 @Composable
@@ -73,31 +90,39 @@ fun PlanningScreen(
     modifier: Modifier = Modifier,
     viewModel: PlanningViewModel = viewModel(),
 ) {
-    val planningUiState: PlanningUiState by viewModel.planningUiState.collectAsStateWithLifecycle()
+    val planningRows = viewModel.planningRows.collectAsLazyPagingItems()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
     val eventsDots by viewModel.eventDots.collectAsStateWithLifecycle(initialValue = emptyMap())
 
     PlanningScreen(
-        goToEventCreation = goToEventCreation,
-        goToEventDetail = goToEventDetail,
-        planningUiState = { planningUiState },
+        callbacks = PlanningScreenCallbacks(
+            goToEventCreation = goToEventCreation,
+            goToEventDetail = goToEventDetail,
+            onJumpTo = viewModel::jumpTo,
+            onNavigationFinished = viewModel::onNavigationFinished,
+            onVisibleDateChanged = viewModel::onVisibleDateChanged,
+        ),
+        planningRows = planningRows,
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventsDots },
-        onVisibleMonthChanged = viewModel::onVisibleMonthChanged,
-        jumpTo = viewModel::jumpTo,
         modifier = modifier,
     )
 }
 
+private data class PlanningScreenCallbacks(
+    val goToEventCreation: () -> Unit,
+    val goToEventDetail: (OccurrenceId) -> Unit,
+    val onJumpTo: (LocalDate) -> Long,
+    val onNavigationFinished: (Long) -> Unit,
+    val onVisibleDateChanged: (LocalDate) -> Unit,
+)
+
 @Composable
 private fun PlanningScreen(
-    goToEventCreation: () -> Unit,
-    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
-    planningUiState: () -> PlanningUiState,
+    callbacks: PlanningScreenCallbacks,
+    planningRows: LazyPagingItems<PlanningRow>,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
-    onVisibleMonthChanged: (YearMonth) -> Unit,
-    jumpTo: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val hazeState = rememberHazeState()
@@ -114,21 +139,12 @@ private fun PlanningScreen(
         val contentPadding = scaffoldContentPadding + PaddingValues(top = topBarHeight)
 
         Box(modifier = Modifier.fillMaxSize()) {
-            when (val planningUi = planningUiState()) {
-                is PlanningUiState.Success -> {
-                    SuccessPlanning(
-                        events = planningUi.eventsByWeekAndDay,
-                        contentPadding = contentPadding + PaddingValues(Margin.Medium),
-                        goToEventCreation = goToEventCreation,
-                        goToEventDetail = goToEventDetail,
-                        jumpTo = jumpTo,
-                        modifier = Modifier.hazeSource(hazeState),
-                    )
-                }
-                is PlanningUiState.Loading -> {
-                    LoadingPlanning(modifier = Modifier.padding(contentPadding))
-                }
-            }
+            PlanningStateContent(
+                planningRows = planningRows,
+                callbacks = callbacks,
+                hazeState = hazeState,
+                contentPadding = contentPadding,
+            )
 
             CalendarTopAppBar(
                 isLoadingEvents = isLoadingEvents,
@@ -139,10 +155,7 @@ private fun PlanningScreen(
                         ExpandableCalendar(
                             isExpanded = { isCalendarExpanded },
                             selectedDate = { visibleDayState.visibleDate },
-                            onDayClick = {
-                                onVisibleMonthChanged(it.yearMonth)
-                                visibleDayState.jumpTo(it)
-                            },
+                            onDayClick = { visibleDayState.jumpTo(it) },
                             weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
                             eventsDots = eventsDots,
                         )
@@ -159,36 +172,82 @@ private fun PlanningScreen(
 }
 
 @Composable
-private fun SuccessPlanning(
-    events: () -> EventsByWeekAndDay,
+private fun BoxScope.PlanningStateContent(
+    planningRows: LazyPagingItems<PlanningRow>,
+    callbacks: PlanningScreenCallbacks,
+    hazeState: HazeState,
     contentPadding: PaddingValues,
-    goToEventCreation: () -> Unit,
-    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
-    jumpTo: (LocalDate) -> Unit,
+) {
+    // Keep the planning mounted once it has shown content, so a far jump's refresh (itemCount
+    // momentarily 0) doesn't tear down the jump/scroll handling — only the very first load shows a spinner.
+    var hasLoadedOnce by rememberSaveable { mutableStateOf(false) }
+    if (planningRows.itemCount > 0) hasLoadedOnce = true
+    val hasLoadError = planningRows.hasLoadError()
+
+    if (hasLoadedOnce) {
+        SuccessPlanning(
+            planningRows = planningRows,
+            callbacks = callbacks,
+            contentPadding = contentPadding + PaddingValues(Margin.Medium),
+            modifier = Modifier.hazeSource(hazeState),
+        )
+        if (hasLoadError) {
+            PagingLoadError(
+                onRetry = planningRows::retry,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(contentPadding)
+                    .padding(Margin.Medium),
+            )
+        }
+    } else if (hasLoadError) {
+        InitialPlanningError(onRetry = planningRows::retry, modifier = Modifier.padding(contentPadding))
+    } else {
+        LoadingPlanning(modifier = Modifier.padding(contentPadding))
+    }
+}
+
+@Composable
+private fun SuccessPlanning(
+    planningRows: LazyPagingItems<PlanningRow>,
+    callbacks: PlanningScreenCallbacks,
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
     val visibleDayState = LocalVisibleDayState.current ?: return
-    val lazyListState = rememberLazyListState(events().indexOf(visibleDayState.visibleDate))
+    val lazyListState = rememberLazyListState()
+    var initialAlignmentCompleted by remember { mutableStateOf(false) }
 
-    ProcessJumpRequests(lazyListState, visibleDayState, events)
+    AlignPlanningToDate(
+        lazyListState = lazyListState,
+        planningRows = planningRows,
+        visibleDayState = visibleDayState,
+        onJumpTo = callbacks.onJumpTo,
+        onNavigationFinished = callbacks.onNavigationFinished,
+        onInitialAlignmentCompleted = { initialAlignmentCompleted = true },
+    )
     ReportVisibleDate(
         lazyListState = lazyListState,
         onVisibleDateChanged = {
-            jumpTo(it)
+            callbacks.onVisibleDateChanged(it)
             visibleDayState.onVisibleDateChanged(it)
         },
     )
 
-    Planning(
-        lazyListState = lazyListState,
-        weekEvents = events,
-        modifier = modifier
-            .scrollableToolbar()
-            .fillMaxSize(),
-        contentPadding = contentPadding,
-        goToEventCreation = goToEventCreation,
-        onEventClick = { goToEventDetail(it.occurrenceId) },
-    )
+    Box(modifier = modifier) {
+        Planning(
+            lazyListState = lazyListState,
+            rows = planningRows,
+            modifier = Modifier
+                .scrollableToolbar()
+                .fillMaxSize()
+                .alpha(if (initialAlignmentCompleted) 1f else 0f),
+            contentPadding = contentPadding,
+            goToEventCreation = callbacks.goToEventCreation,
+            onEventClick = { callbacks.goToEventDetail(it.occurrenceId) },
+        )
+        if (!initialAlignmentCompleted) LoadingPlanning()
+    }
 }
 
 @Composable
@@ -198,21 +257,60 @@ private fun LoadingPlanning(modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+private fun InitialPlanningError(onRetry: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(Margin.Large),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Margin.Medium, Alignment.CenterVertically),
+    ) {
+        Text(text = stringResource(R.string.syncEventsError), textAlign = TextAlign.Center)
+        Button(onClick = onRetry) { Text(stringResource(RCore.string.buttonRetry)) }
+    }
+}
+
+@Composable
+private fun PagingLoadError(onRetry: () -> Unit, modifier: Modifier = Modifier) {
+    Surface(modifier = modifier, shape = MaterialTheme.shapes.large) {
+        Column(
+            modifier = Modifier.padding(Margin.Medium),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Margin.Small),
+        ) {
+            Text(text = stringResource(R.string.syncEventsError), textAlign = TextAlign.Center)
+            Button(onClick = onRetry) { Text(stringResource(RCore.string.buttonRetry)) }
+        }
+    }
+}
+
+private fun LazyPagingItems<PlanningRow>.hasLoadError(): Boolean {
+    val loadStates = loadState
+    return loadStates.refresh is LoadState.Error ||
+        loadStates.prepend is LoadState.Error ||
+        loadStates.append is LoadState.Error
+}
+
 @Preview
 @Composable
-private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class) weekEvents: EventsByWeekAndDay) {
+private fun Preview(@PreviewParameter(PlanningRowPreviewParameter::class) rows: List<PlanningRow>) {
     CalendarThemeForPreview {
         val visibleDate = remember { mutableStateOf(Clock.today()) }
+        val planningRows = flowOf(PagingData.from(rows)).collectAsLazyPagingItems()
 
         CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(visibleDate)) {
             PlanningScreen(
-                planningUiState = { PlanningUiState.Success({ weekEvents }) },
-                goToEventCreation = {},
-                goToEventDetail = {},
+                callbacks = PlanningScreenCallbacks(
+                    goToEventCreation = {},
+                    goToEventDetail = {},
+                    onJumpTo = { 0L },
+                    onNavigationFinished = {},
+                    onVisibleDateChanged = {},
+                ),
+                planningRows = planningRows,
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
-                onVisibleMonthChanged = {},
-                jumpTo = {},
             )
         }
     }
