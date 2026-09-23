@@ -19,6 +19,7 @@ package com.infomaniak.calendar.ui.screen.planning
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -75,6 +76,7 @@ import com.infomaniak.core.common.R as RCore
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.flow.flowOf
@@ -137,33 +139,12 @@ private fun PlanningScreen(
         val contentPadding = scaffoldContentPadding + PaddingValues(top = topBarHeight)
 
         Box(modifier = Modifier.fillMaxSize()) {
-            // Keep the planning mounted once it has shown content, so a far jump's refresh (itemCount
-            // momentarily 0) doesn't tear down the jump/scroll handling — only the very first load shows a spinner.
-            var hasLoadedOnce by rememberSaveable { mutableStateOf(false) }
-            if (planningRows.itemCount > 0) hasLoadedOnce = true
-            val hasLoadError = planningRows.hasLoadError()
-
-            if (hasLoadedOnce) {
-                SuccessPlanning(
-                    planningRows = planningRows,
-                    callbacks = callbacks,
-                    contentPadding = contentPadding + PaddingValues(Margin.Medium),
-                    modifier = Modifier.hazeSource(hazeState),
-                )
-                if (hasLoadError) {
-                    PagingLoadError(
-                        onRetry = planningRows::retry,
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(contentPadding)
-                            .padding(Margin.Medium),
-                    )
-                }
-            } else if (hasLoadError) {
-                InitialPlanningError(onRetry = planningRows::retry, modifier = Modifier.padding(contentPadding))
-            } else {
-                LoadingPlanning(modifier = Modifier.padding(contentPadding))
-            }
+            PlanningStateContent(
+                planningRows = planningRows,
+                callbacks = callbacks,
+                hazeState = hazeState,
+                contentPadding = contentPadding,
+            )
 
             CalendarTopAppBar(
                 isLoadingEvents = isLoadingEvents,
@@ -187,6 +168,42 @@ private fun PlanningScreen(
                     .onSizeChanged { topBarHeight = with(density) { it.height.toDp() } },
             )
         }
+    }
+}
+
+@Composable
+private fun BoxScope.PlanningStateContent(
+    planningRows: LazyPagingItems<PlanningRow>,
+    callbacks: PlanningScreenCallbacks,
+    hazeState: HazeState,
+    contentPadding: PaddingValues,
+) {
+    // Keep the planning mounted once it has shown content, so a far jump's refresh (itemCount
+    // momentarily 0) doesn't tear down the jump/scroll handling — only the very first load shows a spinner.
+    var hasLoadedOnce by rememberSaveable { mutableStateOf(false) }
+    if (planningRows.itemCount > 0) hasLoadedOnce = true
+    val hasLoadError = planningRows.hasLoadError()
+
+    if (hasLoadedOnce) {
+        SuccessPlanning(
+            planningRows = planningRows,
+            callbacks = callbacks,
+            contentPadding = contentPadding + PaddingValues(Margin.Medium),
+            modifier = Modifier.hazeSource(hazeState),
+        )
+        if (hasLoadError) {
+            PagingLoadError(
+                onRetry = planningRows::retry,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(contentPadding)
+                    .padding(Margin.Medium),
+            )
+        }
+    } else if (hasLoadError) {
+        InitialPlanningError(onRetry = planningRows::retry, modifier = Modifier.padding(contentPadding))
+    } else {
+        LoadingPlanning(modifier = Modifier.padding(contentPadding))
     }
 }
 
