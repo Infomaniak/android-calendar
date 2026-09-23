@@ -75,6 +75,7 @@ class PlanningViewModel(
     private val weekNumbering = WeekNumbering.ISO_8601
 
     private val observedWeek = MutableStateFlow(weekNumbering.weekOf(today))
+    private val selectedDate = MutableStateFlow(today)
 
     /** Recreating this anchor lets an explicit navigation win over a refresh anchored on an old scroll position. */
     private val pagingAnchor = MutableStateFlow(PagingAnchor(day = today, generation = 0))
@@ -113,6 +114,7 @@ class PlanningViewModel(
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
 
     fun onVisibleDateChanged(date: LocalDate) {
+        selectedDate.value = date
         observedWeek.value = weekNumbering.weekOf(date)
     }
 
@@ -145,6 +147,7 @@ class PlanningViewModel(
     private fun createPagingSource(day: LocalDate): PlanningPagingSource {
         return PlanningPagingSource(
             initialDay = day,
+            preferredRefreshDate = { selectedDate.value },
             calendarManager = calendarManager,
             timeZone = timeZone,
             weekNumbering = weekNumbering, //TODO[weekNumbering]: Use week numbering from LocalSettings
@@ -177,24 +180,18 @@ class PlanningViewModel(
     private fun onSyncPhaseChanged(syncPhase: SyncPhase) {
         if (syncPhase == previousSyncPhase) return
 
-        when (syncPhase) {
-            SyncPhase.DownloadingVisibleRange -> {
-                cancelRefresh()
-            }
-            SyncPhase.SyncingEvents -> {
-                if (previousSyncPhase == SyncPhase.DownloadingVisibleRange) {
-                    requestRefresh(RefreshReason.VisibleRangeDownloaded)
-                }
-            }
-            SyncPhase.Idle -> {
-                when (previousSyncPhase) {
-                    SyncPhase.DownloadingVisibleRange -> requestRefresh(RefreshReason.VisibleRangeDownloadFailed)
-                    SyncPhase.SyncingEvents -> requestRefresh(RefreshReason.SyncCompleted)
-                    SyncPhase.Idle -> Unit
-                }
-            }
-        }
+        if (syncPhase == SyncPhase.DownloadingVisibleRange) cancelRefresh()
+        refreshReasonFor(previousSyncPhase, syncPhase)?.let(::requestRefresh)
         previousSyncPhase = syncPhase
+    }
+
+    private fun refreshReasonFor(previous: SyncPhase, current: SyncPhase): RefreshReason? {
+        return when (previous to current) {
+            SyncPhase.DownloadingVisibleRange to SyncPhase.SyncingEvents -> RefreshReason.VisibleRangeDownloaded
+            SyncPhase.DownloadingVisibleRange to SyncPhase.Idle -> RefreshReason.VisibleRangeDownloadFailed
+            SyncPhase.SyncingEvents to SyncPhase.Idle -> RefreshReason.SyncCompleted
+            else -> null
+        }
     }
 
     private fun requestRefresh(reason: RefreshReason) {

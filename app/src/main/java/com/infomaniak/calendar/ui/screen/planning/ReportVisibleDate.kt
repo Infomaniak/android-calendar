@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.ui.screen.planning
 
 import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,42 +31,59 @@ import kotlinx.datetime.LocalDate
 @Composable
 fun ReportVisibleDate(lazyListState: LazyListState, onVisibleDateChanged: (LocalDate) -> Unit) {
     LaunchedEffect(lazyListState) {
-        var isUserScroll = false
-        var hasScrolled = false
-        var lastReportedDate: LocalDate? = null
-
-        fun reportVisibleDate(date: LocalDate?) {
-            if (date == null || date == lastReportedDate) return
-
-            onVisibleDateChanged(date)
-            lastReportedDate = date
-        }
+        val reporter = VisibleDateReporter()
 
         launch {
             lazyListState.interactionSource.interactions.collect { interaction ->
-                when (interaction) {
-                    is DragInteraction.Start -> {
-                        isUserScroll = true
-                        hasScrolled = lazyListState.isScrollInProgress
-                    }
-                    is DragInteraction.Stop, is DragInteraction.Cancel -> {
-                        if (!hasScrolled) isUserScroll = false
-                    }
-                    else -> Unit
-                }
+                reporter.onInteraction(interaction, lazyListState.isScrollInProgress)
             }
         }
 
         snapshotFlow { lazyListState.isScrollInProgress to lazyListState.firstVisibleDate() }.collect { (isScrolling, date) ->
-            if (isScrolling && isUserScroll) {
-                hasScrolled = true
-                reportVisibleDate(date)
-            } else if (!isScrolling && isUserScroll && hasScrolled) {
-                reportVisibleDate(date)
-                isUserScroll = false
-                hasScrolled = false
-            }
+            reporter.onScrollStateChanged(isScrolling, date, onVisibleDateChanged)
         }
+    }
+}
+
+private class VisibleDateReporter {
+    private var isUserScroll = false
+    private var hasScrolled = false
+    private var lastReportedDate: LocalDate? = null
+
+    fun onInteraction(interaction: Interaction, isScrollInProgress: Boolean) {
+        when (interaction) {
+            is DragInteraction.Start -> {
+                isUserScroll = true
+                hasScrolled = isScrollInProgress
+            }
+            is DragInteraction.Stop, is DragInteraction.Cancel -> clearUserScrollIfNotScrolled()
+            else -> Unit
+        }
+    }
+
+    fun onScrollStateChanged(isScrolling: Boolean, date: LocalDate?, onVisibleDateChanged: (LocalDate) -> Unit) {
+        if (isScrolling && isUserScroll) {
+            hasScrolled = true
+            reportVisibleDate(date, onVisibleDateChanged)
+            return
+        }
+
+        if (!isScrolling && isUserScroll && hasScrolled) {
+            reportVisibleDate(date, onVisibleDateChanged)
+            isUserScroll = false
+            hasScrolled = false
+        }
+    }
+
+    private fun clearUserScrollIfNotScrolled() {
+        if (!hasScrolled) isUserScroll = false
+    }
+
+    private fun reportVisibleDate(date: LocalDate?, onVisibleDateChanged: (LocalDate) -> Unit) {
+        if (date == null || date == lastReportedDate) return
+
+        onVisibleDateChanged(date)
+        lastReportedDate = date
     }
 }
 

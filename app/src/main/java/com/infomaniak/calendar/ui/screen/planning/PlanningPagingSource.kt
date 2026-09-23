@@ -54,6 +54,7 @@ import kotlinx.datetime.plus
  */
 internal class PlanningPagingSource(
     private val initialDay: LocalDate,
+    private val preferredRefreshDate: () -> LocalDate,
     private val calendarManager: CalendarManager,
     private val timeZone: TimeZone,
     private val weekNumbering: WeekNumbering = WeekNumbering.ISO_8601,
@@ -102,9 +103,7 @@ internal class PlanningPagingSource(
     }
 
     override fun getRefreshKey(state: PagingState<YearWeek, PlanningRow>): YearWeek {
-        val anchorPosition = state.anchorPosition ?: return initialWeek
-        val anchorDate = state.closestItemToPosition(anchorPosition)?.key?.date ?: return initialWeek
-        return weekNumbering.weekOf(anchorDate)
+        return weekNumbering.weekOf(preferredRefreshDate())
     }
 
     // Recompute through WeekNumbering so the week number stays correct across year boundaries.

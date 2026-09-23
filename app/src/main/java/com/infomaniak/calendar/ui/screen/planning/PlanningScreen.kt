@@ -33,10 +33,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -86,12 +88,14 @@ fun PlanningScreen(
     val visibleDayState = LocalVisibleDayState.current ?: return
 
     PlanningScreen(
-        goToEventCreation = goToEventCreation,
-        goToEventDetail = goToEventDetail,
+        callbacks = PlanningScreenCallbacks(
+            goToEventCreation = goToEventCreation,
+            goToEventDetail = goToEventDetail,
+            onJumpTo = viewModel::jumpTo,
+            onNavigationFinished = viewModel::onNavigationFinished,
+            onVisibleDateChanged = viewModel::onVisibleDateChanged,
+        ),
         planningRows = planningRows,
-        onJumpTo = viewModel::jumpTo,
-        onNavigationFinished = viewModel::onNavigationFinished,
-        onVisibleDateChanged = viewModel::onVisibleDateChanged,
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventsDots },
         visibleDayState = visibleDayState,
@@ -99,14 +103,18 @@ fun PlanningScreen(
     )
 }
 
+private data class PlanningScreenCallbacks(
+    val goToEventCreation: (LocalDate) -> Unit,
+    val goToEventDetail: (OccurrenceId) -> Unit,
+    val onJumpTo: (LocalDate) -> Long,
+    val onNavigationFinished: (Long) -> Unit,
+    val onVisibleDateChanged: (LocalDate) -> Unit,
+)
+
 @Composable
 private fun PlanningScreen(
-    goToEventCreation: (LocalDate) -> Unit,
-    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
+    callbacks: PlanningScreenCallbacks,
     planningRows: LazyPagingItems<PlanningRow>,
-    onJumpTo: (LocalDate) -> Long,
-    onNavigationFinished: (Long) -> Unit,
-    onVisibleDateChanged: (LocalDate) -> Unit,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     visibleDayState: VisibleDayState,
@@ -144,12 +152,8 @@ private fun PlanningScreen(
             if (hasLoadedOnce) {
                 SuccessPlanning(
                     planningRows = planningRows,
-                    onJumpTo = onJumpTo,
-                    onNavigationFinished = onNavigationFinished,
-                    onVisibleDateChanged = onVisibleDateChanged,
+                    callbacks = callbacks,
                     contentPadding = contentPadding + PaddingValues(Margin.Medium),
-                    goToEventCreation = goToEventCreation,
-                    goToEventDetail = goToEventDetail,
                     visibleDayState = visibleDayState,
                     modifier = Modifier
                         .hazeSource(hazeState)
@@ -176,36 +180,44 @@ private fun PlanningScreen(
 @Composable
 private fun SuccessPlanning(
     planningRows: LazyPagingItems<PlanningRow>,
-    onJumpTo: (LocalDate) -> Long,
-    onNavigationFinished: (Long) -> Unit,
-    onVisibleDateChanged: (LocalDate) -> Unit,
+    callbacks: PlanningScreenCallbacks,
     contentPadding: PaddingValues,
-    goToEventCreation: (LocalDate) -> Unit,
-    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     visibleDayState: VisibleDayState,
     modifier: Modifier = Modifier,
 ) {
     val lazyListState = rememberLazyListState()
+    var initialAlignmentCompleted by remember { mutableStateOf(false) }
 
-    AlignPlanningToDate(lazyListState, planningRows, visibleDayState, onJumpTo, onNavigationFinished)
+    AlignPlanningToDate(
+        lazyListState = lazyListState,
+        planningRows = planningRows,
+        visibleDayState = visibleDayState,
+        onJumpTo = callbacks.onJumpTo,
+        onNavigationFinished = callbacks.onNavigationFinished,
+        onInitialAlignmentCompleted = { initialAlignmentCompleted = true },
+    )
     ReportVisibleDate(
         lazyListState = lazyListState,
         onVisibleDateChanged = {
-            onVisibleDateChanged(it)
+            callbacks.onVisibleDateChanged(it)
             visibleDayState.updateVisibleDate(it)
         },
     )
 
-    Planning(
-        lazyListState = lazyListState,
-        rows = planningRows,
-        modifier = modifier
-            .scrollableToolbar()
-            .fillMaxSize(),
-        contentPadding = contentPadding,
-        goToEventCreation = goToEventCreation,
-        onEventClick = { goToEventDetail(it.occurrenceId) },
-    )
+    Box(modifier = modifier) {
+        Planning(
+            lazyListState = lazyListState,
+            rows = planningRows,
+            modifier = Modifier
+                .scrollableToolbar()
+                .fillMaxSize()
+                .alpha(if (initialAlignmentCompleted) 1f else 0f),
+            contentPadding = contentPadding,
+            goToEventCreation = callbacks.goToEventCreation,
+            onEventClick = { callbacks.goToEventDetail(it.occurrenceId) },
+        )
+        if (!initialAlignmentCompleted) ScreenLoader()
+    }
 }
 
 @Composable
@@ -252,12 +264,14 @@ private fun Preview(@PreviewParameter(PlanningRowPreviewParameter::class) rows: 
 
         CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
             PlanningScreen(
+                callbacks = PlanningScreenCallbacks(
+                    goToEventCreation = {},
+                    goToEventDetail = {},
+                    onJumpTo = { 0L },
+                    onNavigationFinished = {},
+                    onVisibleDateChanged = {},
+                ),
                 planningRows = planningRows,
-                onJumpTo = { 0L },
-                onNavigationFinished = {},
-                onVisibleDateChanged = {},
-                goToEventCreation = {},
-                goToEventDetail = {},
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
                 visibleDayState = visibleDayState,
