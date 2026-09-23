@@ -24,13 +24,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.DropdownMenuGroup
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorPosition
 import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.SelectableDropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -62,7 +62,6 @@ fun FloatingToolbarDropdownMenu(
         modifier = modifier.padding(bottom = Margin.Medium),
         properties = PopupProperties(clippingEnabled = false, focusable = true),
     ) {
-        val lastIndex = DateSelectionItems.entries.lastIndex
         val currentDestination = currentDestination()
 
         DropdownMenuGroup(
@@ -71,7 +70,7 @@ fun FloatingToolbarDropdownMenu(
             contentPadding = MenuDefaults.DropdownMenuGroupContentPadding + PaddingValues(vertical = 2.dp),
         ) {
             DateSelectionItems.entries.forEachIndexed { index, item ->
-                DropdownMenuItem(
+                SelectableDropdownMenuItem(
                     selected = item.destination == currentDestination,
                     shapes = MenuDefaults.itemShape(index, DateSelectionItems.entries.count()),
                     text = { Text(stringResource(item.labelRessourceId)) },

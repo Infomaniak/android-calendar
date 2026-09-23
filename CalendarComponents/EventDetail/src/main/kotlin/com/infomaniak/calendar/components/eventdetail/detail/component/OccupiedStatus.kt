@@ -33,7 +33,7 @@ import com.infomaniak.calendar.components.resources.R
 @Composable
 internal fun OccupiedStatus(isOccupied: Boolean, modifier: Modifier = Modifier) {
     ListItem(
-        headlineContent = { Text(text = stringResource(if (isOccupied) R.string.occupiedLabel else R.string.availableLabel)) },
+        content = { Text(text = stringResource(if (isOccupied) R.string.occupiedLabel else R.string.availableLabel)) },
         leadingContent = { Icon(painter = painterResource(R.drawable.ic_briefcase), contentDescription = null) },
         modifier = modifier,
     )

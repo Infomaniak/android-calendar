@@ -96,7 +96,7 @@ fun AccountItemContent(user: User, isClickable: Boolean, modifier: Modifier = Mo
         modifier = modifier.fillMaxWidth(),
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
         leadingContent = { Avatar(avatarType = AvatarType.fromUser(user), modifier = Modifier.size(32.dp)) },
-        headlineContent = {
+        content = {
             Text(
                 text = user.displayName.toString(),
                 style = MaterialTheme.typography.bodyLarge,

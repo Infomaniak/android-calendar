@@ -39,7 +39,7 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 @Composable
 internal fun Calendar(calendarColor: Color, calendarName: String, modifier: Modifier = Modifier) {
     ListItem(
-        headlineContent = { Text(stringResource(id = R.string.sectionCalendarHeader)) },
+        content = { Text(stringResource(id = R.string.sectionCalendarHeader)) },
         leadingContent = {
             Box(
                 modifier = Modifier

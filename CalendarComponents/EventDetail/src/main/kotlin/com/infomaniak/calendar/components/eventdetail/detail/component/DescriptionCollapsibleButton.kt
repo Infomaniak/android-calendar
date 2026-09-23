@@ -69,7 +69,7 @@ internal fun DescriptionCollapsibleButton(description: String, contentPadding: P
         )
     } else {
         ListItem(
-            headlineContent = { Text(stringResource(descriptionTitle)) },
+            content = { Text(stringResource(descriptionTitle)) },
             supportingContent = { DescriptionContent(description, descriptionState) },
             leadingContent = { Icon(painterResource(leadingIconRes), contentDescription = null) },
             modifier = Modifier.padding(contentPadding),

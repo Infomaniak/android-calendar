@@ -132,7 +132,7 @@ fun EventDetail(
 @Composable
 private fun Title(color: Color, title: String, modifier: Modifier = Modifier) {
     ListItem(
-        headlineContent = { Text(text = title, style = MaterialTheme.typography.titleLargeEmphasized) },
+        content = { Text(text = title, style = MaterialTheme.typography.titleLargeEmphasized) },
         leadingContent = {
             Box(
                 modifier = Modifier
