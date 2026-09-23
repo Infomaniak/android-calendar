@@ -28,6 +28,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -137,6 +138,11 @@ private fun Event(
     onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    DisposableEffect(itemKey, sectionItemKeys) {
+        sectionSizing.retainSection(sectionItemKeys)
+        onDispose { sectionSizing.releaseSection(sectionItemKeys) }
+    }
+
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(Margin.Small),
