@@ -32,6 +32,14 @@ fun ReportVisibleDate(lazyListState: LazyListState, onVisibleDateChanged: (Local
     LaunchedEffect(lazyListState) {
         var isUserScroll = false
         var hasScrolled = false
+        var lastReportedDate: LocalDate? = null
+
+        fun reportVisibleDate(date: LocalDate?) {
+            if (date == null || date == lastReportedDate) return
+
+            onVisibleDateChanged(date)
+            lastReportedDate = date
+        }
 
         launch {
             lazyListState.interactionSource.interactions.collect { interaction ->
@@ -48,11 +56,12 @@ fun ReportVisibleDate(lazyListState: LazyListState, onVisibleDateChanged: (Local
             }
         }
 
-        snapshotFlow { lazyListState.isScrollInProgress }.collect { isScrolling ->
+        snapshotFlow { lazyListState.isScrollInProgress to lazyListState.firstVisibleDate() }.collect { (isScrolling, date) ->
             if (isScrolling && isUserScroll) {
                 hasScrolled = true
+                reportVisibleDate(date)
             } else if (!isScrolling && isUserScroll && hasScrolled) {
-                lazyListState.firstVisibleDate()?.let(onVisibleDateChanged)
+                reportVisibleDate(date)
                 isUserScroll = false
                 hasScrolled = false
             }
