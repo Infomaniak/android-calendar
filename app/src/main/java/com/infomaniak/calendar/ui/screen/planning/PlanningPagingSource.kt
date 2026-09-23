@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.ui.screen.planning
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering

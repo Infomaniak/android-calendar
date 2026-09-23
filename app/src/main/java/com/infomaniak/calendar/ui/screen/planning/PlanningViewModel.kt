@@ -76,10 +76,12 @@ class PlanningViewModel(
 
     private val observedWeek = MutableStateFlow(weekNumbering.weekOf(today))
 
-    /** The day the planning is (re)centered on. Changing it rebuilds the pager around that day. */
-    private val initialDay = MutableStateFlow(today)
+    /** Recreating this anchor lets an explicit navigation win over a refresh anchored on an old scroll position. */
+    private val pagingAnchor = MutableStateFlow(PagingAnchor(day = today, generation = 0))
     private val activePagingSource = AtomicReference<PlanningPagingSource?>()
     private var refreshJob: Job? = null
+    private var activeNavigationGeneration: Long? = null
+    private var refreshPendingDuringNavigation = false
     private var previousSyncPhase = SyncPhase.Idle
 
     init {
@@ -87,8 +89,8 @@ class PlanningViewModel(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val planningRows: Flow<PagingData<PlanningRow>> = initialDay
-        .flatMapLatest { day ->
+    val planningRows: Flow<PagingData<PlanningRow>> = pagingAnchor
+        .flatMapLatest { anchor ->
             Pager(
                 config = PagingConfig(
                     pageSize = ROWS_PER_PAGE_HINT,
@@ -102,7 +104,7 @@ class PlanningViewModel(
                     enablePlaceholders = false,
                 ),
             ) {
-                createPagingSource(day)
+                createPagingSource(anchor.day)
             }.flow
         }
         .cachedIn(viewModelScope)
@@ -115,14 +117,29 @@ class PlanningViewModel(
     }
 
     /**
-     * Recenters the planning on [date] by rebuilding the pager. Returns `true` if this actually changed
-     * the center (a rebuild will happen), `false` if [date] was already the center (no-op).
+     * Recenters the planning on [date] by rebuilding the pager. Every request creates a new pager, even
+     * when [date] is unchanged, because the active source may have been refreshed around another scroll anchor.
+     *
+     * The returned generation identifies this navigation until its UI alignment completes.
      */
-    fun jumpTo(date: LocalDate): Boolean {
-        val changed = initialDay.value != date
-        initialDay.value = date
+    fun jumpTo(date: LocalDate): Long {
+        val previousAnchor = pagingAnchor.value
+        val navigationGeneration = previousAnchor.generation + 1
+        cancelRefresh()
+        activeNavigationGeneration = navigationGeneration
+        pagingAnchor.value = PagingAnchor(day = date, generation = navigationGeneration)
         onVisibleDateChanged(date)
-        return changed
+        return navigationGeneration
+    }
+
+    fun onNavigationFinished(generation: Long) {
+        if (activeNavigationGeneration != generation) return
+
+        activeNavigationGeneration = null
+        if (!refreshPendingDuringNavigation) return
+
+        refreshPendingDuringNavigation = false
+        requestRefresh(RefreshReason.NavigationSettled)
     }
 
     private fun createPagingSource(day: LocalDate): PlanningPagingSource {
@@ -182,6 +199,10 @@ class PlanningViewModel(
 
     private fun requestRefresh(reason: RefreshReason) {
         cancelRefresh()
+        if (activeNavigationGeneration != null) {
+            refreshPendingDuringNavigation = true
+            return
+        }
         if (reason == RefreshReason.VisibleRangeDownloaded) {
             activePagingSource.get()?.invalidate()
             return
@@ -202,12 +223,15 @@ class PlanningViewModel(
         VisibleRangeDownloaded,
         VisibleRangeDownloadFailed,
         SyncCompleted,
+        NavigationSettled,
     }
 
     private fun cancelRefresh() {
         refreshJob?.cancel()
         refreshJob = null
     }
+
+    private data class PagingAnchor(val day: LocalDate, val generation: Long)
 
     companion object {
         // Weeks have a variable number of rows; these are only hints used by Paging to time prefetch
