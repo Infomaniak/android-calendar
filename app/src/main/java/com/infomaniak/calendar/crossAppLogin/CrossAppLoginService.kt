@@ -19,8 +19,8 @@ package com.infomaniak.calendar.crossAppLogin
 
 import com.infomaniak.calendar.extensions.appGraph
 import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginService
+import kotlinx.coroutines.flow.map
 
 class CrossAppLoginService : BaseCrossAppLoginService() {
-
-    override val selectedUserIdFlow by lazy { appGraph.accountUtils.currentUserIdFlow }
+    override val selectedUserIdFlow by lazy { appGraph.accountUtils.users.map { it.first().id } }
 }
