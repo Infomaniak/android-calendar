@@ -103,26 +103,43 @@ private fun Timeline(
                 is PlanningRow.WeekHeader -> {
                     Text(row.week.label, modifier = Modifier.padding(bottom = Margin.Medium))
                 }
-                is PlanningRow.Event -> {
-                    Event(
-                        event = row.event,
-                        date = row.date,
-                        today = today,
-                        lazyListState = lazyListState,
-                        sectionSizing = sectionSizing,
-                        itemKey = row.key,
-                        sectionItemKeys = row.daySectionKeys,
-                        goToEventCreation = goToEventCreation,
-                        onEventClick = onEventClick,
-                        modifier = Modifier
-                            .ensureSectionMinHeight(sectionSizing, row.daySectionKeys, row.key)
-                            .padding(bottom = if (row.isLastInDay) Margin.Medium else 0.dp),
-                    )
-                }
+                is PlanningRow.Event -> TimelineEvent(
+                    row = row,
+                    today = today,
+                    lazyListState = lazyListState,
+                    sectionSizing = sectionSizing,
+                    goToEventCreation = goToEventCreation,
+                    onEventClick = onEventClick,
+                )
                 null -> Unit
             }
         }
     }
+}
+
+@Composable
+private fun TimelineEvent(
+    row: PlanningRow.Event,
+    today: LocalDate,
+    lazyListState: LazyListState,
+    sectionSizing: SectionSizing,
+    goToEventCreation: () -> Unit,
+    onEventClick: (EventUi.Normal) -> Unit,
+) {
+    Event(
+        event = row.event,
+        date = row.date,
+        today = today,
+        lazyListState = lazyListState,
+        sectionSizing = sectionSizing,
+        itemKey = row.key,
+        sectionItemKeys = row.daySectionKeys,
+        goToEventCreation = goToEventCreation,
+        onEventClick = onEventClick,
+        modifier = Modifier
+            .ensureSectionMinHeight(sectionSizing, row.daySectionKeys, row.key)
+            .padding(bottom = if (row.isLastInDay) Margin.Medium else 0.dp),
+    )
 }
 
 @Composable

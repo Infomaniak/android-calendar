@@ -93,6 +93,17 @@ app/
   Android-only equivalents.
 - **KISS / SOLID**: Keep Composables focused; extract reusable pieces into small `@Composable` functions.
 
+### Planning scroll position
+
+- `AlignPlanningToDate` aligns to a day's first row only for initial positioning and explicit date navigation.
+- `PreservePlanningScrollPosition` handles automatic Paging window changes (refresh, prepend, append and page drops).
+  It resolves the current visible row's stable `PlanningItemKey` in the new window and preserves its pixel scroll offset,
+  before the next list measurement. If that row was removed, it chooses a surviving neighbor in the same day, then the
+  next available day (or the end of the list). Active gestures and explicit navigation take precedence over restoration.
+- Loading/error state changes alone must never scroll the list. Do not add date-based pins or UI acknowledgements to
+  `PlanningViewModel` refreshes: preserving a date is not sufficient to preserve the position within that date.
+- The initial loading overlay stays until initial alignment completes so the first loaded week does not flash on screen.
+
 ### Commands
 
 ```bash

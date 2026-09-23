@@ -33,79 +33,65 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.dropWhile
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.LocalDate
 
 /**
  * Applies a single initial alignment and turns explicit [VisibleDayState] jump requests into a
- * recentering followed by one scroll. Data refreshes restore the selected date after their rows are updated.
+ * recentering followed by one scroll. Automatic page changes preserve the current row and its pixel offset instead.
  */
 @Composable
-fun AlignPlanningToDate(
+internal fun AlignPlanningToDate(
     lazyListState: LazyListState,
     planningRows: LazyPagingItems<PlanningRow>,
     visibleDayState: VisibleDayState,
     onJumpTo: (LocalDate) -> Long,
     onNavigationFinished: (Long) -> Unit,
+    onInitialAlignmentCompleted: () -> Unit,
 ) {
-    // The list state is recreated with this composition, so it must realign to the visible date after restoration.
     var initialAlignmentCompleted by remember { mutableStateOf(false) }
-    val alignmentMutex = remember { Mutex() }
+    var isNavigating by remember { mutableStateOf(false) }
+    val snapshot = planningRows.itemSnapshotList
+    val keys = remember(snapshot) { snapshot.items.map { it.key } }
+
+    PreservePlanningScrollPosition(
+        keys = keys,
+        lazyListState = lazyListState,
+        enabled = initialAlignmentCompleted && !isNavigating,
+    )
 
     LaunchedEffect(planningRows, visibleDayState) {
-        if (!initialAlignmentCompleted) {
-            alignmentMutex.withLock {
-                planningRows.scrollToDate(
-                    lazyListState = lazyListState,
-                    date = visibleDayState.visibleDate,
-                    forceRecenter = false,
-                    onJumpTo = onJumpTo,
-                    onNavigationFinished = onNavigationFinished,
-                )
+        visibleDayState.scrollCommand.receiveAsFlow()
+            .map { DateAlignment(it, forceRecenter = true) }
+            .onStart {
+                if (!initialAlignmentCompleted) emit(DateAlignment(visibleDayState.visibleDate, forceRecenter = false))
             }
-            initialAlignmentCompleted = true
-        }
-        visibleDayState.scrollCommand.receiveAsFlow().collectLatest { date ->
-            alignmentMutex.withLock {
-                planningRows.scrollToDate(
-                    lazyListState = lazyListState,
-                    date = date,
-                    forceRecenter = true,
-                    onJumpTo = onJumpTo,
-                    onNavigationFinished = onNavigationFinished,
-                )
-            }
-        }
-    }
-
-    LaunchedEffect(planningRows, visibleDayState, alignmentMutex) {
-        snapshotFlow { planningRows.loadState.refresh }
-            .drop(1)
-            .filterIsInstance<LoadState.NotLoading>()
-            .collectLatest {
-                if (lazyListState.isScrollInProgress) {
-                    snapshotFlow { lazyListState.isScrollInProgress }.first { !it }
-                }
-
-                alignmentMutex.withLock {
-                    val selectedDate = visibleDayState.visibleDate
+            .collectLatest { request ->
+                isNavigating = true
+                try {
                     planningRows.scrollToDate(
                         lazyListState = lazyListState,
-                        date = selectedDate,
-                        forceRecenter = false,
+                        date = request.date,
+                        forceRecenter = request.forceRecenter,
                         onJumpTo = onJumpTo,
                         onNavigationFinished = onNavigationFinished,
                     )
+                    if (!initialAlignmentCompleted) {
+                        initialAlignmentCompleted = true
+                        onInitialAlignmentCompleted()
+                    }
+                } finally {
+                    isNavigating = false
                 }
             }
     }
 }
+
+private data class DateAlignment(val date: LocalDate, val forceRecenter: Boolean)
 
 /**
  * Recenters the pager when an explicit navigation requests it or the target is no longer loaded, then scrolls to its row.
@@ -123,10 +109,10 @@ private suspend fun LazyPagingItems<PlanningRow>.scrollToDate(
 
     try {
         if (rebuilt) {
-            val refreshState = snapshotFlow { loadState.refresh }
+            // Keep the target pending on failure: the error UI offers retry, and a newer jump cancels this wait.
+            snapshotFlow { loadState.refresh }
                 .dropWhile { it !is LoadState.Loading }
-                .first { it is LoadState.NotLoading || it is LoadState.Error }
-            if (refreshState is LoadState.Error) return
+                .first { it is LoadState.NotLoading }
         }
 
         val index = if (rebuilt) {
