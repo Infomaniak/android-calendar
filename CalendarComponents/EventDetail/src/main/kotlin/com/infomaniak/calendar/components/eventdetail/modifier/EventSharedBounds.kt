@@ -56,8 +56,8 @@ internal fun Modifier.eventSharedElement(element: EventSharedElement): Modifier 
 }
 
 /**
- * Enables [eventSharedBounds] and [eventSharedElement]. Nothing animates unless both scopes are provided, which is the case for
- * previews and for screens that don't take part in a transition.
+ * Enables [eventSharedBounds] and [eventSharedElement]. Nothing animates unless both scopes are provided. Previews don't provide
+ * such scopes.
  */
 @Composable
 internal fun ProvideEventSharedTransition(

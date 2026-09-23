@@ -38,7 +38,7 @@ import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 /**
  * Reusable component for both the creation and the edition of an event.
  *
- * [sharedTransitionScope] and [animatedVisibilityScope] are used to animate associated components between detail and creation.
+ * [sharedTransitionScope] and [animatedVisibilityScope] animate associated components between detail and editing.
  */
 @Composable
 fun EventForm(
