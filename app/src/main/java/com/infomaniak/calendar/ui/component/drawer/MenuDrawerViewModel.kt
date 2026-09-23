@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
-class DrawerViewModel(
+class MenuDrawerViewModel(
     accountUtils: AccountUtils,
     private val calendarManager: CalendarManager,
     private val calendarDataValues: CalendarDataValues,
