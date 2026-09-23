@@ -56,11 +56,17 @@ fun EventAttendeesScreen(
         viewModel.setEventId(eventId)
     }
 
-    when (val current = state) {
-        EventAttendeesUiState.Loading -> Unit
+    when (val currentState = state) {
+        EventAttendeesUiState.Loading -> Unit // TODO: check how we want to handle the loading state while searching
         EventAttendeesUiState.EventMissing -> Unit
         is EventAttendeesUiState.Loaded -> {
-            EventAttendeesScreen({ current.attendees }, { searchQuery }, viewModel::onSearchQueryChanged, onBack, modifier)
+            EventAttendeesScreen(
+                attendees = { currentState.attendees },
+                searchQuery = { searchQuery },
+                onSearchQueryChanged = viewModel::onSearchQueryChanged,
+                onBack = onBack,
+                modifier = modifier,
+            )
         }
     }
 }
@@ -85,10 +91,11 @@ fun EventAttendeesScreen(
     ) { paddingValues ->
         AttendeesSearch(
             attendees = attendees,
-            modifier = Modifier.padding(paddingValues).fillMaxWidth(),
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxWidth(),
             searchQuery = searchQuery,
             onSearchQueryChanged = onSearchQueryChanged,
-
         )
     }
 }
