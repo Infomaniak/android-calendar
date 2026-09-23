@@ -33,6 +33,7 @@ import com.infomaniak.calendar.components.planning.component.DayIndicator
 @Stable
 internal class SectionSizing {
     private val rowHeights = mutableStateMapOf<Any, Int>()
+    private val sectionReferenceCounts = mutableMapOf<List<Any>, Int>()
     private var indicatorHeight by mutableIntStateOf(0)
 
     /** Record the size of a [DayIndicator] so we can compute what size should be allocated */
@@ -43,6 +44,23 @@ internal class SectionSizing {
     /** Record the size of each row so we can compute what size should be allocated to the section's last row */
     fun reportItemHeight(key: Any, height: Int) {
         if (rowHeights[key] != height) rowHeights[key] = height
+    }
+
+    /** Keep a section's measurements only while at least one of its rows is composed. */
+    fun retainSection(sectionItemKeys: List<Any>) {
+        sectionReferenceCounts[sectionItemKeys] = (sectionReferenceCounts[sectionItemKeys] ?: 0) + 1
+    }
+
+    /** Release every measurement in a section once Paging disposes all of its rows. */
+    fun releaseSection(sectionItemKeys: List<Any>) {
+        val remainingReferences = (sectionReferenceCounts[sectionItemKeys] ?: return) - 1
+        if (remainingReferences > 0) {
+            sectionReferenceCounts[sectionItemKeys] = remainingReferences
+            return
+        }
+
+        sectionReferenceCounts.remove(sectionItemKeys)
+        sectionItemKeys.forEach { rowHeights.remove(it) }
     }
 
     /** Extra height needed so the section is at least as tall as the indicator. */

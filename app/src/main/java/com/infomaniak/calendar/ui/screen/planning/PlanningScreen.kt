@@ -17,25 +17,37 @@
  */
 package com.infomaniak.calendar.ui.screen.planning
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
@@ -53,6 +65,7 @@ import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.core.common.R as RCore
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.hazeSource
@@ -121,27 +134,41 @@ private fun PlanningScreen(
         },
         modifier = modifier,
     ) { contentPadding ->
-        // Keep the planning mounted once it has shown content, so a far jump's refresh (itemCount
-        // momentarily 0) doesn't tear down the jump/scroll handling — only the very first load shows a spinner.
-        var hasLoadedOnce by rememberSaveable { mutableStateOf(false) }
-        if (planningRows.itemCount > 0) hasLoadedOnce = true
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Keep the planning mounted once it has shown content, so a far jump's refresh (itemCount
+            // momentarily 0) doesn't tear down the jump/scroll handling — only the very first load shows a spinner.
+            var hasLoadedOnce by rememberSaveable { mutableStateOf(false) }
+            if (planningRows.itemCount > 0) hasLoadedOnce = true
+            val hasLoadError = planningRows.hasLoadError()
 
-        if (hasLoadedOnce) {
-            SuccessPlanning(
-                planningRows = planningRows,
-                onJumpTo = onJumpTo,
-                onNavigationFinished = onNavigationFinished,
-                onVisibleDateChanged = onVisibleDateChanged,
-                contentPadding = contentPadding + PaddingValues(Margin.Medium),
-                goToEventCreation = goToEventCreation,
-                goToEventDetail = goToEventDetail,
-                visibleDayState = visibleDayState,
-                modifier = Modifier
-                    .hazeSource(hazeState)
-                    .collapseCalendarOnScroll(calendarExpansionState),
-            )
-        } else {
-            ScreenLoader(modifier = Modifier.padding(contentPadding))
+            if (hasLoadedOnce) {
+                SuccessPlanning(
+                    planningRows = planningRows,
+                    onJumpTo = onJumpTo,
+                    onNavigationFinished = onNavigationFinished,
+                    onVisibleDateChanged = onVisibleDateChanged,
+                    contentPadding = contentPadding + PaddingValues(Margin.Medium),
+                    goToEventCreation = goToEventCreation,
+                    goToEventDetail = goToEventDetail,
+                    visibleDayState = visibleDayState,
+                    modifier = Modifier
+                        .hazeSource(hazeState)
+                        .collapseCalendarOnScroll(calendarExpansionState),
+                )
+                if (hasLoadError) {
+                    PagingLoadError(
+                        onRetry = planningRows::retry,
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(contentPadding)
+                            .padding(Margin.Medium),
+                    )
+                }
+            } else if (hasLoadError) {
+                InitialPlanningError(onRetry = planningRows::retry, modifier = Modifier.padding(contentPadding))
+            } else {
+                ScreenLoader(modifier = Modifier.padding(contentPadding))
+            }
         }
     }
 }
@@ -179,6 +206,41 @@ private fun SuccessPlanning(
         goToEventCreation = goToEventCreation,
         onEventClick = { goToEventDetail(it.occurrenceId) },
     )
+}
+
+@Composable
+private fun InitialPlanningError(onRetry: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(Margin.Large),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Margin.Medium, Alignment.CenterVertically),
+    ) {
+        Text(text = stringResource(R.string.syncEventsError), textAlign = TextAlign.Center)
+        Button(onClick = onRetry) { Text(stringResource(RCore.string.buttonRetry)) }
+    }
+}
+
+@Composable
+private fun PagingLoadError(onRetry: () -> Unit, modifier: Modifier = Modifier) {
+    Surface(modifier = modifier, shape = MaterialTheme.shapes.large) {
+        Column(
+            modifier = Modifier.padding(Margin.Medium),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Margin.Small),
+        ) {
+            Text(text = stringResource(R.string.syncEventsError), textAlign = TextAlign.Center)
+            Button(onClick = onRetry) { Text(stringResource(RCore.string.buttonRetry)) }
+        }
+    }
+}
+
+private fun LazyPagingItems<PlanningRow>.hasLoadError(): Boolean {
+    val loadStates = loadState
+    return loadStates.refresh is LoadState.Error ||
+        loadStates.prepend is LoadState.Error ||
+        loadStates.append is LoadState.Error
 }
 
 @Preview

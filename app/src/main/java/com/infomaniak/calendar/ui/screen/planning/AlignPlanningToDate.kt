@@ -23,7 +23,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.paging.LoadState
@@ -55,7 +54,8 @@ fun AlignPlanningToDate(
     onJumpTo: (LocalDate) -> Long,
     onNavigationFinished: (Long) -> Unit,
 ) {
-    var initialAlignmentCompleted by rememberSaveable { mutableStateOf(false) }
+    // The list state is recreated with this composition, so it must realign to the visible date after restoration.
+    var initialAlignmentCompleted by remember { mutableStateOf(false) }
     val alignmentMutex = remember { Mutex() }
 
     LaunchedEffect(planningRows, visibleDayState) {
