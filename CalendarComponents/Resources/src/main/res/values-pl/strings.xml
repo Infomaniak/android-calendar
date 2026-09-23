@@ -49,6 +49,7 @@
         <item quantity="many">%1$d może</item>
         <item quantity="other">%1$d może</item>
     </plurals>
+    <string name="attendeesEmptyState">Nie znaleziono uczestników</string>
     <string name="availableLabel">Wolny</string>
     <string name="buttonJoin">Dołącz</string>
     <string name="confidentialLabel">Poufne</string>
@@ -62,6 +63,7 @@
     <string name="contentDescriptionHasAttendees">Czy są uczestnicy?</string>
     <string name="contentDescriptionHasKMeetLink">Zawiera link do kMeet</string>
     <string name="contentDescriptionHasLocation">Ma lokalizację</string>
+    <string name="contentDescriptionSearch">Szukaj</string>
     <string name="contentDescriptionToday">Dziś</string>
     <plurals name="dayAmount">
         <item quantity="one">%d dzień</item>
@@ -102,7 +104,13 @@
         <item quantity="many">%d miejsc</item>
         <item quantity="other">%d miejsc</item>
     </plurals>
+    <string name="searchForAttendees">Wyszukiwanie gości</string>
     <string name="sectionCalendarHeader">Kalendarz</string>
+    <string name="sectionOrganizerHeader">Organizator</string>
+    <string name="statusAcceptedLabel">Zaakceptowano</string>
+    <string name="statusDeclinedLabel">Odrzucono</string>
+    <string name="statusNeedsActionLabel">W toku</string>
+    <string name="statusTentativeLabel">Może</string>
     <plurals name="weekAmount">
         <item quantity="one">%d tydzień</item>
         <item quantity="few">%d tygodnie</item>

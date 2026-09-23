@@ -39,6 +39,7 @@
         <item quantity="one">%1$d kanskje</item>
         <item quantity="other">%1$d kanskje</item>
     </plurals>
+    <string name="attendeesEmptyState">Ingen deltakere funnet</string>
     <string name="availableLabel">Ledig</string>
     <string name="buttonJoin">Bli med</string>
     <string name="confidentialLabel">Konfidensiell</string>
@@ -50,6 +51,7 @@
     <string name="contentDescriptionHasAttendees">Har deltakere</string>
     <string name="contentDescriptionHasKMeetLink">Har en kMeet-lenke</string>
     <string name="contentDescriptionHasLocation">Har en beliggenhet</string>
+    <string name="contentDescriptionSearch">Søk</string>
     <string name="contentDescriptionToday">I dag</string>
     <plurals name="dayAmount">
         <item quantity="one">%d dag</item>
@@ -82,7 +84,13 @@
         <item quantity="one">%d sete</item>
         <item quantity="other">%d seter</item>
     </plurals>
+    <string name="searchForAttendees">Søk etter gjester</string>
     <string name="sectionCalendarHeader">Kalender</string>
+    <string name="sectionOrganizerHeader">Arrangør</string>
+    <string name="statusAcceptedLabel">Godkjent</string>
+    <string name="statusDeclinedLabel">Avvist</string>
+    <string name="statusNeedsActionLabel">Under behandling</string>
+    <string name="statusTentativeLabel">Kanskje</string>
     <plurals name="weekAmount">
         <item quantity="one">%d uke</item>
         <item quantity="other">%d uker</item>

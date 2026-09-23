@@ -39,6 +39,7 @@
         <item quantity="one">%1$d ίσως</item>
         <item quantity="other">%1$d ίσως</item>
     </plurals>
+    <string name="attendeesEmptyState">Δεν βρέθηκαν συμμετέχοντες</string>
     <string name="availableLabel">Διαθέσιμο</string>
     <string name="buttonJoin">Εγγραφή</string>
     <string name="confidentialLabel">Εμπιστευτικό</string>
@@ -50,6 +51,7 @@
     <string name="contentDescriptionHasAttendees">Έχει συμμετέχοντες</string>
     <string name="contentDescriptionHasKMeetLink">Διαθέτει σύνδεσμο kMeet</string>
     <string name="contentDescriptionHasLocation">Έχει τοποθεσία</string>
+    <string name="contentDescriptionSearch">Αναζήτηση</string>
     <string name="contentDescriptionToday">Σήμερα</string>
     <plurals name="dayAmount">
         <item quantity="one">%d ημέρα</item>
@@ -82,7 +84,13 @@
         <item quantity="one">%d θέση</item>
         <item quantity="other">%d θέσεις</item>
     </plurals>
+    <string name="searchForAttendees">Αναζήτηση επισκεπτών</string>
     <string name="sectionCalendarHeader">Ημερολόγιο</string>
+    <string name="sectionOrganizerHeader">Διοργανωτής</string>
+    <string name="statusAcceptedLabel">Εγκρίθηκε</string>
+    <string name="statusDeclinedLabel">Απορρίφθηκε</string>
+    <string name="statusNeedsActionLabel">Σε εκκρεμότητα</string>
+    <string name="statusTentativeLabel">Ίσως</string>
     <plurals name="weekAmount">
         <item quantity="one">%d εβδομάδα</item>
         <item quantity="other">%d εβδομάδες</item>
