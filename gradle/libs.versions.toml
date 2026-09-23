@@ -5,7 +5,7 @@ designsystem = "0.6.0"
 haze = "2.0.1"
 kizitonwoseCalendar = "2.10.1"
 metrox = "1.4.5"
-paging3 = "3.5.0"
+paging3 = "3.5.1"
 
 [libraries]
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
