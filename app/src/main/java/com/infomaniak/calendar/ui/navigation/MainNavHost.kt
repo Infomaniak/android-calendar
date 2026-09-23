@@ -45,8 +45,9 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDa
 import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
 import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
 import com.infomaniak.calendar.ui.screen.day.DayScreen
-import com.infomaniak.calendar.ui.screen.eventCreation.EventCreationScreen
-import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
@@ -99,13 +100,20 @@ private fun baseEntryProvider(
     entry<NavDestination.CalendarView.Month>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         MonthScreen()
     }
-    entry<NavDestination.EventCreation> {
+    entry<NavDestination.EventCreation>(metadata = metaDataOf(ResponsiveDialog)) {
         EventCreationScreen()
     }
     entry<NavDestination.EventDetail>(metadata = metaDataOf(ResponsiveDialog)) { destination ->
         EventDetailScreen(
             occurrenceId = destination.occurrenceId,
-            onBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
+            goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
+            goToEdit = { backStack.addOnce(NavDestination.EventEdit(destination.occurrenceId)) },
+        )
+    }
+    entry<NavDestination.EventEdit>(metadata = metaDataOf(ResponsiveDialog)) { destination ->
+        EventEditScreen(
+            occurrenceId = destination.occurrenceId,
+            goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
         )
     }
     entry<NavDestination.Accounts.List> {

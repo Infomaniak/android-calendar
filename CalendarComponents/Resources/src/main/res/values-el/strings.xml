@@ -39,6 +39,7 @@
     <string name="contentDescriptionHasLocation">Έχει τοποθεσία</string>
     <string name="contentDescriptionToday">Σήμερα</string>
     <string name="descriptionTitle">Περιγραφή</string>
+    <string name="eventTitle">Τίτλος εκδήλωσης</string>
     <string name="notificationTypeEmail">Email</string>
     <string name="notificationTypePush">Ειδοποίηση</string>
     <string name="occupiedLabel">Κατειλημμένο</string>

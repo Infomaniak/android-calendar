@@ -15,25 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.edit
+package com.infomaniak.calendar.ui.theme
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.layout.PaddingValues
+import com.infomaniak.core.ui.compose.margin.Margin
 
-@Composable
-fun EventEdit(
-    modifier: Modifier = Modifier,
-) {
-    Box(modifier) {
-        Text(text = "EventEdit")
-    }
-}
-
-@Preview
-@Composable
-private fun Preview() {
-    EventEdit()
+object Dimens {
+    val EventDetailScreensHorizontalPadding = PaddingValues(horizontal = Margin.Small)
 }
