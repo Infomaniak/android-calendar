@@ -135,7 +135,7 @@ When adding a new CalendarComponents module, apply the flavor-aware plugin if it
 | `:CalendarComponents:Foundation`  | `com.infomaniak.calendar.components.foundation`  | Shared models (`EventUi`, `YearWeek`, `WeekNumbering`) and base Compose components (`DayCircle`, `DateState`) used by all other CalendarComponents modules. |
 | `:CalendarComponents:Resources`   | `com.infomaniak.calendar.components.resources`   | String-only module: `res/values/strings.xml` (+ translations). No Kotlin code, no Compose. Centralises all CalendarComponents string resources. |
 | `:CalendarComponents:Event`       | `com.infomaniak.calendar.components.event`       | `EventItem` Composable — renders a single event row. Re-exports Foundation via `api`. |
-| `:CalendarComponents:Planning`    | `com.infomaniak.calendar.components.planning`    | `Planning` Composable — a `LazyColumn` driven by `LazyPagingItems<PlanningRow>` (Paging 3), with ISO week headers and one lazy item per event. `PlanningRow` is the flat paged row type (`WeekHeader` / `Event`); `planningRows(week, days)` flattens a week into rows. Also provides the `stickyDayIndicator` `Modifier` extension. Re-exports Foundation via `api` (its types appear in `Planning`'s public signature); Event and Resources are internal implementation details and stay `implementation`. Week header design is a **placeholder**. |
+| `:CalendarComponents:Planning`    | `com.infomaniak.calendar.components.planning`    | `Planning` Composable — a `LazyColumn` driven by `LazyPagingItems<PlanningRow>` (Paging 3), with ISO week headers and one lazy item per event. `PlanningRow` is the flat paged row type (`WeekHeader` / `Event`); `planningRows(week, days)` flattens a week into rows. Also provides the `stickyDayIndicator` `Modifier` extension. Re-exports Foundation and Paging Compose via `api` because both appear in its public signature; Event and Resources are internal implementation details and stay `implementation`. Week header design is a **placeholder**. |
 | `:CalendarComponents:Day`         | `com.infomaniak.calendar.components.day`         | Day view — a day's header, its all-day band, and the scrollable hour grid carrying its timed events, with the current time indicator and pinch-to-zoom over it. Holds `resolveOverlaps`, the pure-Kotlin solver placing concurrent events, ported from the [Eventually](https://github.com/claustrofob/Eventually) SwiftUI layout the iOS calendar uses so both platforms arrange a day identically. Reusable by the future 3-day / week views. Re-exports Foundation via `api`. |
 | `:CalendarComponents:EventDetail` | `com.infomaniak.calendar.components.eventdetail` | Event detail module — the `detail` package contains the read-only `EventDetail` Composable, while the `form` package contains the editable `EventForm` shared by event editing and creation. Matching fields can opt into shared-element transitions through optional Compose animation scopes and internal element keys, without depending on app navigation or domain identifier types. Re-exports Foundation and `core.infomaniak.core.filetypes` via `api` since both appear in `EventDetailUi`. |
 
@@ -152,7 +152,8 @@ public `EventItem` signature exposes `Foundation` types. `Planning` and `Day` ea
 dependency on `Foundation` (its types appear in their own public signatures) and depend on `Event` and `Resources` as
 `implementation` only (internal implementation details, not part of their own public API surface — not re-exported).
 `Planning` and `Day` are the two top-level entry points for consumers, one per calendar view; each transitively brings
-in the stack it needs.
+in the stack it needs. `Planning` also exposes Paging Compose through `api`, since `LazyPagingItems` is part of its public
+`Planning` signature.
 
 ### What is final vs placeholder
 
@@ -175,7 +176,7 @@ in the stack it needs.
 - `kmpCalendar.kotlinx.datetime` — `kotlinx-datetime` types (`LocalDate`, `TimeZone`, …) (Foundation + Planning).
 - `libs.compose.material3` — Material 3 Compose (from `libs` catalog).
 - `libs.infomaniak.designsystem.theme.calendar` — Infomaniak Design System.
-- `libs.paging.compose` — Paging 3 Compose (`LazyPagingItems`, `collectAsLazyPagingItems`) consumed by `Planning`.
+- `libs.paging.compose` — Paging 3 Compose (`LazyPagingItems`, `collectAsLazyPagingItems`) exposed by `Planning`'s public API.
 
 ### Ownership
 
