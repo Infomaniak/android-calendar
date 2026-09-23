@@ -31,12 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.resources.R
-import com.infomaniak.core.ui.compose.margin.Margin
-
-internal val LIST_ITEM_HORIZONTAL_PADDING = Margin.Medium
-internal val LIST_ITEM_VERTICAL_PADDING = 10.dp
 
 @Composable
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -79,9 +74,7 @@ internal fun ClickableItem(
         trailingContent = trailingContent,
         onClick = onClick,
         shapes = ListItemDefaults.RectangleShapes,
-        contentPadding = contentPadding + PaddingValues(
-            horizontal = LIST_ITEM_HORIZONTAL_PADDING, vertical = LIST_ITEM_VERTICAL_PADDING,
-        ),
+        contentPadding = contentPadding + ListItemDefaults.ContentPadding,
     )
 }
 
