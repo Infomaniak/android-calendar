@@ -46,14 +46,23 @@ fun EventAttendeesScreen(
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),
 ) {
-    val attendees by viewModel.eventAttendees.collectAsStateWithLifecycle(initialValue = emptyList())
+    val state by viewModel.eventAttendeesState.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
+        if (state is EventAttendeesUiState.EventMissing) {
+            onBack()
+        }
         viewModel.setEventId(eventId)
     }
 
-    EventAttendeesScreen({ attendees }, { searchQuery }, viewModel::onSearchQueryChanged, onBack, modifier)
+    when (val current = state) {
+        EventAttendeesUiState.Loading -> Unit
+        EventAttendeesUiState.EventMissing -> Unit
+        is EventAttendeesUiState.Loaded -> {
+            EventAttendeesScreen({ current.attendees }, { searchQuery }, viewModel::onSearchQueryChanged, onBack, modifier)
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
