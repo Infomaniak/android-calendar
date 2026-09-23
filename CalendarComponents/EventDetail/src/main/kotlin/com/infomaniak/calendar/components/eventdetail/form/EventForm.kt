@@ -22,60 +22,20 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
-
-@Stable
-class EventFormState(
-    val titleTextState: TextFieldState,
-    val colorState: MutableState<Color?>,
-    val calendars: List<EventDetailCalendar>,
-) {
-    fun toEventDraft(): EventDraft? = EventDraft(
-        title = titleTextState.text.toString(),
-        color = colorState.value ?: return null,
-    )
-}
-
-data class EventDraft(
-    val title: String,
-    val color: Color,
-)
-
-@Composable
-fun rememberSaveableEventFormState(
-    calendars: List<EventDetailCalendar>,
-    initialCalendar: EventDetailCalendar?,
-    initialText: String = "",
-): EventFormState {
-    val textFieldState = rememberTextFieldState(initialText)
-    val colorState = rememberSaveable(initialCalendar == null, stateSaver = ColorSaver) { mutableStateOf(initialCalendar?.color) }
-
-    return EventFormState(
-        titleTextState = textFieldState,
-        colorState = colorState,
-        calendars = calendars,
-    )
-}
 
 /**
  * Reusable component for both the creation and the edition of an event.
@@ -104,11 +64,6 @@ fun EventForm(
         )
     }
 }
-
-private val ColorSaver = Saver<Color?, String>(
-    save = { color -> color?.value?.toString() ?: "null" },
-    restore = { stringValue -> if (stringValue == "null") null else Color(stringValue.toULong()) },
-)
 
 @Preview
 @Composable

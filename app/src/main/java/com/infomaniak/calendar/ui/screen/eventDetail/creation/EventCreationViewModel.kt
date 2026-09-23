@@ -19,7 +19,7 @@ package com.infomaniak.calendar.ui.screen.eventDetail.creation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.calendar.components.eventdetail.form.EventDraft
+import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventFormCalendars
 import com.infomaniak.calendar.ui.screen.eventDetail.EventFormCalendarsUseCase
 import dev.zacsweers.metro.AppScope
