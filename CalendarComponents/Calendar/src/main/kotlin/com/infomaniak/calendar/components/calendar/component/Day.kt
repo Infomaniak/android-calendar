@@ -69,7 +69,6 @@ import kotlin.time.Clock
 
 private const val MAX_DOTS = 3
 private val DOT_SIZE = 6.dp
-private const val OTHER_MONTH_ALPHA = 0.38f
 
 @Composable
 internal fun Day(
@@ -78,7 +77,7 @@ internal fun Day(
     onClick: () -> Unit,
     dotsFor: () -> List<EventColorsUi>,
     modifier: Modifier = Modifier,
-    otherMonthProgress: (() -> Float)? = null,
+    notMonthFraction: () -> Float = { 1f },
 ) {
     val fullDate = date.formatFullDateWithYear()
 
@@ -95,9 +94,13 @@ internal fun Day(
     val stateDescriptionToday = if (dateState == DateState.Today) stringResource(R.string.contentDescriptionToday) else null
     val interactionSource = remember { MutableInteractionSource() }
 
+    val isNotMonth = dateState == DateState.NotMonth
+    val drawnState = if (isNotMonth) DateState.None else dateState
+    val notMonthAlpha = DateState.NotMonth.contentColor().alpha
+
     Box(
         modifier = modifier
-            .dimAsOtherMonth(otherMonthProgress)
+            .fadeToNotMonth(isNotMonth, notMonthAlpha, notMonthFraction)
             .fillMaxWidth()
             .height(LocalViewConfiguration.current.minimumTouchTargetSize.height)
             .clickable(
@@ -114,7 +117,7 @@ internal fun Day(
         contentAlignment = Alignment.Center,
     ) {
         DayCircle(
-            state = dateState,
+            state = drawnState,
             modifier = Modifier
                 .fillMaxHeight()
                 .then(
@@ -133,21 +136,13 @@ internal fun Day(
                 Spacer(modifier = Modifier.height(DOT_SIZE))
                 Text(text = date.day.toString())
 
-                if (dateState == DateState.None) {
+                if (drawnState == DateState.None) {
                     EventDots(
                         dots = dotsFor(),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = Margin.Micro)
-                            // Dots are the one thing a day of another month does not keep at all, so they
-                            // fade out on their own on top of the dimming the whole cell is already taking.
-                            .then(
-                                if (otherMonthProgress == null) {
-                                    Modifier
-                                } else {
-                                    Modifier.graphicsLayer { alpha = 1f - otherMonthProgress() }
-                                },
-                            ),
+                            .fadeOutDots(isNotMonth, notMonthFraction),
                     )
                 } else {
                     Spacer(modifier = Modifier.height(DOT_SIZE))
@@ -157,10 +152,16 @@ internal fun Day(
     }
 }
 
-private fun Modifier.dimAsOtherMonth(otherMonthProgress: (() -> Float)?): Modifier {
-    if (otherMonthProgress == null) return this
+private fun Modifier.fadeToNotMonth(isNotMonth: Boolean, notMonthAlpha: Float, fraction: () -> Float): Modifier {
+    if (!isNotMonth) return this
 
-    return graphicsLayer { alpha = lerp(1f, OTHER_MONTH_ALPHA, otherMonthProgress()) }
+    return graphicsLayer { alpha = lerp(1f, notMonthAlpha, fraction()) }
+}
+
+private fun Modifier.fadeOutDots(isNotMonth: Boolean, fraction: () -> Float): Modifier {
+    if (!isNotMonth) return this
+
+    return graphicsLayer { alpha = 1f - fraction() }
 }
 
 @Composable
@@ -216,17 +217,6 @@ private fun DayPreview() {
                         modifier = Modifier.size(previewDaySize),
                     )
                 }
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Other month", style = MaterialTheme.typography.labelSmall)
-                Day(
-                    dateState = DateState.None,
-                    date = today,
-                    onClick = {},
-                    dotsFor = { listOf(eventColors, eventColors, eventColors) },
-                    otherMonthProgress = { 1f },
-                    modifier = Modifier.size(previewDaySize),
-                )
             }
         }
     }

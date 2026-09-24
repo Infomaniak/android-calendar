@@ -99,7 +99,7 @@ fun ExpandableCalendar(
                         monthMargin = MONTH_MARGIN,
                         headerState = headerState,
                         eventsDots = eventsDots,
-                        otherMonthProgress = { expansionState.progress },
+                        notMonthFraction = { expansionState.progress },
                     )
                     HorizontalMonthSelector(
                         selectedMonth = { selectedDate().yearMonth },

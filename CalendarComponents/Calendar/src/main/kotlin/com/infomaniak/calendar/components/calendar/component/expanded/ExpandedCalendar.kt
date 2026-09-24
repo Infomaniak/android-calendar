@@ -54,12 +54,7 @@ import kotlin.time.Clock
 /** Margins held on each side at startup, so the first swipes never have to grow the range. */
 private const val INITIAL_MARGINS = 2
 
-/**
- * @param otherMonthProgress how much the days borrowed from the neighbouring months are told apart from the
- * others, from not at all to fully dimmed. It follows the expansion rather than being fixed, so that a month
- * collapsed down to a single week is drawn exactly like the week layout that replaces it, and the swap
- * between the two goes unseen.
- */
+/** @param notMonthFraction how far the days borrowed from the neighbouring months are set apart from the others. */
 @Composable
 internal fun ExpandedCalendar(
     monthMargin: Int,
@@ -69,7 +64,7 @@ internal fun ExpandedCalendar(
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     modifier: Modifier = Modifier,
     headerState: CalendarHeaderState = rememberCalendarHeaderState(),
-    otherMonthProgress: () -> Float = { 1f },
+    notMonthFraction: () -> Float = { 1f },
 ) {
     val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
     val initialMonth = remember { selectedDate().yearMonth }
@@ -111,7 +106,7 @@ internal fun ExpandedCalendar(
                 today = { today },
                 onDayClick = onDayClick,
                 dotsFor = { eventsDots()[day.date].orEmpty() },
-                otherMonthProgress = otherMonthProgress,
+                notMonthFraction = notMonthFraction,
             )
         },
         modifier = modifier
@@ -127,14 +122,12 @@ private fun DayContent(
     today: () -> LocalDate,
     onDayClick: (LocalDate) -> Unit,
     dotsFor: () -> List<EventColorsUi>,
-    otherMonthProgress: () -> Float,
+    notMonthFraction: () -> Float,
 ) {
-    val isInMonth = day.position == DayPosition.MonthDate
-
     val dateState by remember(day) {
         derivedStateOf {
             when {
-                !isInMonth -> DateState.None
+                day.position != DayPosition.MonthDate -> DateState.NotMonth
                 day.date == selectedDate() -> DateState.Selected
                 day.date == today() -> DateState.Today
                 else -> DateState.None
@@ -147,7 +140,7 @@ private fun DayContent(
         dateState = dateState,
         onClick = { onDayClick(day.date) },
         dotsFor = dotsFor,
-        otherMonthProgress = if (isInMonth) null else otherMonthProgress,
+        notMonthFraction = notMonthFraction,
     )
 }
 
