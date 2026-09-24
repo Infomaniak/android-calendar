@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Toevoegen</string>
     <string name="allDayLabel">De hele dag</string>
+    <string name="attendees">Deelnemers</string>
     <plurals name="attendeesAcceptedCount">
         <item quantity="one">%1$d geaccepteerd</item>
         <item quantity="other">%1$d geaccepteerd</item>
@@ -25,6 +26,18 @@
     <plurals name="attendeesCount">
         <item quantity="one">%1$d gast</item>
         <item quantity="other">%1$d gasten</item>
+    </plurals>
+    <plurals name="attendeesDeclinedCount">
+        <item quantity="one">%d geweigerd</item>
+        <item quantity="other">%d afgewezen</item>
+    </plurals>
+    <plurals name="attendeesPendingCount">
+        <item quantity="one">%1$d in afwachting</item>
+        <item quantity="other">%1$d in afwachting</item>
+    </plurals>
+    <plurals name="attendeesTentativeCount">
+        <item quantity="one">%1$d misschien</item>
+        <item quantity="other">%1$d misschien</item>
     </plurals>
     <string name="availableLabel">Beschikbaar</string>
     <string name="buttonJoin">Lid worden</string>

@@ -25,16 +25,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
+import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.previewAttendees
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 
 /**
@@ -45,6 +47,7 @@ import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 @Composable
 fun EventForm(
     state: EventFormState,
+    onAttendeesClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -62,6 +65,15 @@ fun EventForm(
                 .padding(horizontalContentPadding)
                 .eventSharedElement(EventSharedElement.Title),
         )
+
+        Section(contentPadding = horizontalContentPadding) {
+            AttendeesButton(
+                attendees = state.attendeesState.value,
+                onClick = onAttendeesClick,
+                contentPadding = horizontalContentPadding,
+                modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
+            )
+        }
     }
 }
 
@@ -75,7 +87,9 @@ private fun Preview() {
                     calendars = listOf(previewEventDetailCalendar),
                     initialCalendar = previewEventDetailCalendar,
                     initialText = "Event title",
+                    initialAttendees = previewAttendees,
                 ),
+                onAttendeesClick = {},
                 contentPadding = PaddingValues(16.dp),
             )
         }

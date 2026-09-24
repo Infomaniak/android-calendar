@@ -143,11 +143,13 @@ When adding a new CalendarComponents module, apply the flavor-aware plugin if it
 
 | Module     | `api` dependency | `implementation` dependencies |
 |------------|-------------------|--------------------------------|
+| `Foundation` | —               | `Resources`                    |
 | `Event`    | `Foundation`      | —                              |
 | `Planning` | `Foundation`      | `Event`, `Resources`           |
 | `Day`      | `Foundation`      | `Event`, `Resources`           |
 
-`Foundation` is the only module with no CalendarComponents dependency. `Event` re-exports `Foundation` via `api` since its
+`Resources` is the only module with no CalendarComponents dependency; `Foundation` depends on it only as `implementation`
+(for resource ids carried by its models, e.g. `ParticipationStatus.countPluralRes`). `Event` re-exports `Foundation` via `api` since its
 public `EventItem` signature exposes `Foundation` types. `Planning` and `Day` each declare their own **direct** `api`
 dependency on `Foundation` (its types appear in their own public signatures) and depend on `Event` and `Resources` as
 `implementation` only (internal implementation details, not part of their own public API surface — not re-exported).

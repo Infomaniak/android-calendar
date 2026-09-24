@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Lisää</string>
     <string name="allDayLabel">Koko päivän</string>
+    <string name="attendees">Osallistujat</string>
     <plurals name="attendeesAcceptedCount">
         <item quantity="one">%1$d hyväksytty</item>
         <item quantity="other">%1$d hyväksyttyä</item>
@@ -25,6 +26,18 @@
     <plurals name="attendeesCount">
         <item quantity="one">%1$d vieras</item>
         <item quantity="other">%1$d vierasta</item>
+    </plurals>
+    <plurals name="attendeesDeclinedCount">
+        <item quantity="one">%d hylätty</item>
+        <item quantity="other">%d hylättyä</item>
+    </plurals>
+    <plurals name="attendeesPendingCount">
+        <item quantity="one">%1$d odottaa</item>
+        <item quantity="other">%1$d odottaa</item>
+    </plurals>
+    <plurals name="attendeesTentativeCount">
+        <item quantity="one">%1$d ehkä</item>
+        <item quantity="other">%1$d ehkä</item>
     </plurals>
     <string name="availableLabel">Vapaa</string>
     <string name="buttonJoin">Liity mukaan</string>
