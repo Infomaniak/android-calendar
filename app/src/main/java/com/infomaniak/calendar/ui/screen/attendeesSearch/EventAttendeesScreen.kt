@@ -28,13 +28,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.attendeessearch.AttendeesSearch
+import com.infomaniak.calendar.components.attendeessearch.preview.previewAttendees
 import com.infomaniak.calendar.components.attendeessearch.state.AttendeesState
 import com.infomaniak.calendar.components.attendeessearch.state.rememberAttendeesState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.utils.toAttendeeUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 
@@ -92,6 +95,20 @@ fun EventAttendeesScreen(
                 .fillMaxWidth(),
             searchQuery = { attendeesState.searchQuery },
             onSearchQueryChanged = attendeesState::onSearchQueryChanged,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun EventAttendeesScreenPreview() {
+    CalendarThemeForPreview {
+        EventAttendeesScreen(
+            attendeesState = rememberAttendeesState(
+                attendees = previewAttendees,
+                contacts = previewAttendees,
+            ),
+            goBack = {},
         )
     }
 }
