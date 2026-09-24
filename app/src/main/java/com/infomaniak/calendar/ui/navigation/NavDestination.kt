@@ -19,6 +19,7 @@ package com.infomaniak.calendar.ui.navigation
 
 import androidx.navigation3.runtime.NavKey
 import com.infomaniak.calendar.ui.navigation.NavDestination.CalendarView.Companion.Default
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -69,10 +70,13 @@ sealed interface NavDestination : NavKey {
     }
 
     @Serializable
-    data class EventDetail(val eventId: String) : NavDestination
+    data class EventDetail(val occurrenceId: OccurrenceId) : NavDestination
 
     @Serializable
-    data class EventAttendees(val eventId: String) : NavDestination
+    data class EventEdit(val occurrenceId: OccurrenceId) : NavDestination
+
+    @Serializable
+    data class EventAttendees(val occurrenceId: OccurrenceId) : NavDestination
 
     @Serializable
     data object EventCreation : NavDestination

@@ -15,24 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.foundation.models
+package com.infomaniak.calendar.ui.theme
 
-import androidx.compose.runtime.Immutable
-import com.infomaniak.core.avatar.computeInitials
+import androidx.compose.foundation.layout.PaddingValues
+import com.infomaniak.core.ui.compose.margin.Margin
 
-@Immutable
-data class AttendeeUi(
-    val email: String,
-    val displayName: String? = null,
-    val status: ParticipationStatus,
-    val isOrganizer: Boolean = false,
-) {
-    fun initials(): String = (displayName ?: email).computeInitials()
-}
-
-enum class ParticipationStatus {
-    Accepted,
-    Declined,
-    Tentative,
-    NeedsAction,
+object Dimens {
+    val EventDetailScreensHorizontalPadding = PaddingValues(horizontal = Margin.Small)
 }

@@ -44,13 +44,15 @@ import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
-import com.infomaniak.calendar.components.day.state.minuteOfDay
-import com.infomaniak.calendar.components.day.state.rememberCurrentDateTime
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
 import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlin.time.Clock
+
+private val LocalDateTime.minuteOfDay: Int get() = hour * MINUTES_PER_HOUR + minute
 
 /**
  * Overlaps are resolved once per width and zoom level rather than on every frame, since the

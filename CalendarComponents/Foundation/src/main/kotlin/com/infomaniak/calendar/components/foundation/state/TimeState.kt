@@ -15,12 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.day.state
+package com.infomaniak.calendar.components.foundation.state
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.produceState
-import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -29,8 +28,6 @@ import kotlin.time.Clock
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
-
-val LocalDateTime.minuteOfDay: Int get() = hour * MINUTES_PER_HOUR + minute
 
 /**
  * Current date and time, re-emitted on every minute boundary.

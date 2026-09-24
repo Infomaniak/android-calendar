@@ -34,16 +34,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.foundation.state.rememberToday
+import com.infomaniak.calendar.components.foundation.state.rememberCurrentYear
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatMonthAndOptionalYear
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -86,12 +83,6 @@ fun AnimatedMonthYearText(
             )
         }
     }
-}
-
-@Composable
-private fun rememberCurrentYear(): State<Int> {
-    val today by rememberToday()
-    return remember { derivedStateOf { today.year } }
 }
 
 private fun <T : Comparable<T>> AnimatedContentTransitionScope<T>.verticalRoll(): ContentTransform {

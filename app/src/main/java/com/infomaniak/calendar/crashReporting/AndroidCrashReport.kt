@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.crash
+package com.infomaniak.calendar.crashReporting
 
 import com.infomaniak.multiplatform_calendar.core.crashreporting.BreadcrumbType
 import com.infomaniak.multiplatform_calendar.core.crashreporting.CrashReport

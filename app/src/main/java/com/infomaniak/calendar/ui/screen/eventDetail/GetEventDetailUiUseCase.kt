@@ -17,52 +17,60 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.toAttendeeUi
 import com.infomaniak.calendar.utils.toEventDetailUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
-import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
-import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlin.time.Duration.Companion.seconds
 
-@Inject
-@ContributesIntoMap(AppScope::class)
-@ViewModelKey
-class EventDetailViewModel(
+/**
+ * Observes the [EventDetailUiState] of the occurrence set through [setOccurrenceId].
+ *
+ * There is a single shared flow, and it is what makes the detail -> edit transition work: both screens display the same
+ * occurrence, so [distinctUntilChanged] turns edit's [setOccurrenceId] into a no-op and [SharingStarted.WhileSubscribed] keeps
+ * the state warm in between. Edit therefore composes its first frame with an already loaded event, instead of going through
+ * [EventDetailUiState.Loading] again and having nothing to animate towards.
+ */
+@SingleIn(AppScope::class)
+class GetEventDetailUiUseCase @Inject constructor(
     accountUtils: AccountUtils,
     private val calendarManager: CalendarManager,
-) : ViewModel() {
-    private val eventIdFlow: MutableSharedFlow<String> = MutableSharedFlow(
-        replay = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-    )
+) {
+    private val useCaseScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
+    private val occurrenceIdFlow = MutableStateFlow<OccurrenceId?>(null)
+
+    // TODO: Move all search related logic to its own use case
     private val searchQueryFlow = MutableStateFlow("")
 
     val searchQuery: StateFlow<String> = searchQueryFlow
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val eventFlow = eventIdFlow
+    private val eventFlow = occurrenceIdFlow
+        .filterNotNull()
         .distinctUntilChanged()
-        .flatMapLatest { eventId -> calendarManager.observeEvent(EventId(eventId)) }
+        .flatMapLatest { occurrenceId -> calendarManager.observeOccurrence(occurrenceId) }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val eventAttendeesState: StateFlow<EventAttendeesUiState> = eventFlow
@@ -74,10 +82,10 @@ class EventDetailViewModel(
                 else -> EventAttendeesUiState.Loaded(attendees)
             }
         }
-        .stateIn(viewModelScope, SharingStarted.Lazily, EventAttendeesUiState.Loading)
+        .stateIn(useCaseScope, SharingStarted.Lazily, EventAttendeesUiState.Loading)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val eventDetailUi = eventFlow
+    val eventDetailUi: StateFlow<EventDetailUiState> = eventFlow
         .flatMapLatest { event ->
             if (event == null) {
                 flowOf(null)
@@ -89,15 +97,16 @@ class EventDetailViewModel(
             }
         }
         .combine(accountUtils.emailsByUserId) { eventAndCalendar, emailsByUserId ->
-            val (event, calendar) = eventAndCalendar ?: return@combine EventDetailUiState.Deleted
+            val (event, calendar) = eventAndCalendar ?: return@combine EventDetailUiState.Unavailable
 
             event
                 .toEventDetailUi(calendar, emailsByUserId)
                 .let(EventDetailUiState::Success)
         }
+        .stateIn(useCaseScope, SharingStarted.WhileSubscribed(5.seconds), EventDetailUiState.Loading)
 
-    fun setEventId(eventId: String) {
-        eventIdFlow.tryEmit(eventId)
+    fun setOccurrenceId(occurrenceId: OccurrenceId) {
+        occurrenceIdFlow.value = occurrenceId
     }
 
     // TODO: add search contacts functionality

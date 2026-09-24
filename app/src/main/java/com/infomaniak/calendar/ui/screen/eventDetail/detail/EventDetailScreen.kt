@@ -15,11 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.eventDetail
+package com.infomaniak.calendar.ui.screen.eventDetail.detail
 
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
@@ -34,39 +36,51 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.infomaniak.calendar.components.eventdetail.EventDetail
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
+import com.infomaniak.calendar.components.eventdetail.detail.EventDetail
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
+import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.core.common.extensions.safeStartActivity
+import com.infomaniak.core.ui.compose.basics.rememberClipboardCopyManager
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
+import com.infomaniak.core.common.R as RCommon
 
 @Composable
 fun EventDetailScreen(
-    eventId: String,
-    onBack: () -> Unit,
+    occurrenceId: OccurrenceId,
+    goBack: () -> Unit,
+    goToEdit: () -> Unit,
     goToEventAttendees: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),
 ) {
     val context = LocalContext.current
-    val uiState by viewModel.eventDetailUi.collectAsStateWithLifecycle(initialValue = EventDetailUiState.Loading)
+    val uiState by viewModel.eventDetailUi.collectAsStateWithLifecycle()
 
-    LaunchedEffect(eventId) {
-        viewModel.setEventId(eventId)
+    LaunchedEffect(occurrenceId) {
+        viewModel.setOccurrenceId(occurrenceId)
     }
 
     EventDetailScreen(
         uiState = { uiState },
-        onBack = onBack,
+        sharedTransitionScope = LocalSharedTransitionScope.current,
+        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+        goBack = goBack,
+        goToEdit = goToEdit,
         onLocationClick = { location -> openLocationInMapApp(context, location) },
         goToEventAttendees = goToEventAttendees,
         modifier = modifier,
@@ -76,30 +90,50 @@ fun EventDetailScreen(
 @Composable
 private fun EventDetailScreen(
     uiState: () -> EventDetailUiState,
-    onBack: () -> Unit,
+    goBack: () -> Unit,
+    goToEdit: () -> Unit,
     goToEventAttendees: () -> Unit,
     onLocationClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
+    val clipboardManager = rememberClipboardCopyManager()
+    val state = uiState()
+
     Scaffold(
-        topBar = { TopAppBar(navigationIcon = { TopAppBarButtons.BackButton(onClick = onBack) }, title = {}) },
+        topBar = {
+            TopAppBar(
+                navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
+                title = {},
+                actions = {
+                    val canEdit = (state as? EventDetailUiState.Success)?.eventDetail?.canEdit == true
+                    TopAppBarButtons.EditButton(onClick = goToEdit, enabled = canEdit)
+                },
+            )
+        },
         modifier = modifier,
     ) { scaffoldContentPadding ->
-        when (val state = uiState()) {
+        when (state) {
             EventDetailUiState.Loading -> Unit // Loaded locally, always fast, no need for a specific progress indicator UI
             is EventDetailUiState.Success -> {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    val copyFeedbackMessage = stringResource(RCommon.string.linkCopied)
+
                     EventDetail(
                         eventDetail = state.eventDetail,
-                        onKMeetClick = { /*TODO[eventDetail]*/ },
+                        onJoinKMeet = { /*TODO[eventDetail]*/ },
+                        onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
                         onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
                         onRoomClick = { /*TODO[eventDetail]*/ },
                         goToEventAttendees = { goToEventAttendees() },
-                        contentPadding = scaffoldContentPadding + PaddingValues(horizontal = Margin.Small),
+                        contentPadding = scaffoldContentPadding + Dimens.EventDetailScreensHorizontalPadding,
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = animatedVisibilityScope,
                     )
                 }
             }
-            EventDetailUiState.Deleted -> LaunchedEffect(Unit) { onBack() }
+            EventDetailUiState.Unavailable -> LaunchedEffect(Unit) { goBack() }
         }
     }
 }
@@ -132,13 +166,15 @@ private fun Preview() {
         notifications = emptyList(),
         isOccupied = true,
         classification = EventDetailUi.Classification.Public,
+        canEdit = true,
     )
 
     CalendarThemeForPreview {
         Surface {
             EventDetailScreen(
                 uiState = { EventDetailUiState.Success(previewEventDetail) },
-                onBack = {},
+                goBack = {},
+                goToEdit = {},
                 goToEventAttendees = {},
                 onLocationClick = {},
             )

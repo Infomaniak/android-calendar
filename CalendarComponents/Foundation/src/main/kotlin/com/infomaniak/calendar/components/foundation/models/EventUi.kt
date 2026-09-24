@@ -26,18 +26,16 @@ sealed interface EventUi {
     val id: String
 
     @Immutable
-    data class Normal(
-        override val id: String,
-        val masterEventId: String,
-        val title: String,
-        val location: String?,
-        val status: EventStatus,
-        val start: Instant,
-        val end: Instant,
-        val isAllDay: Boolean,
-        val colors: EventColorsUi,
-        val attendees: Attendees,
-    ) : EventUi
+    interface Normal : EventUi {
+        val title: String
+        val location: String?
+        val status: EventStatus
+        val start: Instant
+        val end: Instant
+        val isAllDay: Boolean
+        val colors: EventColorsUi
+        val attendees: Attendees
+    }
 
     @Immutable
     data object TodayEmptyState : EventUi {

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.component
+package com.infomaniak.calendar.components.eventdetail.detail.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -52,7 +52,7 @@ internal fun DateAndTime(
 ) {
     ListItem(
         leadingContent = { Icon(painterResource(R.drawable.ic_clock), contentDescription = null) },
-        headlineContent = {
+        content = {
             val startAtLocale = start.atLocale
             val endAtLocale = end.atLocale
             Text(

@@ -45,6 +45,7 @@ data class EventDetailUi(
     val notifications: List<Notification>,
     val isOccupied: Boolean,
     val classification: Classification?,
+    val canEdit: Boolean,
 ) {
     data class Room(val title: String, val seats: Int, val floor: Int)
 

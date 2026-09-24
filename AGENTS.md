@@ -20,7 +20,7 @@ android-calendar/
 ├── CalendarComponents/             # Portable Android UI component library (this repo)
 │   ├── Foundation/                 # Shared models + base Compose components
 │   ├── Event/                      # EventItem Composable
-│   ├── EventDetail/                # EventDetail Composable (a single event's full detail)
+│   ├── EventDetail/                # Event detail module (`detail` UI + reusable `form` UI)
 │   ├── Day/                        # Day Composable (hour grid, timed events, all-day band)
 │   ├── Planning/                   # Planning Composable (week/day/event list)
 │   ├── Calendar/                   # Calendar Composable (expanded, unexpanded)
@@ -101,6 +101,19 @@ The group is intentionally **self-contained**: no dependency on `:app`, no DI fr
 String resources follow the single-module pattern — all strings consumed by any CalendarComponents module are declared in 
 `:CalendarComponents:Resources` so consumers never have to manage per-module string tags.
 
+`EventUi.Normal` is an **interface**, not a data class: it declares only what the components need to draw an event.
+The consumer implements it and is free to carry its own identity alongside — the components never read anything beyond
+the declared properties, and hand the instance itself back through their click callbacks. That is how the app attaches
+the KMP `OccurrenceId` to every event (`OccurrenceEventUi`) and recovers it on click, without `OccurrenceId` ever
+appearing in these modules. `SimpleEventUi` is the ready-made implementation for consumers with nothing extra to carry
+(previews, simple hosts).
+
+The consequence is that reading consumer-specific data back out of a clicked event requires a cast on the consumer's
+side (the app does it once, in the `EventUi.Normal.occurrenceId` extension). Prefer this over making `EventUi.Normal`
+generic: a type parameter there would have to be threaded through every type that transports an event (`DayEvents`,
+`TimedEvent`, `Planning`, `DayView`, …), and since `Planning` dispatches over the sealed `EventUi` hierarchy it could
+only narrow to `Normal<*>` and would still need an unchecked cast — an unsafe one, this time inside the library.
+
 ### Flavors
 
 Every CalendarComponents module that contains **code** (`Foundation`, `Event`, `Planning`, `Day`, `Calendar`, `EventDetail`)
@@ -124,7 +137,7 @@ When adding a new CalendarComponents module, apply the flavor-aware plugin if it
 | `:CalendarComponents:Event`       | `com.infomaniak.calendar.components.event`       | `EventItem` Composable — renders a single event row. Re-exports Foundation via `api`. |
 | `:CalendarComponents:Planning`    | `com.infomaniak.calendar.components.planning`    | `Planning` Composable — a `LazyColumn` with ISO week headers and per-day event lists. Also provides the `stickyWithinItem` `Modifier` extension. Re-exports Foundation via `api` (its types appear in `Planning`'s public signature); Event and Resources are internal implementation details and stay `implementation`. Week header design is a **placeholder**. |
 | `:CalendarComponents:Day`         | `com.infomaniak.calendar.components.day`         | Day view — a day's header, its all-day band, and the scrollable hour grid carrying its timed events, with the current time indicator and pinch-to-zoom over it. Holds `resolveOverlaps`, the pure-Kotlin solver placing concurrent events, ported from the [Eventually](https://github.com/claustrofob/Eventually) SwiftUI layout the iOS calendar uses so both platforms arrange a day identically. Reusable by the future 3-day / week views. Re-exports Foundation via `api`. |
-| `:CalendarComponents:EventDetail` | `com.infomaniak.calendar.components.eventdetail` | `EventDetail` Composable — a single event's full detail (title, date and time, …), driven by the `EventDetailUi` model. Re-exports Foundation and `core.infomaniak.core.filetypes` via `api` since both appear in `EventDetailUi`. |
+| `:CalendarComponents:EventDetail` | `com.infomaniak.calendar.components.eventdetail` | Event detail module — the `detail` package contains the read-only `EventDetail` Composable, while the `form` package contains the editable `EventForm` shared by event editing and creation. Matching fields can opt into shared-element transitions through optional Compose animation scopes and internal element keys, without depending on app navigation or domain identifier types. Re-exports Foundation and `core.infomaniak.core.filetypes` via `api` since both appear in `EventDetailUi`. |
 
 ### Dependency graph
 
@@ -148,6 +161,7 @@ in the stack it needs.
 | `DayCircle` + `DateState` (Foundation)| ✅ Final UI                   |
 | `DayIndicator` (Planning)             | ✅ Final UI                   |
 | `EventItem` (Event)                   | ✅ Final UI                   |
+| `EventForm` (EventDetail)             | 🚧 Placeholder                |
 | Week header in `Planning`             | 🚧 Placeholder — design TBD   |
 
 ### External dependencies used

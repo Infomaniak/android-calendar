@@ -53,10 +53,12 @@ import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
 import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewParameter
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
+import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.datetime.LocalDate
@@ -67,7 +69,7 @@ import kotlin.time.Clock
 @Composable
 fun PlanningScreen(
     goToEventCreation: () -> Unit,
-    goToEventDetail: (eventId: String) -> Unit,
+    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PlanningViewModel = viewModel(),
 ) {
@@ -90,7 +92,7 @@ fun PlanningScreen(
 @Composable
 private fun PlanningScreen(
     goToEventCreation: () -> Unit,
-    goToEventDetail: (eventId: String) -> Unit,
+    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     planningUiState: () -> PlanningUiState,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
@@ -161,7 +163,7 @@ private fun SuccessPlanning(
     events: () -> EventsByWeekAndDay,
     contentPadding: PaddingValues,
     goToEventCreation: () -> Unit,
-    goToEventDetail: (eventId: String) -> Unit,
+    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     jumpTo: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -185,7 +187,7 @@ private fun SuccessPlanning(
             .fillMaxSize(),
         contentPadding = contentPadding,
         goToEventCreation = goToEventCreation,
-        onEventClick = { goToEventDetail(it.masterEventId) }, // TODO[eventDetail]: Send id over masterEventId when we can load it
+        onEventClick = { goToEventDetail(it.occurrenceId) },
     )
 }
 

@@ -22,7 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.infomaniak.calendar.BuildConfig
 import com.infomaniak.calendar.MainApplication
-import com.infomaniak.calendar.crash.AndroidCrashReport
+import com.infomaniak.calendar.crashReporting.AndroidCrashReport
 import com.infomaniak.calendar.di.metroAndroidExtensions.AndroidComponentProvider
 import com.infomaniak.calendar.secured.DavCredentialsManager
 import com.infomaniak.calendar.utils.ConfigUtils

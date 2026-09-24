@@ -15,74 +15,83 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail
+package com.infomaniak.calendar.components.eventdetail.detail
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
-import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
-import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
-import com.infomaniak.calendar.components.eventdetail.component.Calendar
-import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatus
-import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
-import com.infomaniak.calendar.components.eventdetail.component.DescriptionCollapsibleButton
-import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
-import com.infomaniak.calendar.components.eventdetail.component.LIST_ITEM_HORIZONTAL_PADDING
-import com.infomaniak.calendar.components.eventdetail.component.LocationButton
-import com.infomaniak.calendar.components.eventdetail.component.Notifications
-import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatus
-import com.infomaniak.calendar.components.eventdetail.component.RoomButton
+import com.infomaniak.calendar.components.eventdetail.component.Title
+import com.infomaniak.calendar.components.eventdetail.detail.component.AttendeesButton
+import com.infomaniak.calendar.components.eventdetail.detail.component.Calendar
+import com.infomaniak.calendar.components.eventdetail.detail.component.ClassificationStatus
+import com.infomaniak.calendar.components.eventdetail.detail.component.DateAndTime
+import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
+import com.infomaniak.calendar.components.eventdetail.detail.component.KMeetButton
+import com.infomaniak.calendar.components.eventdetail.detail.component.LIST_ITEM_HORIZONTAL_PADDING
+import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
+import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
+import com.infomaniak.calendar.components.eventdetail.detail.component.OccupiedStatus
+import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
+import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
+import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
+import com.infomaniak.calendar.components.eventdetail.previewAttendees
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
+/**
+ * [sharedTransitionScope] and [animatedVisibilityScope] animate associated components between detail and editing.
+ */
 @Composable
 fun EventDetail(
     eventDetail: EventDetailUi,
-    onKMeetClick: () -> Unit,
+    onJoinKMeet: () -> Unit,
+    onCopyKMeet: () -> Unit,
     onLocationClick: () -> Unit,
     goToEventAttendees: () -> Unit,
     onRoomClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
-) {
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
+) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
     val horizontalContentPadding = contentPadding.onlyHorizontal()
 
     Column(
         modifier = modifier.padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding()),
     ) {
         with(eventDetail) {
-            Title(eventColor, title, Modifier.padding(horizontalContentPadding))
+            Title(
+                dotColor = eventColor,
+                title = title,
+                modifier = Modifier
+                    .padding(horizontalContentPadding)
+                    .eventSharedElement(EventSharedElement.Title),
+            )
             DateAndTime(start, end, isAllDay, Modifier.padding(horizontalContentPadding))
 
             Section(contentPadding = horizontalContentPadding) {
@@ -91,7 +100,7 @@ fun EventDetail(
                 }
 
                 if (kMeetUrl?.isNotBlank() == true) {
-                    KMeetButton(onClick = onKMeetClick, contentPadding = horizontalContentPadding)
+                    KMeetButton(onJoin = onJoinKMeet, onCopy = onCopyKMeet, modifier = Modifier.padding(horizontalContentPadding))
                 }
 
                 if (location?.isNotBlank() == true) {
@@ -138,41 +147,6 @@ fun EventDetail(
             }
         }
     }
-}
-
-@Composable
-private fun Title(color: Color, title: String, modifier: Modifier = Modifier) {
-    ListItem(
-        headlineContent = { Text(text = title, style = MaterialTheme.typography.titleLargeEmphasized) },
-        leadingContent = {
-            Box(
-                modifier = Modifier
-                    .size(EsdsTheme.icon.sizeMd)
-                    .padding(2.dp)
-                    .clip(CircleShape)
-                    .background(color),
-            )
-        },
-        modifier = modifier,
-    )
-}
-
-@Composable
-private fun OccupiedStatus(isOccupied: Boolean, modifier: Modifier = Modifier) {
-    ListItem(
-        headlineContent = { Text(text = stringResource(if (isOccupied) R.string.occupiedLabel else R.string.availableLabel)) },
-        leadingContent = { Icon(painter = painterResource(R.drawable.ic_briefcase), contentDescription = null) },
-        modifier = modifier,
-    )
-}
-
-@Composable
-private fun ClassificationStatus(classification: EventDetailUi.Classification, modifier: Modifier = Modifier) {
-    ListItem(
-        headlineContent = { Text(text = stringResource(classification.label)) },
-        leadingContent = { Icon(painter = painterResource(R.drawable.ic_lock), contentDescription = null) },
-        modifier = modifier,
-    )
 }
 
 /**
@@ -239,6 +213,7 @@ private fun PreviewEventDetail() {
         ),
         isOccupied = true,
         classification = EventDetailUi.Classification.Public,
+        canEdit = true,
     )
 
     MaterialTheme {
@@ -247,7 +222,8 @@ private fun PreviewEventDetail() {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     EventDetail(
                         eventDetail = eventDetail,
-                        onKMeetClick = {},
+                        onJoinKMeet = {},
+                        onCopyKMeet = {},
                         onLocationClick = {},
                         onRoomClick = {},
                         goToEventAttendees = {},

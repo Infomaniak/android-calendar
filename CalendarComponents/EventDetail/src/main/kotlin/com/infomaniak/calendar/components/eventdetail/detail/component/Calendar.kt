@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.component
+package com.infomaniak.calendar.components.eventdetail.detail.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -39,7 +39,7 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 @Composable
 internal fun Calendar(calendarColor: Color, calendarName: String, modifier: Modifier = Modifier) {
     ListItem(
-        headlineContent = { Text(stringResource(id = R.string.sectionCalendarHeader)) },
+        content = { Text(stringResource(id = R.string.sectionCalendarHeader)) },
         leadingContent = {
             Box(
                 modifier = Modifier

@@ -15,24 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.foundation.models
+package com.infomaniak.calendar.components.foundation.state
 
-import androidx.compose.runtime.Immutable
-import com.infomaniak.core.avatar.computeInitials
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 
-@Immutable
-data class AttendeeUi(
-    val email: String,
-    val displayName: String? = null,
-    val status: ParticipationStatus,
-    val isOrganizer: Boolean = false,
-) {
-    fun initials(): String = (displayName ?: email).computeInitials()
-}
-
-enum class ParticipationStatus {
-    Accepted,
-    Declined,
-    Tentative,
-    NeedsAction,
+@Composable
+fun rememberCurrentYear(): State<Int> {
+    val today by rememberToday()
+    return remember { derivedStateOf { today.year } }
 }

@@ -18,9 +18,12 @@
 package com.infomaniak.calendar.components.eventdetail
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesList
 import com.infomaniak.calendar.components.eventdetail.component.EmptyState
 import com.infomaniak.calendar.components.eventdetail.component.SearchBar
@@ -43,6 +46,20 @@ fun AttendeesSearch(
                 onSearchQueryChanged = onSearchQueryChanged,
             )
             AttendeesList(attendees)
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    MaterialTheme {
+        Surface {
+            AttendeesSearch(
+                attendees = { listOf() },
+                searchQuery = { "" },
+                onSearchQueryChanged = {},
+            )
         }
     }
 }

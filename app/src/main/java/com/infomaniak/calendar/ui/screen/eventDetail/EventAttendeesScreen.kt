@@ -37,23 +37,25 @@ import com.infomaniak.calendar.components.eventdetail.AttendeesSearch
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 
 @Composable
 fun EventAttendeesScreen(
-    eventId: String,
-    onBack: () -> Unit,
+    occurrenceId: OccurrenceId,
+    goBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: EventDetailViewModel = viewModel(),
+    viewModel: EventDetailViewModel = viewModel(), // TODO: Use its own view model
 ) {
     val state by viewModel.eventAttendeesState.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         if (state is EventAttendeesUiState.EventMissing) {
-            onBack()
+            goBack()
         }
-        viewModel.setEventId(eventId)
+        viewModel.setOccurrenceId(occurrenceId)
     }
 
     when (val currentState = state) {
@@ -64,7 +66,7 @@ fun EventAttendeesScreen(
                 attendees = { currentState.attendees },
                 searchQuery = { searchQuery },
                 onSearchQueryChanged = viewModel::onSearchQueryChanged,
-                onBack = onBack,
+                goBack = goBack,
                 modifier = modifier,
             )
         }
@@ -77,13 +79,13 @@ fun EventAttendeesScreen(
     attendees: () -> List<AttendeeUi>,
     searchQuery: () -> String,
     onSearchQueryChanged: (String) -> Unit,
-    onBack: () -> Unit,
+    goBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                navigationIcon = { TopAppBarButtons.BackButton(onClick = onBack) },
+                navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
                 title = { Text(text = stringResource(R.string.attendeesTitle)) },
             )
         },

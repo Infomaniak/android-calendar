@@ -52,6 +52,7 @@ fun Event.toEventDetailUi(calendar: Calendar, emailsByUserId: Map<AccountId, Str
     notifications = alarms.mapNotNull { it.toNotification() },
     isOccupied = timeBlocking != TimeBlocking.DoesNotBlock, // null is considered as occupied
     classification = classification?.toClassification(),
+    canEdit = canEdit,
 )
 
 /**

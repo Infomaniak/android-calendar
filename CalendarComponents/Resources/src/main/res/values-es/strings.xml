@@ -41,6 +41,7 @@
     <string name="contentDescriptionSearch">Buscar</string>
     <string name="contentDescriptionToday">Hoy</string>
     <string name="descriptionTitle">Descripción</string>
+    <string name="eventTitle">Título del evento</string>
     <string name="notificationTypeEmail">Correo electrónico</string>
     <string name="notificationTypePush">Notificación</string>
     <string name="occupiedLabel">Ocupado</string>

@@ -41,6 +41,7 @@
     <string name="contentDescriptionSearch">Zoeken</string>
     <string name="contentDescriptionToday">Vandaag</string>
     <string name="descriptionTitle">Beschrijving</string>
+    <string name="eventTitle">Titel van het evenement</string>
     <string name="notificationTypeEmail">E-mail</string>
     <string name="notificationTypePush">Melding</string>
     <string name="occupiedLabel">Bezet</string>

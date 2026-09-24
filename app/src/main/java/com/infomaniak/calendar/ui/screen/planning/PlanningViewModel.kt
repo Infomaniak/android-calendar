@@ -23,7 +23,7 @@ import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.common.utils.today
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.VisibleCalendarColor
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.DotColor
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
@@ -84,7 +84,7 @@ class PlanningViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     val eventDots: StateFlow<Map<LocalDate, List<EventColorsUi>>> = visibleMonth
         .flatMapLatest { month ->
-            calendarManager.observeMonthlyCalendarColors(
+            calendarManager.observeMonthlyDotColors(
                 startMonth = month.minus(1, DateTimeUnit.MONTH),
                 endMonth = month.plus(1, DateTimeUnit.MONTH),
                 timeZone = timeZone,
@@ -104,8 +104,8 @@ class PlanningViewModel(
         return changed
     }
 
-    private fun Map<LocalDate, List<VisibleCalendarColor>>.toEventDots(): Map<LocalDate, List<EventColorsUi>> {
-        return mapValues { (_, colors) -> colors.map { EventColors.from(null, it.colors.sourceColor).toEventColorsUi() } }
+    private fun Map<LocalDate, List<DotColor>>.toEventDots(): Map<LocalDate, List<EventColorsUi>> {
+        return mapValues { (_, colors) -> colors.map { EventColors.from(null, it.sourceColor).toEventColorsUi() } }
     }
 
     companion object {

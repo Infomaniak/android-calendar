@@ -41,6 +41,7 @@
     <string name="contentDescriptionSearch">Søk</string>
     <string name="contentDescriptionToday">I dag</string>
     <string name="descriptionTitle">Beskrivelse</string>
+    <string name="eventTitle">Arrangementstittel</string>
     <string name="notificationTypeEmail">E-post</string>
     <string name="notificationTypePush">Varsel</string>
     <string name="occupiedLabel">Opptatt</string>

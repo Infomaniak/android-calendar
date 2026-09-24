@@ -18,21 +18,17 @@
 package com.infomaniak.calendar.components.foundation.models
 
 import androidx.compose.runtime.Immutable
-import com.infomaniak.core.avatar.computeInitials
+import kotlin.time.Instant
 
 @Immutable
-data class AttendeeUi(
-    val email: String,
-    val displayName: String? = null,
-    val status: ParticipationStatus,
-    val isOrganizer: Boolean = false,
-) {
-    fun initials(): String = (displayName ?: email).computeInitials()
-}
-
-enum class ParticipationStatus {
-    Accepted,
-    Declined,
-    Tentative,
-    NeedsAction,
-}
+data class SimpleEventUi(
+    override val id: String,
+    override val title: String,
+    override val location: String?,
+    override val status: EventStatus,
+    override val start: Instant,
+    override val end: Instant,
+    override val isAllDay: Boolean,
+    override val colors: EventColorsUi,
+    override val attendees: Attendees,
+) : EventUi.Normal
