@@ -125,7 +125,7 @@ private fun baseEntryProvider(
     entry<NavDestination.EventAttendees> { destination ->
         EventAttendeesScreen(
             occurrenceId = destination.occurrenceId,
-            goBack = { backStack.popOrReplaceRoot(NavDestination.CalendarView.Planning) },
+            goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
         )
     }
     entry<NavDestination.Accounts.List> {
