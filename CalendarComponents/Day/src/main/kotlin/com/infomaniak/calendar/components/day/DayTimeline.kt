@@ -22,8 +22,6 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
@@ -35,7 +33,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.component.CurrentTimeIndicator
 import com.infomaniak.calendar.components.day.component.HourGrid
@@ -52,6 +49,7 @@ import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
 import com.infomaniak.core.common.utils.today
+import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlin.time.Clock
@@ -72,15 +70,11 @@ fun DayTimeline(
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val currentDateTime by rememberCurrentDateTime()
-    val layoutDirection = LocalLayoutDirection.current
 
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
-            .padding(
-                start = contentPadding.calculateStartPadding(layoutDirection),
-                end = contentPadding.calculateEndPadding(layoutDirection),
-            ),
+            .padding(contentPadding.onlyHorizontal()),
     ) {
         val density = LocalDensity.current
         val config = eventLayoutConfig()

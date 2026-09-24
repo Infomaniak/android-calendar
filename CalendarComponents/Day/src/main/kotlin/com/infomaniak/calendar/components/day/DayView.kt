@@ -17,19 +17,16 @@
  */
 package com.infomaniak.calendar.components.day
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -51,6 +48,7 @@ import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.core.common.utils.today
+import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
@@ -92,6 +90,7 @@ fun DayView(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = contentPadding.calculateTopPadding())
+                    .padding(paddingValues = contentPadding.onlyHorizontal())
                     .onSizeChanged { headerHeight = with(density) { it.height.toDp() } }
                     .then(headerModifier),
             ) {
@@ -109,12 +108,7 @@ fun DayView(
                 )
             }
 
-            Spacer(
-                modifier = Modifier
-                    .height(DividerHeight)
-                    .fillMaxWidth()
-                    .background(color = MaterialTheme.colorScheme.outlineVariant),
-            )
+            HorizontalDivider(thickness = DividerHeight)
         }
     }
 }
