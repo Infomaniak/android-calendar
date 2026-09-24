@@ -17,47 +17,38 @@
  */
 package com.infomaniak.calendar.utils
 
-import kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi
-import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 /*
- * `map` and `combine` turn a StateFlow into a plain Flow, whose first value is only produced after a coroutine dispatch, and
- * `stateIn` needs an initial value that can already be stale. These derived StateFlows instead compute their `value` on demand
- * from their sources, so they're always as ready as their sources are, without any scope or initial value.
+ * `map` and `combine` turn a StateFlow into a plain Flow, whose first value is only produced after a coroutine dispatch. These
+ * extensions recreate standard behaviors but automate the first state initialization based on input state flow's values.
  */
 
 /**
- * A map operation on state flows that returns a new state flow with its values always computed at each call so there's no need
- * for a default initial state. The first value is always up to date.
+ * A map operation on state flows that returns a new state flow with its initial value based on the initial values of its source
+ * state flows.
  */
-fun <T, R> StateFlow<T>.mapState(transform: (T) -> R): StateFlow<R> {
-    return DerivedStateFlow(getValue = { transform(value) }, updates = map(transform))
+fun <T, R> StateFlow<T>.mapState(scope: CoroutineScope, started: SharingStarted, transform: (T) -> R): StateFlow<R> {
+    return map(transform)
+        .stateIn(scope, started, transform(value))
 }
 
 /**
- * A combine operation on state flows that returns a new state flow with its values always computed at each call so there's no
- * need for a default initial state. The first value is always up to date.
+ * A combine operation on state flows that returns a new state flow with its initial value based on the initial values of its
+ * source state flows.
  */
-fun <T1, T2, R> combineStates(flow1: StateFlow<T1>, flow2: StateFlow<T2>, transform: (T1, T2) -> R): StateFlow<R> {
-    return DerivedStateFlow(getValue = { transform(flow1.value, flow2.value) }, updates = combine(flow1, flow2, transform))
-}
-
-/**
- * Acts as a view that derives the value computation at each call based on the input instructions.
- */
-@OptIn(ExperimentalForInheritanceCoroutinesApi::class)
-private class DerivedStateFlow<T>(private val getValue: () -> T, private val updates: Flow<T>) : StateFlow<T> {
-    override val value: T get() = getValue()
-    override val replayCache: List<T> get() = listOf(value)
-
-    override suspend fun collect(collector: FlowCollector<T>): Nothing {
-        updates.distinctUntilChanged().collect(collector)
-        awaitCancellation()
-    }
+fun <T1, T2, R> combineStates(
+    flow1: StateFlow<T1>,
+    flow2: StateFlow<T2>,
+    scope: CoroutineScope,
+    started: SharingStarted,
+    transform: (T1, T2) -> R,
+): StateFlow<R> {
+    return combine(flow1, flow2, transform)
+        .stateIn(scope, started, transform(flow1.value, flow2.value))
 }

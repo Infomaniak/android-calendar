@@ -95,7 +95,9 @@ class GetEventDetailUiUseCase @Inject constructor(
         }
         .stateIn(useCaseScope, SharingStarted.WhileSubscribed(5.seconds), EventDetailUiState.Loading)
 
-    val eventCalendar: StateFlow<EventDetailCalendar?> = eventAndCalendarFlow.mapState { it?.second?.toEventDetailCalendar() }
+    val eventCalendar: StateFlow<EventDetailCalendar?> = eventAndCalendarFlow.mapState(useCaseScope, SharingStarted.Eagerly) {
+        it?.second?.toEventDetailCalendar()
+    }
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) {
         occurrenceIdFlow.value = occurrenceId

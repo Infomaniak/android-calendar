@@ -42,7 +42,9 @@ class CachedCalendarManager @Inject constructor(calendarManager: CalendarManager
         .observeCalendars()
         .stateIn(managerScope, SharingStarted.Eagerly, emptyList())
 
-    val writableCalendars = calendars.mapState { calendars -> calendars.filter { it.accessLevel.canWrite } }
+    val writableCalendars = calendars.mapState(managerScope, SharingStarted.Eagerly) { calendars ->
+        calendars.filter { it.accessLevel.canWrite }
+    }
 
     val lastUsedCalendarId = calendarDataValues.lastUsedCalendarId.flow.stateIn(managerScope, SharingStarted.Eagerly, null)
 }
