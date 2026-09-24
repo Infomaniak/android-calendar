@@ -25,6 +25,7 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -65,7 +66,7 @@ internal fun DescriptionCollapsibleButton(description: String, contentPadding: P
             leadingContent = { Icon(painterResource(leadingIconRes), contentDescription = null) },
             trailingContent = { AnimatedChevron({ isCollapsed }) },
             onClick = { isCollapsed = !isCollapsed },
-            contentPadding = contentPadding + PaddingValues(LIST_ITEM_HORIZONTAL_PADDING),
+            contentPadding = contentPadding + ListItemDefaults.ContentPadding,
         )
     } else {
         ListItem(
