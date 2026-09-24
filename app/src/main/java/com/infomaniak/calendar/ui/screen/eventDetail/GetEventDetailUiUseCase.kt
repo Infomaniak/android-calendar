@@ -17,6 +17,8 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
+import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.calendar.utils.toEventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.utils.account.AccountUtils
@@ -66,7 +68,7 @@ class GetEventDetailUiUseCase @Inject constructor(
     private val occurrenceIdFlow = MutableStateFlow<OccurrenceId?>(null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val eventFlow = occurrenceIdFlow
+    val eventFlow = occurrenceIdFlow
         .filterNotNull()
         .distinctUntilChanged()
         .flatMapLatest { occurrenceId -> calendarManager.observeOccurrence(occurrenceId) }

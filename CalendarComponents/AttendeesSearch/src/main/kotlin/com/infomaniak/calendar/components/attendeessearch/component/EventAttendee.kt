@@ -15,15 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.component
+package com.infomaniak.calendar.components.attendeessearch.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -47,7 +48,6 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
 fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
-            .background(MaterialTheme.colorScheme.background)
             .padding(start = EsdsTheme.spacing.lg),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -58,18 +58,12 @@ fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
                 .size(40.dp),
         )
         ListItem(
+            modifier = Modifier,
+            colors = ListItemDefaults.colors(
+                containerColor = Color.Transparent,
+            ),
             overlineContent = {
                 AttendeeParticipationStatus(attendee.status, attendee.isOrganizer)
-            },
-            headlineContent = {
-                Column {
-                    Text(
-                        text = attendee.displayName ?: attendee.email,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Normal,
-                    )
-                }
-
             },
             supportingContent = if (attendee.displayName.isNullOrEmpty()) {
                 null
@@ -79,6 +73,15 @@ fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
                         text = attendee.email,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            },
+            content = {
+                Column {
+                    Text(
+                        text = attendee.displayName ?: attendee.email,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Normal,
                     )
                 }
             },
@@ -149,24 +152,32 @@ fun ParticipationStatusText(text: String, color: Color, isOrganizer: Boolean, mo
 @Preview
 @Composable
 private fun PreviewAttendeeAccepted() {
-    EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted, true))
+    Surface() {
+        EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted, true))
+    }
 }
 
 @Preview
 @Composable
 private fun PreviewAttendeeDeclined() {
-    EventAttendee(AttendeeUi("alice@example.com", null, ParticipationStatus.Declined))
+    Surface() {
+        EventAttendee(AttendeeUi("alice@example.com", null, ParticipationStatus.Declined))
+    }
 }
 
 @Preview
 @Composable
 private fun PreviewAttendeeMaybe() {
-    EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Tentative))
+    Surface() {
+        EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Tentative))
+    }
 }
 
 @Preview
 @Composable
 private fun PreviewAttendeePending() {
-    EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.NeedsAction))
+    Surface() {
+        EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.NeedsAction))
+    }
 }
 
