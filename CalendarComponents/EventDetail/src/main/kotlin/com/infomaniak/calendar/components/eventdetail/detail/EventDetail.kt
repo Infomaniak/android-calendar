@@ -25,17 +25,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
+import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
 import com.infomaniak.calendar.components.eventdetail.detail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Calendar
@@ -43,7 +42,6 @@ import com.infomaniak.calendar.components.eventdetail.detail.component.Classific
 import com.infomaniak.calendar.components.eventdetail.detail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.KMeetButton
-import com.infomaniak.calendar.components.eventdetail.detail.component.LIST_ITEM_HORIZONTAL_PADDING
 import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
 import com.infomaniak.calendar.components.eventdetail.detail.component.OccupiedStatus
@@ -135,42 +133,6 @@ fun EventDetail(
             }
         }
     }
-}
-
-/**
- * Automatically shows or hides divider based on if any content is composed or not. This layout acts like a column.
- */
-@Composable
-private fun Section(
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(),
-    content: @Composable () -> Unit,
-) {
-    Layout(
-        contents = listOf({ Divider(modifier = Modifier.padding(contentPadding)) }, content),
-        modifier = modifier,
-    ) { (dividerMeasurables, contentMeasurables), constraints ->
-        if (contentMeasurables.isEmpty()) return@Layout layout(0, 0) {}
-
-        val childConstraints = constraints.copy(minHeight = 0)
-        val placeables = (dividerMeasurables + contentMeasurables).map { it.measure(childConstraints) }
-
-        val width = placeables.maxOf { it.width }.coerceIn(constraints.minWidth, constraints.maxWidth)
-        val height = placeables.sumOf { it.height }.coerceIn(constraints.minHeight, constraints.maxHeight)
-
-        layout(width, height) {
-            var y = 0
-            placeables.forEach { placeable ->
-                placeable.place(0, y)
-                y += placeable.height
-            }
-        }
-    }
-}
-
-@Composable
-private fun Divider(modifier: Modifier = Modifier) {
-    HorizontalDivider(modifier = modifier.padding(LIST_ITEM_HORIZONTAL_PADDING))
 }
 
 @Preview(heightDp = 1200)
