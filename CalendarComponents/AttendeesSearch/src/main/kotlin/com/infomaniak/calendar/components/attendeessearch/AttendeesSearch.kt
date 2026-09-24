@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail
+package com.infomaniak.calendar.components.attendeessearch
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
@@ -24,9 +24,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.component.AttendeesList
-import com.infomaniak.calendar.components.eventdetail.component.EmptyState
-import com.infomaniak.calendar.components.eventdetail.component.SearchBar
+import com.infomaniak.calendar.components.attendeessearch.component.AttendeesList
+import com.infomaniak.calendar.components.attendeessearch.component.EmptyState
+import com.infomaniak.calendar.components.attendeessearch.component.SearchBar
+import com.infomaniak.calendar.components.attendeessearch.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.resources.R
 
@@ -38,13 +39,13 @@ fun AttendeesSearch(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
+        SearchBar(
+            searchQuery = searchQuery,
+            onSearchQueryChanged = onSearchQueryChanged,
+        )
         if (attendees().isEmpty()) {
             EmptyState(text = stringResource(R.string.attendeesEmptyState))
         } else {
-            SearchBar(
-                searchQuery = searchQuery,
-                onSearchQueryChanged = onSearchQueryChanged,
-            )
             AttendeesList(attendees)
         }
     }
@@ -53,6 +54,20 @@ fun AttendeesSearch(
 @Preview
 @Composable
 private fun Preview() {
+    MaterialTheme {
+        Surface {
+            AttendeesSearch(
+                attendees = { previewAttendees },
+                searchQuery = { "" },
+                onSearchQueryChanged = {},
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewEmptyState() {
     MaterialTheme {
         Surface {
             AttendeesSearch(

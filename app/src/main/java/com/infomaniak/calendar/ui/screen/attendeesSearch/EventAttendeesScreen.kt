@@ -15,13 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.eventDetail
+package com.infomaniak.calendar.ui.screen.attendeesSearch
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -29,16 +28,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
-import com.infomaniak.calendar.components.eventdetail.AttendeesSearch
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
-import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
+import com.infomaniak.calendar.components.attendeessearch.AttendeesSearch
+import com.infomaniak.calendar.components.attendeessearch.state.AttendeesState
+import com.infomaniak.calendar.components.attendeessearch.state.rememberAttendeesState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
-import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailViewModel
-import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.calendar.utils.toAttendeeUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 
 @Composable
@@ -46,15 +43,11 @@ fun EventAttendeesScreen(
     occurrenceId: OccurrenceId,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: EventDetailViewModel = viewModel(), // TODO: Use its own view model
+    viewModel: EventAttendeesViewModel = viewModel(),
 ) {
     val state by viewModel.eventAttendeesState.collectAsStateWithLifecycle()
-    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        if (state is EventAttendeesUiState.EventMissing) {
-            goBack()
-        }
         viewModel.setOccurrenceId(occurrenceId)
     }
 
@@ -62,10 +55,13 @@ fun EventAttendeesScreen(
         EventAttendeesUiState.Loading -> Unit // TODO: check how we want to handle the loading state while searching
         EventAttendeesUiState.EventMissing -> Unit
         is EventAttendeesUiState.Loaded -> {
+            val attendeesState = rememberAttendeesState(
+                attendees = currentState.attendees.map { it.toAttendeeUi() },
+                contacts = currentState.contacts.map { it.toAttendeeUi() },
+            )
+
             EventAttendeesScreen(
-                attendees = { currentState.attendees },
-                searchQuery = { searchQuery },
-                onSearchQueryChanged = viewModel::onSearchQueryChanged,
+                attendeesState = attendeesState,
                 goBack = goBack,
                 modifier = modifier,
             )
@@ -76,9 +72,7 @@ fun EventAttendeesScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventAttendeesScreen(
-    attendees: () -> List<AttendeeUi>,
-    searchQuery: () -> String,
-    onSearchQueryChanged: (String) -> Unit,
+    attendeesState: AttendeesState,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -92,46 +86,12 @@ fun EventAttendeesScreen(
         modifier = modifier,
     ) { paddingValues ->
         AttendeesSearch(
-            attendees = attendees,
+            attendees = { attendeesState.searchResults },
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxWidth(),
-            searchQuery = searchQuery,
-            onSearchQueryChanged = onSearchQueryChanged,
+            searchQuery = { attendeesState.searchQuery },
+            onSearchQueryChanged = attendeesState::onSearchQueryChanged,
         )
-    }
-}
-
-@Preview
-@Composable
-private fun EventAttendeesScreenPreview() {
-    val previewAttendees = listOf(
-        AttendeeUi(
-            email = "alice@example.com",
-            displayName = "Alice Johnson",
-            isOrganizer = true,
-            status = ParticipationStatus.Accepted,
-        ),
-        AttendeeUi(
-            email = "bob@example.com",
-            displayName = "Bob Smith",
-            status = ParticipationStatus.Tentative,
-        ),
-        AttendeeUi(
-            email = "charlie@example.com",
-            displayName = "Charlie Brown",
-            status = ParticipationStatus.Declined,
-        ),
-    )
-
-    CalendarThemeForPreview {
-        Surface {
-            EventAttendeesScreen(
-                attendees = { previewAttendees },
-                searchQuery = { "" },
-                onSearchQueryChanged = {},
-                onBack = {},
-            )
-        }
     }
 }

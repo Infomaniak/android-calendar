@@ -15,32 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.component
+package com.infomaniak.calendar.components.attendeessearch.component
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
-fun AttendeesList(
-    attendees: () -> List<AttendeeUi>,
+fun EmptyState(text: String, modifier: Modifier = Modifier) {
+    // TODO: improve empty state
+    Box(
+        modifier = modifier.fillMaxSize().padding(top = EsdsTheme.spacing.lg),
+        contentAlignment = Alignment.TopCenter,
+    ) {
+        Text(text, style = MaterialTheme.typography.labelMedium)
+    }
+}
 
-    ) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = EsdsTheme.spacing.md, vertical = EsdsTheme.spacing.sm),
-    ) {
-        items(
-            items = attendees(),
-            key = { attendee -> attendee.email }, // TODO: change to attendee.key when kmp adds it
-        ) { attendee ->
-            EventAttendee(attendee = attendee)
-        }
+@Preview
+@Composable
+private fun EmptyStatePreview() {
+    Surface {
+        EmptyState(text = "Empty state")
     }
 }

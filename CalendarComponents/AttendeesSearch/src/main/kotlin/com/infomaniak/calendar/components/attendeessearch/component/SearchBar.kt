@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.component
+package com.infomaniak.calendar.components.attendeessearch.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -65,7 +65,7 @@ fun SearchBar(
 
 @Preview
 @Composable
-private fun SearchBarPreview(){
+private fun SearchBarPreview() {
     SearchBar(
         searchQuery = { "" },
         onSearchQueryChanged = {},

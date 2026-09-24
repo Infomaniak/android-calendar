@@ -17,11 +17,8 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.utils.account.AccountUtils
-import com.infomaniak.calendar.utils.toAttendeeUi
 import com.infomaniak.calendar.utils.toEventDetailUi
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
@@ -61,28 +58,11 @@ class GetEventDetailUiUseCase @Inject constructor(
 
     private val occurrenceIdFlow = MutableStateFlow<OccurrenceId?>(null)
 
-    // TODO: Move all search related logic to its own use case
-    private val searchQueryFlow = MutableStateFlow("")
-
-    val searchQuery: StateFlow<String> = searchQueryFlow
-
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val eventFlow = occurrenceIdFlow
+    val eventFlow = occurrenceIdFlow
         .filterNotNull()
         .distinctUntilChanged()
         .flatMapLatest { occurrenceId -> calendarManager.observeOccurrence(occurrenceId) }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val eventAttendeesState: StateFlow<EventAttendeesUiState> = eventFlow
-        .map { event ->
-            val attendees = event?.attendees.orEmpty().map(Attendee::toAttendeeUi)
-
-            when {
-                event == null -> EventAttendeesUiState.EventMissing
-                else -> EventAttendeesUiState.Loaded(attendees)
-            }
-        }
-        .stateIn(useCaseScope, SharingStarted.Lazily, EventAttendeesUiState.Loading)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val eventDetailUi: StateFlow<EventDetailUiState> = eventFlow
@@ -108,15 +88,4 @@ class GetEventDetailUiUseCase @Inject constructor(
     fun setOccurrenceId(occurrenceId: OccurrenceId) {
         occurrenceIdFlow.value = occurrenceId
     }
-
-    // TODO: add search contacts functionality
-    fun onSearchQueryChanged(query: String) {
-        searchQueryFlow.value = query
-    }
-}
-
-sealed interface EventAttendeesUiState {
-    data object Loading : EventAttendeesUiState
-    data object EventMissing : EventAttendeesUiState
-    data class Loaded(val attendees: List<AttendeeUi>) : EventAttendeesUiState
 }

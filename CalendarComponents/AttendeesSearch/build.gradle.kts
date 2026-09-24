@@ -1,0 +1,56 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+plugins {
+    alias(core.plugins.infomaniak.android.library.flavor.aware)
+    alias(core.plugins.compose.compiler)
+}
+
+val appCompileSdk: Int by rootProject.extra
+val appMinSdk: Int by rootProject.extra
+val javaVersion: JavaVersion by rootProject.extra
+
+android {
+    namespace = "com.infomaniak.calendar.components.attendeessearch"
+    compileSdk = appCompileSdk
+
+    defaultConfig {
+        minSdk = appMinSdk
+    }
+
+    compileOptions {
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
+    }
+
+    buildFeatures {
+        compose = true
+    }
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.fromTarget(javaVersion.toString()))
+        }
+    }
+}
+
+dependencies {
+    api(project(":CalendarComponents:Foundation"))
+    implementation(project(":CalendarComponents:Resources"))
+
+    api(core.infomaniak.core.filetypes)
+    implementation(core.infomaniak.core.avatar)
+    implementation(core.infomaniak.core.ui.compose.basics)
+    implementation(core.infomaniak.core.ui.compose.margin)
+    implementation(core.infomaniak.core.ui.compose.theme)
+
+    implementation(libs.infomaniak.designsystem.foundation)
+
+    implementation(platform(core.compose.bom))
+    implementation(core.compose.foundation)
+    implementation(core.infomaniak.core.common)
+    implementation(core.compose.ui.android)
+    implementation(core.compose.ui.tooling.preview)
+    implementation(libs.compose.material3)
+    debugImplementation(core.compose.ui.tooling)
+}
+
