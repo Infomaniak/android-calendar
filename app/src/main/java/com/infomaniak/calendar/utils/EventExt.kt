@@ -24,11 +24,9 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Classification
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDateTime
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.TimeBlocking
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.EventAlarm
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
 
 /**
  * Translation of the KMP event model into the UI model consumed by the EventDetail component,
@@ -39,8 +37,8 @@ fun Event.toEventDetailUi(calendar: Calendar, emailsByUserId: Map<AccountId, Str
     calendarColor = Color(colors.calendarSourceColor.argb),
     calendarName = calendar.displayName,
     title = title,
-    start = getDetailTiming(timing.start, timing.startTimeZone),
-    end = getDetailTiming(timing.end, timing.endTimeZone),
+    start = timing.start.toDetailTiming(),
+    end = timing.end.toDetailTiming(),
     isAllDay = timing.isAllDay,
     attendees = attendees.toAttendees(accountId, emailsByUserId),
     kMeetUrl = null, // TODO[eventDetail]: Not carried by the KMP model yet
@@ -55,16 +53,9 @@ fun Event.toEventDetailUi(calendar: Calendar, emailsByUserId: Map<AccountId, Str
     canEdit = canEdit,
 )
 
-/**
- *  A wall-clock without a time zone is floating: it is read in whatever zone the reader is in.
- *
- *  A wall-clock + a time zone is ambiguous during DST repeated hours. During such a day, like the 25th of oct. 2026,
- *  2:30 AM occurs twice at the Europe/Paris time zone. This conversion method handles the collapsing of the both possibilities
- *  instants into a single one.
- **/
-private fun getDetailTiming(wallClock: LocalDateTime, timeZone: TimeZone?): EventDetailTiming = when (timeZone) {
-    null -> EventDetailTiming.Floating(wallClock)
-    else -> EventDetailTiming.Precise(wallClock.toInstant(timeZone), timeZone)
+private fun EventDateTime.toDetailTiming(): EventDetailTiming = when (this) {
+    is EventDateTime.Floating -> EventDetailTiming.Floating(wallClock)
+    is EventDateTime.Precise -> EventDetailTiming.Precise(instant, timeZone)
 }
 
 // TODO[eventDetail]: Handle notifications
