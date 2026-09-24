@@ -23,6 +23,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 /**
  * Automatically shows or hides divider based on if any content is composed or not. This layout acts like a column.
@@ -34,10 +35,7 @@ internal fun Section(
     content: @Composable () -> Unit,
 ) {
     Layout(
-        contents = listOf(
-            { HorizontalDivider(modifier = Modifier.padding(contentPadding)) },
-            content,
-        ),
+        contents = listOf({ Divider(Modifier.padding(contentPadding)) }, content),
         modifier = modifier,
     ) { (dividerMeasurables, contentMeasurables), constraints ->
         if (contentMeasurables.isEmpty()) return@Layout layout(0, 0) {}
@@ -56,4 +54,9 @@ internal fun Section(
             }
         }
     }
+}
+
+@Composable
+private fun Divider(modifier: Modifier = Modifier) {
+    HorizontalDivider(modifier = modifier.padding(vertical = EsdsTheme.spacing.md))
 }
