@@ -18,6 +18,7 @@
 <resources>
     <string name="accountsTitle">Conti</string>
     <string name="addAccount">Aggiungi un account</string>
+    <string name="attendeesSearchTitle">Aggiungi invitati</string>
     <string name="attendeesTitle">Ospiti</string>
     <string name="buttonLogOut">Esci</string>
     <string name="contentDescriptionBack">Indietro</string>

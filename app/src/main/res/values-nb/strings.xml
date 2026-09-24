@@ -18,6 +18,7 @@
 <resources>
     <string name="accountsTitle">Kontoer</string>
     <string name="addAccount">Legg til en konto</string>
+    <string name="attendeesSearchTitle">Legg til gjester</string>
     <string name="attendeesTitle">Gjester</string>
     <string name="buttonLogOut">Logg ut</string>
     <string name="contentDescriptionBack">Tilbake</string>

@@ -18,6 +18,7 @@
 <resources>
     <string name="accountsTitle">Konten</string>
     <string name="addAccount">Konto hinzufügen</string>
+    <string name="attendeesSearchTitle">Gäste hinzufügen</string>
     <string name="attendeesTitle">Gäste</string>
     <string name="buttonLogOut">Abmelden</string>
     <string name="contentDescriptionBack">Zurück</string>

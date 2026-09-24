@@ -18,6 +18,7 @@
 <resources>
     <string name="accountsTitle">Tilit</string>
     <string name="addAccount">Lisää tili</string>
+    <string name="attendeesSearchTitle">Lisää vieraita</string>
     <string name="attendeesTitle">Vieraat</string>
     <string name="buttonLogOut">Kirjaudu ulos</string>
     <string name="contentDescriptionBack">Takaisin</string>
