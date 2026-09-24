@@ -84,7 +84,7 @@ fun EventAttendeesScreen(
         topBar = {
             TopAppBar(
                 navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
-                title = { Text(text = stringResource(R.string.attendeesTitle)) },
+                title = { Text(text = stringResource(R.string.attendeesSearchTitle)) },
             )
         },
         modifier = modifier,
