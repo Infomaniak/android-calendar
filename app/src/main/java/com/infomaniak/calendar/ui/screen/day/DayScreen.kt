@@ -145,7 +145,7 @@ private fun DayScreen(
     dateRange: ClosedRange<LocalDate>,
     modifier: Modifier = Modifier,
 ) {
-    val calendarExpansion = rememberCalendarExpansionState()
+    val calendarExpansionState = rememberCalendarExpansionState()
 
     val hazeState = rememberHazeState()
 
@@ -153,12 +153,12 @@ private fun DayScreen(
         topBar = {
             CalendarTopAppBar(
                 isLoadingEvents = isLoadingEvents,
-                onToggleCalendar = calendarExpansion::toggle,
-                calendarExpansionProgress = { calendarExpansion.progress },
+                onToggleCalendar = calendarExpansionState::toggle,
+                calendarExpansionProgress = { calendarExpansionState.progress },
                 hazeState = hazeState,
                 calendar = {
                     ExpandableCalendar(
-                        expansionState = calendarExpansion,
+                        expansionState = calendarExpansionState,
                         selectedDate = { visibleDayState.visibleDate },
                         onDayClick = { visibleDayState.jumpTo(it) },
                         weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
@@ -182,7 +182,7 @@ private fun DayScreen(
                     contentPadding = contentPadding,
                     // Placed here rather than on each page: the hour grid's vertical scroll reaches it through
                     // the pager, which only consumes the horizontal axis.
-                    modifier = Modifier.collapseCalendarOnScroll(calendarExpansion),
+                    modifier = Modifier.collapseCalendarOnScroll(calendarExpansionState),
                 )
             }
         }

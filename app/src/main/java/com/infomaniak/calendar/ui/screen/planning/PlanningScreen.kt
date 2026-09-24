@@ -95,7 +95,7 @@ private fun PlanningScreen(
 ) {
     val hazeState = rememberHazeState()
 
-    val calendarExpansion = rememberCalendarExpansionState()
+    val calendarExpansionState = rememberCalendarExpansionState()
     val visibleDayState = LocalVisibleDayState.current
 
     OverlaidTopBarScaffold(
@@ -103,11 +103,11 @@ private fun PlanningScreen(
             CalendarTopAppBar(
                 isLoadingEvents = isLoadingEvents,
                 hazeState = hazeState,
-                onToggleCalendar = calendarExpansion::toggle,
+                onToggleCalendar = calendarExpansionState::toggle,
                 calendar = {
                     if (visibleDayState != null) {
                         ExpandableCalendar(
-                            expansionState = calendarExpansion,
+                            expansionState = calendarExpansionState,
                             selectedDate = { visibleDayState.visibleDate },
                             onDayClick = {
                                 onVisibleMonthChanged(it.yearMonth)
@@ -118,7 +118,7 @@ private fun PlanningScreen(
                         )
                     }
                 },
-                calendarExpansionProgress = { calendarExpansion.progress },
+                calendarExpansionProgress = { calendarExpansionState.progress },
             )
         },
         modifier = modifier,
@@ -133,7 +133,7 @@ private fun PlanningScreen(
                     jumpTo = jumpTo,
                     modifier = Modifier
                         .hazeSource(hazeState)
-                        .collapseCalendarOnScroll(calendarExpansion),
+                        .collapseCalendarOnScroll(calendarExpansionState),
                 )
             }
             is PlanningUiState.Loading -> {

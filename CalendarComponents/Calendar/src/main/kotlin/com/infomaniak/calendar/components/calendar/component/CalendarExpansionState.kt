@@ -21,14 +21,14 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -63,9 +63,9 @@ private val SettleSpec = spring<Float>(dampingRatio = Spring.DampingRatioNoBounc
  * redraws the calendar without ever recomposing it.
  */
 @Stable
-class CalendarExpansionState internal constructor(initiallyExpanded: Boolean, private val coroutineScope: CoroutineScope) {
+class CalendarExpansionState(private val _isExpanded: MutableState<Boolean>, private val coroutineScope: CoroutineScope) {
 
-    private val _progress = mutableFloatStateOf(if (initiallyExpanded) EXPANDED else COLLAPSED)
+    private val _progress = mutableFloatStateOf(if (_isExpanded.value) EXPANDED else COLLAPSED)
 
     var progress: Float
         get() = _progress.floatValue
@@ -73,8 +73,7 @@ class CalendarExpansionState internal constructor(initiallyExpanded: Boolean, pr
             _progress.floatValue = value.coerceIn(COLLAPSED, EXPANDED)
         }
 
-    var isExpanded: Boolean by mutableStateOf(initiallyExpanded)
-        private set
+    val isExpanded: Boolean by _isExpanded
 
     private var dragRange = 0f
     private var flickVelocity: Float? = null
@@ -99,7 +98,7 @@ class CalendarExpansionState internal constructor(initiallyExpanded: Boolean, pr
         progress = to
 
         // A drag that goes all the way settles itself, and there is no release left to record where it landed.
-        if (to == COLLAPSED || to == EXPANDED) isExpanded = to == EXPANDED
+        if (to == COLLAPSED || to == EXPANDED) _isExpanded.value = to == EXPANDED
 
         return (to - from) * dragRange
     }
@@ -112,7 +111,7 @@ class CalendarExpansionState internal constructor(initiallyExpanded: Boolean, pr
     }
 
     private fun animateTo(expanded: Boolean, initialVelocity: Float) {
-        isExpanded = expanded
+        _isExpanded.value = expanded
         settling?.cancel()
         settling = coroutineScope.launch {
             animate(
@@ -144,13 +143,6 @@ class CalendarExpansionState internal constructor(initiallyExpanded: Boolean, pr
             return Velocity.Zero
         }
     }
-
-    internal companion object {
-        fun Saver(coroutineScope: CoroutineScope) = Saver<CalendarExpansionState, Boolean>(
-            save = { it.isExpanded },
-            restore = { CalendarExpansionState(initiallyExpanded = it, coroutineScope = coroutineScope) },
-        )
-    }
 }
 
 fun Modifier.collapseCalendarOnScroll(expansionState: CalendarExpansionState): Modifier {
@@ -159,9 +151,8 @@ fun Modifier.collapseCalendarOnScroll(expansionState: CalendarExpansionState): M
 
 @Composable
 fun rememberCalendarExpansionState(initiallyExpanded: Boolean = false): CalendarExpansionState {
+    val isExpanded = rememberSaveable { mutableStateOf(initiallyExpanded) }
     val coroutineScope = rememberCoroutineScope()
 
-    return rememberSaveable(saver = CalendarExpansionState.Saver(coroutineScope)) {
-        CalendarExpansionState(initiallyExpanded, coroutineScope)
-    }
+    return remember { CalendarExpansionState(isExpanded, coroutineScope) }
 }

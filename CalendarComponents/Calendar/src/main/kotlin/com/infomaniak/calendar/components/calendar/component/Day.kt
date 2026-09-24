@@ -96,11 +96,14 @@ internal fun Day(
 
     val isNotMonth = dateState == DateState.NotMonth
     val drawnState = if (isNotMonth) DateState.None else dateState
-    val notMonthAlpha = DateState.NotMonth.contentColor().alpha
 
     Box(
         modifier = modifier
-            .fadeToNotMonth(isNotMonth, notMonthAlpha, notMonthFraction)
+            .fadeToNotMonth(
+                isNotMonth = isNotMonth,
+                notMonthAlpha = DateState.NotMonth.contentColor().alpha,
+                fraction = notMonthFraction,
+            )
             .fillMaxWidth()
             .height(LocalViewConfiguration.current.minimumTouchTargetSize.height)
             .clickable(
