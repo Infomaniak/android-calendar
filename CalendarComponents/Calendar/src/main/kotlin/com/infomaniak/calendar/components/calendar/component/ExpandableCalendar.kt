@@ -56,16 +56,6 @@ private const val MONTH_MARGIN = 1
 
 private const val DAYS_IN_WEEK = 7
 
-/**
- * A calendar that goes from the week holding the selected date to its whole month, and back, following
- * whatever [expansionState] is doing: a tap on the title, or a finger dragging the content below it.
- *
- * Both layouts are laid out at all times and only one is ever placed, so the swap happens at rest, on the
- * frame the expansion reaches one of its two ends, where the two are drawn identically. Everything in
- * between is the month, slid up so the selected week stays put under the header while the rows above it
- * roll away, inside a box whose height follows the same fraction. Nothing here recomposes while the finger
- * moves: the expansion is read from the measure and draw lambdas that need it.
- */
 @Composable
 fun ExpandableCalendar(
     expansionState: CalendarExpansionState,
@@ -84,7 +74,7 @@ fun ExpandableCalendar(
 
     val currentSelectedDate by rememberUpdatedState(selectedDate)
     val weeksAboveSelection by remember(firstDayOfWeek) {
-        derivedStateOf { currentSelectedDate().weeksSinceMonthStart(firstDayOfWeek) }
+        derivedStateOf { currentSelectedDate().weekRowsAboveCurrentRow(firstDayOfWeek) }
     }
 
     Layout(
@@ -130,7 +120,7 @@ fun ExpandableCalendar(
             },
             {
                 DayOfWeekOverlayHeader(
-                    headerSize = { headerSize },
+                    headerWidth = { headerSize.width },
                     updateHeaderSize = { headerSize = it },
                     firstDayOfWeek = firstDayOfWeek,
                     headerState = headerState,
@@ -161,7 +151,7 @@ fun ExpandableCalendar(
 
 @Composable
 private fun DayOfWeekOverlayHeader(
-    headerSize: () -> IntSize,
+    headerWidth: () -> Int,
     updateHeaderSize: (IntSize) -> Unit,
     firstDayOfWeek: DayOfWeek,
     headerState: CalendarHeaderState,
@@ -173,10 +163,6 @@ private fun DayOfWeekOverlayHeader(
             .clipToBounds()
             .onSizeChanged(updateHeaderSize),
     ) {
-        // The offset is read inside `graphicsLayer`, so it is sampled at draw time: the row follows
-        // the columns frame for frame, and a scroll never triggers recomposition here. It follows
-        // whichever layout is on screen, and the month is on screen as soon as the expansion leaves
-        // its collapsed end, which is exactly when `ExpandableCalendar` starts placing it.
         DaysOfWeekTitle(
             firstDayOfWeek = firstDayOfWeek,
             modifier = Modifier.graphicsLayer {
@@ -186,16 +172,14 @@ private fun DayOfWeekOverlayHeader(
         DaysOfWeekTitle(
             firstDayOfWeek = firstDayOfWeek,
             modifier = Modifier.graphicsLayer {
-                translationX = headerState.offset(isExpanded = expansionProgress() > COLLAPSED) + headerSize().width
+                translationX = headerState.offset(isExpanded = expansionProgress() > COLLAPSED) + headerWidth()
             },
         )
     }
 }
 
-/** How many week rows of the month holding this date sit above the row holding it. */
-private fun LocalDate.weeksSinceMonthStart(firstDayOfWeek: DayOfWeek): Int {
+private fun LocalDate.weekRowsAboveCurrentRow(firstDayOfWeek: DayOfWeek): Int {
     val firstRow = yearMonth.firstDay.startOfWeek(firstDayOfWeek)
-
     return firstRow.daysUntil(startOfWeek(firstDayOfWeek)) / DAYS_IN_WEEK
 }
 

@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 internal const val COLLAPSED = 0f
 internal const val EXPANDED = 1f
@@ -76,7 +77,7 @@ class CalendarExpansionState internal constructor(initiallyExpanded: Boolean, pr
         private set
 
     private var dragRange = 0f
-    private var flickVelocity = Float.MAX_VALUE
+    private var flickVelocity: Float? = null
 
     private var settling: Job? = null
 
@@ -104,11 +105,8 @@ class CalendarExpansionState internal constructor(initiallyExpanded: Boolean, pr
     }
 
     private fun settle(velocity: Float) {
-        val expanded = when {
-            velocity <= -flickVelocity -> false
-            velocity >= flickVelocity -> true
-            else -> progress > SETTLE_THRESHOLD
-        }
+        val isFlick = flickVelocity?.let { abs(velocity) >= it } == true
+        val expanded = if (isFlick) velocity > 0f else progress > SETTLE_THRESHOLD
 
         animateTo(expanded, initialVelocity = velocity)
     }
@@ -155,7 +153,7 @@ class CalendarExpansionState internal constructor(initiallyExpanded: Boolean, pr
     }
 }
 
-fun Modifier.collapsesCalendarOnScroll(expansionState: CalendarExpansionState): Modifier {
+fun Modifier.collapseCalendarOnScroll(expansionState: CalendarExpansionState): Modifier {
     return nestedScroll(expansionState.nestedScrollConnection)
 }
 
