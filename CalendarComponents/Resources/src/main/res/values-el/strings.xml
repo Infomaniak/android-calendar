@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Προσθήκη</string>
     <string name="allDayLabel">Όλη την ημέρα</string>
+    <string name="attendees">Συμμετέχοντες</string>
     <plurals name="attendeesAcceptedCount">
         <item quantity="one">%1$d αποδεκτός</item>
         <item quantity="other">%1$d αποδεκτοί</item>
@@ -25,6 +26,18 @@
     <plurals name="attendeesCount">
         <item quantity="one">%1$d καλεσμένος</item>
         <item quantity="other">%1$d καλεσμένοι</item>
+    </plurals>
+    <plurals name="attendeesDeclinedCount">
+        <item quantity="one">%d απορρίφθηκε</item>
+        <item quantity="other">%d απορριφθέντα</item>
+    </plurals>
+    <plurals name="attendeesPendingCount">
+        <item quantity="one">%1$d σε αναμονή</item>
+        <item quantity="other">%1$d σε αναμονή</item>
+    </plurals>
+    <plurals name="attendeesTentativeCount">
+        <item quantity="one">%1$d ίσως</item>
+        <item quantity="other">%1$d ίσως</item>
     </plurals>
     <string name="availableLabel">Διαθέσιμο</string>
     <string name="buttonJoin">Εγγραφή</string>

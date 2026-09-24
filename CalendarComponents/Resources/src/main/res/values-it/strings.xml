@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Aggiungi</string>
     <string name="allDayLabel">Tutto il giorno</string>
+    <string name="attendees">Invitati</string>
     <plurals name="attendeesAcceptedCount">
         <item quantity="one">%1$d accettato</item>
         <item quantity="other">%1$d accettati</item>
@@ -25,6 +26,18 @@
     <plurals name="attendeesCount">
         <item quantity="one">%1$d invitato</item>
         <item quantity="other">%1$d invitati</item>
+    </plurals>
+    <plurals name="attendeesDeclinedCount">
+        <item quantity="one">%d rifiutato</item>
+        <item quantity="other">%d rifiutati</item>
+    </plurals>
+    <plurals name="attendeesPendingCount">
+        <item quantity="one">%1$d in attesa</item>
+        <item quantity="other">%1$d in attesa</item>
+    </plurals>
+    <plurals name="attendeesTentativeCount">
+        <item quantity="one">%1$d forse</item>
+        <item quantity="other">%1$d forse</item>
     </plurals>
     <string name="availableLabel">Disponibile</string>
     <string name="buttonJoin">Unirsi</string>

@@ -17,21 +17,26 @@
  */
 package com.infomaniak.calendar.components.foundation.models
 
+import android.os.Parcelable
+import androidx.annotation.PluralsRes
 import androidx.compose.runtime.Immutable
+import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.computeInitials
+import kotlinx.parcelize.Parcelize
 
 @Immutable
+@Parcelize
 data class AttendeeUi(
     val email: String,
     val displayName: String? = null,
     val status: ParticipationStatus,
-) {
+) : Parcelable {
     fun initials(): String = (displayName ?: email).computeInitials()
 }
 
-enum class ParticipationStatus {
-    Accepted,
-    Declined,
-    Tentative,
-    NeedsAction,
+enum class ParticipationStatus(@PluralsRes val countPluralRes: Int) {
+    Accepted(R.plurals.attendeesAcceptedCount),
+    Tentative(R.plurals.attendeesTentativeCount),
+    NeedsAction(R.plurals.attendeesPendingCount),
+    Declined(R.plurals.attendeesDeclinedCount),
 }

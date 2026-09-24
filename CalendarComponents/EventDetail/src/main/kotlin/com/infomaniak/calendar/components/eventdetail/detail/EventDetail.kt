@@ -36,7 +36,7 @@ import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
-import com.infomaniak.calendar.components.eventdetail.detail.component.AttendeesButton
+import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Calendar
 import com.infomaniak.calendar.components.eventdetail.detail.component.ClassificationStatus
 import com.infomaniak.calendar.components.eventdetail.detail.component.DateAndTime
@@ -93,7 +93,12 @@ fun EventDetail(
 
             Section(contentPadding = horizontalContentPadding) {
                 if (attendees.all.isNotEmpty()) {
-                    AttendeesButton(attendees.all, onClick = {}, contentPadding = horizontalContentPadding)
+                    AttendeesButton(
+                        attendees = attendees.all,
+                        onClick = {},
+                        contentPadding = horizontalContentPadding,
+                        modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
+                    )
                 }
 
                 if (kMeetUrl?.isNotBlank() == true) {

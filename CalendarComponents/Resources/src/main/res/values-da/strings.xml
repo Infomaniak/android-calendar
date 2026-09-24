@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Tilføj</string>
     <string name="allDayLabel">Hele dagen</string>
+    <string name="attendees">Deltagere</string>
     <plurals name="attendeesAcceptedCount">
         <item quantity="one">%1$d accepteret</item>
         <item quantity="other">%1$d accepterede</item>
@@ -25,6 +26,18 @@
     <plurals name="attendeesCount">
         <item quantity="one">%1$d gæst</item>
         <item quantity="other">%1$d gæster</item>
+    </plurals>
+    <plurals name="attendeesDeclinedCount">
+        <item quantity="one">%d afvist</item>
+        <item quantity="other">%d afviste</item>
+    </plurals>
+    <plurals name="attendeesPendingCount">
+        <item quantity="one">%1$d afventende</item>
+        <item quantity="other">%1$d afventende</item>
+    </plurals>
+    <plurals name="attendeesTentativeCount">
+        <item quantity="one">%1$d måske</item>
+        <item quantity="other">%1$d måske</item>
     </plurals>
     <string name="availableLabel">Ledig</string>
     <string name="buttonJoin">Tilmeld dig</string>
