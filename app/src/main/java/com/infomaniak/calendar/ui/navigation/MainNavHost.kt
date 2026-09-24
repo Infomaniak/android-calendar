@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
@@ -138,9 +139,10 @@ private fun baseEntryProvider(
     }
 }
 
+@Composable
 private fun sceneStrategies(windowSizeClass: WindowSizeClass): List<SceneStrategy<NavKey>> {
-    val dialogStrategy = ResponsiveDialogSceneStrategy<NavKey>(windowSizeClass)
-    return listOf(dialogStrategy)
+    // ResponsiveDialogSceneStrategy holds the scene of the ongoing dialog, it must survive recompositions.
+    return remember(windowSizeClass) { listOf(ResponsiveDialogSceneStrategy<NavKey>(windowSizeClass)) }
 }
 
 private fun sceneDecoratorStrategies(
