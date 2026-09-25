@@ -18,8 +18,10 @@
 package com.infomaniak.calendar.components.eventdetail.models
 
 import androidx.compose.ui.graphics.Color
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 
 data class EventDraft(
     val title: String,
     val color: Color,
+    val attendees: List<AttendeeUi>,
 )

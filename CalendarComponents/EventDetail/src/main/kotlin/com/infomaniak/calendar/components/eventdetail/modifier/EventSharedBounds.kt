@@ -78,6 +78,7 @@ internal fun ProvideEventSharedTransition(
 
 internal enum class EventSharedElement {
     Title,
+    Attendees,
 }
 
 private data class EventSharedTransition(

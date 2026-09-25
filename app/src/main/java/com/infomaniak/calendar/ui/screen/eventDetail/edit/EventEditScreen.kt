@@ -56,6 +56,7 @@ fun EventEditScreen(
                 calendars = eventFormCalendars?.calendars ?: emptyList(),
                 initialCalendar = eventFormCalendars?.initialCalendar,
                 initialText = eventDetailUiState.eventDetail.title,
+                initialAttendees = eventDetailUiState.eventDetail.attendees.all,
             ),
         )
         EventDetailUiState.Unavailable -> EventEditScreenState.Unavailable
@@ -91,6 +92,7 @@ private fun EventEditScreen(
             EventEditScreenState.Loading -> Unit
             is EventEditScreenState.Success -> EventForm(
                 state = uiState.eventFormState,
+                onAttendeesClick = { /*TODO[eventForm]*/ },
                 modifier = modifier,
                 contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                 sharedTransitionScope = sharedTransitionScope,

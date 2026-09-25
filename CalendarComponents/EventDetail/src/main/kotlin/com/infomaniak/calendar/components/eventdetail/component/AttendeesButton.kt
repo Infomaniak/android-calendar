@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.detail.component
+package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -34,16 +34,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.infomaniak.calendar.components.eventdetail.detail.component.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.previewAttendees
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
-import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
+import com.infomaniak.calendar.components.foundation.models.ParticipationStatus.Accepted
+import com.infomaniak.calendar.components.foundation.models.ParticipationStatus.Declined
+import com.infomaniak.calendar.components.foundation.models.ParticipationStatus.NeedsAction
+import com.infomaniak.calendar.components.foundation.models.ParticipationStatus.Tentative
 import com.infomaniak.calendar.components.foundation.utils.fromAttendee
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.components.Avatar
@@ -65,10 +71,15 @@ internal fun AttendeesButton(
         contentPadding = contentPadding,
         onClick = onClick,
         leadingIconRes = R.drawable.ic_users_stacked,
-        text = pluralStringResource(R.plurals.attendeesCount, attendees.size, attendees.size),
-        supportingContent = {
-            val acceptedCount = attendees.count { it.status == ParticipationStatus.Accepted }
-            Text(text = pluralStringResource(R.plurals.attendeesAcceptedCount, acceptedCount, acceptedCount))
+        text = if (attendees.isEmpty()) {
+            stringResource(R.string.attendees)
+        } else {
+            pluralStringResource(R.plurals.attendeesCount, attendees.size, attendees.size)
+        },
+        supportingContent = if (attendees.isEmpty()) {
+            null
+        } else {
+            { Text(text = participationSummary(attendees)) }
         },
         trailingContent = {
             Row(horizontalArrangement = Arrangement.spacedBy(Margin.Mini), verticalAlignment = Alignment.CenterVertically) {
@@ -78,6 +89,19 @@ internal fun AttendeesButton(
         },
         modifier = modifier,
     )
+}
+
+private val participationSummaryOrder = listOf(Accepted, Tentative, NeedsAction, Declined)
+
+@Composable
+@ReadOnlyComposable
+private fun participationSummary(attendees: List<AttendeeUi>): String {
+    val countByStatus = attendees.groupingBy { it.status }.eachCount()
+
+    return participationSummaryOrder.mapNotNull { status ->
+        val count = countByStatus[status] ?: return@mapNotNull null
+        pluralStringResource(status.countPluralRes, count, count)
+    }.joinToString(", ")
 }
 
 @Composable
@@ -120,6 +144,16 @@ private fun PreviewAttendeesButton() {
     MaterialTheme {
         Surface {
             AttendeesButton(previewAttendees, onClick = {})
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewEmptyList() {
+    MaterialTheme {
+        Surface {
+            AttendeesButton(emptyList(), onClick = {})
         }
     }
 }
