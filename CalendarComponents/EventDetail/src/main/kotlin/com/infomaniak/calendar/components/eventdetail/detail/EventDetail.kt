@@ -67,6 +67,7 @@ fun EventDetail(
     onJoinKMeet: () -> Unit,
     onCopyKMeet: () -> Unit,
     onLocationClick: () -> Unit,
+    goToEventAttendees: () -> Unit,
     onRoomClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
@@ -90,7 +91,7 @@ fun EventDetail(
 
             Section(contentPadding = horizontalContentPadding) {
                 if (attendees.all.isNotEmpty()) {
-                    AttendeesButton(attendees.all, onClick = {}, contentPadding = horizontalContentPadding)
+                    AttendeesButton(attendees.all, onClick = goToEventAttendees, contentPadding = horizontalContentPadding)
                 }
 
                 if (kMeetUrl?.isNotBlank() == true) {
@@ -130,6 +131,14 @@ fun EventDetail(
                 }
 
                 Calendar(calendarColor, calendarName, modifier = Modifier.padding(horizontalContentPadding))
+            }
+
+            Section(contentPadding = horizontalContentPadding) {
+                OccupiedStatus(isOccupied, modifier = Modifier.padding(horizontalContentPadding))
+
+                if (classification != null) {
+                    ClassificationStatus(classification, modifier = Modifier.padding(horizontalContentPadding))
+                }
             }
         }
     }
@@ -176,6 +185,7 @@ private fun PreviewEventDetail() {
                         onCopyKMeet = {},
                         onLocationClick = {},
                         onRoomClick = {},
+                        goToEventAttendees = {},
                         contentPadding = PaddingValues(horizontal = Margin.Small) + it,
                     )
                 }

@@ -15,24 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.foundation.models
+package com.infomaniak.calendar.components.attendeessearch.preview
 
-import androidx.compose.runtime.Immutable
-import com.infomaniak.core.avatar.computeInitials
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 
-@Immutable
-data class AttendeeUi(
-    val email: String,
-    val displayName: String? = null,
-    val status: ParticipationStatus,
-    val isOrganizer: Boolean = false,
-) {
-    fun initials(): String = (displayName ?: email).computeInitials()
-}
-
-enum class ParticipationStatus {
-    Accepted,
-    Declined,
-    Tentative,
-    NeedsAction,
-}
+val previewAttendees = listOf(
+    AttendeeUi(
+        email = "alice@example.com",
+        displayName = "Alice Johnson",
+        isOrganizer = true,
+        status = ParticipationStatus.Accepted,
+    ),
+    AttendeeUi(
+        email = "bob@example.com",
+        displayName = "Bob Smith",
+        status = ParticipationStatus.Tentative,
+    ),
+    AttendeeUi(
+        email = "charlie@example.com",
+        displayName = "Charlie Brown",
+        status = ParticipationStatus.Declined,
+    ),
+)

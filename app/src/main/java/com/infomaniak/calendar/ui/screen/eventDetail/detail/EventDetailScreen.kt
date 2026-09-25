@@ -64,6 +64,7 @@ fun EventDetailScreen(
     occurrenceId: OccurrenceId,
     goBack: () -> Unit,
     goToEdit: () -> Unit,
+    goToEventAttendees: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),
 ) {
@@ -81,6 +82,7 @@ fun EventDetailScreen(
         goBack = goBack,
         goToEdit = goToEdit,
         onLocationClick = { location -> openLocationInMapApp(context, location) },
+        goToEventAttendees = goToEventAttendees,
         modifier = modifier,
     )
 }
@@ -90,6 +92,7 @@ private fun EventDetailScreen(
     uiState: () -> EventDetailUiState,
     goBack: () -> Unit,
     goToEdit: () -> Unit,
+    goToEventAttendees: () -> Unit,
     onLocationClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -123,6 +126,7 @@ private fun EventDetailScreen(
                         onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
                         onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
                         onRoomClick = { /*TODO[eventDetail]*/ },
+                        goToEventAttendees = { goToEventAttendees() },
                         contentPadding = scaffoldContentPadding + Dimens.EventDetailScreensHorizontalPadding,
                         sharedTransitionScope = sharedTransitionScope,
                         animatedVisibilityScope = animatedVisibilityScope,
@@ -171,6 +175,7 @@ private fun Preview() {
                 uiState = { EventDetailUiState.Success(previewEventDetail) },
                 goBack = {},
                 goToEdit = {},
+                goToEventAttendees = {},
                 onLocationClick = {},
             )
         }

@@ -144,6 +144,7 @@ dependencies {
     implementation(project(":CalendarComponents:Calendar"))
     implementation(project(":CalendarComponents:Day"))
     implementation(project(":CalendarComponents:EventDetail"))
+    implementation(project(":CalendarComponents:AttendeesSearch"))
     implementation(project(":CalendarComponents:Planning"))
     implementation(project(":CalendarComponents:Foundation"))
     implementation(project(":CalendarComponents:Resources"))

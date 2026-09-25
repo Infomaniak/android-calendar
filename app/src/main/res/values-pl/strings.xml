@@ -18,6 +18,8 @@
 <resources>
     <string name="accountsTitle">Konta</string>
     <string name="addAccount">Dodaj konto</string>
+    <string name="attendeesSearchTitle">Dodaj gości</string>
+    <string name="attendeesTitle">Goście</string>
     <string name="buttonLogOut">Wyloguj się</string>
     <string name="contentDescriptionBack">Wstecz</string>
     <string name="contentDescriptionInbox">Otwórz skrzynkę odbiorczą</string>
@@ -28,10 +30,16 @@
     <string name="helpTitle">Pomoc</string>
     <string name="monthTitle">Miesiąc</string>
     <string name="planningTitle">Planowanie</string>
+    <string name="searchForAttendees">Wyszukiwanie gości</string>
+    <string name="sectionOrganizerHeader">Organizator</string>
     <string name="settingsTitle">Ustawienia</string>
     <string name="signOutAccountAlertConfirm">Wyloguj się z konta</string>
     <string name="signOutAccountAlertDescription">To konto oraz powiązane z nim kalendarze zostaną odłączone od aplikacji „Kalendarz”. Będą one nadal dostępne na Twoim koncie internetowym Infomaniak.</string>
     <string name="signOutAccountAlertTitle">Wyloguj się z konta „%s“</string>
+    <string name="statusAcceptedLabel">Zaakceptowano</string>
+    <string name="statusDeclinedLabel">Odrzucono</string>
+    <string name="statusNeedsActionLabel">W toku</string>
+    <string name="statusTentativeLabel">Może</string>
     <string name="syncEventsError">Błąd podczas pobierania wydarzeń</string>
     <string name="threeDaysTitle">Trzy dni</string>
     <string name="weekTitle">Tydzień</string>

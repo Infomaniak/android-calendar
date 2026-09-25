@@ -18,6 +18,8 @@
 <resources>
     <string name="accountsTitle">Kontoer</string>
     <string name="addAccount">Legg til en konto</string>
+    <string name="attendeesSearchTitle">Legg til gjester</string>
+    <string name="attendeesTitle">Gjester</string>
     <string name="buttonLogOut">Logg ut</string>
     <string name="contentDescriptionBack">Tilbake</string>
     <string name="contentDescriptionInbox">Åpne innboksen</string>
@@ -28,10 +30,16 @@
     <string name="helpTitle">Hjelp</string>
     <string name="monthTitle">Måned</string>
     <string name="planningTitle">Planlegging</string>
+    <string name="searchForAttendees">Søk etter gjester</string>
+    <string name="sectionOrganizerHeader">Arrangør</string>
     <string name="settingsTitle">Innstillinger</string>
     <string name="signOutAccountAlertConfirm">Logg ut av kontoen</string>
     <string name="signOutAccountAlertDescription">Denne kontoen og de tilknyttede kalenderne vil bli koblet fra «Kalender»-appen. De vil fortsatt være tilgjengelige i din Infomaniak-nettkonto.</string>
     <string name="signOutAccountAlertTitle">Logg ut av kontoen «%s»</string>
+    <string name="statusAcceptedLabel">Godkjent</string>
+    <string name="statusDeclinedLabel">Avvist</string>
+    <string name="statusNeedsActionLabel">Under behandling</string>
+    <string name="statusTentativeLabel">Kanskje</string>
     <string name="syncEventsError">Feil ved henting av hendelser</string>
     <string name="threeDaysTitle">Tre dager</string>
     <string name="weekTitle">Uke</string>
