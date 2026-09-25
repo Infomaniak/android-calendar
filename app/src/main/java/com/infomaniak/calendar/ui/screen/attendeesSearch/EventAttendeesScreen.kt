@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.attendeesSearch
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -95,6 +96,8 @@ fun EventAttendeesScreen(
                 .fillMaxWidth(),
             searchQuery = { attendeesState.searchQuery },
             onSearchQueryChanged = attendeesState::onSearchQueryChanged,
+            onRemoveAttendee = { attendeeMail ->
+                attendeesState.removeAttendee(attendeeMail) }
         )
     }
 }

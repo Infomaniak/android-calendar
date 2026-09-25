@@ -34,6 +34,7 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 @Composable
 fun AttendeesList(
     attendees: () -> List<AttendeeUi>,
+    onRemoveAttendee: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -46,7 +47,7 @@ fun AttendeesList(
             items = attendees(),
             key = { attendee -> attendee.email }, // TODO: change to attendee.key when kmp adds it
         ) { attendee ->
-            EventAttendee(attendee = attendee)
+            EventAttendee(attendee = attendee, onRemove = onRemoveAttendee)
         }
     }
 }
@@ -56,5 +57,6 @@ fun AttendeesList(
 private fun AttendeesListPreview() {
     AttendeesList(
         attendees = { previewAttendees },
+        onRemoveAttendee = {},
     )
 }

@@ -29,16 +29,18 @@ import java.util.Locale
 
 @Stable
 class AttendeesState(
-    private val attendees: List<AttendeeUi>,
+    attendees: List<AttendeeUi>,
     private val contacts: List<AttendeeUi>,
 ) {
+    private var attendeesList by mutableStateOf(attendees)
+
     var searchQuery by mutableStateOf("")
         private set
 
     val searchResults by derivedStateOf {
         val query = searchQuery.trim()
         if (query.isEmpty()) {
-            attendees
+            attendeesList
         } else {
             contacts.filter { it.matchesQuery(query) }
         }
@@ -53,6 +55,10 @@ class AttendeesState(
         return sequenceOf(email, displayName)
             .filterNotNull()
             .any { value -> value.lowercase(Locale.ROOT).contains(normalizedQuery) }
+    }
+
+    fun removeAttendee(attendeeMail: String) {
+        attendeesList = attendeesList.filterNot { it.email == attendeeMail }
     }
 }
 

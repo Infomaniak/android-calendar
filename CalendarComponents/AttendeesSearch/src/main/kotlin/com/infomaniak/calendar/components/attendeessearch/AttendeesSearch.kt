@@ -36,6 +36,7 @@ fun AttendeesSearch(
     attendees: () -> List<AttendeeUi>,
     searchQuery: () -> String,
     onSearchQueryChanged: (String) -> Unit,
+    onRemoveAttendee: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
@@ -46,7 +47,7 @@ fun AttendeesSearch(
         if (attendees().isEmpty()) {
             EmptyState(text = stringResource(R.string.attendeesEmptyState))
         } else {
-            AttendeesList(attendees)
+            AttendeesList(attendees, onRemoveAttendee)
         }
     }
 }
@@ -60,6 +61,7 @@ private fun Preview() {
                 attendees = { previewAttendees },
                 searchQuery = { "" },
                 onSearchQueryChanged = {},
+                onRemoveAttendee = {},
             )
         }
     }
@@ -74,6 +76,7 @@ private fun PreviewEmptyState() {
                 attendees = { listOf() },
                 searchQuery = { "" },
                 onSearchQueryChanged = {},
+                onRemoveAttendee = {},
             )
         }
     }

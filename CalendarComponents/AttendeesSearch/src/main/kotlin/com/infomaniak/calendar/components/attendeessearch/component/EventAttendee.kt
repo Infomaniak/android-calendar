@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,7 +48,7 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
 
 @Composable
-fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
+fun EventAttendee(attendee: AttendeeUi, onRemove: (String) -> Unit, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .padding(start = EsdsTheme.spacing.lg),
@@ -58,7 +61,7 @@ fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
                 .size(40.dp),
         )
         ListItem(
-            modifier = Modifier,
+            modifier = Modifier.weight(1f),
             colors = ListItemDefaults.colors(
                 containerColor = Color.Transparent,
             ),
@@ -86,6 +89,17 @@ fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
                 }
             },
         )
+        IconButton(
+            onClick = { onRemove(attendee.email) },
+            modifier = Modifier.padding(end = EsdsTheme.spacing.lg),
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.cross),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                contentDescription = null,
+            )
+        }
+
     }
 }
 
@@ -153,7 +167,10 @@ fun ParticipationStatusText(text: String, color: Color, isOrganizer: Boolean, mo
 @Composable
 private fun PreviewAttendeeAccepted() {
     Surface() {
-        EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted, true))
+        EventAttendee(
+            AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted, true),
+            onRemove = {},
+        )
     }
 }
 
@@ -161,7 +178,10 @@ private fun PreviewAttendeeAccepted() {
 @Composable
 private fun PreviewAttendeeDeclined() {
     Surface() {
-        EventAttendee(AttendeeUi("alice@example.com", null, ParticipationStatus.Declined))
+        EventAttendee(
+            AttendeeUi("alice@example.com", null, ParticipationStatus.Declined),
+            onRemove = { },
+        )
     }
 }
 
@@ -169,7 +189,10 @@ private fun PreviewAttendeeDeclined() {
 @Composable
 private fun PreviewAttendeeMaybe() {
     Surface() {
-        EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Tentative))
+        EventAttendee(
+            AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Tentative),
+            onRemove = { },
+        )
     }
 }
 
@@ -177,7 +200,10 @@ private fun PreviewAttendeeMaybe() {
 @Composable
 private fun PreviewAttendeePending() {
     Surface() {
-        EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.NeedsAction))
+        EventAttendee(
+            AttendeeUi("alice@example.com", "Alice", ParticipationStatus.NeedsAction),
+            onRemove = { },
+        )
     }
 }
 
