@@ -61,6 +61,7 @@
         <item quantity="one">%d timme</item>
         <item quantity="other">%d timmar</item>
     </plurals>
+    <string name="kMeetMeeting">kMeet-möte</string>
     <plurals name="minuteAmount">
         <item quantity="one">%d minut</item>
         <item quantity="other">%d minuter</item>

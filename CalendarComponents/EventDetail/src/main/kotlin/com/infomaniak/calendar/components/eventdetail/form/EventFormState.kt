@@ -35,12 +35,14 @@ class EventFormState(
     val titleTextState: TextFieldState,
     val colorState: MutableState<Color?>,
     val attendeesState: MutableState<List<AttendeeUi>>,
+    val kMeetUrlState: MutableState<String?>,
     val calendars: List<EventDetailCalendar>,
 ) {
     fun toEventDraft(): EventDraft? = EventDraft(
         title = titleTextState.text.toString(),
         color = colorState.value ?: return null,
         attendees = attendeesState.value,
+        kMeetUrl = kMeetUrlState.value,
     )
 }
 
@@ -50,15 +52,15 @@ fun rememberSaveableEventFormState(
     initialCalendar: EventDetailCalendar?,
     initialText: String = "",
     initialAttendees: List<AttendeeUi> = emptyList(),
+    initialKMeetUrl: String? = null,
 ): EventFormState {
-    val textFieldState = rememberTextFieldState(initialText)
     val colorState = rememberSaveable(initialCalendar == null, stateSaver = ColorSaver) { mutableStateOf(initialCalendar?.color) }
-    val attendeesState = rememberSaveable { mutableStateOf(initialAttendees) }
 
     return EventFormState(
-        titleTextState = textFieldState,
+        titleTextState = rememberTextFieldState(initialText),
         colorState = colorState,
-        attendeesState = attendeesState,
+        attendeesState = rememberSaveable { mutableStateOf(initialAttendees) },
+        kMeetUrlState = rememberSaveable { mutableStateOf(initialKMeetUrl) },
         calendars = calendars,
     )
 }

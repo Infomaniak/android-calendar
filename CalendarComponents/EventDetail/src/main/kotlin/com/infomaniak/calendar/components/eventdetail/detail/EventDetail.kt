@@ -34,14 +34,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
+import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
+import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
-import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Calendar
 import com.infomaniak.calendar.components.eventdetail.detail.component.ClassificationStatus
 import com.infomaniak.calendar.components.eventdetail.detail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
-import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
 import com.infomaniak.calendar.components.eventdetail.detail.component.OccupiedStatus
@@ -105,7 +105,9 @@ fun EventDetail(
                     KMeetButton(
                         onJoin = onJoinKMeet,
                         onCopy = onCopyKMeet,
-                        modifier = Modifier.padding(horizontalContentPadding),
+                        modifier = Modifier
+                            .padding(horizontalContentPadding)
+                            .eventSharedElement(EventSharedElement.KMeet),
                     )
                 }
 

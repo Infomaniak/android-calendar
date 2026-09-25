@@ -61,6 +61,7 @@
         <item quantity="one">%d ώρα</item>
         <item quantity="other">%d ώρες</item>
     </plurals>
+    <string name="kMeetMeeting">Συνάντηση kMeet</string>
     <plurals name="minuteAmount">
         <item quantity="one">%d λεπτό</item>
         <item quantity="other">%d λεπτά</item>

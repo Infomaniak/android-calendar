@@ -28,6 +28,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
@@ -51,9 +52,7 @@ internal fun KMeetButton(
     modifier: Modifier = Modifier,
 ) {
     ListItem(
-        content = {
-            Text(stringResource(id = R.string.participateKMeetTitle), style = MaterialTheme.typography.bodyLarge)
-        },
+        content = { Text(stringResource(id = R.string.participateKMeetTitle)) },
         leadingContent = {
             Icon(
                 painter = painterResource(R.drawable.ic_product_kmeet),
@@ -70,6 +69,26 @@ internal fun KMeetButton(
                 CopyButton(onClick = onCopy)
             }
         },
+        modifier = modifier,
+    )
+}
+
+@Composable
+internal fun KMeetButtonSwitch(
+    checked: () -> Boolean,
+    onToggle: (isChecked: Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    ListItem(
+        content = { Text(stringResource(id = R.string.kMeetMeeting)) },
+        leadingContent = {
+            Icon(
+                painter = painterResource(R.drawable.ic_product_kmeet),
+                contentDescription = null,
+                modifier = Modifier.size(EsdsTheme.icon.sizeSm),
+            )
+        },
+        trailingContent = { Switch(checked = checked(), onCheckedChange = onToggle) },
         modifier = modifier,
     )
 }
@@ -100,6 +119,16 @@ private fun PreviewKMeetButton() {
     MaterialTheme {
         Surface {
             KMeetButton(onJoin = {}, onCopy = {})
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewKMeetButtonSwitch() {
+    MaterialTheme {
+        Surface {
+            KMeetButtonSwitch(checked = { true }, onToggle = {})
         }
     }
 }

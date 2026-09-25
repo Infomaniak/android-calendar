@@ -24,4 +24,5 @@ data class EventDraft(
     val title: String,
     val color: Color,
     val attendees: List<AttendeeUi>,
+    val kMeetUrl: String?,
 )
