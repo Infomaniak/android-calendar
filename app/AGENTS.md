@@ -221,6 +221,10 @@ fun MyComponent(
 - **Theming**: Wrap content in `CalendarTheme`. Add new tokens to `ui/theme/Color.kt`, `Type.kt`, and `Theme.kt`.
 - **Edge-to-edge & insets**: Honor `Scaffold` inner padding (see `Modifier.padding(innerPadding)`); do not hardcode
   system bar insets.
+- **Overlaid top bars**: A screen whose content scrolls behind its top bar uses `OverlaidTopBarScaffold`
+  (`ui/component/`) instead of `Scaffold`. It has the same shape as a `Scaffold`, and owns the details that go with
+  overlaying: the top bar is drawn over the content and keeps the top window insets, and the content padding it hands
+  out already includes the measured top bar height. Do not re-implement that per screen.
 
 ### Testing
 

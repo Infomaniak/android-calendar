@@ -18,15 +18,29 @@
 package com.infomaniak.calendar.components.day
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.component.AllDayEventsBand
 import com.infomaniak.calendar.components.day.component.DayHeader
+import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults.DividerHeight
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
@@ -34,6 +48,7 @@ import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.core.common.utils.today
+import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
@@ -50,29 +65,51 @@ fun DayView(
     weekNumbering: WeekNumbering,
     onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
+    headerModifier: Modifier = Modifier,
+    timelineModifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
     headerTrailingContent: @Composable () -> Unit = {},
 ) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md)) {
-        DayHeader(
-            date = date,
-            weekNumbering = weekNumbering,
-            trailing = headerTrailingContent,
-            modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md),
-        )
+    val density = LocalDensity.current
+    var headerHeight by remember { mutableStateOf(0.dp) }
+    val dayPadding = contentPadding + PaddingValues(horizontal = EsdsTheme.spacing.md)
 
-        AllDayEventsBand(
-            events = events.allDay,
-            onEventClick = onEventClick,
-            modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md),
-        )
-
+    Box(modifier = modifier) {
         DayTimeline(
             date = date,
             events = events,
             state = state,
             onEventClick = onEventClick,
-            modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md),
+            contentPadding = dayPadding + PaddingValues(top = headerHeight + EsdsTheme.spacing.md),
+            modifier = timelineModifier.fillMaxSize(),
         )
+
+        Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = contentPadding.calculateTopPadding())
+                    .padding(paddingValues = contentPadding.onlyHorizontal())
+                    .onSizeChanged { headerHeight = with(density) { it.height.toDp() } }
+                    .then(headerModifier),
+            ) {
+                DayHeader(
+                    date = date,
+                    weekNumbering = weekNumbering,
+                    trailing = headerTrailingContent,
+                    modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md),
+                )
+
+                AllDayEventsBand(
+                    events = events.allDay,
+                    onEventClick = onEventClick,
+                    modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md),
+                )
+            }
+
+            HorizontalDivider(thickness = DividerHeight)
+        }
     }
 }
 

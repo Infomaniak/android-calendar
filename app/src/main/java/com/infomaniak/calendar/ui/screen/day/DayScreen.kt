@@ -18,13 +18,12 @@
 package com.infomaniak.calendar.ui.screen.day
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -47,14 +46,19 @@ import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
-import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.model.occurrenceId
+import com.infomaniak.calendar.ui.modifier.backgroundBlur
+import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.datetime.DateTimeUnit
@@ -143,13 +147,15 @@ private fun DayScreen(
 ) {
     var isCalendarExpanded by rememberSaveable { mutableStateOf(false) }
 
-    Scaffold(
+    val hazeState = rememberHazeState()
+
+    OverlaidTopBarScaffold(
         topBar = {
             CalendarTopAppBar(
                 isLoadingEvents = isLoadingEvents,
                 onToggleCalendar = { isCalendarExpanded = !isCalendarExpanded },
                 isCalendarExpanded = { isCalendarExpanded },
-                hazeState = null,
+                hazeState = hazeState,
                 calendar = {
                     ExpandableCalendar(
                         isExpanded = { isCalendarExpanded },
@@ -161,17 +167,20 @@ private fun DayScreen(
                 },
             )
         },
-        // The bottom insets stay out so the timeline can run under the navigation bar; it makes
-        // room for it in its own scrolled content instead.
-        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
         modifier = modifier,
-    ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
-            when (val state = dayUiState()) {
-                is DayUiState.Loading -> LoadingDay()
-                is DayUiState.Success -> {
-                    SuccessDay(visibleDayState, timelineState, dateRange, state.eventsByDate, goToEventDetail)
-                }
+    ) { contentPadding ->
+        when (val state = dayUiState()) {
+            is DayUiState.Loading -> LoadingDay(modifier = Modifier.padding(contentPadding))
+            is DayUiState.Success -> {
+                SuccessDay(
+                    visibleDayState = visibleDayState,
+                    timelineState = timelineState,
+                    dateRange = dateRange,
+                    eventsByDate = state.eventsByDate,
+                    goToEventDetail = goToEventDetail,
+                    hazeState = hazeState,
+                    contentPadding = contentPadding,
+                )
             }
         }
     }
@@ -184,6 +193,8 @@ private fun SuccessDay(
     dateRange: ClosedRange<LocalDate>,
     eventsByDate: () -> DayEventsByDate,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
+    hazeState: HazeState,
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
     DayPager(
@@ -194,6 +205,9 @@ private fun SuccessDay(
         weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
         onVisibleDateChanged = { visibleDayState.onVisibleDateChanged(it) },
         onEventClick = { goToEventDetail(it.occurrenceId) },
+        headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
+        timelineModifier = Modifier.hazeSource(hazeState),
+        contentPadding = contentPadding,
         modifier = modifier.fillMaxSize(),
     )
 }

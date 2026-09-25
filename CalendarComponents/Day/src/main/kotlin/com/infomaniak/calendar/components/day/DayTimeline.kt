@@ -19,6 +19,7 @@ package com.infomaniak.calendar.components.day
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -48,6 +49,7 @@ import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
 import com.infomaniak.core.common.utils.today
+import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlin.time.Clock
@@ -65,10 +67,15 @@ fun DayTimeline(
     state: DayTimelineState,
     onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     val currentDateTime by rememberCurrentDateTime()
 
-    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+    BoxWithConstraints(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(contentPadding.onlyHorizontal()),
+    ) {
         val density = LocalDensity.current
         val config = eventLayoutConfig()
         // The solver strips horizontalSpacing off the end of every card, so the area runs that far
@@ -93,7 +100,10 @@ fun DayTimeline(
         Box(
             modifier = Modifier
                 .verticalScroll(state.scrollState, enabled = !state.isPinching)
-                .padding(top = HourLabelOverhang, bottom = DayTimelineDefaults.BottomPadding + navigationBarPadding)
+                .padding(
+                    top = HourLabelOverhang + contentPadding.calculateTopPadding(),
+                    bottom = DayTimelineDefaults.BottomPadding + navigationBarPadding + contentPadding.calculateBottomPadding(),
+                )
                 // Inside the padding: a pinch reads its own y as an hour, so it has to start
                 // counting where the first hour line is drawn, not where the padding begins.
                 .pinchToZoom(state),
