@@ -17,6 +17,11 @@
  */
 package com.infomaniak.calendar.components.calendar.component
 
+import android.util.Log
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -55,10 +60,9 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.lerp
-import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.component.DayCircle
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
+import com.infomaniak.calendar.components.foundation.state.DateState
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatFullDateWithYear
 import com.infomaniak.calendar.components.resources.R
@@ -94,16 +98,8 @@ internal fun Day(
     val stateDescriptionToday = if (dateState == DateState.Today) stringResource(R.string.contentDescriptionToday) else null
     val interactionSource = remember { MutableInteractionSource() }
 
-    val isNotMonth = dateState == DateState.NotMonth
-    val drawnState = if (isNotMonth) DateState.None else dateState
-
     Box(
         modifier = modifier
-            .fadeToNotMonth(
-                isNotMonth = isNotMonth,
-                notMonthAlpha = DateState.NotMonth.contentColor().alpha,
-                fraction = notMonthFraction,
-            )
             .fillMaxWidth()
             .height(LocalViewConfiguration.current.minimumTouchTargetSize.height)
             .clickable(
@@ -119,52 +115,71 @@ internal fun Day(
             .padding(Margin.Micro),
         contentAlignment = Alignment.Center,
     ) {
-        DayCircle(
-            state = drawnState,
-            modifier = Modifier
-                .fillMaxHeight()
-                .then(
-                    if (dateState == DateState.Selected || dateState == DateState.Today) Modifier.aspectRatio(
-                        1f,
-                        matchHeightConstraintsFirst = true,
-                    ) else Modifier,
-                ),
-
-            ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                Spacer(modifier = Modifier.height(DOT_SIZE))
-                Text(text = date.day.toString())
-
-                if (drawnState == DateState.None) {
-                    EventDots(
-                        dots = dotsFor(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = Margin.Micro)
-                            .fadeOutDots(isNotMonth, notMonthFraction),
-                    )
-                } else {
-                    Spacer(modifier = Modifier.height(DOT_SIZE))
-                }
+        AnimatedContent(
+            targetState = dateState,
+            transitionSpec = { fadeIn() togetherWith fadeOut() },
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize(),
+        ) { state ->
+            if (state == DateState.NotMonth) {
+                DayCircleContent(
+                    date = date,
+                    dateState = DateState.NotMonth,
+                    dotsFor = dotsFor,
+                    modifier = Modifier.graphicsLayer { alpha = notMonthFraction() },
+                )
+                DayCircleContent(
+                    date = date,
+                    dateState = DateState.None,
+                    dotsFor = dotsFor,
+                    modifier = Modifier.graphicsLayer { alpha = 1f - notMonthFraction() },
+                )
+            } else {
+                DayCircleContent(date = date, dateState = state, dotsFor = dotsFor)
             }
         }
     }
 }
 
-private fun Modifier.fadeToNotMonth(isNotMonth: Boolean, notMonthAlpha: Float, fraction: () -> Float): Modifier {
-    if (!isNotMonth) return this
+@Composable
+private fun DayCircleContent(
+    date: LocalDate,
+    dateState: DateState,
+    dotsFor: () -> List<EventColorsUi>,
+    modifier: Modifier = Modifier,
+) {
+    DayCircle(
+        state = dateState,
+        modifier = modifier
+            .fillMaxHeight()
+            .then(
+                if (dateState == DateState.Selected || dateState == DateState.Today) {
+                    Modifier.aspectRatio(1f, matchHeightConstraintsFirst = true)
+                } else {
+                    Modifier
+                },
+            ),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Spacer(modifier = Modifier.height(DOT_SIZE))
+            Text(text = date.day.toString())
 
-    return graphicsLayer { alpha = lerp(1f, notMonthAlpha, fraction()) }
-}
-
-private fun Modifier.fadeOutDots(isNotMonth: Boolean, fraction: () -> Float): Modifier {
-    if (!isNotMonth) return this
-
-    return graphicsLayer { alpha = 1f - fraction() }
+            if (dateState.showDots) {
+                EventDots(
+                    dots = dotsFor(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = Margin.Micro),
+                )
+            } else {
+                Spacer(modifier = Modifier.height(DOT_SIZE))
+            }
+        }
+    }
 }
 
 @Composable

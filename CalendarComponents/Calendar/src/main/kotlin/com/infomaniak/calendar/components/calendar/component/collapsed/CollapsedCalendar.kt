@@ -30,9 +30,9 @@ import com.infomaniak.calendar.components.calendar.component.collapsed.rememberW
 import com.infomaniak.calendar.components.calendar.modifier.FollowExternalSelection
 import com.infomaniak.calendar.components.calendar.modifier.SyncHeaderOffset
 import com.infomaniak.calendar.components.calendar.modifier.pagedSwipe
-import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.calendar.components.foundation.state.DateState
 import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.calendar.components.foundation.utils.startOfWeek
 import com.infomaniak.core.common.utils.today

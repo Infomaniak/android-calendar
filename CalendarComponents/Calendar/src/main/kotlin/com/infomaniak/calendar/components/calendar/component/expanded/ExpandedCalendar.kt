@@ -34,9 +34,9 @@ import com.infomaniak.calendar.components.calendar.component.rememberCalendarHea
 import com.infomaniak.calendar.components.calendar.modifier.FollowExternalSelection
 import com.infomaniak.calendar.components.calendar.modifier.SyncHeaderOffset
 import com.infomaniak.calendar.components.calendar.modifier.pagedSwipe
-import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.calendar.components.foundation.state.DateState
 import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.core.common.utils.today
 import com.kizitonwose.calendar.compose.HorizontalCalendar
