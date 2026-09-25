@@ -33,9 +33,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.foundation.state.DateState
 
 @Composable
 fun DayCircle(
@@ -53,33 +53,6 @@ fun DayCircle(
             content()
         }
     }
-}
-
-enum class DateState(
-    val containerColor: @Composable () -> Color,
-    val contentColor: @Composable () -> Color,
-    val borderColor: @Composable () -> Color,
-) {
-    Today(
-        containerColor = { Color.Transparent },
-        contentColor = { MaterialTheme.colorScheme.primary },
-        borderColor = { MaterialTheme.colorScheme.primary },
-    ),
-    Selected(
-        containerColor = { MaterialTheme.colorScheme.primary },
-        contentColor = { MaterialTheme.colorScheme.onPrimary },
-        borderColor = { Color.Transparent },
-    ),
-    None(
-        containerColor = { Color.Transparent },
-        contentColor = { MaterialTheme.colorScheme.onSurface },
-        borderColor = { Color.Transparent },
-    ),
-    NotMonth(
-        containerColor = { Color.Transparent },
-        contentColor = { MaterialTheme.colorScheme.onSurface.copy(0.38f) },
-        borderColor = { Color.Transparent },
-    ),
 }
 
 @Preview

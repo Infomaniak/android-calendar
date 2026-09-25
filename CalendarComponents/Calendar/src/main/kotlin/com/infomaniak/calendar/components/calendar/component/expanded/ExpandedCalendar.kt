@@ -17,8 +17,6 @@
  */
 package com.infomaniak.calendar.components.calendar.component.expanded
 
-import androidx.compose.animation.AnimatedVisibilityScope
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.animateContentSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -32,14 +30,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.calendar.component.CalendarHeaderState
 import com.infomaniak.calendar.components.calendar.component.Day
 import com.infomaniak.calendar.components.calendar.component.DaysOfWeekTitle
-import com.infomaniak.calendar.components.calendar.component.daySharedElement
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarHeaderState
 import com.infomaniak.calendar.components.calendar.modifier.FollowExternalSelection
 import com.infomaniak.calendar.components.calendar.modifier.SyncHeaderOffset
 import com.infomaniak.calendar.components.calendar.modifier.pagedSwipe
-import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.calendar.components.foundation.state.DateState
 import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.core.common.utils.today
 import com.kizitonwose.calendar.compose.HorizontalCalendar
@@ -57,6 +54,7 @@ import kotlin.time.Clock
 /** Margins held on each side at startup, so the first swipes never have to grow the range. */
 private const val INITIAL_MARGINS = 2
 
+/** @param notMonthFraction how far the days borrowed from the neighbouring months are set apart from the others. */
 @Composable
 internal fun ExpandedCalendar(
     monthMargin: Int,
@@ -66,8 +64,7 @@ internal fun ExpandedCalendar(
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     modifier: Modifier = Modifier,
     headerState: CalendarHeaderState = rememberCalendarHeaderState(),
-    sharedTransitionScope: SharedTransitionScope? = null,
-    animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    notMonthFraction: () -> Float = { 1f },
 ) {
     val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
     val initialMonth = remember { selectedDate().yearMonth }
@@ -80,8 +77,6 @@ internal fun ExpandedCalendar(
     val pager = rememberMonthPager(state = monthState, monthMargin = monthMargin)
 
     val today by rememberToday()
-
-    val sharedElementDays by remember { derivedStateOf { monthState.firstVisibleMonth.weekDays.flatten().toSet() } }
 
     FollowExternalSelection(pager = pager, selectedDate = selectedDate)
 
@@ -110,10 +105,8 @@ internal fun ExpandedCalendar(
                 selectedDate = selectedDate,
                 today = { today },
                 onDayClick = onDayClick,
-                sharedTransitionScope = sharedTransitionScope,
-                animatedVisibilityScope = animatedVisibilityScope,
-                isSharedElementEnabled = day in sharedElementDays,
                 dotsFor = { eventsDots()[day.date].orEmpty() },
+                notMonthFraction = notMonthFraction,
             )
         },
         modifier = modifier
@@ -128,19 +121,16 @@ private fun DayContent(
     selectedDate: () -> LocalDate,
     today: () -> LocalDate,
     onDayClick: (LocalDate) -> Unit,
-    sharedTransitionScope: SharedTransitionScope?,
-    animatedVisibilityScope: AnimatedVisibilityScope?,
-    isSharedElementEnabled: Boolean,
     dotsFor: () -> List<EventColorsUi>,
+    notMonthFraction: () -> Float,
 ) {
     val dateState by remember(day) {
         derivedStateOf {
-            val isInMonth = day.position == DayPosition.MonthDate
             when {
-                isInMonth && day.date == selectedDate() -> DateState.Selected
-                isInMonth && day.date == today() -> DateState.Today
-                isInMonth -> DateState.None
-                else -> DateState.NotMonth
+                day.position != DayPosition.MonthDate -> DateState.NotMonth
+                day.date == selectedDate() -> DateState.Selected
+                day.date == today() -> DateState.Today
+                else -> DateState.None
             }
         }
     }
@@ -149,13 +139,8 @@ private fun DayContent(
         date = day.date,
         dateState = dateState,
         onClick = { onDayClick(day.date) },
-        modifier = Modifier.daySharedElement(
-            sharedTransitionScope = sharedTransitionScope,
-            animatedVisibilityScope = animatedVisibilityScope,
-            date = day.date,
-            enabled = isSharedElementEnabled,
-        ),
         dotsFor = dotsFor,
+        notMonthFraction = notMonthFraction,
     )
 }
 

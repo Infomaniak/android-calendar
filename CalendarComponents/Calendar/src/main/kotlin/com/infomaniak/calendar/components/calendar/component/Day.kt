@@ -17,8 +17,13 @@
  */
 package com.infomaniak.calendar.components.calendar.component
 
-import androidx.compose.animation.AnimatedVisibilityScope
-import androidx.compose.animation.SharedTransitionScope
+import android.util.Log
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -45,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -56,9 +62,9 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.component.DayCircle
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
+import com.infomaniak.calendar.components.foundation.state.DateState
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatFullDateWithYear
 import com.infomaniak.calendar.components.resources.R
@@ -77,6 +83,7 @@ internal fun Day(
     onClick: () -> Unit,
     dotsFor: () -> List<EventColorsUi>,
     modifier: Modifier = Modifier,
+    notMonthFraction: () -> Float = { 1f },
 ) {
     val fullDate = date.formatFullDateWithYear()
 
@@ -110,36 +117,68 @@ internal fun Day(
             .padding(Margin.Micro),
         contentAlignment = Alignment.Center,
     ) {
-        DayCircle(
-            state = dateState,
-            modifier = Modifier
-                .fillMaxHeight()
-                .then(
-                    if (dateState == DateState.Selected || dateState == DateState.Today) Modifier.aspectRatio(
-                        1f,
-                        matchHeightConstraintsFirst = true,
-                    ) else Modifier,
-                ),
+        AnimatedContent(
+            targetState = dateState,
+            transitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize(),
+        ) { state ->
+            if (state == DateState.NotMonth) {
+                DayCircleContent(
+                    date = date,
+                    dateState = DateState.NotMonth,
+                    dotsFor = dotsFor,
+                    modifier = Modifier.graphicsLayer { alpha = notMonthFraction() },
+                )
+                DayCircleContent(
+                    date = date,
+                    dateState = DateState.None,
+                    dotsFor = dotsFor,
+                    modifier = Modifier.graphicsLayer { alpha = 1f - notMonthFraction() },
+                )
+            } else {
+                DayCircleContent(date = date, dateState = state, dotsFor = dotsFor)
+            }
+        }
+    }
+}
 
-            ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                Spacer(modifier = Modifier.height(DOT_SIZE))
-                Text(text = date.day.toString())
-
-                if (dateState == DateState.None) {
-                    EventDots(
-                        dots = dotsFor(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = Margin.Micro),
-                    )
+@Composable
+private fun DayCircleContent(
+    date: LocalDate,
+    dateState: DateState,
+    dotsFor: () -> List<EventColorsUi>,
+    modifier: Modifier = Modifier,
+) {
+    DayCircle(
+        state = dateState,
+        modifier = modifier
+            .fillMaxHeight()
+            .then(
+                if (dateState == DateState.Selected || dateState == DateState.Today) {
+                    Modifier.aspectRatio(1f, matchHeightConstraintsFirst = true)
                 } else {
-                    Spacer(modifier = Modifier.height(DOT_SIZE))
-                }
+                    Modifier
+                },
+            ),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Spacer(modifier = Modifier.height(DOT_SIZE))
+            Text(text = date.day.toString())
+
+            if (dateState.showDots) {
+                EventDots(
+                    dots = dotsFor(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = Margin.Micro),
+                )
+            } else {
+                Spacer(modifier = Modifier.height(DOT_SIZE))
             }
         }
     }
@@ -176,29 +215,6 @@ private fun EventDot(color: Color, modifier: Modifier = Modifier) {
             .clip(CircleShape)
             .background(color),
     )
-}
-
-/**
- * Builds a [Modifier] that turns a day cell into a shared element keyed by its [date], so the same day
- * translates gracefully between the collapsed week and the expanded month during the expand/collapse
- * transition. Days that only exist on one side (e.g. days from other weeks of the month) have no match
- * and simply fade in/out with the [AnimatedVisibilityScope].
- *
- * Returns [Modifier] unchanged when [enabled] is false or when the transition scopes are unavailable
- * so the day renders normally without participating in any shared transition.
- */
-@Composable
-internal fun Modifier.daySharedElement(
-    sharedTransitionScope: SharedTransitionScope?,
-    animatedVisibilityScope: AnimatedVisibilityScope?,
-    date: LocalDate,
-    enabled: Boolean,
-): Modifier {
-    if (!enabled || sharedTransitionScope == null || animatedVisibilityScope == null) return this
-
-    return with(sharedTransitionScope) {
-        sharedElement(rememberSharedContentState(key = date), animatedVisibilityScope)
-    }
 }
 
 @Composable
