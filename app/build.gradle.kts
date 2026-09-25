@@ -160,6 +160,7 @@ dependencies {
     implementation(core.infomaniak.core.crossapplogin.front)
     implementation(core.infomaniak.core.matomo)
     implementation(core.infomaniak.core.network)
+    implementation(core.infomaniak.core.notifications)
     implementation(core.infomaniak.core.onboarding)
     implementation(core.infomaniak.core.datavalue)
     implementation(core.infomaniak.core.sentry)
