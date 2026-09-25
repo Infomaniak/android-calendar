@@ -41,7 +41,7 @@ import com.infomaniak.calendar.components.eventdetail.detail.component.Calendar
 import com.infomaniak.calendar.components.eventdetail.detail.component.ClassificationStatus
 import com.infomaniak.calendar.components.eventdetail.detail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
-import com.infomaniak.calendar.components.eventdetail.detail.component.KMeetButton
+import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
 import com.infomaniak.calendar.components.eventdetail.detail.component.OccupiedStatus
