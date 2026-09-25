@@ -28,6 +28,7 @@
     <string name="contentDescriptionBack">Retour</string>
     <string name="contentDescriptionInbox">Ouvrir la boîte de réception</string>
     <string name="contentDescriptionMenuDrawer">Ouvrir le menu</string>
+    <string name="contentDescriptionSearch">Rechercher</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Vue actuelle : %1$s. Appuyez pour changer de vue.</string>
     <string name="dayTitle">Jour</string>
     <string name="eventUntitledLabel">(Sans titre)</string>

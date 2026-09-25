@@ -28,6 +28,7 @@
     <string name="contentDescriptionBack">Tillbaka</string>
     <string name="contentDescriptionInbox">Öppna inkorgen</string>
     <string name="contentDescriptionMenuDrawer">Öppna meny</string>
+    <string name="contentDescriptionSearch">Sök</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Aktuell vy: %1$s. Tryck för att ändra vy.</string>
     <string name="dayTitle">Dag</string>
     <string name="eventUntitledLabel">(Utan titel)</string>
