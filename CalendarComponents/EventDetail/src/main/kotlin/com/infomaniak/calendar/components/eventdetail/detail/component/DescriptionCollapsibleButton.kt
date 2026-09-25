@@ -66,6 +66,7 @@ internal fun DescriptionCollapsibleButton(description: String, contentPadding: P
             leadingContent = { Icon(painterResource(leadingIconRes), contentDescription = null) },
             trailingContent = { AnimatedChevron({ isCollapsed }) },
             onClick = { isCollapsed = !isCollapsed },
+            shapes = ListItemDefaults.RectangleShapes,
             contentPadding = contentPadding + ListItemDefaults.ContentPadding,
         )
     } else {
