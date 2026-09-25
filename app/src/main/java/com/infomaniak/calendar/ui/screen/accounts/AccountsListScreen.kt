@@ -35,7 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.component.drawer.DrawerPreviewProvider
-import com.infomaniak.calendar.ui.component.drawer.DrawerViewModel
+import com.infomaniak.calendar.ui.component.drawer.MenuDrawerViewModel
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -47,9 +47,9 @@ fun AccountsListScreen(
     onBack: () -> Unit,
     onAccountClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    drawerViewModel: DrawerViewModel = viewModel(),
+    menuDrawerViewModel: MenuDrawerViewModel = viewModel(),
 ) {
-    val calendarsUsers by drawerViewModel.calendarsUsers.collectAsStateWithLifecycle()
+    val calendarsUsers by menuDrawerViewModel.calendarsUsers.collectAsStateWithLifecycle()
 
     AccountsListContent(
         calendarsUsers = { calendarsUsers },

@@ -45,25 +45,25 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import kotlinx.coroutines.launch
 
 @Composable
-fun CalendarDrawer(
+fun MenuDrawer(
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     onManageAccounts: () -> Unit = {},
-    drawerViewModel: DrawerViewModel = viewModel(),
+    menuDrawerViewModel: MenuDrawerViewModel = viewModel(),
 ) {
     val calendarDrawerState = LocalDrawerState.current ?: return
-    val calendarsUsers by drawerViewModel.calendarsUsers.collectAsStateWithLifecycle()
-    val expandedAccountIds by drawerViewModel.expandedAccountIds.collectAsStateWithLifecycle(emptySet())
+    val calendarsUsers by menuDrawerViewModel.calendarsUsers.collectAsStateWithLifecycle()
+    val expandedAccountIds by menuDrawerViewModel.expandedAccountIds.collectAsStateWithLifecycle(emptySet())
     val scope = rememberCoroutineScope()
 
     BackHandler(enabled = calendarDrawerState.isOpen) { scope.launch { calendarDrawerState.close() } }
 
-    CalendarDrawerContent(
+    MenuDrawer(
         drawerState = calendarDrawerState,
         calendarsUsers = calendarsUsers,
-        onCalendarVisibilityChanged = drawerViewModel::onCalendarVisibilityChanged,
+        onCalendarVisibilityChanged = menuDrawerViewModel::onCalendarVisibilityChanged,
         content = content,
-        onAccountExpandedChange = drawerViewModel::onAccountExpandedChanged,
+        onAccountExpandedChange = menuDrawerViewModel::onAccountExpandedChanged,
         isSectionExpanded = { expandedAccountIds.contains(it) },
         onManageAccounts = {
             scope.launch {
@@ -76,7 +76,7 @@ fun CalendarDrawer(
 }
 
 @Composable
-private fun CalendarDrawerContent(
+private fun MenuDrawer(
     drawerState: DrawerState,
     calendarsUsers: List<UserCalendarsUi>,
     onCalendarVisibilityChanged: (CalendarId, Boolean) -> Unit,
@@ -147,11 +147,11 @@ private fun drawerMenuOptions(
 
 @PreviewLightDark
 @Composable
-private fun CalendarDrawerPreview(
+private fun MenuDrawerPreview(
     @PreviewParameter(DrawerPreviewProvider::class) usersCalendars: List<UserCalendarsUi>,
 ) {
     CalendarThemeForPreview {
-        CalendarDrawerContent(
+        MenuDrawer(
             drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
             calendarsUsers = usersCalendars,
             onCalendarVisibilityChanged = { _, _ -> },
