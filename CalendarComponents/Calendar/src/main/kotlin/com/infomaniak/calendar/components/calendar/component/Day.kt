@@ -19,6 +19,8 @@ package com.infomaniak.calendar.components.calendar.component
 
 import android.util.Log
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -117,7 +119,7 @@ internal fun Day(
     ) {
         AnimatedContent(
             targetState = dateState,
-            transitionSpec = { fadeIn() togetherWith fadeOut() },
+            transitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
             contentAlignment = Alignment.Center,
             modifier = Modifier.fillMaxSize(),
         ) { state ->
