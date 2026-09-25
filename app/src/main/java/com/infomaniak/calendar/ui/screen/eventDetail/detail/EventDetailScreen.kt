@@ -22,11 +22,10 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
@@ -42,6 +41,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
+import com.infomaniak.calendar.components.eventdetail.component.ParticipationStatusButtonsToolbar
 import com.infomaniak.calendar.components.eventdetail.detail.EventDetail
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
@@ -51,9 +51,10 @@ import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
+import com.infomaniak.calendar.utils.nestedScrollToolbar
+import com.infomaniak.calendar.utils.rememberFloatingToolbarExitScrollBehavior
 import com.infomaniak.core.common.extensions.safeStartActivity
 import com.infomaniak.core.ui.compose.basics.rememberClipboardCopyManager
-import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
@@ -85,6 +86,7 @@ fun EventDetailScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun EventDetailScreen(
     uiState: () -> EventDetailUiState,
@@ -97,6 +99,8 @@ private fun EventDetailScreen(
 ) {
     val clipboardManager = rememberClipboardCopyManager()
     val state = uiState()
+    val scrollState = rememberScrollState()
+    val floatingToolbarScrollBehavior = rememberFloatingToolbarExitScrollBehavior(scrollState.canScrollForward)
 
     Scaffold(
         topBar = {
@@ -109,25 +113,33 @@ private fun EventDetailScreen(
                 },
             )
         },
-        modifier = modifier,
+        bottomBar = {
+            (state as? EventDetailUiState.Success)?.eventDetail?.attendees?.me?.let { me ->
+                ParticipationStatusButtonsToolbar(
+                    participationStatus = { me.status },
+                    onParticipationStatusChange = { /*TODO[eventDetail]*/ },
+                    scrollBehavior = floatingToolbarScrollBehavior,
+                )
+            }
+        },
+        modifier = modifier.nestedScrollToolbar(floatingToolbarScrollBehavior),
     ) { scaffoldContentPadding ->
         when (state) {
             EventDetailUiState.Loading -> Unit // Loaded locally, always fast, no need for a specific progress indicator UI
             is EventDetailUiState.Success -> {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    val copyFeedbackMessage = stringResource(RCommon.string.linkCopied)
+                val copyFeedbackMessage = stringResource(RCommon.string.linkCopied)
 
-                    EventDetail(
-                        eventDetail = state.eventDetail,
-                        onJoinKMeet = { /*TODO[eventDetail]*/ },
-                        onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
-                        onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
-                        onRoomClick = { /*TODO[eventDetail]*/ },
-                        contentPadding = scaffoldContentPadding + Dimens.EventDetailScreensHorizontalPadding,
-                        sharedTransitionScope = sharedTransitionScope,
-                        animatedVisibilityScope = animatedVisibilityScope,
-                    )
-                }
+                EventDetail(
+                    eventDetail = state.eventDetail,
+                    onJoinKMeet = { /*TODO[eventDetail]*/ },
+                    onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
+                    onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
+                    onRoomClick = { /*TODO[eventDetail]*/ },
+                    modifier = Modifier.verticalScroll(scrollState),
+                    contentPadding = scaffoldContentPadding + Dimens.EventDetailScreensHorizontalPadding,
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope,
+                )
             }
             EventDetailUiState.Unavailable -> LaunchedEffect(Unit) { goBack() }
         }

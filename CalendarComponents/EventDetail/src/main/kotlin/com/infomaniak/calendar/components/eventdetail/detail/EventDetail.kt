@@ -94,7 +94,11 @@ fun EventDetail(
                 }
 
                 if (kMeetUrl?.isNotBlank() == true) {
-                    KMeetButton(onJoin = onJoinKMeet, onCopy = onCopyKMeet, modifier = Modifier.padding(horizontalContentPadding))
+                    KMeetButton(
+                        onJoin = onJoinKMeet,
+                        onCopy = onCopyKMeet,
+                        modifier = Modifier.padding(horizontalContentPadding),
+                    )
                 }
 
                 if (location?.isNotBlank() == true) {
@@ -146,7 +150,10 @@ private fun PreviewEventDetail() {
         start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
         end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
         isAllDay = false,
-        attendees = Attendees(all = previewAttendees, me = null),
+        attendees = Attendees(
+            all = previewAttendees,
+            me = previewAttendees.first(),
+        ),
         kMeetUrl = "test url",
         location = "Location",
         room = EventDetailUi.Room("Japan room", 5, 3),
