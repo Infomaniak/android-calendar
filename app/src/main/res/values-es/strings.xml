@@ -28,6 +28,7 @@
     <string name="contentDescriptionBack">Atrás</string>
     <string name="contentDescriptionInbox">Abrir la bandeja de entrada</string>
     <string name="contentDescriptionMenuDrawer">Abrir menú</string>
+    <string name="contentDescriptionSearch">Buscar</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Vista actual: %1$s. Toque para cambiar de vista.</string>
     <string name="dayTitle">Día</string>
     <string name="eventUntitledLabel">(Sin título)</string>

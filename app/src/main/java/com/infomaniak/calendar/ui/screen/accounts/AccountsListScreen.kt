@@ -97,7 +97,7 @@ private fun AccountsListContent(
                         .fillMaxWidth()
                         .padding(all = EsdsTheme.spacing.xl),
                 ) {
-                    Text(stringResource(R.string.addAccount), modifier = Modifier.padding(vertical = EsdsTheme.spacing.md))
+                    Text(stringResource(R.string.buttonAddAccount), modifier = Modifier.padding(vertical = EsdsTheme.spacing.md))
                 }
             }
         }
