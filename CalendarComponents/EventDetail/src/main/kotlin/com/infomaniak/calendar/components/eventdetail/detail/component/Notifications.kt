@@ -54,8 +54,6 @@ internal fun Notifications(
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     notifications.forEach { notification ->
-        val timeText = notificationTimeText(notification.time)
-
         ClickableItem(
             text = stringResource(notification.type.label),
             leadingIconRes = notification.type.icon,
@@ -64,7 +62,7 @@ internal fun Notifications(
             trailingContent = {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
                     Text(
-                        text = timeText,
+                        text = notificationTimeText(notification.time),
                         style = MaterialTheme.typography.labelLarge,
                         textAlign = TextAlign.End,
                         modifier = Modifier.fillMaxWidth(0.5f),
@@ -79,12 +77,13 @@ internal fun Notifications(
 
 @Composable
 private fun notificationTimeText(time: NotificationTime): String {
-    val timeZone = TimeZone.currentSystemDefault()
-    val currentYear = Clock.today(timeZone).year
-
     return when (time) {
         is NotificationTime.Offset -> time.duration.formatDurationOffset()
-        is NotificationTime.Absolute -> time.instant.formatDateTime(timeZone = timeZone, currentYear = currentYear)
+        is NotificationTime.Absolute -> {
+            val timeZone = TimeZone.currentSystemDefault()
+            val currentYear = Clock.today(timeZone).year
+            time.instant.formatDateTime(timeZone = timeZone, currentYear = currentYear)
+        }
     }
 }
 
