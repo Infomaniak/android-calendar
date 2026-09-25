@@ -16,7 +16,7 @@ Kotlin Multiplatform library.
 - **Build System**: Gradle with Kotlin DSL, version catalog (`gradle/libs.versions.toml`)
 - **UI Framework**: Jetpack Compose (Material 3), Navigation 3
 - **Architecture**: Single-Activity + Compose, with shared logic delegated to the KMP module
-- **Shared Logic**: Consumed from `multiplatform-calendar` composite build via `libs.infomaniak.multiplatform.calendar.core`
+- **Shared Logic**: Consumed from `multiplatform-calendar` (`CalendarCore` artifact, or the submodule as a composite build)
 - **Testing**: JUnit 4 (unit), Espresso + Compose UI Test (instrumented)
 
 ## Context Map
@@ -276,11 +276,11 @@ fun MyComponent(
 - App dependencies are declared in `gradle/libs.versions.toml` (accessed via the `libs` accessor).
 - The KMP submodule exposes `multiplatform-calendar/gradle/kmpCalendar.versions.toml` as the `kmpCalendar` catalog
   (see root `settings.gradle.kts`). Use it for plugin/library coordinates shared with the KMP world.
-- The `multiplatform-calendar` library is consumed as a composite build; its `:Core` project is substituted for
-  the `com.infomaniak.multiplaform-calendar:Core` Maven coordinate and its `:kmpdav` bridge project for the
-  `com.infomaniak.multiplaform-calendar:multiplatform-calendar` coordinate (declared in `gradle/libs.versions.toml`
-  as `infomaniak-multiplaform-calendar-core` / `infomaniak-multiplaform-calendar` and referenced via
-  `libs.infomaniak.multiplaform.calendar.core` / `libs.infomaniak.multiplaform.calendar`).
+- The `multiplatform-calendar` library is consumed as the published `CalendarCore` artifact
+  (`libs.infomaniak.multiplatform.calendar.core`, version `calendarCore`). With `useCalendarCoreCompositeBuild=true`,
+  the submodule is included as a composite build instead and its `:CalendarCore` project substitutes the
+  `com.infomaniak.multiplaform-calendar:CalendarCore` coordinate (`libs.infomaniak.multiplatform.calendar.core.submodule`).
+  `:CalendarKmpDav` (CalDAV bridge) comes transitively through `CalendarCore`'s `api`.
 - When adding a dependency:
     1. Add the version to `[versions]`, the coordinate to `[libraries]` (or `[plugins]`), in `libs.versions.toml`.
     2. Reference it as `libs.<group>.<name>` in `app/build.gradle.kts`.

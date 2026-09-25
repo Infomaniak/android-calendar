@@ -66,12 +66,12 @@ android-calendar/
       as the `kmpCalendar` catalog (e.g. `kotlinx-datetime` used by Foundation and Planning).
     - `Core/gradle/core.versions.toml` — Core library dependencies and plugin aliases, exposed as the `core` catalog
       (e.g. `core.plugins.android.library`, `core.compose.bom`, `core.infomaniak.core.ui.compose.margin`).
-- **Project inclusion**: `settings.gradle.kts` includes `:app` plus the four `:CalendarComponents:*` subprojects, and
-  wires `multiplatform-calendar` as a composite build via `includeBuild("multiplatform-calendar")` with a
-  `dependencySubstitution` block that maps two Maven coordinates:
-    - `com.infomaniak.multiplaform-calendar:Core` → `:Core` project
-    - `com.infomaniak.multiplaform-calendar:multiplatform-calendar` → `:kmpdav` project (internal bridge module)
-  The app depends on both via `libs.infomaniak.multiplatform.calendar` and `libs.infomaniak.multiplatform.calendar.core`.
+- **Project inclusion**: `settings.gradle.kts` includes `:app` plus the `:CalendarComponents:*` subprojects. The
+  `multiplatform-calendar` library comes either from its published artifact (default) or, with
+  `useCalendarCoreCompositeBuild=true` (in `local.properties` or as a Gradle property), from the submodule sources:
+  `includeBuild("multiplatform-calendar")` then substitutes `com.infomaniak.multiplaform-calendar:CalendarCore` with the
+  `:CalendarCore` project. The app switches between `libs.infomaniak.multiplatform.calendar.core` (published, version
+  `calendarCore`) and `libs.infomaniak.multiplatform.calendar.core.submodule` accordingly.
 - **Impact**: Editing `multiplatform-calendar/` or `Core/` affects every consumer of those libraries — changes belong in
   their own repos and PRs.
 
@@ -183,27 +183,27 @@ All CalendarComponents source lives **in this repository**. Changes to these mod
 
 ## Key Integration Points
 
-- **Two KMP modules consumed by the app**: The submodule contains two consumable Gradle projects (plus a pure-aggregator
-  root project `:` with no sources):
-    - **kmpdav module** (`:kmpdav`) — internal bridge module: Rust/UniFFI CalDAV bridge, remote CalDAV models/client, `CaldavClientModule`.
-    - **Core module** (`:Core`) — public API module: domain models, Room database, repositories, `AccountManager`, `CalendarManager`, Apple `CalendarSDK`.
+- **Two KMP modules**: The submodule contains two Gradle projects; the app depends on `:CalendarCore` only, which
+  re-exports `:CalendarKmpDav` via `api`:
+    - **`:CalendarKmpDav`** — Rust/UniFFI CalDAV bridge, remote CalDAV models/client, `CaldavClientModule`, and the
+      process-wide client configuration (`configureCaldavClient()`, `CaldavClientConfig`).
+    - **`:CalendarCore`** — public API module: domain models, Room database, repositories, `AccountManager`,
+      `CalendarManager`, Apple `CalendarSDK`.
 - **Shared models / business logic**: The app imports from `com.infomaniak.multiplatform_calendar.core.*` (e.g.,
   `com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Color`) and the bridge from
-  `com.infomaniak.multiplatform_calendar.data.remote.caldav.*` (e.g., `DavAccount`).
-- **Dependency wiring**: Declared in `app/build.gradle.kts` via two dependencies:
-    - `implementation(libs.infomaniak.multiplatform.calendar)` — substituted with the `:kmpdav` project.
-    - `implementation(libs.infomaniak.multiplatform.calendar.core)` — substituted with `:Core`.
-- **DI**: The app uses Metro's `@DependencyGraph` (`AppGraph`) which picks up `@ContributesTo` modules from both
-  the `:kmpdav` and Core modules (e.g., `CalendarCoreGraph`, `AndroidDatabaseModule`, `DatabaseModule`, `CaldavClientModule`).
-  `CalendarCoreGraph` (in Core `commonMain`) defines the shared accessors (`accountManager`, `calendarManager`)
-  and is automatically merged into `AppGraph` (Android). On Apple, `CalendarSDK` lives in Core `appleMain` and explicitly
-  inherits `:kmpdav`'s `CaldavClientModule` while also receiving Core's contributed bindings.
-- **Apple artifact**: The public `KmpCalendar.xcframework` is produced by the Core module (`:Core`). `:kmpdav` is a
-  plain `implementation` dependency and is **not** exported: the public Apple API exposes only Core-owned types (e.g.
-  credentials are passed as Core's `DavCredentials`, mapped to `:kmpdav`'s `DavAccount` at the repository boundary).
-  `CalendarSDKProvider.shared.sdk` is the Apple entry point exposed by Core.
-- **Rust/UniFFI**: The Rust crate lives in `multiplatform-calendar/kmpdav/rust/caldav_bridge`; `:kmpdav/build.gradle.kts`
-  wires Gobley (`dev.gobley.cargo` / `dev.gobley.uniffi`) to compile it and generate `uniffi.caldav_bridge.*` bindings.
+  `com.infomaniak.multiplatform_calendar.data.remote.caldav.*` (e.g., `DavAccount`, `CaldavClientConfig`).
+- **DI**: The app uses Metro's `@DependencyGraph` (`AppGraph`) which picks up the `@ContributesTo(AppScope)` modules of
+  both KMP modules (`CalendarCoreGraph`, `DatabaseModule`, `CaldavClientModule`). `CalendarCoreGraph` (in
+  `:CalendarCore` `commonMain`) defines the shared accessors (`accountManager`, `calendarManager`) and is automatically
+  merged into `AppGraph` (Android). On Apple, `CalendarSDK` lives in `:CalendarCore` `appleMain` and explicitly inherits
+  `CaldavClientModule` while also receiving the contributed bindings.
+- **Apple artifact**: The public `MultiplatformCalendar.xcframework` is produced by `:CalendarCore`. `:CalendarKmpDav`
+  is **not** exported: the public Apple API exposes only `:CalendarCore` types (e.g. credentials are passed as
+  `DavCredentials`, mapped to `DavAccount` at the repository boundary). `CalendarSDKProvider.sdk(...)` is the Apple
+  entry point.
+- **Rust/UniFFI**: The Rust crate lives in `multiplatform-calendar/CalendarKmpDav/rust/caldav_bridge`;
+  `CalendarKmpDav/build.gradle.kts` wires Gobley (`dev.gobley.cargo` / `dev.gobley.uniffi`) to compile it and generate
+  `uniffi.caldav_bridge.*` bindings.
 - **Plugin aliases**: Module `build.gradle.kts` files reference plugins from all three catalogs:
   `libs.plugins.*` (app), `kmpCalendar.plugins.*` (KMP), and `core.plugins.*` (Core build-logic).
 
