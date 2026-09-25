@@ -38,8 +38,23 @@
     <string name="contentDescriptionHasKMeetLink">Sisältää kMeet-linkin</string>
     <string name="contentDescriptionHasLocation">On sijainti</string>
     <string name="contentDescriptionToday">Tänään</string>
+    <plurals name="dayAmount">
+        <item quantity="one">%d päivä</item>
+        <item quantity="other">%d päivää</item>
+    </plurals>
     <string name="descriptionTitle">Kuvaus</string>
     <string name="eventTitle">Tapahtuman nimi</string>
+    <plurals name="hourAmount">
+        <item quantity="one">%d tunti</item>
+        <item quantity="other">%d tuntia</item>
+    </plurals>
+    <plurals name="minuteAmount">
+        <item quantity="one">%d minuutti</item>
+        <item quantity="other">%d minuuttia</item>
+    </plurals>
+    <string name="notificationTimeAfter">%1$s jälkeen</string>
+    <string name="notificationTimeAtStart">Tapahtuman hetkellä</string>
+    <string name="notificationTimeBefore">%1$s ennen</string>
     <string name="notificationTypeEmail">Sähköposti</string>
     <string name="notificationTypePush">Ilmoitus</string>
     <string name="occupiedLabel">Varattu</string>
@@ -53,6 +68,10 @@
         <item quantity="other">%d paikkaa</item>
     </plurals>
     <string name="sectionCalendarHeader">Kalenteri</string>
+    <plurals name="weekAmount">
+        <item quantity="one">%d viikko</item>
+        <item quantity="other">%d viikkoa</item>
+    </plurals>
     <string name="weekHeaderDateRange">%d.–%d. %s %d</string>
     <string name="weekHeaderWeekNumber">V%d</string>
 </resources>

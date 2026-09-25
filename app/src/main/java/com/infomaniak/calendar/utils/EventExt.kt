@@ -20,11 +20,14 @@ package com.infomaniak.calendar.utils
 import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Classification
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.TimeBlocking
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.AlarmAction
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.AlarmTrigger
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.EventAlarm
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -67,9 +70,19 @@ private fun getDetailTiming(wallClock: LocalDateTime, timeZone: TimeZone?): Even
     else -> EventDetailTiming.Precise(wallClock.toInstant(timeZone), timeZone)
 }
 
-// TODO[eventDetail]: Handle notifications
 private fun EventAlarm.toNotification(): EventDetailUi.Notification? {
-    return null
+
+    return EventDetailUi.Notification(
+        type = when (action) {
+            AlarmAction.Display -> EventDetailUi.Notification.Type.Push
+            AlarmAction.Email -> EventDetailUi.Notification.Type.Email
+            else -> return null // Other types of alarms are not supported in the UI yet
+        },
+        time = when (val trigger = trigger) {
+            is AlarmTrigger.Relative -> NotificationTime.Offset(trigger.offset)
+            is AlarmTrigger.Absolute -> NotificationTime.Absolute(trigger.instant)
+        },
+    )
 }
 
 private fun Classification.toClassification(): EventDetailUi.Classification? = when (this) {

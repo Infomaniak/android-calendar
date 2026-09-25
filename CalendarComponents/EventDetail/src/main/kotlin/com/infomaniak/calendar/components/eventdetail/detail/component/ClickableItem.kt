@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.resources.R
 
@@ -68,7 +69,7 @@ internal fun ClickableItem(
 ) {
     ListItem(
         modifier = modifier,
-        content = { Text(text = text) },
+        content = { Text(text) },
         supportingContent = supportingContent,
         leadingContent = leadingContent,
         trailingContent = trailingContent,

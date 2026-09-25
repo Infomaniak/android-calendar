@@ -48,6 +48,7 @@ import com.infomaniak.calendar.components.eventdetail.detail.component.OccupiedS
 import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
@@ -56,6 +57,8 @@ import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
 /**
@@ -165,8 +168,14 @@ private fun PreviewEventDetail() {
             EventDetailUi.File("3", "Next loto results.png"),
         ),
         notifications = listOf(
-            EventDetailUi.Notification("1", EventDetailUi.Notification.Type.Email, Instant.parse("2026-05-20T07:00:00Z")),
-            EventDetailUi.Notification("2", EventDetailUi.Notification.Type.Push, Instant.parse("2026-05-20T07:30:00Z")),
+            EventDetailUi.Notification(
+                EventDetailUi.Notification.Type.Email,
+                NotificationTime.Absolute(Instant.parse("2026-05-20T07:00:00Z")),
+            ),
+            EventDetailUi.Notification(
+                EventDetailUi.Notification.Type.Push,
+                NotificationTime.Offset(90.days + 30.minutes),
+            ),
         ),
         isOccupied = true,
         classification = EventDetailUi.Classification.Public,
