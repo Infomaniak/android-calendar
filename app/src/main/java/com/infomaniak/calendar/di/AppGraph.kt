@@ -24,6 +24,7 @@ import com.infomaniak.calendar.BuildConfig
 import com.infomaniak.calendar.MainApplication
 import com.infomaniak.calendar.crashReporting.AndroidCrashReport
 import com.infomaniak.calendar.di.metroAndroidExtensions.AndroidComponentProvider
+import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.secured.DavCredentialsManager
 import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.calendar.utils.account.AccountUtils
@@ -64,6 +65,8 @@ interface AppGraph : AndroidComponentProvider, ViewModelGraph {
     val accountManager: AccountManager
 
     val davCredentialsManager: DavCredentialsManager
+
+    val cachedCalendarManager: CachedCalendarManager
 
     @Provides
     @SingleIn(AppScope::class)

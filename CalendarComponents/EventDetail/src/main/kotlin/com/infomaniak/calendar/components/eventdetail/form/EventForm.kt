@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,6 +34,7 @@ import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
+import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 
 /**
@@ -42,8 +44,7 @@ import com.infomaniak.core.ui.compose.basics.onlyHorizontal
  */
 @Composable
 fun EventForm(
-    eventColor: Color, // TODO: Adapt this when structuring edit/creation and its states correctly
-    title: String, // TODO: Adapt this when structuring edit/creation and its states correctly
+    state: EventFormState,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -55,8 +56,8 @@ fun EventForm(
         modifier.padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding()),
     ) {
         TitleEditable(
-            dotColor = eventColor,
-            title = title,
+            dotColor = state.colorState.value ?: Color.Transparent, // Temporarily hide the dot until we get the actual color
+            textFieldState = state.titleTextState,
             modifier = Modifier
                 .padding(horizontalContentPadding)
                 .eventSharedElement(EventSharedElement.Title),
@@ -70,8 +71,11 @@ private fun Preview() {
     MaterialTheme {
         Surface {
             EventForm(
-                eventColor = MaterialTheme.colorScheme.primary,
-                title = "Event title",
+                state = rememberSaveableEventFormState(
+                    calendars = listOf(previewEventDetailCalendar),
+                    initialCalendar = previewEventDetailCalendar,
+                    initialText = "Event title",
+                ),
                 contentPadding = PaddingValues(16.dp),
             )
         }

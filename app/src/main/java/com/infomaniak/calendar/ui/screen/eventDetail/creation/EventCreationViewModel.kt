@@ -15,30 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.eventDetail.edit
+package com.infomaniak.calendar.ui.screen.eventDetail.creation
 
 import androidx.lifecycle.ViewModel
-import com.infomaniak.calendar.ui.screen.eventDetail.EventFormCalendarsUseCase
-import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
+import androidx.lifecycle.viewModelScope
+import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventFormCalendars
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import com.infomaniak.calendar.ui.screen.eventDetail.EventFormCalendarsUseCase
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.stateIn
 
 @Inject
 @ContributesIntoMap(AppScope::class)
-@ViewModelKey
-class EventEditViewModel(
-    private val getEventDetailUiUseCase: GetEventDetailUiUseCase,
-    eventFormCalendarsUseCase: EventFormCalendarsUseCase,
-) : ViewModel() {
-    val eventDetailUi = getEventDetailUiUseCase.eventDetailUi
+@ViewModelKey(EventCreationViewModel::class)
+class EventCreationViewModel(eventFormCalendarsUseCase: EventFormCalendarsUseCase) : ViewModel() {
+    val uiState = flowOf(Unit).stateIn(viewModelScope, SharingStarted.Lazily, Unit)
 
-    val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase
-        .editionCalendars(getEventDetailUiUseCase.eventCalendar)
+    val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase.creationCalendars
 
-    fun setOccurrenceId(occurrenceId: OccurrenceId) = getEventDetailUiUseCase.setOccurrenceId(occurrenceId)
+    fun submitEvent(eventDraft: EventDraft) {
+        // TODO
+    }
 }

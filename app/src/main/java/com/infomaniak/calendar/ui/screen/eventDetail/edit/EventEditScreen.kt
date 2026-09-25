@@ -25,13 +25,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
+import com.infomaniak.calendar.components.eventdetail.form.EventFormState
+import com.infomaniak.calendar.components.eventdetail.form.rememberSaveableEventFormState
+import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.theme.CalendarTheme
@@ -45,14 +47,26 @@ fun EventEditScreen(
     modifier: Modifier = Modifier,
     viewModel: EventEditViewModel = viewModel(),
 ) {
-    val uiState by viewModel.eventDetail.collectAsStateWithLifecycle()
+    val eventDetailUiState = viewModel.eventDetailUi.collectAsStateWithLifecycle().value
+    val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
+    val uiState = when (eventDetailUiState) {
+        EventDetailUiState.Loading -> EventEditScreenState.Loading
+        is EventDetailUiState.Success -> EventEditScreenState.Success(
+            rememberSaveableEventFormState(
+                calendars = eventFormCalendars?.calendars ?: emptyList(),
+                initialCalendar = eventFormCalendars?.initialCalendar,
+                initialText = eventDetailUiState.eventDetail.title,
+            ),
+        )
+        EventDetailUiState.Unavailable -> EventEditScreenState.Unavailable
+    }
 
     LaunchedEffect(occurrenceId) {
         viewModel.setOccurrenceId(occurrenceId)
     }
 
     EventEditScreen(
-        uiState = { uiState },
+        uiState = uiState,
         goBack = goBack,
         modifier = modifier,
         sharedTransitionScope = LocalSharedTransitionScope.current,
@@ -62,7 +76,7 @@ fun EventEditScreen(
 
 @Composable
 private fun EventEditScreen(
-    uiState: () -> EventDetailUiState,
+    uiState: EventEditScreenState,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -71,21 +85,26 @@ private fun EventEditScreen(
     Scaffold(
         topBar = { TopAppBar(title = {}) },
     ) { contentPadding ->
-        when (val state = uiState()) {
+        when (uiState) {
             // Coming from the detail screen, the shared flow is already warm, so this is only hit when entering edit directly or
             // recreating the activity, but it still will be loaded from disk which is fast enough.
-            EventDetailUiState.Loading -> Unit
-            is EventDetailUiState.Success -> EventForm(
-                eventColor = state.eventDetail.eventColor,
-                title = state.eventDetail.title,
+            EventEditScreenState.Loading -> Unit
+            is EventEditScreenState.Success -> EventForm(
+                state = uiState.eventFormState,
                 modifier = modifier,
                 contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
             )
-            EventDetailUiState.Unavailable -> LaunchedEffect(Unit) { goBack() }
+            EventEditScreenState.Unavailable -> LaunchedEffect(Unit) { goBack() }
         }
     }
+}
+
+private sealed interface EventEditScreenState {
+    object Loading : EventEditScreenState
+    data class Success(val eventFormState: EventFormState) : EventEditScreenState
+    object Unavailable : EventEditScreenState
 }
 
 @Preview
@@ -94,7 +113,13 @@ private fun Preview() {
     CalendarTheme {
         Surface {
             EventEditScreen(
-                uiState = { EventDetailUiState.Loading },
+                uiState = EventEditScreenState.Success(
+                    rememberSaveableEventFormState(
+                        calendars = listOf(previewEventDetailCalendar),
+                        initialCalendar = previewEventDetailCalendar,
+                        initialText = "Meeting on how to find funny preview titles",
+                    ),
+                ),
                 goBack = {},
             )
         }

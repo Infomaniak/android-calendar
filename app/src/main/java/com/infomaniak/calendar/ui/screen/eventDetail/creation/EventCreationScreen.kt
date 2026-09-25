@@ -18,26 +18,48 @@
 package com.infomaniak.calendar.ui.screen.eventDetail.creation
 
 import androidx.compose.foundation.layout.plus
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
+import com.infomaniak.calendar.components.eventdetail.form.EventFormState
+import com.infomaniak.calendar.components.eventdetail.form.rememberSaveableEventFormState
+import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 
 @Composable
-fun EventCreationScreen(modifier: Modifier = Modifier) {
+fun EventCreationScreen(modifier: Modifier = Modifier, viewModel: EventCreationViewModel = viewModel()) {
+    val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
+    val state = rememberSaveableEventFormState(
+        calendars = eventFormCalendars?.calendars ?: emptyList(),
+        initialCalendar = eventFormCalendars?.initialCalendar,
+    )
+
+    EventCreationScreen(
+        state = state,
+        onSubmit = { viewModel.submitEvent(state.toEventDraft() ?: return@EventCreationScreen) },
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun EventCreationScreen(
+    state: EventFormState,
+    onSubmit: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         topBar = { TopAppBar(title = { Text("EventCreationScreen") }) },
         modifier = modifier,
     ) { contentPadding ->
         EventForm(
-            eventColor = MaterialTheme.colorScheme.primary,
-            title = "",
+            state = state,
             contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
         )
     }
@@ -47,6 +69,11 @@ fun EventCreationScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun EventCreationScreenPreview() {
     CalendarThemeForPreview {
-        EventCreationScreen()
+        val state = rememberSaveableEventFormState(
+            calendars = listOf(previewEventDetailCalendar),
+            initialCalendar = previewEventDetailCalendar,
+        )
+
+        EventCreationScreen(state = state, onSubmit = {})
     }
 }

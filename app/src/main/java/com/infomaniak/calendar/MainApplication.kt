@@ -54,6 +54,7 @@ class MainApplication : Application(), MetroApplication {
         initCrossAppLogin()
 
         loadCalDavCredential()
+        appGraph.cachedCalendarManager // Start loading calendars now so they're ready before any screen needs them
     }
 
     private fun loadCalDavCredential() {

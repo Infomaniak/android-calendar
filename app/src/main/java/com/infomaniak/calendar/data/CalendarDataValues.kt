@@ -53,6 +53,8 @@ class CalendarDataValues @Inject constructor(
         defaultValue = CalendarView.Default,
         serializer = CalendarViewSerializer,
     )
+
+    val lastUsedCalendarId = dataValue<String?>(key = "lastSelectedCalendarId", defaultValue = null)
 }
 
 private object CalendarViewSerializer : DataValueSerializer<CalendarView> {
