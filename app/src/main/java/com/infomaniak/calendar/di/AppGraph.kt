@@ -23,8 +23,11 @@ import androidx.compose.ui.platform.LocalContext
 import com.infomaniak.calendar.BuildConfig
 import com.infomaniak.calendar.MainApplication
 import com.infomaniak.calendar.crashReporting.AndroidCrashReport
+import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.di.metroAndroidExtensions.AndroidComponentProvider
 import com.infomaniak.calendar.manager.CachedCalendarManager
+import com.infomaniak.calendar.notification.AlarmScheduler
+import com.infomaniak.calendar.secured.DavCredentialsManager
 import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.login.InfomaniakLogin
@@ -65,6 +68,10 @@ interface AppGraph : AndroidComponentProvider, ViewModelGraph {
     val accountManager: AccountManager
 
     val cachedCalendarManager: CachedCalendarManager
+
+    val calendarDataValues: CalendarDataValues
+
+    val alarmScheduler: AlarmScheduler
 
     @Provides
     @SingleIn(AppScope::class)
