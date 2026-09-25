@@ -29,25 +29,29 @@ import kotlin.time.Clock
 class BootReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        when (intent.action) {
+        if (!shouldRefreshAlarms(intent)) return
+
+        val pendingResult = goAsync()
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                val appGraph = context.appGraph
+                if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
+                    appGraph.calendarDataValues.scheduledAlarmIds.setValue(emptySet())
+                }
+                appGraph.alarmScheduler.refreshUpcomingAlarms(from = Clock.System.now())
+            } finally {
+                pendingResult.finish()
+            }
+        }
+    }
+
+    private fun shouldRefreshAlarms(intent: Intent): Boolean {
+        return when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED,
             Intent.ACTION_MY_PACKAGE_REPLACED,
             Intent.ACTION_TIME_CHANGED,
-            Intent.ACTION_TIMEZONE_CHANGED,
-            -> {
-                val pendingResult = goAsync()
-                CoroutineScope(Dispatchers.Default).launch {
-                    try {
-                        val appGraph = context.appGraph
-                        if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-                            appGraph.calendarDataValues.scheduledAlarmIds.setValue(emptySet<String>())
-                        }
-                        appGraph.alarmScheduler.refreshUpcomingAlarms(from = Clock.System.now())
-                    } finally {
-                        pendingResult.finish()
-                    }
-                }
-            }
+            Intent.ACTION_TIMEZONE_CHANGED -> true
+            else -> false
         }
     }
 }
