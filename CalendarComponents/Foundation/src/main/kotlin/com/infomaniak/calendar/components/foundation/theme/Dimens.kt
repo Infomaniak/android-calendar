@@ -21,5 +21,5 @@ import androidx.compose.ui.unit.dp
 
 object Dimens {
 
-    val floatingToolbarElevation = 3.dp
+    val FloatingToolbarElevation = 3.dp
 }

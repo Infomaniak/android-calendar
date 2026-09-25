@@ -67,7 +67,7 @@ fun ParticipationStatusButtonsToolbar(
     participationStatus: () -> ParticipationStatus,
     onParticipationStatusChange: (ParticipationStatus) -> Unit,
     modifier: Modifier = Modifier,
-    elevation: Dp = Dimens.floatingToolbarElevation,
+    elevation: Dp = Dimens.FloatingToolbarElevation,
     windowInsets: WindowInsets = BottomAppBarDefaults.windowInsets,
     scrollBehavior: FloatingToolbarScrollBehavior? = null,
 ) {
@@ -144,7 +144,10 @@ private fun ParticipationStatusButtonsToolbarPreview() {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(Margin.Medium)) {
                 ParticipationStatus.entries.forEach { participationStatus ->
-                    ParticipationStatusButtonsToolbar(participationStatus = { participationStatus }, onParticipationStatusChange = {})
+                    ParticipationStatusButtonsToolbar(
+                        participationStatus = { participationStatus },
+                        onParticipationStatusChange = {},
+                    )
                 }
             }
         }

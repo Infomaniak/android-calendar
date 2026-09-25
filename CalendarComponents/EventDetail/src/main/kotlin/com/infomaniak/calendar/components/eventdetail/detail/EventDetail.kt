@@ -76,8 +76,7 @@ fun EventDetail(
     val horizontalContentPadding = contentPadding.onlyHorizontal()
 
     Column(
-        modifier = modifier
-            .padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding()),
+        modifier = modifier.padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding()),
     ) {
         with(eventDetail) {
             Title(

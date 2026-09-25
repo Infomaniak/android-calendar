@@ -48,7 +48,7 @@ fun rememberFloatingToolbarExitScrollBehavior(
 }
 
 @Composable
-fun hasSmallHeightScreen(): Boolean {
+private fun hasSmallHeightScreen(): Boolean {
     return !currentWindowAdaptiveInfo().windowSizeClass.isHeightAtLeastBreakpoint(HEIGHT_DP_MEDIUM_LOWER_BOUND)
 }
 
