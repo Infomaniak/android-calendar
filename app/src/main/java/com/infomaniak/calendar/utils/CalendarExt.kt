@@ -21,10 +21,6 @@ import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 
-/**
- * Translation of the KMP calendar model into the UI model consumed by the EventDetail component,
- * shared by every view that lets the user pick the calendar an event belongs to.
- */
 fun Calendar.toEventDetailCalendar(): EventDetailCalendar = EventDetailCalendar(
     id = id.url,
     name = displayName,
