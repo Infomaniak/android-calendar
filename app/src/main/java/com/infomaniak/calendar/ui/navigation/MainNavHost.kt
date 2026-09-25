@@ -55,6 +55,7 @@ import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
 import com.infomaniak.calendar.ui.screen.threeDays.ThreeDayScreen
 import com.infomaniak.calendar.ui.screen.week.WeekScreen
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
+import com.infomaniak.calendar.utils.NavigationTransition
 import com.infomaniak.core.common.utils.today
 import kotlin.time.Clock
 
@@ -74,6 +75,8 @@ fun MainNavHost(
                 sceneDecoratorStrategies = sceneDecoratorStrategies(backStack, onCalendarViewSelected),
                 sceneStrategies = sceneStrategies(windowSizeClass),
                 sharedTransitionScope = this@SharedTransitionLayout,
+                transitionSpec = { NavigationTransition.contentTransform },
+                popTransitionSpec = { NavigationTransition.contentTransform },
             )
         }
     }
@@ -142,7 +145,7 @@ private fun baseEntryProvider(
 @Composable
 private fun sceneStrategies(windowSizeClass: WindowSizeClass): List<SceneStrategy<NavKey>> {
     // ResponsiveDialogSceneStrategy holds the scene of the ongoing dialog, it must survive recompositions.
-    return remember(windowSizeClass) { listOf(ResponsiveDialogSceneStrategy<NavKey>(windowSizeClass)) }
+    return remember(windowSizeClass) { listOf(ResponsiveDialogSceneStrategy(windowSizeClass)) }
 }
 
 private fun sceneDecoratorStrategies(

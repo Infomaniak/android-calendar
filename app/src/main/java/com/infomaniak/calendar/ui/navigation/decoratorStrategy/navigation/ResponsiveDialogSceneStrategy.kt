@@ -19,9 +19,6 @@ package com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -43,6 +40,7 @@ import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowSizeClass.Companion.HEIGHT_DP_MEDIUM_LOWER_BOUND
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
+import com.infomaniak.calendar.utils.NavigationTransition
 
 /**
  * Displays every trailing entry flagged with [SHOULD_SHOW_RESPONSIVE_DIALOG] inside a single [Dialog], as long as the window is
@@ -108,7 +106,7 @@ private class ResponsiveDialogScene<T : Any>(override val key: Any, private val 
                         AnimatedContent(
                             targetState = entries.last(),
                             modifier = Modifier.clip(AlertDialogDefaults.shape),
-                            transitionSpec = { fadeIn() togetherWith fadeOut() },
+                            transitionSpec = { NavigationTransition.contentTransform },
                             contentKey = { it.contentKey },
                         ) { animatedEntry ->
                             // AnimatedContent keeps the instance it was given when the content key showed up, but entries are
