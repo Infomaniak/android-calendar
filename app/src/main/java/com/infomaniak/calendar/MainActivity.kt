@@ -68,7 +68,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val lastCalendarView by mainViewModel.lastCalendarView.collectAsStateWithLifecycle()
-            val currentUserLoadState by mainViewModel.userLoadState.collectAsStateWithLifecycle()
+            val currentUserLoadState by mainViewModel.usersLoadState.collectAsStateWithLifecycle()
 
             CalendarTheme {
                 Surface {

@@ -63,7 +63,7 @@ class MainViewModel(
     val lastCalendarView: StateFlow<NavDestination.CalendarView?> = calendarDataValues.lastCalendarView.flow
         .stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
 
-    val userLoadState: StateFlow<UserLoadState> = accountUtils.users
+    val usersLoadState: StateFlow<UserLoadState> = accountUtils.users
         .map { users -> if (users.isEmpty()) UserLoadState.Loaded.Disconnected else UserLoadState.Loaded.Connected }
         .stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = UserLoadState.Awaiting)
 
