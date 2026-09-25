@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.infomaniak.calendar.components.resources.R
@@ -60,6 +61,7 @@ internal fun LocalDate.formatShortNumericDate(locale: Locale, currentYear: Int):
 /** `1 hour, 30 minutes before`, `At the event time`, `2 days after`, weeks being the largest unit of duration we display. */
 
 @Composable
+@ReadOnlyComposable
 fun Duration.formatDurationOffset(): String {
     if (absoluteValue.inWholeSeconds == 0L) {
         return stringResource(R.string.notificationTimeAtStart)
@@ -67,18 +69,23 @@ fun Duration.formatDurationOffset(): String {
     absoluteValue.toComponents { totalDays, hours, minutes, _, _ ->
         val weeks = (totalDays / DateTimeUnit.WEEK.days).toInt()
         val days = (totalDays % DateTimeUnit.WEEK.days).toInt()
-        val parts = buildList {
-            if (weeks > 0) add(pluralStringResource(R.plurals.weekAmount, weeks, weeks))
-            if (days > 0) add(pluralStringResource(R.plurals.dayAmount, days, days))
-            if (hours > 0) add(pluralStringResource(R.plurals.hourAmount, hours, hours))
-            if (minutes > 0) add(pluralStringResource(R.plurals.minuteAmount, minutes, minutes))
-        }
-        val isBefore = isNegative()
-        val durationText = parts.joinToString(", ")
-        return if (isBefore) {
+        val durationText = formatDurationParts(weeks, days, hours, minutes)
+
+        return if (isNegative()) {
             stringResource(R.string.notificationTimeBefore, durationText)
         } else {
             stringResource(R.string.notificationTimeAfter, durationText)
         }
     }
+}
+
+@Composable
+@ReadOnlyComposable
+private fun formatDurationParts(weeks: Int, days: Int, hours: Int, minutes: Int): String {
+    return buildList {
+        if (weeks > 0) add(pluralStringResource(R.plurals.weekAmount, weeks, weeks))
+        if (days > 0) add(pluralStringResource(R.plurals.dayAmount, days, days))
+        if (hours > 0) add(pluralStringResource(R.plurals.hourAmount, hours, hours))
+        if (minutes > 0) add(pluralStringResource(R.plurals.minuteAmount, minutes, minutes))
+    }.joinToString(", ")
 }
