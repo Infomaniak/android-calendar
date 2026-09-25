@@ -85,7 +85,7 @@ object ClickableItemDefaults {
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-private val ListItemDefaults.RectangleShapes
+internal val ListItemDefaults.RectangleShapes
     @Composable
     get() = shapes(
         shape = RectangleShape,
