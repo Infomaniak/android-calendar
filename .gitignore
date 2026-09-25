@@ -19,3 +19,6 @@ uitest-env.properties
 *.realm
 *.realm.lock
 *.mx
+
+# CalDAV debug proxy root CAs, generated per machine. See CaldavDebugConfig.
+app/src/debug/assets/certificates/*
