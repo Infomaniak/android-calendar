@@ -195,14 +195,19 @@ All CalendarComponents source lives **in this repository**. Changes to these mod
       process-wide client configuration (`configureCaldavClient()`, `CaldavClientConfig`).
     - **`:CalendarCore`** — public API module: domain models, Room database, repositories, `AccountManager`,
       `CalendarManager`, Apple `CalendarSDK`.
+- **Contacts module**: `:Contacts` is a standalone KMP module (server address book merged with device contacts, ETag
+  sync) wired by `:CalendarCore` via `api` + `ContactsModule`; it is exported in the XCFramework. The app provides
+  `ContactsSettings` (contacts database path, initial tokens) and gets `contactsManager` through `CalendarCoreGraph`.
+  Tokens live in RAM only (`updateTokens()` on refresh); `UserId`/`AccessToken` are the module's own types, mapped from
+  Core's `AccountId` at the boundary.
 - **Shared models / business logic**: The app imports from `com.infomaniak.multiplatform_calendar.core.*` (e.g.,
   `com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Color`) and the bridge from
   `com.infomaniak.multiplatform_calendar.data.remote.caldav.*` (e.g., `DavAccount`, `CaldavClientConfig`).
 - **DI**: The app uses Metro's `@DependencyGraph` (`AppGraph`) which picks up the `@ContributesTo(AppScope)` modules of
   both KMP modules (`CalendarCoreGraph`, `DatabaseModule`, `CaldavClientModule`). `CalendarCoreGraph` (in
-  `:CalendarCore` `commonMain`) defines the shared accessors (`accountManager`, `calendarManager`) and is automatically
-  merged into `AppGraph` (Android). On Apple, `CalendarSDK` lives in `:CalendarCore` `appleMain` and explicitly inherits
-  `CaldavClientModule` while also receiving the contributed bindings.
+  `:CalendarCore` `commonMain`) defines the shared accessors (`accountManager`, `calendarManager`, `contactsManager`)
+  and is automatically merged into `AppGraph` (Android). On Apple, `CalendarSDK` lives in `:CalendarCore` `appleMain`
+  and explicitly inherits `CaldavClientModule` while also receiving the contributed bindings.
 - **Apple artifact**: The public `MultiplatformCalendar.xcframework` is produced by `:CalendarCore`. `:CalendarKmpDav`
   is **not** exported: the public Apple API exposes only `:CalendarCore` types (e.g. credentials are passed as
   `DavCredentials`, mapped to `DavAccount` at the repository boundary). `CalendarSDKProvider.sdk(...)` is the Apple

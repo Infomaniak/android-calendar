@@ -32,6 +32,7 @@ import com.infomaniak.core.login.InfomaniakLogin
 import com.infomaniak.core.network.LOGIN_ENDPOINT_URL
 import com.infomaniak.multiplatform_calendar.core.crashreporting.CrashReport
 import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
+import com.infomaniak.multiplatform_core.contacts.ContactsSettings
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provides
@@ -82,6 +83,11 @@ interface AppGraph : AndroidComponentProvider, ViewModelGraph {
     @Provides
     @SingleIn(AppScope::class)
     fun provideCrashReportInterface(): CrashReport = AndroidCrashReport
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideContactsSettings(appContext: Context): ContactsSettings =
+        ContactsSettings(databasePath = appContext.getDatabasePath("contacts.db").absolutePath)
 
     @DependencyGraph.Factory
     fun interface Factory {
