@@ -17,8 +17,6 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
-import com.infomaniak.calendar.utils.account.AccountUtils
-import com.infomaniak.calendar.utils.toEventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.utils.account.AccountUtils

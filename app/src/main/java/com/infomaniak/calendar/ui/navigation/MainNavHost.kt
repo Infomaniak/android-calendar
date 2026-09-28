@@ -45,12 +45,11 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Respon
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
 import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
 import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
+import com.infomaniak.calendar.ui.screen.attendeesSearch.EventAttendeesScreen
 import com.infomaniak.calendar.ui.screen.day.DayScreen
-import com.infomaniak.calendar.ui.screen.eventDetail.EventAttendeesScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
-import com.infomaniak.calendar.ui.screen.attendeesSearch.EventAttendeesScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
