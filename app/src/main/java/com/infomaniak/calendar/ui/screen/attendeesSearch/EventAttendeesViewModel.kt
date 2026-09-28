@@ -19,7 +19,9 @@ package com.infomaniak.calendar.ui.screen.attendeesSearch
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
+import com.infomaniak.calendar.utils.toAttendeeUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
@@ -40,7 +42,7 @@ class EventAttendeesViewModel(private val getEventDetailUiUseCase: GetEventDetai
     @OptIn(ExperimentalCoroutinesApi::class)
     val eventAttendeesState: StateFlow<EventAttendeesUiState> = getEventDetailUiUseCase.eventFlow
         .map { event ->
-            val attendees = event?.attendees.orEmpty()
+            val attendees = event?.attendees.toAttendeesUiOrEmpty()
             when {
                 event == null -> EventAttendeesUiState.EventMissing
                 else -> EventAttendeesUiState.Loaded(
@@ -51,12 +53,14 @@ class EventAttendeesViewModel(private val getEventDetailUiUseCase: GetEventDetai
         }
         .stateIn(viewModelScope, SharingStarted.Lazily, EventAttendeesUiState.Loading)
 
+    private fun List<Attendee>?.toAttendeesUiOrEmpty(): List<AttendeeUi> = orEmpty().map { it.toAttendeeUi() }
+
     fun setOccurrenceId(occurrenceId: OccurrenceId) = getEventDetailUiUseCase.setOccurrenceId(occurrenceId)
 }
 
 sealed interface EventAttendeesUiState {
     data object Loading : EventAttendeesUiState
     data object EventMissing : EventAttendeesUiState
-    data class Loaded(val attendees: List<Attendee>, val contacts: List<Attendee>) : EventAttendeesUiState
+    data class Loaded(val attendees: List<AttendeeUi>, val contacts: List<AttendeeUi>) : EventAttendeesUiState
 }
 

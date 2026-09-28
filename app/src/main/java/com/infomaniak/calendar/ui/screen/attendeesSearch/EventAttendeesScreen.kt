@@ -38,9 +38,7 @@ import com.infomaniak.calendar.components.attendeessearch.state.AttendeesState
 import com.infomaniak.calendar.components.attendeessearch.state.rememberAttendeesState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.calendar.utils.toAttendeeUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationStatus
 
 @Composable
 fun EventAttendeesScreen(
@@ -59,12 +57,12 @@ fun EventAttendeesScreen(
     }
 
     when (val currentState = state) {
-        EventAttendeesUiState.Loading -> Unit // TODO: check how we want to handle the loading state while searching
+        EventAttendeesUiState.Loading -> Unit
         EventAttendeesUiState.EventMissing -> Unit
         is EventAttendeesUiState.Loaded -> {
             val attendeesState = rememberAttendeesState(
-                attendees = currentState.attendees.map { it.toAttendeeUi() },
-                contacts = currentState.contacts.map { it.toAttendeeUi() },
+                attendees = currentState.attendees,
+                contacts = currentState.contacts,
             )
 
             EventAttendeesScreen(
