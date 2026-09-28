@@ -34,6 +34,7 @@ fun List<Attendee>.toAttendees(accountId: AccountId, emailsByUserId: Map<Account
 }
 
 fun Attendee.toAttendeeUi(): AttendeeUi = AttendeeUi(
+    key = key,
     email = email,
     displayName = displayName,
     status = status.toParticipationStatus(),

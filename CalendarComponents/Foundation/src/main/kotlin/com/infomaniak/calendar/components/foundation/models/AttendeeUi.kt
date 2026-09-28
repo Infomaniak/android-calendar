@@ -27,6 +27,7 @@ import kotlinx.parcelize.Parcelize
 @Immutable
 @Parcelize
 data class AttendeeUi(
+    val key: String,
     val email: String,
     val displayName: String? = null,
     val status: ParticipationStatus,

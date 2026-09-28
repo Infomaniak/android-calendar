@@ -44,7 +44,7 @@ fun AttendeesList(
     ) {
         items(
             items = attendees(),
-            key = { attendee -> attendee.email }, // TODO: change to attendee.key when kmp adds it
+            key = { attendee -> attendee.key },
         ) { attendee ->
             EventAttendee(attendee = attendee)
         }

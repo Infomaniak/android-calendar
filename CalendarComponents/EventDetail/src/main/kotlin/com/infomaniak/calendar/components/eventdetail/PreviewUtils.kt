@@ -21,9 +21,34 @@ import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 
 internal val previewAttendees = listOf(
-    AttendeeUi(email = "alice@example.com", displayName = "Alice Johnson", status = ParticipationStatus.Accepted),
-    AttendeeUi(email = "ellen@example.com", displayName = "Ellen Joe", status = ParticipationStatus.NeedsAction),
-    AttendeeUi(email = "bob@example.com", displayName = "Bob Smith", status = ParticipationStatus.Tentative),
-    AttendeeUi(email = "carla@example.com", displayName = "Carla Lopez", status = ParticipationStatus.Declined),
-    AttendeeUi(email = "denis@example.com", displayName = "Denis Brown", status = ParticipationStatus.NeedsAction),
+    AttendeeUi(
+        "alice@example.com#Alice Johnson",
+        email = "alice@example.com",
+        displayName = "Alice Johnson",
+        status = ParticipationStatus.Accepted,
+    ),
+    AttendeeUi(
+        "ellen@example.com#Ellen Joe",
+        email = "ellen@example.com",
+        displayName = "Ellen Joe",
+        status = ParticipationStatus.NeedsAction,
+    ),
+    AttendeeUi(
+        "bob@example.com#Bob Smith",
+        email = "bob@example.com",
+        displayName = "Bob Smith",
+        status = ParticipationStatus.Tentative,
+    ),
+    AttendeeUi(
+        "carla@example.com#Carla Lopez",
+        email = "carla@example.com",
+        displayName = "Carla Lopez",
+        status = ParticipationStatus.Declined,
+    ),
+    AttendeeUi(
+        "denis@example.com#Denis Brown",
+        email = "denis@example.com",
+        displayName = "Denis Brown",
+        status = ParticipationStatus.NeedsAction,
+    ),
 )
