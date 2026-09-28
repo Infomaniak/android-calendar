@@ -23,7 +23,7 @@
     <string name="contentDescriptionInbox">Avaa saapuneet</string>
     <string name="contentDescriptionMenuDrawer">Avaa valikko</string>
     <string name="contentDescriptionSearch">Haku</string>
-    <string name="contentDescriptionToolbarCurrentViewButton">Nykyinen näkymä: %1$s. Napauta vaihtaaksesi näkymää.</string>
+    <string name="contentDescriptionToolbarCurrentViewButton">Nykyinen näkymä: %s. Napauta vaihtaaksesi näkymää.</string>
     <string name="dayTitle">Päivä</string>
     <string name="helpTitle">Apua</string>
     <string name="monthTitle">Kuukausi</string>
