@@ -25,7 +25,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
-import java.util.Locale
 
 @Stable
 class AttendeesState(
@@ -49,10 +48,10 @@ class AttendeesState(
     }
 
     private fun AttendeeUi.matchesQuery(query: String): Boolean {
-        val normalizedQuery = query.lowercase(Locale.ROOT)
+        val normalizedQuery = query.lowercase()
         return sequenceOf(email, displayName)
             .filterNotNull()
-            .any { value -> value.lowercase(Locale.ROOT).contains(normalizedQuery) }
+            .any { value -> value.lowercase().contains(normalizedQuery) }
     }
 }
 
