@@ -81,13 +81,13 @@ internal fun ClickableItem(
     )
 }
 
-object ClickableItemDefaults {
+internal object ClickableItemDefaults {
     val trailingContent = @Composable {
         Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null)
     }
 
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-    internal val ClickableItemShapes
+    val ClickableItemShapes
         @Composable get() = ListItemDefaults.shapes(MaterialTheme.shapes.large)
 }
 
