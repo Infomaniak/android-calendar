@@ -25,6 +25,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
@@ -40,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.eventdetail.detail.component.RectangleShapes
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.core.common.R as RCommon
@@ -79,7 +81,11 @@ internal fun KMeetButtonSwitch(
     onToggle: (isChecked: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val defaultColors = ListItemDefaults.colors()
+
     ListItem(
+        checked = checked(),
+        onCheckedChange = onToggle,
         content = { Text(stringResource(id = R.string.kMeetMeeting)) },
         leadingContent = {
             Icon(
@@ -90,6 +96,15 @@ internal fun KMeetButtonSwitch(
         },
         trailingContent = { Switch(checked = checked(), onCheckedChange = onToggle) },
         modifier = modifier,
+        colors = ListItemDefaults.colors(
+            selectedContainerColor = defaultColors.containerColor,
+            selectedContentColor = defaultColors.contentColor,
+            selectedLeadingContentColor = defaultColors.leadingContentColor,
+            selectedTrailingContentColor = defaultColors.trailingContentColor,
+            selectedSupportingContentColor = defaultColors.supportingContentColor,
+            selectedOverlineContentColor = defaultColors.overlineContentColor,
+        ),
+        shapes = ListItemDefaults.RectangleShapes,
     )
 }
 
