@@ -20,8 +20,8 @@
     <string name="allDayLabel">Journée</string>
     <string name="attendees">Invités</string>
     <plurals name="attendeesAcceptedCount">
-        <item quantity="one">%1$d accepté</item>
-        <item quantity="other">%1$d acceptés</item>
+        <item quantity="one">%d accepté</item>
+        <item quantity="other">%d acceptés</item>
     </plurals>
     <plurals name="attendeesCount">
         <item quantity="one">%1$d invité</item>
@@ -32,8 +32,8 @@
         <item quantity="other">%d refusés</item>
     </plurals>
     <plurals name="attendeesPendingCount">
-        <item quantity="one">%1$d en attente</item>
-        <item quantity="other">%1$d en attente</item>
+        <item quantity="one">%d en attente</item>
+        <item quantity="other">%d en attente</item>
     </plurals>
     <plurals name="attendeesTentativeCount">
         <item quantity="one">%1$d peut-être</item>
