@@ -47,11 +47,11 @@ class AttendeesState(
         searchQuery = query
     }
 
+    // This function will be replaced by KMP search
     private fun AttendeeUi.matchesQuery(query: String): Boolean {
         val normalizedQuery = query.lowercase()
-        return sequenceOf(email, displayName)
-            .filterNotNull()
-            .any { value -> value.lowercase().contains(normalizedQuery) }
+
+        return email.lowercase().contains(normalizedQuery) || displayName?.lowercase()?.contains(normalizedQuery) == true
     }
 }
 
