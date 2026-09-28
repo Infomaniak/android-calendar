@@ -43,7 +43,7 @@ class AttendeesState(
         }
     }
 
-    fun onSearchQueryChanged(query: String) {
+    fun updateQuery(query: String) {
         searchQuery = query
     }
 
