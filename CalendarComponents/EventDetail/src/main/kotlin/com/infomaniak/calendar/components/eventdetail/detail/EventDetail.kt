@@ -54,7 +54,6 @@ import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventShare
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.eventdetail.previewAttendees
 import com.infomaniak.calendar.components.foundation.models.Attendees
-import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
 import kotlin.time.Duration.Companion.days
@@ -76,27 +75,18 @@ fun EventDetail(
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
-    val horizontalContentPadding = contentPadding.onlyHorizontal()
-
     Column(
-        modifier = modifier.padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding()),
+        modifier = modifier.padding(contentPadding),
     ) {
         with(eventDetail) {
-            Title(
-                dotColor = eventColor,
-                title = title,
-                modifier = Modifier
-                    .padding(horizontalContentPadding)
-                    .eventSharedElement(EventSharedElement.Title),
-            )
-            DateAndTime(start, end, isAllDay, Modifier.padding(horizontalContentPadding))
+            Title(dotColor = eventColor, title = title, modifier = Modifier.eventSharedElement(EventSharedElement.Title))
+            DateAndTime(start, end, isAllDay)
 
-            Section(contentPadding = horizontalContentPadding) {
+            Section {
                 if (attendees.all.isNotEmpty()) {
                     AttendeesButton(
                         attendees = attendees.all,
                         onClick = {},
-                        contentPadding = horizontalContentPadding,
                         modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
                     )
                 }
@@ -105,45 +95,42 @@ fun EventDetail(
                     KMeetButton(
                         onJoin = onJoinKMeet,
                         onCopy = onCopyKMeet,
-                        modifier = Modifier
-                            .padding(horizontalContentPadding)
-                            .eventSharedElement(EventSharedElement.KMeet),
+                        modifier = Modifier.eventSharedElement(EventSharedElement.KMeet),
                     )
                 }
 
                 if (location?.isNotBlank() == true) {
-                    LocationButton(location = location, onClick = onLocationClick, contentPadding = horizontalContentPadding)
+                    LocationButton(location = location, onClick = onLocationClick)
                 }
 
                 if (room != null) {
-                    RoomButton(room = room, onClick = onRoomClick, contentPadding = horizontalContentPadding)
+                    RoomButton(room = room, onClick = onRoomClick)
                 }
             }
 
-            Section(contentPadding = horizontalContentPadding) {
+            Section {
                 if (description?.isNotBlank() == true) {
-                    DescriptionCollapsibleButton(description = description, contentPadding = horizontalContentPadding)
+                    DescriptionCollapsibleButton(description = description)
                 }
 
-                AttachmentFiles(files, onFileClick = { /*TODO[eventDetail]*/ }, contentPadding = horizontalContentPadding)
+                AttachmentFiles(files, onFileClick = { /*TODO[eventDetail]*/ })
             }
 
-            Section(contentPadding = horizontalContentPadding) {
+            Section {
                 Notifications(
                     notifications,
                     onNotificationClick = { /*TODO[eventDetail]*/ },
-                    contentPadding = horizontalContentPadding,
                 )
             }
 
-            Section(contentPadding = horizontalContentPadding) {
-                OccupiedStatus(isOccupied, modifier = Modifier.padding(horizontalContentPadding))
+            Section {
+                OccupiedStatus(isOccupied, modifier = Modifier)
 
                 if (classification != null) {
-                    ClassificationStatus(classification, modifier = Modifier.padding(horizontalContentPadding))
+                    ClassificationStatus(classification, modifier = Modifier)
                 }
 
-                Calendar(calendarColor, calendarName, modifier = Modifier.padding(horizontalContentPadding))
+                Calendar(calendarColor, calendarName, modifier = Modifier)
             }
         }
     }

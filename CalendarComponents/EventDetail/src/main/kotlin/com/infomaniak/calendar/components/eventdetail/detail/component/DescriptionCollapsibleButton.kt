@@ -53,7 +53,7 @@ private const val COLLAPSED_MAX_LINES = 3
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-internal fun DescriptionCollapsibleButton(description: String, contentPadding: PaddingValues) {
+internal fun DescriptionCollapsibleButton(description: String, contentPadding: PaddingValues = PaddingValues()) {
     var isCollapsed by rememberSaveable { mutableStateOf(true) }
     val descriptionState = rememberCollapsibleTextState(isCollapsed, COLLAPSED_MAX_LINES)
 

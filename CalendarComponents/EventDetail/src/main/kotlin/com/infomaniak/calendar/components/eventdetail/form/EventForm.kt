@@ -38,7 +38,6 @@ import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventShare
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.previewAttendees
-import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 
 /**
  * Reusable component for both the creation and the edition of an event.
@@ -54,33 +53,26 @@ fun EventForm(
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
-    val horizontalContentPadding = contentPadding.onlyHorizontal()
-
     Column(
-        modifier.padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding()),
+        modifier.padding(contentPadding),
     ) {
         TitleEditable(
             dotColor = state.colorState.value ?: Color.Transparent, // Temporarily hide the dot until we get the actual color
             textFieldState = state.titleTextState,
-            modifier = Modifier
-                .padding(horizontalContentPadding)
-                .eventSharedElement(EventSharedElement.Title),
+            modifier = Modifier.eventSharedElement(EventSharedElement.Title),
         )
 
-        Section(contentPadding = horizontalContentPadding) {
+        Section {
             AttendeesButton(
                 attendees = state.attendeesState.value,
                 onClick = onAttendeesClick,
-                contentPadding = horizontalContentPadding,
                 modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
             )
 
             KMeetButtonSwitch(
                 checked = { state.isKMeetUrlEnabled.value },
                 onToggle = { isChecked -> state.isKMeetUrlEnabled.value = isChecked },
-                modifier = Modifier
-                    .padding(horizontalContentPadding)
-                    .eventSharedElement(EventSharedElement.KMeet),
+                modifier = Modifier.eventSharedElement(EventSharedElement.KMeet),
             )
         }
     }
