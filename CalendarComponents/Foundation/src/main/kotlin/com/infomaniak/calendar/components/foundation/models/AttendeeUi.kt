@@ -37,6 +37,6 @@ data class AttendeeUi(
 enum class ParticipationStatus(@PluralsRes val countPluralRes: Int) {
     Accepted(R.plurals.attendeesAcceptedCount),
     Tentative(R.plurals.attendeesTentativeCount),
-    NeedsAction(R.plurals.attendeesPendingCount),
     Declined(R.plurals.attendeesDeclinedCount),
+    NeedsAction(R.plurals.attendeesPendingCount),
 }

@@ -91,7 +91,7 @@ internal fun AttendeesButton(
     )
 }
 
-private val participationSummaryOrder = listOf(Accepted, Tentative, NeedsAction, Declined)
+private val participationSummaryOrder = listOf(Accepted, Tentative, Declined, NeedsAction)
 
 @Composable
 @ReadOnlyComposable
