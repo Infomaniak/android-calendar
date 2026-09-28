@@ -25,6 +25,7 @@
     <string name="contentDescriptionSearch">Haku</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Nykyinen näkymä: %s. Napauta vaihtaaksesi näkymää.</string>
     <string name="dayTitle">Päivä</string>
+    <string name="eventOccurrenceNotFound">Tämä tapahtuma ei ole enää saatavilla.</string>
     <string name="helpTitle">Apua</string>
     <string name="monthTitle">Kuukausi</string>
     <string name="planningTitle">Suunnittelu</string>

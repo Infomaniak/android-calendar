@@ -25,6 +25,7 @@
     <string name="contentDescriptionSearch">Pesquisar</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Vista atual: %s. Toque para mudar de vista.</string>
     <string name="dayTitle">Dia</string>
+    <string name="eventOccurrenceNotFound">Este evento já não está disponível.</string>
     <string name="helpTitle">Ajuda</string>
     <string name="monthTitle">Mês</string>
     <string name="planningTitle">Planeamento</string>

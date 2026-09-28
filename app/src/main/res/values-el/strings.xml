@@ -25,6 +25,7 @@
     <string name="contentDescriptionSearch">Αναζήτηση</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Τρέχουσα προβολή: %s. Πατήστε για να αλλάξετε την προβολή.</string>
     <string name="dayTitle">Ημέρα</string>
+    <string name="eventOccurrenceNotFound">Αυτή η εκδήλωση δεν είναι πλέον διαθέσιμη.</string>
     <string name="helpTitle">Βοήθεια</string>
     <string name="monthTitle">Μήνας</string>
     <string name="planningTitle">Προγραμματισμός</string>

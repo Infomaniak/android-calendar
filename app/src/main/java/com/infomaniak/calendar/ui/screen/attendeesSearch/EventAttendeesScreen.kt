@@ -37,6 +37,7 @@ import com.infomaniak.calendar.components.attendeessearch.preview.previewAttende
 import com.infomaniak.calendar.components.attendeessearch.state.AttendeesState
 import com.infomaniak.calendar.components.attendeessearch.state.rememberAttendeesState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 
@@ -50,15 +51,20 @@ fun EventAttendeesScreen(
     val state by viewModel.eventAttendeesState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        if (state is EventAttendeesUiState.EventMissing) {
-            goBack()
-        }
         viewModel.setOccurrenceId(occurrenceId)
     }
 
     when (val currentState = state) {
         EventAttendeesUiState.Loading -> Unit
-        EventAttendeesUiState.EventMissing -> Unit
+        EventAttendeesUiState.EventMissing -> {
+            val snackbarHostState = LocalSharedSnackbarHostState.current
+            val eventMissingMessage = stringResource(R.string.eventOccurrenceNotFound)
+
+            LaunchedEffect(Unit) {
+                snackbarHostState?.showSnackbar(eventMissingMessage)
+                goBack()
+            }
+        }
         is EventAttendeesUiState.Loaded -> {
             val attendeesState = rememberAttendeesState(
                 attendees = currentState.attendees,

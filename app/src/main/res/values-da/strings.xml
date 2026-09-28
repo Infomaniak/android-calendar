@@ -25,6 +25,7 @@
     <string name="contentDescriptionSearch">Søg</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Aktuel visning: %s. Tryk for at skifte visning.</string>
     <string name="dayTitle">Dag</string>
+    <string name="eventOccurrenceNotFound">Denne begivenhed er ikke længere tilgængelig.</string>
     <string name="helpTitle">Hjælp</string>
     <string name="monthTitle">Måned</string>
     <string name="planningTitle">Planlægning</string>

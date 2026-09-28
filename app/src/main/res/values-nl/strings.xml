@@ -25,6 +25,7 @@
     <string name="contentDescriptionSearch">Zoeken</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Huidige weergave: %s. Tik om de weergave te wijzigen.</string>
     <string name="dayTitle">Dag</string>
+    <string name="eventOccurrenceNotFound">Dit evenement is niet meer beschikbaar.</string>
     <string name="helpTitle">Hulp</string>
     <string name="monthTitle">Maand</string>
     <string name="planningTitle">Planning</string>
