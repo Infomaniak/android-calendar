@@ -18,17 +18,36 @@
 <resources>
     <string name="addEventLabel">Dodaj</string>
     <string name="allDayLabel">Przez cały dzień</string>
+    <string name="attendees">Uczestnicy</string>
     <plurals name="attendeesAcceptedCount">
-        <item quantity="one">%1$d zaakceptowany</item>
-        <item quantity="few">%1$d zaakceptowani</item>
-        <item quantity="many">%1$d zaakceptowanych</item>
-        <item quantity="other">%1$d zaakceptowanych</item>
+        <item quantity="one">%d zaakceptowany</item>
+        <item quantity="few">%d zaakceptowani</item>
+        <item quantity="many">%d zaakceptowanych</item>
+        <item quantity="other">%d zaakceptowanych</item>
     </plurals>
     <plurals name="attendeesCount">
         <item quantity="one">%1$d gość</item>
         <item quantity="few">%1$d gości</item>
         <item quantity="many">%1$d gości</item>
         <item quantity="other">%1$d gościa</item>
+    </plurals>
+    <plurals name="attendeesDeclinedCount">
+        <item quantity="one">%d odrzucony</item>
+        <item quantity="few">%d odrzucone</item>
+        <item quantity="many">%d odrzucone</item>
+        <item quantity="other">%d odrzucone</item>
+    </plurals>
+    <plurals name="attendeesPendingCount">
+        <item quantity="one">%d oczekujący</item>
+        <item quantity="few">%d oczekujących</item>
+        <item quantity="many">%d oczekujących</item>
+        <item quantity="other">%d oczekujących</item>
+    </plurals>
+    <plurals name="attendeesTentativeCount">
+        <item quantity="one">%1$d może</item>
+        <item quantity="few">%1$d może</item>
+        <item quantity="many">%1$d może</item>
+        <item quantity="other">%1$d może</item>
     </plurals>
     <string name="availableLabel">Wolny</string>
     <string name="buttonJoin">Dołącz</string>

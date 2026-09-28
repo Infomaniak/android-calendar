@@ -60,6 +60,7 @@ private fun EventCreationScreen(
     ) { contentPadding ->
         EventForm(
             state = state,
+            onAttendeesClick = { /*TODO[eventForm]*/ },
             contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
         )
     }
