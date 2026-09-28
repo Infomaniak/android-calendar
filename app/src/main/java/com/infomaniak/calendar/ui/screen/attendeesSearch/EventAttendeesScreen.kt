@@ -55,7 +55,7 @@ fun EventAttendeesScreen(
     }
 
     when (val currentState = state) {
-        EventAttendeesUiState.Loading -> Unit
+        EventAttendeesUiState.Loading -> Unit // This happens too quickly, so no need to show anything
         EventAttendeesUiState.EventMissing -> {
             val snackbarHostState = LocalSharedSnackbarHostState.current
             val eventMissingMessage = stringResource(R.string.eventOccurrenceNotFound)
