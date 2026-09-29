@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.attendeessearch.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -48,6 +49,7 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
 fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
+            .background(ListItemDefaults.colors().containerColor)
             .padding(start = EsdsTheme.spacing.lg),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -59,9 +61,6 @@ fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
         )
         ListItem(
             modifier = Modifier,
-            colors = ListItemDefaults.colors(
-                containerColor = Color.Transparent,
-            ),
             overlineContent = {
                 AttendeeParticipationStatus(attendee.status, attendee.isOrganizer)
             },
@@ -152,23 +151,23 @@ fun ParticipationStatusText(text: String, color: Color, isOrganizer: Boolean, mo
 @Preview
 @Composable
 private fun PreviewAttendeeAccepted() {
-    Surface() {
-        EventAttendee(AttendeeUi("alice@example.com#Alice","alice@example.com", "Alice", ParticipationStatus.Accepted, true))
+    Surface {
+        EventAttendee(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Accepted, true))
     }
 }
 
 @Preview
 @Composable
 private fun PreviewAttendeeDeclined() {
-    Surface() {
-        EventAttendee(AttendeeUi("alice@example.com#","alice@example.com", null, ParticipationStatus.Declined))
+    Surface {
+        EventAttendee(AttendeeUi("alice@example.com#", "alice@example.com", null, ParticipationStatus.Declined))
     }
 }
 
 @Preview
 @Composable
 private fun PreviewAttendeeMaybe() {
-    Surface() {
+    Surface {
         EventAttendee(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Tentative))
     }
 }
@@ -176,8 +175,7 @@ private fun PreviewAttendeeMaybe() {
 @Preview
 @Composable
 private fun PreviewAttendeePending() {
-    Surface() {
+    Surface {
         EventAttendee(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.NeedsAction))
     }
 }
-
