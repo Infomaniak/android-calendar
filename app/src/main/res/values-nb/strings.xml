@@ -17,7 +17,7 @@
   -->
 <resources>
     <string name="accountsTitle">Kontoer</string>
-    <string name="addAccount">Legg til en konto</string>
+    <string name="buttonAddAccount">Legg til en konto</string>
     <string name="buttonLogOut">Logg ut</string>
     <string name="contentDescriptionBack">Tilbake</string>
     <string name="contentDescriptionInbox">Åpne innboksen</string>

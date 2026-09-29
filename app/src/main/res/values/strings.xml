@@ -17,7 +17,7 @@
   -->
 <resources>
     <string name="accountsTitle">Accounts</string>
-    <string name="addAccount">Add an account</string>
+    <string name="buttonAddAccount">Add an account</string>
     <string name="buttonLogOut">Log Out</string>
     <string name="contentDescriptionBack">Back</string>
     <string name="contentDescriptionInbox">Open inbox</string>

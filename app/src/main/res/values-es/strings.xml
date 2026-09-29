@@ -17,7 +17,7 @@
   -->
 <resources>
     <string name="accountsTitle">Cuentas</string>
-    <string name="addAccount">Añadir una cuenta</string>
+    <string name="buttonAddAccount">Añadir una cuenta</string>
     <string name="buttonLogOut">Cerrar sesión</string>
     <string name="contentDescriptionBack">Atrás</string>
     <string name="contentDescriptionInbox">Abrir la bandeja de entrada</string>

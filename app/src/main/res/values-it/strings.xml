@@ -17,7 +17,7 @@
   -->
 <resources>
     <string name="accountsTitle">Conti</string>
-    <string name="addAccount">Aggiungi un account</string>
+    <string name="buttonAddAccount">Aggiungi un account</string>
     <string name="buttonLogOut">Esci</string>
     <string name="contentDescriptionBack">Indietro</string>
     <string name="contentDescriptionInbox">Apri la posta in arrivo</string>

@@ -17,7 +17,7 @@
   -->
 <resources>
     <string name="accountsTitle">Accounts</string>
-    <string name="addAccount">Een account toevoegen</string>
+    <string name="buttonAddAccount">Een account toevoegen</string>
     <string name="buttonLogOut">Uitloggen</string>
     <string name="contentDescriptionBack">Terug</string>
     <string name="contentDescriptionInbox">Postvak IN openen</string>

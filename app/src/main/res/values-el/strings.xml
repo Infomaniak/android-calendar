@@ -17,7 +17,7 @@
   -->
 <resources>
     <string name="accountsTitle">Λογαριασμοί</string>
-    <string name="addAccount">Προσθήκη λογαριασμού</string>
+    <string name="buttonAddAccount">Προσθήκη λογαριασμού</string>
     <string name="buttonLogOut">Αποσύνδεση</string>
     <string name="contentDescriptionBack">Πίσω</string>
     <string name="contentDescriptionInbox">Άνοιγμα εισερχομένων</string>
