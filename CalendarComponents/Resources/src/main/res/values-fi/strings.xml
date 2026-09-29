@@ -61,6 +61,7 @@
         <item quantity="one">%d tunti</item>
         <item quantity="other">%d tuntia</item>
     </plurals>
+    <string name="kMeetMeeting">kMeet-kokous</string>
     <plurals name="minuteAmount">
         <item quantity="one">%d minuutti</item>
         <item quantity="other">%d minuuttia</item>

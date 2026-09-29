@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.eventdetail.component.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.resources.R
 
@@ -35,7 +36,7 @@ import com.infomaniak.calendar.components.resources.R
 internal fun ClassificationStatus(classification: EventDetailUi.Classification, modifier: Modifier = Modifier) {
     ListItem(
         content = { Text(text = stringResource(classification.label)) },
-        leadingContent = { Icon(painter = painterResource(R.drawable.ic_lock), contentDescription = null) },
+        leadingContent = { ItemIcon(painterResource(R.drawable.ic_lock)) },
         modifier = modifier,
     )
 }

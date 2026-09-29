@@ -43,7 +43,6 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.theme.MaterialPreviewTheme
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 private const val MAX_LINES = Int.MAX_VALUE
 
@@ -89,8 +88,8 @@ internal fun TitleEditable(dotColor: Color, textFieldState: TextFieldState, modi
 private fun EventColorDot(color: Color) {
     Box(
         modifier = Modifier
-            .size(EsdsTheme.icon.sizeMd)
-            .padding(2.dp)
+            .size(ItemIconDefaults.size)
+            .padding(1.dp)
             .clip(CircleShape)
             .background(color),
     )

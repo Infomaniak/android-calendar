@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.detail.component
+package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
@@ -30,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.resources.R
 
@@ -48,7 +47,7 @@ internal fun ClickableItem(
     ClickableItem(
         text = text,
         supportingContent = supportingContent,
-        leadingContent = { Icon(painterResource(leadingIconRes), contentDescription = null) },
+        leadingContent = { ItemIcon(painterResource(leadingIconRes)) },
         trailingContent = trailingContent,
         onClick = onClick,
         contentPadding = contentPadding,

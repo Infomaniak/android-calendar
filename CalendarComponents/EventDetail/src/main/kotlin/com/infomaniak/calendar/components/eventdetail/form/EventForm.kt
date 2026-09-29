@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
+import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitch
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
@@ -72,6 +73,14 @@ fun EventForm(
                 onClick = onAttendeesClick,
                 contentPadding = horizontalContentPadding,
                 modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
+            )
+
+            KMeetButtonSwitch(
+                checked = { state.isKMeetUrlEnabled.value },
+                onToggle = { isChecked -> state.isKMeetUrlEnabled.value = isChecked },
+                modifier = Modifier
+                    .padding(horizontalContentPadding)
+                    .eventSharedElement(EventSharedElement.KMeet),
             )
         }
     }

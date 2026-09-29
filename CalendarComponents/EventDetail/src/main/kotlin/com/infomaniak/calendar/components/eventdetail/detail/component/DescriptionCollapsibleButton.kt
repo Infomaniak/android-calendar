@@ -42,6 +42,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.eventdetail.component.ItemIcon
+import com.infomaniak.calendar.components.eventdetail.component.RectangleShapes
 import com.infomaniak.calendar.components.eventdetail.state.CollapsibleTextState
 import com.infomaniak.calendar.components.eventdetail.state.animateCollapse
 import com.infomaniak.calendar.components.eventdetail.state.rememberCollapsibleTextState
@@ -63,7 +65,7 @@ internal fun DescriptionCollapsibleButton(description: String, contentPadding: P
         ListItem(
             content = { Text(stringResource(descriptionTitle)) },
             supportingContent = { DescriptionContent(description, descriptionState) },
-            leadingContent = { Icon(painterResource(leadingIconRes), contentDescription = null) },
+            leadingContent = { ItemIcon(painterResource(leadingIconRes)) },
             trailingContent = { AnimatedChevron({ isCollapsed }) },
             onClick = { isCollapsed = !isCollapsed },
             shapes = ListItemDefaults.RectangleShapes,
@@ -73,7 +75,7 @@ internal fun DescriptionCollapsibleButton(description: String, contentPadding: P
         ListItem(
             content = { Text(stringResource(descriptionTitle)) },
             supportingContent = { DescriptionContent(description, descriptionState) },
-            leadingContent = { Icon(painterResource(leadingIconRes), contentDescription = null) },
+            leadingContent = { ItemIcon(painterResource(leadingIconRes)) },
             modifier = Modifier.padding(contentPadding),
         )
     }
