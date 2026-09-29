@@ -53,9 +53,7 @@ fun EventForm(
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
-    Column(
-        modifier.padding(contentPadding),
-    ) {
+    Column(modifier.padding(contentPadding)) {
         TitleEditable(
             dotColor = state.colorState.value ?: Color.Transparent, // Temporarily hide the dot until we get the actual color
             textFieldState = state.titleTextState,

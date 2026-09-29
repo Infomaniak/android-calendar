@@ -75,9 +75,7 @@ fun EventDetail(
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
-    Column(
-        modifier = modifier.padding(contentPadding),
-    ) {
+    Column(modifier = modifier.padding(contentPadding)) {
         with(eventDetail) {
             Title(dotColor = eventColor, title = title, modifier = Modifier.eventSharedElement(EventSharedElement.Title))
             DateAndTime(start, end, isAllDay)
