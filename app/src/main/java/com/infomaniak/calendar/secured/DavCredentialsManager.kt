@@ -22,6 +22,7 @@ import com.infomaniak.calendar.utils.account.accountId
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCredentials
 import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
+import com.infomaniak.multiplatform_core.account.domain.model.AccessToken
 import com.infomaniak.multiplatform_core.account.domain.model.AccountId
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.flow.first
@@ -36,24 +37,25 @@ class DavCredentialsManager @Inject constructor(
     private val dataValues: CalendarDataValues,
     private val accountManager: AccountManager,
 ) {
-    suspend fun initStoredCredentials() {
-        dataValues.davCredentials.flow.first().forEach { (userId, credentials) ->
-            initAccountCredential(AccountId(userId), credentials)
+    /** Inits the accounts of [users] that have stored credentials. */
+    suspend fun initStoredCredentials(users: List<User>) {
+        val credentialsByUserId = dataValues.davCredentials.flow.first()
+        users.forEach { user ->
+            credentialsByUserId[user.accountId.value]?.let { initAccount(user, it) }
         }
     }
 
     suspend fun addCredential(user: User, davCredentials: DavCredentials) {
-        val accountId = user.accountId
-        dataValues.davCredentials.update { current -> current + (accountId.value to davCredentials) }
-        initAccountCredential(accountId, davCredentials)
-    }
-
-    suspend fun initAccountCredential(accountId: AccountId, davCredentials: DavCredentials) {
-        accountManager.initAccount(accountId, davCredentials)
+        dataValues.davCredentials.update { current -> current + (user.accountId.value to davCredentials) }
+        initAccount(user, davCredentials)
     }
 
     suspend fun removeCredential(userId: Long) {
         dataValues.davCredentials.update { it - userId }
         accountManager.removeAccount(AccountId(userId))
+    }
+
+    private suspend fun initAccount(user: User, davCredentials: DavCredentials) {
+        accountManager.initAccount(user.accountId, davCredentials, AccessToken(user.apiToken.accessToken))
     }
 }

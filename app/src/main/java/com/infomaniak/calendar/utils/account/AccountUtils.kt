@@ -25,6 +25,7 @@ import com.infomaniak.core.auth.models.user.User
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 @Inject
@@ -35,6 +36,10 @@ class AccountUtils(
 ) : UserAccountUtils(appContext, { MainApplication.userDataCleanableList }) {
     val emailsByUserId = users.map { user ->
         user.associateBy({ it.accountId }, { it.email })
+    }
+
+    suspend fun initStoredAccounts() {
+        davCredentialsManager.initStoredCredentials(users.first())
     }
 
     suspend fun addUser(calendarUser: CalendarUser) {
