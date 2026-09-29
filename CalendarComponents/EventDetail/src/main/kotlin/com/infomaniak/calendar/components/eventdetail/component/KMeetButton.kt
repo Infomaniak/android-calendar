@@ -95,7 +95,7 @@ internal fun KMeetButtonSwitch(
             selectedSupportingContentColor = defaultColors.supportingContentColor,
             selectedOverlineContentColor = defaultColors.overlineContentColor,
         ),
-        shapes = ListItemDefaults.RectangleShapes,
+        shapes = ClickableItemDefaults.ClickableItemShapes,
     )
 }
 

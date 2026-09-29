@@ -40,10 +40,10 @@ internal fun AttachmentFiles(
                 val fileType = file.fileType
                 ItemIcon(fileType.icon, tint = fileType.color(LocalIsThemeDarkMode.current))
             },
-            trailingContent = {},
             onClick = { onFileClick(file.id) },
-            contentPadding = contentPadding,
             modifier = modifier,
+            contentPadding = contentPadding,
+            trailingContent = {},
         )
     }
 }

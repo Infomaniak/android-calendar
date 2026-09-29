@@ -42,8 +42,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.eventdetail.component.ClickableItemDefaults
 import com.infomaniak.calendar.components.eventdetail.component.ItemIcon
-import com.infomaniak.calendar.components.eventdetail.component.RectangleShapes
 import com.infomaniak.calendar.components.eventdetail.state.CollapsibleTextState
 import com.infomaniak.calendar.components.eventdetail.state.animateCollapse
 import com.infomaniak.calendar.components.eventdetail.state.rememberCollapsibleTextState
@@ -53,7 +53,7 @@ private const val COLLAPSED_MAX_LINES = 3
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-internal fun DescriptionCollapsibleButton(description: String, contentPadding: PaddingValues) {
+internal fun DescriptionCollapsibleButton(description: String, contentPadding: PaddingValues = PaddingValues()) {
     var isCollapsed by rememberSaveable { mutableStateOf(true) }
     val descriptionState = rememberCollapsibleTextState(isCollapsed, COLLAPSED_MAX_LINES)
 
@@ -68,7 +68,7 @@ internal fun DescriptionCollapsibleButton(description: String, contentPadding: P
             leadingContent = { ItemIcon(painterResource(leadingIconRes)) },
             trailingContent = { AnimatedChevron({ isCollapsed }) },
             onClick = { isCollapsed = !isCollapsed },
-            shapes = ListItemDefaults.RectangleShapes,
+            shapes = ClickableItemDefaults.ClickableItemShapes,
             contentPadding = contentPadding + ListItemDefaults.ContentPadding,
         )
     } else {

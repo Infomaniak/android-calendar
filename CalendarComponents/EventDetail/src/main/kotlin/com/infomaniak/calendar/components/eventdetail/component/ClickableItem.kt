@@ -23,12 +23,12 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.resources.R
@@ -41,17 +41,19 @@ internal fun ClickableItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
     trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
     supportingContent: @Composable (() -> Unit)? = null,
 ) {
     ClickableItem(
         text = text,
-        supportingContent = supportingContent,
         leadingContent = { ItemIcon(painterResource(leadingIconRes)) },
-        trailingContent = trailingContent,
         onClick = onClick,
-        contentPadding = contentPadding,
         modifier = modifier,
+        contentPadding = contentPadding,
+        trailingContent = trailingContent,
+        supportingContent = supportingContent,
+        shapes = shapes,
     )
 }
 
@@ -63,6 +65,7 @@ internal fun ClickableItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
     trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
     supportingContent: @Composable (() -> Unit)? = null,
 ) {
@@ -73,28 +76,20 @@ internal fun ClickableItem(
         leadingContent = leadingContent,
         trailingContent = trailingContent,
         onClick = onClick,
-        shapes = ListItemDefaults.RectangleShapes,
+        shapes = shapes,
         contentPadding = contentPadding + ListItemDefaults.ContentPadding,
     )
 }
 
-object ClickableItemDefaults {
+internal object ClickableItemDefaults {
     val trailingContent = @Composable {
         Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null)
     }
-}
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-internal val ListItemDefaults.RectangleShapes
-    @Composable
-    get() = shapes(
-        shape = RectangleShape,
-        selectedShape = RectangleShape,
-        pressedShape = RectangleShape,
-        focusedShape = RectangleShape,
-        hoveredShape = RectangleShape,
-        draggedShape = RectangleShape,
-    )
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    val ClickableItemShapes
+        @Composable get() = ListItemDefaults.shapes(MaterialTheme.shapes.large)
+}
 
 @Preview
 @Composable
