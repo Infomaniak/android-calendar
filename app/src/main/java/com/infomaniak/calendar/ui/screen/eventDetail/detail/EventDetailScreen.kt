@@ -41,7 +41,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
-import com.infomaniak.calendar.components.eventdetail.component.ParticipationStatusButtonsToolbar
+import com.infomaniak.calendar.components.eventdetail.detail.component.ParticipationStatusButtonsToolbar
 import com.infomaniak.calendar.components.eventdetail.detail.EventDetail
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi

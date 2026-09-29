@@ -41,7 +41,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.detail.component.RectangleShapes
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.core.common.R as RCommon
@@ -55,13 +54,7 @@ internal fun KMeetButton(
 ) {
     ListItem(
         content = { Text(stringResource(id = R.string.participateKMeetTitle)) },
-        leadingContent = {
-            Icon(
-                painter = painterResource(R.drawable.ic_product_kmeet),
-                contentDescription = null,
-                modifier = Modifier.size(EsdsTheme.icon.sizeSm),
-            )
-        },
+        leadingContent = { KMeetIcon() },
         trailingContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Button(onClick = onJoin) {
@@ -87,13 +80,7 @@ internal fun KMeetButtonSwitch(
         checked = checked(),
         onCheckedChange = onToggle,
         content = { Text(stringResource(id = R.string.kMeetMeeting)) },
-        leadingContent = {
-            Icon(
-                painter = painterResource(R.drawable.ic_product_kmeet),
-                contentDescription = null,
-                modifier = Modifier.size(EsdsTheme.icon.sizeSm),
-            )
-        },
+        leadingContent = { KMeetIcon() },
         trailingContent = { Switch(checked = checked(), onCheckedChange = onToggle) },
         modifier = modifier,
         colors = ListItemDefaults.colors(
@@ -106,6 +93,11 @@ internal fun KMeetButtonSwitch(
         ),
         shapes = ListItemDefaults.RectangleShapes,
     )
+}
+
+@Composable
+private fun KMeetIcon() {
+    ItemIcon(painterResource(R.drawable.ic_product_kmeet))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

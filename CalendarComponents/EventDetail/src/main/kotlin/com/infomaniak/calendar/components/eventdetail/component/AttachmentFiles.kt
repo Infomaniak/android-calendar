@@ -18,17 +18,13 @@
 package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.detail.component.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.core.ui.compose.theme.LocalIsThemeDarkMode
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
 internal fun AttachmentFiles(
@@ -42,12 +38,7 @@ internal fun AttachmentFiles(
             text = file.name,
             leadingContent = {
                 val fileType = file.fileType
-                Icon(
-                    imageVector = fileType.icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(EsdsTheme.icon.sizeSm),
-                    tint = fileType.color(LocalIsThemeDarkMode.current),
-                )
+                ItemIcon(fileType.icon, tint = fileType.color(LocalIsThemeDarkMode.current))
             },
             trailingContent = {},
             onClick = { onFileClick(file.id) },
