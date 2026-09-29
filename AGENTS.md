@@ -198,8 +198,9 @@ All CalendarComponents source lives **in this repository**. Changes to these mod
 - **Contacts module**: `:Contacts` is a standalone KMP module (server address book merged with device contacts, ETag
   sync) wired by `:CalendarCore` via `api` + `ContactsModule`; it is exported in the XCFramework. The app provides
   `ContactsSettings` (contacts database path, initial tokens) and gets `contactsManager` through `CalendarCoreGraph`.
-  Tokens live in RAM only (`updateTokens()` on refresh); `UserId`/`AccessToken` are the module's own types, mapped from
-  Core's `AccountId` at the boundary.
+  Tokens live in RAM only (`updateTokens()` on refresh).
+- **Account module**: `:Account` holds the identity types shared by `:CalendarCore` and `:Contacts` (`AccountId`,
+  `AccessToken`, package `com.infomaniak.multiplatform_core.account.domain.model`); it is exported in the XCFramework.
 - **Shared models / business logic**: The app imports from `com.infomaniak.multiplatform_calendar.core.*` (e.g.,
   `com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Color`) and the bridge from
   `com.infomaniak.multiplatform_calendar.data.remote.caldav.*` (e.g., `DavAccount`, `CaldavClientConfig`).

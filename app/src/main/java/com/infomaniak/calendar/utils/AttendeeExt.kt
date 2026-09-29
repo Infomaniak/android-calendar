@@ -20,9 +20,9 @@ package com.infomaniak.calendar.utils
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
-import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationStatus as KmpParticipationStatus
+import com.infomaniak.multiplatform_core.account.domain.model.AccountId
 
 /**
  * Attendees of an event owned by [accountId], with the current user singled out by matching their

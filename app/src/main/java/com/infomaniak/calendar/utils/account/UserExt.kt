@@ -18,6 +18,6 @@
 package com.infomaniak.calendar.utils.account
 
 import com.infomaniak.core.auth.models.user.User
-import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
+import com.infomaniak.multiplatform_core.account.domain.model.AccountId
 
 val User.accountId: AccountId get() = AccountId(id.toLong())

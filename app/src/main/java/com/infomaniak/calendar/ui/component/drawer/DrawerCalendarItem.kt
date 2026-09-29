@@ -31,9 +31,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.ui.component.drawer.model.CalendarUi
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.utils.toCalendarColorsUi
-import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
+import com.infomaniak.multiplatform_core.account.domain.model.AccountId
 
 @Composable
 fun DrawerCalendarItem(
