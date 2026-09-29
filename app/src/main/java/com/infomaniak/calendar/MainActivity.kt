@@ -18,6 +18,7 @@
 package com.infomaniak.calendar
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -31,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -39,8 +41,10 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import com.infomaniak.calendar.extensions.appGraph
 import com.infomaniak.calendar.manager.SyncEventsManager
+import com.infomaniak.calendar.notification.NotificationHelper
 import com.infomaniak.calendar.ui.navigation.MainNavHost
 import com.infomaniak.calendar.ui.navigation.NavDestination
+import com.infomaniak.calendar.ui.navigation.addOnce
 import com.infomaniak.calendar.ui.navigation.replaceRoot
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
@@ -52,17 +56,21 @@ import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.utils.UserLoadState
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.serialization.json.Json
 
 class MainActivity : ComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
+    private val pendingOccurrenceId = mutableStateOf<OccurrenceId?>(null)
 
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
         get() = appGraph.metroViewModelFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        handleEventIntent(intent)
         enableEdgeToEdge()
         if (SDK_INT >= 29) window.isNavigationBarContrastEnforced = false
 
@@ -79,12 +87,27 @@ class MainActivity : ComponentActivity() {
                             visibleDayState = rememberVisibleDayState(mainViewModel.visibleDay),
                             loadingEventsError = mainViewModel.loadingEventsError,
                             lastCalendarView = { lastCalendarView },
+                            pendingOccurrenceId = pendingOccurrenceId.value,
+                            onClearPendingOccurrenceId = { pendingOccurrenceId.value = null },
                             onCalendarViewSelected = mainViewModel::saveCalendarView,
                         )
                     }
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleEventIntent(intent)
+    }
+
+    private fun handleEventIntent(intent: Intent?) {
+        val json = intent?.getStringExtra(NotificationHelper.EXTRA_OCCURRENCE_ID_JSON) ?: return
+        intent.removeExtra(NotificationHelper.EXTRA_OCCURRENCE_ID_JSON)
+        val occurrenceId = runCatching { Json.decodeFromString(OccurrenceId.serializer(), json) }.getOrNull() ?: return
+        pendingOccurrenceId.value = occurrenceId
     }
 }
 
@@ -94,6 +117,8 @@ private fun MainContent(
     visibleDayState: VisibleDayState,
     loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError>,
     lastCalendarView: () -> NavDestination.CalendarView?,
+    pendingOccurrenceId: OccurrenceId?,
+    onClearPendingOccurrenceId: () -> Unit,
     onCalendarViewSelected: (NavDestination.CalendarView) -> Unit,
 ) {
     val lastCalendarView = lastCalendarView()
@@ -101,6 +126,15 @@ private fun MainContent(
     val startDestination =
         if (userLoadState is UserLoadState.Loaded.Disconnected) NavDestination.Onboarding() else (lastCalendarView ?: return)
     val backStack = rememberNavBackStack(startDestination)
+
+    val isUserConnected = userLoadState is UserLoadState.Loaded.Connected
+    LaunchedEffect(pendingOccurrenceId, isUserConnected) {
+        val occurrenceId = pendingOccurrenceId ?: return@LaunchedEffect
+        if (isUserConnected) {
+            backStack.addOnce(NavDestination.EventDetail(occurrenceId))
+            onClearPendingOccurrenceId()
+        }
+    }
 
     CompositionLocalProvider(
         LocalVisibleDayState provides visibleDayState,

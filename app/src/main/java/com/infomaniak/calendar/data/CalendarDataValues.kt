@@ -55,6 +55,12 @@ class CalendarDataValues @Inject constructor(
     )
 
     val lastUsedCalendarId = dataValue<String?>(key = "lastSelectedCalendarId", defaultValue = null)
+
+    /** IDs of alarms currently scheduled in the AlarmManager. */
+    val scheduledAlarmIds = dataValue(
+        key = "scheduledAlarmIds",
+        defaultValue = emptySet<String>(),
+    )
 }
 
 private object CalendarViewSerializer : DataValueSerializer<CalendarView> {

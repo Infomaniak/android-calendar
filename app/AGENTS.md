@@ -26,6 +26,7 @@ app/src/main/java/com/infomaniak/calendar/
 ├── MainApplication.kt              # Application class, initialises Metro AppGraph, Sentry and Matomo
 ├── MainActivity.kt                 # Single Activity, hosts Compose content
 ├── MatomoCalendar.kt               # Matomo tracker (implements Core's Matomo interface)
+├── notification/                   # Event notifications & AlarmManager scheduling (AlarmScheduler, AlarmReceiver, BootReceiver, NotificationHelper)
 ├── di/
 │   ├── AppGraph.kt                 # Metro @DependencyGraph (AppScope) — inherits CalendarCoreGraph, ViewModelGraph (metrox) + worker support
 │   └── metroAndroidExtensions/     # Portable Metro↔Android glue (no :app coupling)
@@ -92,6 +93,10 @@ app/
   bound concretely by `CalendarViewModelFactory`), set as `defaultViewModelProviderFactory` in `MainActivity`.
   In Composables, use the standard `viewModel<MyViewModel>()` from `androidx.lifecycle.viewmodel.compose`.
 - **Edge-to-edge**: Call `enableEdgeToEdge()` in `onCreate` before `setContent` (already wired in `MainActivity`).
+- **Event reminders**: `AlarmScheduler` (`AppScope` singleton, started from `MainApplication`) mirrors
+  `CalendarManager.observeUpcomingAlarms` (device alarms only: `DISPLAY` / `AUDIO`, max 400 over 30 days) into exact
+  `AlarmManager` alarms. `AlarmReceiver` posts the notification (tap opens `EventDetail`), `BootReceiver` reschedules on
+  boot, app update and time / time zone change. The `POST_NOTIFICATIONS` runtime permission is not requested yet.
 - **Shared logic**: Prefer reusing models / logic from `com.infomaniak.multiplatform_calendar.*` instead of duplicating
   Android-only equivalents.
 - **KISS / SOLID**: Keep Composables focused; extract reusable pieces into small `@Composable` functions.
