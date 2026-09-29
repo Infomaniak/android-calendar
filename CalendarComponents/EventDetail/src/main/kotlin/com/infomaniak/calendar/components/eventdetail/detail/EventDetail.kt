@@ -122,13 +122,13 @@ fun EventDetail(
             }
 
             Section {
-                OccupiedStatus(isOccupied, modifier = Modifier)
+                OccupiedStatus(isOccupied)
 
                 if (classification != null) {
-                    ClassificationStatus(classification, modifier = Modifier)
+                    ClassificationStatus(classification)
                 }
 
-                Calendar(calendarColor, calendarName, modifier = Modifier)
+                Calendar(calendarColor, calendarName)
             }
         }
     }
