@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
@@ -56,7 +57,10 @@ internal fun KMeetButton(
         content = { Text(stringResource(id = R.string.participateKMeetTitle)) },
         leadingContent = { KMeetIcon() },
         trailingContent = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xl),
+            ) {
                 Button(onClick = onJoin) {
                     Text(stringResource(R.string.buttonJoin))
                 }
