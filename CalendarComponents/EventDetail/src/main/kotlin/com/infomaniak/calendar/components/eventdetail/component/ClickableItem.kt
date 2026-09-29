@@ -24,10 +24,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -74,7 +76,11 @@ internal fun ClickableItem(
         content = { Text(text) },
         supportingContent = supportingContent,
         leadingContent = leadingContent,
-        trailingContent = trailingContent,
+        trailingContent = {
+            CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.labelLarge) {
+                trailingContent()
+            }
+        },
         onClick = onClick,
         shapes = shapes,
         contentPadding = contentPadding + ListItemDefaults.ContentPadding,
