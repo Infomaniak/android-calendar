@@ -86,7 +86,6 @@ fun EventDetail(
                     AttendeesButton(
                         attendees = attendees.all,
                         onClick = goToEventAttendees,
-                        contentPadding = horizontalContentPadding,
                         modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
                     )
                 }
