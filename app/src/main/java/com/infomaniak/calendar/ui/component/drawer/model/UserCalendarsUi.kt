@@ -17,8 +17,10 @@
  */
 package com.infomaniak.calendar.ui.component.drawer.model
 
+import androidx.compose.runtime.Immutable
 import com.infomaniak.core.auth.models.user.User
 
+@Immutable
 data class UserCalendarsUi(
     val user: User,
     val calendars: List<CalendarUi>,

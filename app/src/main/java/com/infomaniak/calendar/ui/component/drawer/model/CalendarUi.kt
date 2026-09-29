@@ -17,9 +17,11 @@
  */
 package com.infomaniak.calendar.ui.component.drawer.model
 
+import androidx.compose.runtime.Immutable
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 
+@Immutable
 data class CalendarUi(
     val id: CalendarId,
     val accountId: AccountId,
