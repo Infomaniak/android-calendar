@@ -66,6 +66,7 @@
         <item quantity="one">%d minutt</item>
         <item quantity="other">%d minutter</item>
     </plurals>
+    <string name="noAttendeesLabel">Ingen</string>
     <string name="notificationTimeAfter">%1$s etter</string>
     <string name="notificationTimeAtStart">På tidspunktet for hendelsen</string>
     <string name="notificationTimeBefore">%1$s før</string>

@@ -66,6 +66,7 @@
         <item quantity="one">%d minuto</item>
         <item quantity="other">%d minutos</item>
     </plurals>
+    <string name="noAttendeesLabel">Nenhum</string>
     <string name="notificationTimeAfter">%1$s depois</string>
     <string name="notificationTimeAtStart">No momento do evento</string>
     <string name="notificationTimeBefore">%1$s antes</string>

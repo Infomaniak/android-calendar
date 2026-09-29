@@ -66,6 +66,7 @@
         <item quantity="one">%d λεπτό</item>
         <item quantity="other">%d λεπτά</item>
     </plurals>
+    <string name="noAttendeesLabel">Κανένας</string>
     <string name="notificationTimeAfter">%1$s μετά</string>
     <string name="notificationTimeAtStart">Κατά την ώρα του γεγονότος</string>
     <string name="notificationTimeBefore">%1$s πριν</string>

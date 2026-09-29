@@ -84,6 +84,7 @@
         <item quantity="many">%d minut</item>
         <item quantity="other">%d minuta</item>
     </plurals>
+    <string name="noAttendeesLabel">Brak</string>
     <string name="notificationTimeAfter">%1$s później</string>
     <string name="notificationTimeAtStart">W czasie wydarzenia</string>
     <string name="notificationTimeBefore">%1$s wcześniej</string>
