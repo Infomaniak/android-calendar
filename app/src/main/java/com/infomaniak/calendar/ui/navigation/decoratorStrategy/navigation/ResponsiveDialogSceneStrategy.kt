@@ -20,6 +20,7 @@ package com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -100,22 +101,24 @@ private class ResponsiveDialogScene<T : Any>(override val key: Any, private val 
         val lifecycleOwner = rememberLifecycleOwner()
 
         Dialog(onDismissRequest = onBack) {
-            CompositionLocalProvider(LocalLifecycleOwner provides lifecycleOwner) {
-                SharedTransitionLayout {
-                    CompositionLocalProvider(LocalSharedTransitionScope provides this@SharedTransitionLayout) {
-                        AnimatedContent(
-                            targetState = entries.last(),
-                            modifier = Modifier.clip(AlertDialogDefaults.shape),
-                            transitionSpec = { NavigationTransition.contentTransform },
-                            contentKey = { it.contentKey },
-                        ) { animatedEntry ->
-                            // AnimatedContent keeps the instance it was given when the content key showed up, but entries are
-                            // recreated on every back stack change. Popped entries are gone from the list while they animate
-                            // out, in which case the one we've been given is the only one left.
-                            val entry = entries.firstOrNull { it.contentKey == animatedEntry.contentKey } ?: animatedEntry
+            Surface(Modifier.clip(AlertDialogDefaults.shape)) {
+                CompositionLocalProvider(LocalLifecycleOwner provides lifecycleOwner) {
+                    SharedTransitionLayout {
+                        CompositionLocalProvider(LocalSharedTransitionScope provides this@SharedTransitionLayout) {
+                            AnimatedContent(
+                                targetState = entries.last(),
+                                modifier = Modifier.clip(AlertDialogDefaults.shape),
+                                transitionSpec = { NavigationTransition.contentTransform },
+                                contentKey = { it.contentKey },
+                            ) { animatedEntry ->
+                                // AnimatedContent keeps the instance it was given when the content key showed up, but entries are
+                                // recreated on every back stack change. Popped entries are gone from the list while they animate
+                                // out, in which case the one we've been given is the only one left.
+                                val entry = entries.firstOrNull { it.contentKey == animatedEntry.contentKey } ?: animatedEntry
 
-                            CompositionLocalProvider(LocalNavAnimatedContentScope provides this@AnimatedContent) {
-                                entry.Content()
+                                CompositionLocalProvider(LocalNavAnimatedContentScope provides this@AnimatedContent) {
+                                    entry.Content()
+                                }
                             }
                         }
                     }
