@@ -66,6 +66,7 @@
         <item quantity="one">%d minuutti</item>
         <item quantity="other">%d minuuttia</item>
     </plurals>
+    <string name="noAttendeesLabel">Ei yhtään</string>
     <string name="notificationTimeAfter">%1$s jälkeen</string>
     <string name="notificationTimeAtStart">Tapahtuman hetkellä</string>
     <string name="notificationTimeBefore">%1$s ennen</string>

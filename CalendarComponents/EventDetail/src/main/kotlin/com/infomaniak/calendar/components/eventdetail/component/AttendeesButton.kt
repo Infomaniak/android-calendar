@@ -82,7 +82,11 @@ internal fun AttendeesButton(
         },
         trailingContent = {
             Row(horizontalArrangement = Arrangement.spacedBy(Margin.Mini), verticalAlignment = Alignment.CenterVertically) {
-                StackedAvatars(attendees)
+                if (attendees.isEmpty()) {
+                    Text(stringResource(R.string.noAttendeesLabel))
+                } else {
+                    StackedAvatars(attendees)
+                }
                 Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null)
             }
         },
