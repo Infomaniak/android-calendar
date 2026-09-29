@@ -28,12 +28,13 @@ import com.infomaniak.calendar.components.attendeessearch.component.AttendeesLis
 import com.infomaniak.calendar.components.attendeessearch.component.EmptyState
 import com.infomaniak.calendar.components.attendeessearch.component.SearchBar
 import com.infomaniak.calendar.components.attendeessearch.preview.previewAttendees
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.attendeessearch.state.AttendeesState
+import com.infomaniak.calendar.components.attendeessearch.state.rememberSaveableAttendeesState
 import com.infomaniak.calendar.components.resources.R
 
 @Composable
 fun AttendeesSearch(
-    attendees: () -> List<AttendeeUi>,
+    attendeesState: AttendeesState,
     searchQuery: () -> String,
     onSearchQueryChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -43,10 +44,10 @@ fun AttendeesSearch(
             searchQuery = searchQuery,
             onSearchQueryChanged = onSearchQueryChanged,
         )
-        if (attendees().isEmpty()) {
+        if (attendeesState.searchResults.isEmpty()) {
             EmptyState(text = stringResource(R.string.attendeesEmptyState))
         } else {
-            AttendeesList(attendees)
+            AttendeesList(attendees = { attendeesState.searchResults })
         }
     }
 }
@@ -57,7 +58,11 @@ private fun Preview() {
     MaterialTheme {
         Surface {
             AttendeesSearch(
-                attendees = { previewAttendees },
+                attendeesState = rememberSaveableAttendeesState(
+                    attendees = previewAttendees,
+                    contacts = previewAttendees,
+                    searchQuery = "",
+                ),
                 searchQuery = { "" },
                 onSearchQueryChanged = {},
             )
@@ -71,7 +76,11 @@ private fun PreviewEmptyState() {
     MaterialTheme {
         Surface {
             AttendeesSearch(
-                attendees = { listOf() },
+                attendeesState = rememberSaveableAttendeesState(
+                    attendees = listOf(),
+                    contacts = listOf(),
+                    searchQuery = "",
+                ),
                 searchQuery = { "" },
                 onSearchQueryChanged = {},
             )

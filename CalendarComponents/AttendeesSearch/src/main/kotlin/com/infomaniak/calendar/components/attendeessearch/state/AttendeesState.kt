@@ -18,11 +18,13 @@
 package com.infomaniak.calendar.components.attendeessearch.state
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 
@@ -30,12 +32,11 @@ import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 class AttendeesState(
     private val attendees: List<AttendeeUi>,
     private val contacts: List<AttendeeUi>,
+    val searchQuery: MutableState<String>,
 ) {
-    var searchQuery by mutableStateOf("")
-        private set
 
     val searchResults by derivedStateOf {
-        val query = searchQuery.trim()
+        val query = searchQuery.value.trim()
         if (query.isEmpty()) {
             attendees
         } else {
@@ -44,7 +45,7 @@ class AttendeesState(
     }
 
     fun updateQuery(query: String) {
-        searchQuery = query
+        searchQuery.value = query
     }
 
     // This function will be replaced by KMP search
@@ -56,9 +57,12 @@ class AttendeesState(
 }
 
 @Composable
-fun rememberAttendeesState(
+fun rememberSaveableAttendeesState(
     attendees: List<AttendeeUi>,
     contacts: List<AttendeeUi>,
-): AttendeesState = remember(attendees, contacts) {
-    AttendeesState(attendees = attendees, contacts = contacts)
+    searchQuery: String,
+): AttendeesState {
+    val searchQuery = rememberSaveable() { mutableStateOf(searchQuery) }
+
+    return AttendeesState(attendees = attendees, contacts = contacts, searchQuery = searchQuery)
 }

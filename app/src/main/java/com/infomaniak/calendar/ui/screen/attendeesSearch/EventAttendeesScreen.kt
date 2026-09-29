@@ -35,7 +35,7 @@ import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.attendeessearch.AttendeesSearch
 import com.infomaniak.calendar.components.attendeessearch.preview.previewAttendees
 import com.infomaniak.calendar.components.attendeessearch.state.AttendeesState
-import com.infomaniak.calendar.components.attendeessearch.state.rememberAttendeesState
+import com.infomaniak.calendar.components.attendeessearch.state.rememberSaveableAttendeesState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -66,9 +66,10 @@ fun EventAttendeesScreen(
             }
         }
         is EventAttendeesUiState.Loaded -> {
-            val attendeesState = rememberAttendeesState(
+            val attendeesState = rememberSaveableAttendeesState(
                 attendees = currentState.attendees,
                 contacts = currentState.contacts,
+                searchQuery = "",
             )
 
             EventAttendeesScreen(
@@ -97,11 +98,11 @@ fun EventAttendeesScreen(
         modifier = modifier,
     ) { paddingValues ->
         AttendeesSearch(
-            attendees = { attendeesState.searchResults },
+            attendeesState = attendeesState,
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxWidth(),
-            searchQuery = { attendeesState.searchQuery },
+            searchQuery = { attendeesState.searchQuery.value },
             onSearchQueryChanged = attendeesState::updateQuery,
         )
     }
@@ -112,9 +113,10 @@ fun EventAttendeesScreen(
 private fun EventAttendeesScreenPreview() {
     CalendarThemeForPreview {
         EventAttendeesScreen(
-            attendeesState = rememberAttendeesState(
+            attendeesState = rememberSaveableAttendeesState(
                 attendees = previewAttendees,
                 contacts = previewAttendees,
+                searchQuery = "",
             ),
             goBack = {},
         )
