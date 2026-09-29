@@ -31,7 +31,6 @@
     <string name="settingsTitle">Asetukset</string>
     <string name="signOutAccountAlertConfirm">Kirjaudu ulos tililtä</string>
     <string name="signOutAccountAlertDescription">Tämä tili ja siihen liittyvät kalenterit irrotetaan ”Kalenteri”-sovelluksesta. Ne ovat edelleen käytettävissä Infomaniak-verkkotililläsi.</string>
-    <string name="signOutAccountAlertTitle">Kirjaudu ulos tililtä ”%s”</string>
     <string name="syncEventsError">Virhe noudettaessa tapahtumia</string>
     <string name="threeDaysTitle">Kolme päivää</string>
     <string name="weekTitle">Viikko</string>

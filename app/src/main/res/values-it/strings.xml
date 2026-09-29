@@ -31,7 +31,6 @@
     <string name="settingsTitle">Impostazioni</string>
     <string name="signOutAccountAlertConfirm">Esci dall’account</string>
     <string name="signOutAccountAlertDescription">Questo account e i calendari ad esso associati verranno disconnessi dall’app “Calendario”. Rimarranno comunque disponibili nel tuo account online Infomaniak.</string>
-    <string name="signOutAccountAlertTitle">Esci dall’account “%s“</string>
     <string name="syncEventsError">Errore durante il recupero degli eventi</string>
     <string name="threeDaysTitle">Tre giorni</string>
     <string name="weekTitle">Settimana</string>

@@ -31,7 +31,6 @@
     <string name="settingsTitle">Settings</string>
     <string name="signOutAccountAlertConfirm">Sign out of the account</string>
     <string name="signOutAccountAlertDescription">This account and its associated calendars will be disconnected from the “Calendar” app. They will remain available in your Infomaniak online account.</string>
-    <string name="signOutAccountAlertTitle">Sign out of the account “%s“</string>
     <string name="syncEventsError">Error while retrieving events</string>
     <string name="threeDaysTitle">Three days</string>
     <string name="weekTitle">Week</string>

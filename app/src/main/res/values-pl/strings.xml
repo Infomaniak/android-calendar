@@ -31,7 +31,6 @@
     <string name="settingsTitle">Ustawienia</string>
     <string name="signOutAccountAlertConfirm">Wyloguj się z konta</string>
     <string name="signOutAccountAlertDescription">To konto oraz powiązane z nim kalendarze zostaną odłączone od aplikacji „Kalendarz”. Będą one nadal dostępne na Twoim koncie internetowym Infomaniak.</string>
-    <string name="signOutAccountAlertTitle">Wyloguj się z konta „%s“</string>
     <string name="syncEventsError">Błąd podczas pobierania wydarzeń</string>
     <string name="threeDaysTitle">Trzy dni</string>
     <string name="weekTitle">Tydzień</string>

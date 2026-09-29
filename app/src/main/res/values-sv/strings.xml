@@ -31,7 +31,6 @@
     <string name="settingsTitle">Inställningar</string>
     <string name="signOutAccountAlertConfirm">Logga ut från kontot</string>
     <string name="signOutAccountAlertDescription">Detta konto och de tillhörande kalendrarna kommer att kopplas bort från appen ”Kalender”. De kommer fortfarande att vara tillgängliga i ditt Infomaniak-onlinekonto.</string>
-    <string name="signOutAccountAlertTitle">Logga ut från kontot ”%s”</string>
     <string name="syncEventsError">Fel vid hämtning av händelser</string>
     <string name="threeDaysTitle">Tre dagar</string>
     <string name="weekTitle">Vecka</string>
