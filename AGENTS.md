@@ -197,8 +197,10 @@ All CalendarComponents source lives **in this repository**. Changes to these mod
       `CalendarManager`, Apple `CalendarSDK`.
 - **Contacts module**: `:Contacts` is a standalone KMP module (server address book merged with device contacts, ETag
   sync) wired by `:CalendarCore` via `api` + `ContactsModule`; it is exported in the XCFramework. The app provides
-  `ContactsSettings` (contacts database path, initial tokens) and gets `contactsManager` through `CalendarCoreGraph`.
-  Tokens live in RAM only (`updateTokens()` on refresh).
+  `ContactsSettings` (contacts database path) and gets `contactsManager` through `CalendarCoreGraph`.
+  `AccountManager.initAccount(accountId, davCredentials, accessToken)` / `removeAccount` also init / remove the account in
+  `ContactsManager` (token kept in RAM only); the app calls `initAccount` at startup (`AccountUtils.initStoredAccounts()`)
+  and on login.
 - **Account module**: `:Account` holds the identity types shared by `:CalendarCore` and `:Contacts` (`AccountId`,
   `AccessToken`, package `com.infomaniak.multiplatform_core.account.domain.model`); it is exported in the XCFramework.
 - **Shared models / business logic**: The app imports from `com.infomaniak.multiplatform_calendar.core.*` (e.g.,
