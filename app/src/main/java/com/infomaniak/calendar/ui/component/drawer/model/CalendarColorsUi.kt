@@ -18,9 +18,11 @@
 package com.infomaniak.calendar.ui.component.drawer.model
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.foundation.models.ThemedColorUi
 
+@Immutable
 data class CalendarColorsUi(
     val sourceColor: Color,
     private val _onSourceColor: ThemedColorUi,
