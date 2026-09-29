@@ -122,7 +122,7 @@ private fun baseEntryProvider(
             goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
         )
     }
-    entry<NavDestination.EventAttendees> { destination ->
+    entry<NavDestination.EventAttendees>(metadata = metaDataOf(ResponsiveDialog)) { destination ->
         EventAttendeesScreen(
             occurrenceId = destination.occurrenceId,
             goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },

@@ -17,6 +17,8 @@
  */
 package com.infomaniak.calendar.ui.screen.attendeesSearch
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -54,29 +56,30 @@ fun EventAttendeesScreen(
         viewModel.setOccurrenceId(occurrenceId)
     }
 
-    when (val currentState = state) {
-        EventAttendeesUiState.Loading -> Unit // This happens too quickly, so no need to show anything
-        EventAttendeesUiState.EventMissing -> {
-            val snackbarHostState = LocalSharedSnackbarHostState.current
-            val eventMissingMessage = stringResource(R.string.eventOccurrenceNotFound)
+    Box(modifier = modifier.fillMaxSize()) {
+        when (val currentState = state) {
+            EventAttendeesUiState.Loading -> Unit // This happens too quickly, so no need to show anything
+            EventAttendeesUiState.EventMissing -> {
+                val snackbarHostState = LocalSharedSnackbarHostState.current
+                val eventMissingMessage = stringResource(R.string.eventOccurrenceNotFound)
 
-            LaunchedEffect(Unit) {
-                snackbarHostState?.showSnackbar(eventMissingMessage)
-                goBack()
+                LaunchedEffect(Unit) {
+                    snackbarHostState?.showSnackbar(eventMissingMessage)
+                    goBack()
+                }
             }
-        }
-        is EventAttendeesUiState.Loaded -> {
-            val attendeesState = rememberSaveableAttendeesState(
-                attendees = currentState.attendees,
-                contacts = currentState.contacts,
-                searchQuery = "",
-            )
+            is EventAttendeesUiState.Loaded -> {
+                val attendeesState = rememberSaveableAttendeesState(
+                    attendees = currentState.attendees,
+                    contacts = currentState.contacts,
+                    searchQuery = "",
+                )
 
-            EventAttendeesScreen(
-                attendeesState = attendeesState,
-                goBack = goBack,
-                modifier = modifier,
-            )
+                EventAttendeesScreen(
+                    attendeesState = attendeesState,
+                    goBack = goBack,
+                )
+            }
         }
     }
 }
