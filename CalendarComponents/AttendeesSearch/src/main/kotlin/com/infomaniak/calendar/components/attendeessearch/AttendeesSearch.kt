@@ -61,7 +61,6 @@ private fun Preview() {
                 attendeesState = rememberSaveableAttendeesState(
                     attendees = previewAttendees,
                     contacts = previewAttendees,
-                    searchQuery = "",
                 ),
                 searchQuery = { "" },
                 onSearchQueryChanged = {},
@@ -79,7 +78,6 @@ private fun PreviewEmptyState() {
                 attendeesState = rememberSaveableAttendeesState(
                     attendees = listOf(),
                     contacts = listOf(),
-                    searchQuery = "",
                 ),
                 searchQuery = { "" },
                 onSearchQueryChanged = {},

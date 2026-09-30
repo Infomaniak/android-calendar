@@ -58,7 +58,7 @@ class AttendeesState(
 fun rememberSaveableAttendeesState(
     attendees: List<AttendeeUi>,
     contacts: List<AttendeeUi>,
-    searchQuery: String,
+    searchQuery: String = "",
 ): AttendeesState {
     val searchQuery = rememberSaveable { mutableStateOf(searchQuery) }
 
