@@ -17,19 +17,16 @@
  */
 package com.infomaniak.calendar.ui.screen.planning
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -42,6 +39,7 @@ import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.planning.Planning
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
+import com.infomaniak.calendar.ui.component.ScreenLoader
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
 import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewParameter
@@ -137,7 +135,7 @@ private fun PlanningScreen(
                 )
             }
             is PlanningUiState.Loading -> {
-                LoadingPlanning(modifier = Modifier.padding(contentPadding))
+                ScreenLoader(modifier = Modifier.padding(contentPadding))
             }
         }
     }
@@ -174,13 +172,6 @@ private fun SuccessPlanning(
         goToEventCreation = goToEventCreation,
         onEventClick = { goToEventDetail(it.occurrenceId) },
     )
-}
-
-@Composable
-private fun LoadingPlanning(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
-    }
 }
 
 @Preview

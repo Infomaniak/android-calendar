@@ -17,12 +17,9 @@
  */
 package com.infomaniak.calendar.ui.screen.day
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.plus
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -31,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -47,6 +43,7 @@ import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
+import com.infomaniak.calendar.ui.component.ScreenLoader
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
@@ -170,7 +167,7 @@ private fun DayScreen(
         modifier = modifier,
     ) { contentPadding ->
         when (val state = dayUiState()) {
-            is DayUiState.Loading -> LoadingDay(modifier = Modifier.padding(contentPadding))
+            is DayUiState.Loading -> ScreenLoader(modifier = Modifier.padding(contentPadding))
             is DayUiState.Success -> {
                 SuccessDay(
                     visibleDayState = visibleDayState,
@@ -213,13 +210,6 @@ private fun SuccessDay(
         contentPadding = contentPadding,
         modifier = modifier.fillMaxSize(),
     )
-}
-
-@Composable
-private fun LoadingDay(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
-    }
 }
 
 @Preview
