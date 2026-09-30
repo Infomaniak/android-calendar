@@ -29,7 +29,7 @@
     <string name="helpTitle">Help</string>
     <string name="monthTitle">Month</string>
     <string name="planningTitle">Planning</string>
-    <string name="searchForAttendees">Search for guests</string>
+    <string name="searchForAttendees">Search for attendees</string>
     <string name="sectionOrganizerHeader">Organizer</string>
     <string name="settingsTitle">Settings</string>
     <string name="signOutAccountAlertConfirm">Sign out of the account</string>

@@ -29,7 +29,7 @@
     <string name="helpTitle">Hjælp</string>
     <string name="monthTitle">Måned</string>
     <string name="planningTitle">Planlægning</string>
-    <string name="searchForAttendees">Søgning efter gæster</string>
+    <string name="searchForAttendees">Søg efter deltagere</string>
     <string name="sectionOrganizerHeader">Arrangør</string>
     <string name="settingsTitle">Indstillinger</string>
     <string name="signOutAccountAlertConfirm">Log ud af kontoen</string>
