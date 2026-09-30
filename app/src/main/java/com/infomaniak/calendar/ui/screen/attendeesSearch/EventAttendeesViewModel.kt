@@ -28,7 +28,6 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -39,7 +38,6 @@ import kotlinx.coroutines.flow.stateIn
 @ViewModelKey
 class EventAttendeesViewModel(private val getEventDetailUiUseCase: GetEventDetailUiUseCase) : ViewModel() {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     val eventAttendeesState: StateFlow<EventAttendeesUiState> = getEventDetailUiUseCase.eventFlow
         .map { event ->
             val attendees = event?.attendees.toAttendeesUiOrEmpty()
