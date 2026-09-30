@@ -20,6 +20,7 @@ package com.infomaniak.calendar.components.attendeessearch.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -57,7 +58,7 @@ internal fun SearchBar(
             .padding(horizontal = Margin.Small, vertical = Margin.Small)
             .background(
                 color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                shape = MaterialTheme.shapes.extraLargeIncreased,
+                shape = CircleShape,
             )
             .fillMaxWidth(),
     )
