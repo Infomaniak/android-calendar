@@ -119,7 +119,9 @@ fun DayTimeline(
 
             if (currentDateTime.date == date) {
                 CurrentTimeIndicator(
-                    minuteOfDay = currentDateTime.minuteOfDay, state = state, modifier = Modifier.matchParentSize(),
+                    minuteOfDay = currentDateTime.minuteOfDay,
+                    state = state,
+                    modifier = Modifier.matchParentSize(),
                 )
             }
         }

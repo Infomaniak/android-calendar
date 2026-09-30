@@ -40,6 +40,7 @@ internal fun Modifier.pinchToZoom(state: DayTimelineState): Modifier = pointerIn
                 if (pressed > 1) {
                     state.isPinching = true
 
+                    // Centroid coordinates are expressed in the whole content's coordinate system, not the viewport's coordinate system.
                     val centroid = event.calculateCentroid()
                     if (centroid.isSpecified) {
                         val pinchAnchor = anchor ?: state.anchorAt(contentY = centroid.y, density = this)

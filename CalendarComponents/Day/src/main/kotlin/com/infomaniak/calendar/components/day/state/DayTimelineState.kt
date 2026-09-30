@@ -100,6 +100,14 @@ class DayTimelineState(initialHourHeight: Dp, val scrollState: ScrollState) {
 
     fun verticalOffsetOf(minuteOfDay: Int): Dp = hourHeight * (minuteOfDay / MINUTES_PER_HOUR.toFloat())
 
+    /**
+     * Turns the centroid Y coordinate expressed in the whole content's coordinate system into a centroid Y coordinate expressed
+     * in the timeline's viewport coordinate system.
+     *
+     * Also computes how many hours the centroid is from the start of the day, which is used to keep that hour under the fingers
+     * while zooming. This way we know where exactly the timeline was centered on before we start applying the zoom which will
+     * offset this center.
+     */
     internal fun anchorAt(contentY: Float, density: Density): PinchAnchor = PinchAnchor(
         hourOfDay = contentY / with(density) { hourHeight.toPx() },
         viewportY = contentY - scrollState.value,
@@ -128,9 +136,10 @@ class DayTimelineState(initialHourHeight: Dp, val scrollState: ScrollState) {
     }
 
     private fun holdAnchor(anchor: PinchAnchor, density: Density) {
-        val anchorY = anchor.hourOfDay * with(density) { hourHeight.toPx() }
+        val newContentY = anchor.hourOfDay * with(density) { hourHeight.toPx() }
+        val newViewportY = newContentY - scrollState.value
 
-        scrollState.dispatchRawDelta(anchorY - anchor.viewportY - scrollState.value)
+        scrollState.dispatchRawDelta(newViewportY - anchor.viewportY)
     }
 
     suspend fun scrollToMinuteOfDay(minuteOfDay: Int, density: Density) {
@@ -144,5 +153,9 @@ class DayTimelineState(initialHourHeight: Dp, val scrollState: ScrollState) {
     }
 }
 
+/**
+ * @param viewportY Y coordinate of the pinch gesture centroid but only inside the timeline's viewport instead of the whole
+ * timeline's content that would include content outside the screen.
+ */
 @Immutable
 internal data class PinchAnchor(val hourOfDay: Float, val viewportY: Float)
