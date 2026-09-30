@@ -92,16 +92,12 @@ internal fun DayTimeline(
             }
         }
 
-        // The timeline runs under the navigation bar, and the toolbar floats above it: the end of
-        // the day has to clear the two of them stacked.
-        val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-
         Box(
             modifier = Modifier
                 .verticalScroll(state.scrollState, enabled = !state.isPinching)
                 .padding(
                     top = HourLabelOverhang + contentPadding.calculateTopPadding(),
-                    bottom = DayTimelineDefaults.BottomPadding + navigationBarPadding + contentPadding.calculateBottomPadding(),
+                    bottom = DayTimelineDefaults.BottomPadding + contentPadding.calculateBottomPadding(),
                 )
                 // Inside the padding: a pinch reads its own y as an hour, so it has to start
                 // counting where the first hour line is drawn, not where the padding begins.

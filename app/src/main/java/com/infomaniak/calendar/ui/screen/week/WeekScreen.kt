@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.ui.screen.week
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,12 +29,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
+import com.infomaniak.calendar.components.day.WeekPager
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.core.ui.compose.basics.onlyHorizontal
+import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.datetime.LocalDate
 
@@ -78,13 +82,17 @@ private fun WeekScreen(
             )
         },
         modifier = modifier,
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .padding(paddingValues)
-                .collapseCalendarOnScroll(calendarExpansionState),
-        ) {
-            
+    ) { contentPadding ->
+        Box(modifier = Modifier.padding(contentPadding.onlyHorizontal())) {
+            WeekPager(
+                modifier = Modifier
+                    .collapseCalendarOnScroll(calendarExpansionState)
+                    .hazeSource(hazeState),
+                contentPadding = PaddingValues(
+                    top = contentPadding.calculateTopPadding(),
+                    bottom = contentPadding.calculateBottomPadding(),
+                ),
+            )
         }
     }
 }
