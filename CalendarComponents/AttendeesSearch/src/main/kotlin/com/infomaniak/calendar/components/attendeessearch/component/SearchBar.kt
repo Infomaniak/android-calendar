@@ -35,7 +35,7 @@ import com.infomaniak.core.ui.compose.margin.Margin
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(
+internal fun SearchBar(
     searchQuery: () -> String,
     onSearchQueryChanged: (String) -> Unit,
     modifier: Modifier = Modifier,

@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
-fun EmptyState(text: String, modifier: Modifier = Modifier) {
+internal fun EmptyState(text: String, modifier: Modifier = Modifier) {
     // TODO: improve empty state
     Box(
         modifier = modifier.fillMaxSize().padding(top = EsdsTheme.spacing.lg),

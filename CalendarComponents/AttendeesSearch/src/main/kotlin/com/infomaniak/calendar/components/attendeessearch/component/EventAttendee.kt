@@ -46,7 +46,7 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
 
 @Composable
-fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
+internal fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .background(ListItemDefaults.colors().containerColor)
@@ -89,7 +89,7 @@ fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun AttendeeParticipationStatus(status: ParticipationStatus, isOrganizer: Boolean, modifier: Modifier = Modifier) {
+internal fun AttendeeParticipationStatus(status: ParticipationStatus, isOrganizer: Boolean, modifier: Modifier = Modifier) {
     return when (status) {
         ParticipationStatus.Accepted -> {
             ParticipationStatusText(

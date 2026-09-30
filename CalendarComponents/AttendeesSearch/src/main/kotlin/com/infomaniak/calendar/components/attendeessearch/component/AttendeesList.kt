@@ -17,23 +17,19 @@
  */
 package com.infomaniak.calendar.components.attendeessearch.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.attendeessearch.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
-import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
-fun AttendeesList(
+internal fun AttendeesList(
     attendees: () -> List<AttendeeUi>,
     modifier: Modifier = Modifier,
 ) {
