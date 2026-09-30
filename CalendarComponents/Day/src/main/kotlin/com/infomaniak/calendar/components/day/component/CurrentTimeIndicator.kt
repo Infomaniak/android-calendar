@@ -75,7 +75,7 @@ private fun CurrentTimeIndicatorWithBackgroundPreview() {
         val state = rememberDayTimelineState()
 
         Box(modifier = Modifier.fillMaxWidth()) {
-            HourGrid(state = state, modifier = Modifier.fillMaxWidth())
+            HourLines(state = state, modifier = Modifier.fillMaxWidth())
             CurrentTimeIndicator(minuteOfDay = 90, state = state, modifier = Modifier.matchParentSize())
         }
     }

@@ -100,7 +100,7 @@ internal fun DayTimeline(
                 // counting where the first hour line is drawn, not where the padding begins.
                 .pinchToZoom(state),
         ) {
-            HourGrid(state = state, modifier = Modifier.fillMaxWidth())
+            HourLines(state = state, modifier = Modifier.fillMaxWidth())
 
             ResizableEventLayout(
                 timedEvents = events.timed,
