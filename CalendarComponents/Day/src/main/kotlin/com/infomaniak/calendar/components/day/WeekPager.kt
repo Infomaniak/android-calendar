@@ -28,12 +28,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.component.HourLabelOverhang
+import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 
 @Composable
-fun WeekPager(modifier: Modifier = Modifier, contentPadding: PaddingValues = PaddingValues()) {
-    val state = rememberDayTimelineState()
-
+fun WeekPager(
+    modifier: Modifier = Modifier,
+    state: DayTimelineState = rememberDayTimelineState(),
+    contentPadding: PaddingValues = PaddingValues(),
+) {
     BoxWithConstraints(
         modifier = modifier
             .verticalScroll(state.scrollState, enabled = !state.isPinching)

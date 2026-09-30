@@ -61,9 +61,7 @@ class DayViewModel(
 ) : ViewModel() {
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
 
-    val hourHeight: Flow<Dp> = calendarDataValues.dayViewHourHeight.flow.map { it.dp }
-
-    suspend fun saveHourHeight(hourHeight: Dp) = calendarDataValues.dayViewHourHeight.setValue(hourHeight.value)
+    val hourHeight: Flow<Dp> = calendarDataValues.dayViewHourHeight.flow
 
     private val timeZone = TimeZone.currentSystemDefault()
     private val today = Clock.today(timeZone)
@@ -87,6 +85,8 @@ class DayViewModel(
 
     val eventDots = visibleMonthManager.eventDots
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
+
+    suspend fun saveHourHeight(hourHeight: Dp) = calendarDataValues.dayViewHourHeight.setValue(hourHeight)
 
     fun onVisibleMonthChanged(month: YearMonth) = visibleMonthManager.onVisibleMonthChanged(month)
 

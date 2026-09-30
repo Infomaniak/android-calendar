@@ -23,14 +23,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
@@ -45,6 +42,9 @@ import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.ScreenLoader
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
+import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
+import com.infomaniak.calendar.ui.effects.ReportVisibleMonth
+import com.infomaniak.calendar.ui.effects.SaveHourHeight
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
@@ -56,14 +56,10 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceI
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
-import kotlinx.coroutines.flow.dropWhile
-import kotlinx.coroutines.flow.filterNot
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.YearMonth
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
 @Composable
@@ -95,40 +91,6 @@ fun DayScreen(
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventsDots },
     )
-}
-
-@Composable
-private fun ReportVisibleMonth(visibleDayState: VisibleDayState, onVisibleMonthChanged: (YearMonth) -> Unit) {
-    LaunchedEffect(visibleDayState) {
-        snapshotFlow { visibleDayState.visibleDate.yearMonth }.collect(onVisibleMonthChanged)
-    }
-}
-
-/**
- * Turns a jump request, such as tapping a day in the calendar, into a change of visible date. The
- * pager then animates to it on its own, since it follows the visible date.
- */
-@Composable
-private fun ApplyJumpRequests(visibleDayState: VisibleDayState) {
-    LaunchedEffect(visibleDayState) {
-        for (date in visibleDayState.scrollCommand) visibleDayState.onVisibleDateChanged(date)
-    }
-}
-
-/**
- * Stores the zoom level the user leaves the day view on.
- *
- * A pinch changes the height on every frame, so the height is stored once the gesture ends: one
- * write per pinch, and nothing left waiting on a timer that leaving the screen would cancel.
- */
-@Composable
-private fun SaveHourHeight(timelineState: DayTimelineState, onHourHeightChanged: suspend (Dp) -> Unit) {
-    LaunchedEffect(timelineState) {
-        snapshotFlow { timelineState.isPinching }
-            .dropWhile { isPinching -> !isPinching }
-            .filterNot { isPinching -> isPinching }
-            .collect { onHourHeightChanged(timelineState.hourHeight) }
-    }
 }
 
 @Composable

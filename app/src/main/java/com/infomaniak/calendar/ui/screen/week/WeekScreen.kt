@@ -30,11 +30,17 @@ import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
 import com.infomaniak.calendar.components.day.WeekPager
+import com.infomaniak.calendar.components.day.state.DayTimelineState
+import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
+import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
+import com.infomaniak.calendar.ui.effects.ReportVisibleMonth
+import com.infomaniak.calendar.ui.effects.SaveHourHeight
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
+import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import dev.chrisbanes.haze.hazeSource
@@ -46,9 +52,21 @@ fun WeekScreen(modifier: Modifier = Modifier, viewModel: WeekScreenViewModel = v
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
     val eventDots by viewModel.eventDots.collectAsStateWithLifecycle()
 
+    val visibleDayState = LocalVisibleDayState.current ?: return
+    // The timeline scrolls to its opening hour as soon as it is measured, and counts that scroll in
+    // hour heights: it is built once the stored height is known, or it would open hours off.
+    val storedHourHeight by viewModel.hourHeight.collectAsStateWithLifecycle(initialValue = null)
+    val timelineState = rememberDayTimelineState(initialHourHeight = storedHourHeight ?: return)
+
+    SaveHourHeight(timelineState, onHourHeightChanged = viewModel::saveHourHeight)
+    ApplyJumpRequests(visibleDayState)
+    ReportVisibleMonth(visibleDayState, onVisibleMonthChanged = viewModel::onVisibleMonthChanged)
+
     WeekScreen(
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventDots },
+        visibleDayState = visibleDayState,
+        timelineState = timelineState,
         modifier = modifier,
     )
 }
@@ -57,11 +75,12 @@ fun WeekScreen(modifier: Modifier = Modifier, viewModel: WeekScreenViewModel = v
 private fun WeekScreen(
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
+    visibleDayState: VisibleDayState,
+    timelineState: DayTimelineState,
     modifier: Modifier = Modifier,
 ) {
     val calendarExpansionState = rememberCalendarExpansionState()
     val hazeState = rememberHazeState()
-    val visibleDayState = LocalVisibleDayState.current ?: return
 
     OverlaidTopBarScaffold(
         topBar = {
@@ -85,6 +104,7 @@ private fun WeekScreen(
     ) { contentPadding ->
         Box(modifier = Modifier.padding(contentPadding.onlyHorizontal())) {
             WeekPager(
+                state = timelineState,
                 modifier = Modifier
                     .collapseCalendarOnScroll(calendarExpansionState)
                     .hazeSource(hazeState),
