@@ -51,7 +51,7 @@ fun EventAttendeesScreen(
 ) {
     val state = viewModel.eventAttendeesState.collectAsStateWithLifecycle().value
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(occurrenceId) {
         viewModel.setOccurrenceId(occurrenceId)
     }
 
@@ -62,7 +62,7 @@ fun EventAttendeesScreen(
                 val snackbarHostState = LocalSharedSnackbarHostState.current
                 val eventMissingMessage = stringResource(R.string.eventOccurrenceNotFound)
 
-                LaunchedEffect(Unit) {
+                LaunchedEffect(occurrenceId) {
                     snackbarHostState?.showSnackbar(eventMissingMessage)
                     goBack()
                 }
