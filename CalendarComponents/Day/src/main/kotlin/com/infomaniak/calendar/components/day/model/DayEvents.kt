@@ -44,7 +44,7 @@ data class TimedEvent(
     val startMinuteOfDay: Int,
     val endMinuteOfDay: Int,
 ) {
-    val durationMinutes: Int get() = endMinuteOfDay - startMinuteOfDay
+    val durationMinutes: Int = endMinuteOfDay - startMinuteOfDay
 }
 
 fun EventUi.Normal.toTimedEvent(date: LocalDate, timeZone: TimeZone): TimedEvent = TimedEvent(
