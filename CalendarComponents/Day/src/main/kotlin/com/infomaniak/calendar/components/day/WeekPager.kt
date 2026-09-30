@@ -19,6 +19,7 @@ package com.infomaniak.calendar.components.day
 
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.day.component.HourGrid
 import com.infomaniak.calendar.components.day.component.HourLabelOverhang
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
@@ -48,10 +50,11 @@ fun WeekPager(
             // counting where the first hour line is drawn, not where the padding begins.
             .pinchToZoom(state),
     ) {
-        val columnCount = 3
+        val columnCount = 7
         val columnWidth = (this@BoxWithConstraints.maxWidth - DayTimelineDefaults.HourGutterWidth) / columnCount
 
-        Text(text = "Column width = $columnWidth")
+        // TODO: Replace with grid
+        HourGrid(state = state, modifier = Modifier.fillMaxWidth())
     }
 }
 
