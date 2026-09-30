@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.attendeessearch
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -31,6 +32,7 @@ import com.infomaniak.calendar.components.attendeessearch.preview.previewAttende
 import com.infomaniak.calendar.components.attendeessearch.state.AttendeesState
 import com.infomaniak.calendar.components.attendeessearch.state.rememberSaveableAttendeesState
 import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
 fun AttendeesSearch(
@@ -47,7 +49,10 @@ fun AttendeesSearch(
         if (attendeesState.searchResults.isEmpty()) {
             EmptyState(text = stringResource(R.string.attendeesEmptyState))
         } else {
-            AttendeesList(attendees = { attendeesState.searchResults })
+            AttendeesList(
+                attendees = { attendeesState.searchResults },
+                modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md, vertical = EsdsTheme.spacing.sm),
+            )
         }
     }
 }

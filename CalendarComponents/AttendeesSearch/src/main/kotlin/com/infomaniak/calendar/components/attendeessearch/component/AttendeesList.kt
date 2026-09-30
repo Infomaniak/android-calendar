@@ -18,7 +18,6 @@
 package com.infomaniak.calendar.components.attendeessearch.component
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -26,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.attendeessearch.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
 internal fun AttendeesList(
@@ -34,9 +32,7 @@ internal fun AttendeesList(
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = EsdsTheme.spacing.md, vertical = EsdsTheme.spacing.sm),
+        modifier = modifier.fillMaxSize(),
     ) {
         items(
             items = attendees(),

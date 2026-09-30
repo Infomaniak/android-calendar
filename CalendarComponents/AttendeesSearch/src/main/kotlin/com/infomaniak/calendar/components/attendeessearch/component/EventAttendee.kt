@@ -60,7 +60,6 @@ internal fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) 
                 .size(40.dp),
         )
         ListItem(
-            modifier = Modifier,
             overlineContent = {
                 AttendeeParticipationStatus(attendee.status, attendee.isOrganizer)
             },
