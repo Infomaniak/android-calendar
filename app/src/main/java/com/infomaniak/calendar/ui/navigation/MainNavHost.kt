@@ -113,7 +113,7 @@ private fun baseEntryProvider(
             occurrenceId = destination.occurrenceId,
             goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             goToEdit = { backStack.addOnce(NavDestination.EventEdit(destination.occurrenceId)) },
-            goToEventAttendees = { backStack.add(NavDestination.EventAttendees(destination.occurrenceId)) },
+            goToEventAttendees = { backStack.addOnce(NavDestination.EventAttendees(destination.occurrenceId)) },
         )
     }
     entry<NavDestination.EventEdit>(metadata = metaDataOf(ResponsiveDialog)) { destination ->
@@ -174,7 +174,7 @@ private fun sceneDecoratorStrategies(
                     currentDestination = { backStack.getLastCalendarView() },
                     floatingActionButton = {
                         CalendarFab(
-                            onClick = { backStack.add(NavDestination.EventCreation) },
+                            onClick = { backStack.addOnce(NavDestination.EventCreation) },
                             modifier = Modifier.fillMaxSize(),
                         )
                     },
@@ -187,7 +187,7 @@ private fun sceneDecoratorStrategies(
             MenuDrawer(
                 content = content,
                 onManageAccounts = {
-                    backStack.add(NavDestination.Accounts.List)
+                    backStack.addOnce(NavDestination.Accounts.List)
                 },
             )
         },
