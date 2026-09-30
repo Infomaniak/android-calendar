@@ -18,6 +18,7 @@
 <resources>
     <string name="accountsTitle">Contas</string>
     <string name="buttonAddAccount">Adicionar uma conta</string>
+    <string name="attendeesSearchTitle">Adicionar participantes</string>
     <string name="buttonLogOut">Sair</string>
     <string name="contentDescriptionBack">Voltar</string>
     <string name="contentDescriptionInbox">Abrir a caixa de entrada</string>

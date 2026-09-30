@@ -18,6 +18,7 @@
 <resources>
     <string name="accountsTitle">Konten</string>
     <string name="buttonAddAccount">Konto hinzufügen</string>
+    <string name="attendeesSearchTitle">Teilnehmer hinzufügen</string>
     <string name="buttonLogOut">Abmelden</string>
     <string name="contentDescriptionBack">Zurück</string>
     <string name="contentDescriptionInbox">Posteingang öffnen</string>
