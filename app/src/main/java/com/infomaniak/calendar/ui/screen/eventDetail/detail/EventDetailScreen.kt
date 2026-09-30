@@ -41,8 +41,8 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
-import com.infomaniak.calendar.components.eventdetail.detail.component.ParticipationStatusButtonsToolbar
 import com.infomaniak.calendar.components.eventdetail.detail.EventDetail
+import com.infomaniak.calendar.components.eventdetail.detail.component.ParticipationStatusButtonsToolbar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
@@ -138,7 +138,7 @@ private fun EventDetailScreen(
                     onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
                     onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
                     onRoomClick = { /*TODO[eventDetail]*/ },
-                    goToEventAttendees = { goToEventAttendees() },
+                    goToEventAttendees = goToEventAttendees,
                     modifier = Modifier.verticalScroll(scrollState),
                     contentPadding = scaffoldContentPadding + Dimens.EventDetailScreensHorizontalPadding,
                     sharedTransitionScope = sharedTransitionScope,

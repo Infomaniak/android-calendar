@@ -23,9 +23,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 
 @Stable
@@ -62,7 +60,7 @@ fun rememberSaveableAttendeesState(
     contacts: List<AttendeeUi>,
     searchQuery: String,
 ): AttendeesState {
-    val searchQuery = rememberSaveable() { mutableStateOf(searchQuery) }
+    val searchQuery = rememberSaveable { mutableStateOf(searchQuery) }
 
     return AttendeesState(attendees = attendees, contacts = contacts, searchQuery = searchQuery)
 }

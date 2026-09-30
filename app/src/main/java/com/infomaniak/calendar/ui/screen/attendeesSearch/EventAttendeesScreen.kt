@@ -50,14 +50,14 @@ fun EventAttendeesScreen(
     modifier: Modifier = Modifier,
     viewModel: EventAttendeesViewModel = viewModel(),
 ) {
-    val state by viewModel.eventAttendeesState.collectAsStateWithLifecycle()
+    val state = viewModel.eventAttendeesState.collectAsStateWithLifecycle().value
 
     LaunchedEffect(Unit) {
         viewModel.setOccurrenceId(occurrenceId)
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-        when (val currentState = state) {
+        when (state) {
             EventAttendeesUiState.Loading -> Unit // This happens too quickly, so no need to show anything
             EventAttendeesUiState.EventMissing -> {
                 val snackbarHostState = LocalSharedSnackbarHostState.current
@@ -70,8 +70,8 @@ fun EventAttendeesScreen(
             }
             is EventAttendeesUiState.Loaded -> {
                 val attendeesState = rememberSaveableAttendeesState(
-                    attendees = currentState.attendees,
-                    contacts = currentState.contacts,
+                    attendees = state.attendees,
+                    contacts = state.contacts,
                     searchQuery = "",
                 )
 
