@@ -15,29 +15,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.attendeessearch.preview
+package com.infomaniak.calendar.components.foundation.preview
 
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 
 val previewAttendees = listOf(
     AttendeeUi(
-        key = "alice@example.com#Alice",
+        "alice@example.com#Alice Johnson",
         email = "alice@example.com",
         displayName = "Alice Johnson",
-        isOrganizer = true,
         status = ParticipationStatus.Accepted,
     ),
     AttendeeUi(
-        key = "bob@example.com#Bob Smith",
+        "ellen@example.com#Ellen Joe",
+        email = "ellen@example.com",
+        displayName = "Ellen Joe",
+        status = ParticipationStatus.NeedsAction,
+    ),
+    AttendeeUi(
+        "bob@example.com#Bob Smith",
         email = "bob@example.com",
         displayName = "Bob Smith",
         status = ParticipationStatus.Tentative,
     ),
     AttendeeUi(
-        key = "charlie@example.com#Charlie Brown",
-        email = "charlie@example.com",
-        displayName = "Charlie Brown",
+        "carla@example.com#Carla Lopez",
+        email = "carla@example.com",
+        displayName = "Carla Lopez",
         status = ParticipationStatus.Declined,
+    ),
+    AttendeeUi(
+        "denis@example.com#Denis Brown",
+        email = "denis@example.com",
+        displayName = "Denis Brown",
+        status = ParticipationStatus.NeedsAction,
     ),
 )

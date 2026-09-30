@@ -88,7 +88,7 @@ internal fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) 
 }
 
 @Composable
-internal fun AttendeeParticipationStatus(status: ParticipationStatus, isOrganizer: Boolean, modifier: Modifier = Modifier) {
+private fun AttendeeParticipationStatus(status: ParticipationStatus, isOrganizer: Boolean, modifier: Modifier = Modifier) {
     return when (status) {
         ParticipationStatus.Accepted -> {
             ParticipationStatusText(
@@ -126,7 +126,7 @@ internal fun AttendeeParticipationStatus(status: ParticipationStatus, isOrganize
 }
 
 @Composable
-fun ParticipationStatusText(text: String, color: Color, isOrganizer: Boolean, modifier: Modifier = Modifier) {
+private fun ParticipationStatusText(text: String, color: Color, isOrganizer: Boolean, modifier: Modifier = Modifier) {
     Row(modifier = modifier) {
         Text(
             text = text,
