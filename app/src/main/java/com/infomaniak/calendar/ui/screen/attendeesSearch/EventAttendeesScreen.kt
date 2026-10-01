@@ -39,6 +39,7 @@ import com.infomaniak.calendar.components.attendeessearch.state.rememberSaveable
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
+import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 
@@ -57,8 +58,8 @@ fun EventAttendeesScreen(
 
     Box(modifier = modifier.fillMaxSize()) {
         when (state) {
-            EventAttendeesUiState.Loading -> Unit // This happens too quickly, so no need to show anything
-            EventAttendeesUiState.EventMissing -> {
+            EventDetailUiState.Loading -> Unit // This happens too quickly, so no need to show anything
+            EventDetailUiState.Unavailable -> {
                 val snackbarHostState = LocalSharedSnackbarHostState.current
                 val eventMissingMessage = stringResource(R.string.eventOccurrenceNotFound)
 
@@ -67,10 +68,10 @@ fun EventAttendeesScreen(
                     goBack()
                 }
             }
-            is EventAttendeesUiState.Loaded -> {
+            is EventDetailUiState.Success -> {
                 val attendeesState = rememberSaveableAttendeesState(
-                    attendees = state.attendees,
-                    contacts = state.contacts,
+                    attendees = state.eventDetail.attendees.all,
+                    contacts = state.eventDetail.attendees.all,
                 )
 
                 EventAttendeesScreen(

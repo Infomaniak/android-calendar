@@ -66,7 +66,7 @@ class GetEventDetailUiUseCase @Inject constructor(
     private val occurrenceIdFlow = MutableStateFlow<OccurrenceId?>(null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val eventFlow = occurrenceIdFlow
+    private val eventFlow = occurrenceIdFlow
         .filterNotNull()
         .distinctUntilChanged()
         .flatMapLatest { occurrenceId -> calendarManager.observeOccurrence(occurrenceId) }
