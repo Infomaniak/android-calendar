@@ -17,35 +17,30 @@
  */
 package com.infomaniak.calendar.components.attendeessearch.state
 
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 
 @Stable
 class AttendeesState(
     private val attendees: List<AttendeeUi>,
     private val contacts: List<AttendeeUi>,
-    private val searchQuery: MutableState<String>,
+    val searchQueryTextFieldState: TextFieldState,
 ) {
-
     val searchResults by derivedStateOf {
-        val query = searchQuery.value.trim()
+        val query = searchQueryTextFieldState.text.trim()
         if (query.isEmpty()) {
             attendees
         } else {
-            contacts.filter { it.matchesQuery(query) }
+            contacts.filter { it.matchesQuery(searchQueryTextFieldState.text.toString()) }
         }
     }
 
-    fun updateQuery(query: String) {
-        searchQuery.value = query
-    }
 
     // This function will be replaced by KMP search
     private fun AttendeeUi.matchesQuery(query: String): Boolean {
@@ -61,9 +56,9 @@ fun rememberSaveableAttendeesState(
     contacts: List<AttendeeUi>,
     searchQuery: String = "",
 ): AttendeesState {
-    val searchQueryState = rememberSaveable { mutableStateOf(searchQuery) }
+    val searchQueryState = rememberTextFieldState(initialText = searchQuery)
 
     return remember(attendees, contacts, searchQueryState) {
-        AttendeesState(attendees = attendees, contacts = contacts, searchQuery = searchQueryState)
+        AttendeesState(attendees = attendees, contacts = contacts, searchQueryTextFieldState = searchQueryState)
     }
 }

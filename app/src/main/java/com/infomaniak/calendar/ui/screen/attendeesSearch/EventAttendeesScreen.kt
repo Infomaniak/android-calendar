@@ -103,8 +103,6 @@ fun EventAttendeesScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxWidth(),
-            searchQuery = { attendeesState.searchQuery.value },
-            onSearchQueryChanged = attendeesState::updateQuery,
         )
     }
 }

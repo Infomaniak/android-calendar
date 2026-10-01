@@ -37,14 +37,11 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 @Composable
 fun AttendeesSearch(
     attendeesState: AttendeesState,
-    searchQuery: () -> String,
-    onSearchQueryChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         SearchBar(
-            searchQuery = searchQuery,
-            onSearchQueryChanged = onSearchQueryChanged,
+            searchState = attendeesState.searchQueryTextFieldState,
         )
         if (attendeesState.searchResults.isEmpty()) {
             EmptyState(text = stringResource(R.string.attendeesEmptyState))
@@ -67,8 +64,6 @@ private fun Preview() {
                     attendees = previewAttendees,
                     contacts = previewAttendees,
                 ),
-                searchQuery = { "" },
-                onSearchQueryChanged = {},
             )
         }
     }
@@ -84,8 +79,6 @@ private fun PreviewEmptyState() {
                     attendees = listOf(),
                     contacts = listOf(),
                 ),
-                searchQuery = { "" },
-                onSearchQueryChanged = {},
             )
         }
     }
