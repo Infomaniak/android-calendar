@@ -17,13 +17,12 @@
   -->
 <resources>
     <string name="accountsTitle">Λογαριασμοί</string>
-    <string name="buttonAddAccount">Προσθήκη λογαριασμού</string>
     <string name="attendeesSearchTitle">Προσθήκη συμμετεχόντων</string>
+    <string name="buttonAddAccount">Προσθήκη λογαριασμού</string>
     <string name="buttonLogOut">Αποσύνδεση</string>
     <string name="contentDescriptionBack">Πίσω</string>
     <string name="contentDescriptionInbox">Άνοιγμα εισερχομένων</string>
     <string name="contentDescriptionMenuDrawer">Άνοιγμα μενού</string>
-    <string name="contentDescriptionSearch">Αναζήτηση</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Τρέχουσα προβολή: %s. Πατήστε για να αλλάξετε την προβολή.</string>
     <string name="dayTitle">Ημέρα</string>
     <string name="eventOccurrenceNotFound">Αυτή η εκδήλωση δεν είναι πλέον διαθέσιμη.</string>

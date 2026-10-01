@@ -17,21 +17,18 @@
   -->
 <resources>
     <string name="accountsTitle">Accounts</string>
-    <string name="buttonAddAccount">Add an account</string>
     <string name="attendeesSearchTitle">Add attendees</string>
+    <string name="buttonAddAccount">Add an account</string>
     <string name="buttonLogOut">Log Out</string>
     <string name="contentDescriptionBack">Back</string>
     <string name="contentDescriptionInbox">Open inbox</string>
     <string name="contentDescriptionMenuDrawer">Open menu</string>
-    <string name="contentDescriptionSearch">Search</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Current view: %s. Tap to change view.</string>
     <string name="dayTitle">Day</string>
     <string name="eventOccurrenceNotFound">This event is no longer available.</string>
     <string name="helpTitle">Help</string>
     <string name="monthTitle">Month</string>
     <string name="planningTitle">Planning</string>
-    <string name="searchForAttendees">Search for attendees</string>
-    <string name="sectionOrganizerHeader">Organizer</string>
     <string name="settingsTitle">Settings</string>
     <string name="signOutAccountAlertConfirm">Sign out of the account</string>
     <string name="signOutAccountAlertDescription">This account and its associated calendars will be disconnected from the “Calendar” app. They will remain available in your Infomaniak online account.</string>

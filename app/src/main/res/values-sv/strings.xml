@@ -17,13 +17,12 @@
   -->
 <resources>
     <string name="accountsTitle">Konton</string>
-    <string name="buttonAddAccount">Lägg till ett konto</string>
     <string name="attendeesSearchTitle">Lägg till deltagare</string>
+    <string name="buttonAddAccount">Lägg till ett konto</string>
     <string name="buttonLogOut">Logga ut</string>
     <string name="contentDescriptionBack">Tillbaka</string>
     <string name="contentDescriptionInbox">Öppna inkorgen</string>
     <string name="contentDescriptionMenuDrawer">Öppna meny</string>
-    <string name="contentDescriptionSearch">Sök</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Aktuell vy: %s. Tryck för att ändra vy.</string>
     <string name="dayTitle">Dag</string>
     <string name="eventOccurrenceNotFound">Det här evenemanget är inte längre tillgängligt.</string>

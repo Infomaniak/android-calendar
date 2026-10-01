@@ -17,13 +17,12 @@
   -->
 <resources>
     <string name="accountsTitle">Comptes</string>
-    <string name="buttonAddAccount">Ajouter un compte</string>
     <string name="attendeesSearchTitle">Ajouter des invités</string>
+    <string name="buttonAddAccount">Ajouter un compte</string>
     <string name="buttonLogOut">Se déconnecter</string>
     <string name="contentDescriptionBack">Retour</string>
     <string name="contentDescriptionInbox">Ouvrir la boîte de réception</string>
     <string name="contentDescriptionMenuDrawer">Ouvrir le menu</string>
-    <string name="contentDescriptionSearch">Rechercher</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Vue actuelle : %s. Appuyez pour changer de vue.</string>
     <string name="dayTitle">Jour</string>
     <string name="eventOccurrenceNotFound">Cet évènement n’est plus disponible.</string>
