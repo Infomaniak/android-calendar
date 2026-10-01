@@ -19,7 +19,9 @@ package com.infomaniak.calendar.components.day.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -141,25 +143,19 @@ internal fun HourLines(state: DayTimelineState, modifier: Modifier = Modifier) {
     )
 }
 
-/** A line across the whole height between every two of the [columnCount] days. */
+/** A line across the whole height along the start edge of a day's column. */
 @Composable
-internal fun DayColumnDividers(columnWidth: Dp, columnCount: Int, modifier: Modifier = Modifier) {
+internal fun Modifier.dayColumnDivider(): Modifier {
     val color = MaterialTheme.colorScheme.outlineVariant
 
-    Spacer(
-        modifier = modifier.drawBehind {
-            for (column in 1 until columnCount) {
-                val x = columnWidth.toPx() * column
-
-                drawLine(
-                    color = color,
-                    start = Offset(x, 0f),
-                    end = Offset(x, size.height),
-                    strokeWidth = GridLineThickness.toPx(),
-                )
-            }
-        },
-    )
+    return drawBehind {
+        drawLine(
+            color = color,
+            start = Offset(0f, 0f),
+            end = Offset(0f, size.height),
+            strokeWidth = GridLineThickness.toPx(),
+        )
+    }
 }
 
 @Preview
@@ -191,7 +187,9 @@ private fun MultiDayGridPreview() {
 
             Box(modifier = Modifier.padding(start = DayTimelineDefaults.HourGutterWidth).width(300.dp)) {
                 HourLines(state = state, modifier = Modifier.fillMaxWidth())
-                DayColumnDividers(columnWidth = 100.dp, columnCount = 3, modifier = Modifier.matchParentSize())
+                Row(modifier = Modifier.matchParentSize()) {
+                    repeat(3) { Spacer(modifier = Modifier.weight(1f).fillMaxHeight().dayColumnDivider()) }
+                }
             }
         }
     }

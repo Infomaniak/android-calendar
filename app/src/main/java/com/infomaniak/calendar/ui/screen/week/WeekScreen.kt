@@ -48,11 +48,15 @@ import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.screen.day.DayEventsByDate
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
+import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.plus
+import kotlin.time.Clock
 
 @Composable
 fun WeekScreen(
@@ -75,6 +79,7 @@ fun WeekScreen(
 
     WeekScreen(
         goToEventDetail = goToEventDetail,
+        dateRange = viewModel.dateRange,
         eventsByDate = { eventsByDate },
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventDots },
@@ -87,6 +92,7 @@ fun WeekScreen(
 @Composable
 private fun WeekScreen(
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
+    dateRange: ClosedRange<LocalDate>,
     eventsByDate: () -> DayEventsByDate,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
@@ -119,6 +125,8 @@ private fun WeekScreen(
     ) { contentPadding ->
         Box(modifier = Modifier.padding(contentPadding.onlyHorizontal())) {
             WeekPager(
+                dateRange = dateRange,
+                weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
                 eventsOf = { eventsByDate()[it] ?: DayEvents.Empty },
                 onEventClick = { goToEventDetail(it.occurrenceId) },
                 state = timelineState,
@@ -143,6 +151,7 @@ private fun WeekScreenPreview() {
         CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
             WeekScreen(
                 goToEventDetail = {},
+                dateRange = Clock.today().let { it..it.plus(DatePeriod(days = 14)) },
                 eventsByDate = { emptyMap() },
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
