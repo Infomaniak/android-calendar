@@ -19,7 +19,6 @@ package com.infomaniak.calendar.components.day.zoom
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -52,19 +51,21 @@ internal fun rememberZoomableAxisState(
 }
 
 /**
- * Zoom and scroll along one axis of a timeline, kept in step so that zooming around a point leaves
- * that point where it was in the viewport.
+ * Zoom and scroll along an axis laid out in a [ScrollState], kept in step so that zooming around a
+ * point leaves that point where it was in the viewport.
  *
- * [zoom] is a factor over the base length of the axis' unit, whatever that unit is (an hour on the
- * vertical axis, a day on the horizontal one): the content along the axis is expected to grow in
- * proportion to it. Knowing nothing more about its axis, the same state serves either of them.
+ * [zoom] is a factor over the base length of the axis' unit, whatever that unit is: the content
+ * along the axis is expected to grow in proportion to it.
+ *
+ * The pinch is read as an offset into the content rather than into the viewport, so
+ * [pinchToZoom] has to come after the scroll, and after any padding laid before the content.
  */
 @Stable
 internal class ZoomableAxisState(
     initialZoom: Float,
     private val zoomRange: ClosedFloatingPointRange<Float>,
     val scrollState: ScrollState,
-) {
+) : ZoomableAxis {
 
     private var clampedZoom by mutableFloatStateOf(initialZoom.coerceIn(zoomRange))
 
@@ -74,21 +75,18 @@ internal class ZoomableAxisState(
             clampedZoom = value.coerceIn(zoomRange)
         }
 
-    var isZooming: Boolean by mutableStateOf(false)
+    override var isZooming: Boolean by mutableStateOf(false)
 
     /** The anchor of the zoom that is still waiting for the content to be measured at its new size. */
     private var heldAnchor: ZoomAnchor? = null
 
-    /**
-     * Pins the point at [contentOffset], expressed in the coordinate system of the whole content
-     * rather than of the viewport, so it can be kept under the fingers while zooming.
-     */
-    fun anchorAt(contentOffset: Float): ZoomAnchor = ZoomAnchor(
-        unzoomedOffset = contentOffset / zoom,
-        viewportOffset = contentOffset - scrollState.value,
+    /** The anchor's position is its offset in the content at a zoom of 1. */
+    override fun anchorAt(pointerOffset: Float): ZoomAnchor = ZoomAnchor(
+        position = pointerOffset / zoom,
+        viewportOffset = pointerOffset - scrollState.value,
     )
 
-    fun zoomAround(anchor: ZoomAnchor, factor: Float) {
+    override fun zoomAround(anchor: ZoomAnchor, factor: Float) {
         zoom *= factor
         heldAnchor = anchor
 
@@ -111,18 +109,10 @@ internal class ZoomableAxisState(
     }
 
     private fun holdAnchor(anchor: ZoomAnchor) {
-        val newContentOffset = anchor.unzoomedOffset * zoom
+        val newContentOffset = anchor.position * zoom
         val newViewportOffset = newContentOffset - scrollState.value
 
         scrollState.dispatchRawDelta(newViewportOffset - anchor.viewportOffset)
     }
 }
 
-/**
- * @param unzoomedOffset Where the anchored point lies in the content at a zoom of 1, which stays
- * the same whatever the zoom, unlike its offset in the zoomed content.
- * @param viewportOffset Where the anchored point lies inside the viewport, which is where it has
- * to stay while zooming.
- */
-@Immutable
-internal data class ZoomAnchor(val unzoomedOffset: Float, val viewportOffset: Float)

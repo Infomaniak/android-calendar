@@ -41,6 +41,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.minus
@@ -62,9 +63,12 @@ class WeekScreenViewModel(
     private val timeZone = TimeZone.currentSystemDefault()
     private val today = Clock.today(timeZone)
 
-    // TODO: Observe only the weeks around the visible one, once the pager pages through weeks.
-    private val startDate = today.minus(DAY_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
-    private val endDate = today.plus(DAY_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
+    val dateRange: ClosedRange<LocalDate> =
+        today.minus(DAY_RANGE_DAYS, DateTimeUnit.DAY)..today.plus(DAY_RANGE_DAYS, DateTimeUnit.DAY)
+
+    // TODO: Observe only the weeks around the visible one.
+    private val startDate = dateRange.start.atStartOfDayIn(timeZone)
+    private val endDate = dateRange.endInclusive.atStartOfDayIn(timeZone)
 
     private val emailsByUserId = accountUtils.emailsByUserId.shareIn(viewModelScope, SharingStarted.Eagerly, 1)
 

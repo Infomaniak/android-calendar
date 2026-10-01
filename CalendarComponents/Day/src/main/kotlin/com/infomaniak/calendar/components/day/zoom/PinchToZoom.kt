@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.input.pointer.PointerEvent
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import kotlin.math.pow
 
@@ -32,21 +33,24 @@ import kotlin.math.pow
  * Zooms the given axes around the fingers of a pinch. Either axis can be left out: it is then
  * neither zoomed nor given a share of the pinch, which the other axis gets in full.
  *
- * The pinch reads its position as an offset into the content of each axis, so the modifier has to
- * come after the scroll of every axis it zooms, and after any padding laid before their content.
+ * The pinch is handed to each axis in the coordinates of the element this modifier is set on, so
+ * where it sits is up to the axes it zooms: see [ZoomableAxis].
+ *
+ * It listens ahead of the content it covers, so that a scrollable laid inside it, a lazy list
+ * especially, does not drag along with the fingers of a pinch.
  */
 internal fun Modifier.pinchToZoom(
-    horizontal: ZoomableAxisState? = null,
-    vertical: ZoomableAxisState? = null,
+    horizontal: ZoomableAxis? = null,
+    vertical: ZoomableAxis? = null,
 ): Modifier = pointerInput(horizontal, vertical) {
     awaitEachGesture {
-        awaitFirstDown(requireUnconsumed = false)
+        awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
         var isPinching = false
         var anchors: PinchAnchors? = null
 
         try {
             do {
-                val event = awaitPointerEvent()
+                val event = awaitPointerEvent(PointerEventPass.Initial)
 
                 if (event.changes.count { it.pressed } > 1) {
                     isPinching = true
@@ -56,8 +60,8 @@ internal fun Modifier.pinchToZoom(
                     val centroid = event.calculateCentroid()
                     if (centroid.isSpecified) {
                         val pinchAnchors = anchors ?: PinchAnchors(
-                            horizontal = horizontal?.anchorAt(contentOffset = centroid.x),
-                            vertical = vertical?.anchorAt(contentOffset = centroid.y),
+                            horizontal = horizontal?.anchorAt(pointerOffset = centroid.x),
+                            vertical = vertical?.anchorAt(pointerOffset = centroid.y),
                         )
 
                         val zoom = event.calculateZoom()
