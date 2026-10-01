@@ -17,48 +17,49 @@
  */
 package com.infomaniak.calendar.components.day
 
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.day.component.HourGrid
-import com.infomaniak.calendar.components.day.component.HourLabelOverhang
+import com.infomaniak.calendar.components.day.component.MultiDayTimeline
+import com.infomaniak.calendar.components.day.model.DayEvents
+import com.infomaniak.calendar.components.day.state.DayColumnsState
 import com.infomaniak.calendar.components.day.state.DayTimelineState
+import com.infomaniak.calendar.components.day.state.rememberDayColumnsState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.core.common.utils.today
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.plus
+import kotlin.time.Clock
 
+private const val DAYS_PER_PAGE = 7
+
+/**
+ * @param columnsState Lets a pinch widen the days, see [rememberDayColumnsState]. Leave it out to
+ * keep every day of the page in view.
+ */
 @Composable
 fun WeekPager(
     modifier: Modifier = Modifier,
     state: DayTimelineState = rememberDayTimelineState(),
+    columnsState: DayColumnsState? = null,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    BoxWithConstraints(
-        modifier = modifier
-            .verticalScroll(state.scrollState, enabled = !state.isPinching)
-            .padding(
-                top = HourLabelOverhang + contentPadding.calculateTopPadding(),
-                bottom = DayTimelineDefaults.BottomPadding + contentPadding.calculateBottomPadding(),
-            )
-            // Inside the padding: a pinch reads its own y as an hour, so it has to start
-            // counting where the first hour line is drawn, not where the padding begins.
-            .pinchToZoom(state),
-    ) {
-        val columnCount = 3
-        val columnWidth = (this@BoxWithConstraints.maxWidth - DayTimelineDefaults.HourGutterWidth) / columnCount
+    // TODO: Page through weeks the way DayPager pages through days, and feed the real events.
+    val dates = remember { List(DAYS_PER_PAGE) { Clock.today() + DatePeriod(days = it) } }
 
-        HourGrid(
-            state = state,
-            columnWidth = columnWidth,
-            columnCount = columnCount,
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
+    MultiDayTimeline(
+        dates = dates,
+        eventsOf = { DayEvents.Empty },
+        state = state,
+        onEventClick = {},
+        modifier = modifier,
+        columnsState = columnsState,
+        contentPadding = contentPadding,
+    )
 }
 
 @Preview
@@ -66,7 +67,7 @@ fun WeekPager(
 private fun Preview() {
     MaterialTheme {
         Surface {
-            WeekPager()
+            WeekPager(columnsState = rememberDayColumnsState(maxVisibleDayCount = DAYS_PER_PAGE))
         }
     }
 }

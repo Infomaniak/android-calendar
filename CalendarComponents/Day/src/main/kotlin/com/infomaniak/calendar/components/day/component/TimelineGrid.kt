@@ -18,9 +18,12 @@
 package com.infomaniak.calendar.components.day.component
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,8 +31,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
@@ -47,7 +48,7 @@ import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortTimeLabel
 import kotlinx.datetime.LocalTime
 
-private val HourLineWidth = DividerHeight
+private val GridLineThickness = DividerHeight
 private const val FIRST_LABELLED_HOUR = 0
 
 private val HourLabelStyle: TextStyle
@@ -62,98 +63,35 @@ private val HourLabelStyle: TextStyle
 internal val HourLabelOverhang: Dp
     @Composable get() = with(LocalDensity.current) { HourLabelStyle.lineHeight.toDp() / 2 }
 
+/**
+ * Scrolls the day vertically, with room above for midnight's label and below for the last events to
+ * clear whatever overlays the bottom of the screen.
+ *
+ * A pinch reads its own y as an hour, so any [pinchToZoom][com.infomaniak.calendar.components.day.zoom.pinchToZoom]
+ * goes after this modifier, inside the padding: it has to start counting where the first hour line
+ * is drawn, not where the padding begins.
+ */
 @Composable
-internal fun HourLines(state: DayTimelineState, modifier: Modifier = Modifier) {
-    val hourLineColor = MaterialTheme.colorScheme.outlineVariant
-    val hourLineEndPadding = DayTimelineDefaults.TimelineEndPadding
+internal fun Modifier.verticalTimelineScroll(state: DayTimelineState, contentPadding: PaddingValues): Modifier = this
+    .verticalScroll(state.scrollState, enabled = !state.isPinching)
+    .padding(
+        top = HourLabelOverhang + contentPadding.calculateTopPadding(),
+        bottom = DayTimelineDefaults.BottomPadding + contentPadding.calculateBottomPadding(),
+    )
 
-    Box(
-        modifier = modifier
-            .timelineHeight(state)
-            .drawBehind { drawHourLines(state, hourLineColor, hourLineEndPadding) },
-    ) {
-        HourLabels(
-            state = state,
-            modifier = Modifier
-                .width(DayTimelineDefaults.HourGutterWidth)
-                .fillMaxHeight(),
-        )
-    }
-}
-
-@Composable
-internal fun HourGrid(state: DayTimelineState, columnWidth: Dp, columnCount: Int, modifier: Modifier = Modifier) {
-    val hourLineColor = MaterialTheme.colorScheme.outlineVariant
-    val hourLineEndPadding = DayTimelineDefaults.TimelineEndPadding
-
-    Box(
-        modifier = modifier
-            .timelineHeight(state)
-            .drawBehind { drawHourGrid(state, columnWidth, columnCount, hourLineColor, hourLineEndPadding) },
-    ) {
-        HourLabels(
-            state = state,
-            modifier = Modifier
-                .width(DayTimelineDefaults.HourGutterWidth)
-                .fillMaxHeight(),
-        )
-    }
-}
-
-private fun Modifier.timelineHeight(state: DayTimelineState): Modifier = layout { measurable, constraints ->
+/** Sets the height of the composable based on the zoom level of the [DayTimelineState] */
+internal fun Modifier.timelineHeight(state: DayTimelineState): Modifier = layout { measurable, constraints ->
     val height = state.timelineHeight.roundToPx()
     val placeable = measurable.measure(constraints.copy(minHeight = height, maxHeight = height))
 
     layout(placeable.width, placeable.height) { placeable.place(x = 0, y = 0) }
 }
 
-private fun DrawScope.drawHourLines(state: DayTimelineState, color: Color, endPadding: Dp) {
-    val lineStartX = DayTimelineDefaults.HourGutterWidth.toPx()
-
-    for (hour in FIRST_LABELLED_HOUR until HOURS_PER_DAY) {
-        val y = state.verticalOffsetOf(hour * MINUTES_PER_HOUR).toPx()
-
-        drawLine(
-            color = color,
-            start = Offset(lineStartX, y),
-            end = Offset(size.width - endPadding.toPx(), y),
-            strokeWidth = HourLineWidth.toPx(),
-        )
-    }
-}
-
-private fun DrawScope.drawHourGrid(state: DayTimelineState, columnWidth: Dp, columnCount: Int, color: Color, endPadding: Dp) {
-    val lineStartX = DayTimelineDefaults.HourGutterWidth.toPx()
-
-    for (hour in FIRST_LABELLED_HOUR until HOURS_PER_DAY) {
-        val y = state.verticalOffsetOf(hour * MINUTES_PER_HOUR).toPx()
-
-        drawLine(
-            color = color,
-            start = Offset(lineStartX, y),
-            end = Offset(size.width - endPadding.toPx(), y),
-            strokeWidth = HourLineWidth.toPx(),
-        )
-    }
-
-
-    val columnWidthPx = columnWidth.toPx()
-    for (column in 1 until columnCount) {
-        val x = lineStartX + columnWidthPx * column
-
-        drawLine(
-            color = color,
-            start = Offset(x, 0f),
-            end = Offset(x, size.height),
-            strokeWidth = HourLineWidth.toPx(), // TODO: Use thickness over width
-        )
-    }
-}
-
+/** The gutter's labels, each centred on the hour line it names. */
 @Composable
-private fun HourLabels(state: DayTimelineState, modifier: Modifier = Modifier) {
+internal fun HourLabels(state: DayTimelineState, modifier: Modifier = Modifier) {
     Layout(
-        modifier = modifier,
+        modifier = modifier.timelineHeight(state),
         content = { for (hour in FIRST_LABELLED_HOUR until HOURS_PER_DAY) HourLabel(hour) },
     ) { measurables, constraints ->
         val labels = measurables.map { it.measure(Constraints(maxWidth = constraints.maxWidth)) }
@@ -180,18 +118,81 @@ private fun HourLabel(hour: Int, modifier: Modifier = Modifier) {
     )
 }
 
+/** A line across the whole width at every hour. */
+@Composable
+internal fun HourLines(state: DayTimelineState, modifier: Modifier = Modifier) {
+    val color = MaterialTheme.colorScheme.outlineVariant
+
+    Spacer(
+        modifier = modifier
+            .timelineHeight(state)
+            .drawBehind {
+                for (hour in FIRST_LABELLED_HOUR until HOURS_PER_DAY) {
+                    val y = state.verticalOffsetOf(hour * MINUTES_PER_HOUR).toPx()
+
+                    drawLine(
+                        color = color,
+                        start = Offset(0f, y),
+                        end = Offset(size.width, y),
+                        strokeWidth = GridLineThickness.toPx(),
+                    )
+                }
+            },
+    )
+}
+
+/** A line across the whole height between every two of the [columnCount] days. */
+@Composable
+internal fun DayColumnDividers(columnWidth: Dp, columnCount: Int, modifier: Modifier = Modifier) {
+    val color = MaterialTheme.colorScheme.outlineVariant
+
+    Spacer(
+        modifier = modifier.drawBehind {
+            for (column in 1 until columnCount) {
+                val x = columnWidth.toPx() * column
+
+                drawLine(
+                    color = color,
+                    start = Offset(x, 0f),
+                    end = Offset(x, size.height),
+                    strokeWidth = GridLineThickness.toPx(),
+                )
+            }
+        },
+    )
+}
+
 @Preview
 @Composable
-private fun HourLinesPreview() {
+private fun DayGridPreview() {
     Surface {
-        HourLines(state = rememberDayTimelineState(), modifier = Modifier.fillMaxWidth())
+        val state = rememberDayTimelineState()
+
+        Box {
+            HourLabels(state = state, modifier = Modifier.width(DayTimelineDefaults.HourGutterWidth))
+            HourLines(
+                state = state,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = DayTimelineDefaults.HourGutterWidth, end = DayTimelineDefaults.TimelineEndPadding),
+            )
+        }
     }
 }
 
 @Preview
 @Composable
-private fun HourGridPreview() {
+private fun MultiDayGridPreview() {
     Surface {
-        HourGrid(state = rememberDayTimelineState(), columnWidth = 100.dp, columnCount = 3, modifier = Modifier.fillMaxWidth())
+        val state = rememberDayTimelineState()
+
+        Box {
+            HourLabels(state = state, modifier = Modifier.width(DayTimelineDefaults.HourGutterWidth))
+
+            Box(modifier = Modifier.padding(start = DayTimelineDefaults.HourGutterWidth).width(300.dp)) {
+                HourLines(state = state, modifier = Modifier.fillMaxWidth())
+                DayColumnDividers(columnWidth = 100.dp, columnCount = 3, modifier = Modifier.matchParentSize())
+            }
+        }
     }
 }
