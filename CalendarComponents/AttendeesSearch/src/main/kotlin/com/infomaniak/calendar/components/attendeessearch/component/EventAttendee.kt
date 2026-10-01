@@ -89,40 +89,12 @@ internal fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) 
 
 @Composable
 private fun AttendeeParticipationStatus(status: ParticipationStatus, isOrganizer: Boolean, modifier: Modifier = Modifier) {
-    return when (status) {
-        ParticipationStatus.Accepted -> {
-            ParticipationStatusText(
-                text = stringResource(R.string.statusAcceptedLabel),
-                color = MaterialTheme.extendedColorScheme.success,
-                isOrganizer = isOrganizer,
-                modifier = modifier,
-            )
-        }
-        ParticipationStatus.Declined -> {
-            ParticipationStatusText(
-                text = stringResource(R.string.statusDeclinedLabel),
-                color = MaterialTheme.colorScheme.error,
-                isOrganizer = isOrganizer,
-                modifier = modifier,
-            )
-        }
-        ParticipationStatus.Tentative -> {
-            ParticipationStatusText(
-                text = stringResource(R.string.statusTentativeLabel),
-                color = MaterialTheme.extendedColorScheme.warning,
-                isOrganizer = isOrganizer,
-                modifier = modifier,
-            )
-        }
-        ParticipationStatus.NeedsAction -> {
-            ParticipationStatusText(
-                text = stringResource(R.string.statusNeedsActionLabel),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                isOrganizer = isOrganizer,
-                modifier = modifier,
-            )
-        }
-    }
+    return ParticipationStatusText(
+        text = stringResource(status.labelRes),
+        color = status.statusColor(),
+        isOrganizer = isOrganizer,
+        modifier = modifier,
+    )
 }
 
 @Composable

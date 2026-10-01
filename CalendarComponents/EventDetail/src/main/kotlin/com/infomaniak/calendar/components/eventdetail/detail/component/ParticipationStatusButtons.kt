@@ -121,18 +121,10 @@ private enum class ParticipationStatusButton(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun ParticipationStatusButton.colors(): ToggleButtonColors = when (this) {
-    ParticipationStatusButton.Yes -> ToggleButtonDefaults.colors(
-        checkedContainerColor = MaterialTheme.extendedColorScheme.success,
-        checkedContentColor = MaterialTheme.extendedColorScheme.onSuccess,
-    )
-    ParticipationStatusButton.No -> ToggleButtonDefaults.colors(
-        checkedContainerColor = MaterialTheme.colorScheme.error,
-        checkedContentColor = MaterialTheme.colorScheme.onError,
-    )
-    ParticipationStatusButton.Maybe -> ToggleButtonDefaults.colors(
-        checkedContainerColor = MaterialTheme.extendedColorScheme.warning,
-        checkedContentColor = MaterialTheme.extendedColorScheme.onWarning,
+private fun ParticipationStatusButton.colors(): ToggleButtonColors {
+    return ToggleButtonDefaults.colors(
+        checkedContainerColor = status.statusColor(),
+        checkedContentColor = status.onStatusColor(),
     )
 }
 

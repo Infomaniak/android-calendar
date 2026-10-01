@@ -19,9 +19,14 @@ package com.infomaniak.calendar.components.foundation.models
 
 import android.os.Parcelable
 import androidx.annotation.PluralsRes
+import androidx.annotation.StringRes
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.computeInitials
+import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
 import kotlinx.parcelize.Parcelize
 
 @Immutable
@@ -36,9 +41,34 @@ data class AttendeeUi(
     fun initials(): String = (displayName ?: email).computeInitials()
 }
 
-enum class ParticipationStatus(@PluralsRes val countPluralRes: Int) {
-    Accepted(R.plurals.attendeesAcceptedCount),
-    Tentative(R.plurals.attendeesTentativeCount),
-    Declined(R.plurals.attendeesDeclinedCount),
-    NeedsAction(R.plurals.attendeesPendingCount),
+enum class ParticipationStatus(
+    @PluralsRes val countPluralRes: Int,
+    @StringRes val labelRes: Int,
+    val statusColor: @Composable () -> Color,
+    val onStatusColor: @Composable () -> Color,
+) {
+    Accepted(
+        R.plurals.attendeesAcceptedCount,
+        R.string.statusAcceptedLabel,
+        { MaterialTheme.extendedColorScheme.success },
+        { MaterialTheme.extendedColorScheme.onSuccess },
+    ),
+    Tentative(
+        R.plurals.attendeesTentativeCount,
+        R.string.statusTentativeLabel,
+        { MaterialTheme.colorScheme.onSurfaceVariant },
+        { MaterialTheme.colorScheme.surfaceVariant },
+    ),
+    Declined(
+        R.plurals.attendeesDeclinedCount,
+        R.string.statusDeclinedLabel,
+        { MaterialTheme.colorScheme.error },
+        { MaterialTheme.colorScheme.onError },
+    ),
+    NeedsAction(
+        R.plurals.attendeesPendingCount,
+        R.string.statusNeedsActionLabel,
+        { MaterialTheme.extendedColorScheme.warning },
+        { MaterialTheme.extendedColorScheme.onWarning },
+    ),
 }
