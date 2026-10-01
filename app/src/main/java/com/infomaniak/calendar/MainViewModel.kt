@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.saveable.Saver
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -70,7 +69,7 @@ class MainViewModel(
     val visibleDate = visibleDateManager.visibleDate
 
     init {
-        savedStateHandle.bindVisibleDate(visibleDateManager)
+        visibleDateManager.makeSaveableTo(savedStateHandle)
         syncEventsForConnectedUsers()
     }
 
@@ -102,28 +101,5 @@ class MainViewModel(
         override fun create(extras: CreationExtras): MainViewModel = create(extras.createSavedStateHandle())
 
         fun create(@Assisted savedStateHandle: SavedStateHandle): MainViewModel
-    }
-}
-
-@OptIn(SavedStateHandleSaveableApi::class)
-private fun SavedStateHandle.bindVisibleDate(manager: VisibleDateManager) {
-    val saver = Saver<VisibleDateManager, Any>(
-        save = { it.visibleDate.value.toString() },
-        restore = { savedValue ->
-            val date = when (savedValue) {
-                is String -> LocalDate.parse(savedValue)
-                // Previously saved with saveable { mutableStateOf(date) }.
-                is MutableState<*> -> {
-                    val date = savedValue.value
-                    check(date is LocalDate) { "Invalid saved visible date: $date" }
-                    date
-                }
-                else -> error("Invalid saved visible date: $savedValue")
-            }
-            manager.apply { restoreVisibleDate(date) }
-        },
-    )
-    saveable("visibleDay", saver = saver) {
-        manager.apply { restoreVisibleDate(visibleDate.value) }
     }
 }
