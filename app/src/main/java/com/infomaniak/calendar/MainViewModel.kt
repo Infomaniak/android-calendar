@@ -18,7 +18,7 @@
 package com.infomaniak.calendar
 
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
@@ -28,11 +28,11 @@ import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
 import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.SyncEventsManager
+import com.infomaniak.calendar.manager.VisibleDateManager
 import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.utils.UserLoadState
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.auth.models.user.User
-import com.infomaniak.core.common.utils.today
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -49,7 +49,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
-import kotlin.time.Clock
 
 @AssistedInject
 class MainViewModel(
@@ -57,6 +56,7 @@ class MainViewModel(
     private val accountUtils: AccountUtils,
     private val syncEventsManager: SyncEventsManager,
     private val calendarDataValues: CalendarDataValues,
+    visibleDateManager: VisibleDateManager,
 ) : ViewModel() {
     val loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError> = syncEventsManager.loadingError
 
@@ -67,12 +67,10 @@ class MainViewModel(
         .map { users -> if (users.isEmpty()) UserLoadState.Loaded.Disconnected else UserLoadState.Loaded.Connected }
         .stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = UserLoadState.Awaiting)
 
-    @OptIn(SavedStateHandleSaveableApi::class)
-    val visibleDay: MutableState<LocalDate> = savedStateHandle.saveable("visibleDay") {
-        mutableStateOf(Clock.today())
-    }
+    val visibleDate = visibleDateManager.visibleDate
 
     init {
+        savedStateHandle.bindVisibleDate(visibleDateManager)
         syncEventsForConnectedUsers()
     }
 
@@ -92,7 +90,7 @@ class MainViewModel(
                     previousUserIds = userIds
                     if (!hasNewUser) return@collectLatest
 
-                    syncEventsManager.loadCurrentMonths(visibleDate = visibleDay.value)
+                    syncEventsManager.loadCurrentMonths(visibleDate = visibleDate.value)
                 }
         }
     }
@@ -104,5 +102,28 @@ class MainViewModel(
         override fun create(extras: CreationExtras): MainViewModel = create(extras.createSavedStateHandle())
 
         fun create(@Assisted savedStateHandle: SavedStateHandle): MainViewModel
+    }
+}
+
+@OptIn(SavedStateHandleSaveableApi::class)
+private fun SavedStateHandle.bindVisibleDate(manager: VisibleDateManager) {
+    val saver = Saver<VisibleDateManager, Any>(
+        save = { it.visibleDate.value.toString() },
+        restore = { savedValue ->
+            val date = when (savedValue) {
+                is String -> LocalDate.parse(savedValue)
+                // Previously saved with saveable { mutableStateOf(date) }.
+                is MutableState<*> -> {
+                    val date = savedValue.value
+                    check(date is LocalDate) { "Invalid saved visible date: $date" }
+                    date
+                }
+                else -> error("Invalid saved visible date: $savedValue")
+            }
+            manager.apply { restoreVisibleDate(date) }
+        },
+    )
+    saveable("visibleDay", saver = saver) {
+        manager.apply { restoreVisibleDate(visibleDate.value) }
     }
 }

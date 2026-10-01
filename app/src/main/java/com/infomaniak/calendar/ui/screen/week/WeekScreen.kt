@@ -40,7 +40,6 @@ import com.infomaniak.calendar.components.foundation.state.rememberVisibleDaySta
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
-import com.infomaniak.calendar.ui.effects.ReportVisibleMonth
 import com.infomaniak.calendar.ui.effects.SaveHourHeight
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -62,7 +61,6 @@ fun WeekScreen(modifier: Modifier = Modifier, viewModel: WeekScreenViewModel = v
 
     SaveHourHeight(timelineState, onHourHeightChanged = viewModel::saveHourHeight)
     ApplyJumpRequests(visibleDayState)
-    ReportVisibleMonth(visibleDayState, onVisibleMonthChanged = viewModel::onVisibleMonthChanged)
 
     WeekScreen(
         isLoadingEvents = { isLoadingEvents },
