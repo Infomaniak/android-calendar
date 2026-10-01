@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
@@ -44,20 +46,23 @@ import kotlin.math.roundToInt
  * Overlaps are resolved once per width and zoom level rather than on every frame, since the
  * arrangement only changes when one of the two does.
  *
- * @param layoutWidth The width the solver shares between concurrent events. It may run past the
- * composable's own bounds, since the solver strips [EventLayoutDefaults.HorizontalSpacing] off the
- * end of every card.
+ * @param width The width of the column, which [modifier] is expected to give it as well.
+ * @param horizontalPadding Room kept between the cards and either edge of the column.
  */
 @Composable
 internal fun TimedEventsColumn(
     events: List<TimedEvent>,
-    layoutWidth: Dp,
+    width: Dp,
     hourHeight: Dp,
     onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
+    horizontalPadding: Dp = DayTimelineDefaults.TimedEventsColumnPadding,
 ) {
     val density = LocalDensity.current
     val config = eventLayoutConfig()
+    // The solver strips horizontalSpacing off the end of every card, so it is handed that much more
+    // than the room left between the paddings, for the last column of cards to stop exactly on it.
+    val layoutWidth = width - horizontalPadding * 2 + EventLayoutDefaults.HorizontalSpacing
 
     val placements = remember(events, layoutWidth, hourHeight, config, density) {
         with(density) {
@@ -73,7 +78,7 @@ internal fun TimedEventsColumn(
         timedEvents = events,
         placements = placements,
         onEventClick = onEventClick,
-        modifier = modifier,
+        modifier = modifier.padding(horizontal = horizontalPadding),
     )
 }
 
@@ -93,7 +98,7 @@ private fun TimedEventsColumnPreview() {
         }
 
         BoxWithConstraints {
-            val layoutWidth = maxWidth
+            val width = maxWidth
 
             Box(
                 modifier = Modifier
@@ -103,7 +108,7 @@ private fun TimedEventsColumnPreview() {
             ) {
                 TimedEventsColumn(
                     events = timedEvents,
-                    layoutWidth = layoutWidth,
+                    width = width,
                     hourHeight = hourHeight,
                     onEventClick = {},
                     modifier = Modifier.matchParentSize(),

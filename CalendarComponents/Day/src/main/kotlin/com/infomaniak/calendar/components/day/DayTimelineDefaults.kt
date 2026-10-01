@@ -47,4 +47,7 @@ object DayTimelineDefaults {
      * (56dp to 80dp), so it cannot be read from the public API and is repeated here.
      */
     val BottomPadding: Dp = 80.dp
+
+    /** Room kept between a day's events and the dividers on either side of its column. */
+    val TimedEventsColumnPadding: Dp = 2.dp
 }
