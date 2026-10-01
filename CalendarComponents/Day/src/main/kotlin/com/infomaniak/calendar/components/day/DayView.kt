@@ -108,7 +108,9 @@ fun DayView(
                 )
             }
 
-            HorizontalDivider(thickness = DividerHeight)
+            if (events.allDay.isNotEmpty()) {
+                HorizontalDivider(thickness = DividerHeight)
+            }
         }
     }
 }
