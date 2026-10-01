@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,14 +35,14 @@ import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.calendar.components.foundation.state.VisibleDayState
+import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
 import com.infomaniak.calendar.ui.effects.ReportVisibleMonth
 import com.infomaniak.calendar.ui.effects.SaveHourHeight
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
-import com.infomaniak.calendar.ui.state.VisibleDayState
-import com.infomaniak.calendar.ui.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import dev.chrisbanes.haze.hazeSource
@@ -92,9 +93,8 @@ private fun WeekScreen(
                 hazeState = hazeState,
                 calendar = {
                     ExpandableCalendar(
+                        visibleDayState = visibleDayState,
                         expansionState = calendarExpansionState,
-                        selectedDate = { visibleDayState.visibleDate },
-                        onDayClick = { visibleDayState.jumpTo(it) },
                         weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
                         eventsDots = eventsDots,
                     )
@@ -122,11 +122,14 @@ private fun WeekScreen(
 @Composable
 private fun WeekScreenPreview() {
     CalendarThemeForPreview {
-        WeekScreen(
-            isLoadingEvents = { false },
-            eventsDots = { emptyMap() },
-            visibleDayState = rememberVisibleDayState(),
-            timelineState = rememberDayTimelineState(),
-        )
+        val visibleDayState = rememberVisibleDayState()
+        CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
+            WeekScreen(
+                isLoadingEvents = { false },
+                eventsDots = { emptyMap() },
+                visibleDayState = visibleDayState,
+                timelineState = rememberDayTimelineState(),
+            )
+        }
     }
 }

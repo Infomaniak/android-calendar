@@ -25,8 +25,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -37,25 +35,23 @@ import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnS
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.calendar.components.foundation.state.VisibleDayState
+import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
 import com.infomaniak.calendar.components.planning.Planning
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.ScreenLoader
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
+import com.infomaniak.calendar.ui.effects.ReportVisibleMonth
+import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
 import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewParameter
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
-import com.infomaniak.calendar.ui.model.occurrenceId
-import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.YearMonth
-import kotlinx.datetime.yearMonth
-import kotlin.time.Clock
 
 @Composable
 fun PlanningScreen(
@@ -67,6 +63,9 @@ fun PlanningScreen(
     val planningUiState: PlanningUiState by viewModel.planningUiState.collectAsStateWithLifecycle()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
     val eventsDots by viewModel.eventDots.collectAsStateWithLifecycle(initialValue = emptyMap())
+    val visibleDayState = LocalVisibleDayState.current ?: return
+
+    ReportVisibleMonth(visibleDayState, onVisibleMonthChanged = viewModel::onVisibleMonthChanged)
 
     PlanningScreen(
         goToEventCreation = goToEventCreation,
@@ -74,8 +73,7 @@ fun PlanningScreen(
         planningUiState = { planningUiState },
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventsDots },
-        onVisibleMonthChanged = viewModel::onVisibleMonthChanged,
-        jumpTo = viewModel::jumpTo,
+        visibleDayState = visibleDayState,
         modifier = modifier,
     )
 }
@@ -87,14 +85,11 @@ private fun PlanningScreen(
     planningUiState: () -> PlanningUiState,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
-    onVisibleMonthChanged: (YearMonth) -> Unit,
-    jumpTo: (LocalDate) -> Unit,
+    visibleDayState: VisibleDayState,
     modifier: Modifier = Modifier,
 ) {
     val hazeState = rememberHazeState()
-
     val calendarExpansionState = rememberCalendarExpansionState()
-    val visibleDayState = LocalVisibleDayState.current
 
     OverlaidTopBarScaffold(
         topBar = {
@@ -103,18 +98,12 @@ private fun PlanningScreen(
                 hazeState = hazeState,
                 onToggleCalendar = calendarExpansionState::toggle,
                 calendar = {
-                    if (visibleDayState != null) {
-                        ExpandableCalendar(
-                            expansionState = calendarExpansionState,
-                            selectedDate = { visibleDayState.visibleDate },
-                            onDayClick = {
-                                onVisibleMonthChanged(it.yearMonth)
-                                visibleDayState.jumpTo(it)
-                            },
-                            weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
-                            eventsDots = eventsDots,
-                        )
-                    }
+                    ExpandableCalendar(
+                        visibleDayState = visibleDayState,
+                        expansionState = calendarExpansionState,
+                        weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
+                        eventsDots = eventsDots,
+                    )
                 },
                 calendarExpansionProgress = { calendarExpansionState.progress },
             )
@@ -128,7 +117,7 @@ private fun PlanningScreen(
                     contentPadding = contentPadding + PaddingValues(Margin.Medium),
                     goToEventCreation = goToEventCreation,
                     goToEventDetail = goToEventDetail,
-                    jumpTo = jumpTo,
+                    visibleDayState = visibleDayState,
                     modifier = Modifier
                         .hazeSource(hazeState)
                         .collapseCalendarOnScroll(calendarExpansionState),
@@ -147,20 +136,13 @@ private fun SuccessPlanning(
     contentPadding: PaddingValues,
     goToEventCreation: () -> Unit,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
-    jumpTo: (LocalDate) -> Unit,
+    visibleDayState: VisibleDayState,
     modifier: Modifier = Modifier,
 ) {
-    val visibleDayState = LocalVisibleDayState.current ?: return
     val lazyListState = rememberLazyListState(events().indexOf(visibleDayState.visibleDate))
 
     ProcessJumpRequests(lazyListState, visibleDayState, events)
-    ReportVisibleDate(
-        lazyListState = lazyListState,
-        onVisibleDateChanged = {
-            jumpTo(it)
-            visibleDayState.onVisibleDateChanged(it)
-        },
-    )
+    ReportVisibleDate(lazyListState, onVisibleDateChanged = visibleDayState::onVisibleDateChanged)
 
     Planning(
         lazyListState = lazyListState,
@@ -178,17 +160,15 @@ private fun SuccessPlanning(
 @Composable
 private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class) weekEvents: EventsByWeekAndDay) {
     CalendarThemeForPreview {
-        val visibleDate = remember { mutableStateOf(Clock.today()) }
-
-        CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(visibleDate)) {
+        val visibleDayState = rememberVisibleDayState()
+        CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
             PlanningScreen(
                 planningUiState = { PlanningUiState.Success({ weekEvents }) },
                 goToEventCreation = {},
                 goToEventDetail = {},
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
-                onVisibleMonthChanged = {},
-                jumpTo = {},
+                visibleDayState = visibleDayState,
             )
         }
     }

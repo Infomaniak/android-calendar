@@ -98,6 +98,8 @@ extracted and shared with other Infomaniak apps.
 ### Design intent
 
 The group is intentionally **self-contained**: no dependency on `:app`, no DI framework, no KMP types leaking in.
+`VisibleDayState` lives in `Foundation`: date jumps request navigation, and the content reports the date it reaches.
+`ExpandableCalendar` accepts this state or explicit date/click callbacks; expansion state stays independent.
 String resources follow the single-module pattern — all strings consumed by any CalendarComponents module are declared in 
 `:CalendarComponents:Resources` so consumers never have to manage per-module string tags.
 
@@ -147,6 +149,7 @@ When adding a new CalendarComponents module, apply the flavor-aware plugin if it
 | `Event`    | `Foundation`      | —                              |
 | `Planning` | `Foundation`      | `Event`, `Resources`           |
 | `Day`      | `Foundation`      | `Event`, `Resources`           |
+| `Calendar` | `Foundation`      | `Resources`                    |
 
 `Resources` is the only module with no CalendarComponents dependency; `Foundation` depends on it only as `implementation`
 (for resource ids carried by its models, e.g. `ParticipationStatus.countPluralRes`). `Event` re-exports `Foundation` via `api` since its

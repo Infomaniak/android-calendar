@@ -19,10 +19,12 @@ package com.infomaniak.calendar.ui.effects
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.unit.Dp
 import com.infomaniak.calendar.components.day.state.DayTimelineState
-import com.infomaniak.calendar.ui.state.VisibleDayState
+import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.datetime.YearMonth
@@ -43,6 +45,7 @@ fun SaveHourHeight(timelineState: DayTimelineState, onHourHeightChanged: suspend
             .collect { onHourHeightChanged(timelineState.hourHeight) }
     }
 }
+
 /**
  * Turns a jump request, such as tapping a day in the calendar, into a change of visible date. The
  * pager then animates to it on its own, since it follows the visible date.
@@ -56,7 +59,9 @@ fun ApplyJumpRequests(visibleDayState: VisibleDayState) {
 
 @Composable
 fun ReportVisibleMonth(visibleDayState: VisibleDayState, onVisibleMonthChanged: (YearMonth) -> Unit) {
+    val currentOnVisibleMonthChanged by rememberUpdatedState(onVisibleMonthChanged)
+
     LaunchedEffect(visibleDayState) {
-        snapshotFlow { visibleDayState.visibleDate.yearMonth }.collect(onVisibleMonthChanged)
+        snapshotFlow { visibleDayState.visibleDate.yearMonth }.collect { currentOnVisibleMonthChanged(it) }
     }
 }
