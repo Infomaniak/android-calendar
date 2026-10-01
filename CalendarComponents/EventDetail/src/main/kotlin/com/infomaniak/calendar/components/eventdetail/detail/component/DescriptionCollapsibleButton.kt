@@ -58,7 +58,7 @@ internal fun DescriptionCollapsibleButton(description: String, contentPadding: P
     val descriptionState = rememberCollapsibleTextState(isCollapsed, COLLAPSED_MAX_LINES)
 
     val descriptionTitle = R.string.descriptionTitle
-    val leadingIconRes = R.drawable.ic_list_left
+    val leadingIconRes = R.drawable.ic_list
 
     // Shows or hides the button to toggle the description based on if the text is actually overflowing when collapsed or not.
     if (descriptionState.isOverflowing) {
@@ -66,7 +66,7 @@ internal fun DescriptionCollapsibleButton(description: String, contentPadding: P
             content = { Text(stringResource(descriptionTitle)) },
             supportingContent = { DescriptionContent(description, descriptionState) },
             leadingContent = { ItemIcon(painterResource(leadingIconRes)) },
-            trailingContent = { AnimatedChevron({ isCollapsed }) },
+            trailingContent = { AnimatedChevron { isCollapsed } },
             onClick = { isCollapsed = !isCollapsed },
             shapes = ClickableItemDefaults.ClickableItemShapes,
             contentPadding = contentPadding + ListItemDefaults.ContentPadding,
