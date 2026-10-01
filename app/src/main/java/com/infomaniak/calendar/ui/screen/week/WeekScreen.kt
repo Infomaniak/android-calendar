@@ -41,6 +41,7 @@ import com.infomaniak.calendar.ui.effects.ReportVisibleMonth
 import com.infomaniak.calendar.ui.effects.SaveHourHeight
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.state.VisibleDayState
+import com.infomaniak.calendar.ui.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import dev.chrisbanes.haze.hazeSource
@@ -121,6 +122,11 @@ private fun WeekScreen(
 @Composable
 private fun WeekScreenPreview() {
     CalendarThemeForPreview {
-        WeekScreen()
+        WeekScreen(
+            isLoadingEvents = { false },
+            eventsDots = { emptyMap() },
+            visibleDayState = rememberVisibleDayState(),
+            timelineState = rememberDayTimelineState(),
+        )
     }
 }
