@@ -168,9 +168,7 @@ class AlarmScheduler @Inject constructor(
     }
 
     companion object {
-        private const val TAG = "AlarmScheduler"
         const val MAX_SCHEDULED_ALARMS = 400
-        private val ALARM_HORIZON = 30.days
 
         const val ACTION_EVENT_REMINDER = "com.infomaniak.calendar.ACTION_EVENT_REMINDER"
         const val EXTRA_ALARM_ID = "com.infomaniak.calendar.EXTRA_ALARM_ID"
@@ -180,6 +178,9 @@ class AlarmScheduler @Inject constructor(
         const val EXTRA_EVENT_START_MS = "com.infomaniak.calendar.EXTRA_EVENT_START_MS"
         const val EXTRA_EVENT_END_MS = "com.infomaniak.calendar.EXTRA_EVENT_END_MS"
         const val EXTRA_IS_ALL_DAY = "com.infomaniak.calendar.EXTRA_IS_ALL_DAY"
+
+        private const val TAG = "AlarmScheduler"
+        private val ALARM_HORIZON = 30.days
 
         internal fun computeAlarmSyncPlan(
             upcomingAlarms: List<UpcomingAlarm>,
