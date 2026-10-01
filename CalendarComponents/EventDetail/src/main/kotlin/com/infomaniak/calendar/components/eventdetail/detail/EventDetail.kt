@@ -52,8 +52,8 @@ import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
-import com.infomaniak.calendar.components.eventdetail.previewAttendees
 import com.infomaniak.calendar.components.foundation.models.Attendees
+import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
 import kotlin.time.Duration.Companion.days
@@ -69,6 +69,7 @@ fun EventDetail(
     onJoinKMeet: () -> Unit,
     onCopyKMeet: () -> Unit,
     onLocationClick: () -> Unit,
+    goToEventAttendees: () -> Unit,
     onRoomClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
@@ -84,7 +85,7 @@ fun EventDetail(
                 if (attendees.all.isNotEmpty()) {
                     AttendeesButton(
                         attendees = attendees.all,
-                        onClick = {},
+                        onClick = goToEventAttendees,
                         modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
                     )
                 }
@@ -184,6 +185,7 @@ private fun PreviewEventDetail() {
                         onCopyKMeet = {},
                         onLocationClick = {},
                         onRoomClick = {},
+                        goToEventAttendees = {},
                         contentPadding = PaddingValues(horizontal = Margin.Small) + it,
                     )
                 }

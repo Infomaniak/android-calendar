@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(core.plugins.infomaniak.android.library.flavor.aware)
     alias(core.plugins.compose.compiler)
-    alias(core.plugins.kotlin.parcelize)
 }
 
 val appCompileSdk: Int by rootProject.extra
@@ -11,7 +10,7 @@ val appMinSdk: Int by rootProject.extra
 val javaVersion: JavaVersion by rootProject.extra
 
 android {
-    namespace = "com.infomaniak.calendar.components.foundation"
+    namespace = "com.infomaniak.calendar.components.attendeessearch"
     compileSdk = appCompileSdk
 
     defaultConfig {
@@ -35,14 +34,13 @@ android {
 }
 
 dependencies {
+    api(project(":CalendarComponents:Foundation"))
     implementation(project(":CalendarComponents:Resources"))
 
     implementation(core.infomaniak.core.avatar)
-    implementation(core.infomaniak.core.common)
-    implementation(core.infomaniak.core.ui.compose.theme)
-    implementation(libs.infomaniak.designsystem.foundation)
+    implementation(core.infomaniak.core.ui.compose.margin)
 
-    implementation(kmpCalendar.kotlinx.datetime)
+    implementation(libs.infomaniak.designsystem.foundation)
 
     implementation(platform(core.compose.bom))
     implementation(core.compose.foundation)
@@ -50,8 +48,5 @@ dependencies {
     implementation(core.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     debugImplementation(core.compose.ui.tooling)
-
-    testImplementation(core.junit)
-    testImplementation(core.robolectric)
-    testImplementation(core.activity.compose)
 }
+

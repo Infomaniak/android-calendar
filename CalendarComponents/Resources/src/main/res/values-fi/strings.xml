@@ -31,6 +31,7 @@
         <item quantity="one">%d hylätty</item>
         <item quantity="other">%d hylättyä</item>
     </plurals>
+    <string name="attendeesEmptyState">Osallistujia ei löytynyt</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d odottaa</item>
         <item quantity="other">%d odottaa</item>
@@ -50,6 +51,7 @@
     <string name="contentDescriptionHasAttendees">Onko osallistujia</string>
     <string name="contentDescriptionHasKMeetLink">Sisältää kMeet-linkin</string>
     <string name="contentDescriptionHasLocation">On sijainti</string>
+    <string name="contentDescriptionSearch">Haku</string>
     <string name="contentDescriptionToday">Tänään</string>
     <plurals name="dayAmount">
         <item quantity="one">%d päivä</item>
@@ -82,7 +84,13 @@
         <item quantity="one">%d paikkaa</item>
         <item quantity="other">%d paikkaa</item>
     </plurals>
+    <string name="searchForAttendees">Etsi osallistujia</string>
     <string name="sectionCalendarHeader">Kalenteri</string>
+    <string name="sectionOrganizerHeader">Järjestäjä</string>
+    <string name="statusAcceptedLabel">Hyväksytty</string>
+    <string name="statusDeclinedLabel">Hylätty</string>
+    <string name="statusNeedsActionLabel">Käsiteltävänä</string>
+    <string name="statusTentativeLabel">Ehkä</string>
     <plurals name="weekAmount">
         <item quantity="one">%d viikko</item>
         <item quantity="other">%d viikkoa</item>
