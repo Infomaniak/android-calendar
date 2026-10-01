@@ -35,7 +35,7 @@ class VisibleDateManager {
     val visibleDate = mutableStateOf(Clock.today())
     val visibleDateFlow = snapshotFlow { visibleDate.value }
 
-    fun saveTo(savedStateHandle: SavedStateHandle) {
+    fun bindTo(savedStateHandle: SavedStateHandle) {
         savedStateHandle.get<Bundle>(KEY)?.getString(KEY)?.let { visibleDate.value = LocalDate.parse(it) }
         savedStateHandle.setSavedStateProvider(KEY) { bundleOf(KEY to visibleDate.value.toString()) }
     }

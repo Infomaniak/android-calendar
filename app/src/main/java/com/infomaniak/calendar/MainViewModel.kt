@@ -65,7 +65,7 @@ class MainViewModel(
     val visibleDate = visibleDateManager.visibleDate
 
     init {
-        visibleDateManager.saveTo(savedStateHandle)
+        visibleDateManager.bindTo(savedStateHandle)
         syncEventsForConnectedUsers()
     }
 
