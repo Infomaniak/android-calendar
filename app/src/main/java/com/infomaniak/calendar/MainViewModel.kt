@@ -17,14 +17,11 @@
  */
 package com.infomaniak.calendar
 
-import androidx.compose.runtime.saveable.Saver
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
-import androidx.lifecycle.viewmodel.compose.saveable
 import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.manager.VisibleDateManager
@@ -47,7 +44,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
 
 @AssistedInject
 class MainViewModel(
@@ -69,7 +65,7 @@ class MainViewModel(
     val visibleDate = visibleDateManager.visibleDate
 
     init {
-        visibleDateManager.makeSaveableTo(savedStateHandle)
+        visibleDateManager.saveTo(savedStateHandle)
         syncEventsForConnectedUsers()
     }
 

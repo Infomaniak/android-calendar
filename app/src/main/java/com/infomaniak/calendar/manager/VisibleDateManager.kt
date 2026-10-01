@@ -17,12 +17,11 @@
  */
 package com.infomaniak.calendar.manager
 
+import android.os.Bundle
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.snapshotFlow
+import androidx.core.os.bundleOf
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
-import androidx.lifecycle.viewmodel.compose.saveable
 import com.infomaniak.core.common.utils.today
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
@@ -36,27 +35,12 @@ class VisibleDateManager {
     val visibleDate = mutableStateOf(Clock.today())
     val visibleDateFlow = snapshotFlow { visibleDate.value }
 
-    private var isInitialized = false
-
-    @OptIn(SavedStateHandleSaveableApi::class)
-    fun makeSaveableTo(savedStateHandle: SavedStateHandle) {
-        val saver = Saver<VisibleDateManager, String>(
-            save = { it.visibleDate.value.toString() },
-            restore = { savedValue ->
-                restoreVisibleDate(LocalDate.parse(savedValue))
-                return@Saver this
-            },
-        )
-        savedStateHandle.saveable("visibleDay", saver = saver) {
-            restoreVisibleDate(visibleDate.value)
-            return@saveable this
-        }
+    fun saveTo(savedStateHandle: SavedStateHandle) {
+        savedStateHandle.get<Bundle>(KEY)?.getString(KEY)?.let { visibleDate.value = LocalDate.parse(it) }
+        savedStateHandle.setSavedStateProvider(KEY) { bundleOf(KEY to visibleDate.value.toString()) }
     }
 
-    private fun restoreVisibleDate(date: LocalDate) {
-        if (isInitialized) return
-
-        isInitialized = true
-        visibleDate.value = date
+    companion object {
+        private const val KEY = "visibleDate"
     }
 }
