@@ -260,6 +260,8 @@ fun MyComponent(
   (`ui/component/`) instead of `Scaffold`. It has the same shape as a `Scaffold`, and owns the details that go with
   overlaying: the top bar is drawn over the content and keeps the top window insets, and the content padding it hands
   out already includes the measured top bar height. Do not re-implement that per screen.
+- **Visible date**: `LocalVisibleDayState` provides Foundation's `VisibleDayState`. All calendar views report the visible
+  month with `ReportVisibleMonth`; do not mirror the date or update the month separately when requesting a jump.
 
 ### Testing
 

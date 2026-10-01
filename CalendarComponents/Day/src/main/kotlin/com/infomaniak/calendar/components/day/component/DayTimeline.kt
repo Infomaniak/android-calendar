@@ -15,15 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.day
+package com.infomaniak.calendar.components.day.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -34,15 +31,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.day.component.CurrentTimeIndicator
-import com.infomaniak.calendar.components.day.component.HourGrid
-import com.infomaniak.calendar.components.day.component.HourLabelOverhang
+import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults
 import com.infomaniak.calendar.components.day.layout.ResizableEventLayout
 import com.infomaniak.calendar.components.day.layout.eventLayoutConfig
 import com.infomaniak.calendar.components.day.layout.resolveOverlaps
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
+import com.infomaniak.calendar.components.day.pinchToZoom
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
@@ -61,7 +57,7 @@ private val LocalDateTime.minuteOfDay: Int get() = hour * MINUTES_PER_HOUR + min
  * arrangement only changes when one of the two does.
  */
 @Composable
-fun DayTimeline(
+internal fun DayTimeline(
     date: LocalDate,
     events: DayEvents,
     state: DayTimelineState,
@@ -93,16 +89,12 @@ fun DayTimeline(
             }
         }
 
-        // The timeline runs under the navigation bar, and the toolbar floats above it: the end of
-        // the day has to clear the two of them stacked.
-        val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-
         Box(
             modifier = Modifier
                 .verticalScroll(state.scrollState, enabled = !state.isPinching)
                 .padding(
                     top = HourLabelOverhang + contentPadding.calculateTopPadding(),
-                    bottom = DayTimelineDefaults.BottomPadding + navigationBarPadding + contentPadding.calculateBottomPadding(),
+                    bottom = DayTimelineDefaults.BottomPadding + contentPadding.calculateBottomPadding(),
                 )
                 // Inside the padding: a pinch reads its own y as an hour, so it has to start
                 // counting where the first hour line is drawn, not where the padding begins.

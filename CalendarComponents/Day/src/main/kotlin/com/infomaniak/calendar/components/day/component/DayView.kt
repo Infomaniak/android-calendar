@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.day
+package com.infomaniak.calendar.components.day.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,8 +38,6 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.day.component.AllDayEventsBand
-import com.infomaniak.calendar.components.day.component.DayHeader
 import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults.DividerHeight
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
@@ -58,7 +56,7 @@ import kotlin.time.Clock
  * carrying the timed events.
  */
 @Composable
-fun DayView(
+internal fun DayView(
     date: LocalDate,
     events: DayEvents,
     state: DayTimelineState,

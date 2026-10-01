@@ -43,18 +43,36 @@ import androidx.compose.ui.util.lerp
 import com.infomaniak.calendar.components.calendar.component.expanded.ExpandedCalendar
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.calendar.components.foundation.state.VisibleDayState
+import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
 import com.infomaniak.calendar.components.foundation.utils.startOfWeek
-import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.daysUntil
 import kotlinx.datetime.toKotlinDayOfWeek
 import kotlinx.datetime.yearMonth
-import kotlin.time.Clock
 
 private const val MONTH_MARGIN = 1
 
 private const val DAYS_IN_WEEK = 7
+
+@Composable
+fun ExpandableCalendar(
+    visibleDayState: VisibleDayState,
+    expansionState: CalendarExpansionState,
+    weekNumbering: WeekNumbering,
+    eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
+    modifier: Modifier = Modifier,
+) {
+    ExpandableCalendar(
+        expansionState = expansionState,
+        selectedDate = { visibleDayState.visibleDate },
+        onDayClick = { visibleDayState.jumpTo(it) },
+        weekNumbering = weekNumbering,
+        eventsDots = eventsDots,
+        modifier = modifier,
+    )
+}
 
 @Composable
 fun ExpandableCalendar(
@@ -188,9 +206,8 @@ private fun LocalDate.weekRowsAboveCurrentRow(firstDayOfWeek: DayOfWeek): Int {
 private fun ExpandableCalendarCollapsedPreview() {
     Surface {
         ExpandableCalendar(
+            visibleDayState = rememberVisibleDayState(),
             expansionState = rememberCalendarExpansionState(),
-            selectedDate = { Clock.today() },
-            onDayClick = {},
             weekNumbering = WeekNumbering.ISO_8601,
             eventsDots = { emptyMap() },
         )
@@ -202,9 +219,8 @@ private fun ExpandableCalendarCollapsedPreview() {
 private fun ExpandableCalendarExpandedPreview() {
     Surface {
         ExpandableCalendar(
+            visibleDayState = rememberVisibleDayState(),
             expansionState = rememberCalendarExpansionState(initiallyExpanded = true),
-            selectedDate = { Clock.today() },
-            onDayClick = {},
             weekNumbering = WeekNumbering.ISO_8601,
             eventsDots = { emptyMap() },
         )

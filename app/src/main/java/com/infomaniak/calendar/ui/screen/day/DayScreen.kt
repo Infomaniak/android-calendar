@@ -23,14 +23,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
@@ -42,29 +37,26 @@ import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.calendar.components.foundation.state.VisibleDayState
+import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.ScreenLoader
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
+import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
+import com.infomaniak.calendar.ui.effects.ReportVisibleMonth
+import com.infomaniak.calendar.ui.effects.SaveHourHeight
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
-import com.infomaniak.calendar.ui.state.VisibleDayState
-import com.infomaniak.calendar.ui.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
-import kotlinx.coroutines.flow.dropWhile
-import kotlinx.coroutines.flow.filterNot
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.YearMonth
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlinx.datetime.yearMonth
-import kotlin.time.Clock
 
 @Composable
 fun DayScreen(
@@ -98,40 +90,6 @@ fun DayScreen(
 }
 
 @Composable
-private fun ReportVisibleMonth(visibleDayState: VisibleDayState, onVisibleMonthChanged: (YearMonth) -> Unit) {
-    LaunchedEffect(visibleDayState) {
-        snapshotFlow { visibleDayState.visibleDate.yearMonth }.collect(onVisibleMonthChanged)
-    }
-}
-
-/**
- * Turns a jump request, such as tapping a day in the calendar, into a change of visible date. The
- * pager then animates to it on its own, since it follows the visible date.
- */
-@Composable
-private fun ApplyJumpRequests(visibleDayState: VisibleDayState) {
-    LaunchedEffect(visibleDayState) {
-        for (date in visibleDayState.scrollCommand) visibleDayState.onVisibleDateChanged(date)
-    }
-}
-
-/**
- * Stores the zoom level the user leaves the day view on.
- *
- * A pinch changes the height on every frame, so the height is stored once the gesture ends: one
- * write per pinch, and nothing left waiting on a timer that leaving the screen would cancel.
- */
-@Composable
-private fun SaveHourHeight(timelineState: DayTimelineState, onHourHeightChanged: suspend (Dp) -> Unit) {
-    LaunchedEffect(timelineState) {
-        snapshotFlow { timelineState.isPinching }
-            .dropWhile { isPinching -> !isPinching }
-            .filterNot { isPinching -> isPinching }
-            .collect { onHourHeightChanged(timelineState.hourHeight) }
-    }
-}
-
-@Composable
 private fun DayScreen(
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     dayUiState: () -> DayUiState,
@@ -143,7 +101,6 @@ private fun DayScreen(
     modifier: Modifier = Modifier,
 ) {
     val calendarExpansionState = rememberCalendarExpansionState()
-
     val hazeState = rememberHazeState()
 
     OverlaidTopBarScaffold(
@@ -155,9 +112,8 @@ private fun DayScreen(
                 hazeState = hazeState,
                 calendar = {
                     ExpandableCalendar(
+                        visibleDayState = visibleDayState,
                         expansionState = calendarExpansionState,
-                        selectedDate = { visibleDayState.visibleDate },
-                        onDayClick = { visibleDayState.jumpTo(it) },
                         weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
                         eventsDots = eventsDots,
                     )
@@ -203,7 +159,7 @@ private fun SuccessDay(
         eventsOf = { eventsByDate()[it] ?: DayEvents.Empty },
         state = timelineState,
         weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
-        onVisibleDateChanged = { visibleDayState.onVisibleDateChanged(it) },
+        onVisibleDateChanged = { visibleDayState.updateVisibleDate(it) },
         onEventClick = { goToEventDetail(it.occurrenceId) },
         headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
         timelineModifier = Modifier.hazeSource(hazeState),
@@ -216,17 +172,18 @@ private fun SuccessDay(
 @Composable
 private fun DayScreenPreview() {
     CalendarThemeForPreview {
-        val visibleDate = remember { mutableStateOf(Clock.today()) }
+        val visibleDayState = rememberVisibleDayState()
+        val date = visibleDayState.visibleDate
 
-        CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(visibleDate)) {
+        CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
             DayScreen(
                 goToEventDetail = {},
                 dayUiState = { DayUiState.Success({ emptyMap() }) },
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
-                visibleDayState = rememberVisibleDayState(visibleDate),
+                visibleDayState = visibleDayState,
                 timelineState = rememberDayTimelineState(),
-                dateRange = visibleDate.value.minus(1, DateTimeUnit.DAY)..visibleDate.value.plus(1, DateTimeUnit.DAY),
+                dateRange = date.minus(1, DateTimeUnit.DAY)..date.plus(1, DateTimeUnit.DAY),
             )
         }
     }
