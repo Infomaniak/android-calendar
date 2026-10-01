@@ -262,9 +262,9 @@ fun MyComponent(
   overlaying: the top bar is drawn over the content and keeps the top window insets, and the content padding it hands
   out already includes the measured top bar height. Do not re-implement that per screen.
 - **Visible date**: `VisibleDateManager` owns one app-scoped `MutableState<LocalDate>` and exposes its changes through
-  `snapshotFlow` for date-dependent queries. `MainViewModel` binds the manager to `SavedStateHandle`
-  under `"visibleDay"` using a saver that snapshots the current date and accepts the previous mutable-state payload.
-  Restoration only initializes a fresh manager. `MainActivity` passes the same mutable state to Foundation's
+  `snapshotFlow` for date-dependent queries. `MainViewModel` binds the manager to `SavedStateHandle` under
+  `"visibleDate"`; the saved-state provider stores the date string in a `Bundle` under the same key, and binding restores
+  it when present. Restoration only initializes a fresh manager. `MainActivity` passes the same mutable state to Foundation's
   `VisibleDayState`, provided through `LocalVisibleDayState`. Months are derived in `VisibleMonthManager`; screens do
   not report them separately. Jump commands remain independent of the date the content reaches.
 
