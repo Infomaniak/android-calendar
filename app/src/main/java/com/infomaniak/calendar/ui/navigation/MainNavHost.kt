@@ -99,7 +99,7 @@ private fun baseEntryProvider(
         ThreeDayScreen()
     }
     entry<NavDestination.CalendarView.Week>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-        WeekScreen()
+        WeekScreen(goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) })
     }
     entry<NavDestination.CalendarView.Month>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         MonthScreen()

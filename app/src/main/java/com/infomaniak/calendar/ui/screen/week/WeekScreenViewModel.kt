@@ -23,23 +23,56 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.manager.VisibleMonthManager
+import com.infomaniak.calendar.ui.screen.day.DayEventsByDate
+import com.infomaniak.calendar.ui.screen.day.toDayEventsByDate
+import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.core.common.utils.today
+import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlin.time.Clock
 
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
 class WeekScreenViewModel(
+    accountUtils: AccountUtils,
+    calendarManager: CalendarManager,
     syncEventsManager: SyncEventsManager,
     visibleMonthManager: VisibleMonthManager,
     private val calendarDataValues: CalendarDataValues,
 ) : ViewModel() {
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
+
+    private val timeZone = TimeZone.currentSystemDefault()
+    private val today = Clock.today(timeZone)
+
+    // TODO: Observe only the weeks around the visible one, once the pager pages through weeks.
+    private val startDate = today.minus(DAY_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
+    private val endDate = today.plus(DAY_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
+
+    private val emailsByUserId = accountUtils.emailsByUserId.shareIn(viewModelScope, SharingStarted.Eagerly, 1)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val eventsByDate: StateFlow<DayEventsByDate> = calendarManager
+        .observeDaySlices(startDate, endDate, timeZone)
+        .mapLatest { it.toDayEventsByDate(emailsByUserId.first(), timeZone) }
+        .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
 
     val eventDots = visibleMonthManager.eventDots
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
@@ -47,4 +80,8 @@ class WeekScreenViewModel(
     val hourHeight: Flow<Dp> = calendarDataValues.dayViewHourHeight.flow
 
     suspend fun saveHourHeight(hourHeight: Dp) = calendarDataValues.dayViewHourHeight.setValue(hourHeight)
+
+    companion object {
+        private const val DAY_RANGE_DAYS = 250
+    }
 }

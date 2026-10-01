@@ -26,12 +26,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.component.MultiDayTimeline
 import com.infomaniak.calendar.components.day.model.DayEvents
+import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.DayColumnsState
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayColumnsState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 import kotlin.time.Clock
 
@@ -43,19 +46,21 @@ private const val DAYS_PER_PAGE = 7
  */
 @Composable
 fun WeekPager(
+    eventsOf: (LocalDate) -> DayEvents,
+    onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
     state: DayTimelineState = rememberDayTimelineState(),
     columnsState: DayColumnsState? = null,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    // TODO: Page through weeks the way DayPager pages through days, and feed the real events.
+    // TODO: Page through weeks the way DayPager pages through days.
     val dates = remember { List(DAYS_PER_PAGE) { Clock.today() + DatePeriod(days = it) } }
 
     MultiDayTimeline(
         dates = dates,
-        eventsOf = { DayEvents.Empty },
+        eventsOf = eventsOf,
         state = state,
-        onEventClick = {},
+        onEventClick = onEventClick,
         modifier = modifier,
         columnsState = columnsState,
         contentPadding = contentPadding,
@@ -67,7 +72,10 @@ fun WeekPager(
 private fun Preview() {
     MaterialTheme {
         Surface {
-            WeekPager(columnsState = rememberDayColumnsState(maxVisibleDayCount = DAYS_PER_PAGE))
+            WeekPager(
+                eventsOf = { previewDayEvents },
+                onEventClick = {},
+                columnsState = rememberDayColumnsState(maxVisibleDayCount = DAYS_PER_PAGE))
         }
     }
 }
