@@ -31,6 +31,7 @@
         <item quantity="one">%d refusé</item>
         <item quantity="other">%d refusés</item>
     </plurals>
+    <string name="attendeesEmptyState">Aucun invité trouvé</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d en attente</item>
         <item quantity="other">%d en attente</item>
@@ -39,7 +40,6 @@
         <item quantity="one">%1$d peut-être</item>
         <item quantity="other">%1$d peut-être</item>
     </plurals>
-    <string name="attendeesEmptyState">Aucun participant trouvé</string>
     <string name="availableLabel">Disponible</string>
     <string name="buttonJoin">Rejoindre</string>
     <string name="confidentialLabel">Confidentiel</string>

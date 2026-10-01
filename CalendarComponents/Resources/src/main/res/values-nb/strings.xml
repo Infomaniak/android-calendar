@@ -31,6 +31,7 @@
         <item quantity="one">%d avvist</item>
         <item quantity="other">%d avviste</item>
     </plurals>
+    <string name="attendeesEmptyState">Ingen deltakere funnet</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d venter</item>
         <item quantity="other">%d venter</item>
@@ -39,7 +40,6 @@
         <item quantity="one">%1$d kanskje</item>
         <item quantity="other">%1$d kanskje</item>
     </plurals>
-    <string name="attendeesEmptyState">Ingen deltakere funnet</string>
     <string name="availableLabel">Ledig</string>
     <string name="buttonJoin">Bli med</string>
     <string name="confidentialLabel">Konfidensiell</string>
@@ -84,7 +84,7 @@
         <item quantity="one">%d sete</item>
         <item quantity="other">%d seter</item>
     </plurals>
-    <string name="searchForAttendees">Søk etter gjester</string>
+    <string name="searchForAttendees">Søk etter deltakere</string>
     <string name="sectionCalendarHeader">Kalender</string>
     <string name="sectionOrganizerHeader">Arrangør</string>
     <string name="statusAcceptedLabel">Godkjent</string>

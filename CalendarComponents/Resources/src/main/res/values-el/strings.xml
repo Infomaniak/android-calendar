@@ -31,6 +31,7 @@
         <item quantity="one">%d απορρίφθηκε</item>
         <item quantity="other">%d απορριφθέντα</item>
     </plurals>
+    <string name="attendeesEmptyState">Δεν βρέθηκαν συμμετέχοντες</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d σε αναμονή</item>
         <item quantity="other">%d σε αναμονή</item>
@@ -39,7 +40,6 @@
         <item quantity="one">%1$d ίσως</item>
         <item quantity="other">%1$d ίσως</item>
     </plurals>
-    <string name="attendeesEmptyState">Δεν βρέθηκαν συμμετέχοντες</string>
     <string name="availableLabel">Διαθέσιμο</string>
     <string name="buttonJoin">Εγγραφή</string>
     <string name="confidentialLabel">Εμπιστευτικό</string>
@@ -84,7 +84,7 @@
         <item quantity="one">%d θέση</item>
         <item quantity="other">%d θέσεις</item>
     </plurals>
-    <string name="searchForAttendees">Αναζήτηση επισκεπτών</string>
+    <string name="searchForAttendees">Αναζήτηση συμμετεχόντων</string>
     <string name="sectionCalendarHeader">Ημερολόγιο</string>
     <string name="sectionOrganizerHeader">Διοργανωτής</string>
     <string name="statusAcceptedLabel">Εγκρίθηκε</string>

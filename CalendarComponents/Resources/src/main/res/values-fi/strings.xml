@@ -31,6 +31,7 @@
         <item quantity="one">%d hylätty</item>
         <item quantity="other">%d hylättyä</item>
     </plurals>
+    <string name="attendeesEmptyState">Osallistujia ei löytynyt</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d odottaa</item>
         <item quantity="other">%d odottaa</item>
@@ -39,7 +40,6 @@
         <item quantity="one">%1$d ehkä</item>
         <item quantity="other">%1$d ehkä</item>
     </plurals>
-    <string name="attendeesEmptyState">Osallistujia ei löytynyt</string>
     <string name="availableLabel">Vapaa</string>
     <string name="buttonJoin">Liity mukaan</string>
     <string name="confidentialLabel">Luottamuksellinen</string>
@@ -84,7 +84,7 @@
         <item quantity="one">%d paikkaa</item>
         <item quantity="other">%d paikkaa</item>
     </plurals>
-    <string name="searchForAttendees">Vieraiden haku</string>
+    <string name="searchForAttendees">Etsi osallistujia</string>
     <string name="sectionCalendarHeader">Kalenteri</string>
     <string name="sectionOrganizerHeader">Järjestäjä</string>
     <string name="statusAcceptedLabel">Hyväksytty</string>

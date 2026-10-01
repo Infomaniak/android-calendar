@@ -31,6 +31,7 @@
         <item quantity="one">%d abgelehnt</item>
         <item quantity="other">%d abgelehnt</item>
     </plurals>
+    <string name="attendeesEmptyState">Keine Teilnehmer gefunden</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d ausstehend</item>
         <item quantity="other">%d ausstehend</item>
@@ -39,7 +40,6 @@
         <item quantity="one">%1$d vielleicht</item>
         <item quantity="other">%1$d vielleicht</item>
     </plurals>
-    <string name="attendeesEmptyState">Keine Teilnehmer gefunden</string>
     <string name="availableLabel">Verfügbar</string>
     <string name="buttonJoin">Beitreten</string>
     <string name="confidentialLabel">Vertraulich</string>
@@ -84,7 +84,7 @@
         <item quantity="one">%d Sitzplatz</item>
         <item quantity="other">%d Plätze</item>
     </plurals>
-    <string name="searchForAttendees">Suche nach Gästen</string>
+    <string name="searchForAttendees">Nach Teilnehmern suchen</string>
     <string name="sectionCalendarHeader">Kalender</string>
     <string name="sectionOrganizerHeader">Veranstalter</string>
     <string name="statusAcceptedLabel">Angenommen</string>

@@ -31,6 +31,7 @@
         <item quantity="one">%d afvist</item>
         <item quantity="other">%d afviste</item>
     </plurals>
+    <string name="attendeesEmptyState">Ingen deltagere fundet</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d afventende</item>
         <item quantity="other">%d afventende</item>
@@ -39,7 +40,6 @@
         <item quantity="one">%1$d måske</item>
         <item quantity="other">%1$d måske</item>
     </plurals>
-    <string name="attendeesEmptyState">Ingen deltagere fundet</string>
     <string name="availableLabel">Ledig</string>
     <string name="buttonJoin">Tilmeld dig</string>
     <string name="confidentialLabel">Fortrolig</string>
@@ -84,7 +84,7 @@
         <item quantity="one">%d plads</item>
         <item quantity="other">%d pladser</item>
     </plurals>
-    <string name="searchForAttendees">Søgning efter gæster</string>
+    <string name="searchForAttendees">Søg efter deltagere</string>
     <string name="sectionCalendarHeader">Kalender</string>
     <string name="sectionOrganizerHeader">Arrangør</string>
     <string name="statusAcceptedLabel">Godkendt</string>
