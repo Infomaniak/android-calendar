@@ -159,7 +159,7 @@ private fun SuccessDay(
         eventsOf = { eventsByDate()[it] ?: DayEvents.Empty },
         state = timelineState,
         weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
-        onVisibleDateChanged = { visibleDayState.onVisibleDateChanged(it) },
+        onVisibleDateChanged = { visibleDayState.updateVisibleDate(it) },
         onEventClick = { goToEventDetail(it.occurrenceId) },
         headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
         timelineModifier = Modifier.hazeSource(hazeState),

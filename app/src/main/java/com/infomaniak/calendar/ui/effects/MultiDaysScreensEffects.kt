@@ -53,7 +53,7 @@ fun SaveHourHeight(timelineState: DayTimelineState, onHourHeightChanged: suspend
 @Composable
 fun ApplyJumpRequests(visibleDayState: VisibleDayState) {
     LaunchedEffect(visibleDayState) {
-        for (date in visibleDayState.scrollCommand) visibleDayState.onVisibleDateChanged(date)
+        for (date in visibleDayState.jumpCommand) visibleDayState.updateVisibleDate(date)
     }
 }
 

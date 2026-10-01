@@ -142,7 +142,7 @@ private fun SuccessPlanning(
     val lazyListState = rememberLazyListState(events().indexOf(visibleDayState.visibleDate))
 
     ProcessJumpRequests(lazyListState, visibleDayState, events)
-    ReportVisibleDate(lazyListState, onVisibleDateChanged = visibleDayState::onVisibleDateChanged)
+    ReportVisibleDate(lazyListState, onVisibleDateChanged = visibleDayState::updateVisibleDate)
 
     Planning(
         lazyListState = lazyListState,

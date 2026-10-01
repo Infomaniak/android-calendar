@@ -29,7 +29,7 @@ fun ProcessJumpRequests(lazyListState: LazyListState, visibleDayState: VisibleDa
     val currentEventsByWeekAndDay by rememberUpdatedState(events)
 
     LaunchedEffect(visibleDayState) {
-        for (date in visibleDayState.scrollCommand) {
+        for (date in visibleDayState.jumpCommand) {
             val targetIndex = currentEventsByWeekAndDay().indexOf(date)
 
             // Swallow CancellationException thrown when a user gesture interrupts the programmatic scroll.

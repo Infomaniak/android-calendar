@@ -24,7 +24,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.infomaniak.core.common.utils.today
 import kotlinx.coroutines.channels.Channel
@@ -32,25 +31,23 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
 
-private val LocalDateSaver = Saver<LocalDate, String>(save = { it.toString() }, restore = { LocalDate.parse(it) })
-
 @Composable
 @SuppressLint("ComposeMutableParameters")
 fun rememberVisibleDayState(
-    visibleDate: MutableState<LocalDate> = rememberSaveable(stateSaver = LocalDateSaver) { mutableStateOf(Clock.today()) },
+    visibleDate: MutableState<LocalDate> = rememberSaveable { mutableStateOf(Clock.today()) },
 ): VisibleDayState = remember(visibleDate) { VisibleDayState(_visibleDate = visibleDate) }
 
 @Stable
 class VisibleDayState(private val _visibleDate: MutableState<LocalDate>) {
     val visibleDate by _visibleDate
 
-    private val _scrollCommand = Channel<LocalDate>(Channel.CONFLATED)
-    val scrollCommand: ReceiveChannel<LocalDate> = _scrollCommand
+    private val _jumpCommand = Channel<LocalDate>(Channel.CONFLATED)
+    val jumpCommand: ReceiveChannel<LocalDate> = _jumpCommand
 
-    fun onVisibleDateChanged(date: LocalDate) {
+    fun updateVisibleDate(date: LocalDate) {
         _visibleDate.value = date
     }
 
     /** Requests navigation; the content reports the date it actually reaches. */
-    fun jumpTo(date: LocalDate) = _scrollCommand.trySend(date)
+    fun jumpTo(date: LocalDate) = _jumpCommand.trySend(date)
 }
