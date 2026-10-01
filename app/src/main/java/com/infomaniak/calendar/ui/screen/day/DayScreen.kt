@@ -43,7 +43,6 @@ import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.ScreenLoader
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
-import com.infomaniak.calendar.ui.effects.ReportVisibleMonth
 import com.infomaniak.calendar.ui.effects.SaveHourHeight
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
@@ -75,7 +74,6 @@ fun DayScreen(
 
     SaveHourHeight(timelineState, onHourHeightChanged = dayViewModel::saveHourHeight)
     ApplyJumpRequests(visibleDayState)
-    ReportVisibleMonth(visibleDayState, onVisibleMonthChanged = dayViewModel::onVisibleMonthChanged)
 
     DayScreen(
         modifier = modifier,

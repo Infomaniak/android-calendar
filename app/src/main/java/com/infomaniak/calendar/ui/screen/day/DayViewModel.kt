@@ -18,7 +18,6 @@
 package com.infomaniak.calendar.ui.screen.day
 
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.data.CalendarDataValues
@@ -36,14 +35,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.YearMonth
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
@@ -57,7 +54,7 @@ class DayViewModel(
     calendarManager: CalendarManager,
     syncEventsManager: SyncEventsManager,
     private val calendarDataValues: CalendarDataValues,
-    private val visibleMonthManager: VisibleMonthManager,
+    visibleMonthManager: VisibleMonthManager,
 ) : ViewModel() {
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
 
@@ -87,8 +84,6 @@ class DayViewModel(
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
 
     suspend fun saveHourHeight(hourHeight: Dp) = calendarDataValues.dayViewHourHeight.setValue(hourHeight)
-
-    fun onVisibleMonthChanged(month: YearMonth) = visibleMonthManager.onVisibleMonthChanged(month)
 
     companion object {
         const val DAY_RANGE_DAYS = 250

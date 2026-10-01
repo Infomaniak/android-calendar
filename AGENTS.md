@@ -99,6 +99,7 @@ extracted and shared with other Infomaniak apps.
 
 The group is intentionally **self-contained**: no dependency on `:app`, no DI framework, no KMP types leaking in.
 `VisibleDayState` lives in `Foundation`: date jumps request navigation, and the content reports the date it reaches.
+It wraps mutable Compose state, so hosts can share the same date with their ViewModels.
 `ExpandableCalendar` accepts this state or explicit date/click callbacks; expansion state stays independent.
 String resources follow the single-module pattern — all strings consumed by any CalendarComponents module are declared in 
 `:CalendarComponents:Resources` so consumers never have to manage per-module string tags.

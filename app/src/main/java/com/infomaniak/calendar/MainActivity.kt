@@ -76,7 +76,7 @@ class MainActivity : ComponentActivity() {
                         UserLoadState.Awaiting -> Unit // Blank surface while waiting for first result
                         is UserLoadState.Loaded -> MainContent(
                             userLoadState = userLoadState,
-                            visibleDayState = rememberVisibleDayState(mainViewModel.visibleDay),
+                            visibleDayState = rememberVisibleDayState(mainViewModel.visibleDate),
                             loadingEventsError = mainViewModel.loadingEventsError,
                             lastCalendarView = { lastCalendarView },
                             onCalendarViewSelected = mainViewModel::saveCalendarView,

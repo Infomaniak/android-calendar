@@ -30,14 +30,13 @@ import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.datetime.YearMonth
 
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
 class WeekScreenViewModel(
     syncEventsManager: SyncEventsManager,
-    private val visibleMonthManager: VisibleMonthManager,
+    visibleMonthManager: VisibleMonthManager,
     private val calendarDataValues: CalendarDataValues,
 ) : ViewModel() {
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
@@ -48,6 +47,4 @@ class WeekScreenViewModel(
     val hourHeight: Flow<Dp> = calendarDataValues.dayViewHourHeight.flow
 
     suspend fun saveHourHeight(hourHeight: Dp) = calendarDataValues.dayViewHourHeight.setValue(hourHeight)
-
-    fun onVisibleMonthChanged(month: YearMonth) = visibleMonthManager.onVisibleMonthChanged(month)
 }
