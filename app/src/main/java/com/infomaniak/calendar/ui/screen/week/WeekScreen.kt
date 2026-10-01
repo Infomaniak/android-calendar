@@ -33,6 +33,7 @@ import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnS
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
 import com.infomaniak.calendar.components.day.WeekPager
 import com.infomaniak.calendar.components.day.state.DayTimelineState
+import com.infomaniak.calendar.components.day.state.rememberDayColumnsState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
@@ -106,6 +107,7 @@ private fun WeekScreen(
         Box(modifier = Modifier.padding(contentPadding.onlyHorizontal())) {
             WeekPager(
                 state = timelineState,
+                columnsState = rememberDayColumnsState(maxVisibleDayCount = 7),
                 modifier = Modifier
                     .collapseCalendarOnScroll(calendarExpansionState)
                     .hazeSource(hazeState),
