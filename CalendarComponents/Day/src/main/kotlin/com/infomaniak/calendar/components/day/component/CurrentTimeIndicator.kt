@@ -36,7 +36,8 @@ import kotlinx.datetime.LocalDateTime
 
 internal val LocalDateTime.minuteOfDay: Int get() = hour * MINUTES_PER_HOUR + minute
 
-private val DotRadius = 4.dp
+/** How far the dot sticks out past the start edge of the indicator. */
+internal val CurrentTimeDotRadius = 4.dp
 private val LineWidth = 1.dp
 
 /**
@@ -59,7 +60,7 @@ internal fun CurrentTimeIndicator(minuteOfDay: Int, state: DayTimelineState, mod
             strokeWidth = LineWidth.toPx(),
         )
 
-        drawCircle(color = color, radius = DotRadius.toPx(), center = Offset(0f, y))
+        drawCircle(color = color, radius = CurrentTimeDotRadius.toPx(), center = Offset(0f, y))
     }
 }
 

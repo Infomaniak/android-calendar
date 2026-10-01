@@ -79,13 +79,17 @@ internal fun MultiDayTimeline(
         val viewportWidth = maxWidth - gutterWidth - endPadding
         val columnWidth = columnsState?.columnWidth(viewportWidth) ?: (viewportWidth / dates.size)
 
-        Row(modifier = Modifier.verticalTimelineScroll(state, contentPadding)) {
+        Box(modifier = Modifier.verticalTimelineScroll(state, contentPadding)) {
             HourLabels(state = state, modifier = Modifier.width(gutterWidth))
 
+            // The columns' viewport reaches into the gutter by the current time dot's radius: a
+            // horizontal scroll clips its content, which would otherwise cut the dot of a day lying
+            // at the start of the viewport in half.
             Box(
                 modifier = Modifier
-                    .weight(1f)
+                    .padding(start = gutterWidth - CurrentTimeDotRadius)
                     .dayColumnsScroll(columnsState)
+                    .padding(start = CurrentTimeDotRadius)
                     .pinchToZoom(horizontal = columnsState?.zoomAxis, vertical = state.zoomAxis),
             ) {
                 DayColumns(
@@ -135,7 +139,7 @@ private fun DayColumns(
                     ) {
                         TimedEventsColumn(
                             events = eventsOf(date).timed,
-                            layoutWidth = columnWidth,
+                            width = columnWidth,
                             hourHeight = state.hourHeight,
                             onEventClick = onEventClick,
                             modifier = Modifier.matchParentSize(),

@@ -29,8 +29,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
-import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults
 import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
@@ -64,9 +64,7 @@ internal fun DayTimeline(
             .fillMaxWidth()
             .padding(contentPadding.onlyHorizontal()),
     ) {
-        // The solver strips horizontalSpacing off the end of every card, so the area runs that far
-        // past the timeline's end padding for the last column of cards to stop exactly on it.
-        val eventsLayoutWidth = maxWidth - gutterWidth - endPadding + EventLayoutDefaults.HorizontalSpacing
+        val eventsWidth = maxWidth - gutterWidth - endPadding
 
         Box(
             modifier = Modifier
@@ -84,12 +82,13 @@ internal fun DayTimeline(
 
             TimedEventsColumn(
                 events = events.timed,
-                layoutWidth = eventsLayoutWidth,
+                width = eventsWidth,
                 hourHeight = state.hourHeight,
                 onEventClick = onEventClick,
                 modifier = Modifier
                     .matchParentSize()
                     .padding(start = gutterWidth),
+                horizontalPadding = 0.dp,
             )
 
             if (currentDateTime.date == date) {
