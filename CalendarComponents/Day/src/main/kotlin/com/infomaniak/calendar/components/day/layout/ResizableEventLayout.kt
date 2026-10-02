@@ -17,16 +17,29 @@
  */
 package com.infomaniak.calendar.components.day.layout
 
+import android.R.attr.maxWidth
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
+import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.components.day.component.ResizableEventItem
 import com.infomaniak.calendar.components.day.component.titleSizingFor
+import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
+import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.model.TimedEvent
+import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import kotlin.math.roundToInt
 
@@ -73,6 +86,57 @@ internal fun ResizableEventLayout(
                     x = placement.x.roundToInt(),
                     y = placement.y.roundToInt(),
                     zIndex = placement.drawOrder,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * The layout only places what the solver hands it, so the preview has to resolve the overlaps
+ * first, over the whole day the way the timeline does.
+ *
+ * A card sits at the hour it starts, and [previewDayEvents] starts at 7 in the morning, hours below
+ * the top of the day: the preview opens scrolled to the first of them, or it would show the empty
+ * night.
+ */
+@Preview
+@Composable
+private fun ResizableEventLayoutPreview() {
+    Surface {
+        val density = LocalDensity.current
+        val timedEvents = previewDayEvents.timed
+        val config = eventLayoutConfig()
+        val pixelsPerMinute = with(density) { DayTimelineDefaults.HourHeight.toPx() } / MINUTES_PER_HOUR
+
+        BoxWithConstraints {
+            // The layout draws the events past the hour gutter, so it gets the width left after it.
+            val eventsAreaEndPadding = DayTimelineDefaults.TimelineEndPadding - EventLayoutDefaults.HorizontalSpacing
+            val eventsAreaWidth = maxWidth - DayTimelineDefaults.HourGutterWidth - eventsAreaEndPadding
+
+            val placements = remember(density, config, eventsAreaWidth) {
+                with(density) {
+                    timedEvents.resolveOverlaps(
+                        layoutWidth = eventsAreaWidth.toPx(),
+                        pixelsPerMinute = pixelsPerMinute,
+                        config = config,
+                    )
+                }
+            }
+
+            val firstEventMinute = timedEvents.minOf { it.startMinuteOfDay }
+
+            Box(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState(initial = (firstEventMinute * pixelsPerMinute).roundToInt()))
+                    .fillMaxWidth()
+                    .height(DayTimelineDefaults.HourHeight * HOURS_PER_DAY),
+            ) {
+                ResizableEventLayout(
+                    timedEvents = timedEvents,
+                    placements = placements,
+                    onEventClick = {},
+                    modifier = Modifier.matchParentSize(),
                 )
             }
         }
