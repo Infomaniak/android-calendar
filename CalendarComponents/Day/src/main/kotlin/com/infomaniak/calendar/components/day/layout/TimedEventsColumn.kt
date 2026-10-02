@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
@@ -45,6 +47,7 @@ import kotlin.math.roundToInt
  * arrangement only changes when one of the two does.
  *
  * @param width The width of the column, which [modifier] is expected to give it as well.
+ * @param horizontalPadding Room kept between the cards and either edge of the column.
  */
 @Composable
 internal fun TimedEventsColumn(
@@ -53,12 +56,13 @@ internal fun TimedEventsColumn(
     hourHeight: Dp,
     onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
+    horizontalPadding: Dp = 0.dp, // TODO: Turn into contentPadding
 ) {
     val density = LocalDensity.current
     val config = eventLayoutConfig()
     // Each card ends with a gap of horizontalSpacing (|card|_|card|_), so the last one would stop a gap short of the edge.
     // We add one gap to the width we give the solver, so that trailing gap falls outside the column to end up with (|card|_|card|).
-    val layoutWidthPx = with(density) { width.toPx() } + config.horizontalSpacing
+    val layoutWidthPx = with(density) { (width - horizontalPadding * 2).toPx() } + config.horizontalSpacing
 
     val placements = remember(events, layoutWidthPx, hourHeight, config, density) {
         events.resolveOverlaps(
@@ -72,7 +76,7 @@ internal fun TimedEventsColumn(
         timedEvents = events,
         placements = placements,
         onEventClick = onEventClick,
-        modifier = modifier,
+        modifier = modifier.padding(horizontal = horizontalPadding),
     )
 }
 
