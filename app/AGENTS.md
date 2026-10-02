@@ -48,8 +48,8 @@ app/src/main/java/com/infomaniak/calendar/
     │   └── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, Accounts, Onboarding)
     ├── screen/
     │   ├── day/                   # DayScreen + DayViewModel + DayUiState + DayEventGroupingExt
-    │   ├── threeDays/             # ThreeDayScreen — placeholder 3-day view
-    │   ├── week/                  # WeekScreen — placeholder week view
+    │   ├── multiDays/             # MultiDaysScreen + MultiDaysViewModel — 3-day and week views (MultiDaysView),
+    │                              # only differing in the Day module pager they show (ThreeDaysPager / WeekPager)
     │   ├── month/                 # MonthScreen + MonthViewModel
     │   ├── planning/              # PlanningScreen + PlanningViewModel + PlanningEventGroupingExt
     │   ├── accounts/              # AccountsListScreen + AccountActionsScreen + AccountsViewModel + AccountItem

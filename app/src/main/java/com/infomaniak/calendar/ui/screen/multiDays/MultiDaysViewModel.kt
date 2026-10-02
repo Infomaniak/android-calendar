@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.week
+package com.infomaniak.calendar.ui.screen.multiDays
 
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.ViewModel
@@ -51,7 +51,7 @@ import kotlin.time.Clock
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
-class WeekScreenViewModel(
+class MultiDaysViewModel(
     accountUtils: AccountUtils,
     calendarManager: CalendarManager,
     syncEventsManager: SyncEventsManager,

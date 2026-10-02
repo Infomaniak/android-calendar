@@ -72,6 +72,7 @@ internal fun FollowSelectedDay(
     LaunchedEffect(stripState, columnsState, dayCount) {
         // Where the selection sits among the days in view, last time it was in view.
         var selectionOffset = 0
+        var lastVisibleDays: IntRange? = null
 
         snapshotFlow {
             val columnWidth = columnWidth()
@@ -82,10 +83,14 @@ internal fun FollowSelectedDay(
             // The selection is read as well, so that picking another day in view moves the offset along.
             visibleDays(stripState.firstVisibleDay(columnWidth), columnsState.visibleDayCount) to currentSelectedDay()
         }.filterNotNull().collect { (visibleDays, selected) ->
-            if (selected in visibleDays) {
-                selectionOffset = selected - visibleDays.first
-            } else {
-                currentOnVisibleDayChanged((visibleDays.first + selectionOffset).coerceIn(visibleDays))
+            val hasRowMoved = lastVisibleDays != null && visibleDays != lastVisibleDays
+            lastVisibleDays = visibleDays
+
+            when {
+                selected in visibleDays -> selectionOffset = selected - visibleDays.first
+                // Otherwise the selection moved out of view on its own: the jump it asks for will
+                // bring it back, unless the selection is reported back to the days in view first.
+                hasRowMoved -> currentOnVisibleDayChanged((visibleDays.first + selectionOffset).coerceIn(visibleDays))
             }
         }
     }
