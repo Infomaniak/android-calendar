@@ -20,6 +20,7 @@ package com.infomaniak.calendar.ui.screen.week
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -44,6 +45,7 @@ import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
 import com.infomaniak.calendar.ui.effects.SaveHourHeight
+import com.infomaniak.calendar.ui.modifier.backgroundBlur
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.screen.day.DayEventsByDate
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
@@ -126,14 +128,16 @@ private fun WeekScreen(
         Box(modifier = Modifier.padding(contentPadding.onlyHorizontal())) {
             WeekPager(
                 dateRange = dateRange,
+                selectedDate = { visibleDayState.visibleDate },
                 weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
                 eventsOf = { eventsByDate()[it] ?: DayEvents.Empty },
+                onVisibleDateChanged = visibleDayState::updateVisibleDate,
                 onEventClick = { goToEventDetail(it.occurrenceId) },
                 state = timelineState,
                 columnsState = rememberDayColumnsState(maxVisibleDayCount = 7),
-                modifier = Modifier
-                    .collapseCalendarOnScroll(calendarExpansionState)
-                    .hazeSource(hazeState),
+                modifier = Modifier.collapseCalendarOnScroll(calendarExpansionState),
+                headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
+                timelineModifier = Modifier.hazeSource(hazeState),
                 contentPadding = PaddingValues(
                     top = contentPadding.calculateTopPadding(),
                     bottom = contentPadding.calculateBottomPadding(),
