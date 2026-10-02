@@ -79,7 +79,7 @@ private fun ThreeDayScreen(
     timelineState: DayTimelineState,
     modifier: Modifier = Modifier,
 ) {
-    val calendarExpansionState = rememberCalendarExpansionState()
+    val calendarExpansionState = rememberCalendarExpansionState(showCollapsedState = false)
     val hazeState = rememberHazeState()
 
     OverlaidTopBarScaffold(

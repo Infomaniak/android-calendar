@@ -20,6 +20,7 @@ package com.infomaniak.calendar.components.calendar.component
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -32,12 +33,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.lerp
 import com.infomaniak.calendar.components.calendar.component.expanded.ExpandedCalendar
@@ -126,15 +131,17 @@ fun ExpandableCalendar(
                 }
             },
             {
-                CollapsedCalendar(
-                    selectedDate = selectedDate,
-                    onDayClick = onDayClick,
-                    weekNumbering = weekNumbering,
-                    monthMargin = MONTH_MARGIN,
-                    headerState = headerState,
-                    eventsDots = eventsDots,
-                    modifier = Modifier.onSizeChanged { collapsedHeight = it.height },
-                )
+                if (expansionState.showCollapsed) {
+                    CollapsedCalendar(
+                        selectedDate = selectedDate,
+                        onDayClick = onDayClick,
+                        weekNumbering = weekNumbering,
+                        monthMargin = MONTH_MARGIN,
+                        headerState = headerState,
+                        eventsDots = eventsDots,
+                        modifier = Modifier.onSizeChanged { collapsedHeight = it.height },
+                    )
+                }
             },
             {
                 DayOfWeekOverlayHeader(
@@ -153,7 +160,7 @@ fun ExpandableCalendar(
         val childConstraints = constraints.copy(minHeight = 0, maxHeight = Constraints.Infinity)
 
         val expanded = expandedMeasurables.first().measure(childConstraints)
-        val collapsed = collapsedMeasurables.first().measure(childConstraints)
+        val collapsed = collapsedMeasurables.firstOrNull()?.measure(childConstraints) ?: EmptyPlaceable(0, 0)
         val header = headerMeasurables.first().measure(childConstraints)
 
         expansionState.updateMetrics(dragRange = (expanded.height - collapsed.height).toFloat(), density = this)
@@ -200,6 +207,16 @@ private fun LocalDate.weekRowsAboveCurrentRow(firstDayOfWeek: DayOfWeek): Int {
     val firstRow = yearMonth.firstDay.startOfWeek(firstDayOfWeek)
     return firstRow.daysUntil(startOfWeek(firstDayOfWeek)) / DAYS_IN_WEEK
 }
+
+private class EmptyPlaceable(width: Int, height: Int) : Placeable() {
+    init {
+        measuredSize = IntSize(width, height)
+    }
+
+    override fun get(alignmentLine: AlignmentLine): Int = AlignmentLine.Unspecified
+    override fun placeAt(position: IntOffset, zIndex: Float, layerBlock: (GraphicsLayerScope.() -> Unit)?) {}
+}
+
 
 @Composable
 @Preview
