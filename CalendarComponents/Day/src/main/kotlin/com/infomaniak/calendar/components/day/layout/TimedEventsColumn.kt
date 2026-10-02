@@ -56,18 +56,16 @@ internal fun TimedEventsColumn(
 ) {
     val density = LocalDensity.current
     val config = eventLayoutConfig()
-    // The solver strips horizontalSpacing off the end of every card, so it is handed that much more
-    // than the column's width, for the last column of cards to stop exactly on its edge.
-    val layoutWidth = width + EventLayoutDefaults.HorizontalSpacing
+    // Each card ends with a gap of horizontalSpacing (|card|_|card|_), so the last one would stop a gap short of the edge.
+    // We add one gap to the width we give the solver, so that trailing gap falls outside the column to end up with (|card|_|card|).
+    val layoutWidthPx = with(density) { width.toPx() } + config.horizontalSpacing
 
-    val placements = remember(events, layoutWidth, hourHeight, config, density) {
-        with(density) {
-            events.resolveOverlaps(
-                layoutWidth = layoutWidth.toPx(),
-                pixelsPerMinute = hourHeight.toPx() / MINUTES_PER_HOUR,
-                config = config,
-            )
-        }
+    val placements = remember(events, layoutWidthPx, hourHeight, config, density) {
+        events.resolveOverlaps(
+            layoutWidth = layoutWidthPx,
+            pixelsPerMinute = with(density) { hourHeight.toPx() } / MINUTES_PER_HOUR,
+            config = config,
+        )
     }
 
     ResizableEventLayout(
