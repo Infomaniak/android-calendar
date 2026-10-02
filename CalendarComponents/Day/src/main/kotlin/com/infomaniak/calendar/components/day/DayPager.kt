@@ -120,7 +120,7 @@ private fun DayPagerPreview() {
             dateRange = today.minus(1, DateTimeUnit.DAY)..today.plus(1, DateTimeUnit.DAY),
             selectedDate = { today },
             eventsOf = { previewDayEvents },
-            state = rememberDayTimelineState(),
+            state = rememberDayTimelineState({}),
             weekNumbering = WeekNumbering.ISO_8601,
             onVisibleDateChanged = {},
             onEventClick = {},

@@ -35,7 +35,7 @@ import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 @Composable
 fun ThreeDayPager(
     modifier: Modifier = Modifier,
-    state: DayTimelineState = rememberDayTimelineState(),
+    state: DayTimelineState = rememberDayTimelineState({}),
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     BoxWithConstraints(
