@@ -18,7 +18,6 @@
 package com.infomaniak.calendar.components.day.component
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -58,43 +57,36 @@ internal fun DayTimeline(
 ) {
     val currentDateTime by rememberCurrentDateTime()
 
-    BoxWithConstraints(
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(contentPadding.onlyHorizontal()),
-    ) {
-        val eventsWidth = maxWidth - DayTimelineDefaults.HourGutterWidth - DayTimelineDefaults.TimelineEndPadding
-
-        Box(
-            modifier = Modifier
-                .verticalScroll(state.scrollState, enabled = !state.isPinching)
-                .padding(
-                    top = HourLabelOverhang + contentPadding.calculateTopPadding(),
-                    bottom = DayTimelineDefaults.BottomPadding + contentPadding.calculateBottomPadding(),
-                )
-                // Inside the padding: a pinch reads its own y as an hour, so it has to start
-                // counting where the first hour line is drawn, not where the padding begins.
-                .pinchToZoom(state),
-        ) {
-            HourGrid(state = state, modifier = Modifier.fillMaxWidth())
-
-            TimedEventsColumn(
-                events = events.timed,
-                width = eventsWidth,
-                hourHeight = state.hourHeight,
-                onEventClick = onEventClick,
-                modifier = Modifier
-                    .matchParentSize()
-                    .padding(start = DayTimelineDefaults.HourGutterWidth),
+            .padding(contentPadding.onlyHorizontal())
+            .verticalScroll(state.scrollState, enabled = !state.isPinching)
+            .padding(
+                top = HourLabelOverhang + contentPadding.calculateTopPadding(),
+                bottom = DayTimelineDefaults.BottomPadding + contentPadding.calculateBottomPadding(),
             )
+            // Inside the padding: a pinch reads its own y as an hour, so it has to start
+            // counting where the first hour line is drawn, not where the padding begins.
+            .pinchToZoom(state),
+    ) {
+        HourGrid(state = state, modifier = Modifier.fillMaxWidth())
 
-            if (currentDateTime.date == date) {
-                CurrentTimeIndicator(
-                    minuteOfDay = currentDateTime.minuteOfDay,
-                    state = state,
-                    modifier = Modifier.matchParentSize(),
-                )
-            }
+        TimedEventsColumn(
+            events = events.timed,
+            hourHeight = state.hourHeight,
+            onEventClick = onEventClick,
+            modifier = Modifier
+                .matchParentSize()
+                .padding(start = DayTimelineDefaults.HourGutterWidth, end = DayTimelineDefaults.TimelineEndPadding),
+        )
+
+        if (currentDateTime.date == date) {
+            CurrentTimeIndicator(
+                minuteOfDay = currentDateTime.minuteOfDay,
+                state = state,
+                modifier = Modifier.matchParentSize(),
+            )
         }
     }
 }

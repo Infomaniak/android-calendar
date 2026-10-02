@@ -39,41 +39,43 @@ import com.infomaniak.calendar.components.foundation.models.EventUi
 import kotlin.math.roundToInt
 
 /**
- * One day's timed events, arranged side by side where they overlap.
+ * One day's timed events, arranged side by side where they overlap, across the width it is given.
  *
  * Overlaps are resolved once per width and zoom level rather than on every frame, since the
  * arrangement only changes when one of the two does.
  *
- * @param width The width of the column, which [modifier] is expected to give it as well.
+ * The column takes its width from its constraints, so it must be given a bounded one, e.g. with
+ * `Modifier.width` when days are laid out in a horizontally scrolling row.
  */
 @Composable
 internal fun TimedEventsColumn(
     events: List<TimedEvent>,
-    width: Dp,
     hourHeight: Dp,
     onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
     val config = eventLayoutConfig()
-    // Each card ends with a gap of horizontalSpacing (|card|_|card|_), so the last one would stop a gap short of the edge.
-    // We add one gap to the width we give the solver, so that trailing gap falls outside the column to end up with (|card|_|card|).
-    val layoutWidthPx = with(density) { width.toPx() } + config.horizontalSpacing
 
-    val placements = remember(events, layoutWidthPx, hourHeight, config, density) {
-        events.resolveOverlaps(
-            layoutWidth = layoutWidthPx,
-            pixelsPerMinute = with(density) { hourHeight.toPx() } / MINUTES_PER_HOUR,
-            config = config,
+    BoxWithConstraints(modifier) {
+        check(constraints.hasBoundedWidth) { "TimedEventsColumn needs a bounded width, e.g. Modifier.width(...)" }
+        val width = constraints.maxWidth
+
+        val placements = remember(events, width, hourHeight, config, density) {
+            events.resolveOverlaps(
+                layoutWidth = width.toFloat(),
+                pixelsPerMinute = with(density) { hourHeight.toPx() } / MINUTES_PER_HOUR,
+                config = config,
+            )
+        }
+
+        ResizableEventLayout(
+            timedEvents = events,
+            placements = placements,
+            onEventClick = onEventClick,
+            modifier = Modifier.matchParentSize(),
         )
     }
-
-    ResizableEventLayout(
-        timedEvents = events,
-        placements = placements,
-        onEventClick = onEventClick,
-        modifier = modifier,
-    )
 }
 
 /**
@@ -91,23 +93,18 @@ private fun TimedEventsColumnPreview() {
             (hourHeight * timedEvents.minOf { it.startMinuteOfDay } / MINUTES_PER_HOUR).toPx()
         }
 
-        BoxWithConstraints {
-            val width = maxWidth
-
-            Box(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState(initial = firstEventOffset.roundToInt()))
-                    .fillMaxWidth()
-                    .height(hourHeight * HOURS_PER_DAY),
-            ) {
-                TimedEventsColumn(
-                    events = timedEvents,
-                    width = width,
-                    hourHeight = hourHeight,
-                    onEventClick = {},
-                    modifier = Modifier.matchParentSize(),
-                )
-            }
+        Box(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState(initial = firstEventOffset.roundToInt()))
+                .fillMaxWidth()
+                .height(hourHeight * HOURS_PER_DAY),
+        ) {
+            TimedEventsColumn(
+                events = timedEvents,
+                hourHeight = hourHeight,
+                onEventClick = {},
+                modifier = Modifier.matchParentSize(),
+            )
         }
     }
 }

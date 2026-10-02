@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.components.day.layout
 
-import android.R.attr.maxWidth
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -51,7 +50,6 @@ internal fun ResizableEventLayout(
     onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
     val density = LocalDensity.current
     val currentPlacements = rememberUpdatedState(placements)
 
@@ -110,18 +108,12 @@ private fun ResizableEventLayoutPreview() {
         val pixelsPerMinute = with(density) { DayTimelineDefaults.HourHeight.toPx() } / MINUTES_PER_HOUR
 
         BoxWithConstraints {
-            // The layout draws the events past the hour gutter, so it gets the width left after it.
-            val eventsAreaEndPadding = DayTimelineDefaults.TimelineEndPadding - EventLayoutDefaults.HorizontalSpacing
-            val eventsAreaWidth = maxWidth - DayTimelineDefaults.HourGutterWidth - eventsAreaEndPadding
-
-            val placements = remember(density, config, eventsAreaWidth) {
-                with(density) {
-                    timedEvents.resolveOverlaps(
-                        layoutWidth = eventsAreaWidth.toPx(),
-                        pixelsPerMinute = pixelsPerMinute,
-                        config = config,
-                    )
-                }
+            val placements = remember(density, config, constraints.maxWidth) {
+                timedEvents.resolveOverlaps(
+                    layoutWidth = constraints.maxWidth.toFloat(),
+                    pixelsPerMinute = pixelsPerMinute,
+                    config = config,
+                )
             }
 
             val firstEventMinute = timedEvents.minOf { it.startMinuteOfDay }
