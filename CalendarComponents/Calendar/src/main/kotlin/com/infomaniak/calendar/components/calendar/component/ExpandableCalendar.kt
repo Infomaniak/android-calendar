@@ -114,7 +114,7 @@ fun ExpandableCalendar(
                             clipRect(top = headerSize.height.toFloat()) { this@drawWithContent.drawContent() }
                         }
                         .graphicsLayer {
-                            val weekRowHeight = (collapsedHeight - headerSize.height).toFloat()
+                            val weekRowHeight = (collapsedHeight - headerSize.height).toFloat().coerceAtLeast(0f)
                             translationY = -weeksAboveSelection * weekRowHeight * (EXPANDED - expansionState.progress)
                         },
                 ) {
