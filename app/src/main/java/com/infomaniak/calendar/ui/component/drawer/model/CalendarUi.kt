@@ -18,8 +18,8 @@
 package com.infomaniak.calendar.ui.component.drawer.model
 
 import androidx.compose.runtime.Immutable
-import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
+import com.infomaniak.multiplatform_core.account.domain.model.AccountId
 
 @Immutable
 data class CalendarUi(

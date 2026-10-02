@@ -24,9 +24,9 @@ import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.utils.toEventUi
 import com.infomaniak.calendar.utils.toThemedColorUi
 import com.infomaniak.core.common.utils.today
-import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
+import com.infomaniak.multiplatform_core.account.domain.model.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext

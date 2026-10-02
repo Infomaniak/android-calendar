@@ -65,7 +65,7 @@ class MainApplication : Application(), MetroApplication {
 
     private fun loadCalDavCredential() {
         applicationScope.launch {
-            appGraph.davCredentialsManager.initStoredCredentials()
+            appGraph.accountUtils.initStoredAccounts()
         }
     }
 

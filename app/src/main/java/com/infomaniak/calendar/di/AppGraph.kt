@@ -25,13 +25,13 @@ import com.infomaniak.calendar.MainApplication
 import com.infomaniak.calendar.crashReporting.AndroidCrashReport
 import com.infomaniak.calendar.di.metroAndroidExtensions.AndroidComponentProvider
 import com.infomaniak.calendar.manager.CachedCalendarManager
-import com.infomaniak.calendar.secured.DavCredentialsManager
 import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.login.InfomaniakLogin
 import com.infomaniak.core.network.LOGIN_ENDPOINT_URL
 import com.infomaniak.multiplatform_calendar.core.crashreporting.CrashReport
 import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
+import com.infomaniak.multiplatform_core.contacts.ContactsSettings
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provides
@@ -64,8 +64,6 @@ interface AppGraph : AndroidComponentProvider, ViewModelGraph {
 
     val accountManager: AccountManager
 
-    val davCredentialsManager: DavCredentialsManager
-
     val cachedCalendarManager: CachedCalendarManager
 
     @Provides
@@ -82,6 +80,11 @@ interface AppGraph : AndroidComponentProvider, ViewModelGraph {
     @Provides
     @SingleIn(AppScope::class)
     fun provideCrashReportInterface(): CrashReport = AndroidCrashReport
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideContactsSettings(appContext: Context): ContactsSettings =
+        ContactsSettings(databasePath = appContext.getDatabasePath("contacts.db").absolutePath)
 
     @DependencyGraph.Factory
     fun interface Factory {
