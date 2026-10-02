@@ -43,7 +43,6 @@ import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.ScreenLoader
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
-import com.infomaniak.calendar.ui.effects.SaveHourHeight
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
@@ -70,9 +69,11 @@ fun DayScreen(
     // The timeline scrolls to its opening hour as soon as it is measured, and counts that scroll in
     // hour heights: it is built once the stored height is known, or it would open hours off.
     val storedHourHeight by dayViewModel.hourHeight.collectAsStateWithLifecycle(initialValue = null)
-    val timelineState = rememberDayTimelineState(initialHourHeight = storedHourHeight ?: return)
+    val timelineState = rememberDayTimelineState(
+        initialHourHeight = storedHourHeight ?: return,
+        onHourHeightSaveRequest = dayViewModel::saveHourHeight,
+    )
 
-    SaveHourHeight(timelineState, onHourHeightChanged = dayViewModel::saveHourHeight)
     ApplyJumpRequests(visibleDayState)
 
     DayScreen(
@@ -180,7 +181,7 @@ private fun DayScreenPreview() {
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
                 visibleDayState = visibleDayState,
-                timelineState = rememberDayTimelineState(),
+                timelineState = rememberDayTimelineState({}),
                 dateRange = date.minus(1, DateTimeUnit.DAY)..date.plus(1, DateTimeUnit.DAY),
             )
         }

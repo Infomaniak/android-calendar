@@ -26,21 +26,6 @@ import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.filterNot
 
-/**
- * Stores the zoom level the user leaves the day view on.
- *
- * A pinch changes the height on every frame, so the height is stored once the gesture ends: one
- * write per pinch, and nothing left waiting on a timer that leaving the screen would cancel.
- */
-@Composable
-fun SaveHourHeight(timelineState: DayTimelineState, onHourHeightChanged: suspend (Dp) -> Unit) {
-    LaunchedEffect(timelineState) {
-        snapshotFlow { timelineState.isPinching }
-            .dropWhile { isPinching -> !isPinching }
-            .filterNot { isPinching -> isPinching }
-            .collect { onHourHeightChanged(timelineState.hourHeight) }
-    }
-}
 
 /**
  * Turns a jump request, such as tapping a day in the calendar, into a change of visible date. The
