@@ -27,15 +27,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
-import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults
-import com.infomaniak.calendar.components.day.layout.ResizableEventLayout
-import com.infomaniak.calendar.components.day.layout.eventLayoutConfig
-import com.infomaniak.calendar.components.day.layout.resolveOverlaps
+import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.pinchToZoom
@@ -52,10 +47,6 @@ import kotlin.time.Clock
 
 private val LocalDateTime.minuteOfDay: Int get() = hour * MINUTES_PER_HOUR + minute
 
-/**
- * Overlaps are resolved once per width and zoom level rather than on every frame, since the
- * arrangement only changes when one of the two does.
- */
 @Composable
 internal fun DayTimeline(
     date: LocalDate,
@@ -72,22 +63,7 @@ internal fun DayTimeline(
             .fillMaxWidth()
             .padding(contentPadding.onlyHorizontal()),
     ) {
-        val density = LocalDensity.current
-        val config = eventLayoutConfig()
-        // The solver strips horizontalSpacing off the end of every card, so the area runs that far
-        // past the timeline's end padding for the last column of cards to stop exactly on it.
-        val eventsAreaEndPadding = DayTimelineDefaults.TimelineEndPadding - EventLayoutDefaults.HorizontalSpacing
-        val eventsAreaWidth = maxWidth - DayTimelineDefaults.HourGutterWidth - eventsAreaEndPadding
-
-        val placements = remember(events, eventsAreaWidth, state.hourHeight, config) {
-            with(density) {
-                events.timed.resolveOverlaps(
-                    layoutWidth = eventsAreaWidth.toPx(),
-                    pixelsPerMinute = state.hourHeight.toPx() / MINUTES_PER_HOUR,
-                    config = config,
-                )
-            }
-        }
+        val eventsWidth = maxWidth - DayTimelineDefaults.HourGutterWidth - DayTimelineDefaults.TimelineEndPadding
 
         Box(
             modifier = Modifier
@@ -102,11 +78,14 @@ internal fun DayTimeline(
         ) {
             HourGrid(state = state, modifier = Modifier.fillMaxWidth())
 
-            ResizableEventLayout(
-                timedEvents = events.timed,
-                placements = placements,
+            TimedEventsColumn(
+                events = events.timed,
+                width = eventsWidth,
+                hourHeight = state.hourHeight,
                 onEventClick = onEventClick,
-                modifier = Modifier.matchParentSize(),
+                modifier = Modifier
+                    .matchParentSize()
+                    .padding(start = DayTimelineDefaults.HourGutterWidth),
             )
 
             if (currentDateTime.date == date) {
