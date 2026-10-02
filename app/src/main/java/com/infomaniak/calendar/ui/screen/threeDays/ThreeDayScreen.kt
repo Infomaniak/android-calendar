@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
+import com.infomaniak.calendar.components.calendar.component.ExpandableCalendarDefaults
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
 import com.infomaniak.calendar.components.day.ThreeDayPager
@@ -95,6 +96,7 @@ private fun ThreeDayScreen(
                         expansionState = calendarExpansionState,
                         weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
                         eventsDots = eventsDots,
+                        collapsedContent = ExpandableCalendarDefaults.None,
                     )
                 },
             )

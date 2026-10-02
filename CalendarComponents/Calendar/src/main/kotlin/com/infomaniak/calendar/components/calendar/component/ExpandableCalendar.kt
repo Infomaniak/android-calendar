@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -63,6 +64,7 @@ fun ExpandableCalendar(
     weekNumbering: WeekNumbering,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     modifier: Modifier = Modifier,
+    collapsedContent: @Composable CollapsedCalendarScope.() -> Unit = ExpandableCalendarDefaults.Week,
 ) {
     ExpandableCalendar(
         expansionState = expansionState,
@@ -71,6 +73,7 @@ fun ExpandableCalendar(
         weekNumbering = weekNumbering,
         eventsDots = eventsDots,
         modifier = modifier,
+        collapsedContent = collapsedContent,
     )
 }
 
@@ -82,6 +85,7 @@ fun ExpandableCalendar(
     weekNumbering: WeekNumbering,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     modifier: Modifier = Modifier,
+    collapsedContent: @Composable CollapsedCalendarScope.() -> Unit = ExpandableCalendarDefaults.Week,
 ) {
     val firstDayOfWeek = remember(weekNumbering) { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
 
@@ -95,6 +99,10 @@ fun ExpandableCalendar(
         derivedStateOf { currentSelectedDate().weekRowsAboveCurrentRow(firstDayOfWeek) }
     }
 
+    val collapsedScope = remember(selectedDate, onDayClick, weekNumbering, eventsDots, headerState) {
+        CollapsedCalendarScope(selectedDate, onDayClick, weekNumbering, eventsDots, headerState)
+    }
+
     Layout(
         contents = listOf(
             {
@@ -106,7 +114,7 @@ fun ExpandableCalendar(
                             clipRect(top = headerSize.height.toFloat()) { this@drawWithContent.drawContent() }
                         }
                         .graphicsLayer {
-                            val weekRowHeight = (collapsedHeight - headerSize.height).toFloat()
+                            val weekRowHeight = (collapsedHeight - headerSize.height).toFloat().coerceAtLeast(0f)
                             translationY = -weeksAboveSelection * weekRowHeight * (EXPANDED - expansionState.progress)
                         },
                 ) {
@@ -126,15 +134,9 @@ fun ExpandableCalendar(
                 }
             },
             {
-                CollapsedCalendar(
-                    selectedDate = selectedDate,
-                    onDayClick = onDayClick,
-                    weekNumbering = weekNumbering,
-                    monthMargin = MONTH_MARGIN,
-                    headerState = headerState,
-                    eventsDots = eventsDots,
-                    modifier = Modifier.onSizeChanged { collapsedHeight = it.height },
-                )
+                Box(modifier = Modifier.onSizeChanged { collapsedHeight = it.height }) {
+                    collapsedScope.collapsedContent()
+                }
             },
             {
                 DayOfWeekOverlayHeader(
@@ -199,6 +201,30 @@ private fun DayOfWeekOverlayHeader(
 private fun LocalDate.weekRowsAboveCurrentRow(firstDayOfWeek: DayOfWeek): Int {
     val firstRow = yearMonth.firstDay.startOfWeek(firstDayOfWeek)
     return firstRow.daysUntil(startOfWeek(firstDayOfWeek)) / DAYS_IN_WEEK
+}
+
+@Stable
+class CollapsedCalendarScope internal constructor(
+    val selectedDate: () -> LocalDate,
+    val onDayClick: (LocalDate) -> Unit,
+    val weekNumbering: WeekNumbering,
+    val eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
+    internal val headerState: CalendarHeaderState,
+)
+
+object ExpandableCalendarDefaults {
+    val Week: @Composable CollapsedCalendarScope.() -> Unit = {
+        CollapsedCalendar(
+            selectedDate = selectedDate,
+            onDayClick = onDayClick,
+            weekNumbering = weekNumbering,
+            monthMargin = MONTH_MARGIN,
+            headerState = headerState,
+            eventsDots = eventsDots,
+        )
+    }
+
+    val None: @Composable CollapsedCalendarScope.() -> Unit = {}
 }
 
 @Composable
