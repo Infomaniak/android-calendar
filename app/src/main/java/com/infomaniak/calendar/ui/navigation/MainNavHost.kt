@@ -50,10 +50,10 @@ import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationScree
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
+import com.infomaniak.calendar.ui.screen.multiDays.MultiDaysScreen
+import com.infomaniak.calendar.ui.screen.multiDays.MultiDaysView
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
-import com.infomaniak.calendar.ui.screen.threeDays.ThreeDayScreen
-import com.infomaniak.calendar.ui.screen.week.WeekScreen
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.utils.NavigationTransition
 import com.infomaniak.core.common.utils.today
@@ -96,10 +96,16 @@ private fun baseEntryProvider(
         DayScreen(goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) })
     }
     entry<NavDestination.CalendarView.ThreeDays>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-        ThreeDayScreen()
+        MultiDaysScreen(
+            view = MultiDaysView.ThreeDays,
+            goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) },
+        )
     }
     entry<NavDestination.CalendarView.Week>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-        WeekScreen(goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) })
+        MultiDaysScreen(
+            view = MultiDaysView.Week,
+            goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) },
+        )
     }
     entry<NavDestination.CalendarView.Month>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         MonthScreen()

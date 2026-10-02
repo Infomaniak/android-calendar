@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.model.DayEvents
@@ -31,36 +30,30 @@ import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayColumnsState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventUi
-import com.infomaniak.calendar.components.foundation.models.WeekNumbering
-import com.infomaniak.calendar.components.foundation.utils.startOfWeek
 import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.DatePeriod
-import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlinx.datetime.toKotlinDayOfWeek
 import kotlin.time.Clock
 
-private const val DAYS_PER_WEEK = 7
+private const val VISIBLE_DAYS = 3
+private const val DAYS_PER_PAGE = 1
 
 /**
- * The weeks of [dateRange], turned one at a time. Zoomed in, the week in view scrolls to its end
- * before the next one turns.
+ * The days of [dateRange], 3 at a time, stepped through one day at a time.
  *
- * Opens on the week of [selectedDate], and follows it from then on: see [MultiDayPager].
+ * Opens with [selectedDate] as its first day, and follows it from then on: see [MultiDayPager].
  *
- * @param dateRange Widened to whole weeks, as [weekNumbering] starts them.
- * @param columnsState How many days the viewport holds. By default, it holds the whole week and a
- * pinch only zooms the hours: see [rememberDayColumnsState] to let a pinch widen the days as well.
+ * @param columnsState How many days the viewport holds. By default, it holds 3 days and a pinch only
+ * zooms the hours: see [rememberDayColumnsState] to let a pinch widen the days as well.
  * @param headerModifier Applied behind the header at the top of each day, which the grid scrolls under.
  * @param timelineModifier Applied to the grid scrolling under the headers.
  */
 @Composable
-fun WeekPager(
+fun ThreeDaysPager(
     dateRange: ClosedRange<LocalDate>,
     selectedDate: () -> LocalDate,
-    weekNumbering: WeekNumbering,
     eventsOf: (LocalDate) -> DayEvents,
     onVisibleDateChanged: (LocalDate) -> Unit,
     onEventClick: (EventUi.Normal) -> Unit,
@@ -69,20 +62,14 @@ fun WeekPager(
     timelineModifier: Modifier = Modifier,
     state: DayTimelineState = rememberDayTimelineState(),
     columnsState: DayColumnsState = rememberDayColumnsState(
-        maxVisibleDayCount = DAYS_PER_WEEK,
-        minVisibleDayCount = DAYS_PER_WEEK,
+        maxVisibleDayCount = VISIBLE_DAYS,
+        minVisibleDayCount = VISIBLE_DAYS,
     ),
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    val firstDayOfWeek = remember(weekNumbering) { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
-    val weeksRange = remember(dateRange, firstDayOfWeek) {
-        dateRange.start.startOfWeek(firstDayOfWeek)..dateRange.endInclusive.startOfWeek(firstDayOfWeek)
-            .plus(DAYS_PER_WEEK - 1, DateTimeUnit.DAY)
-    }
-
     MultiDayPager(
-        dateRange = weeksRange,
-        daysPerPage = DAYS_PER_WEEK,
+        dateRange = dateRange,
+        daysPerPage = DAYS_PER_PAGE,
         selectedDate = selectedDate,
         eventsOf = eventsOf,
         onVisibleDateChanged = onVisibleDateChanged,
@@ -103,14 +90,12 @@ private fun Preview() {
 
     MaterialTheme {
         Surface {
-            WeekPager(
+            ThreeDaysPager(
                 dateRange = today.minus(DatePeriod(days = 14))..today.plus(DatePeriod(days = 14)),
                 selectedDate = { today },
-                weekNumbering = WeekNumbering.ISO_8601,
                 eventsOf = { previewDayEvents },
                 onVisibleDateChanged = {},
                 onEventClick = {},
-                columnsState = rememberDayColumnsState(maxVisibleDayCount = DAYS_PER_WEEK),
             )
         }
     }
