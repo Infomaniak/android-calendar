@@ -32,6 +32,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.component.DayView
 import com.infomaniak.calendar.components.day.model.DayEvents
+import com.infomaniak.calendar.components.day.model.dateAt
+import com.infomaniak.calendar.components.day.model.dayCount
+import com.infomaniak.calendar.components.day.model.indexOf
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
@@ -41,7 +44,6 @@ import com.infomaniak.core.common.utils.today
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.daysUntil
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlin.time.Clock
@@ -62,7 +64,7 @@ fun DayPager(
     headerTrailingContent: @Composable () -> Unit = {},
 ) {
     val pageCount = remember(dateRange) { dateRange.dayCount }
-    val pagerState = rememberPagerState(initialPage = dateRange.pageOf(selectedDate())) { pageCount }
+    val pagerState = rememberPagerState(initialPage = dateRange.indexOf(selectedDate())) { pageCount }
 
     // The page a jump is travelling to, while it travels. The pager reports every page it crosses on
     // the way, and those are the jump's own doing: reported back as a date the user moved to, they
@@ -71,7 +73,7 @@ fun DayPager(
 
     LaunchedEffect(pagerState) {
         snapshotFlow { selectedDate() }.collectLatest { date ->
-            val page = dateRange.pageOf(date)
+            val page = dateRange.indexOf(date)
             if (page == pagerState.currentPage) return@collectLatest
 
             travellingTo = page
@@ -85,12 +87,12 @@ fun DayPager(
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
-            if (travellingTo == null) onVisibleDateChanged(dateRange.dateOf(page))
+            if (travellingTo == null) onVisibleDateChanged(dateRange.dateAt(page))
         }
     }
 
     HorizontalPager(state = pagerState, modifier = modifier) { page ->
-        val date = dateRange.dateOf(page)
+        val date = dateRange.dateAt(page)
 
         DayView(
             date = date,
@@ -105,10 +107,6 @@ fun DayPager(
         )
     }
 }
-
-private val ClosedRange<LocalDate>.dayCount: Int get() = start.daysUntil(endInclusive) + 1
-private fun ClosedRange<LocalDate>.pageOf(date: LocalDate): Int = start.daysUntil(date)
-private fun ClosedRange<LocalDate>.dateOf(page: Int): LocalDate = start.plus(page, DateTimeUnit.DAY)
 
 @Preview
 @Composable

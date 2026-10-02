@@ -22,10 +22,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -34,10 +38,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -45,6 +54,9 @@ import androidx.compose.ui.unit.IntOffset
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
 import com.infomaniak.calendar.components.day.model.DayEvents
+import com.infomaniak.calendar.components.day.model.dateAt
+import com.infomaniak.calendar.components.day.model.dayCount
+import com.infomaniak.calendar.components.day.model.indexOf
 import com.infomaniak.calendar.components.day.paging.rememberDayPagesFlingBehavior
 import com.infomaniak.calendar.components.day.paging.viewportOffsetOf
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
@@ -53,6 +65,7 @@ import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayColumnsState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.day.zoom.DayStripZoomAxis
+import com.infomaniak.calendar.components.day.zoom.offsetBy
 import com.infomaniak.calendar.components.day.zoom.pinchToZoom
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
@@ -61,10 +74,9 @@ import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.datetime.DatePeriod
-import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.daysUntil
 import kotlinx.datetime.plus
+import kotlin.math.max
 import kotlin.time.Clock
 
 /**
@@ -76,8 +88,16 @@ import kotlin.time.Clock
  * when it allows for it. How many it turns per page is up to [daysPerPage] alone: a week view holds
  * and turns 7 days, while a 3 days view holds 3 days but steps through them one day at a time.
  *
+ * Each column is an item of the row, made of its [header] laid over its own vertical viewport of the
+ * grid: the header moves along with its day without any delay, while staying at the top. All the
+ * viewports and the gutter scroll the same [state], and so as one. The grid scrolls under the
+ * headers, all as tall as the tallest of them.
+ *
  * @param stripState Where the row of days is scrolled to, its item indices being the days of
  * [dateRange].
+ * @param headerModifier Applied to each header and to the corner above the gutter, typically to give
+ * them a background the grid scrolls under.
+ * @param timelineModifier Applied to each vertical viewport of the grid and to the gutter.
  */
 @Composable
 internal fun MultiDayTimeline(
@@ -89,35 +109,56 @@ internal fun MultiDayTimeline(
     state: DayTimelineState,
     onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
+    headerModifier: Modifier = Modifier,
+    timelineModifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    header: @Composable (LocalDate) -> Unit = { DayColumnHeader(date = it) },
 ) {
+    val density = LocalDensity.current
     val gutterWidth = DayTimelineDefaults.HourGutterWidth
     val endPadding = DayTimelineDefaults.TimelineEndPadding
 
-    val dayCount = remember(dateRange) { dateRange.start.daysUntil(dateRange.endInclusive) + 1 }
+    val dayCount = remember(dateRange) { dateRange.dayCount }
     val flingBehavior = rememberDayPagesFlingBehavior(stripState, columnsState, daysPerPage)
+
+    // Never shrinks, so that the tallest header seen so far sets the height of all of them, the ones
+    // composed later included.
+    var headerHeightPx by remember { mutableIntStateOf(0) }
+    val headerHeight = with(density) { headerHeightPx.toDp() }
+    val headersTop = contentPadding.calculateTopPadding()
+    val gridPadding = PaddingValues(top = headersTop + headerHeight, bottom = contentPadding.calculateBottomPadding())
+
+    // Where the first hour line lies below the top of the pinched area, when scrolled to the top.
+    val hourZeroTopPx by rememberUpdatedState(with(density) { (headersTop + HourLabelOverhang).toPx() })
+    val gutterWidthPx by rememberUpdatedState(with(density) { gutterWidth.toPx() })
+
     val stripZoomAxis = remember(columnsState, stripState) {
-        if (columnsState.isZoomable) DayStripZoomAxis(columnsState, stripState) else null
+        if (columnsState.isZoomable) DayStripZoomAxis(columnsState, stripState).offsetBy { -gutterWidthPx } else null
+    }
+    val hoursZoomAxis = remember(state) {
+        state.zoomAxis.offsetBy { state.scrollState.value - hourZeroTopPx - headerHeightPx }
     }
 
     SettleAfterPinch(stripState, flingBehavior, isPinching = { columnsState.isPinching || state.isPinching })
 
     BoxWithConstraints(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(contentPadding.onlyHorizontal()),
     ) {
         val viewportWidth = maxWidth - gutterWidth - endPadding
-        val columnWidth = with(LocalDensity.current) { columnsState.columnWidthPx(viewportWidth.roundToPx()).toDp() }
+        val columnWidth = with(density) { columnsState.columnWidthPx(viewportWidth.roundToPx()).toDp() }
 
-        Box(modifier = Modifier.verticalTimelineScroll(state, contentPadding)) {
-            HourLabels(state = state, modifier = Modifier.width(gutterWidth))
-            HourLines(
-                state = state,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = gutterWidth, end = endPadding),
-            )
+        // Over the gutter and the headers as well, the pinch is caught wherever the fingers land.
+        Box(modifier = Modifier.fillMaxSize().pinchToZoom(horizontal = stripZoomAxis, vertical = hoursZoomAxis)) {
+            Box(
+                modifier = timelineModifier
+                    .width(gutterWidth)
+                    .fillMaxHeight()
+                    .verticalTimelineScroll(state, gridPadding, overscrollEffect = null),
+            ) {
+                HourLabels(state = state, modifier = Modifier.fillMaxWidth())
+            }
 
             LazyRow(
                 state = stripState,
@@ -126,16 +167,34 @@ internal fun MultiDayTimeline(
                 modifier = Modifier
                     .padding(start = gutterWidth)
                     .width(viewportWidth)
-                    .timelineHeight(state)
-                    .pinchToZoom(horizontal = stripZoomAxis, vertical = state.zoomAxis),
+                    .fillMaxHeight(),
             ) {
                 items(count = dayCount, key = { it }) { index ->
-                    DayColumn(
-                        events = eventsOf(dateRange.dateOf(index)),
-                        columnWidth = columnWidth,
-                        state = state,
-                        onEventClick = onEventClick,
-                    )
+                    val date = dateRange.dateAt(index)
+
+                    Box(modifier = Modifier.width(columnWidth).fillMaxHeight()) {
+                        DayColumn(
+                            events = eventsOf(date),
+                            columnWidth = columnWidth,
+                            state = state,
+                            onEventClick = onEventClick,
+                            modifier = timelineModifier
+                                .fillMaxSize()
+                                .verticalTimelineScroll(state, gridPadding, overscrollEffect = null),
+                        )
+
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .padding(top = headersTop)
+                                .then(headerModifier)
+                                .fillMaxWidth()
+                                .heightIn(min = headerHeight)
+                                .onSizeChanged { headerHeightPx = max(headerHeightPx, it.height) },
+                        ) {
+                            header(date)
+                        }
+                    }
                 }
             }
 
@@ -146,7 +205,16 @@ internal fun MultiDayTimeline(
                 state = state,
                 modifier = Modifier
                     .matchParentSize()
-                    .padding(start = gutterWidth - CurrentTimeDotRadius, end = endPadding),
+                    .padding(start = gutterWidth - CurrentTimeDotRadius, end = endPadding, top = headersTop + headerHeight),
+            )
+
+            // The gutter's share of the header row, for the hours not to show through beside the headers.
+            Box(
+                modifier = Modifier
+                    .padding(top = headersTop)
+                    .then(headerModifier)
+                    .width(gutterWidth)
+                    .height(headerHeight),
             )
         }
     }
@@ -165,26 +233,31 @@ private fun SettleAfterPinch(stripState: LazyListState, flingBehavior: TargetedF
     }
 }
 
+/** A day's events over its share of the grid, to be laid in a vertical scroll. */
 @Composable
 private fun DayColumn(
     events: DayEvents,
     columnWidth: Dp,
     state: DayTimelineState,
     onEventClick: (EventUi.Normal) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier = Modifier
-            .width(columnWidth)
-            .fillMaxHeight()
-            .dayColumnDivider(),
-    ) {
-        TimedEventsColumn(
-            events = events.timed,
-            width = columnWidth,
-            hourHeight = state.hourHeight,
-            onEventClick = onEventClick,
-            modifier = Modifier.matchParentSize(),
-        )
+    Box(modifier = modifier) {
+        Box(
+            modifier = Modifier
+                .timelineHeight(state)
+                .fillMaxWidth()
+                .dayColumnDivider(),
+        ) {
+            HourLines(state = state, modifier = Modifier.fillMaxWidth())
+            TimedEventsColumn(
+                events = events.timed,
+                width = columnWidth,
+                hourHeight = state.hourHeight,
+                onEventClick = onEventClick,
+                modifier = Modifier.matchParentSize(),
+            )
+        }
     }
 }
 
@@ -193,7 +266,7 @@ private fun DayColumn(
  * its days to its viewport, which would cut the dot of a today lying at its start in half.
  *
  * The overlay clips to its own bounds instead, which are expected to start a dot's radius before
- * the row so that the dot can reach into the gutter.
+ * the row so that the dot can reach into the gutter, and below the headers.
  */
 @Composable
 private fun CurrentTimeOverlay(
@@ -206,7 +279,8 @@ private fun CurrentTimeOverlay(
     val currentDateTime by rememberCurrentDateTime()
     if (currentDateTime.date !in dateRange) return
 
-    val todayIndex = dateRange.start.daysUntil(currentDateTime.date)
+    val todayIndex = dateRange.indexOf(currentDateTime.date)
+    val hourZeroTop = HourLabelOverhang
 
     Box(modifier = modifier.clipToBounds()) {
         CurrentTimeIndicator(
@@ -216,15 +290,18 @@ private fun CurrentTimeOverlay(
                 .offset {
                     // Out of view, today's column is left past the end of the clip.
                     val todayOffset = stripState.viewportOffsetOf(todayIndex) ?: stripState.layoutInfo.viewportSize.width
-                    IntOffset(x = CurrentTimeDotRadius.roundToPx() + todayOffset, y = 0)
+                    IntOffset(
+                        x = CurrentTimeDotRadius.roundToPx() + todayOffset,
+                        y = hourZeroTop.roundToPx() - state.scrollState.value,
+                    )
                 }
                 .width(columnWidth)
-                .fillMaxHeight(),
+                // Taller than the overlay, the grid would otherwise be centred in it.
+                .wrapContentHeight(Alignment.Top, unbounded = true)
+                .timelineHeight(state),
         )
     }
 }
-
-private fun ClosedRange<LocalDate>.dateOf(index: Int): LocalDate = start.plus(index, DateTimeUnit.DAY)
 
 private val previewDateRange = Clock.today().let { it..it + DatePeriod(days = 6) }
 

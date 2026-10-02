@@ -37,6 +37,14 @@ internal interface ZoomableAxis {
 }
 
 /**
+ * The same axis, read from an element [offset] pixels before the one it expects the pinch on: lets a
+ * single [pinchToZoom] cover an area wider than what each of its axes scrolls.
+ */
+internal fun ZoomableAxis.offsetBy(offset: () -> Float): ZoomableAxis = object : ZoomableAxis by this {
+    override fun anchorAt(pointerOffset: Float): ZoomAnchor = this@offsetBy.anchorAt(pointerOffset + offset())
+}
+
+/**
  * @param position Where the anchored point lies along the axis, in a unit the zoom leaves unchanged,
  * unlike its offset in the zoomed content.
  * @param viewportOffset Where the anchored point lies inside the viewport, which is where it has

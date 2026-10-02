@@ -27,6 +27,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.component.MultiDayTimeline
 import com.infomaniak.calendar.components.day.model.DayEvents
+import com.infomaniak.calendar.components.day.model.dateAt
+import com.infomaniak.calendar.components.day.model.dayCount
+import com.infomaniak.calendar.components.day.model.indexOf
+import com.infomaniak.calendar.components.day.paging.FollowSelectedDay
+import com.infomaniak.calendar.components.day.paging.pagePositionOf
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.DayColumnsState
 import com.infomaniak.calendar.components.day.state.DayTimelineState
@@ -39,7 +44,6 @@ import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.daysUntil
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toKotlinDayOfWeek
@@ -51,19 +55,26 @@ private const val DAYS_PER_WEEK = 7
  * The weeks of [dateRange], turned one at a time. Zoomed in, the week in view scrolls to its end
  * before the next one turns.
  *
- * Opens on the current week.
+ * Opens on the week of [selectedDate], and follows it from then on: see [FollowSelectedDay] for how
+ * moving through the weeks reports a day back through [onVisibleDateChanged].
  *
  * @param dateRange Widened to whole weeks, as [weekNumbering] starts them.
  * @param columnsState How many days the viewport holds. By default, it holds the whole week and a
  * pinch only zooms the hours: see [rememberDayColumnsState] to let a pinch widen the days as well.
+ * @param headerModifier Applied behind the header at the top of each day, which the grid scrolls under.
+ * @param timelineModifier Applied to the grid scrolling under the headers.
  */
 @Composable
 fun WeekPager(
     dateRange: ClosedRange<LocalDate>,
+    selectedDate: () -> LocalDate,
     weekNumbering: WeekNumbering,
     eventsOf: (LocalDate) -> DayEvents,
+    onVisibleDateChanged: (LocalDate) -> Unit,
     onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
+    headerModifier: Modifier = Modifier,
+    timelineModifier: Modifier = Modifier,
     state: DayTimelineState = rememberDayTimelineState(),
     columnsState: DayColumnsState = rememberDayColumnsState(
         maxVisibleDayCount = DAYS_PER_WEEK,
@@ -76,10 +87,20 @@ fun WeekPager(
         dateRange.start.startOfWeek(firstDayOfWeek)..dateRange.endInclusive.startOfWeek(firstDayOfWeek)
             .plus(DAYS_PER_WEEK - 1, DateTimeUnit.DAY)
     }
+    val dayCount = weeksRange.dayCount
+    fun selectedDay() = weeksRange.indexOf(selectedDate()).coerceIn(0, dayCount - 1)
 
-    // TODO: Follow the jumps of the visible day and report the week in view, the way DayPager does.
     val stripState = rememberLazyListState(
-        initialFirstVisibleItemIndex = weeksRange.start.daysUntil(Clock.today().startOfWeek(firstDayOfWeek)).coerceAtLeast(0),
+        initialFirstVisibleItemIndex = pagePositionOf(selectedDay(), columnsState.visibleDayCount, DAYS_PER_WEEK).toInt(),
+    )
+
+    FollowSelectedDay(
+        stripState = stripState,
+        columnsState = columnsState,
+        daysPerPage = DAYS_PER_WEEK,
+        dayCount = dayCount,
+        selectedDay = ::selectedDay,
+        onVisibleDayChanged = { onVisibleDateChanged(weeksRange.dateAt(it)) },
     )
 
     MultiDayTimeline(
@@ -91,6 +112,8 @@ fun WeekPager(
         state = state,
         onEventClick = onEventClick,
         modifier = modifier,
+        headerModifier = headerModifier,
+        timelineModifier = timelineModifier,
         contentPadding = contentPadding,
     )
 }
@@ -104,8 +127,10 @@ private fun Preview() {
         Surface {
             WeekPager(
                 dateRange = today.minus(DatePeriod(days = 14))..today.plus(DatePeriod(days = 14)),
+                selectedDate = { today },
                 weekNumbering = WeekNumbering.ISO_8601,
                 eventsOf = { previewDayEvents },
+                onVisibleDateChanged = {},
                 onEventClick = {},
                 columnsState = rememberDayColumnsState(maxVisibleDayCount = DAYS_PER_WEEK),
             )
