@@ -63,11 +63,7 @@ private val SettleSpec = spring<Float>(dampingRatio = Spring.DampingRatioNoBounc
  * redraws the calendar without ever recomposing it.
  */
 @Stable
-class CalendarExpansionState(
-    private val _isExpanded: MutableState<Boolean>,
-    private val coroutineScope: CoroutineScope,
-    val showCollapsed: Boolean
-) {
+class CalendarExpansionState(private val _isExpanded: MutableState<Boolean>, private val coroutineScope: CoroutineScope) {
 
     private val _progress = mutableFloatStateOf(if (_isExpanded.value) EXPANDED else COLLAPSED)
 
@@ -154,9 +150,9 @@ fun Modifier.collapseCalendarOnScroll(expansionState: CalendarExpansionState): M
 }
 
 @Composable
-fun rememberCalendarExpansionState(initiallyExpanded: Boolean = false, showCollapsedState: Boolean = true): CalendarExpansionState {
+fun rememberCalendarExpansionState(initiallyExpanded: Boolean = false): CalendarExpansionState {
     val isExpanded = rememberSaveable { mutableStateOf(initiallyExpanded) }
     val coroutineScope = rememberCoroutineScope()
 
-    return remember(showCollapsedState) { CalendarExpansionState(isExpanded, coroutineScope, showCollapsedState) }
+    return remember { CalendarExpansionState(isExpanded, coroutineScope) }
 }
