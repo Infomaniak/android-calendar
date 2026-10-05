@@ -198,9 +198,12 @@ private fun buildContainers(
     val containers = mutableListOf<FrameContainer>()
     for (index in 0 until edges.lastIndex) {
         val width = edges[index + 1] - edges[index]
-        // Like Arrangement.spacedBy: a gap before a card already placed, none before the edge of the layout.
+        // Add horizontal spacing after every container except the last one that ends exactly on the column end edge (= layoutWidth)
         val trailingPadding = if (edges[index + 1] < layoutWidth) config.horizontalSpacing else 0f
-        // Measured like the shares, as cards each followed by a gap, so the layout's edge is not penalised.
+        // Skip containers that are too narrow to hold a card. We need to check the actual available size for drawing without
+        // taking into account the needed optional trailing padding nor the required spacing between containers.
+        // The remaining drawing width must at least hold the minimum horizontal padding. This doesn't mean there will be enough
+        // space to display an event but this is checked later on.
         if (width - trailingPadding + config.horizontalSpacing <= config.horizontalPadding) continue
 
         val leadingPadding = if (containers.isEmpty() && index == 0) 0f else config.horizontalPadding
