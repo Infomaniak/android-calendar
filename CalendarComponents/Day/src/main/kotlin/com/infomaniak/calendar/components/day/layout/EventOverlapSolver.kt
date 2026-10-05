@@ -206,7 +206,7 @@ private fun buildContainers(
         // space to display an event but this is checked later on.
         if (width - trailingPadding + config.horizontalSpacing <= config.horizontalPadding) continue
 
-        val leadingPadding = if (containers.isEmpty() && index == 0) 0f else config.horizontalPadding
+        val leadingPadding = if (index == 0) 0f else config.horizontalPadding
         containers.add(FrameContainer(edges[index], width, leadingPadding, trailingPadding))
     }
 
