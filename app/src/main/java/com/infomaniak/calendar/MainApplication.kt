@@ -59,13 +59,13 @@ class MainApplication : Application(), MetroApplication {
         MatomoCalendar.addTrackingCallbackForDebugLog()
         initCrossAppLogin()
 
-        loadCalDavCredential()
+        initStoredAccounts()
         appGraph.cachedCalendarManager // Start loading calendars now so they're ready before any screen needs them
     }
 
-    private fun loadCalDavCredential() {
+    private fun initStoredAccounts() {
         applicationScope.launch {
-            appGraph.davCredentialsManager.initStoredCredentials()
+            appGraph.accountUtils.initStoredAccounts()
         }
     }
 
