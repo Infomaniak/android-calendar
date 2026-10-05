@@ -244,18 +244,14 @@ private fun distributeAmongContainers(
     return eventIndicesByContainer
 }
 
-private fun EventFrame.toPlacement(drawOrder: Float): EventPlacement {
-    val height = height.coerceAtLeast(0f)
-
-    return EventPlacement(
-        x = x,
-        y = y,
-        width = width.coerceAtLeast(0f),
-        height = height,
-        visibleHeight = height,
-        drawOrder = drawOrder,
-    )
-}
+private fun EventFrame.toPlacement(drawOrder: Float): EventPlacement = EventPlacement(
+    x = x,
+    y = y,
+    width = width,
+    height = height,
+    visibleHeight = height,
+    drawOrder = drawOrder,
+)
 
 private fun Float.roundedToHundredths(): Float = round(this * 100f) / 100f
 
