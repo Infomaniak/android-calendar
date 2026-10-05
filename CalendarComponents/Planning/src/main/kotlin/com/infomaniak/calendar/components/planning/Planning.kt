@@ -139,7 +139,7 @@ private fun Event(
         horizontalArrangement = Arrangement.spacedBy(Margin.Small),
     ) {
         DayIndicator(
-            dayName = date.formatShortDayName(),
+            dayName = date.formatShortDayName().uppercase(),
             dayNumber = date.day,
             state = if (date == today) DateState.Today else DateState.None,
             modifier = Modifier
