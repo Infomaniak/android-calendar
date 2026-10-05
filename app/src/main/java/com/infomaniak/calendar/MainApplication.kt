@@ -83,9 +83,6 @@ class MainApplication : Application(), MetroApplication {
                 debugInterception = debugInterception,
             ),
         )
-
-        // Off the main thread and after the fact: this only reports, it never gates the configuration.
-        applicationScope.launch { CaldavDebugConfig.warnIfProxyUnreachable(debugInterception) }
     }
 
     /**
