@@ -18,8 +18,9 @@
 package com.infomaniak.calendar.components.day.component
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -28,8 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
@@ -46,7 +45,7 @@ import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortTimeLabel
 import kotlinx.datetime.LocalTime
 
-private val HourLineWidth = DividerHeight
+private val GridLineThickness = DividerHeight
 private const val FIRST_LABELLED_HOUR = 0
 
 private val HourLabelStyle: TextStyle
@@ -61,51 +60,37 @@ private val HourLabelStyle: TextStyle
 internal val HourLabelOverhang: Dp
     @Composable get() = with(LocalDensity.current) { HourLabelStyle.lineHeight.toDp() / 2 }
 
+/** A line at every hour, across the whole width it is given. */
 @Composable
-internal fun HourGrid(state: DayTimelineState, modifier: Modifier = Modifier) {
-    val hourLineColor = MaterialTheme.colorScheme.outlineVariant
-    val hourLineEndPadding = DayTimelineDefaults.TimelineEndPadding
+internal fun HourLines(state: DayTimelineState, modifier: Modifier = Modifier) {
+    val color = MaterialTheme.colorScheme.outlineVariant
 
     Box(
         modifier = modifier
             .timelineHeight(state)
-            .drawBehind { drawHourLines(state, hourLineColor, hourLineEndPadding) },
-    ) {
-        HourLabels(
-            state = state,
-            modifier = Modifier
-                .width(DayTimelineDefaults.HourGutterWidth)
-                .fillMaxHeight(),
-        )
-    }
+            .drawBehind {
+                for (hour in FIRST_LABELLED_HOUR until HOURS_PER_DAY) {
+                    val y = state.verticalOffsetOf(hour * MINUTES_PER_HOUR).toPx()
+
+                    drawLine(
+                        color = color,
+                        start = Offset(0f, y),
+                        end = Offset(size.width, y),
+                        strokeWidth = GridLineThickness.toPx(),
+                    )
+                }
+            },
+    )
 }
 
-private fun Modifier.timelineHeight(state: DayTimelineState): Modifier = layout { measurable, constraints ->
-    val height = state.timelineHeight.roundToPx()
-    val placeable = measurable.measure(constraints.copy(minHeight = height, maxHeight = height))
-
-    layout(placeable.width, placeable.height) { placeable.place(x = 0, y = 0) }
-}
-
-private fun DrawScope.drawHourLines(state: DayTimelineState, color: Color, endPadding: Dp) {
-    val lineStartX = DayTimelineDefaults.HourGutterWidth.toPx()
-
-    for (hour in FIRST_LABELLED_HOUR until HOURS_PER_DAY) {
-        val y = state.verticalOffsetOf(hour * MINUTES_PER_HOUR).toPx()
-
-        drawLine(
-            color = color,
-            start = Offset(lineStartX, y),
-            end = Offset(size.width - endPadding.toPx(), y),
-            strokeWidth = HourLineWidth.toPx(),
-        )
-    }
-}
-
+/**
+ * The hour labels alone, each centred on the line it names, across the width it is given: usually
+ * [DayTimelineDefaults.HourGutterWidth]. Pair it with [HourLines] sharing the same [state].
+ */
 @Composable
-private fun HourLabels(state: DayTimelineState, modifier: Modifier = Modifier) {
+internal fun HourLabels(state: DayTimelineState, modifier: Modifier = Modifier) {
     Layout(
-        modifier = modifier,
+        modifier = modifier.timelineHeight(state),
         content = { for (hour in FIRST_LABELLED_HOUR until HOURS_PER_DAY) HourLabel(hour) },
     ) { measurables, constraints ->
         val labels = measurables.map { it.measure(Constraints(maxWidth = constraints.maxWidth)) }
@@ -121,6 +106,14 @@ private fun HourLabels(state: DayTimelineState, modifier: Modifier = Modifier) {
     }
 }
 
+/** Makes the composable as tall as the whole day at the zoom level of [state]. */
+private fun Modifier.timelineHeight(state: DayTimelineState): Modifier = layout { measurable, constraints ->
+    val height = state.timelineHeight.roundToPx()
+    val placeable = measurable.measure(constraints.copy(minHeight = height, maxHeight = height))
+
+    layout(placeable.width, placeable.height) { placeable.place(x = 0, y = 0) }
+}
+
 @Composable
 private fun HourLabel(hour: Int, modifier: Modifier = Modifier) {
     Text(
@@ -134,8 +127,18 @@ private fun HourLabel(hour: Int, modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-private fun HourGridPreview() {
+private fun TimelineGridPreview() {
     Surface {
-        HourGrid(state = rememberDayTimelineState({}), modifier = Modifier.fillMaxWidth())
+        val state = rememberDayTimelineState({})
+
+        Box {
+            HourLabels(state = state, modifier = Modifier.width(DayTimelineDefaults.HourGutterWidth))
+            HourLines(
+                state = state,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = DayTimelineDefaults.HourGutterWidth, end = DayTimelineDefaults.TimelineEndPadding),
+            )
+        }
     }
 }

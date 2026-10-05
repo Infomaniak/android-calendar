@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
@@ -40,9 +41,9 @@ import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
+import kotlin.time.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
-import kotlin.time.Clock
 
 private val LocalDateTime.minuteOfDay: Int get() = hour * MINUTES_PER_HOUR + minute
 
@@ -70,7 +71,13 @@ internal fun DayTimeline(
             // counting where the first hour line is drawn, not where the padding begins.
             .pinchToZoom(state),
     ) {
-        HourGrid(state = state, modifier = Modifier.fillMaxWidth())
+        HourLabels(state = state, modifier = Modifier.width(DayTimelineDefaults.HourGutterWidth))
+        HourLines(
+            state = state,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = DayTimelineDefaults.HourGutterWidth, end = DayTimelineDefaults.TimelineEndPadding),
+        )
 
         TimedEventsColumn(
             events = events.timed,

@@ -20,6 +20,8 @@ package com.infomaniak.calendar.components.day.component
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -75,7 +77,13 @@ private fun CurrentTimeIndicatorWithBackgroundPreview() {
         val state = rememberDayTimelineState({})
 
         Box(modifier = Modifier.fillMaxWidth()) {
-            HourGrid(state = state, modifier = Modifier.fillMaxWidth())
+            HourLabels(state = state, modifier = Modifier.width(DayTimelineDefaults.HourGutterWidth))
+            HourLines(
+                state = state,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = DayTimelineDefaults.HourGutterWidth, end = DayTimelineDefaults.TimelineEndPadding),
+            )
             CurrentTimeIndicator(minuteOfDay = 90, state = state, modifier = Modifier.matchParentSize())
         }
     }
