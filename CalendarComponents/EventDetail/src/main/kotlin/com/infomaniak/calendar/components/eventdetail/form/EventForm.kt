@@ -29,11 +29,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
+import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitch
+import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
-import com.infomaniak.core.ui.compose.basics.onlyHorizontal
+import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.previewAttendees
 
 /**
  * Reusable component for both the creation and the edition of an event.
@@ -42,25 +46,33 @@ import com.infomaniak.core.ui.compose.basics.onlyHorizontal
  */
 @Composable
 fun EventForm(
-    eventColor: Color, // TODO: Adapt this when structuring edit/creation and its states correctly
-    title: String, // TODO: Adapt this when structuring edit/creation and its states correctly
+    state: EventFormState,
+    onAttendeesClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
-    val horizontalContentPadding = contentPadding.onlyHorizontal()
-
-    Column(
-        modifier.padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding()),
-    ) {
+    Column(modifier.padding(contentPadding)) {
         TitleEditable(
-            dotColor = eventColor,
-            title = title,
-            modifier = Modifier
-                .padding(horizontalContentPadding)
-                .eventSharedElement(EventSharedElement.Title),
+            dotColor = state.colorState.value ?: Color.Transparent, // Temporarily hide the dot until we get the actual color
+            textFieldState = state.titleTextState,
+            modifier = Modifier.eventSharedElement(EventSharedElement.Title),
         )
+
+        Section {
+            AttendeesButton(
+                attendees = state.attendeesState.value,
+                onClick = onAttendeesClick,
+                modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
+            )
+
+            KMeetButtonSwitch(
+                checked = { state.isKMeetUrlEnabled.value },
+                onToggle = { isChecked -> state.isKMeetUrlEnabled.value = isChecked },
+                modifier = Modifier.eventSharedElement(EventSharedElement.KMeet),
+            )
+        }
     }
 }
 
@@ -70,8 +82,13 @@ private fun Preview() {
     MaterialTheme {
         Surface {
             EventForm(
-                eventColor = MaterialTheme.colorScheme.primary,
-                title = "Event title",
+                state = rememberSaveableEventFormState(
+                    calendars = listOf(previewEventDetailCalendar),
+                    initialCalendar = previewEventDetailCalendar,
+                    initialText = "Event title",
+                    initialAttendees = previewAttendees,
+                ),
+                onAttendeesClick = {},
                 contentPadding = PaddingValues(16.dp),
             )
         }

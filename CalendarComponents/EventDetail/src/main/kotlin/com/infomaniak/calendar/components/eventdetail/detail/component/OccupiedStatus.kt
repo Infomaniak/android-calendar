@@ -18,7 +18,6 @@
 package com.infomaniak.calendar.components.eventdetail.detail.component
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -28,13 +27,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.eventdetail.component.ItemIcon
 import com.infomaniak.calendar.components.resources.R
 
 @Composable
 internal fun OccupiedStatus(isOccupied: Boolean, modifier: Modifier = Modifier) {
     ListItem(
         content = { Text(text = stringResource(if (isOccupied) R.string.occupiedLabel else R.string.availableLabel)) },
-        leadingContent = { Icon(painter = painterResource(R.drawable.ic_briefcase), contentDescription = null) },
+        leadingContent = { ItemIcon(painterResource(R.drawable.ic_briefcase)) },
         modifier = modifier,
     )
 }

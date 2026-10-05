@@ -38,11 +38,11 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.EventItem
 import com.infomaniak.calendar.components.event.EventItemDefaults
-import com.infomaniak.calendar.components.foundation.component.DateState
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.YearWeek
+import com.infomaniak.calendar.components.foundation.state.DateState
 import com.infomaniak.calendar.components.foundation.state.rememberToday
-import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortDayName
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortDayNameUppercase
 import com.infomaniak.calendar.components.planning.component.DayIndicator
 import com.infomaniak.calendar.components.planning.component.emptyState.OtherDayEmptyState
 import com.infomaniak.calendar.components.planning.component.emptyState.TodayEmptyState
@@ -139,7 +139,7 @@ private fun Event(
         horizontalArrangement = Arrangement.spacedBy(Margin.Small),
     ) {
         DayIndicator(
-            dayName = date.formatShortDayName(),
+            dayName = date.formatShortDayNameUppercase(),
             dayNumber = date.day,
             state = if (date == today) DateState.Today else DateState.None,
             modifier = Modifier

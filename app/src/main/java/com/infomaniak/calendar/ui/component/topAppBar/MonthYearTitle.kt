@@ -31,15 +31,20 @@ import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
 
 @Composable
-fun CurrentMonthTitle(isExpanded: () -> Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun CurrentMonthTitle(expansionProgress: () -> Float, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val visibleDateState = LocalVisibleDayState.current ?: return
-    MonthYearTitle(date = { visibleDateState.visibleDate }, isExpanded = isExpanded, onClick = onClick, modifier = modifier)
+    MonthYearTitle(
+        date = { visibleDateState.visibleDate },
+        expansionProgress = expansionProgress,
+        onClick = onClick,
+        modifier = modifier,
+    )
 }
 
 @Composable
 private fun MonthYearTitle(
     date: () -> LocalDate,
-    isExpanded: () -> Boolean,
+    expansionProgress: () -> Float,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -48,7 +53,7 @@ private fun MonthYearTitle(
         colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
         onClick = onClick,
     ) {
-        ProvideTextStyle(MaterialTheme.typography.titleLarge) { AnimatedMonthYearText(date = date, isExpanded = isExpanded) }
+        ProvideTextStyle(MaterialTheme.typography.titleLarge) { AnimatedMonthYearText(date = date, expansionProgress = expansionProgress) }
     }
 }
 
@@ -56,7 +61,7 @@ private fun MonthYearTitle(
 @Composable
 private fun MonthYearTitlePreview() {
     CalendarThemeForPreview {
-        MonthYearTitle(date = { Clock.today() }, onClick = {}, isExpanded = { false })
+        MonthYearTitle(date = { Clock.today() }, onClick = {}, expansionProgress = { 0f })
     }
 }
 
@@ -64,6 +69,6 @@ private fun MonthYearTitlePreview() {
 @Composable
 private fun MonthYearTitleFrenchPreview() {
     CalendarThemeForPreview {
-        MonthYearTitle(date = { LocalDate(2025, 12, 25) }, onClick = {}, isExpanded = { false })
+        MonthYearTitle(date = { LocalDate(2025, 12, 25) }, onClick = {}, expansionProgress = { 0f })
     }
 }

@@ -17,41 +17,7 @@
  */
 package com.infomaniak.calendar.ui.state
 
-import android.annotation.SuppressLint
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.staticCompositionLocalOf
-import com.infomaniak.core.common.utils.today
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.datetime.LocalDate
-import kotlin.time.Clock
+import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 
 val LocalVisibleDayState = staticCompositionLocalOf<VisibleDayState?> { null }
-
-@Composable
-@SuppressLint("ComposeMutableParameters")
-fun rememberVisibleDayState(visibleDate: MutableState<LocalDate> = rememberSaveable { mutableStateOfToday() }): VisibleDayState {
-    return remember { VisibleDayState(_visibleDate = visibleDate) }
-}
-
-private fun mutableStateOfToday(): MutableState<LocalDate> = mutableStateOf(Clock.today())
-
-@Stable
-class VisibleDayState(private val _visibleDate: MutableState<LocalDate>) {
-    val visibleDate by _visibleDate
-
-    private val _scrollCommand = Channel<LocalDate>(Channel.CONFLATED)
-    val scrollCommand: ReceiveChannel<LocalDate> = _scrollCommand
-
-    fun onVisibleDateChanged(date: LocalDate) {
-        _visibleDate.value = date
-    }
-
-    fun jumpTo(date: LocalDate) = _scrollCommand.trySend(date)
-}

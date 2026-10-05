@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.filetypes.FileType
-import kotlin.time.Instant
 
 @Immutable
 data class EventDetailUi(
@@ -55,8 +54,7 @@ data class EventDetailUi(
     }
 
     @Immutable
-    data class Notification(val id: String, val type: Type, val executionTime: Instant) {
-
+    data class Notification(val type: Type, val time: NotificationTime) {
         @Immutable
         enum class Type(@DrawableRes val icon: Int, @StringRes val label: Int) {
             Email(R.drawable.ic_bell, R.string.notificationTypeEmail),

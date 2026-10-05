@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.eventdetail.component.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.resources.R
 import java.util.Locale

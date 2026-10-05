@@ -39,8 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.R
+import com.infomaniak.calendar.components.foundation.theme.Dimens
 import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.modifier.sharedElement
 import com.infomaniak.calendar.ui.navigation.NavDestination
@@ -95,8 +95,8 @@ private fun CalendarHorizontalFloatingToolbar(
             HorizontalFloatingToolbar(
                 expanded = isExpanded(),
                 shape = MaterialTheme.shapes.large,
-                expandedShadowElevation = 3.dp,
-                collapsedShadowElevation = 3.dp,
+                expandedShadowElevation = Dimens.FloatingToolbarElevation,
+                collapsedShadowElevation = Dimens.FloatingToolbarElevation,
                 floatingActionButton = { floatingActionButton.invoke() },
                 content = {
                     ContentFloatingToolbar(onCurrentDayClicked, onNavigationButtonClicked, currentDestination)
@@ -106,8 +106,8 @@ private fun CalendarHorizontalFloatingToolbar(
             HorizontalFloatingToolbar(
                 expanded = isExpanded(),
                 shape = MaterialTheme.shapes.large,
-                expandedShadowElevation = 3.dp,
-                collapsedShadowElevation = 3.dp,
+                expandedShadowElevation = Dimens.FloatingToolbarElevation,
+                collapsedShadowElevation = Dimens.FloatingToolbarElevation,
                 content = {
                     ContentFloatingToolbar(onCurrentDayClicked, onNavigationButtonClicked, currentDestination)
                 },

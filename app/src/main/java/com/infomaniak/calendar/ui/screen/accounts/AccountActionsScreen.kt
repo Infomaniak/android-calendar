@@ -43,7 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.component.drawer.DrawerPreviewProvider
-import com.infomaniak.calendar.ui.component.drawer.DrawerViewModel
+import com.infomaniak.calendar.ui.component.drawer.MenuDrawerViewModel
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -57,9 +57,9 @@ fun AccountActionsScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     accountsViewModel: AccountsViewModel = viewModel(),
-    drawerViewModel: DrawerViewModel = viewModel(),
+    menuDrawerViewModel: MenuDrawerViewModel = viewModel(),
 ) {
-    val calendarsUsers by drawerViewModel.calendarsUsers.collectAsStateWithLifecycle()
+    val calendarsUsers by menuDrawerViewModel.calendarsUsers.collectAsStateWithLifecycle()
     val user = calendarsUsers.firstOrNull { it.user.id == userId }?.user ?: return
 
     LaunchedEffect(accountsViewModel) {

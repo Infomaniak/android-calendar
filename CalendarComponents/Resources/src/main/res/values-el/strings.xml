@@ -18,13 +18,26 @@
 <resources>
     <string name="addEventLabel">Προσθήκη</string>
     <string name="allDayLabel">Όλη την ημέρα</string>
+    <string name="attendees">Συμμετέχοντες</string>
     <plurals name="attendeesAcceptedCount">
-        <item quantity="one">%1$d αποδεκτός</item>
-        <item quantity="other">%1$d αποδεκτοί</item>
+        <item quantity="one">%d αποδεκτός</item>
+        <item quantity="other">%d αποδεκτοί</item>
     </plurals>
     <plurals name="attendeesCount">
-        <item quantity="one">%1$d καλεσμένος</item>
-        <item quantity="other">%1$d καλεσμένοι</item>
+        <item quantity="one">%d καλεσμένος</item>
+        <item quantity="other">%d καλεσμένοι</item>
+    </plurals>
+    <plurals name="attendeesDeclinedCount">
+        <item quantity="one">%d απορρίφθηκε</item>
+        <item quantity="other">%d απορριφθέντα</item>
+    </plurals>
+    <plurals name="attendeesPendingCount">
+        <item quantity="one">%d σε αναμονή</item>
+        <item quantity="other">%d σε αναμονή</item>
+    </plurals>
+    <plurals name="attendeesTentativeCount">
+        <item quantity="one">%1$d ίσως</item>
+        <item quantity="other">%1$d ίσως</item>
     </plurals>
     <string name="attendeesEmptyState">Δεν βρέθηκαν συμμετέχοντες</string>
     <string name="availableLabel">Διαθέσιμο</string>
@@ -40,8 +53,25 @@
     <string name="contentDescriptionHasLocation">Έχει τοποθεσία</string>
     <string name="contentDescriptionSearch">Αναζήτηση</string>
     <string name="contentDescriptionToday">Σήμερα</string>
+    <plurals name="dayAmount">
+        <item quantity="one">%d ημέρα</item>
+        <item quantity="other">%d ημέρες</item>
+    </plurals>
     <string name="descriptionTitle">Περιγραφή</string>
     <string name="eventTitle">Τίτλος εκδήλωσης</string>
+    <plurals name="hourAmount">
+        <item quantity="one">%d ώρα</item>
+        <item quantity="other">%d ώρες</item>
+    </plurals>
+    <string name="kMeetMeeting">Συνάντηση kMeet</string>
+    <plurals name="minuteAmount">
+        <item quantity="one">%d λεπτό</item>
+        <item quantity="other">%d λεπτά</item>
+    </plurals>
+    <string name="noAttendeesLabel">Κανένας</string>
+    <string name="notificationTimeAfter">%1$s μετά</string>
+    <string name="notificationTimeAtStart">Κατά την ώρα του γεγονότος</string>
+    <string name="notificationTimeBefore">%1$s πριν</string>
     <string name="notificationTypeEmail">Email</string>
     <string name="notificationTypePush">Ειδοποίηση</string>
     <string name="occupiedLabel">Κατειλημμένο</string>
@@ -56,6 +86,10 @@
     </plurals>
     <string name="searchForAttendees">Αναζήτηση επισκεπτών</string>
     <string name="sectionCalendarHeader">Ημερολόγιο</string>
+    <plurals name="weekAmount">
+        <item quantity="one">%d εβδομάδα</item>
+        <item quantity="other">%d εβδομάδες</item>
+    </plurals>
     <string name="sectionOrganizerHeader">Διοργανωτής</string>
     <string name="statusAcceptedLabel">Εγκρίθηκε</string>
     <string name="statusDeclinedLabel">Απορρίφθηκε</string>

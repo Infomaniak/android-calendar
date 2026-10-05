@@ -15,8 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.detail.component
+package com.infomaniak.calendar.components.eventdetail.component
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
@@ -25,9 +26,11 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
@@ -51,18 +54,13 @@ internal fun KMeetButton(
     modifier: Modifier = Modifier,
 ) {
     ListItem(
-        content = {
-            Text(stringResource(id = R.string.participateKMeetTitle), style = MaterialTheme.typography.bodyLarge)
-        },
-        leadingContent = {
-            Icon(
-                painter = painterResource(R.drawable.ic_product_kmeet),
-                contentDescription = null,
-                modifier = Modifier.size(EsdsTheme.icon.sizeSm),
-            )
-        },
+        content = { Text(stringResource(id = R.string.participateKMeetTitle)) },
+        leadingContent = { KMeetIcon() },
         trailingContent = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xl),
+            ) {
                 Button(onClick = onJoin) {
                     Text(stringResource(R.string.buttonJoin))
                 }
@@ -72,6 +70,38 @@ internal fun KMeetButton(
         },
         modifier = modifier,
     )
+}
+
+@Composable
+internal fun KMeetButtonSwitch(
+    checked: () -> Boolean,
+    onToggle: (isChecked: Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val defaultColors = ListItemDefaults.colors()
+
+    ListItem(
+        checked = checked(),
+        onCheckedChange = onToggle,
+        content = { Text(stringResource(id = R.string.kMeetMeeting)) },
+        leadingContent = { KMeetIcon() },
+        trailingContent = { Switch(checked = checked(), onCheckedChange = onToggle) },
+        modifier = modifier,
+        colors = ListItemDefaults.colors(
+            selectedContainerColor = defaultColors.containerColor,
+            selectedContentColor = defaultColors.contentColor,
+            selectedLeadingContentColor = defaultColors.leadingContentColor,
+            selectedTrailingContentColor = defaultColors.trailingContentColor,
+            selectedSupportingContentColor = defaultColors.supportingContentColor,
+            selectedOverlineContentColor = defaultColors.overlineContentColor,
+        ),
+        shapes = ClickableItemDefaults.ClickableItemShapes,
+    )
+}
+
+@Composable
+private fun KMeetIcon() {
+    ItemIcon(painterResource(R.drawable.ic_product_kmeet))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -100,6 +130,16 @@ private fun PreviewKMeetButton() {
     MaterialTheme {
         Surface {
             KMeetButton(onJoin = {}, onCopy = {})
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewKMeetButtonSwitch() {
+    MaterialTheme {
+        Surface {
+            KMeetButtonSwitch(checked = { true }, onToggle = {})
         }
     }
 }

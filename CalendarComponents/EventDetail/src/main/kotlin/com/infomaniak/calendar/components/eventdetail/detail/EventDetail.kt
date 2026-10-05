@@ -25,42 +25,39 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
+import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
+import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
+import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
-import com.infomaniak.calendar.components.eventdetail.detail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Calendar
 import com.infomaniak.calendar.components.eventdetail.detail.component.ClassificationStatus
 import com.infomaniak.calendar.components.eventdetail.detail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
-import com.infomaniak.calendar.components.eventdetail.detail.component.KMeetButton
-import com.infomaniak.calendar.components.eventdetail.detail.component.LIST_ITEM_HORIZONTAL_PADDING
 import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
 import com.infomaniak.calendar.components.eventdetail.detail.component.OccupiedStatus
 import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.eventdetail.previewAttendees
 import com.infomaniak.calendar.components.foundation.models.Attendees
-import com.infomaniak.calendar.components.resources.R
-import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.TimeZone
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
 /**
@@ -79,110 +76,71 @@ fun EventDetail(
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
-    val horizontalContentPadding = contentPadding.onlyHorizontal()
-
-    Column(
-        modifier = modifier.padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding()),
-    ) {
+    Column(modifier = modifier.padding(contentPadding)) {
         with(eventDetail) {
-            Title(
-                dotColor = eventColor,
-                title = title,
-                modifier = Modifier
-                    .padding(horizontalContentPadding)
-                    .eventSharedElement(EventSharedElement.Title),
-            )
-            DateAndTime(start, end, isAllDay, Modifier.padding(horizontalContentPadding))
+            Title(dotColor = eventColor, title = title, modifier = Modifier.eventSharedElement(EventSharedElement.Title))
+            DateAndTime(start, end, isAllDay)
 
-            Section(contentPadding = horizontalContentPadding) {
+            Section {
                 if (attendees.all.isNotEmpty()) {
-                    AttendeesButton(attendees.all, onClick = goToEventAttendees, contentPadding = horizontalContentPadding)
+                    AttendeesButton(
+                        attendees = attendees.all,
+                        onClick = goToEventAttendees,
+                        modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
+                    )
                 }
 
                 if (kMeetUrl?.isNotBlank() == true) {
-                    KMeetButton(onJoin = onJoinKMeet, onCopy = onCopyKMeet, modifier = Modifier.padding(horizontalContentPadding))
+                    KMeetButton(
+                        onJoin = onJoinKMeet,
+                        onCopy = onCopyKMeet,
+                        modifier = Modifier.eventSharedElement(EventSharedElement.KMeet),
+                    )
                 }
 
                 if (location?.isNotBlank() == true) {
-                    LocationButton(location = location, onClick = onLocationClick, contentPadding = horizontalContentPadding)
+                    LocationButton(location = location, onClick = onLocationClick)
                 }
 
                 if (room != null) {
-                    RoomButton(room = room, onClick = onRoomClick, contentPadding = horizontalContentPadding)
+                    RoomButton(room = room, onClick = onRoomClick)
                 }
             }
 
-            Section(contentPadding = horizontalContentPadding) {
+            Section {
                 if (description?.isNotBlank() == true) {
-                    DescriptionCollapsibleButton(description = description, contentPadding = horizontalContentPadding)
+                    DescriptionCollapsibleButton(description = description)
                 }
 
-                AttachmentFiles(files, onFileClick = { /*TODO[eventDetail]*/ }, contentPadding = horizontalContentPadding)
+                AttachmentFiles(files, onFileClick = { /*TODO[eventDetail]*/ })
             }
 
-            Section(contentPadding = horizontalContentPadding) {
+            Section {
                 Notifications(
                     notifications,
                     onNotificationClick = { /*TODO[eventDetail]*/ },
-                    contentPadding = horizontalContentPadding,
                 )
             }
 
-            Section(contentPadding = horizontalContentPadding) {
-                OccupiedStatus(isOccupied, modifier = Modifier.padding(horizontalContentPadding))
+            Section {
+                OccupiedStatus(isOccupied)
 
                 if (classification != null) {
-                    ClassificationStatus(classification, modifier = Modifier.padding(horizontalContentPadding))
+                    ClassificationStatus(classification)
                 }
 
-                Calendar(calendarColor, calendarName, modifier = Modifier.padding(horizontalContentPadding))
+                Calendar(calendarColor, calendarName)
             }
 
-            Section(contentPadding = horizontalContentPadding) {
-                OccupiedStatus(isOccupied, modifier = Modifier.padding(horizontalContentPadding))
+            Section {
+                OccupiedStatus(isOccupied)
 
                 if (classification != null) {
-                    ClassificationStatus(classification, modifier = Modifier.padding(horizontalContentPadding))
+                    ClassificationStatus(classification)
                 }
             }
         }
     }
-}
-
-/**
- * Automatically shows or hides divider based on if any content is composed or not. This layout acts like a column.
- */
-@Composable
-private fun Section(
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(),
-    content: @Composable () -> Unit,
-) {
-    Layout(
-        contents = listOf({ Divider(modifier = Modifier.padding(contentPadding)) }, content),
-        modifier = modifier,
-    ) { (dividerMeasurables, contentMeasurables), constraints ->
-        if (contentMeasurables.isEmpty()) return@Layout layout(0, 0) {}
-
-        val childConstraints = constraints.copy(minHeight = 0)
-        val placeables = (dividerMeasurables + contentMeasurables).map { it.measure(childConstraints) }
-
-        val width = placeables.maxOf { it.width }.coerceIn(constraints.minWidth, constraints.maxWidth)
-        val height = placeables.sumOf { it.height }.coerceIn(constraints.minHeight, constraints.maxHeight)
-
-        layout(width, height) {
-            var y = 0
-            placeables.forEach { placeable ->
-                placeable.place(0, y)
-                y += placeable.height
-            }
-        }
-    }
-}
-
-@Composable
-private fun Divider(modifier: Modifier = Modifier) {
-    HorizontalDivider(modifier = modifier.padding(LIST_ITEM_HORIZONTAL_PADDING))
 }
 
 @Preview(heightDp = 1200)
@@ -196,7 +154,10 @@ private fun PreviewEventDetail() {
         start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
         end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
         isAllDay = false,
-        attendees = Attendees(all = previewAttendees, me = null),
+        attendees = Attendees(
+            all = previewAttendees,
+            me = previewAttendees.first(),
+        ),
         kMeetUrl = "test url",
         location = "Location",
         room = EventDetailUi.Room("Japan room", 5, 3),
@@ -208,8 +169,14 @@ private fun PreviewEventDetail() {
             EventDetailUi.File("3", "Next loto results.png"),
         ),
         notifications = listOf(
-            EventDetailUi.Notification("1", EventDetailUi.Notification.Type.Email, Instant.parse("2026-05-20T07:00:00Z")),
-            EventDetailUi.Notification("2", EventDetailUi.Notification.Type.Push, Instant.parse("2026-05-20T07:30:00Z")),
+            EventDetailUi.Notification(
+                EventDetailUi.Notification.Type.Email,
+                NotificationTime.Absolute(Instant.parse("2026-05-20T07:00:00Z")),
+            ),
+            EventDetailUi.Notification(
+                EventDetailUi.Notification.Type.Push,
+                NotificationTime.Offset(90.days + 30.minutes),
+            ),
         ),
         isOccupied = true,
         classification = EventDetailUi.Classification.Public,

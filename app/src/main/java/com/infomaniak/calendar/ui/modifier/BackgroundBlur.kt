@@ -25,26 +25,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
+import dev.chrisbanes.haze.HazeInput
 import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.blur.blurEffect
+import dev.chrisbanes.haze.blur.hazeBlur
 import dev.chrisbanes.haze.blur.materials.HazeMaterials
-import dev.chrisbanes.haze.hazeEffect
 
 @Composable
 fun Modifier.backgroundBlur(containerColor: Color, hazeState: HazeState?, shape: Shape = RectangleShape): Modifier {
     return if (hazeState == null) {
         background(containerColor, shape)
     } else {
-        val style = HazeMaterials.thick(containerColor)
+        val style = HazeMaterials.thick(containerColor).then { blurRadius(8.dp) }
         then(
             Modifier
                 .clip(shape)
-                .hazeEffect(hazeState) {
-                    blurEffect {
-                        blurRadius = 8.dp
-                        this.style = style
-                    }
-                },
+                .hazeBlur(input = HazeInput.Backdrop(hazeState), style = style),
         )
     }
 }

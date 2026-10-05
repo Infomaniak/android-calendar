@@ -20,6 +20,7 @@ package com.infomaniak.calendar.ui.component.drawer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.data.CalendarDataValues
+import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.ui.component.drawer.model.CalendarUi
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.utils.account.AccountUtils
@@ -43,14 +44,15 @@ import kotlinx.coroutines.launch
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
-class DrawerViewModel(
+class MenuDrawerViewModel(
     accountUtils: AccountUtils,
+    cachedCalendarManager: CachedCalendarManager,
     private val calendarManager: CalendarManager,
     private val calendarDataValues: CalendarDataValues,
 ) : ViewModel() {
     val calendarsUsers: StateFlow<List<UserCalendarsUi>> = combine(
         accountUtils.users,
-        calendarManager.observeCalendars(),
+        cachedCalendarManager.calendars,
     ) { users, calendars ->
         return@combine users.map { user ->
             val userCalendars = calendars.filter { it.accountId == user.accountId }.map { it.toCalendarUi() }

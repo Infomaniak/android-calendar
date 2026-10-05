@@ -21,8 +21,8 @@ import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.ui.model.OccurrenceEventUi
 import com.infomaniak.calendar.ui.screen.planning.toEventColorsUi
-import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
+import com.infomaniak.multiplatform_core.account.domain.model.AccountId
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventStatus as KmpEventStatus

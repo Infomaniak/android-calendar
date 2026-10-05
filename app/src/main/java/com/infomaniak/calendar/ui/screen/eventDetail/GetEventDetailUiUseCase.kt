@@ -17,8 +17,14 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
+import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.calendar.utils.mapState
+import com.infomaniak.calendar.utils.toEventDetailCalendar
 import com.infomaniak.calendar.utils.toEventDetailUi
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
@@ -53,6 +59,7 @@ import kotlin.time.Duration.Companion.seconds
 class GetEventDetailUiUseCase @Inject constructor(
     accountUtils: AccountUtils,
     private val calendarManager: CalendarManager,
+    private val cachedCalendarManager: CachedCalendarManager,
 ) {
     private val useCaseScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
@@ -65,17 +72,20 @@ class GetEventDetailUiUseCase @Inject constructor(
         .flatMapLatest { occurrenceId -> calendarManager.observeOccurrence(occurrenceId) }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val eventDetailUi: StateFlow<EventDetailUiState> = eventFlow
+    private val eventAndCalendarFlow: StateFlow<Pair<Event, Calendar>?> = eventFlow
         .flatMapLatest { event ->
             if (event == null) {
                 flowOf(null)
             } else {
-                calendarManager
-                    .observeCalendars()
+                cachedCalendarManager
+                    .calendars
                     .map { it.find { calendar -> calendar.id == event.calendarId } }
                     .map { calendar -> calendar?.let { event to it } }
             }
         }
+        .stateIn(useCaseScope, SharingStarted.WhileSubscribed(5.seconds), null)
+
+    val eventDetailUi: StateFlow<EventDetailUiState> = eventAndCalendarFlow
         .combine(accountUtils.emailsByUserId) { eventAndCalendar, emailsByUserId ->
             val (event, calendar) = eventAndCalendar ?: return@combine EventDetailUiState.Unavailable
 
@@ -84,6 +94,10 @@ class GetEventDetailUiUseCase @Inject constructor(
                 .let(EventDetailUiState::Success)
         }
         .stateIn(useCaseScope, SharingStarted.WhileSubscribed(5.seconds), EventDetailUiState.Loading)
+
+    val eventCalendar: StateFlow<EventDetailCalendar?> = eventAndCalendarFlow.mapState(useCaseScope, SharingStarted.Eagerly) {
+        it?.second?.toEventDetailCalendar()
+    }
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) {
         occurrenceIdFlow.value = occurrenceId

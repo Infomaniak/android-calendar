@@ -18,14 +18,12 @@
 package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
 import androidx.compose.runtime.Composable
-import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toJavaDayOfWeek
 import kotlinx.datetime.toJavaLocalDate
 import java.time.format.TextStyle
 import java.util.Locale
-import kotlin.time.Clock
 
 private const val FULL_DATE_SKELETON = "EEEEdMMMM"
 private const val FULL_DATE_WITH_YEAR_SKELETON = "yEEEEdMMMM"
@@ -40,7 +38,13 @@ fun DayOfWeek.formatNarrowDayName(): String = toJavaDayOfWeek().getDisplayName(T
 
 /** `Wed` */
 @Composable
-fun LocalDate.formatShortDayName(): String = toJavaLocalDate().format(fixedFormatter(SHORT_DAY_NAME_PATTERN, currentLocale()))
+fun LocalDate.formatShortDayName(locale: Locale = currentLocale()): String {
+    return toJavaLocalDate().format(fixedFormatter(SHORT_DAY_NAME_PATTERN, locale))
+}
+
+/** `WED` */
+@Composable
+fun LocalDate.formatShortDayNameUppercase(): String = currentLocale().let { formatShortDayName(it).uppercase(it) }
 
 /** `Wednesday - 20 May`, keeping the day view header's own layout in every language. */
 @Composable
@@ -60,7 +64,7 @@ internal fun LocalDate.formatFullDate(locale: Locale, currentYear: Int): String 
     return format(if (year == currentYear) FULL_DATE_SKELETON else FULL_DATE_WITH_YEAR_SKELETON, locale)
 }
 
-private fun LocalDate.format(skeleton: String, locale: Locale): String {
+internal fun LocalDate.format(skeleton: String, locale: Locale): String {
     return toJavaLocalDate().format(localizedFormatter(skeleton, locale)).titlecaseFirstChar(locale)
 }
 //endregion

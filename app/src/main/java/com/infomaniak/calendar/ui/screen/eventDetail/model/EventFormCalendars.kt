@@ -15,9 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui
+package com.infomaniak.calendar.ui.screen.eventDetail.model
 
-import androidx.compose.runtime.compositionLocalOf
-import com.infomaniak.core.auth.models.user.User
+import com.infomaniak.calendar.components.eventdetail.form.rememberSaveableEventFormState
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 
-val LocalUser = compositionLocalOf<User?> { null }
+/** The calendars an event form can be filled with, in the shape expected by [rememberSaveableEventFormState]. */
+data class EventFormCalendars(val calendars: List<EventDetailCalendar>, val initialCalendar: EventDetailCalendar)

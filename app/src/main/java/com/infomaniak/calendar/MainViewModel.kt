@@ -17,22 +17,18 @@
  */
 package com.infomaniak.calendar
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
-import androidx.lifecycle.viewmodel.compose.saveable
 import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.SyncEventsManager
+import com.infomaniak.calendar.manager.VisibleDateManager
 import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.utils.UserLoadState
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.auth.models.user.User
-import com.infomaniak.core.common.utils.today
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -48,8 +44,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
-import kotlin.time.Clock
 
 @AssistedInject
 class MainViewModel(
@@ -57,22 +51,21 @@ class MainViewModel(
     private val accountUtils: AccountUtils,
     private val syncEventsManager: SyncEventsManager,
     private val calendarDataValues: CalendarDataValues,
+    visibleDateManager: VisibleDateManager,
 ) : ViewModel() {
     val loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError> = syncEventsManager.loadingError
 
     val lastCalendarView: StateFlow<NavDestination.CalendarView?> = calendarDataValues.lastCalendarView.flow
         .stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
 
-    val userLoadState: StateFlow<UserLoadState> = accountUtils.currentUserFlow
-        .map(UserLoadState::Loaded)
+    val usersLoadState: StateFlow<UserLoadState> = accountUtils.users
+        .map { users -> if (users.isEmpty()) UserLoadState.Loaded.Disconnected else UserLoadState.Loaded.Connected }
         .stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = UserLoadState.Awaiting)
 
-    @OptIn(SavedStateHandleSaveableApi::class)
-    val visibleDay: MutableState<LocalDate> = savedStateHandle.saveable("visibleDay") {
-        mutableStateOf(Clock.today())
-    }
+    val visibleDate = visibleDateManager.visibleDate
 
     init {
+        visibleDateManager.bindTo(savedStateHandle)
         syncEventsForConnectedUsers()
     }
 
@@ -92,7 +85,7 @@ class MainViewModel(
                     previousUserIds = userIds
                     if (!hasNewUser) return@collectLatest
 
-                    syncEventsManager.loadCurrentMonths(visibleDate = visibleDay.value)
+                    syncEventsManager.loadCurrentMonths(visibleDate = visibleDate.value)
                 }
         }
     }

@@ -18,13 +18,26 @@
 <resources>
     <string name="addEventLabel">Aggiungi</string>
     <string name="allDayLabel">Tutto il giorno</string>
+    <string name="attendees">Invitati</string>
     <plurals name="attendeesAcceptedCount">
-        <item quantity="one">%1$d accettato</item>
-        <item quantity="other">%1$d accettati</item>
+        <item quantity="one">%d accettato</item>
+        <item quantity="other">%d accettati</item>
     </plurals>
     <plurals name="attendeesCount">
-        <item quantity="one">%1$d invitato</item>
-        <item quantity="other">%1$d invitati</item>
+        <item quantity="one">%d invitato</item>
+        <item quantity="other">%d invitati</item>
+    </plurals>
+    <plurals name="attendeesDeclinedCount">
+        <item quantity="one">%d rifiutato</item>
+        <item quantity="other">%d rifiutati</item>
+    </plurals>
+    <plurals name="attendeesPendingCount">
+        <item quantity="one">%d in attesa</item>
+        <item quantity="other">%d in attesa</item>
+    </plurals>
+    <plurals name="attendeesTentativeCount">
+        <item quantity="one">%1$d forse</item>
+        <item quantity="other">%1$d forse</item>
     </plurals>
     <string name="attendeesEmptyState">Nessun partecipante trovato</string>
     <string name="availableLabel">Disponibile</string>
@@ -40,8 +53,25 @@
     <string name="contentDescriptionHasLocation">Ha una sede</string>
     <string name="contentDescriptionSearch">Cerca</string>
     <string name="contentDescriptionToday">Oggi</string>
+    <plurals name="dayAmount">
+        <item quantity="one">%d giorno</item>
+        <item quantity="other">%d giorni</item>
+    </plurals>
     <string name="descriptionTitle">Descrizione</string>
     <string name="eventTitle">Titolo dell’evento</string>
+    <plurals name="hourAmount">
+        <item quantity="one">%d ora</item>
+        <item quantity="other">%d ore</item>
+    </plurals>
+    <string name="kMeetMeeting">Riunione kMeet</string>
+    <plurals name="minuteAmount">
+        <item quantity="one">%d minuto</item>
+        <item quantity="other">%d minuti</item>
+    </plurals>
+    <string name="noAttendeesLabel">Nessuno</string>
+    <string name="notificationTimeAfter">%1$s dopo</string>
+    <string name="notificationTimeAtStart">Al momento dell’evento</string>
+    <string name="notificationTimeBefore">%1$s prima</string>
     <string name="notificationTypeEmail">Email</string>
     <string name="notificationTypePush">Notifica</string>
     <string name="occupiedLabel">Occupato</string>
@@ -56,6 +86,10 @@
     </plurals>
     <string name="searchForAttendees">Ricerca degli ospiti</string>
     <string name="sectionCalendarHeader">Calendario</string>
+    <plurals name="weekAmount">
+        <item quantity="one">%d settimana</item>
+        <item quantity="other">%d settimane</item>
+    </plurals>
     <string name="sectionOrganizerHeader">Organizzatore</string>
     <string name="statusAcceptedLabel">Accettato</string>
     <string name="statusDeclinedLabel">Rifiutato</string>

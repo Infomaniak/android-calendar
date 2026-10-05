@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
@@ -32,7 +33,7 @@ import androidx.navigation3.scene.SceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import androidx.window.core.layout.WindowSizeClass
 import com.infomaniak.calendar.ui.component.CalendarFab
-import com.infomaniak.calendar.ui.component.drawer.CalendarDrawer
+import com.infomaniak.calendar.ui.component.drawer.MenuDrawer
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.component.CalendarHorizontalFloatingToolbar
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.DrawerDecoratorStrategy
@@ -55,6 +56,7 @@ import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
 import com.infomaniak.calendar.ui.screen.threeDays.ThreeDayScreen
 import com.infomaniak.calendar.ui.screen.week.WeekScreen
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
+import com.infomaniak.calendar.utils.NavigationTransition
 import com.infomaniak.core.common.utils.today
 import kotlin.time.Clock
 
@@ -74,6 +76,8 @@ fun MainNavHost(
                 sceneDecoratorStrategies = sceneDecoratorStrategies(backStack, onCalendarViewSelected),
                 sceneStrategies = sceneStrategies(windowSizeClass),
                 sharedTransitionScope = this@SharedTransitionLayout,
+                transitionSpec = { NavigationTransition.contentTransform },
+                popTransitionSpec = { NavigationTransition.contentTransform },
             )
         }
     }
@@ -146,9 +150,10 @@ private fun baseEntryProvider(
     }
 }
 
+@Composable
 private fun sceneStrategies(windowSizeClass: WindowSizeClass): List<SceneStrategy<NavKey>> {
-    val dialogStrategy = ResponsiveDialogSceneStrategy<NavKey>(windowSizeClass)
-    return listOf(dialogStrategy)
+    // ResponsiveDialogSceneStrategy holds the scene of the ongoing dialog, it must survive recompositions.
+    return remember(windowSizeClass) { listOf(ResponsiveDialogSceneStrategy(windowSizeClass)) }
 }
 
 private fun sceneDecoratorStrategies(
@@ -179,7 +184,7 @@ private fun sceneDecoratorStrategies(
 
     val drawerStrategy = DrawerDecoratorStrategy<NavKey>(
         drawer = { content ->
-            CalendarDrawer(
+            MenuDrawer(
                 content = content,
                 onManageAccounts = {
                     backStack.add(NavDestination.Accounts.List)

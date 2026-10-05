@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.day
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Surface
@@ -29,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.day.component.DayView
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
@@ -54,6 +56,9 @@ fun DayPager(
     onVisibleDateChanged: (LocalDate) -> Unit,
     onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
+    headerModifier: Modifier = Modifier,
+    timelineModifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
     headerTrailingContent: @Composable () -> Unit = {},
 ) {
     val pageCount = remember(dateRange) { dateRange.dayCount }
@@ -93,6 +98,9 @@ fun DayPager(
             state = state,
             weekNumbering = weekNumbering,
             onEventClick = onEventClick,
+            headerModifier = headerModifier,
+            timelineModifier = timelineModifier,
+            contentPadding = contentPadding,
             headerTrailingContent = headerTrailingContent,
         )
     }

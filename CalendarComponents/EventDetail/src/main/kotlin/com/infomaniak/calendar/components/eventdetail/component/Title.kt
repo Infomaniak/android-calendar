@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
@@ -42,7 +43,6 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.theme.MaterialPreviewTheme
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 private const val MAX_LINES = Int.MAX_VALUE
 
@@ -56,9 +56,7 @@ internal fun Title(dotColor: Color, title: String, modifier: Modifier = Modifier
 }
 
 @Composable
-internal fun TitleEditable(dotColor: Color, title: String, modifier: Modifier = Modifier) {
-    val textFieldState = rememberTextFieldState(title)
-
+internal fun TitleEditable(dotColor: Color, textFieldState: TextFieldState, modifier: Modifier = Modifier) {
     ListItem(
         leadingContent = { EventColorDot(dotColor) },
         content = {
@@ -90,8 +88,8 @@ internal fun TitleEditable(dotColor: Color, title: String, modifier: Modifier = 
 private fun EventColorDot(color: Color) {
     Box(
         modifier = Modifier
-            .size(EsdsTheme.icon.sizeMd)
-            .padding(2.dp)
+            .size(ItemIconDefaults.size)
+            .padding(1.dp)
             .clip(CircleShape)
             .background(color),
     )
@@ -114,7 +112,7 @@ private fun Preview() {
 private fun PreviewEditable() {
     MaterialPreviewTheme {
         Surface {
-            TitleEditable(dotColor = Color.Red, title = PREVIEW_TITLE)
+            TitleEditable(dotColor = Color.Red, textFieldState = rememberTextFieldState(PREVIEW_TITLE))
         }
     }
 }

@@ -18,13 +18,26 @@
 <resources>
     <string name="addEventLabel">Tilføj</string>
     <string name="allDayLabel">Hele dagen</string>
+    <string name="attendees">Deltagere</string>
     <plurals name="attendeesAcceptedCount">
-        <item quantity="one">%1$d accepteret</item>
-        <item quantity="other">%1$d accepterede</item>
+        <item quantity="one">%d accepteret</item>
+        <item quantity="other">%d accepterede</item>
     </plurals>
     <plurals name="attendeesCount">
-        <item quantity="one">%1$d gæst</item>
-        <item quantity="other">%1$d gæster</item>
+        <item quantity="one">%d gæst</item>
+        <item quantity="other">%d gæster</item>
+    </plurals>
+    <plurals name="attendeesDeclinedCount">
+        <item quantity="one">%d afvist</item>
+        <item quantity="other">%d afviste</item>
+    </plurals>
+    <plurals name="attendeesPendingCount">
+        <item quantity="one">%d afventende</item>
+        <item quantity="other">%d afventende</item>
+    </plurals>
+    <plurals name="attendeesTentativeCount">
+        <item quantity="one">%1$d måske</item>
+        <item quantity="other">%1$d måske</item>
     </plurals>
     <string name="attendeesEmptyState">Ingen deltagere fundet</string>
     <string name="availableLabel">Ledig</string>
@@ -40,8 +53,25 @@
     <string name="contentDescriptionHasLocation">Har en placering</string>
     <string name="contentDescriptionSearch">Søg</string>
     <string name="contentDescriptionToday">I dag</string>
+    <plurals name="dayAmount">
+        <item quantity="one">%d dag</item>
+        <item quantity="other">%d dage</item>
+    </plurals>
     <string name="descriptionTitle">Beskrivelse</string>
     <string name="eventTitle">Arrangementstitel</string>
+    <plurals name="hourAmount">
+        <item quantity="one">%d time</item>
+        <item quantity="other">%d timer</item>
+    </plurals>
+    <string name="kMeetMeeting">kMeet-møde</string>
+    <plurals name="minuteAmount">
+        <item quantity="one">%d minut</item>
+        <item quantity="other">%d minutter</item>
+    </plurals>
+    <string name="noAttendeesLabel">Ingen</string>
+    <string name="notificationTimeAfter">%1$s efter</string>
+    <string name="notificationTimeAtStart">På begivenhedens tidspunkt</string>
+    <string name="notificationTimeBefore">%1$s før</string>
     <string name="notificationTypeEmail">E-mail</string>
     <string name="notificationTypePush">Meddelelse</string>
     <string name="occupiedLabel">Optaget</string>
@@ -56,6 +86,10 @@
     </plurals>
     <string name="searchForAttendees">Søgning efter gæster</string>
     <string name="sectionCalendarHeader">Kalender</string>
+    <plurals name="weekAmount">
+        <item quantity="one">%d uge</item>
+        <item quantity="other">%d uger</item>
+    </plurals>
     <string name="sectionOrganizerHeader">Arrangør</string>
     <string name="statusAcceptedLabel">Godkendt</string>
     <string name="statusDeclinedLabel">Afvist</string>

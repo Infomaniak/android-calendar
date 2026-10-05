@@ -18,13 +18,26 @@
 <resources>
     <string name="addEventLabel">Lisää</string>
     <string name="allDayLabel">Koko päivän</string>
+    <string name="attendees">Osallistujat</string>
     <plurals name="attendeesAcceptedCount">
-        <item quantity="one">%1$d hyväksytty</item>
-        <item quantity="other">%1$d hyväksyttyä</item>
+        <item quantity="one">%d hyväksytty</item>
+        <item quantity="other">%d hyväksyttyä</item>
     </plurals>
     <plurals name="attendeesCount">
-        <item quantity="one">%1$d vieras</item>
-        <item quantity="other">%1$d vierasta</item>
+        <item quantity="one">%d vieras</item>
+        <item quantity="other">%d vierasta</item>
+    </plurals>
+    <plurals name="attendeesDeclinedCount">
+        <item quantity="one">%d hylätty</item>
+        <item quantity="other">%d hylättyä</item>
+    </plurals>
+    <plurals name="attendeesPendingCount">
+        <item quantity="one">%d odottaa</item>
+        <item quantity="other">%d odottaa</item>
+    </plurals>
+    <plurals name="attendeesTentativeCount">
+        <item quantity="one">%1$d ehkä</item>
+        <item quantity="other">%1$d ehkä</item>
     </plurals>
     <string name="attendeesEmptyState">Osallistujia ei löytynyt</string>
     <string name="availableLabel">Vapaa</string>
@@ -40,8 +53,25 @@
     <string name="contentDescriptionHasLocation">On sijainti</string>
     <string name="contentDescriptionSearch">Haku</string>
     <string name="contentDescriptionToday">Tänään</string>
+    <plurals name="dayAmount">
+        <item quantity="one">%d päivä</item>
+        <item quantity="other">%d päivää</item>
+    </plurals>
     <string name="descriptionTitle">Kuvaus</string>
     <string name="eventTitle">Tapahtuman nimi</string>
+    <plurals name="hourAmount">
+        <item quantity="one">%d tunti</item>
+        <item quantity="other">%d tuntia</item>
+    </plurals>
+    <string name="kMeetMeeting">kMeet-kokous</string>
+    <plurals name="minuteAmount">
+        <item quantity="one">%d minuutti</item>
+        <item quantity="other">%d minuuttia</item>
+    </plurals>
+    <string name="noAttendeesLabel">Ei yhtään</string>
+    <string name="notificationTimeAfter">%1$s jälkeen</string>
+    <string name="notificationTimeAtStart">Tapahtuman hetkellä</string>
+    <string name="notificationTimeBefore">%1$s ennen</string>
     <string name="notificationTypeEmail">Sähköposti</string>
     <string name="notificationTypePush">Ilmoitus</string>
     <string name="occupiedLabel">Varattu</string>
@@ -56,6 +86,10 @@
     </plurals>
     <string name="searchForAttendees">Vieraiden haku</string>
     <string name="sectionCalendarHeader">Kalenteri</string>
+    <plurals name="weekAmount">
+        <item quantity="one">%d viikko</item>
+        <item quantity="other">%d viikkoa</item>
+    </plurals>
     <string name="sectionOrganizerHeader">Järjestäjä</string>
     <string name="statusAcceptedLabel">Hyväksytty</string>
     <string name="statusDeclinedLabel">Hylätty</string>

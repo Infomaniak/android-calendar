@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.detail.component
+package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
@@ -23,18 +23,17 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.resources.R
-import com.infomaniak.core.ui.compose.margin.Margin
-
-internal val LIST_ITEM_HORIZONTAL_PADDING = Margin.Medium
 
 @Composable
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -44,17 +43,19 @@ internal fun ClickableItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
     trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
     supportingContent: @Composable (() -> Unit)? = null,
 ) {
     ClickableItem(
         text = text,
-        supportingContent = supportingContent,
-        leadingContent = { Icon(painterResource(leadingIconRes), contentDescription = null) },
-        trailingContent = trailingContent,
+        leadingContent = { ItemIcon(painterResource(leadingIconRes)) },
         onClick = onClick,
-        contentPadding = contentPadding,
         modifier = modifier,
+        contentPadding = contentPadding,
+        trailingContent = trailingContent,
+        supportingContent = supportingContent,
+        shapes = shapes,
     )
 }
 
@@ -66,38 +67,35 @@ internal fun ClickableItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
     trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
     supportingContent: @Composable (() -> Unit)? = null,
 ) {
     ListItem(
         modifier = modifier,
-        content = { Text(text = text) },
+        content = { Text(text) },
         supportingContent = supportingContent,
         leadingContent = leadingContent,
-        trailingContent = trailingContent,
+        trailingContent = {
+            CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.labelLarge) {
+                trailingContent()
+            }
+        },
         onClick = onClick,
-        contentPadding = contentPadding + PaddingValues(horizontal = LIST_ITEM_HORIZONTAL_PADDING),
-        shapes = ListItemDefaults.RectangleShapes,
+        shapes = shapes,
+        contentPadding = contentPadding + ListItemDefaults.ContentPadding,
     )
 }
 
-object ClickableItemDefaults {
+internal object ClickableItemDefaults {
     val trailingContent = @Composable {
         Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null)
     }
-}
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-private val ListItemDefaults.RectangleShapes
-    @Composable
-    get() = shapes(
-        shape = RectangleShape,
-        selectedShape = RectangleShape,
-        pressedShape = RectangleShape,
-        focusedShape = RectangleShape,
-        hoveredShape = RectangleShape,
-        draggedShape = RectangleShape,
-    )
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    val ClickableItemShapes
+        @Composable get() = ListItemDefaults.shapes(MaterialTheme.shapes.large)
+}
 
 @Preview
 @Composable

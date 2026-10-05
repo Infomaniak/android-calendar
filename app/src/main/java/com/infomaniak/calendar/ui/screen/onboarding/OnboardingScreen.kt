@@ -70,6 +70,7 @@ import com.infomaniak.core.onboarding.components.OnboardingComponents
 import com.infomaniak.core.onboarding.components.OnboardingComponents.DefaultTitleAndDescription
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCredentials
 import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
+import com.infomaniak.multiplatform_core.account.domain.model.AccessToken
 import kotlinx.coroutines.launch
 import com.infomaniak.core.common.R as RCore
 
@@ -203,7 +204,7 @@ private suspend fun fetchDavCredentials(
     user: User,
     accountManager: AccountManager,
 ): DavCredentials? = runCatching {
-    accountManager.retrieveDavCredential(authToken = user.apiToken.accessToken, login = user.login)
+    accountManager.retrieveDavCredential(authToken = AccessToken(user.apiToken.accessToken), login = user.login)
 }.getOrNull()
 
 @Composable

@@ -17,9 +17,10 @@
  */
 package com.infomaniak.calendar.utils
 
-import com.infomaniak.core.auth.models.user.User
-
 sealed interface UserLoadState {
-    object Awaiting : UserLoadState
-    data class Loaded(val user: User?) : UserLoadState
+    data object Awaiting : UserLoadState
+    sealed interface Loaded : UserLoadState {
+        data object Connected : Loaded
+        data object Disconnected : Loaded
+    }
 }

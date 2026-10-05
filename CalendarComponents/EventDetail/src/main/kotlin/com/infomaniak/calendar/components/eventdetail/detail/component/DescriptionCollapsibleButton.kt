@@ -25,6 +25,7 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -41,6 +42,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.eventdetail.component.ClickableItemDefaults
+import com.infomaniak.calendar.components.eventdetail.component.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.state.CollapsibleTextState
 import com.infomaniak.calendar.components.eventdetail.state.animateCollapse
 import com.infomaniak.calendar.components.eventdetail.state.rememberCollapsibleTextState
@@ -50,28 +53,29 @@ private const val COLLAPSED_MAX_LINES = 3
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-internal fun DescriptionCollapsibleButton(description: String, contentPadding: PaddingValues) {
+internal fun DescriptionCollapsibleButton(description: String, contentPadding: PaddingValues = PaddingValues()) {
     var isCollapsed by rememberSaveable { mutableStateOf(true) }
     val descriptionState = rememberCollapsibleTextState(isCollapsed, COLLAPSED_MAX_LINES)
 
     val descriptionTitle = R.string.descriptionTitle
-    val leadingIconRes = R.drawable.ic_list_left
+    val leadingIconRes = R.drawable.ic_list
 
     // Shows or hides the button to toggle the description based on if the text is actually overflowing when collapsed or not.
     if (descriptionState.isOverflowing) {
         ListItem(
             content = { Text(stringResource(descriptionTitle)) },
             supportingContent = { DescriptionContent(description, descriptionState) },
-            leadingContent = { Icon(painterResource(leadingIconRes), contentDescription = null) },
-            trailingContent = { AnimatedChevron({ isCollapsed }) },
+            leadingContent = { ItemIcon(painterResource(leadingIconRes)) },
+            trailingContent = { AnimatedChevron { isCollapsed } },
             onClick = { isCollapsed = !isCollapsed },
-            contentPadding = contentPadding + PaddingValues(LIST_ITEM_HORIZONTAL_PADDING),
+            shapes = ClickableItemDefaults.ClickableItemShapes,
+            contentPadding = contentPadding + ListItemDefaults.ContentPadding,
         )
     } else {
         ListItem(
             content = { Text(stringResource(descriptionTitle)) },
             supportingContent = { DescriptionContent(description, descriptionState) },
-            leadingContent = { Icon(painterResource(leadingIconRes), contentDescription = null) },
+            leadingContent = { ItemIcon(painterResource(leadingIconRes)) },
             modifier = Modifier.padding(contentPadding),
         )
     }

@@ -17,29 +17,20 @@
   -->
 <resources>
     <string name="accountsTitle">Accounts</string>
-    <string name="addAccount">Add an account</string>
-    <string name="attendeesSearchTitle">Add guests</string>
-    <string name="attendeesTitle">Guests</string>
+    <string name="attendeesSearchTitle">Add attendees</string>
+    <string name="buttonAddAccount">Add an account</string>
     <string name="buttonLogOut">Log Out</string>
     <string name="contentDescriptionBack">Back</string>
     <string name="contentDescriptionInbox">Open inbox</string>
     <string name="contentDescriptionMenuDrawer">Open menu</string>
-    <string name="contentDescriptionSearch">Search</string>
-    <string name="contentDescriptionToolbarCurrentViewButton">Current view: %1$s. Tap to change view.</string>
+    <string name="contentDescriptionToolbarCurrentViewButton">Current view: %s. Tap to change view.</string>
     <string name="dayTitle">Day</string>
     <string name="helpTitle">Help</string>
     <string name="monthTitle">Month</string>
     <string name="planningTitle">Planning</string>
-    <string name="searchForAttendees">Search for guests</string>
-    <string name="sectionOrganizerHeader">Organizer</string>
     <string name="settingsTitle">Settings</string>
     <string name="signOutAccountAlertConfirm">Sign out of the account</string>
     <string name="signOutAccountAlertDescription">This account and its associated calendars will be disconnected from the “Calendar” app. They will remain available in your Infomaniak online account.</string>
-    <string name="signOutAccountAlertTitle">Sign out of the account “%s“</string>
-    <string name="statusAcceptedLabel">Accepted</string>
-    <string name="statusDeclinedLabel">Declined</string>
-    <string name="statusNeedsActionLabel">Pending</string>
-    <string name="statusTentativeLabel">Maybe</string>
     <string name="syncEventsError">Error while retrieving events</string>
     <string name="threeDaysTitle">Three days</string>
     <string name="weekTitle">Week</string>

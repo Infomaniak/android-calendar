@@ -37,9 +37,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
+import com.infomaniak.calendar.components.foundation.state.VisibleDayState
+import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
 import com.infomaniak.calendar.extensions.appGraph
 import com.infomaniak.calendar.manager.SyncEventsManager
-import com.infomaniak.calendar.ui.LocalUser
 import com.infomaniak.calendar.ui.navigation.MainNavHost
 import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.navigation.replaceRoot
@@ -49,11 +50,8 @@ import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableState
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
-import com.infomaniak.calendar.ui.state.VisibleDayState
-import com.infomaniak.calendar.ui.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.utils.UserLoadState
-import com.infomaniak.core.auth.models.user.User
 import kotlinx.coroutines.channels.ReceiveChannel
 
 class MainActivity : ComponentActivity() {
@@ -70,7 +68,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val lastCalendarView by mainViewModel.lastCalendarView.collectAsStateWithLifecycle()
-            val currentUserLoadState by mainViewModel.userLoadState.collectAsStateWithLifecycle()
+            val currentUserLoadState by mainViewModel.usersLoadState.collectAsStateWithLifecycle()
 
             CalendarTheme {
                 Surface {
@@ -78,7 +76,7 @@ class MainActivity : ComponentActivity() {
                         UserLoadState.Awaiting -> Unit // Blank surface while waiting for first result
                         is UserLoadState.Loaded -> MainContent(
                             userLoadState = userLoadState,
-                            visibleDayState = rememberVisibleDayState(mainViewModel.visibleDay),
+                            visibleDayState = rememberVisibleDayState(mainViewModel.visibleDate),
                             loadingEventsError = mainViewModel.loadingEventsError,
                             lastCalendarView = { lastCalendarView },
                             onCalendarViewSelected = mainViewModel::saveCalendarView,
@@ -100,18 +98,18 @@ private fun MainContent(
 ) {
     val lastCalendarView = lastCalendarView()
     // Blank surface while the last selected calendar view is being read from the data value which is instantaneous
-    val startDestination = if (userLoadState.user == null) NavDestination.Onboarding() else (lastCalendarView ?: return)
+    val startDestination =
+        if (userLoadState is UserLoadState.Loaded.Disconnected) NavDestination.Onboarding() else (lastCalendarView ?: return)
     val backStack = rememberNavBackStack(startDestination)
 
     CompositionLocalProvider(
-        LocalUser provides userLoadState.user,
         LocalVisibleDayState provides visibleDayState,
         LocalSharedSnackbarHostState provides rememberCustomSnackbarHostState(),
         LocalToolbarScrollableState provides rememberToolbarScrollableState(),
         LocalDrawerState provides rememberDrawerState(initialValue = DrawerValue.Closed),
     ) {
         ObserveSyncError(loadingEventsError)
-        NavigateToOnboardingIfLastUserIsDisconnected(backStack, userLoadState.user)
+        NavigateToOnboardingIfLastUserIsDisconnected(backStack, isUserLoaded = userLoadState is UserLoadState.Loaded.Connected)
         MainNavHost(
             backStack = backStack,
             defaultCalendarView = lastCalendarView ?: NavDestination.CalendarView.Default,
@@ -134,9 +132,7 @@ private fun ObserveSyncError(loadingEventsError: ReceiveChannel<SyncEventsManage
 }
 
 @Composable
-private fun NavigateToOnboardingIfLastUserIsDisconnected(backStack: NavBackStack<NavKey>, user: User?) {
-    val isUserLoaded = user != null
-
+private fun NavigateToOnboardingIfLastUserIsDisconnected(backStack: NavBackStack<NavKey>, isUserLoaded: Boolean) {
     LaunchedEffect(isUserLoaded) {
         if (isUserLoaded.not()) {
             backStack.replaceRoot(NavDestination.Onboarding())

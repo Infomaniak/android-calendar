@@ -25,9 +25,9 @@ import com.infomaniak.calendar.utils.toCalendarColorsUi
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.auth.models.user.preferences.OrganizationPreference
 import com.infomaniak.core.auth.models.user.preferences.Preferences
-import com.infomaniak.multiplatform_calendar.core.domain.model.account.AccountId
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
+import com.infomaniak.multiplatform_core.account.domain.model.AccountId
 
 class DrawerPreviewProvider : PreviewParameterProvider<List<UserCalendarsUi>> {
     override val values = sequenceOf(usersCalendars)

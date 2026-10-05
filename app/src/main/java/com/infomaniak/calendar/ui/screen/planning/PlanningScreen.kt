@@ -17,54 +17,40 @@
  */
 package com.infomaniak.calendar.ui.screen.planning
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
+import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
+import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.calendar.components.foundation.state.VisibleDayState
+import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
 import com.infomaniak.calendar.components.planning.Planning
+import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
+import com.infomaniak.calendar.ui.component.ScreenLoader
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
+import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
 import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewParameter
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
-import com.infomaniak.calendar.ui.model.occurrenceId
-import com.infomaniak.calendar.ui.state.VisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.YearMonth
-import kotlinx.datetime.yearMonth
-import kotlin.time.Clock
 
 @Composable
 fun PlanningScreen(
@@ -76,6 +62,7 @@ fun PlanningScreen(
     val planningUiState: PlanningUiState by viewModel.planningUiState.collectAsStateWithLifecycle()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
     val eventsDots by viewModel.eventDots.collectAsStateWithLifecycle(initialValue = emptyMap())
+    val visibleDayState = LocalVisibleDayState.current ?: return
 
     PlanningScreen(
         goToEventCreation = goToEventCreation,
@@ -83,8 +70,7 @@ fun PlanningScreen(
         planningUiState = { planningUiState },
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventsDots },
-        onVisibleMonthChanged = viewModel::onVisibleMonthChanged,
-        jumpTo = viewModel::jumpTo,
+        visibleDayState = visibleDayState,
         modifier = modifier,
     )
 }
@@ -96,64 +82,47 @@ private fun PlanningScreen(
     planningUiState: () -> PlanningUiState,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
-    onVisibleMonthChanged: (YearMonth) -> Unit,
-    jumpTo: (LocalDate) -> Unit,
+    visibleDayState: VisibleDayState,
     modifier: Modifier = Modifier,
 ) {
     val hazeState = rememberHazeState()
-    val density = LocalDensity.current
-    var topBarHeight by remember { mutableStateOf(0.dp) }
+    val calendarExpansionState = rememberCalendarExpansionState()
 
-    var isCalendarExpanded by rememberSaveable { mutableStateOf(false) }
-    val visibleDayState = LocalVisibleDayState.current
-
-    Scaffold(
-        modifier = modifier,
-        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
-    ) { scaffoldContentPadding ->
-        val contentPadding = scaffoldContentPadding + PaddingValues(top = topBarHeight)
-
-        Box(modifier = Modifier.fillMaxSize()) {
-            when (val planningUi = planningUiState()) {
-                is PlanningUiState.Success -> {
-                    SuccessPlanning(
-                        events = planningUi.eventsByWeekAndDay,
-                        contentPadding = contentPadding + PaddingValues(Margin.Medium),
-                        goToEventCreation = goToEventCreation,
-                        goToEventDetail = goToEventDetail,
-                        jumpTo = jumpTo,
-                        modifier = Modifier.hazeSource(hazeState),
-                    )
-                }
-                is PlanningUiState.Loading -> {
-                    LoadingPlanning(modifier = Modifier.padding(contentPadding))
-                }
-            }
-
+    OverlaidTopBarScaffold(
+        topBar = {
             CalendarTopAppBar(
                 isLoadingEvents = isLoadingEvents,
                 hazeState = hazeState,
-                onToggleCalendar = { isCalendarExpanded = !isCalendarExpanded },
+                onToggleCalendar = calendarExpansionState::toggle,
                 calendar = {
-                    if (visibleDayState != null) {
-                        ExpandableCalendar(
-                            isExpanded = { isCalendarExpanded },
-                            selectedDate = { visibleDayState.visibleDate },
-                            onDayClick = {
-                                onVisibleMonthChanged(it.yearMonth)
-                                visibleDayState.jumpTo(it)
-                            },
-                            weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
-                            eventsDots = eventsDots,
-                        )
-                    }
+                    ExpandableCalendar(
+                        visibleDayState = visibleDayState,
+                        expansionState = calendarExpansionState,
+                        weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
+                        eventsDots = eventsDots,
+                    )
                 },
-                isCalendarExpanded = { isCalendarExpanded },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.TopCenter)
-                    .onSizeChanged { topBarHeight = with(density) { it.height.toDp() } },
+                calendarExpansionProgress = { calendarExpansionState.progress },
             )
+        },
+        modifier = modifier,
+    ) { contentPadding ->
+        when (val planningUi = planningUiState()) {
+            is PlanningUiState.Success -> {
+                SuccessPlanning(
+                    events = planningUi.eventsByWeekAndDay,
+                    contentPadding = contentPadding + PaddingValues(Margin.Medium),
+                    goToEventCreation = goToEventCreation,
+                    goToEventDetail = goToEventDetail,
+                    visibleDayState = visibleDayState,
+                    modifier = Modifier
+                        .hazeSource(hazeState)
+                        .collapseCalendarOnScroll(calendarExpansionState),
+                )
+            }
+            is PlanningUiState.Loading -> {
+                ScreenLoader(modifier = Modifier.padding(contentPadding))
+            }
         }
     }
 }
@@ -164,20 +133,13 @@ private fun SuccessPlanning(
     contentPadding: PaddingValues,
     goToEventCreation: () -> Unit,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
-    jumpTo: (LocalDate) -> Unit,
+    visibleDayState: VisibleDayState,
     modifier: Modifier = Modifier,
 ) {
-    val visibleDayState = LocalVisibleDayState.current ?: return
     val lazyListState = rememberLazyListState(events().indexOf(visibleDayState.visibleDate))
 
     ProcessJumpRequests(lazyListState, visibleDayState, events)
-    ReportVisibleDate(
-        lazyListState = lazyListState,
-        onVisibleDateChanged = {
-            jumpTo(it)
-            visibleDayState.onVisibleDateChanged(it)
-        },
-    )
+    ReportVisibleDate(lazyListState, onVisibleDateChanged = visibleDayState::updateVisibleDate)
 
     Planning(
         lazyListState = lazyListState,
@@ -191,28 +153,19 @@ private fun SuccessPlanning(
     )
 }
 
-@Composable
-private fun LoadingPlanning(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
-    }
-}
-
 @Preview
 @Composable
 private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class) weekEvents: EventsByWeekAndDay) {
     CalendarThemeForPreview {
-        val visibleDate = remember { mutableStateOf(Clock.today()) }
-
-        CompositionLocalProvider(LocalVisibleDayState provides VisibleDayState(visibleDate)) {
+        val visibleDayState = rememberVisibleDayState()
+        CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
             PlanningScreen(
                 planningUiState = { PlanningUiState.Success({ weekEvents }) },
                 goToEventCreation = {},
                 goToEventDetail = {},
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
-                onVisibleMonthChanged = {},
-                jumpTo = {},
+                visibleDayState = visibleDayState,
             )
         }
     }

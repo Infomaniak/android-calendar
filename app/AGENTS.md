@@ -16,7 +16,7 @@ Kotlin Multiplatform library.
 - **Build System**: Gradle with Kotlin DSL, version catalog (`gradle/libs.versions.toml`)
 - **UI Framework**: Jetpack Compose (Material 3), Navigation 3
 - **Architecture**: Single-Activity + Compose, with shared logic delegated to the KMP module
-- **Shared Logic**: Consumed from `multiplatform-calendar` composite build via `libs.infomaniak.multiplatform.calendar.core`
+- **Shared Logic**: Consumed from `multiplatform-calendar` (`CalendarCore` artifact, or the submodule as a composite build)
 - **Testing**: JUnit 4 (unit), Espresso + Compose UI Test (instrumented)
 
 ## Context Map
@@ -34,6 +34,10 @@ app/src/main/java/com/infomaniak/calendar/
 │       ├── viewModel/
 │       │   └── CalendarViewModelFactory.kt # Concrete metrox MetroViewModelFactory binding (multibinding maps)
 │       └── worker/                 # MetroWorker key, MetroWorkerFactory, WorkerGraphProvider, WorkerInstanceFactory
+├── manager/
+│   ├── SyncEventsManager.kt        # App-scoped: downloads + syncs the events of the months around the visible date
+│   ├── VisibleDateManager.kt       # App-scoped: single visible-date source, restored/saved by MainViewModel
+│   └── VisibleMonthManager.kt      # App-scoped: event dots derived from the shared visible date's month
 ├── utils/
 │   ├── AttendeeExt.kt              # KMP Attendee → Attendees mapping, shared by the two event UI models below
 │   ├── EventDaySliceExt.kt         # KMP EventDaySlice → EventUi mapping, shared by every calendar view
@@ -92,6 +96,42 @@ app/
 - **Shared logic**: Prefer reusing models / logic from `com.infomaniak.multiplatform_calendar.*` instead of duplicating
   Android-only equivalents.
 - **KISS / SOLID**: Keep Composables focused; extract reusable pieces into small `@Composable` functions.
+
+### CalDAV client configuration
+
+`MainApplication.initCaldavClient()` installs `CaldavClientConfig` into the Rust CalDAV client at startup
+(`configureCaldavClient()`, from `:CalendarKmpDav`). It sets the `User-Agent` and, in debug, the proxy interception
+below; timeouts and pool settings stay at the library defaults until a measurement justifies otherwise. The call is
+cheap and stays synchronous in `onCreate()`: it must land before the first CalDAV request.
+
+**Debugging CalDAV traffic**: those requests are issued by Rust, not OkHttp, so they ignore the system proxy
+and `network_security_config.xml`. To route them through Proxyman/Charles/mitmproxy, export the proxy's root CA
+in PEM form to `app/src/debug/assets/certificates/` — any file name works, as long as it ends with `.pem`. That
+directory's content is **git-ignored**: these tools generate one certificate per machine, so they are
+per-developer files, not shared assets — never commit them.
+
+The presence of at least one certificate is what **opts in**: without it HTTPS would fail anyway, since the
+bridge's TLS store ignores user-installed certificates. The proxy address defaults to the host machine as seen
+from an emulator; for a physical device, override it in `local.properties` (git-ignored):
+
+```properties
+caldavDebugProxyUrl=http://<machine LAN address>:9090
+```
+
+The proxy is probed once at startup: when it is unreachable, the client connects directly and logs a warning, so
+start the proxy, then restart the app to intercept. See `CaldavDebugConfig`.
+
+The Rust bridge ships the interception code in every build; the app keeps it **debug-only, by construction**
+rather than by a runtime `if`:
+
+| Piece | Where |
+|---|---|
+| `CaldavDebugConfig` implementation | `src/debug/java/…` — `src/release/java/…` holds a stub returning `null` |
+| `CALDAV_DEBUG_PROXY_URL` | declared on the `debug` build type only, so it doesn't exist in release |
+| The root CA assets | live in the `debug` source set only, so they are absent from release APKs |
+
+When touching `CaldavDebugConfig`, keep the debug and release declarations in sync: they are two separate
+files and only the variant being compiled is checked.
 
 ### Commands
 
@@ -218,6 +258,16 @@ fun MyComponent(
 - **Theming**: Wrap content in `CalendarTheme`. Add new tokens to `ui/theme/Color.kt`, `Type.kt`, and `Theme.kt`.
 - **Edge-to-edge & insets**: Honor `Scaffold` inner padding (see `Modifier.padding(innerPadding)`); do not hardcode
   system bar insets.
+- **Overlaid top bars**: A screen whose content scrolls behind its top bar uses `OverlaidTopBarScaffold`
+  (`ui/component/`) instead of `Scaffold`. It has the same shape as a `Scaffold`, and owns the details that go with
+  overlaying: the top bar is drawn over the content and keeps the top window insets, and the content padding it hands
+  out already includes the measured top bar height. Do not re-implement that per screen.
+- **Visible date**: `VisibleDateManager` owns one app-scoped `MutableState<LocalDate>` and exposes its changes through
+  `snapshotFlow` for date-dependent queries. `MainViewModel` binds the manager to `SavedStateHandle` under
+  `"visibleDate"`; the saved-state provider stores the date string in a `Bundle` under the same key, and binding restores
+  it when present. Restoration only initializes a fresh manager. `MainActivity` passes the same mutable state to Foundation's
+  `VisibleDayState`, provided through `LocalVisibleDayState`. Months are derived in `VisibleMonthManager`; screens do
+  not report them separately. Jump commands remain independent of the date the content reaches.
 
 ### Testing
 
@@ -234,11 +284,11 @@ fun MyComponent(
 - App dependencies are declared in `gradle/libs.versions.toml` (accessed via the `libs` accessor).
 - The KMP submodule exposes `multiplatform-calendar/gradle/kmpCalendar.versions.toml` as the `kmpCalendar` catalog
   (see root `settings.gradle.kts`). Use it for plugin/library coordinates shared with the KMP world.
-- The `multiplatform-calendar` library is consumed as a composite build; its `:Core` project is substituted for
-  the `com.infomaniak.multiplaform-calendar:Core` Maven coordinate and its `:kmpdav` bridge project for the
-  `com.infomaniak.multiplaform-calendar:multiplatform-calendar` coordinate (declared in `gradle/libs.versions.toml`
-  as `infomaniak-multiplaform-calendar-core` / `infomaniak-multiplaform-calendar` and referenced via
-  `libs.infomaniak.multiplaform.calendar.core` / `libs.infomaniak.multiplaform.calendar`).
+- The `multiplatform-calendar` library is consumed as the published `CalendarCore` artifact
+  (`libs.infomaniak.multiplatform.calendar.core`, version `calendarCore`). With `useCalendarCoreCompositeBuild=true`,
+  the submodule is included as a composite build instead and its `:CalendarCore` project substitutes the
+  `com.infomaniak.multiplaform-calendar:CalendarCore` coordinate (`libs.infomaniak.multiplatform.calendar.core.submodule`).
+  `:CalendarKmpDav` (CalDAV bridge) comes transitively through `CalendarCore`'s `api`.
 - When adding a dependency:
     1. Add the version to `[versions]`, the coordinate to `[libraries]` (or `[plugins]`), in `libs.versions.toml`.
     2. Reference it as `libs.<group>.<name>` in `app/build.gradle.kts`.
