@@ -118,7 +118,8 @@ from an emulator; for a physical device, override it in `local.properties` (git-
 caldavDebugProxyUrl=http://<machine LAN address>:9090
 ```
 
-See `CaldavDebugConfig`.
+The proxy is probed once at startup: when it is unreachable, the client connects directly and logs a warning, so
+start the proxy, then restart the app to intercept. See `CaldavDebugConfig`.
 
 The Rust bridge ships the interception code in every build; the app keeps it **debug-only, by construction**
 rather than by a runtime `if`:

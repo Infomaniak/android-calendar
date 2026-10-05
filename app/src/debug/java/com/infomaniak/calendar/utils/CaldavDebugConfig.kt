@@ -23,6 +23,7 @@ import android.util.Log
 import com.infomaniak.calendar.BuildConfig
 import com.infomaniak.multiplatform_calendar.data.remote.caldav.CaldavDebugInterception
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.net.InetSocketAddress
 import java.net.Socket
@@ -34,7 +35,7 @@ import java.net.URI
  * `network_security_config.xml` — hence this plumbing. To enable it, export the proxy's root CA to any
  * `.pem` file inside `src/debug/assets/certificates/`, git-ignored: Android's system trust store ignores
  * user-installed certificates, so it is passed explicitly. Without any of them, HTTPS would fail anyway,
- * so they are what opts in.
+ * so they are what opts in. An unreachable proxy at startup falls back to a direct connection.
  *
  * The proxy defaults to the host machine as seen from an emulator; for a physical device, override it
  * with `caldavDebugProxyUrl=http://<machine LAN address>:9090` in `local.properties`.
@@ -44,31 +45,25 @@ object CaldavDebugConfig {
     private const val TAG = "CaldavDebugConfig"
     private const val CERTIFICATES_ASSETS_DIR = "certificates"
     private const val PEM_EXTENSION = ".pem"
-    private const val REACHABILITY_TIMEOUT_MS = 1_000
-
-    /**
-     * Once a proxy is configured every CalDAV request goes through it, so an unreachable proxy fails the
-     * whole sync with an opaque connection error. Say so out loud, because the cause is nowhere near the
-     * symptom. Purely advisory: nothing is bypassed, since silently falling back to a direct connection
-     * would leave the interception you asked for quietly disabled.
-     */
-    suspend fun warnIfProxyUnreachable(interception: CaldavDebugInterception?) {
-        val proxyUrl = interception?.proxyUrl ?: return
-        if (isReachable(proxyUrl)) return
-
-        Log.e(TAG, "CalDAV proxy at $proxyUrl is unreachable: every sync will fail until it is started.")
-        Log.e(TAG, "Start your intercepting proxy, or remove the .pem from $CERTIFICATES_ASSETS_DIR/ to opt out.")
-    }
+    private const val REACHABILITY_TIMEOUT_MS = 300
 
     private suspend fun isReachable(proxyUrl: String): Boolean = withContext(Dispatchers.IO) {
         runCatching {
             val uri = URI(proxyUrl)
-            val port = uri.port.takeIf { it != -1 } ?: return@runCatching false
+            val port = uri.port.takeIf { it != -1 } ?: when (uri.scheme?.lowercase()) {
+                "http" -> 80
+                "https" -> 443
+                else -> return@runCatching false
+            }
             Socket().use { it.connect(InetSocketAddress(uri.host, port), REACHABILITY_TIMEOUT_MS) }
             true
         }.getOrDefault(false)
     }
 
+    /**
+     * The interception to apply, or `null` without any certificate or when the proxy is unreachable: the
+     * client then connects directly. Decided once, so start the proxy before the app to intercept.
+     */
     fun interception(context: Context): CaldavDebugInterception? {
         val rootCertificates = readRootCertificates(context)
         if (rootCertificates.isEmpty()) return null
@@ -77,6 +72,13 @@ object CaldavDebugConfig {
         val interception = BuildConfig.CALDAV_DEBUG_PROXY_URL.takeIf { it.isNotBlank() }
             ?.let { defaultInterception.copy(proxyUrl = it) }
             ?: defaultInterception
+
+        // Blocking, but debug only and capped by the timeout: the configuration must precede the first sync.
+        if (!runBlocking { isReachable(interception.proxyUrl) }) {
+            Log.w(TAG, "CalDAV proxy at ${interception.proxyUrl} is unreachable: connecting directly.")
+            Log.w(TAG, "Start your intercepting proxy, then restart the app to intercept.")
+            return null
+        }
 
         Log.i(TAG, "Proxying CalDAV through ${interception.proxyUrl}, trusting ${rootCertificates.count()} root certificate(s)")
 
