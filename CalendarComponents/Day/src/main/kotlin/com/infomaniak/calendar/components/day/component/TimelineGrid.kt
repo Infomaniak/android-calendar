@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -49,7 +50,7 @@ private val GridLineThickness = DividerHeight
 private const val FIRST_LABELLED_HOUR = 0
 
 private val HourLabelStyle: TextStyle
-    @Composable get() = MaterialTheme.typography.bodyMedium
+    @Composable @ReadOnlyComposable get() = MaterialTheme.typography.bodyMedium
 
 /**
  * How far the first and last labels stick out past the grid. Each label is centred on the line it
@@ -58,7 +59,7 @@ private val HourLabelStyle: TextStyle
  * edge of the screen.
  */
 internal val HourLabelOverhang: Dp
-    @Composable get() = with(LocalDensity.current) { HourLabelStyle.lineHeight.toDp() / 2 }
+    @Composable @ReadOnlyComposable get() = with(LocalDensity.current) { HourLabelStyle.lineHeight.toDp() / 2 }
 
 /** A line at every hour, across the whole width it is given. */
 @Composable
