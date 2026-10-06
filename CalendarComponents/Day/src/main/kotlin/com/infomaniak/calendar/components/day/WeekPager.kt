@@ -21,14 +21,16 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.day.component.HourGrid
 import com.infomaniak.calendar.components.day.component.HourLabelOverhang
+import com.infomaniak.calendar.components.day.component.HourLabels
+import com.infomaniak.calendar.components.day.component.HourLines
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 
@@ -53,7 +55,13 @@ fun WeekPager(
         val columnWidth = (this@BoxWithConstraints.maxWidth - DayTimelineDefaults.HourGutterWidth) / columnCount
 
         // TODO: Replace with grid
-        HourGrid(state = state, modifier = Modifier.fillMaxWidth())
+        HourLabels(state = state, modifier = Modifier.width(DayTimelineDefaults.HourGutterWidth))
+        HourLines(
+            state = state,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = DayTimelineDefaults.HourGutterWidth, end = DayTimelineDefaults.TimelineEndPadding),
+        )
     }
 }
 
