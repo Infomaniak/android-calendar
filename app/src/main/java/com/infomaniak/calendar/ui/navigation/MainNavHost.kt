@@ -45,7 +45,7 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Respon
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
 import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
 import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
-import com.infomaniak.calendar.ui.screen.attendeesSearch.EventAttendeesScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.EventAttendeesScreen
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen

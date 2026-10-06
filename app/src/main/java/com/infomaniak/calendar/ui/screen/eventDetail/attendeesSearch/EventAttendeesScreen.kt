@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.attendeesSearch
+package com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,7 +50,7 @@ fun EventAttendeesScreen(
     modifier: Modifier = Modifier,
     viewModel: EventAttendeesViewModel = viewModel(),
 ) {
-    val state = viewModel.eventAttendeesState.collectAsStateWithLifecycle().value
+    val state = viewModel.eventDetailUi.collectAsStateWithLifecycle().value
 
     LaunchedEffect(occurrenceId) {
         viewModel.setOccurrenceId(occurrenceId)
