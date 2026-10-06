@@ -22,15 +22,14 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.day.component.HourLabelOverhang
 import com.infomaniak.calendar.components.day.component.HourLabels
 import com.infomaniak.calendar.components.day.component.HourLines
+import com.infomaniak.calendar.components.day.component.verticalTimelineScroll
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 
@@ -42,14 +41,8 @@ fun ThreeDayPager(
 ) {
     BoxWithConstraints(
         modifier = modifier
-            .verticalScroll(state.scrollState, enabled = !state.isPinching)
-            .padding(
-                top = HourLabelOverhang + contentPadding.calculateTopPadding(),
-                bottom = DayTimelineDefaults.BottomPadding + contentPadding.calculateBottomPadding(),
-            )
-            // Inside the padding: a pinch reads its own y as an hour, so it has to start
-            // counting where the first hour line is drawn, not where the padding begins.
-            .pinchToZoom(state),
+            .verticalTimelineScroll(state, contentPadding)
+            .pinchToZoom(state), // Pinch to zoom after scroll which adds some more paddings
     ) {
         val columnCount = 3
         val columnWidth = (this@BoxWithConstraints.maxWidth - DayTimelineDefaults.HourGutterWidth) / columnCount
