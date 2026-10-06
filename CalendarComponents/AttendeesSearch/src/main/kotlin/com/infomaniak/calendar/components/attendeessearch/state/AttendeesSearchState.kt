@@ -41,7 +41,6 @@ class AttendeesSearchState(
         }
     }
 
-
     // This function will be replaced by KMP search
     private fun AttendeeUi.matchesQuery(query: String): Boolean {
         val normalizedQuery = query.lowercase()

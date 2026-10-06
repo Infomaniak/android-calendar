@@ -39,17 +39,15 @@ import com.infomaniak.core.ui.compose.margin.Margin
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(
+internal fun SearchBar(
     searchState: TextFieldState,
     modifier: Modifier = Modifier,
 ) {
-    val placeholder = stringResource(R.string.searchForAttendees)
-
     SearchBarDefaults.InputField(
         textFieldState = searchState,
         searchBarState = rememberSearchBarState(),
         onSearch = {},
-        placeholder = { Text(placeholder) },
+        placeholder = { Text(stringResource(R.string.searchForAttendees)) },
         leadingIcon = {
             Icon(
                 painter = painterResource(R.drawable.ic_magnifying_glass),
