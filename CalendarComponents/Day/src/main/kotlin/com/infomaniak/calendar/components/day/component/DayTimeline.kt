@@ -127,7 +127,7 @@ private fun DayTimelinePreview() {
         DayTimeline(
             date = Clock.today(),
             events = previewDayEvents,
-            state = rememberDayTimelineState({}, scrollState = rememberScrollState(initial = 430),),
+            state = rememberDayTimelineState({}, scrollState = rememberScrollState(initial = 430)),
             onEventClick = {},
         )
     }
@@ -140,7 +140,7 @@ private fun DayTimelineZoomedOutPreview() {
         DayTimeline(
             date = Clock.today(),
             events = previewDayEvents,
-            state = rememberDayTimelineState({}, initialHourHeight = DayTimelineDefaults.MinHourHeight,),
+            state = rememberDayTimelineState({}, initialHourHeight = DayTimelineDefaults.MinHourHeight),
             onEventClick = {},
         )
     }
