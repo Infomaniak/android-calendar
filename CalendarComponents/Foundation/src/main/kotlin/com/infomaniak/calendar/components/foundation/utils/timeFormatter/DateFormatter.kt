@@ -38,7 +38,13 @@ fun DayOfWeek.formatNarrowDayName(): String = toJavaDayOfWeek().getDisplayName(T
 
 /** `Wed` */
 @Composable
-fun LocalDate.formatShortDayName(): String = toJavaLocalDate().format(fixedFormatter(SHORT_DAY_NAME_PATTERN, currentLocale()))
+fun LocalDate.formatShortDayName(locale: Locale = currentLocale()): String {
+    return toJavaLocalDate().format(fixedFormatter(SHORT_DAY_NAME_PATTERN, locale))
+}
+
+/** `WED` */
+@Composable
+fun LocalDate.formatShortDayNameUppercase(): String = currentLocale().let { formatShortDayName(it).uppercase(it) }
 
 /** `Wednesday - 20 May`, keeping the day view header's own layout in every language. */
 @Composable

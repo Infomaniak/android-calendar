@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
+import com.infomaniak.calendar.components.calendar.component.ExpandableCalendarDefaults
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
 import com.infomaniak.calendar.components.day.WeekPager
@@ -40,8 +41,6 @@ import com.infomaniak.calendar.components.foundation.state.rememberVisibleDaySta
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
-import com.infomaniak.calendar.ui.effects.ReportVisibleMonth
-import com.infomaniak.calendar.ui.effects.SaveHourHeight
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
@@ -58,11 +57,12 @@ fun WeekScreen(modifier: Modifier = Modifier, viewModel: WeekScreenViewModel = v
     // The timeline scrolls to its opening hour as soon as it is measured, and counts that scroll in
     // hour heights: it is built once the stored height is known, or it would open hours off.
     val storedHourHeight by viewModel.hourHeight.collectAsStateWithLifecycle(initialValue = null)
-    val timelineState = rememberDayTimelineState(initialHourHeight = storedHourHeight ?: return)
+    val timelineState = rememberDayTimelineState(
+        initialHourHeight = storedHourHeight ?: return,
+        onHourHeightSaveRequest = viewModel::saveHourHeight,
+    )
 
-    SaveHourHeight(timelineState, onHourHeightChanged = viewModel::saveHourHeight)
     ApplyJumpRequests(visibleDayState)
-    ReportVisibleMonth(visibleDayState, onVisibleMonthChanged = viewModel::onVisibleMonthChanged)
 
     WeekScreen(
         isLoadingEvents = { isLoadingEvents },
@@ -97,6 +97,7 @@ private fun WeekScreen(
                         expansionState = calendarExpansionState,
                         weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
                         eventsDots = eventsDots,
+                        collapsedContent = ExpandableCalendarDefaults.None,
                     )
                 },
             )
@@ -128,7 +129,7 @@ private fun WeekScreenPreview() {
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
                 visibleDayState = visibleDayState,
-                timelineState = rememberDayTimelineState(),
+                timelineState = rememberDayTimelineState({}),
             )
         }
     }

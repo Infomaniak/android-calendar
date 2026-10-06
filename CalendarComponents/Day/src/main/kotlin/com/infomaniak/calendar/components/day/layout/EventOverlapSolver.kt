@@ -82,7 +82,7 @@ internal fun List<TimedEvent>.resolveOverlaps(
     }
     alignGroup(frames, groupStart, frames.size, layoutWidth, config)
 
-    val drawnPlacements = frames.mapIndexed { position, frame -> frame.toPlacement(position.toFloat(), config) }
+    val drawnPlacements = frames.mapIndexed { position, frame -> frame.toPlacement(position.toFloat()) }
     val visibleHeights = drawnPlacements.visibleHeights()
 
     val placements = arrayOfNulls<EventPlacement>(size)
@@ -147,21 +147,25 @@ private fun alignGroup(frames: List<EventFrame>, from: Int, until: Int, layoutWi
     val group = frames.subList(from, until)
     val containers = buildContainers(frames, from, group.minOf { it.y }, group.maxOf { it.maxY }, layoutWidth, config)
 
-    distributeAmongContainers(group, containers).forEach { (containerIndex, groupIndices) ->
+    distributeAmongContainers(group, containers, config.horizontalSpacing).forEach { (containerIndex, groupIndices) ->
         val container = containers[containerIndex]
-        val fairShare = (container.width - container.padding) / groupIndices.size
-        // The frame still carries the trailing spacing toPlacement() strips, so the floor includes
-        // it to keep the drawn card at least minEventWidth wide.
-        val eventWidth = fairShare.coerceAtLeast(config.minEventWidth + config.horizontalSpacing)
-        // An even split fills the container exactly, so crossing maxX can only be float rounding
-        // noise: events can genuinely run out of room only once the floor overrides the split.
-        val isFloored = eventWidth > fairShare
+        val spacing = config.horizontalSpacing
+        val n = groupIndices.size
+
+        // Greedy event width simply divides the container's content width by the number of events.
+        val greedyEventWidth = (container.contentWidth - spacing * (n - 1)) / n
+        val eventWidth = greedyEventWidth.coerceAtLeast(config.minEventWidth)
+        val wasResizedToMinWidth = eventWidth > greedyEventWidth
 
         groupIndices.forEachIndexed { slot, groupIndex ->
-            val x = container.x + eventWidth * slot + container.padding
+            val offset = (eventWidth + spacing) * slot
             val frame = group[groupIndex]
 
-            if (isFloored && x + eventWidth > container.maxX) frame.collapse() else frame.moveTo(x, eventWidth)
+            if (wasResizedToMinWidth && offset + eventWidth > container.contentWidth) {
+                frame.collapse()
+            } else {
+                frame.moveTo(container.contentX + offset, eventWidth)
+            }
         }
     }
 }
@@ -193,29 +197,43 @@ private fun buildContainers(
 
     val containers = mutableListOf<FrameContainer>()
     for (index in 0 until edges.lastIndex) {
-        if (edges[index] + config.horizontalPadding >= edges[index + 1]) continue
+        val width = edges[index + 1] - edges[index]
+        // Add horizontal spacing after every container except the last one that ends exactly on the column end edge (= layoutWidth)
+        val trailingPadding = if (edges[index + 1] < layoutWidth) config.horizontalSpacing else 0f
+        // Skip containers that are too narrow to hold a card. We need to check the actual available size for drawing without
+        // taking into account the needed optional trailing padding nor the required spacing between containers.
+        // The remaining drawing width must at least hold the minimum horizontal padding. This doesn't mean there will be enough
+        // space to display an event but this is checked later on.
+        if (width - trailingPadding + config.horizontalSpacing <= config.horizontalPadding) continue
 
-        val padding = if (containers.isEmpty() && index == 0) 0f else config.horizontalPadding
-        containers.add(FrameContainer(edges[index], edges[index + 1] - edges[index], padding))
+        val leadingPadding = if (index == 0) 0f else config.horizontalPadding
+        containers.add(FrameContainer(edges[index], width, leadingPadding, trailingPadding))
     }
 
-    return containers.ifEmpty { listOf(FrameContainer(x = 0f, width = 0f, padding = 0f)) }
+    return containers.ifEmpty { listOf(FrameContainer(x = 0f, width = 0f, leadingPadding = 0f, trailingPadding = 0f)) }
 }
 
-/** Every event joins the container where it would still get the widest share. */
+/**
+ * Every event joins the container where it would get the widest share. A share counts a card
+ * and the gap after it, so containers compare the same whether or not they end on the layout's edge.
+ */
 private fun distributeAmongContainers(
-    group: List<EventFrame>,
+    events: List<EventFrame>,
     containers: List<FrameContainer>,
+    spacing: Float,
 ): Map<Int, List<Int>> {
-    val eventsByContainer = mutableMapOf<Int, MutableList<Int>>()
+    val eventIndicesByContainer = mutableMapOf<Int, MutableList<Int>>()
 
-    group.indices.forEach { groupIndex ->
+    events.indices.forEach { eventIndex ->
         var widestShare = 0f
         var chosenContainer = 0
 
         containers.forEachIndexed { containerIndex, container ->
-            val occupants = eventsByContainer[containerIndex]?.size ?: 0
-            val share = ((container.width - container.padding) / (occupants + 1)).roundedToHundredths()
+            val containerEventCount = eventIndicesByContainer[containerIndex]?.size ?: 0
+            // Find the potential width for this event if it gets associated to this container.
+            // We need to take into account the spacing between events which is why we subtract it to only get actually drawable width.
+            val share = ((container.contentWidth - spacing * containerEventCount) / (containerEventCount + 1))
+                .roundedToHundredths()
 
             if (widestShare < share) {
                 widestShare = share
@@ -223,24 +241,20 @@ private fun distributeAmongContainers(
             }
         }
 
-        eventsByContainer.getOrPut(chosenContainer) { mutableListOf() }.add(groupIndex)
+        eventIndicesByContainer.getOrPut(chosenContainer) { mutableListOf() }.add(eventIndex)
     }
 
-    return eventsByContainer
+    return eventIndicesByContainer
 }
 
-private fun EventFrame.toPlacement(drawOrder: Float, config: EventLayoutConfig): EventPlacement {
-    val height = height.coerceAtLeast(0f)
-
-    return EventPlacement(
-        x = x,
-        y = y,
-        width = (width - config.horizontalSpacing).coerceAtLeast(0f),
-        height = height,
-        visibleHeight = height,
-        drawOrder = drawOrder,
-    )
-}
+private fun EventFrame.toPlacement(drawOrder: Float): EventPlacement = EventPlacement(
+    x = x,
+    y = y,
+    width = width,
+    height = height,
+    visibleHeight = height,
+    drawOrder = drawOrder,
+)
 
 private fun Float.roundedToHundredths(): Float = round(this * 100f) / 100f
 
@@ -260,6 +274,7 @@ private class EventFrame(var x: Float, var y: Float, var width: Float, var heigh
     }
 }
 
-private class FrameContainer(val x: Float, val width: Float, val padding: Float) {
-    val maxX get() = x + width
+private class FrameContainer(val x: Float, val width: Float, val leadingPadding: Float, val trailingPadding: Float) {
+    val contentX get() = x + leadingPadding
+    val contentWidth get() = width - leadingPadding - trailingPadding
 }

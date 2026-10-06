@@ -35,7 +35,7 @@ import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 
 @Composable
-fun WeekPager(
+fun ThreeDayPager(
     modifier: Modifier = Modifier,
     state: DayTimelineState = rememberDayTimelineState({}),
     contentPadding: PaddingValues = PaddingValues(),
@@ -51,7 +51,7 @@ fun WeekPager(
             // counting where the first hour line is drawn, not where the padding begins.
             .pinchToZoom(state),
     ) {
-        val columnCount = 7
+        val columnCount = 3
         val columnWidth = (this@BoxWithConstraints.maxWidth - DayTimelineDefaults.HourGutterWidth) / columnCount
 
         // TODO: Replace with grid
@@ -70,7 +70,7 @@ fun WeekPager(
 private fun Preview() {
     MaterialTheme {
         Surface {
-            WeekPager()
+            ThreeDayPager()
         }
     }
 }

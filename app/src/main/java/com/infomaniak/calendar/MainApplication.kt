@@ -59,13 +59,13 @@ class MainApplication : Application(), MetroApplication {
         MatomoCalendar.addTrackingCallbackForDebugLog()
         initCrossAppLogin()
 
-        loadCalDavCredential()
+        initStoredAccounts()
         appGraph.cachedCalendarManager // Start loading calendars now so they're ready before any screen needs them
     }
 
-    private fun loadCalDavCredential() {
+    private fun initStoredAccounts() {
         applicationScope.launch {
-            appGraph.davCredentialsManager.initStoredCredentials()
+            appGraph.accountUtils.initStoredAccounts()
         }
     }
 
@@ -83,9 +83,6 @@ class MainApplication : Application(), MetroApplication {
                 debugInterception = debugInterception,
             ),
         )
-
-        // Off the main thread and after the fact: this only reports, it never gates the configuration.
-        applicationScope.launch { CaldavDebugConfig.warnIfProxyUnreachable(debugInterception) }
     }
 
     /**

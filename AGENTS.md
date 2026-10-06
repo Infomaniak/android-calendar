@@ -99,6 +99,7 @@ extracted and shared with other Infomaniak apps.
 
 The group is intentionally **self-contained**: no dependency on `:app`, no DI framework, no KMP types leaking in.
 `VisibleDayState` lives in `Foundation`: date jumps request navigation, and the content reports the date it reaches.
+It wraps mutable Compose state, so hosts can share the same date with their ViewModels.
 `ExpandableCalendar` accepts this state or explicit date/click callbacks; expansion state stays independent.
 String resources follow the single-module pattern — all strings consumed by any CalendarComponents module are declared in 
 `:CalendarComponents:Resources` so consumers never have to manage per-module string tags.
@@ -138,7 +139,7 @@ When adding a new CalendarComponents module, apply the flavor-aware plugin if it
 | `:CalendarComponents:Resources`   | `com.infomaniak.calendar.components.resources`   | String-only module: `res/values/strings.xml` (+ translations). No Kotlin code, no Compose. Centralises all CalendarComponents string resources. |
 | `:CalendarComponents:Event`       | `com.infomaniak.calendar.components.event`       | `EventItem` Composable — renders a single event row. Re-exports Foundation via `api`. |
 | `:CalendarComponents:Planning`    | `com.infomaniak.calendar.components.planning`    | `Planning` Composable — a `LazyColumn` with ISO week headers and per-day event lists. Also provides the `stickyWithinItem` `Modifier` extension. Re-exports Foundation via `api` (its types appear in `Planning`'s public signature); Event and Resources are internal implementation details and stay `implementation`. Week header design is a **placeholder**. |
-| `:CalendarComponents:Day`         | `com.infomaniak.calendar.components.day`         | Day view — a day's header, its all-day band, and the scrollable hour grid carrying its timed events, with the current time indicator and pinch-to-zoom over it. Holds `resolveOverlaps`, the pure-Kotlin solver placing concurrent events, ported from the [Eventually](https://github.com/claustrofob/Eventually) SwiftUI layout the iOS calendar uses so both platforms arrange a day identically. Reusable by the future 3-day / week views. Re-exports Foundation via `api`. |
+| `:CalendarComponents:Day`         | `com.infomaniak.calendar.components.day`         | Day view — a day's header, its all-day band, and the scrollable hour grid carrying its timed events, with the current time indicator and pinch-to-zoom over it. Holds `resolveOverlaps`, the pure-Kotlin solver placing concurrent events, ported from the [Eventually](https://github.com/claustrofob/Eventually) SwiftUI layout the iOS calendar uses so both platforms arrange a day identically. `TimedEventsColumn` resolves and places a day's timed events within its own bounds (no knowledge of the hour gutter), so any timeline can position one column per day. The grid is split the same way: `HourLabels` (the gutter's hour labels only) and `HourLines` (a line per hour across the width it is given), both sized by `Modifier.timelineHeight`, so each screen composes the gutter, lines and columns it needs. Reusable by the future 3-day / week views. Re-exports Foundation via `api`. |
 | `:CalendarComponents:EventDetail` | `com.infomaniak.calendar.components.eventdetail` | Event detail module — the `detail` package contains the read-only `EventDetail` Composable, while the `form` package contains the editable `EventForm` shared by event editing and creation. Matching fields can opt into shared-element transitions through optional Compose animation scopes and internal element keys, without depending on app navigation or domain identifier types. Re-exports Foundation and `core.infomaniak.core.filetypes` via `api` since both appear in `EventDetailUi`. |
 
 ### Dependency graph
@@ -194,14 +195,22 @@ All CalendarComponents source lives **in this repository**. Changes to these mod
       process-wide client configuration (`configureCaldavClient()`, `CaldavClientConfig`).
     - **`:CalendarCore`** — public API module: domain models, Room database, repositories, `AccountManager`,
       `CalendarManager`, Apple `CalendarSDK`.
+- **Contacts module**: `:Contacts` is a standalone KMP module (server address book merged with device contacts, ETag
+  sync) wired by `:CalendarCore` via `api` + `ContactsModule`; it is exported in the XCFramework. The app provides
+  `ContactsSettings` (contacts database path) and gets `contactsManager` through `CalendarCoreGraph`.
+  `AccountManager.initAccount(accountId, davCredentials, accessToken)` / `removeAccount` also init / remove the account in
+  `ContactsManager` (token kept in RAM only); the app calls `initAccount` at startup (`AccountUtils.initStoredAccounts()`)
+  and on login.
+- **Account module**: `:Account` holds the identity types shared by `:CalendarCore` and `:Contacts` (`AccountId`,
+  `AccessToken`, package `com.infomaniak.multiplatform_core.account.domain.model`); it is exported in the XCFramework.
 - **Shared models / business logic**: The app imports from `com.infomaniak.multiplatform_calendar.core.*` (e.g.,
   `com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Color`) and the bridge from
   `com.infomaniak.multiplatform_calendar.data.remote.caldav.*` (e.g., `DavAccount`, `CaldavClientConfig`).
 - **DI**: The app uses Metro's `@DependencyGraph` (`AppGraph`) which picks up the `@ContributesTo(AppScope)` modules of
   both KMP modules (`CalendarCoreGraph`, `DatabaseModule`, `CaldavClientModule`). `CalendarCoreGraph` (in
-  `:CalendarCore` `commonMain`) defines the shared accessors (`accountManager`, `calendarManager`) and is automatically
-  merged into `AppGraph` (Android). On Apple, `CalendarSDK` lives in `:CalendarCore` `appleMain` and explicitly inherits
-  `CaldavClientModule` while also receiving the contributed bindings.
+  `:CalendarCore` `commonMain`) defines the shared accessors (`accountManager`, `calendarManager`, `contactsManager`)
+  and is automatically merged into `AppGraph` (Android). On Apple, `CalendarSDK` lives in `:CalendarCore` `appleMain`
+  and explicitly inherits `CaldavClientModule` while also receiving the contributed bindings.
 - **Apple artifact**: The public `MultiplatformCalendar.xcframework` is produced by `:CalendarCore`. `:CalendarKmpDav`
   is **not** exported: the public Apple API exposes only `:CalendarCore` types (e.g. credentials are passed as
   `DavCredentials`, mapped to `DavAccount` at the repository boundary). `CalendarSDKProvider.sdk(...)` is the Apple

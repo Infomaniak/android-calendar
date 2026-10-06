@@ -18,24 +18,19 @@
 package com.infomaniak.calendar.components.day.component
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
-import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults
-import com.infomaniak.calendar.components.day.layout.ResizableEventLayout
-import com.infomaniak.calendar.components.day.layout.eventLayoutConfig
-import com.infomaniak.calendar.components.day.layout.resolveOverlaps
+import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.pinchToZoom
@@ -46,16 +41,12 @@ import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
+import kotlin.time.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
-import kotlin.time.Clock
 
 private val LocalDateTime.minuteOfDay: Int get() = hour * MINUTES_PER_HOUR + minute
 
-/**
- * Overlaps are resolved once per width and zoom level rather than on every frame, since the
- * arrangement only changes when one of the two does.
- */
 @Composable
 internal fun DayTimeline(
     date: LocalDate,
@@ -67,55 +58,42 @@ internal fun DayTimeline(
 ) {
     val currentDateTime by rememberCurrentDateTime()
 
-    BoxWithConstraints(
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(contentPadding.onlyHorizontal()),
+            .padding(contentPadding.onlyHorizontal())
+            .verticalScroll(state.scrollState, enabled = !state.isPinching)
+            .padding(
+                top = HourLabelOverhang + contentPadding.calculateTopPadding(),
+                bottom = DayTimelineDefaults.BottomPadding + contentPadding.calculateBottomPadding(),
+            )
+            // Inside the padding: a pinch reads its own y as an hour, so it has to start
+            // counting where the first hour line is drawn, not where the padding begins.
+            .pinchToZoom(state),
     ) {
-        val density = LocalDensity.current
-        val config = eventLayoutConfig()
-        // The solver strips horizontalSpacing off the end of every card, so the area runs that far
-        // past the timeline's end padding for the last column of cards to stop exactly on it.
-        val eventsAreaEndPadding = DayTimelineDefaults.TimelineEndPadding - EventLayoutDefaults.HorizontalSpacing
-        val eventsAreaWidth = maxWidth - DayTimelineDefaults.HourGutterWidth - eventsAreaEndPadding
-
-        val placements = remember(events, eventsAreaWidth, state.hourHeight, config) {
-            with(density) {
-                events.timed.resolveOverlaps(
-                    layoutWidth = eventsAreaWidth.toPx(),
-                    pixelsPerMinute = state.hourHeight.toPx() / MINUTES_PER_HOUR,
-                    config = config,
-                )
-            }
-        }
-
-        Box(
+        HourLabels(state = state, modifier = Modifier.width(DayTimelineDefaults.HourGutterWidth))
+        HourLines(
+            state = state,
             modifier = Modifier
-                .verticalScroll(state.scrollState, enabled = !state.isPinching)
-                .padding(
-                    top = HourLabelOverhang + contentPadding.calculateTopPadding(),
-                    bottom = DayTimelineDefaults.BottomPadding + contentPadding.calculateBottomPadding(),
-                )
-                // Inside the padding: a pinch reads its own y as an hour, so it has to start
-                // counting where the first hour line is drawn, not where the padding begins.
-                .pinchToZoom(state),
-        ) {
-            HourGrid(state = state, modifier = Modifier.fillMaxWidth())
+                .fillMaxWidth()
+                .padding(start = DayTimelineDefaults.HourGutterWidth, end = DayTimelineDefaults.TimelineEndPadding),
+        )
 
-            ResizableEventLayout(
-                timedEvents = events.timed,
-                placements = placements,
-                onEventClick = onEventClick,
+        TimedEventsColumn(
+            events = events.timed,
+            hourHeight = state.hourHeight,
+            onEventClick = onEventClick,
+            modifier = Modifier
+                .matchParentSize()
+                .padding(start = DayTimelineDefaults.HourGutterWidth, end = DayTimelineDefaults.TimelineEndPadding),
+        )
+
+        if (currentDateTime.date == date) {
+            CurrentTimeIndicator(
+                minuteOfDay = currentDateTime.minuteOfDay,
+                state = state,
                 modifier = Modifier.matchParentSize(),
             )
-
-            if (currentDateTime.date == date) {
-                CurrentTimeIndicator(
-                    minuteOfDay = currentDateTime.minuteOfDay,
-                    state = state,
-                    modifier = Modifier.matchParentSize(),
-                )
-            }
         }
     }
 }
@@ -127,7 +105,7 @@ private fun DayTimelinePreview() {
         DayTimeline(
             date = Clock.today(),
             events = previewDayEvents,
-            state = rememberDayTimelineState(scrollState = rememberScrollState(initial = 430)),
+            state = rememberDayTimelineState({}, scrollState = rememberScrollState(initial = 430)),
             onEventClick = {},
         )
     }
@@ -140,7 +118,7 @@ private fun DayTimelineZoomedOutPreview() {
         DayTimeline(
             date = Clock.today(),
             events = previewDayEvents,
-            state = rememberDayTimelineState(initialHourHeight = DayTimelineDefaults.MinHourHeight),
+            state = rememberDayTimelineState({}, initialHourHeight = DayTimelineDefaults.MinHourHeight),
             onEventClick = {},
         )
     }

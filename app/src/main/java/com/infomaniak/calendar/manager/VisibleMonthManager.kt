@@ -19,7 +19,6 @@ package com.infomaniak.calendar.manager
 
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.ui.screen.planning.toEventColorsUi
-import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.DotColor
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
@@ -28,27 +27,28 @@ import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.YearMonth
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.yearMonth
-import kotlin.time.Clock
 
 @Inject
 @SingleIn(AppScope::class)
-class VisibleMonthManager(private val calendarManager: CalendarManager) {
+class VisibleMonthManager(
+    private val calendarManager: CalendarManager,
+    visibleDateManager: VisibleDateManager,
+) {
     private val timeZone = TimeZone.currentSystemDefault()
-    private val visibleMonth = MutableStateFlow(Clock.today(timeZone).yearMonth)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val eventDots: Flow<Map<LocalDate, List<EventColorsUi>>> = visibleMonth
+    val eventDots: Flow<Map<LocalDate, List<EventColorsUi>>> = visibleDateManager.visibleDateFlow
+        .map { it.yearMonth }
+        .distinctUntilChanged()
         .flatMapLatest { month ->
             calendarManager.observeMonthlyDotColors(
                 startMonth = month.minus(MONTH_MARGIN, DateTimeUnit.MONTH),
@@ -57,10 +57,6 @@ class VisibleMonthManager(private val calendarManager: CalendarManager) {
             )
         }
         .map { it.toEventDots() }
-
-    fun onVisibleMonthChanged(month: YearMonth) {
-        visibleMonth.value = month
-    }
 
     private fun Map<LocalDate, List<DotColor>>.toEventDots(): Map<LocalDate, List<EventColorsUi>> {
         return mapValues { (_, colors) -> colors.map { EventColors.from(null, it.sourceColor).toEventColorsUi() } }

@@ -38,7 +38,6 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.YearMonth
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
@@ -51,7 +50,7 @@ class PlanningViewModel(
     accountUtils: AccountUtils,
     calendarManager: CalendarManager,
     syncEventsManager: SyncEventsManager,
-    private val visibleMonthManager: VisibleMonthManager,
+    visibleMonthManager: VisibleMonthManager,
 ) : ViewModel() {
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
 
@@ -74,8 +73,6 @@ class PlanningViewModel(
 
     val eventDots = visibleMonthManager.eventDots
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
-
-    fun onVisibleMonthChanged(month: YearMonth) = visibleMonthManager.onVisibleMonthChanged(month)
 
     companion object {
         private const val PLANNING_RANGE_DAYS = 250

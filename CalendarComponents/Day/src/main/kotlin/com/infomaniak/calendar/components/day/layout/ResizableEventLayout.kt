@@ -42,6 +42,7 @@ import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import kotlin.math.roundToInt
 
+/** Places every card where the solver put it, relative to its own start edge. */
 @Composable
 internal fun ResizableEventLayout(
     timedEvents: List<TimedEvent>,
@@ -49,7 +50,6 @@ internal fun ResizableEventLayout(
     onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
     val density = LocalDensity.current
     val currentPlacements = rememberUpdatedState(placements)
 
@@ -71,8 +71,6 @@ internal fun ResizableEventLayout(
             }
         },
     ) { measurables, constraints ->
-        val eventsAreaStart = DayTimelineDefaults.HourGutterWidth.roundToPx()
-
         val cards = measurables.mapIndexed { index, measurable ->
             val placement = placements[index]
             measurable.measure(Constraints.fixed(placement.width.roundToInt(), placement.height.roundToInt()))
@@ -83,7 +81,7 @@ internal fun ResizableEventLayout(
                 val placement = placements[index]
 
                 card.place(
-                    x = eventsAreaStart + placement.x.roundToInt(),
+                    x = placement.x.roundToInt(),
                     y = placement.y.roundToInt(),
                     zIndex = placement.drawOrder,
                 )
@@ -97,8 +95,7 @@ internal fun ResizableEventLayout(
  * first, over the whole day the way the timeline does.
  *
  * A card sits at the hour it starts, and [previewDayEvents] starts at 7 in the morning, hours below
- * the top of the day: the preview opens scrolled to the first of them, or it would show the empty
- * night.
+ * the top of the day: the preview opens scrolled to the first of them, or it would show the empty night.
  */
 @Preview
 @Composable
@@ -110,18 +107,12 @@ private fun ResizableEventLayoutPreview() {
         val pixelsPerMinute = with(density) { DayTimelineDefaults.HourHeight.toPx() } / MINUTES_PER_HOUR
 
         BoxWithConstraints {
-            // The layout draws the events past the hour gutter, so it gets the width left after it.
-            val eventsAreaEndPadding = DayTimelineDefaults.TimelineEndPadding - EventLayoutDefaults.HorizontalSpacing
-            val eventsAreaWidth = maxWidth - DayTimelineDefaults.HourGutterWidth - eventsAreaEndPadding
-
-            val placements = remember(density, config, eventsAreaWidth) {
-                with(density) {
-                    timedEvents.resolveOverlaps(
-                        layoutWidth = eventsAreaWidth.toPx(),
-                        pixelsPerMinute = pixelsPerMinute,
-                        config = config,
-                    )
-                }
+            val placements = remember(density, config, constraints.maxWidth) {
+                timedEvents.resolveOverlaps(
+                    layoutWidth = constraints.maxWidth.toFloat(),
+                    pixelsPerMinute = pixelsPerMinute,
+                    config = config,
+                )
             }
 
             val firstEventMinute = timedEvents.minOf { it.startMinuteOfDay }

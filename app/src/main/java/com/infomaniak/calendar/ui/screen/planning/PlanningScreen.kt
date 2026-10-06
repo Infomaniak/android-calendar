@@ -41,7 +41,6 @@ import com.infomaniak.calendar.components.planning.Planning
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.ScreenLoader
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
-import com.infomaniak.calendar.ui.effects.ReportVisibleMonth
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
 import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewParameter
@@ -64,8 +63,6 @@ fun PlanningScreen(
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
     val eventsDots by viewModel.eventDots.collectAsStateWithLifecycle(initialValue = emptyMap())
     val visibleDayState = LocalVisibleDayState.current ?: return
-
-    ReportVisibleMonth(visibleDayState, onVisibleMonthChanged = viewModel::onVisibleMonthChanged)
 
     PlanningScreen(
         goToEventCreation = goToEventCreation,

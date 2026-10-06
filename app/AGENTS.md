@@ -36,7 +36,8 @@ app/src/main/java/com/infomaniak/calendar/
 │       └── worker/                 # MetroWorker key, MetroWorkerFactory, WorkerGraphProvider, WorkerInstanceFactory
 ├── manager/
 │   ├── SyncEventsManager.kt        # App-scoped: downloads + syncs the events of the months around the visible date
-│   └── VisibleMonthManager.kt      # App-scoped: the month the calendar shows + its event dots, shared by every calendar view
+│   ├── VisibleDateManager.kt       # App-scoped: single visible-date source, restored/saved by MainViewModel
+│   └── VisibleMonthManager.kt      # App-scoped: event dots derived from the shared visible date's month
 ├── utils/
 │   ├── AttendeeExt.kt              # KMP Attendee → Attendees mapping, shared by the two event UI models below
 │   ├── EventDaySliceExt.kt         # KMP EventDaySlice → EventUi mapping, shared by every calendar view
@@ -117,7 +118,8 @@ from an emulator; for a physical device, override it in `local.properties` (git-
 caldavDebugProxyUrl=http://<machine LAN address>:9090
 ```
 
-See `CaldavDebugConfig`.
+The proxy is probed once at startup: when it is unreachable, the client connects directly and logs a warning, so
+start the proxy, then restart the app to intercept. See `CaldavDebugConfig`.
 
 The Rust bridge ships the interception code in every build; the app keeps it **debug-only, by construction**
 rather than by a runtime `if`:
@@ -260,8 +262,12 @@ fun MyComponent(
   (`ui/component/`) instead of `Scaffold`. It has the same shape as a `Scaffold`, and owns the details that go with
   overlaying: the top bar is drawn over the content and keeps the top window insets, and the content padding it hands
   out already includes the measured top bar height. Do not re-implement that per screen.
-- **Visible date**: `LocalVisibleDayState` provides Foundation's `VisibleDayState`. All calendar views report the visible
-  month with `ReportVisibleMonth`; do not mirror the date or update the month separately when requesting a jump.
+- **Visible date**: `VisibleDateManager` owns one app-scoped `MutableState<LocalDate>` and exposes its changes through
+  `snapshotFlow` for date-dependent queries. `MainViewModel` binds the manager to `SavedStateHandle` under
+  `"visibleDate"`; the saved-state provider stores the date string in a `Bundle` under the same key, and binding restores
+  it when present. Restoration only initializes a fresh manager. `MainActivity` passes the same mutable state to Foundation's
+  `VisibleDayState`, provided through `LocalVisibleDayState`. Months are derived in `VisibleMonthManager`; screens do
+  not report them separately. Jump commands remain independent of the date the content reaches.
 
 ### Testing
 

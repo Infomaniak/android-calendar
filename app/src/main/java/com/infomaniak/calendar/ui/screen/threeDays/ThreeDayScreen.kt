@@ -17,53 +17,120 @@
  */
 package com.infomaniak.calendar.ui.screen.threeDays
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.R
-import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
+import com.infomaniak.calendar.components.calendar.component.ExpandableCalendarDefaults
+import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
+import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
+import com.infomaniak.calendar.components.day.ThreeDayPager
+import com.infomaniak.calendar.components.day.state.DayTimelineState
+import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.foundation.models.EventColorsUi
+import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.calendar.components.foundation.state.VisibleDayState
+import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
+import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
+import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
+import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
+import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.core.ui.compose.basics.onlyHorizontal
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.rememberHazeState
+import kotlinx.datetime.LocalDate
 
 @Composable
-fun ThreeDayScreen(modifier: Modifier = Modifier) {
-    Scaffold(
+fun ThreeDayScreen(modifier: Modifier = Modifier, viewModel: ThreeDayViewModel = viewModel()) {
+    val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
+    val eventDots by viewModel.eventDots.collectAsStateWithLifecycle()
+
+    val visibleDayState = LocalVisibleDayState.current ?: return
+    // The timeline scrolls to its opening hour as soon as it is measured, and counts that scroll in
+    // hour heights: it is built once the stored height is known, or it would open hours off.
+    val storedHourHeight by viewModel.hourHeight.collectAsStateWithLifecycle(initialValue = null)
+    val timelineState = rememberDayTimelineState(
+        initialHourHeight = storedHourHeight ?: return,
+        onHourHeightSaveRequest = viewModel::saveHourHeight,
+    )
+
+    ApplyJumpRequests(visibleDayState)
+
+    ThreeDayScreen(
+        isLoadingEvents = { isLoadingEvents },
+        eventsDots = { eventDots },
+        visibleDayState = visibleDayState,
+        timelineState = timelineState,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun ThreeDayScreen(
+    isLoadingEvents: () -> Boolean,
+    eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
+    visibleDayState: VisibleDayState,
+    timelineState: DayTimelineState,
+    modifier: Modifier = Modifier,
+) {
+    val calendarExpansionState = rememberCalendarExpansionState()
+    val hazeState = rememberHazeState()
+
+    OverlaidTopBarScaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.threeDaysTitle)) },
-                navigationIcon = { TopAppBarButtons.DrawerIconButton() },
+            CalendarTopAppBar(
+                isLoadingEvents = isLoadingEvents,
+                onToggleCalendar = calendarExpansionState::toggle,
+                calendarExpansionProgress = { calendarExpansionState.progress },
+                hazeState = hazeState,
+                calendar = {
+                    ExpandableCalendar(
+                        visibleDayState = visibleDayState,
+                        expansionState = calendarExpansionState,
+                        weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
+                        eventsDots = eventsDots,
+                        collapsedContent = ExpandableCalendarDefaults.None,
+                    )
+                },
             )
         },
         modifier = modifier,
-    ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = paddingValues,
-        ) {
-            items(50) { index ->
-                Text(
-                    text = "Événement du jour n°$index",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                )
-            }
+    ) { contentPadding ->
+        Box(modifier = Modifier.padding(contentPadding.onlyHorizontal())) {
+            ThreeDayPager(
+                state = timelineState,
+                modifier = Modifier
+                    .collapseCalendarOnScroll(calendarExpansionState)
+                    .hazeSource(hazeState),
+                contentPadding = PaddingValues(
+                    top = contentPadding.calculateTopPadding(),
+                    bottom = contentPadding.calculateBottomPadding(),
+                ),
+            )
         }
     }
 }
 
 @Preview
 @Composable
-private fun ThreeDayScreenPreview() {
+private fun Preview() {
     CalendarThemeForPreview {
-        ThreeDayScreen()
+        val visibleDayState = rememberVisibleDayState()
+        CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
+            ThreeDayScreen(
+                isLoadingEvents = { false },
+                eventsDots = { emptyMap() },
+                visibleDayState = visibleDayState,
+                timelineState = rememberDayTimelineState({}),
+            )
+        }
     }
 }
