@@ -28,26 +28,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.attendeessearch.component.AttendeesList
 import com.infomaniak.calendar.components.attendeessearch.component.EmptyState
 import com.infomaniak.calendar.components.attendeessearch.component.SearchBar
-import com.infomaniak.calendar.components.attendeessearch.state.AttendeesState
-import com.infomaniak.calendar.components.attendeessearch.state.rememberSaveableAttendeesState
+import com.infomaniak.calendar.components.attendeessearch.state.AttendeesSearchState
+import com.infomaniak.calendar.components.attendeessearch.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
 fun AttendeesSearch(
-    attendeesState: AttendeesState,
+    attendeesSearchState: AttendeesSearchState,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         SearchBar(
-            searchState = attendeesState.searchQueryTextFieldState,
+            searchState = attendeesSearchState.searchQueryTextFieldState,
         )
-        if (attendeesState.searchResults.isEmpty()) {
+        if (attendeesSearchState.searchResults.isEmpty()) {
             EmptyState(text = stringResource(R.string.attendeesEmptyState))
         } else {
             AttendeesList(
-                attendees = { attendeesState.searchResults },
+                attendees = { attendeesSearchState.searchResults },
                 modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md, vertical = EsdsTheme.spacing.sm),
             )
         }
@@ -60,7 +60,7 @@ private fun Preview() {
     MaterialTheme {
         Surface {
             AttendeesSearch(
-                attendeesState = rememberSaveableAttendeesState(
+                attendeesSearchState = rememberSaveableAttendeesSearchState(
                     attendees = previewAttendees,
                     contacts = previewAttendees,
                 ),
@@ -71,11 +71,11 @@ private fun Preview() {
 
 @Preview
 @Composable
-private fun PreviewEmptyState() {
+private fun PreviewEmptySearchState() {
     MaterialTheme {
         Surface {
             AttendeesSearch(
-                attendeesState = rememberSaveableAttendeesState(
+                attendeesSearchState = rememberSaveableAttendeesSearchState(
                     attendees = listOf(),
                     contacts = listOf(),
                 ),

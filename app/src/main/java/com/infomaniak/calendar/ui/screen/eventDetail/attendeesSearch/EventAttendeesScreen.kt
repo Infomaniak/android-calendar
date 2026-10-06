@@ -34,8 +34,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.attendeessearch.AttendeesSearch
-import com.infomaniak.calendar.components.attendeessearch.state.AttendeesState
-import com.infomaniak.calendar.components.attendeessearch.state.rememberSaveableAttendeesState
+import com.infomaniak.calendar.components.attendeessearch.state.AttendeesSearchState
+import com.infomaniak.calendar.components.attendeessearch.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
@@ -69,13 +69,13 @@ fun EventAttendeesScreen(
                 }
             }
             is EventDetailUiState.Success -> {
-                val attendeesState = rememberSaveableAttendeesState(
+                val attendeesSearchState = rememberSaveableAttendeesSearchState(
                     attendees = state.eventDetail.attendees.all,
                     contacts = state.eventDetail.attendees.all,
                 )
 
                 EventAttendeesScreen(
-                    attendeesState = attendeesState,
+                    attendeesSearchState = attendeesSearchState,
                     goBack = goBack,
                 )
             }
@@ -86,7 +86,7 @@ fun EventAttendeesScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventAttendeesScreen(
-    attendeesState: AttendeesState,
+    attendeesSearchState: AttendeesSearchState,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -100,7 +100,7 @@ fun EventAttendeesScreen(
         modifier = modifier,
     ) { paddingValues ->
         AttendeesSearch(
-            attendeesState = attendeesState,
+            attendeesSearchState = attendeesSearchState,
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxWidth(),
@@ -110,10 +110,10 @@ fun EventAttendeesScreen(
 
 @Preview
 @Composable
-private fun EventAttendeesScreenPreview() {
+private fun EventAttendeesSearchScreenPreview() {
     CalendarThemeForPreview {
         EventAttendeesScreen(
-            attendeesState = rememberSaveableAttendeesState(
+            attendeesSearchState = rememberSaveableAttendeesSearchState(
                 attendees = previewAttendees,
                 contacts = previewAttendees,
             ),

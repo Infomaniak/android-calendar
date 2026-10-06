@@ -27,7 +27,7 @@ import androidx.compose.runtime.remember
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 
 @Stable
-class AttendeesState(
+class AttendeesSearchState(
     private val attendees: List<AttendeeUi>,
     private val contacts: List<AttendeeUi>,
     val searchQueryTextFieldState: TextFieldState,
@@ -51,14 +51,14 @@ class AttendeesState(
 }
 
 @Composable
-fun rememberSaveableAttendeesState(
+fun rememberSaveableAttendeesSearchState(
     attendees: List<AttendeeUi>,
     contacts: List<AttendeeUi>,
     searchQuery: String = "",
-): AttendeesState {
+): AttendeesSearchState {
     val searchQueryState = rememberTextFieldState(initialText = searchQuery)
 
     return remember(attendees, contacts, searchQueryState) {
-        AttendeesState(attendees = attendees, contacts = contacts, searchQueryTextFieldState = searchQueryState)
+        AttendeesSearchState(attendees = attendees, contacts = contacts, searchQueryTextFieldState = searchQueryState)
     }
 }
