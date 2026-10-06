@@ -85,7 +85,7 @@ fun EventAttendeesScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventAttendeesScreen(
+private fun EventAttendeesScreen(
     attendeesSearchState: AttendeesSearchState,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,

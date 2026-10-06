@@ -43,7 +43,6 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.designsystem.core.theme.EsdsTheme
-import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
 
 @Composable
 internal fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
