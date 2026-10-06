@@ -80,8 +80,7 @@ internal fun TimedEventsColumn(
 
 /**
  * A card sits at the hour it starts, and [previewDayEvents] starts at 7 in the morning, hours below
- * the top of the day: the preview opens scrolled to the first of them, or it would show the empty
- * night.
+ * the top of the day: the preview opens scrolled to the first of them, or it would show the empty night.
  */
 @Preview
 @Composable

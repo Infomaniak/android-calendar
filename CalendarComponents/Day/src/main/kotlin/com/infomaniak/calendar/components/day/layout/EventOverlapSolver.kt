@@ -214,7 +214,7 @@ private fun buildContainers(
 }
 
 /**
- * Every event joins the container where it would still get the widest share. A share counts a card
+ * Every event joins the container where it would get the widest share. A share counts a card
  * and the gap after it, so containers compare the same whether or not they end on the layout's edge.
  */
 private fun distributeAmongContainers(
@@ -231,7 +231,7 @@ private fun distributeAmongContainers(
         containers.forEachIndexed { containerIndex, container ->
             val containerEventCount = eventIndicesByContainer[containerIndex]?.size ?: 0
             // Find the potential width for this event if it gets associated to this container.
-            // We need to take into account the spacing between occupants.
+            // We need to take into account the spacing between events which is why we subtract it to only get actually drawable width.
             val share = ((container.contentWidth - spacing * containerEventCount) / (containerEventCount + 1))
                 .roundedToHundredths()
 
