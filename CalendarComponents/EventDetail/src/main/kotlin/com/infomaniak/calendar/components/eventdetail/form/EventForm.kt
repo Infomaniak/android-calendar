@@ -37,7 +37,7 @@ import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElemen
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
-import com.infomaniak.calendar.components.eventdetail.previewAttendees
+import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 
 /**
  * Reusable component for both the creation and the edition of an event.

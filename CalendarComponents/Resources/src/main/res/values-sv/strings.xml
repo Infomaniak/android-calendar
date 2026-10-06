@@ -31,6 +31,7 @@
         <item quantity="one">%d avvisad</item>
         <item quantity="other">%d avvisade</item>
     </plurals>
+    <string name="attendeesEmptyState">Inga deltagare hittades</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d väntande</item>
         <item quantity="other">%d väntande</item>
@@ -50,6 +51,7 @@
     <string name="contentDescriptionHasAttendees">Har deltagare</string>
     <string name="contentDescriptionHasKMeetLink">Har en kMeet-länk</string>
     <string name="contentDescriptionHasLocation">Har en plats</string>
+    <string name="contentDescriptionSearch">Sök</string>
     <string name="contentDescriptionToday">Idag</string>
     <plurals name="dayAmount">
         <item quantity="one">%d dag</item>
@@ -82,7 +84,13 @@
         <item quantity="one">%d plats</item>
         <item quantity="other">%d platser</item>
     </plurals>
+    <string name="searchForAttendees">Sök efter deltagare</string>
     <string name="sectionCalendarHeader">Kalender</string>
+    <string name="sectionOrganizerHeader">Arrangör</string>
+    <string name="statusAcceptedLabel">Godkänt</string>
+    <string name="statusDeclinedLabel">Avvisat</string>
+    <string name="statusNeedsActionLabel">Väntar på beslut</string>
+    <string name="statusTentativeLabel">Kanske</string>
     <plurals name="weekAmount">
         <item quantity="one">%d vecka</item>
         <item quantity="other">%d veckor</item>

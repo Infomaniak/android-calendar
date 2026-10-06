@@ -24,8 +24,8 @@ import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
-import com.infomaniak.calendar.components.foundation.models.SimpleEventUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
+import com.infomaniak.calendar.components.foundation.models.SimpleEventUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.foundation.preview.EventColorsUiFactory
@@ -58,9 +58,9 @@ class WeekEventsPreviewParameter : PreviewParameterProvider<Map<YearWeek, Map<Lo
 }
 
 private val dummyAttendees = listOf(
-    AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted),
-    AttendeeUi("bob@example.com", "Bob", ParticipationStatus.Tentative),
-    AttendeeUi("carol@example.com", "Carol", ParticipationStatus.NeedsAction),
+    AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Accepted),
+    AttendeeUi("bob@example.com#Bob", "bob@example.com", "Bob", ParticipationStatus.Tentative),
+    AttendeeUi("carol@example.com#Carol", "carol@example.com", "Carol", ParticipationStatus.NeedsAction),
 )
 
 private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalDate, List<EventUi>>> {

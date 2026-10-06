@@ -31,6 +31,7 @@
         <item quantity="one">%d geweigerd</item>
         <item quantity="other">%d afgewezen</item>
     </plurals>
+    <string name="attendeesEmptyState">Geen deelnemers gevonden</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d in afwachting</item>
         <item quantity="other">%d in afwachting</item>
@@ -50,6 +51,7 @@
     <string name="contentDescriptionHasAttendees">Heeft deelnemers</string>
     <string name="contentDescriptionHasKMeetLink">Bevat een kMeet-link</string>
     <string name="contentDescriptionHasLocation">Heeft een locatie</string>
+    <string name="contentDescriptionSearch">Zoeken</string>
     <string name="contentDescriptionToday">Vandaag</string>
     <plurals name="dayAmount">
         <item quantity="one">%d dag</item>
@@ -82,7 +84,13 @@
         <item quantity="one">%d plaats</item>
         <item quantity="other">%d plaatsen</item>
     </plurals>
+    <string name="searchForAttendees">Zoeken naar deelnemers</string>
     <string name="sectionCalendarHeader">Kalender</string>
+    <string name="sectionOrganizerHeader">Organisator</string>
+    <string name="statusAcceptedLabel">Geaccepteerd</string>
+    <string name="statusDeclinedLabel">Afgewezen</string>
+    <string name="statusNeedsActionLabel">In behandeling</string>
+    <string name="statusTentativeLabel">Misschien</string>
     <plurals name="weekAmount">
         <item quantity="one">%d week</item>
         <item quantity="other">%d weken</item>

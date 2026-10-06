@@ -17,14 +17,15 @@
   -->
 <resources>
     <string name="accountsTitle">Konten</string>
+    <string name="attendeesSearchTitle">Teilnehmer hinzufügen</string>
     <string name="buttonAddAccount">Konto hinzufügen</string>
     <string name="buttonLogOut">Abmelden</string>
     <string name="contentDescriptionBack">Zurück</string>
     <string name="contentDescriptionInbox">Posteingang öffnen</string>
     <string name="contentDescriptionMenuDrawer">Menü öffnen</string>
-    <string name="contentDescriptionSearch">Suchen</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Aktuelle Ansicht: %s. Tippen, um die Ansicht zu wechseln.</string>
     <string name="dayTitle">Tag</string>
+    <string name="eventOccurrenceNotFound">Dieser Anlass ist nicht mehr verfügbar.</string>
     <string name="helpTitle">Hilfe</string>
     <string name="monthTitle">Monat</string>
     <string name="planningTitle">Planung</string>

@@ -45,6 +45,7 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Respon
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
 import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
 import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.EventAttendeesScreen
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
@@ -112,10 +113,17 @@ private fun baseEntryProvider(
             occurrenceId = destination.occurrenceId,
             goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             goToEdit = { backStack.addOnce(NavDestination.EventEdit(destination.occurrenceId)) },
+            goToEventAttendees = { backStack.addOnce(NavDestination.EventAttendees(destination.occurrenceId)) },
         )
     }
     entry<NavDestination.EventEdit>(metadata = metaDataOf(ResponsiveDialog)) { destination ->
         EventEditScreen(
+            occurrenceId = destination.occurrenceId,
+            goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
+        )
+    }
+    entry<NavDestination.EventAttendees>(metadata = metaDataOf(ResponsiveDialog)) { destination ->
+        EventAttendeesScreen(
             occurrenceId = destination.occurrenceId,
             goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
         )
@@ -166,7 +174,7 @@ private fun sceneDecoratorStrategies(
                     currentDestination = { backStack.getLastCalendarView() },
                     floatingActionButton = {
                         CalendarFab(
-                            onClick = { backStack.add(NavDestination.EventCreation) },
+                            onClick = { backStack.addOnce(NavDestination.EventCreation) },
                             modifier = Modifier.fillMaxSize(),
                         )
                     },
@@ -179,7 +187,7 @@ private fun sceneDecoratorStrategies(
             MenuDrawer(
                 content = content,
                 onManageAccounts = {
-                    backStack.add(NavDestination.Accounts.List)
+                    backStack.addOnce(NavDestination.Accounts.List)
                 },
             )
         },

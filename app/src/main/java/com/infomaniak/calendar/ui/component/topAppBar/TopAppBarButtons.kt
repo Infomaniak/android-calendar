@@ -60,7 +60,7 @@ object TopAppBarButtons {
     fun SearchButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
         TooltipIconButton(
             painter = painterResource(R.drawable.ic_magnifying_glass),
-            contentDescription = stringResource(R.string.contentDescriptionSearch),
+            contentDescription = stringResource(RComponents.string.contentDescriptionSearch),
             onClick = onClick,
             modifier = modifier,
         )

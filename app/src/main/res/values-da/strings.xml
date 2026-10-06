@@ -17,14 +17,15 @@
   -->
 <resources>
     <string name="accountsTitle">Konti</string>
+    <string name="attendeesSearchTitle">Tilføj deltagere</string>
     <string name="buttonAddAccount">Tilføj en konto</string>
     <string name="buttonLogOut">Log ud</string>
     <string name="contentDescriptionBack">Tilbage</string>
     <string name="contentDescriptionInbox">Åbn indbakken</string>
     <string name="contentDescriptionMenuDrawer">Åbn menu</string>
-    <string name="contentDescriptionSearch">Søg</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Aktuel visning: %s. Tryk for at skifte visning.</string>
     <string name="dayTitle">Dag</string>
+    <string name="eventOccurrenceNotFound">Denne begivenhed er ikke længere tilgængelig.</string>
     <string name="helpTitle">Hjælp</string>
     <string name="monthTitle">Måned</string>
     <string name="planningTitle">Planlægning</string>

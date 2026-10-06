@@ -43,12 +43,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.infomaniak.calendar.components.eventdetail.previewAttendees
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus.Accepted
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus.Declined
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus.NeedsAction
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus.Tentative
+import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.utils.fromAttendee
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.components.Avatar

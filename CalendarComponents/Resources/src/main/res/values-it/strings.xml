@@ -31,6 +31,7 @@
         <item quantity="one">%d rifiutato</item>
         <item quantity="other">%d rifiutati</item>
     </plurals>
+    <string name="attendeesEmptyState">Nessun partecipante trovato</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d in attesa</item>
         <item quantity="other">%d in attesa</item>
@@ -50,6 +51,7 @@
     <string name="contentDescriptionHasAttendees">Ha partecipanti</string>
     <string name="contentDescriptionHasKMeetLink">Contiene un link kMeet</string>
     <string name="contentDescriptionHasLocation">Ha una sede</string>
+    <string name="contentDescriptionSearch">Cerca</string>
     <string name="contentDescriptionToday">Oggi</string>
     <plurals name="dayAmount">
         <item quantity="one">%d giorno</item>
@@ -82,7 +84,13 @@
         <item quantity="one">%d posto</item>
         <item quantity="other">%d posti</item>
     </plurals>
+    <string name="searchForAttendees">Cerca partecipanti</string>
     <string name="sectionCalendarHeader">Calendario</string>
+    <string name="sectionOrganizerHeader">Organizzatore</string>
+    <string name="statusAcceptedLabel">Accettato</string>
+    <string name="statusDeclinedLabel">Rifiutato</string>
+    <string name="statusNeedsActionLabel">In attesa</string>
+    <string name="statusTentativeLabel">Forse</string>
     <plurals name="weekAmount">
         <item quantity="one">%d settimana</item>
         <item quantity="other">%d settimane</item>

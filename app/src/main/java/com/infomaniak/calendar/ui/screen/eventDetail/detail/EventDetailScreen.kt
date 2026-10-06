@@ -41,8 +41,8 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
-import com.infomaniak.calendar.components.eventdetail.detail.component.ParticipationStatusButtonsToolbar
 import com.infomaniak.calendar.components.eventdetail.detail.EventDetail
+import com.infomaniak.calendar.components.eventdetail.detail.component.ParticipationStatusButtonsToolbar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
@@ -65,6 +65,7 @@ fun EventDetailScreen(
     occurrenceId: OccurrenceId,
     goBack: () -> Unit,
     goToEdit: () -> Unit,
+    goToEventAttendees: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),
 ) {
@@ -82,6 +83,7 @@ fun EventDetailScreen(
         goBack = goBack,
         goToEdit = goToEdit,
         onLocationClick = { location -> openLocationInMapApp(context, location) },
+        goToEventAttendees = goToEventAttendees,
         modifier = modifier,
     )
 }
@@ -92,6 +94,7 @@ private fun EventDetailScreen(
     uiState: () -> EventDetailUiState,
     goBack: () -> Unit,
     goToEdit: () -> Unit,
+    goToEventAttendees: () -> Unit,
     onLocationClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -135,6 +138,7 @@ private fun EventDetailScreen(
                     onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
                     onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
                     onRoomClick = { /*TODO[eventDetail]*/ },
+                    goToEventAttendees = goToEventAttendees,
                     modifier = Modifier.verticalScroll(scrollState),
                     contentPadding = scaffoldContentPadding + Dimens.EventDetailScreensHorizontalPadding,
                     sharedTransitionScope = sharedTransitionScope,
@@ -183,6 +187,7 @@ private fun Preview() {
                 uiState = { EventDetailUiState.Success(previewEventDetail) },
                 goBack = {},
                 goToEdit = {},
+                goToEventAttendees = {},
                 onLocationClick = {},
             )
         }

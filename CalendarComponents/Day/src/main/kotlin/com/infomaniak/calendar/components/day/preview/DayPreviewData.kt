@@ -25,8 +25,8 @@ import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
-import com.infomaniak.calendar.components.foundation.models.SimpleEventUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
+import com.infomaniak.calendar.components.foundation.models.SimpleEventUi
 import com.infomaniak.calendar.components.foundation.preview.EventColorsUiFactory
 import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.LocalDateTime
@@ -37,13 +37,13 @@ import kotlin.time.Clock
 private val previewTimeZone = TimeZone.currentSystemDefault()
 
 private val acceptedByMe = Attendees(
-    all = listOf(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted)),
-    me = AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted),
+    all = listOf(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Accepted)),
+    me = AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Accepted),
 )
 
 private val declinedByMe = Attendees(
-    all = listOf(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Declined)),
-    me = AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Declined),
+    all = listOf(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Declined)),
+    me = AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Declined),
 )
 
 internal val previewDayEvents: DayEvents by lazy {
