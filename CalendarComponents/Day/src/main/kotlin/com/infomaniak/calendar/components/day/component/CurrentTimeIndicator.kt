@@ -64,7 +64,7 @@ internal fun CurrentTimeIndicator(minuteOfDay: Int, state: DayTimelineState, mod
 @Preview(heightDp = 240)
 @Composable
 private fun CurrentTimeIndicatorPreview() {
-    val state = rememberDayTimelineState()
+    val state = rememberDayTimelineState({})
     CurrentTimeIndicator(minuteOfDay = 90, state = state, modifier = Modifier.fillMaxWidth())
 }
 
@@ -72,7 +72,7 @@ private fun CurrentTimeIndicatorPreview() {
 @Composable
 private fun CurrentTimeIndicatorWithBackgroundPreview() {
     Surface {
-        val state = rememberDayTimelineState()
+        val state = rememberDayTimelineState({})
 
         Box(modifier = Modifier.fillMaxWidth()) {
             HourGrid(state = state, modifier = Modifier.fillMaxWidth())

@@ -120,7 +120,7 @@ private fun DayViewPreview() {
         DayView(
             date = Clock.today(),
             events = previewDayEvents,
-            state = rememberDayTimelineState(scrollState = rememberScrollState(initial = 430)),
+            state = rememberDayTimelineState({}, scrollState = rememberScrollState(initial = 430)),
             weekNumbering = WeekNumbering.ISO_8601,
             onEventClick = {},
         )

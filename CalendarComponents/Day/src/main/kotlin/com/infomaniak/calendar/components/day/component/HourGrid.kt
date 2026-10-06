@@ -136,6 +136,6 @@ private fun HourLabel(hour: Int, modifier: Modifier = Modifier) {
 @Composable
 private fun HourGridPreview() {
     Surface {
-        HourGrid(state = rememberDayTimelineState(), modifier = Modifier.fillMaxWidth())
+        HourGrid(state = rememberDayTimelineState({}), modifier = Modifier.fillMaxWidth())
     }
 }

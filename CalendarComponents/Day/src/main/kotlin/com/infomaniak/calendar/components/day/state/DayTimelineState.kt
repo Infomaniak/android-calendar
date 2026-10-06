@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.Dp
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
+import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.first
 
 /** The hour a day opens on: early enough to have the morning in view, late enough to skip the night. */
@@ -49,6 +51,7 @@ private const val INITIAL_VISIBLE_HOUR = 8
  */
 @Composable
 fun rememberDayTimelineState(
+    onHourHeightSaveRequest: suspend (Dp) -> Unit,
     initialHourHeight: Dp = DayTimelineDefaults.HourHeight,
     scrollState: ScrollState = rememberScrollState(),
 ): DayTimelineState {
@@ -69,7 +72,25 @@ fun rememberDayTimelineState(
         snapshotFlow { scrollState.maxValue }.collect { state.reanchorAfterZoom(density) }
     }
 
+    SaveHourHeight(state, onHourHeightChanged = onHourHeightSaveRequest)
+
     return state
+}
+
+/**
+ * Stores the zoom level the user leaves the day view on.
+ *
+ * A pinch changes the height on every frame, so the height is stored once the gesture ends: one
+ * write per pinch, and nothing left waiting on a timer that leaving the screen would cancel.
+ */
+@Composable
+private fun SaveHourHeight(timelineState: DayTimelineState, onHourHeightChanged: suspend (Dp) -> Unit) {
+    LaunchedEffect(timelineState) {
+        snapshotFlow { timelineState.isPinching }
+            .dropWhile { isPinching -> !isPinching }
+            .filterNot { isPinching -> isPinching }
+            .collect { onHourHeightChanged(timelineState.hourHeight) }
+    }
 }
 
 /**
