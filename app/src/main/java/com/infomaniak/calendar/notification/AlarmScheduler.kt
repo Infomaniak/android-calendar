@@ -33,6 +33,7 @@ import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -40,6 +41,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.TimeZone
 import kotlinx.serialization.json.Json
 import kotlin.time.Clock
@@ -58,6 +60,12 @@ class AlarmScheduler @Inject constructor(
         replay = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
+
+    /**
+     * Alarms this process registered, with what they carry. It starts empty so that each process registers every alarm
+     * once: the AlarmManager may have dropped them while the app wasn't running (force stop, revoked exact alarm access…).
+     */
+    private var registeredAlarms = emptyMap<String, AlarmRegistration>()
 
     fun refreshUpcomingAlarms(from: Instant = Clock.System.now()) {
         refreshTrigger.tryEmit(from)
@@ -83,35 +91,49 @@ class AlarmScheduler @Inject constructor(
         }
     }
 
-    suspend fun syncAlarms(upcomingAlarms: List<UpcomingAlarm>) {
-        val nowMs = System.currentTimeMillis()
+    private suspend fun syncAlarms(upcomingAlarms: List<UpcomingAlarm>) {
         val previouslyScheduledIds = calendarDataValues.scheduledAlarmIds.flow.first()
-        val plan = computeAlarmSyncPlan(upcomingAlarms, previouslyScheduledIds, nowMs)
+        val plan = computeAlarmSyncPlan(
+            upcomingAlarms = upcomingAlarms,
+            previouslyScheduledIds = previouslyScheduledIds,
+            registeredAlarms = registeredAlarms,
+            nowMs = System.currentTimeMillis(),
+        )
 
-        for (alarmId in plan.toCancel) {
-            cancelAlarm(alarmId)
+        // Not cancellable, so that the AlarmManager, registeredAlarms and the persisted IDs can't drift apart
+        withContext(NonCancellable) {
+            plan.toCancel.forEach(::cancelAlarm)
+            plan.toSchedule.forEach(::scheduleAlarm)
+            registeredAlarms = (plan.unchanged + plan.toSchedule).associateBy(AlarmRegistration::alarmId)
+            calendarDataValues.scheduledAlarmIds.setValue(registeredAlarms.keys)
         }
-
-        for (alarm in plan.toSchedule) {
-            scheduleAlarm(alarm)
-        }
-
-        calendarDataValues.scheduledAlarmIds.setValue(plan.newScheduledIds)
     }
 
     internal data class AlarmSyncPlan(
         val toCancel: Set<String>,
-        val toSchedule: List<UpcomingAlarm>,
-        val newScheduledIds: Set<String>,
+        val toSchedule: List<AlarmRegistration>,
+        val unchanged: List<AlarmRegistration>,
     )
 
-    private fun scheduleAlarm(alarm: UpcomingAlarm) {
+    /** Everything an alarm is registered with: it only needs to be registered again when one of these changes. */
+    internal data class AlarmRegistration(
+        val alarmId: String,
+        val triggerAtMs: Long,
+        val occurrenceIdJson: String,
+        val title: String,
+        val location: String?,
+        val startMs: Long,
+        val endMs: Long,
+        val isAllDay: Boolean,
+    )
+
+    private fun scheduleAlarm(registration: AlarmRegistration) {
         val alarmManager = alarmManager ?: return
-        val triggerAtMs = alarm.firesAt.toEpochMilliseconds()
-        val intent = createAlarmIntent(alarm)
+        val triggerAtMs = registration.triggerAtMs
+        val intent = createAlarmIntent(registration)
         val pendingIntent = PendingIntent.getBroadcast(
             appContext,
-            alarm.id.value.hashCode(),
+            registration.alarmId.hashCode(),
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
@@ -127,7 +149,7 @@ class AlarmScheduler @Inject constructor(
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMs, pendingIntent)
             }
         }.onFailure { exception ->
-            Log.w(TAG, "Failed to schedule alarm for ${alarm.id.value}", exception)
+            Log.w(TAG, "Failed to schedule alarm for ${registration.alarmId}", exception)
         }
     }
 
@@ -167,19 +189,17 @@ class AlarmScheduler @Inject constructor(
         }
     }
 
-    private fun createAlarmIntent(alarm: UpcomingAlarm): Intent {
-        val timeZone = TimeZone.currentSystemDefault()
-        val occurrenceIdJson = Json.encodeToString(OccurrenceId.serializer(), alarm.event.occurrenceId)
+    private fun createAlarmIntent(registration: AlarmRegistration): Intent {
         return Intent(appContext, AlarmReceiver::class.java).apply {
             action = ACTION_EVENT_REMINDER
-            data = "calendar://alarm/${alarm.id.value}".toUri()
-            putExtra(EXTRA_ALARM_ID, alarm.id.value)
-            putExtra(EXTRA_OCCURRENCE_ID_JSON, occurrenceIdJson)
-            putExtra(EXTRA_EVENT_TITLE, alarm.event.title)
-            putExtra(EXTRA_EVENT_LOCATION, alarm.event.location)
-            putExtra(EXTRA_EVENT_START_MS, alarm.event.timing.startInstant(timeZone).toEpochMilliseconds())
-            putExtra(EXTRA_EVENT_END_MS, alarm.event.timing.endInstant(timeZone).toEpochMilliseconds())
-            putExtra(EXTRA_IS_ALL_DAY, alarm.event.timing.isAllDay)
+            data = "calendar://alarm/${registration.alarmId}".toUri()
+            putExtra(EXTRA_ALARM_ID, registration.alarmId)
+            putExtra(EXTRA_OCCURRENCE_ID_JSON, registration.occurrenceIdJson)
+            putExtra(EXTRA_EVENT_TITLE, registration.title)
+            putExtra(EXTRA_EVENT_LOCATION, registration.location)
+            putExtra(EXTRA_EVENT_START_MS, registration.startMs)
+            putExtra(EXTRA_EVENT_END_MS, registration.endMs)
+            putExtra(EXTRA_IS_ALL_DAY, registration.isAllDay)
         }
     }
 
@@ -210,20 +230,34 @@ class AlarmScheduler @Inject constructor(
         internal fun computeAlarmSyncPlan(
             upcomingAlarms: List<UpcomingAlarm>,
             previouslyScheduledIds: Set<String>,
+            registeredAlarms: Map<String, AlarmRegistration>,
             nowMs: Long,
+            timeZone: TimeZone = TimeZone.currentSystemDefault(),
             limit: Int = MAX_SCHEDULED_ALARMS,
         ): AlarmSyncPlan {
-            val validAlarms = upcomingAlarms
+            val wantedAlarms = upcomingAlarms
                 .filter { it.firesAt.toEpochMilliseconds() > nowMs }
                 .take(limit)
+                .map { it.toRegistration(timeZone) }
 
-            val newAlarmIds = validAlarms.map { it.id.value }.toSet()
-            val toCancel = previouslyScheduledIds - newAlarmIds
+            val wantedIds = wantedAlarms.mapTo(mutableSetOf(), AlarmRegistration::alarmId)
+            val (unchanged, toSchedule) = wantedAlarms.partition { registeredAlarms[it.alarmId] == it }
             return AlarmSyncPlan(
-                toCancel = toCancel,
-                toSchedule = validAlarms,
-                newScheduledIds = newAlarmIds,
+                toCancel = previouslyScheduledIds + registeredAlarms.keys - wantedIds,
+                toSchedule = toSchedule,
+                unchanged = unchanged,
             )
         }
+
+        private fun UpcomingAlarm.toRegistration(timeZone: TimeZone) = AlarmRegistration(
+            alarmId = id.value,
+            triggerAtMs = firesAt.toEpochMilliseconds(),
+            occurrenceIdJson = Json.encodeToString(OccurrenceId.serializer(), event.occurrenceId),
+            title = event.title,
+            location = event.location,
+            startMs = event.timing.startInstant(timeZone).toEpochMilliseconds(),
+            endMs = event.timing.endInstant(timeZone).toEpochMilliseconds(),
+            isAllDay = event.timing.isAllDay,
+        )
     }
 }
