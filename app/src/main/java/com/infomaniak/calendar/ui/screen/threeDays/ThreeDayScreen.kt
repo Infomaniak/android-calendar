@@ -17,9 +17,8 @@
  */
 package com.infomaniak.calendar.ui.screen.threeDays
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -32,6 +31,7 @@ import com.infomaniak.calendar.components.calendar.component.ExpandableCalendarD
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
 import com.infomaniak.calendar.components.day.ThreeDayPager
+import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
@@ -41,9 +41,9 @@ import com.infomaniak.calendar.components.foundation.state.rememberVisibleDaySta
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
+import com.infomaniak.calendar.ui.modifier.backgroundBlur
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.datetime.LocalDate
@@ -104,18 +104,19 @@ private fun ThreeDayScreen(
         },
         modifier = modifier,
     ) { contentPadding ->
-        Box(modifier = Modifier.padding(contentPadding.onlyHorizontal())) {
-            ThreeDayPager(
-                state = timelineState,
-                modifier = Modifier
-                    .collapseCalendarOnScroll(calendarExpansionState)
-                    .hazeSource(hazeState),
-                contentPadding = PaddingValues(
-                    top = contentPadding.calculateTopPadding(),
-                    bottom = contentPadding.calculateBottomPadding(),
-                ),
-            )
-        }
+        ThreeDayPager(
+            selectedDate = { visibleDayState.visibleDate },
+            eventsOf = { DayEvents.Empty }, // TODO: Observe the events of the days in view
+            state = timelineState,
+            weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
+            onEventClick = {},
+            headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
+            timelineModifier = Modifier.hazeSource(hazeState),
+            contentPadding = contentPadding,
+            modifier = Modifier
+                .fillMaxSize()
+                .collapseCalendarOnScroll(calendarExpansionState),
+        )
     }
 }
 
