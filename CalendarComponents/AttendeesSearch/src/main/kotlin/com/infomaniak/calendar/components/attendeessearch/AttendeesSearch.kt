@@ -22,15 +22,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateSetOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.attendeessearch.component.AttendeesList
 import com.infomaniak.calendar.components.attendeessearch.component.EmptyState
 import com.infomaniak.calendar.components.attendeessearch.component.SearchBar
-import com.infomaniak.calendar.components.attendeessearch.state.rememberSaveableAttendeesSearchState
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
+import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
@@ -39,15 +44,22 @@ fun AttendeesSearch(
     attendeesSearchState: AttendeesSearchState,
     modifier: Modifier = Modifier,
 ) {
+    val attendeesList: List<AttendeeUi> =
+        if (attendeesSearchState.searchQueryTextFieldState.text.isBlank()) {
+            attendeesSearchState.attendees.toList()
+        } else {
+            attendeesSearchState.results.toList()
+        }
+
     Column(modifier = modifier) {
         SearchBar(
             searchState = attendeesSearchState.searchQueryTextFieldState,
         )
-        if (attendeesSearchState.searchResults.isEmpty()) {
+        if (attendeesList.isEmpty()) {
             EmptyState(text = stringResource(R.string.attendeesEmptyState))
         } else {
             AttendeesList(
-                attendees = { attendeesSearchState.searchResults },
+                attendees = { attendeesList },
                 modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md, vertical = EsdsTheme.spacing.sm),
             )
         }
@@ -61,8 +73,8 @@ private fun Preview() {
         Surface {
             AttendeesSearch(
                 attendeesSearchState = rememberSaveableAttendeesSearchState(
-                    attendees = previewAttendees,
-                    contacts = previewAttendees,
+                    attendees = remember { mutableStateSetOf<AttendeeUi>().apply { addAll(previewAttendees) } },
+                    results = remember { previewAttendees.toMutableStateList() },
                 ),
             )
         }
@@ -76,8 +88,8 @@ private fun PreviewEmptySearchState() {
         Surface {
             AttendeesSearch(
                 attendeesSearchState = rememberSaveableAttendeesSearchState(
-                    attendees = listOf(),
-                    contacts = listOf(),
+                    attendees = remember { mutableStateSetOf() },
+                    results = remember { mutableStateListOf() },
                 ),
             )
         }
