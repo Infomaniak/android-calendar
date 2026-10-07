@@ -73,15 +73,7 @@ class MenuDrawerViewModel(
     }
 
     fun onCalendarLongClicked(selectedId: CalendarId) {
-        val allCalendars = calendarsUsers.value.flatMap { it.calendars }
-        viewModelScope.launch {
-            allCalendars.forEach { calendar ->
-                val shouldBeVisible = calendar.id == selectedId
-                if (calendar.isVisible != shouldBeVisible) {
-                    calendarManager.updateCalendar(calendar.id, edit = CalendarEditData(isVisible = shouldBeVisible))
-                }
-            }
-        }
+        viewModelScope.launch { calendarManager.showOnlyCalendar(selectedId) }
     }
 
     fun onAccountExpandedChanged(userId: Int, isExpanded: Boolean) {
