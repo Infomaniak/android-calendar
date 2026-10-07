@@ -25,14 +25,13 @@ import com.infomaniak.calendar.extensions.appGraph
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.time.Clock
 
 class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             AlarmScheduler.ACTION_EVENT_REMINDER -> handleEventReminder(context, intent)
-            AlarmScheduler.ACTION_REFRESH_ALARMS -> context.appGraph.alarmScheduler.refreshUpcomingAlarms()
+            AlarmScheduler.ACTION_REFRESH_ALARMS -> syncAlarms(context)
         }
     }
 
@@ -63,14 +62,19 @@ class AlarmReceiver : BroadcastReceiver() {
             }
         }
 
+        syncAlarms(context, firedAlarmId = alarmId)
+    }
+
+    /** Keeps the broadcast alive until the alarms are synced, as this process may be killed or frozen once it's over. */
+    private fun syncAlarms(context: Context, firedAlarmId: String? = null) {
         val pendingResult = goAsync()
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 val appGraph = context.appGraph
-                if (alarmId != null) {
-                    appGraph.calendarDataValues.scheduledAlarmIds.update { it - alarmId }
+                if (firedAlarmId != null) {
+                    appGraph.calendarDataValues.scheduledAlarmIds.update { it - firedAlarmId }
                 }
-                appGraph.alarmScheduler.refreshUpcomingAlarms(from = Clock.System.now())
+                appGraph.alarmScheduler.syncUpcomingAlarms()
             } finally {
                 pendingResult.finish()
             }

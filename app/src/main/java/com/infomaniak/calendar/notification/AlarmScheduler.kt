@@ -73,10 +73,6 @@ class AlarmScheduler @Inject constructor(
      */
     private var registeredAlarms = emptyMap<String, AlarmRegistration>()
 
-    fun refreshUpcomingAlarms(from: Instant = Clock.System.now()) {
-        requestRefresh(from)
-    }
-
     /**
      * Moves the window of upcoming alarms to start at [from], then waits for the AlarmManager to be synced with it, for at
      * most [SYNC_TIMEOUT]. A broadcast receiver must await it before finishing, as its process may then be killed or frozen.
