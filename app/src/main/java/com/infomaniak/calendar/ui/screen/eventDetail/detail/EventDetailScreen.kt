@@ -49,6 +49,7 @@ import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
+import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.EventAttendeesViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.calendar.utils.nestedScrollToolbar
@@ -68,12 +69,14 @@ fun EventDetailScreen(
     goToEventAttendees: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),
+    eventAttendeesViewModel: EventAttendeesViewModel = viewModel(),
 ) {
     val context = LocalContext.current
     val uiState by viewModel.eventDetailUi.collectAsStateWithLifecycle()
 
     LaunchedEffect(occurrenceId) {
         viewModel.setOccurrenceId(occurrenceId)
+        eventAttendeesViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
     }
 
     EventDetailScreen(

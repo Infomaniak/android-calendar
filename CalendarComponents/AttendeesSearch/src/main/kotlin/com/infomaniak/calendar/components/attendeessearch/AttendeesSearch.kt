@@ -28,9 +28,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.attendeessearch.component.AttendeesList
 import com.infomaniak.calendar.components.attendeessearch.component.EmptyState
 import com.infomaniak.calendar.components.attendeessearch.component.SearchBar
-import com.infomaniak.calendar.components.attendeessearch.state.AttendeesSearchState
 import com.infomaniak.calendar.components.attendeessearch.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
+import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 

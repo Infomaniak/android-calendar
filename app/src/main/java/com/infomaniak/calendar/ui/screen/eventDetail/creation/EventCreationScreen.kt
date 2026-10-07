@@ -18,9 +18,14 @@
 package com.infomaniak.calendar.ui.screen.eventDetail.creation
 
 import androidx.compose.foundation.layout.plus
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateSetOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -29,7 +34,9 @@ import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberSaveableEventFormState
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.EventAttendeesViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 
@@ -39,12 +46,19 @@ fun EventCreationScreen(
     goToEventsAttendees: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventCreationViewModel = viewModel(),
+    eventAttendeesViewModel: EventAttendeesViewModel = viewModel(),
 ) {
     val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
     val state = rememberSaveableEventFormState(
         calendars = eventFormCalendars?.calendars ?: emptyList(),
         initialCalendar = eventFormCalendars?.initialCalendar,
+        initialAttendees = viewModel.attendeesSearchState.attendees,
+        attendeesSearchState = viewModel.attendeesSearchState,
     )
+
+    LaunchedEffect(Unit) {
+        eventAttendeesViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
+    }
 
     EventCreationScreen(
         state = state,
@@ -87,6 +101,13 @@ private fun EventCreationScreenPreview() {
         val state = rememberSaveableEventFormState(
             calendars = listOf(previewEventDetailCalendar),
             initialCalendar = previewEventDetailCalendar,
+            initialAttendees = remember { mutableStateSetOf() },
+            attendeesSearchState = AttendeesSearchState(
+                searchQueryTextFieldState = TextFieldState(),
+                attendees = remember { mutableStateSetOf() },
+                results = remember { mutableStateListOf() },
+                attendeesComparator = { true },
+            ),
         )
 
         EventCreationScreen(state = state, onSubmit = {}, goBack = {}, goToEventsAttendees = {})
