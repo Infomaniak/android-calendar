@@ -31,6 +31,7 @@
     <string name="notificationAllDay">All day</string>
     <string name="notificationChannelEventRemindersDescription">Notifications for upcoming events and reminders</string>
     <string name="notificationChannelEventRemindersTitle">Event reminders</string>
+    <string name="notificationDefaultDescription">Event Alert</string>
     <string name="notificationDefaultEventTitle">Event reminder</string>
     <string name="planningTitle">Planning</string>
     <string name="settingsTitle">Settings</string>
