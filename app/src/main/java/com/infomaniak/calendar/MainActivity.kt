@@ -74,9 +74,14 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        handleEventIntent(intent)
-        // Only on a fresh start, so a configuration change right after a refusal doesn't ask again
-        if (savedInstanceState == null) requestNotificationPermissionIfNeeded()
+        if (savedInstanceState == null) {
+            handleEventIntent(intent)
+            // Only on a fresh start, so a configuration change right after a refusal doesn't ask again
+            requestNotificationPermissionIfNeeded()
+        } else {
+            // On recreation, the already handled intent comes back: only restore a destination not navigated to yet
+            pendingOccurrenceId.value = savedInstanceState.getString(KEY_PENDING_OCCURRENCE_ID)?.toOccurrenceIdOrNull()
+        }
         enableEdgeToEdge()
         if (SDK_INT >= 29) window.isNavigationBarContrastEnforced = false
 
@@ -103,23 +108,38 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        pendingOccurrenceId.value?.let { outState.putString(KEY_PENDING_OCCURRENCE_ID, it.toJson()) }
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
         handleEventIntent(intent)
     }
 
-    private fun handleEventIntent(intent: Intent?) {
-        val json = intent?.getStringExtra(NotificationHelper.EXTRA_OCCURRENCE_ID_JSON) ?: return
-        intent.removeExtra(NotificationHelper.EXTRA_OCCURRENCE_ID_JSON)
-        val occurrenceId = runCatching { Json.decodeFromString(OccurrenceId.serializer(), json) }.getOrNull() ?: return
-        pendingOccurrenceId.value = occurrenceId
+    private fun handleEventIntent(intent: Intent) {
+        // Reopening the app from recents replays the intent its task was created with, so a notification already handled
+        if ((intent.flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0) return
+        val occurrenceIdJson = intent.getStringExtra(NotificationHelper.EXTRA_OCCURRENCE_ID_JSON) ?: return
+        pendingOccurrenceId.value = occurrenceIdJson.toOccurrenceIdOrNull() ?: return
+    }
+
+    private fun OccurrenceId.toJson(): String = Json.encodeToString(OccurrenceId.serializer(), this)
+
+    private fun String.toOccurrenceIdOrNull(): OccurrenceId? {
+        return runCatching { Json.decodeFromString(OccurrenceId.serializer(), this) }.getOrNull()
     }
 
     private fun requestNotificationPermissionIfNeeded() {
         if (SDK_INT >= 33 && !hasPermission(Manifest.permission.POST_NOTIFICATIONS)) {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
+    }
+
+    companion object {
+        private const val KEY_PENDING_OCCURRENCE_ID = "pendingOccurrenceId"
     }
 }
 
