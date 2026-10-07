@@ -17,53 +17,69 @@
  */
 package com.infomaniak.calendar.components.day
 
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.day.component.HourLabels
-import com.infomaniak.calendar.components.day.component.HourLines
-import com.infomaniak.calendar.components.day.component.verticalTimelineScroll
+import com.infomaniak.calendar.components.day.component.MultiDayView
+import com.infomaniak.calendar.components.day.model.DayEvents
+import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.core.common.utils.today
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.plus
+import kotlin.time.Clock
 
+private const val DAYS_PER_WEEK = 7
+
+/**
+ * The week holding the selected date, its days side by side, starting on the first day of the week
+ * of [weekNumbering].
+ */
 @Composable
 fun WeekPager(
+    selectedDate: () -> LocalDate,
+    eventsOf: (LocalDate) -> DayEvents,
+    state: DayTimelineState,
+    weekNumbering: WeekNumbering,
+    onEventClick: (EventUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
-    state: DayTimelineState = rememberDayTimelineState({}),
+    headerModifier: Modifier = Modifier,
+    timelineModifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    BoxWithConstraints(
-        modifier = modifier
-            .verticalTimelineScroll(state, contentPadding)
-            .pinchToZoom(state), // Pinch to zoom after scroll which adds some more paddings
-    ) {
-        val columnCount = 7
-        val columnWidth = (this@BoxWithConstraints.maxWidth - DayTimelineDefaults.HourGutterWidth) / columnCount
+    val firstDay = weekNumbering.weekOf(selectedDate()).firstDay
+    val dates = remember(firstDay) { List(DAYS_PER_WEEK) { firstDay.plus(it, DateTimeUnit.DAY) } }
 
-        // TODO: Replace with grid
-        HourLabels(state = state, modifier = Modifier.width(DayTimelineDefaults.HourGutterWidth))
-        HourLines(
-            state = state,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = DayTimelineDefaults.HourGutterWidth, end = DayTimelineDefaults.TimelineEndPadding),
-        )
-    }
+    MultiDayView(
+        dates = dates,
+        eventsOf = eventsOf,
+        state = state,
+        weekNumbering = weekNumbering,
+        onEventClick = onEventClick,
+        headerModifier = headerModifier,
+        timelineModifier = timelineModifier,
+        contentPadding = contentPadding,
+        modifier = modifier,
+    )
 }
 
 @Preview
 @Composable
-private fun Preview() {
-    MaterialTheme {
-        Surface {
-            WeekPager()
-        }
+private fun WeekPagerPreview() {
+    Surface {
+        WeekPager(
+            selectedDate = { Clock.today() },
+            eventsOf = { previewDayEvents },
+            state = rememberDayTimelineState({}),
+            weekNumbering = WeekNumbering.ISO_8601,
+            onEventClick = {},
+        )
     }
 }
