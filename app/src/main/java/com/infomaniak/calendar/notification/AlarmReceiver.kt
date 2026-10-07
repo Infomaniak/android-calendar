@@ -54,11 +54,11 @@ class AlarmReceiver : BroadcastReceiver() {
             isAllDay = isAllDay,
         )
 
-        val notificationId = alarmId?.hashCode() ?: occurrenceIdJson.hashCode()
         val notificationManager = NotificationManagerCompat.from(context)
         if (notificationManager.areNotificationsEnabled()) {
             runCatching {
-                notificationManager.notify(notificationId, notification)
+                // Tagged with the full ID, as its hash code could be the same as another reminder's
+                notificationManager.notify(alarmId ?: occurrenceIdJson, NOTIFICATION_ID, notification)
             }
         }
 
@@ -79,5 +79,9 @@ class AlarmReceiver : BroadcastReceiver() {
                 pendingResult.finish()
             }
         }
+    }
+
+    companion object {
+        private const val NOTIFICATION_ID = 0
     }
 }

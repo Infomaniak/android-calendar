@@ -22,8 +22,10 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.text.format.DateFormat
 import androidx.core.app.NotificationCompat
+import androidx.core.net.toUri
 import com.infomaniak.calendar.MainActivity
 import com.infomaniak.calendar.R
 import com.infomaniak.core.notifications.buildNotificationChannel
@@ -56,13 +58,15 @@ object NotificationHelper {
     ): Notification {
         val clickIntent = Intent(context, MainActivity::class.java).apply {
             action = Intent.ACTION_VIEW
+            // Unlike its extras, an intent's data is part of the PendingIntent identity, so each occurrence gets its own
+            data = "calendar://occurrence/${Uri.encode(occurrenceIdJson)}".toUri()
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
             putExtra(EXTRA_OCCURRENCE_ID_JSON, occurrenceIdJson)
         }
 
         val pendingIntent = PendingIntent.getActivity(
             context,
-            occurrenceIdJson.hashCode(),
+            0,
             clickIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
