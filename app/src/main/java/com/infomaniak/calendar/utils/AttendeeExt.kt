@@ -46,4 +46,7 @@ private fun KmpParticipationStatus.toParticipationStatus(): ParticipationStatus 
     KmpParticipationStatus.Declined -> ParticipationStatus.Declined
     KmpParticipationStatus.Tentative -> ParticipationStatus.Tentative
     KmpParticipationStatus.NeedsAction -> ParticipationStatus.NeedsAction
+    else -> {
+        ParticipationStatus.Declined
+    }
 }
