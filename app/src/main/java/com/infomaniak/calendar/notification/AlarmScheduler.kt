@@ -36,16 +36,20 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.datetime.TimeZone
 import kotlinx.serialization.json.Json
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 import androidx.core.net.toUri
 
@@ -56,10 +60,12 @@ class AlarmScheduler @Inject constructor(
     private val calendarDataValues: CalendarDataValues,
 ) {
     private val alarmManager by lazy { appContext.getSystemService<AlarmManager>() }
-    private val refreshTrigger = MutableSharedFlow<Instant>(
+    private val refreshRequests = MutableSharedFlow<RefreshRequest>(
         replay = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
+    private var lastRequestId = 0L
+    private val lastSyncedRequestId = MutableStateFlow(0L)
 
     /**
      * Alarms this process registered, with what they carry. It starts empty so that each process registers every alarm
@@ -68,28 +74,47 @@ class AlarmScheduler @Inject constructor(
     private var registeredAlarms = emptyMap<String, AlarmRegistration>()
 
     fun refreshUpcomingAlarms(from: Instant = Clock.System.now()) {
-        refreshTrigger.tryEmit(from)
+        requestRefresh(from)
+    }
+
+    /**
+     * Moves the window of upcoming alarms to start at [from], then waits for the AlarmManager to be synced with it, for at
+     * most [SYNC_TIMEOUT]. A broadcast receiver must await it before finishing, as its process may then be killed or frozen.
+     */
+    suspend fun syncUpcomingAlarms(from: Instant = Clock.System.now()) {
+        val requestId = requestRefresh(from)
+        withTimeoutOrNull(SYNC_TIMEOUT) { lastSyncedRequestId.first { it >= requestId } }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun startObserving(scope: CoroutineScope) {
-        refreshUpcomingAlarms()
+        requestRefresh(from = Clock.System.now())
 
         scope.launch {
-            refreshTrigger
-                .onEach { from -> scheduleWindowRefresh(at = from + WINDOW_REFRESH_INTERVAL) }
-                .flatMapLatest { from ->
+            refreshRequests
+                .onEach { request -> scheduleWindowRefresh(at = request.from + WINDOW_REFRESH_INTERVAL) }
+                .flatMapLatest { request ->
                     calendarManager.observeUpcomingAlarms(
                         limit = MAX_SCHEDULED_ALARMS,
                         horizon = ALARM_HORIZON,
-                        from = from,
-                    )
+                        from = request.from,
+                    ).map { upcomingAlarms -> request.id to upcomingAlarms }
                 }
-                .collectLatest { upcomingAlarms ->
+                .collectLatest { (requestId, upcomingAlarms) ->
                     syncAlarms(upcomingAlarms)
+                    lastSyncedRequestId.value = requestId
                 }
         }
     }
+
+    // Synchronized so that request IDs are emitted in increasing order, which syncUpcomingAlarms relies on
+    private fun requestRefresh(from: Instant): Long = synchronized(refreshRequests) {
+        val request = RefreshRequest(id = ++lastRequestId, from = from)
+        refreshRequests.tryEmit(request)
+        request.id
+    }
+
+    private data class RefreshRequest(val id: Long, val from: Instant)
 
     private suspend fun syncAlarms(upcomingAlarms: List<UpcomingAlarm>) {
         val previouslyScheduledIds = calendarDataValues.scheduledAlarmIds.flow.first()
@@ -227,6 +252,8 @@ class AlarmScheduler @Inject constructor(
         private const val TAG = "AlarmScheduler"
         private val ALARM_HORIZON = 30.days
         private val WINDOW_REFRESH_INTERVAL = 1.days
+        // Within the 10 s a broadcast receiver is given to finish, goAsync() included
+        private val SYNC_TIMEOUT = 8.seconds
 
         internal fun computeAlarmSyncPlan(
             upcomingAlarms: List<UpcomingAlarm>,
