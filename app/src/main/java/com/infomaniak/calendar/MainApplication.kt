@@ -36,11 +36,14 @@ import dev.zacsweers.metro.createGraphFactory
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 class MainApplication : Application(), MetroApplication {
     override val appGraph by lazy { createGraphFactory<AppGraph.Factory>().create(applicationContext) }
-    private val applicationScope = CoroutineScope(Dispatchers.Default + CoroutineName(this::class.java.simpleName))
+    private val applicationScope = CoroutineScope(
+        SupervisorJob() + Dispatchers.Default + CoroutineName(this::class.java.simpleName),
+    )
 
     override fun onCreate() {
         super.onCreate()
