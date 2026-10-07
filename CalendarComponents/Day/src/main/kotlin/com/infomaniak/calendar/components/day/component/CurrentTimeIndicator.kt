@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.state.DayTimelineState
@@ -59,7 +60,8 @@ internal fun CurrentTimeIndicator(minuteOfDay: Int, state: DayTimelineState, mod
             strokeWidth = LineWidth.toPx(),
         )
 
-        drawCircle(color = color, radius = CurrentTimeDotRadius.toPx(), center = Offset(0f, y))
+        val startX = if (layoutDirection == LayoutDirection.Ltr) 0f else size.width
+        drawCircle(color = color, radius = CurrentTimeDotRadius.toPx(), center = Offset(startX, y))
     }
 }
 
