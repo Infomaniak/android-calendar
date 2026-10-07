@@ -100,7 +100,8 @@ app/
   boot, app update and time / time zone change. The 30-day window doesn't follow the clock, so each refresh also sets an
   inexact, non-wakeup `ACTION_REFRESH_ALARMS` alarm one day later (handled by `AlarmReceiver`) to move it forward.
   Each process registers every alarm once (the system may have dropped them while it was dead: force stop, hibernation,
-  revoked exact alarm access), then only registers alarms whose content (`AlarmRegistration`) changed.
+  revoked exact alarm access), then only registers alarms whose content (`AlarmRegistration`) changed. Failed
+  registrations aren't kept (neither in memory nor in the persisted `scheduledAlarmIds`), so they're retried next sync.
   `MainActivity` requests the `POST_NOTIFICATIONS` runtime permission (Android 13+) on each fresh start (skipped on
   recreation). Exact alarms need no request: `USE_EXACT_ALARM` on API 33+, `SCHEDULE_EXACT_ALARM` on API 31–32 (falls
   back to inexact alarms if the user revokes it).

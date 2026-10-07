@@ -103,8 +103,8 @@ class AlarmScheduler @Inject constructor(
         // Not cancellable, so that the AlarmManager, registeredAlarms and the persisted IDs can't drift apart
         withContext(NonCancellable) {
             plan.toCancel.forEach(::cancelAlarm)
-            plan.toSchedule.forEach(::scheduleAlarm)
-            registeredAlarms = (plan.unchanged + plan.toSchedule).associateBy(AlarmRegistration::alarmId)
+            val newlyRegistered = plan.toSchedule.filter(::scheduleAlarm)
+            registeredAlarms = (plan.unchanged + newlyRegistered).associateBy(AlarmRegistration::alarmId)
             calendarDataValues.scheduledAlarmIds.setValue(registeredAlarms.keys)
         }
     }
@@ -127,8 +127,9 @@ class AlarmScheduler @Inject constructor(
         val isAllDay: Boolean,
     )
 
-    private fun scheduleAlarm(registration: AlarmRegistration) {
-        val alarmManager = alarmManager ?: return
+    /** Returns whether the alarm got registered. */
+    private fun scheduleAlarm(registration: AlarmRegistration): Boolean {
+        val alarmManager = alarmManager ?: return false
         val triggerAtMs = registration.triggerAtMs
         val intent = createAlarmIntent(registration)
         val pendingIntent = PendingIntent.getBroadcast(
@@ -138,7 +139,7 @@ class AlarmScheduler @Inject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-        runCatching {
+        return runCatching {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 if (alarmManager.canScheduleExactAlarms()) {
                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMs, pendingIntent)
@@ -150,7 +151,7 @@ class AlarmScheduler @Inject constructor(
             }
         }.onFailure { exception ->
             Log.w(TAG, "Failed to schedule alarm for ${registration.alarmId}", exception)
-        }
+        }.isSuccess
     }
 
     private fun cancelAlarm(alarmId: String) {
