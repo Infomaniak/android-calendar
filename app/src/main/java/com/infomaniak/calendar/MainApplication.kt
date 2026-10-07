@@ -63,7 +63,6 @@ class MainApplication : Application(), MetroApplication {
         NotificationHelper.initNotificationChannels(this)
         appGraph.alarmScheduler.startObserving(applicationScope)
 
-        loadCalDavCredential()
         initStoredAccounts()
         appGraph.cachedCalendarManager // Start loading calendars now so they're ready before any screen needs them
     }
