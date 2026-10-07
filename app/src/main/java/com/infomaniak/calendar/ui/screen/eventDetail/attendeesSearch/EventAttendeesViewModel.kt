@@ -17,7 +17,11 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch
 
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateSetOf
 import androidx.lifecycle.ViewModel
+import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
@@ -25,7 +29,9 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 @Inject
 @ContributesIntoMap(AppScope::class)
@@ -33,7 +39,20 @@ import kotlinx.coroutines.flow.StateFlow
 class EventAttendeesViewModel(private val getEventDetailUiUseCase: GetEventDetailUiUseCase) : ViewModel() {
 
     val eventDetailUi: StateFlow<EventDetailUiState> = getEventDetailUiUseCase.eventDetailUi
+    private val _attendeesSearchState = MutableStateFlow(
+        AttendeesSearchState(
+            searchQueryTextFieldState = TextFieldState(),
+            results = mutableStateListOf(),
+            attendees = mutableStateSetOf(),
+            attendeesComparator = { true },
+        ),
+    )
+    val attendeesSearchState: StateFlow<AttendeesSearchState> = _attendeesSearchState.asStateFlow()
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) = getEventDetailUiUseCase.setOccurrenceId(occurrenceId)
+
+    fun setAttendeesSearchState(attendeesSearchState: AttendeesSearchState) {
+        _attendeesSearchState.value = attendeesSearchState
+    }
 }
 
