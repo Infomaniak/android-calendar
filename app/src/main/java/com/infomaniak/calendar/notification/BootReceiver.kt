@@ -24,7 +24,6 @@ import com.infomaniak.calendar.extensions.appGraph
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.time.Clock
 
 class BootReceiver : BroadcastReceiver() {
 
@@ -38,7 +37,7 @@ class BootReceiver : BroadcastReceiver() {
                 if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
                     appGraph.calendarDataValues.scheduledAlarmIds.setValue(emptySet())
                 }
-                appGraph.alarmScheduler.refreshUpcomingAlarms(from = Clock.System.now())
+                appGraph.alarmScheduler.syncUpcomingAlarms()
             } finally {
                 pendingResult.finish()
             }

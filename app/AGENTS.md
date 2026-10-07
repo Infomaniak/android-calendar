@@ -102,6 +102,8 @@ app/
   Each process registers every alarm once (the system may have dropped them while it was dead: force stop, hibernation,
   revoked exact alarm access), then only registers alarms whose content (`AlarmRegistration`) changed. Failed
   registrations aren't kept (neither in memory nor in the persisted `scheduledAlarmIds`), so they're retried next sync.
+  Receivers await `AlarmScheduler.syncUpcomingAlarms` (capped at 8 s, within their `goAsync()` budget) before finishing:
+  a process started for a broadcast may be killed or frozen as soon as it's over.
   `MainActivity` requests the `POST_NOTIFICATIONS` runtime permission (Android 13+) on each fresh start (skipped on
   recreation). Exact alarms need no request: `USE_EXACT_ALARM` on API 33+, `SCHEDULE_EXACT_ALARM` on API 31–32 (falls
   back to inexact alarms if the user revokes it).
