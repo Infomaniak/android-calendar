@@ -58,12 +58,13 @@ class AlarmSchedulerTest {
         val plan = AlarmScheduler.computeAlarmSyncPlan(
             upcomingAlarms = listOf(pastAlarm, futureAlarm),
             previouslyScheduledIds = emptySet(),
+            registeredAlarms = emptyMap(),
             nowMs = nowMs,
         )
 
         assertEquals(1, plan.toSchedule.size)
-        assertEquals("future", plan.toSchedule.single().id.value)
-        assertEquals(setOf("future"), plan.newScheduledIds)
+        assertEquals("future", plan.toSchedule.single().alarmId)
+        assertEquals(setOf("future"), plan.wantedIds())
     }
 
     @Test
@@ -77,14 +78,16 @@ class AlarmSchedulerTest {
         val plan = AlarmScheduler.computeAlarmSyncPlan(
             upcomingAlarms = alarms,
             previouslyScheduledIds = emptySet(),
+            registeredAlarms = emptyMap(),
             nowMs = nowMs,
         )
 
+        val wantedIds = plan.wantedIds()
         assertEquals(400, plan.toSchedule.size)
-        assertEquals(400, plan.newScheduledIds.size)
-        assertTrue(plan.newScheduledIds.contains("alarm-1"))
-        assertTrue(plan.newScheduledIds.contains("alarm-400"))
-        assertFalse(plan.newScheduledIds.contains("alarm-401"))
+        assertEquals(400, wantedIds.size)
+        assertTrue(wantedIds.contains("alarm-1"))
+        assertTrue(wantedIds.contains("alarm-400"))
+        assertFalse(wantedIds.contains("alarm-401"))
     }
 
     @Test
@@ -99,10 +102,11 @@ class AlarmSchedulerTest {
         val initialPlan = AlarmScheduler.computeAlarmSyncPlan(
             upcomingAlarms = allAlarms,
             previouslyScheduledIds = emptySet(),
+            registeredAlarms = emptyMap(),
             nowMs = nowMs,
         )
-        assertEquals(400, initialPlan.newScheduledIds.size)
-        assertFalse(initialPlan.newScheduledIds.contains("alarm-401"))
+        assertEquals(400, initialPlan.wantedIds().size)
+        assertFalse(initialPlan.wantedIds().contains("alarm-401"))
 
         // Time passes: alarm-1 fired, nowMs advanced past alarm-1
         val advancedNowMs = nowMs + 1500
@@ -110,41 +114,120 @@ class AlarmSchedulerTest {
 
         val updatedPlan = AlarmScheduler.computeAlarmSyncPlan(
             upcomingAlarms = remainingAlarms,
-            previouslyScheduledIds = initialPlan.newScheduledIds,
+            previouslyScheduledIds = initialPlan.wantedIds(),
+            registeredAlarms = initialPlan.registered(),
             nowMs = advancedNowMs,
         )
 
         // alarm-1 must be cancelled
         assertEquals(setOf("alarm-1"), updatedPlan.toCancel)
-        // alarm-401 is now included
-        assertTrue(updatedPlan.newScheduledIds.contains("alarm-401"))
-        assertEquals(400, updatedPlan.newScheduledIds.size)
+        // alarm-401 is now included, and is the only one to register
+        assertEquals(listOf("alarm-401"), updatedPlan.toSchedule.map { it.alarmId })
+        assertEquals(400, updatedPlan.wantedIds().size)
     }
 
     @Test
     fun `diffing properly cancels removed alarms and retains unchanged ones`() {
         val nowMs = 1_000_000L
+        val alarm1 = testAlarm(id = "alarm-1", firesAtMs = nowMs + 1000)
         val alarm2 = testAlarm(id = "alarm-2", firesAtMs = nowMs + 2000)
         val alarm3 = testAlarm(id = "alarm-3", firesAtMs = nowMs + 3000)
+        val initialPlan = AlarmScheduler.computeAlarmSyncPlan(
+            upcomingAlarms = listOf(alarm1, alarm2),
+            previouslyScheduledIds = emptySet(),
+            registeredAlarms = emptyMap(),
+            nowMs = nowMs,
+        )
 
         val plan = AlarmScheduler.computeAlarmSyncPlan(
             upcomingAlarms = listOf(alarm2, alarm3),
-            previouslyScheduledIds = setOf("alarm-1", "alarm-2"),
+            previouslyScheduledIds = initialPlan.wantedIds(),
+            registeredAlarms = initialPlan.registered(),
             nowMs = nowMs,
         )
 
         assertEquals(setOf("alarm-1"), plan.toCancel)
-        assertEquals(setOf("alarm-2", "alarm-3"), plan.newScheduledIds)
+        assertEquals(listOf("alarm-2"), plan.unchanged.map { it.alarmId })
+        assertEquals(listOf("alarm-3"), plan.toSchedule.map { it.alarmId })
     }
 
-    private fun testAlarm(id: String, firesAtMs: Long): UpcomingAlarm {
+    @Test
+    fun `alarms persisted by an earlier process are all registered again`() {
+        val nowMs = 1_000_000L
+        val alarm1 = testAlarm(id = "alarm-1", firesAtMs = nowMs + 1000)
+        val alarm2 = testAlarm(id = "alarm-2", firesAtMs = nowMs + 2000)
+
+        val plan = AlarmScheduler.computeAlarmSyncPlan(
+            upcomingAlarms = listOf(alarm1, alarm2),
+            previouslyScheduledIds = setOf("alarm-1", "alarm-2"),
+            registeredAlarms = emptyMap(),
+            nowMs = nowMs,
+        )
+
+        assertTrue(plan.toCancel.isEmpty())
+        assertTrue(plan.unchanged.isEmpty())
+        assertEquals(listOf("alarm-1", "alarm-2"), plan.toSchedule.map { it.alarmId })
+    }
+
+    @Test
+    fun `an alarm whose notification content changed is registered again`() {
+        val nowMs = 1_000_000L
+        val initialPlan = AlarmScheduler.computeAlarmSyncPlan(
+            upcomingAlarms = listOf(testAlarm(id = "alarm-1", firesAtMs = nowMs + 1000, title = "Before")),
+            previouslyScheduledIds = emptySet(),
+            registeredAlarms = emptyMap(),
+            nowMs = nowMs,
+        )
+
+        val plan = AlarmScheduler.computeAlarmSyncPlan(
+            upcomingAlarms = listOf(testAlarm(id = "alarm-1", firesAtMs = nowMs + 1000, title = "After")),
+            previouslyScheduledIds = initialPlan.wantedIds(),
+            registeredAlarms = initialPlan.registered(),
+            nowMs = nowMs,
+        )
+
+        assertTrue(plan.toCancel.isEmpty())
+        assertTrue(plan.unchanged.isEmpty())
+        assertEquals("After", plan.toSchedule.single().title)
+    }
+
+    @Test
+    fun `an alarm registered by this process is cancelled once unwanted, even without its persisted id`() {
+        val nowMs = 1_000_000L
+        val initialPlan = AlarmScheduler.computeAlarmSyncPlan(
+            upcomingAlarms = listOf(testAlarm(id = "alarm-1", firesAtMs = nowMs + 1000)),
+            previouslyScheduledIds = emptySet(),
+            registeredAlarms = emptyMap(),
+            nowMs = nowMs,
+        )
+
+        val plan = AlarmScheduler.computeAlarmSyncPlan(
+            upcomingAlarms = emptyList(),
+            previouslyScheduledIds = emptySet(), // As cleared by BootReceiver
+            registeredAlarms = initialPlan.registered(),
+            nowMs = nowMs,
+        )
+
+        assertEquals(setOf("alarm-1"), plan.toCancel)
+    }
+
+    private fun AlarmScheduler.AlarmSyncPlan.wantedIds(): Set<String> {
+        return (unchanged + toSchedule).mapTo(mutableSetOf()) { it.alarmId }
+    }
+
+    /** What [AlarmScheduler] holds as registered once this plan is applied without any failure. */
+    private fun AlarmScheduler.AlarmSyncPlan.registered(): Map<String, AlarmScheduler.AlarmRegistration> {
+        return (unchanged + toSchedule).associateBy { it.alarmId }
+    }
+
+    private fun testAlarm(id: String, firesAtMs: Long, title: String = "Test Event $id"): UpcomingAlarm {
         val eventId = EventId("event://$id")
         val event = Event(
             masterEventId = eventId,
             occurrenceId = OccurrenceId.Master(eventId),
             calendarId = CalendarId("calendar://test"),
             accountId = AccountId(1L),
-            title = "Test Event $id",
+            title = title,
             timing = EventTiming(
                 start = LocalDateTime(2026, 9, 18, 10, 0),
                 end = LocalDateTime(2026, 9, 18, 11, 0),
