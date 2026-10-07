@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.serialization.json.Json
@@ -68,6 +69,7 @@ class AlarmScheduler @Inject constructor(
 
         scope.launch {
             refreshTrigger
+                .onEach { from -> scheduleWindowRefresh(at = from + WINDOW_REFRESH_INTERVAL) }
                 .flatMapLatest { from ->
                     calendarManager.observeUpcomingAlarms(
                         limit = MAX_SCHEDULED_ALARMS,
@@ -144,6 +146,27 @@ class AlarmScheduler @Inject constructor(
         }
     }
 
+    /**
+     * [CalendarManager.observeUpcomingAlarms] doesn't follow the clock: if no alarm fires within its window, nothing else
+     * would move it forward. This inexact, non-wakeup alarm refreshes it whenever the device is next awake after [at].
+     */
+    private fun scheduleWindowRefresh(at: Instant) {
+        val alarmManager = alarmManager ?: return
+        val intent = Intent(appContext, AlarmReceiver::class.java).setAction(ACTION_REFRESH_ALARMS)
+        val pendingIntent = PendingIntent.getBroadcast(
+            appContext,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+
+        runCatching {
+            alarmManager.set(AlarmManager.RTC, at.toEpochMilliseconds(), pendingIntent)
+        }.onFailure { exception ->
+            Log.w(TAG, "Failed to schedule the alarm window refresh", exception)
+        }
+    }
+
     private fun createAlarmIntent(alarm: UpcomingAlarm): Intent {
         val timeZone = TimeZone.currentSystemDefault()
         val occurrenceIdJson = Json.encodeToString(OccurrenceId.serializer(), alarm.event.occurrenceId)
@@ -171,6 +194,7 @@ class AlarmScheduler @Inject constructor(
         const val MAX_SCHEDULED_ALARMS = 400
 
         const val ACTION_EVENT_REMINDER = "com.infomaniak.calendar.ACTION_EVENT_REMINDER"
+        const val ACTION_REFRESH_ALARMS = "com.infomaniak.calendar.ACTION_REFRESH_ALARMS"
         const val EXTRA_ALARM_ID = "com.infomaniak.calendar.EXTRA_ALARM_ID"
         const val EXTRA_OCCURRENCE_ID_JSON = "com.infomaniak.calendar.EXTRA_OCCURRENCE_ID_JSON"
         const val EXTRA_EVENT_TITLE = "com.infomaniak.calendar.EXTRA_EVENT_TITLE"
@@ -181,6 +205,7 @@ class AlarmScheduler @Inject constructor(
 
         private const val TAG = "AlarmScheduler"
         private val ALARM_HORIZON = 30.days
+        private val WINDOW_REFRESH_INTERVAL = 1.days
 
         internal fun computeAlarmSyncPlan(
             upcomingAlarms: List<UpcomingAlarm>,

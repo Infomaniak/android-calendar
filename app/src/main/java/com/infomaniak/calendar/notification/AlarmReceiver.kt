@@ -30,8 +30,13 @@ import kotlin.time.Clock
 class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != AlarmScheduler.ACTION_EVENT_REMINDER) return
+        when (intent.action) {
+            AlarmScheduler.ACTION_EVENT_REMINDER -> handleEventReminder(context, intent)
+            AlarmScheduler.ACTION_REFRESH_ALARMS -> context.appGraph.alarmScheduler.refreshUpcomingAlarms()
+        }
+    }
 
+    private fun handleEventReminder(context: Context, intent: Intent) {
         val occurrenceIdJson = intent.getStringExtra(AlarmScheduler.EXTRA_OCCURRENCE_ID_JSON) ?: return
         val alarmId = intent.getStringExtra(AlarmScheduler.EXTRA_ALARM_ID)
         val title = intent.getStringExtra(AlarmScheduler.EXTRA_EVENT_TITLE).orEmpty()
