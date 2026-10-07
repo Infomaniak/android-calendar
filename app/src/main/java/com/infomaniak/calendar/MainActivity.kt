@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build.VERSION.SDK_INT
@@ -24,6 +25,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Surface
@@ -56,6 +58,7 @@ import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableStat
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.utils.UserLoadState
+import com.infomaniak.core.common.extensions.hasPermission
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.serialization.json.Json
@@ -64,6 +67,7 @@ class MainActivity : ComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
     private val pendingOccurrenceId = mutableStateOf<OccurrenceId?>(null)
+    private val notificationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
         get() = appGraph.metroViewModelFactory
@@ -71,6 +75,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         handleEventIntent(intent)
+        // Only on a fresh start, so a configuration change right after a refusal doesn't ask again
+        if (savedInstanceState == null) requestNotificationPermissionIfNeeded()
         enableEdgeToEdge()
         if (SDK_INT >= 29) window.isNavigationBarContrastEnforced = false
 
@@ -108,6 +114,12 @@ class MainActivity : ComponentActivity() {
         intent.removeExtra(NotificationHelper.EXTRA_OCCURRENCE_ID_JSON)
         val occurrenceId = runCatching { Json.decodeFromString(OccurrenceId.serializer(), json) }.getOrNull() ?: return
         pendingOccurrenceId.value = occurrenceId
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (SDK_INT >= 33 && !hasPermission(Manifest.permission.POST_NOTIFICATIONS)) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
     }
 }
 

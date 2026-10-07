@@ -97,7 +97,9 @@ app/
 - **Event reminders**: `AlarmScheduler` (`AppScope` singleton, started from `MainApplication`) mirrors
   `CalendarManager.observeUpcomingAlarms` (device alarms only: `DISPLAY` / `AUDIO`, max 400 over 30 days) into exact
   `AlarmManager` alarms. `AlarmReceiver` posts the notification (tap opens `EventDetail`), `BootReceiver` reschedules on
-  boot, app update and time / time zone change. The `POST_NOTIFICATIONS` runtime permission is not requested yet.
+  boot, app update and time / time zone change. `MainActivity` requests the `POST_NOTIFICATIONS` runtime permission
+  (Android 13+) on each fresh start (skipped on recreation). Exact alarms need no request: `USE_EXACT_ALARM` on API 33+,
+  `SCHEDULE_EXACT_ALARM` on API 31–32 (falls back to inexact alarms if the user revokes it).
 - **Shared logic**: Prefer reusing models / logic from `com.infomaniak.multiplatform_calendar.*` instead of duplicating
   Android-only equivalents.
 - **KISS / SOLID**: Keep Composables focused; extract reusable pieces into small `@Composable` functions.
