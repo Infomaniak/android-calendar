@@ -43,9 +43,16 @@ fun LazyListScope.drawerListItems(
     onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
     isSectionExpanded: (Int) -> Boolean,
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
+    onCalendarLongClick: (CalendarId) -> Unit,
 ) {
     usersCalendars.forEach { userCalendars ->
-        calendarSection(userCalendars, isSectionExpanded, onAccountExpandedChange, onCalendarVisibilityChange)
+        calendarSection(
+            userCalendars = userCalendars,
+            isExpanded = isSectionExpanded,
+            onAccountExpandedChange = onAccountExpandedChange,
+            onCalendarVisibilityChange = onCalendarVisibilityChange,
+            onCalendarLongClick = onCalendarLongClick,
+        )
     }
 }
 
@@ -54,6 +61,7 @@ private fun LazyListScope.calendarSection(
     isExpanded: (Int) -> Boolean,
     onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
+    onCalendarLongClick: (CalendarId) -> Unit,
 ) {
     val userId = userCalendars.user.id
     val expanded = isExpanded(userId)
@@ -77,6 +85,7 @@ private fun LazyListScope.calendarSection(
                         DrawerCalendarItem(
                             calendar = calendar,
                             onCalendarVisibilityChange = onCalendarVisibilityChange,
+                            onCalendarLongClick = onCalendarLongClick,
                         )
                     }
                 }
@@ -95,6 +104,7 @@ private fun DrawerListPreviewContent(
             onAccountExpandedChange = { _, _ -> {} },
             isSectionExpanded = { false },
             onCalendarVisibilityChange = { _, _ -> },
+            onCalendarLongClick = {},
         )
     }
 }

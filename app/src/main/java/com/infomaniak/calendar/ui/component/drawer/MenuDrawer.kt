@@ -62,6 +62,7 @@ fun MenuDrawer(
         drawerState = calendarDrawerState,
         calendarsUsers = calendarsUsers,
         onCalendarVisibilityChanged = menuDrawerViewModel::onCalendarVisibilityChanged,
+        onCalendarLongClick = menuDrawerViewModel::onCalendarLongClicked,
         content = content,
         onAccountExpandedChange = menuDrawerViewModel::onAccountExpandedChanged,
         isSectionExpanded = { expandedAccountIds.contains(it) },
@@ -80,6 +81,7 @@ private fun MenuDrawer(
     drawerState: DrawerState,
     calendarsUsers: List<UserCalendarsUi>,
     onCalendarVisibilityChanged: (CalendarId, Boolean) -> Unit,
+    onCalendarLongClick: (CalendarId) -> Unit,
     onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
     isSectionExpanded: (Int) -> Boolean,
     onManageAccounts: () -> Unit,
@@ -105,6 +107,7 @@ private fun MenuDrawer(
                     drawerListItems(
                         usersCalendars = calendarsUsers,
                         onCalendarVisibilityChange = onCalendarVisibilityChanged,
+                        onCalendarLongClick = onCalendarLongClick,
                         isSectionExpanded = isSectionExpanded,
                         onAccountExpandedChange = onAccountExpandedChange,
                     )
@@ -155,6 +158,7 @@ private fun MenuDrawerPreview(
             drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
             calendarsUsers = usersCalendars,
             onCalendarVisibilityChanged = { _, _ -> },
+            onCalendarLongClick = {},
             onAccountExpandedChange = { _, _ -> },
             isSectionExpanded = { false },
             onManageAccounts = {},
