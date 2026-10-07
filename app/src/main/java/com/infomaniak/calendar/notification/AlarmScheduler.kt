@@ -25,6 +25,8 @@ import android.os.Build
 import android.util.Log
 import androidx.core.content.getSystemService
 import com.infomaniak.calendar.data.CalendarDataValues
+import com.infomaniak.core.common.cancellable
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.UpcomingAlarm
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
@@ -74,8 +76,9 @@ class AlarmScheduler @Inject constructor(
     private var registeredAlarms = emptyMap<String, AlarmRegistration>()
 
     /**
-     * Moves the window of upcoming alarms to start at [from], then waits for the AlarmManager to be synced with it, for at
-     * most [SYNC_TIMEOUT]. A broadcast receiver must await it before finishing, as its process may then be killed or frozen.
+     * Moves the window of upcoming alarms to start at [from], then waits for the AlarmManager to be synced with it (or for
+     * that to fail), for at most [SYNC_TIMEOUT]. A broadcast receiver must await it before finishing, as its process may
+     * then be killed or frozen.
      */
     suspend fun syncUpcomingAlarms(from: Instant = Clock.System.now()) {
         val requestId = requestRefresh(from)
@@ -97,7 +100,10 @@ class AlarmScheduler @Inject constructor(
                     ).map { upcomingAlarms -> request.id to upcomingAlarms }
                 }
                 .collectLatest { (requestId, upcomingAlarms) ->
-                    syncAlarms(upcomingAlarms)
+                    // An uncaught failure would crash the app. The next refresh or database change retries it.
+                    runCatching { syncAlarms(upcomingAlarms) }.cancellable().onFailure { exception ->
+                        SentryLog.e(TAG, "Failed to sync the upcoming alarms", exception)
+                    }
                     lastSyncedRequestId.value = requestId
                 }
         }
