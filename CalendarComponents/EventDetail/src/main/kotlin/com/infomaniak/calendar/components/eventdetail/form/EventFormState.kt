@@ -25,23 +25,26 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
+import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 
 @Stable
 class EventFormState(
     val titleTextState: TextFieldState,
     val colorState: MutableState<Color?>,
-    val attendeesState: MutableState<List<AttendeeUi>>,
+    val attendeesState: AttendeesSearchState,
     val isKMeetUrlEnabled: MutableState<Boolean>,
     val calendars: List<EventDetailCalendar>,
 ) {
     fun toEventDraft(): EventDraft? = EventDraft(
         title = titleTextState.text.toString(),
         color = colorState.value ?: return null,
-        attendees = attendeesState.value,
+        attendees = attendeesState.attendees.toList(),
         isKMeetUrlEnabled = isKMeetUrlEnabled.value,
     )
 }
@@ -50,16 +53,22 @@ class EventFormState(
 fun rememberSaveableEventFormState(
     calendars: List<EventDetailCalendar>,
     initialCalendar: EventDetailCalendar?,
+    initialAttendees: SnapshotStateSet<AttendeeUi>,
     initialText: String = "",
-    initialAttendees: List<AttendeeUi> = emptyList(),
     initialIsKMeetUrlEnabled: Boolean = false,
+    attendeesSearchState: AttendeesSearchState? = null,
 ): EventFormState {
     val colorState = rememberSaveable(initialCalendar == null, stateSaver = ColorSaver) { mutableStateOf(initialCalendar?.color) }
+
+    val attendeesState = attendeesSearchState
+        ?: rememberSaveableAttendeesSearchState(
+            attendees = initialAttendees,
+        )
 
     return EventFormState(
         titleTextState = rememberTextFieldState(initialText),
         colorState = colorState,
-        attendeesState = rememberSaveable { mutableStateOf(initialAttendees) },
+        attendeesState = attendeesState,
         isKMeetUrlEnabled = rememberSaveable { mutableStateOf(initialIsKMeetUrlEnabled) },
         calendars = calendars,
     )
