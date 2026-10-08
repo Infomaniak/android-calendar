@@ -101,7 +101,8 @@ app/
   inexact, non-wakeup `ACTION_REFRESH_ALARMS` alarm one day later (handled by `AlarmReceiver`) to move it forward.
   Each process registers every alarm once (the system may have dropped them while it was dead: force stop, hibernation,
   revoked exact alarm access), then only registers alarms whose content (`AlarmRegistration`) changed. Failed
-  registrations aren't kept (neither in memory nor in the persisted `scheduledAlarmIds`), so they're retried next sync.
+  registrations aren't kept (neither in memory nor in the persisted `scheduledAlarmIds`), so they're retried next sync,
+  and are cancelled, since a failed replacement may leave the previous alarm in place.
   Receivers await `AlarmScheduler.syncUpcomingAlarms` (capped at 8 s, within their `goAsync()` budget) before finishing:
   a process started for a broadcast may be killed or frozen as soon as it's over.
   `MainActivity` requests the `POST_NOTIFICATIONS` runtime permission (Android 13+) on each fresh start (skipped on
