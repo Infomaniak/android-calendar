@@ -40,26 +40,23 @@ internal class OccurrenceAttendeesLoader(
 
     fun load(occurrenceId: OccurrenceId) {
         if (currentOccurrenceId == occurrenceId) return
+
         currentOccurrenceId = occurrenceId
         loadJob?.cancel()
 
-        val ownsSavedState =
-            savedStateHandle.get<String>(ATTENDEES_OCCURRENCE_KEY) ==
-                    occurrenceId.value
+        val ownsSavedState = savedStateHandle.get<String>(ATTENDEES_OCCURRENCE_KEY) == occurrenceId.value
 
         val preserveSelection = preserveRestoredSelections && ownsSavedState
 
-        var initialAttendees = if (preserveSelection) {
-            savedStateHandle
-                .get<ArrayList<AttendeeUi>>(INITIAL_ATTENDEES_KEY)
-                ?.toSet()
+        var currentAttendees = if (preserveSelection) {
+            savedStateHandle.get<ArrayList<AttendeeUi>>(CURRENT_ATTENDEES_KEY)?.toSet()
         } else {
             null
         }
 
         if (!preserveSelection) {
             savedStateHandle.remove<String>(ATTENDEES_OCCURRENCE_KEY)
-            savedStateHandle.remove<ArrayList<AttendeeUi>>(INITIAL_ATTENDEES_KEY)
+            savedStateHandle.remove<ArrayList<AttendeeUi>>(CURRENT_ATTENDEES_KEY)
             state.reset()
         }
 
@@ -67,13 +64,14 @@ internal class OccurrenceAttendeesLoader(
             calendarManager.observeOccurrence(occurrenceId).collect { event ->
                 ensureActive()
                 if (currentOccurrenceId != occurrenceId) return@collect
+
                 if (event == null) return@collect // Unavailable event is handled by the UI.
 
                 val invited = event.attendees.map { it.toAttendeeUi() }
-                val previousInitial = initialAttendees
+                val currentAttendeesList = currentAttendees
 
-                val canRefresh = if (previousInitial != null) {
-                    state.hasSameAttendees(previousInitial)
+                val canRefresh = if (currentAttendeesList != null) {
+                    state.hasSameAttendees(currentAttendeesList)
                 } else {
                     !preserveSelection
                 }
@@ -82,20 +80,13 @@ internal class OccurrenceAttendeesLoader(
                     Snapshot.withMutableSnapshot {
                         state.attendees.clear()
                         state.attendees.addAll(invited)
-
-                        // Don't replace active search results.
-                        if (state.searchQueryTextFieldState.text.isBlank()) {
-                            state.results.clear()
-                            state.results.addAll(invited)
-                        }
                     }
 
-                    initialAttendees = invited.toSet()
-                    savedStateHandle[INITIAL_ATTENDEES_KEY] = ArrayList(invited)
-                } else if (previousInitial == null) {
-                    // Older saved drafts may not contain a baseline.
-                    initialAttendees = invited.toSet()
-                    savedStateHandle[INITIAL_ATTENDEES_KEY] = ArrayList(invited)
+                    currentAttendees = invited.toSet()
+                    savedStateHandle[CURRENT_ATTENDEES_KEY] = ArrayList(invited)
+                } else if (currentAttendeesList == null) {
+                    currentAttendees = invited.toSet()
+                    savedStateHandle[CURRENT_ATTENDEES_KEY] = ArrayList(invited)
                 }
 
                 savedStateHandle[ATTENDEES_OCCURRENCE_KEY] = occurrenceId.value
@@ -105,6 +96,6 @@ internal class OccurrenceAttendeesLoader(
 
     private companion object {
         const val ATTENDEES_OCCURRENCE_KEY = "attendeesOccurrenceId"
-        const val INITIAL_ATTENDEES_KEY = "initialAttendees"
+        const val CURRENT_ATTENDEES_KEY = "currentAttendees"
     }
 }
