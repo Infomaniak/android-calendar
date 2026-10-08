@@ -134,7 +134,9 @@ fun rememberSaveableAttendeesSearchState(
             attendees = mutableStateSetOf<AttendeeUi>().apply {
                 addAll(attendees)
             },
-            attendeesComparator = attendeesComparator,
+            attendeesComparator = { initial, current ->
+                currentComparator(initial, current)
+            },
         )
     }
 }
