@@ -30,13 +30,12 @@ private const val ATTENDEES_SEARCH_STATE_KEY = "attendeesSearchState"
 @OptIn(SavedStateHandleSaveableApi::class)
 fun SavedStateHandle.attendeesSearchState(): AttendeesSearchState = saveable(
     key = ATTENDEES_SEARCH_STATE_KEY,
-    saver = AttendeesSearchState.saver { true },
+    saver = AttendeesSearchState.saver(),
 ) {
     AttendeesSearchState(
         searchQueryTextFieldState = TextFieldState(),
         results = mutableStateListOf(),
         attendees = mutableStateSetOf(),
-        attendeesComparator = { true },
     )
 }
 

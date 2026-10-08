@@ -106,7 +106,6 @@ private fun EventCreationScreenPreview() {
                 searchQueryTextFieldState = TextFieldState(),
                 attendees = remember { mutableStateSetOf() },
                 results = remember { mutableStateListOf() },
-                attendeesComparator = { true },
             ),
         )
 

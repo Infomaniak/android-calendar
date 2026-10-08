@@ -52,17 +52,17 @@ class EventAttendeesViewModel(
 
     @OptIn(SavedStateHandleSaveableApi::class)
     private var savedAttendeesSearchState by savedStateHandle.saveable(
-        stateSaver = AttendeesSearchState.saver { true },
+        stateSaver = AttendeesSearchState.saver(),
     ) {
         mutableStateOf(
             AttendeesSearchState(
                 searchQueryTextFieldState = TextFieldState(),
                 results = mutableStateListOf(),
                 attendees = mutableStateSetOf(),
-                attendeesComparator = { true },
             ),
         )
     }
+
     private val _attendeesSearchState = MutableStateFlow(savedAttendeesSearchState)
     val attendeesSearchState: StateFlow<AttendeesSearchState> = _attendeesSearchState.asStateFlow()
 
