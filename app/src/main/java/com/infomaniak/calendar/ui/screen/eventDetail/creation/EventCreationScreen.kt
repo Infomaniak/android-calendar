@@ -52,7 +52,6 @@ fun EventCreationScreen(
     val state = rememberSaveableEventFormState(
         calendars = eventFormCalendars?.calendars ?: emptyList(),
         initialCalendar = eventFormCalendars?.initialCalendar,
-        initialAttendees = viewModel.attendeesSearchState.attendees,
         attendeesSearchState = viewModel.attendeesSearchState,
     )
 
@@ -101,12 +100,6 @@ private fun EventCreationScreenPreview() {
         val state = rememberSaveableEventFormState(
             calendars = listOf(previewEventDetailCalendar),
             initialCalendar = previewEventDetailCalendar,
-            initialAttendees = remember { mutableStateSetOf() },
-            attendeesSearchState = AttendeesSearchState(
-                searchQueryTextFieldState = TextFieldState(),
-                attendees = remember { mutableStateSetOf() },
-                results = remember { mutableStateListOf() },
-            ),
         )
 
         EventCreationScreen(state = state, onSubmit = {}, goBack = {}, goToEventsAttendees = {})

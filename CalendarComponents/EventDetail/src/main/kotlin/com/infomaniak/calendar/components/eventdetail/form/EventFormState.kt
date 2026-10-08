@@ -23,6 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateSetOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateSet
@@ -53,7 +55,7 @@ class EventFormState(
 fun rememberSaveableEventFormState(
     calendars: List<EventDetailCalendar>,
     initialCalendar: EventDetailCalendar?,
-    initialAttendees: SnapshotStateSet<AttendeeUi>,
+    initialAttendees: SnapshotStateSet<AttendeeUi> = remember { mutableStateSetOf() },
     initialText: String = "",
     initialIsKMeetUrlEnabled: Boolean = false,
     attendeesSearchState: AttendeesSearchState? = null,

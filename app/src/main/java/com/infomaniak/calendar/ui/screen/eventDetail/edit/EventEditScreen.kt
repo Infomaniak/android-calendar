@@ -38,6 +38,7 @@ import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberSaveableEventFormState
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
@@ -144,10 +145,9 @@ private fun Preview() {
                         calendars = listOf(previewEventDetailCalendar),
                         initialCalendar = previewEventDetailCalendar,
                         initialText = "Meeting on how to find funny preview titles",
-                        initialAttendees = remember { mutableStateSetOf(previewAttendees.first()) },
                         attendeesSearchState = AttendeesSearchState(
                             searchQueryTextFieldState = TextFieldState(),
-                            attendees = remember { mutableStateSetOf(previewAttendees.first()) },
+                            attendees = remember {mutableStateSetOf<AttendeeUi>().apply { addAll(previewAttendees) } },
                             results = remember { mutableStateListOf() },
                         ),
                     ),
