@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.foundation.state
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -26,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.compose.runtime.toMutableStateList
@@ -72,6 +74,20 @@ class AttendeesSearchState(
                 )
             },
         )
+    }
+
+    fun updateSearchQuery(query: String) {
+        searchQueryTextFieldState.setTextAndPlaceCursorAtEnd(query)
+    }
+
+    fun reset(invitedAttendees: List<AttendeeUi> = emptyList()) {
+        Snapshot.withMutableSnapshot {
+            updateSearchQuery("")
+            results.clear()
+            results.addAll(invitedAttendees)
+            attendees.clear()
+            attendees.addAll(invitedAttendees)
+        }
     }
 }
 
