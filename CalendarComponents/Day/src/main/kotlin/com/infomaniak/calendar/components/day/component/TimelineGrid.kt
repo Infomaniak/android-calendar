@@ -41,15 +41,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
-import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults.DividerHeight
+import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults
 import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.foundation.theme.ComponentColors
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortTimeLabel
 import kotlinx.datetime.LocalTime
 
-private val GridLineThickness = DividerHeight
 private const val FIRST_LABELLED_HOUR = 0
 
 private val HourLabelStyle: TextStyle
@@ -91,7 +91,7 @@ internal fun Modifier.verticalTimelineScroll(
 /** A line at every hour, across the whole width it is given. */
 @Composable
 internal fun HourLines(state: DayTimelineState, modifier: Modifier = Modifier) {
-    val color = MaterialTheme.colorScheme.outlineVariant
+    val color = ComponentColors.GridDividerColor
 
     Box(
         modifier = modifier
@@ -104,7 +104,29 @@ internal fun HourLines(state: DayTimelineState, modifier: Modifier = Modifier) {
                         color = color,
                         start = Offset(0f, y),
                         end = Offset(size.width, y),
-                        strokeWidth = GridLineThickness.toPx(),
+                        strokeWidth = EventLayoutDefaults.GridLineThickness.toPx(),
+                    )
+                }
+            },
+    )
+}
+
+@Composable
+internal fun HourGrid(state: DayTimelineState, modifier: Modifier = Modifier) {
+    val color = ComponentColors.GridDividerColor
+
+    Box(
+        modifier = modifier
+            .timelineHeight(state)
+            .drawBehind {
+                for (hour in FIRST_LABELLED_HOUR until HOURS_PER_DAY) {
+                    val y = state.verticalOffsetOf(hour * MINUTES_PER_HOUR).toPx()
+
+                    drawLine(
+                        color = color,
+                        start = Offset(0f, y),
+                        end = Offset(size.width, y),
+                        strokeWidth = EventLayoutDefaults.GridLineThickness.toPx(),
                     )
                 }
             },
@@ -155,13 +177,31 @@ private fun HourLabel(hour: Int, modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-private fun TimelineGridPreview() {
+private fun LinesPreview() {
     Surface {
         val state = rememberDayTimelineState({})
 
         Box {
             HourLabels(state = state, modifier = Modifier.width(DayTimelineDefaults.HourGutterWidth))
             HourLines(
+                state = state,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = DayTimelineDefaults.HourGutterWidth, end = DayTimelineDefaults.TimelineEndPadding),
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun GridPreview() {
+    Surface {
+        val state = rememberDayTimelineState({})
+
+        Box {
+            HourLabels(state = state, modifier = Modifier.width(DayTimelineDefaults.HourGutterWidth))
+            HourGrid(
                 state = state,
                 modifier = Modifier
                     .fillMaxWidth()

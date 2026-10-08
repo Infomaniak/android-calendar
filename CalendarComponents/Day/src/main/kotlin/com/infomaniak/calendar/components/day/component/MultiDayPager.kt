@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.day.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,14 +28,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,23 +49,21 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
-import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults.DividerHeight
+import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults.GridLineThickness
 import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.pinchToZoom
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
-import com.infomaniak.calendar.components.foundation.component.DayCircle
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
-import com.infomaniak.calendar.components.foundation.state.DateState
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
-import com.infomaniak.calendar.components.foundation.state.rememberToday
-import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortDayName
+import com.infomaniak.calendar.components.foundation.theme.ComponentColors
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
@@ -75,14 +74,13 @@ import kotlinx.datetime.plus
 import kotlin.time.Clock
 
 /**
- * Several days side by side, one column each: their headers and all-day events pinned at the top,
- * over the scrollable hour grid carrying their timed events.
+ * Several days side by side, one column each. Each column has a header.
  *
- * Every column follows the same layout as the hour gutter beside them, so a column's header, its
- * all-day events and its timed events all line up with each other.
+ * Every column follows the same layout as the hour gutter beside them, so a column's header and its timed events all line up with
+ * each other.
  */
 @Composable
-internal fun MultiDayView(
+internal fun MultiDayPager(
     dates: List<LocalDate>,
     eventsOf: (LocalDate) -> DayEvents,
     state: DayTimelineState,
@@ -95,8 +93,7 @@ internal fun MultiDayView(
 ) {
     val density = LocalDensity.current
     var headerHeight by remember { mutableStateOf(0.dp) }
-    val hasAllDayEvents = dates.any { eventsOf(it).allDay.isNotEmpty() }
-    val daysPadding = contentPadding + PaddingValues(horizontal = EsdsTheme.spacing.md)
+    val contentPadding = contentPadding + PaddingValues(horizontal = EsdsTheme.spacing.md)
 
     Box(modifier = modifier) {
         MultiDayTimeline(
@@ -104,44 +101,17 @@ internal fun MultiDayView(
             eventsOf = eventsOf,
             state = state,
             onEventClick = onEventClick,
-            contentPadding = daysPadding + PaddingValues(top = headerHeight + EsdsTheme.spacing.md),
+            contentPadding = contentPadding + PaddingValues(top = headerHeight + EsdsTheme.spacing.md),
             modifier = timelineModifier.fillMaxSize(),
         )
 
-        Column {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = contentPadding.calculateTopPadding())
-                    .padding(daysPadding.onlyHorizontal())
-                    // Measured inside the padding: the timeline already makes room for it on its own.
-                    .onSizeChanged { headerHeight = with(density) { it.height.toDp() } }
-                    .then(headerModifier),
-            ) {
-                DayColumns(
-                    dates = dates,
-                    gutter = {
-                        Text(
-                            text = stringResource(R.string.weekHeaderWeekNumber, weekNumbering.weekOf(dates.first()).weekNumber),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    },
-                    verticalAlignment = Alignment.CenterVertically,
-                ) { date ->
-                    DayColumnHeader(date)
-                }
-
-                if (hasAllDayEvents) {
-                    DayColumns(dates = dates) { date ->
-                        AllDayEventsBand(events = eventsOf(date).allDay, onEventClick = onEventClick)
-                    }
-                }
-            }
-
-            if (hasAllDayEvents) HorizontalDivider(thickness = DividerHeight)
-        }
+        OverlaidHeaders(
+            dates = dates,
+            weekNumbering = weekNumbering,
+            onSizeChanged = { headerHeight = with(density) { it.height.toDp() } },
+            modifier = headerModifier.fillMaxWidth(),
+            contentPadding = contentPadding.onlyHorizontalAndTop(),
+        )
     }
 }
 
@@ -175,34 +145,81 @@ private fun MultiDayTimeline(
                 .padding(start = gutterWidth, end = endPadding),
         )
 
-        DayColumns(dates = dates, modifier = Modifier.matchParentSize()) { date ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .dayColumnDivider(MaterialTheme.colorScheme.outlineVariant),
-            ) {
-                TimedEventsColumn(
-                    events = eventsOf(date).timed,
-                    hourHeight = state.hourHeight,
-                    onEventClick = onEventClick,
-                    modifier = Modifier.matchParentSize(),
-                )
-
-                if (currentDateTime.date == date) {
-                    CurrentTimeIndicator(
-                        minuteOfDay = currentDateTime.minuteOfDay,
-                        state = state,
-                        modifier = Modifier.matchParentSize(),
+        // Each column draws its end vertical divider and the initial vertical divider is drawn inside the gutter slot.
+        DayColumns(
+            dates = dates,
+            modifier = Modifier.matchParentSize(),
+            gutter = {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.CenterEnd,
+                ) {
+                    VerticalDivider(
+                        thickness = GridLineThickness,
+                        color = ComponentColors.GridDividerColor,
                     )
                 }
-            }
-        }
+            },
+            content = { date ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalDivider(),
+                ) {
+                    TimedEventsColumn(
+                        events = eventsOf(date).timed,
+                        hourHeight = state.hourHeight,
+                        onEventClick = onEventClick,
+                        modifier = Modifier.matchParentSize(),
+                    )
+
+                    if (currentDateTime.date == date) {
+                        CurrentTimeIndicator(
+                            minuteOfDay = currentDateTime.minuteOfDay,
+                            state = state,
+                            modifier = Modifier.matchParentSize(),
+                        )
+                    }
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun OverlaidHeaders(
+    dates: List<LocalDate>,
+    weekNumbering: WeekNumbering,
+    onSizeChanged: (IntSize) -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),
+        modifier = modifier
+            .padding(contentPadding)
+            // Measured inside the padding: the timeline already makes room for it on its own.
+            .onSizeChanged(onSizeChanged),
+    ) {
+        DayColumns(
+            dates = dates,
+            gutter = {
+                Text(
+                    text = stringResource(R.string.weekHeaderWeekNumber, weekNumbering.weekOf(dates.first()).weekNumber),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+            content = { date ->
+                DayColumnHeader(date, modifier = Modifier.padding(bottom = EsdsTheme.spacing.xl))
+            },
+            verticalAlignment = Alignment.CenterVertically,
+        )
     }
 }
 
 /**
- * Lays [dates] out as equal columns past the hour gutter, the one layout shared by the headers, the
- * all-day events and the hour grid so that they all line up.
+ * Creates as many columns as there are [dates]. It takes an extra slot for the [gutter] placed at the start of the columns.
  */
 @Composable
 private fun DayColumns(
@@ -210,7 +227,7 @@ private fun DayColumns(
     modifier: Modifier = Modifier,
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     gutter: @Composable () -> Unit = {},
-    column: @Composable (LocalDate) -> Unit,
+    content: @Composable (LocalDate) -> Unit,
 ) {
     Row(
         verticalAlignment = verticalAlignment,
@@ -224,7 +241,7 @@ private fun DayColumns(
         }
 
         dates.forEach { date ->
-            DayColumn { column(date) }
+            DayColumn { content(date) }
         }
     }
 }
@@ -236,28 +253,44 @@ private fun RowScope.DayColumn(content: @Composable () -> Unit) {
     }
 }
 
-/** A line along the start of a day's column, which separates it from the column before it. */
-private fun Modifier.dayColumnDivider(color: Color): Modifier = drawBehind {
-    val x = if (layoutDirection == LayoutDirection.Ltr) 0f else size.width
+/** A vertical line, by default it's drawn at the end of the component */
+@Composable
+@ReadOnlyComposable
+private fun Modifier.verticalDivider(
+    position: DayColumnDividerPosition? = null,
+    color: Color = ComponentColors.GridDividerColor,
+): Modifier = drawBehind {
+    val x = when (position) {
+        DayColumnDividerPosition.Start -> 0f
+        DayColumnDividerPosition.End -> size.width
+        null -> if (layoutDirection == LayoutDirection.Ltr) size.width else 0f
+    }
     drawLine(
         color = color,
         start = Offset(x, 0f),
         end = Offset(x, size.height),
-        strokeWidth = DividerHeight.toPx(),
+        strokeWidth = GridLineThickness.toPx(),
     )
+}
+@Composable
+private fun PaddingValues.onlyHorizontalAndTop(): PaddingValues = onlyHorizontal() + PaddingValues(top = calculateTopPadding())
+
+internal enum class DayColumnDividerPosition {
+    Start, End
 }
 
 private val previewDates = Clock.today().let { today -> List(3) { today.plus(it, DateTimeUnit.DAY) } }
 
 @Preview
 @Composable
-private fun MultiDayViewPreview() {
+private fun MultiDayPagerPreview() {
     Surface {
-        MultiDayView(
+        MultiDayPager(
             dates = previewDates,
             eventsOf = { previewDayEvents },
             state = rememberDayTimelineState({}, scrollState = rememberScrollState(initial = 430)),
             weekNumbering = WeekNumbering.ISO_8601,
+            headerModifier = Modifier.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)),
             onEventClick = {},
         )
     }

@@ -23,7 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.day.component.MultiDayView
+import com.infomaniak.calendar.components.day.component.MultiDayPager
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
@@ -57,7 +57,7 @@ fun WeekPager(
     val firstDay = weekNumbering.weekOf(selectedDate()).firstDay
     val dates = remember(firstDay) { List(DAYS_PER_WEEK) { firstDay.plus(it, DateTimeUnit.DAY) } }
 
-    MultiDayView(
+    MultiDayPager(
         dates = dates,
         eventsOf = eventsOf,
         state = state,

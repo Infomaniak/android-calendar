@@ -17,8 +17,11 @@
  */
 package com.infomaniak.calendar.components.foundation.theme
 
-import androidx.compose.ui.unit.dp
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 
-object Dimens {
-    val FloatingToolbarElevation = 3.dp
+object ComponentColors {
+    val GridDividerColor
+        @Composable @ReadOnlyComposable get() = MaterialTheme.colorScheme.outlineVariant
 }
