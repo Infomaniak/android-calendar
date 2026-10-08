@@ -97,8 +97,9 @@ app/
 - **Event reminders**: `AlarmScheduler` (`AppScope` singleton, started from `MainApplication`) mirrors
   `CalendarManager.observeUpcomingAlarms` (device alarms only: `DISPLAY` / `AUDIO`, max 400 over 30 days) into exact
   `AlarmManager` alarms. `AlarmReceiver` posts the notification (tap opens `EventDetail`), `BootReceiver` reschedules on
-  boot, app update and time / time zone change. The 30-day window doesn't follow the clock, so each refresh also sets an
-  inexact, non-wakeup `ACTION_REFRESH_ALARMS` alarm one day later (handled by `AlarmReceiver`) to move it forward.
+  boot, app update, time / time zone change and once exact alarm access is granted. The 30-day window doesn't follow the
+  clock, so each refresh also sets an inexact, non-wakeup `ACTION_REFRESH_ALARMS` alarm one day later (handled by
+  `AlarmReceiver`) to move it forward.
   Each process registers every alarm once (the system may have dropped them while it was dead: force stop, hibernation,
   revoked exact alarm access), then only registers alarms whose content (`AlarmRegistration`) changed. Failed
   registrations aren't kept (neither in memory nor in the persisted `scheduledAlarmIds`), so they're retried next sync,
@@ -107,7 +108,8 @@ app/
   a process started for a broadcast may be killed or frozen as soon as it's over.
   `MainActivity` requests the `POST_NOTIFICATIONS` runtime permission (Android 13+) on each fresh start (skipped on
   recreation). Exact alarms need no request: `USE_EXACT_ALARM` on API 33+, `SCHEDULE_EXACT_ALARM` on API 31–32 (falls
-  back to inexact alarms if the user revokes it).
+  back to inexact alarms while the user revokes it; exactness is part of `AlarmRegistration`, so they're all registered
+  again as exact ones once it's granted back).
 - **Shared logic**: Prefer reusing models / logic from `com.infomaniak.multiplatform_calendar.*` instead of duplicating
   Android-only equivalents.
 - **KISS / SOLID**: Keep Composables focused; extract reusable pieces into small `@Composable` functions.

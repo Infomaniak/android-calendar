@@ -125,6 +125,7 @@ class AlarmScheduler @Inject constructor(
             previouslyScheduledIds = previouslyScheduledIds,
             registeredAlarms = registeredAlarms,
             nowMs = System.currentTimeMillis(),
+            isExact = canScheduleExactAlarms(),
         )
 
         // Not cancellable, so that the AlarmManager, registeredAlarms and the persisted IDs can't drift apart
@@ -152,7 +153,14 @@ class AlarmScheduler @Inject constructor(
         val startMs: Long,
         val endMs: Long,
         val isAllDay: Boolean,
+        // Granting exact alarm access back changes it for every alarm, so they all get registered again as exact ones
+        val isExact: Boolean,
     )
+
+    // Exact alarms need no permission below Android 12
+    private fun canScheduleExactAlarms(): Boolean {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager?.canScheduleExactAlarms() == true
+    }
 
     /** Returns whether the alarm got registered. */
     private fun scheduleAlarm(registration: AlarmRegistration): Boolean {
@@ -167,14 +175,10 @@ class AlarmScheduler @Inject constructor(
         )
 
         return runCatching {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                if (alarmManager.canScheduleExactAlarms()) {
-                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMs, pendingIntent)
-                } else {
-                    alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMs, pendingIntent)
-                }
-            } else {
+            if (registration.isExact) {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMs, pendingIntent)
+            } else {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMs, pendingIntent)
             }
         }.onFailure { exception ->
             Log.w(TAG, "Failed to schedule alarm for ${registration.alarmId}", exception)
@@ -265,13 +269,14 @@ class AlarmScheduler @Inject constructor(
             previouslyScheduledIds: Set<String>,
             registeredAlarms: Map<String, AlarmRegistration>,
             nowMs: Long,
+            isExact: Boolean = true,
             timeZone: TimeZone = TimeZone.currentSystemDefault(),
             limit: Int = MAX_SCHEDULED_ALARMS,
         ): AlarmSyncPlan {
             val wantedAlarms = upcomingAlarms
                 .filter { it.firesAt.toEpochMilliseconds() > nowMs }
                 .take(limit)
-                .map { it.toRegistration(timeZone) }
+                .map { it.toRegistration(timeZone, isExact) }
 
             val wantedIds = wantedAlarms.mapTo(mutableSetOf(), AlarmRegistration::alarmId)
             val (unchanged, toSchedule) = wantedAlarms.partition { registeredAlarms[it.alarmId] == it }
@@ -282,7 +287,7 @@ class AlarmScheduler @Inject constructor(
             )
         }
 
-        private fun UpcomingAlarm.toRegistration(timeZone: TimeZone) = AlarmRegistration(
+        private fun UpcomingAlarm.toRegistration(timeZone: TimeZone, isExact: Boolean) = AlarmRegistration(
             alarmId = id.value,
             triggerAtMs = firesAt.toEpochMilliseconds(),
             occurrenceIdJson = Json.encodeToString(OccurrenceId.serializer(), event.occurrenceId),
@@ -291,6 +296,7 @@ class AlarmScheduler @Inject constructor(
             startMs = event.timing.startInstant(timeZone).toEpochMilliseconds(),
             endMs = event.timing.endInstant(timeZone).toEpochMilliseconds(),
             isAllDay = event.timing.isAllDay,
+            isExact = isExact,
         )
     }
 }
