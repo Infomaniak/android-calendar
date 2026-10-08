@@ -247,29 +247,6 @@ private fun Modifier.dayColumnDivider(color: Color): Modifier = drawBehind {
     )
 }
 
-@Composable
-private fun DayColumnHeader(date: LocalDate) {
-    val today by rememberToday()
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = date.formatShortDayName(),
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 1,
-        )
-
-        DayCircle(
-            state = if (date == today) DateState.Today else DateState.None,
-            modifier = Modifier.size(DayNumberSize),
-        ) {
-            Text(text = date.day.toString(), style = MaterialTheme.typography.titleMedium)
-        }
-    }
-}
-
-private val DayNumberSize = 36.dp
-
 private val previewDates = Clock.today().let { today -> List(3) { today.plus(it, DateTimeUnit.DAY) } }
 
 @Preview
