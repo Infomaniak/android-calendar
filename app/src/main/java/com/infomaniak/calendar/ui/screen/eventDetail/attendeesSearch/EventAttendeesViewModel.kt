@@ -19,40 +19,70 @@ package com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
+import androidx.lifecycle.viewmodel.compose.saveable
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
-import dev.zacsweers.metro.Inject
-import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
+import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-@Inject
-@ContributesIntoMap(AppScope::class)
-@ViewModelKey
-class EventAttendeesViewModel(private val getEventDetailUiUseCase: GetEventDetailUiUseCase) : ViewModel() {
+@AssistedInject
+class EventAttendeesViewModel(
+    @Assisted savedStateHandle: SavedStateHandle,
+    private val getEventDetailUiUseCase: GetEventDetailUiUseCase,
+) : ViewModel() {
 
     val eventDetailUi: StateFlow<EventDetailUiState> = getEventDetailUiUseCase.eventDetailUi
-    private val _attendeesSearchState = MutableStateFlow(
-        AttendeesSearchState(
-            searchQueryTextFieldState = TextFieldState(),
-            results = mutableStateListOf(),
-            attendees = mutableStateSetOf(),
-            attendeesComparator = { true },
-        ),
-    )
+
+    @OptIn(SavedStateHandleSaveableApi::class)
+    private var savedAttendeesSearchState by savedStateHandle.saveable(
+        stateSaver = AttendeesSearchState.saver { true },
+    ) {
+        mutableStateOf(
+            AttendeesSearchState(
+                searchQueryTextFieldState = TextFieldState(),
+                results = mutableStateListOf(),
+                attendees = mutableStateSetOf(),
+                attendeesComparator = { true },
+            ),
+        )
+    }
+    private val _attendeesSearchState = MutableStateFlow(savedAttendeesSearchState)
     val attendeesSearchState: StateFlow<AttendeesSearchState> = _attendeesSearchState.asStateFlow()
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) = getEventDetailUiUseCase.setOccurrenceId(occurrenceId)
 
     fun setAttendeesSearchState(attendeesSearchState: AttendeesSearchState) {
+        savedAttendeesSearchState = attendeesSearchState
         _attendeesSearchState.value = attendeesSearchState
+    }
+
+    @AssistedFactory
+    @ViewModelAssistedFactoryKey(EventAttendeesViewModel::class)
+    @ContributesIntoMap(AppScope::class)
+    fun interface Factory : ViewModelAssistedFactory {
+        override fun create(extras: CreationExtras): EventAttendeesViewModel =
+            create(extras.createSavedStateHandle())
+
+        fun create(
+            @Assisted savedStateHandle: SavedStateHandle,
+        ): EventAttendeesViewModel
     }
 }
 
