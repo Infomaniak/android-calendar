@@ -24,8 +24,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
+import com.infomaniak.calendar.utils.OccurrenceAttendeesLoader
 import com.infomaniak.calendar.utils.attendeesSearchState
-import com.infomaniak.calendar.utils.toAttendeeUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
@@ -35,9 +35,6 @@ import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 @AssistedInject
 class EventDetailViewModel(
@@ -48,25 +45,19 @@ class EventDetailViewModel(
     val eventDetailUi = getEventDetailUiUseCase.eventDetailUi
     val attendeesSearchState: AttendeesSearchState = savedStateHandle.attendeesSearchState()
 
-    private var attendeesLoadJob: Job? = null
-    private var currentOccurrenceId: OccurrenceId? = null
+    private val attendeesLoader = OccurrenceAttendeesLoader(
+        scope = viewModelScope,
+        savedStateHandle = savedStateHandle,
+        calendarManager = calendarManager,
+        state = attendeesSearchState,
+        preserveRestoredSelections = false,
+    )
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) {
         getEventDetailUiUseCase.setOccurrenceId(occurrenceId)
-
-        // it shouldn't reload the attendees if the occurrence ID hasn't changed
-        if (currentOccurrenceId == occurrenceId) return
-        currentOccurrenceId = occurrenceId
-        attendeesLoadJob = viewModelScope.launch {
-            val event = calendarManager.observeOccurrence(occurrenceId).first()
-                ?: return@launch
-
-            attendeesSearchState.reset(
-                invitedAttendees = event.attendees.map { it.toAttendeeUi() },
-            )
-        }
+        attendeesLoader.load(occurrenceId)
     }
-    
+
     @AssistedFactory
     @ViewModelAssistedFactoryKey(EventDetailViewModel::class)
     @ContributesIntoMap(AppScope::class)
@@ -76,5 +67,3 @@ class EventDetailViewModel(
         fun create(@Assisted savedStateHandle: SavedStateHandle): EventDetailViewModel
     }
 }
-
-private const val ATTENDEES_LOADED_KEY = "attendeesLoaded"
