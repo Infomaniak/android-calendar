@@ -32,17 +32,48 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.compose.runtime.toMutableStateList
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState.Companion.DefaultAttendeesComparator
 
 @Stable
 class AttendeesSearchState(
     val searchQueryTextFieldState: TextFieldState,
     val results: SnapshotStateList<AttendeeUi>,
     val attendees: SnapshotStateSet<AttendeeUi>,
-    private val attendeesComparator: () -> Boolean,
+    private val attendeesComparator: (
+        initialAttendees: Set<AttendeeUi>,
+        currentAttendees: Set<AttendeeUi>,
+    ) -> Boolean = DefaultAttendeesComparator,
 ) {
+    fun updateSearchQuery(query: String) {
+        searchQueryTextFieldState.setTextAndPlaceCursorAtEnd(query)
+    }
+
+    fun hasSameAttendees(initialAttendees: Collection<AttendeeUi>): Boolean {
+        return attendeesComparator(
+            initialAttendees.toSet(),
+            attendees.toSet(),
+        )
+    }
+
+    fun reset(invitedAttendees: List<AttendeeUi> = emptyList()) {
+        Snapshot.withMutableSnapshot {
+            updateSearchQuery("")
+            results.clear()
+            results.addAll(invitedAttendees)
+            attendees.clear()
+            attendees.addAll(invitedAttendees)
+        }
+    }
+
     companion object {
+        val DefaultAttendeesComparator: (Set<AttendeeUi>, Set<AttendeeUi>) -> Boolean =
+            { initial, current -> initial == current }
+
         fun saver(
-            attendeesComparator: () -> Boolean,
+            attendeesComparator: (
+                initialAttendees: Set<AttendeeUi>,
+                currentAttendees: Set<AttendeeUi>,
+            ) -> Boolean = DefaultAttendeesComparator,
         ): Saver<AttendeesSearchState, Any> = Saver(
             save = { state ->
                 val savedQuery = with(TextFieldState.Saver) { save(state.searchQueryTextFieldState) }
@@ -75,20 +106,6 @@ class AttendeesSearchState(
             },
         )
     }
-
-    fun updateSearchQuery(query: String) {
-        searchQueryTextFieldState.setTextAndPlaceCursorAtEnd(query)
-    }
-
-    fun reset(invitedAttendees: List<AttendeeUi> = emptyList()) {
-        Snapshot.withMutableSnapshot {
-            updateSearchQuery("")
-            results.clear()
-            results.addAll(invitedAttendees)
-            attendees.clear()
-            attendees.addAll(invitedAttendees)
-        }
-    }
 }
 
 /**
@@ -101,12 +118,12 @@ fun rememberSaveableAttendeesSearchState(
     attendees: SnapshotStateSet<AttendeeUi>,
     results: List<AttendeeUi> = emptyList(),
     searchQuery: String = "",
-    attendeesComparator: () -> Boolean = { true },
+    attendeesComparator: (initialAttendees: Set<AttendeeUi>, currentAttendees: Set<AttendeeUi>) -> Boolean = DefaultAttendeesComparator,
 ): AttendeesSearchState {
     val currentComparator by rememberUpdatedState(attendeesComparator)
     val saver = remember {
-        AttendeesSearchState.saver {
-            currentComparator()
+        AttendeesSearchState.saver { initial, current ->
+            currentComparator(initial, current)
         }
     }
 
@@ -117,7 +134,7 @@ fun rememberSaveableAttendeesSearchState(
             attendees = mutableStateSetOf<AttendeeUi>().apply {
                 addAll(attendees)
             },
-            attendeesComparator = { currentComparator() },
+            attendeesComparator = attendeesComparator,
         )
     }
 }

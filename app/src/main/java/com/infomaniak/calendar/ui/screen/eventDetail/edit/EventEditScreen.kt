@@ -149,7 +149,6 @@ private fun Preview() {
                             searchQueryTextFieldState = TextFieldState(),
                             attendees = remember { mutableStateSetOf(previewAttendees.first()) },
                             results = remember { mutableStateListOf() },
-                            attendeesComparator = { true },
                         ),
                     ),
                 ),
