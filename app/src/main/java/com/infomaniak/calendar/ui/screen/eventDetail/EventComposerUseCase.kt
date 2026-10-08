@@ -17,3 +17,4 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
+// TODO: add all the edit, create and delete functions for events here
