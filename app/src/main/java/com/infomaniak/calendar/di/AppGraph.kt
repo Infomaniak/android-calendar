@@ -27,7 +27,6 @@ import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.di.metroAndroidExtensions.AndroidComponentProvider
 import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.notification.AlarmScheduler
-import com.infomaniak.calendar.secured.DavCredentialsManager
 import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.login.InfomaniakLogin
