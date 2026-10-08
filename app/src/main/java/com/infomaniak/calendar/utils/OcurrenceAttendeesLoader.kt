@@ -17,14 +17,15 @@
  */
 package com.infomaniak.calendar.utils
 
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.lifecycle.SavedStateHandle
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 internal class OccurrenceAttendeesLoader(
@@ -40,35 +41,70 @@ internal class OccurrenceAttendeesLoader(
     fun load(occurrenceId: OccurrenceId) {
         if (currentOccurrenceId == occurrenceId) return
         currentOccurrenceId = occurrenceId
-
         loadJob?.cancel()
 
-        if (
-            preserveRestoredSelections &&
+        val ownsSavedState =
             savedStateHandle.get<String>(ATTENDEES_OCCURRENCE_KEY) ==
-            occurrenceId.value
-        ) {
-            return
+                    occurrenceId.value
+
+        val preserveSelection = preserveRestoredSelections && ownsSavedState
+
+        var initialAttendees = if (preserveSelection) {
+            savedStateHandle
+                .get<ArrayList<AttendeeUi>>(INITIAL_ATTENDEES_KEY)
+                ?.toSet()
+        } else {
+            null
         }
 
-        savedStateHandle.remove<String>(ATTENDEES_OCCURRENCE_KEY)
-        state.reset()
+        if (!preserveSelection) {
+            savedStateHandle.remove<String>(ATTENDEES_OCCURRENCE_KEY)
+            savedStateHandle.remove<ArrayList<AttendeeUi>>(INITIAL_ATTENDEES_KEY)
+            state.reset()
+        }
 
         loadJob = scope.launch {
-            val event = calendarManager.observeOccurrence(occurrenceId).first()
-                ?: return@launch // The screen handles unavailable events.
+            calendarManager.observeOccurrence(occurrenceId).collect { event ->
+                ensureActive()
+                if (currentOccurrenceId != occurrenceId) return@collect
+                if (event == null) return@collect // Unavailable event is handled by the UI.
 
-            ensureActive()
-            if (currentOccurrenceId != occurrenceId) return@launch
+                val invited = event.attendees.map { it.toAttendeeUi() }
+                val previousInitial = initialAttendees
 
-            state.reset(
-                invitedAttendees = event.attendees.map { it.toAttendeeUi() },
-            )
-            savedStateHandle[ATTENDEES_OCCURRENCE_KEY] = occurrenceId.value
+                val canRefresh = if (previousInitial != null) {
+                    state.hasSameAttendees(previousInitial)
+                } else {
+                    !preserveSelection
+                }
+
+                if (canRefresh) {
+                    Snapshot.withMutableSnapshot {
+                        state.attendees.clear()
+                        state.attendees.addAll(invited)
+
+                        // Don't replace active search results.
+                        if (state.searchQueryTextFieldState.text.isBlank()) {
+                            state.results.clear()
+                            state.results.addAll(invited)
+                        }
+                    }
+
+                    initialAttendees = invited.toSet()
+                    savedStateHandle[INITIAL_ATTENDEES_KEY] = ArrayList(invited)
+                } else if (previousInitial == null) {
+                    // Older saved drafts may not contain a baseline.
+                    initialAttendees = invited.toSet()
+                    savedStateHandle[INITIAL_ATTENDEES_KEY] = ArrayList(invited)
+                }
+
+                savedStateHandle[ATTENDEES_OCCURRENCE_KEY] = occurrenceId.value
+            }
         }
     }
 
     private companion object {
         const val ATTENDEES_OCCURRENCE_KEY = "attendeesOccurrenceId"
+        const val INITIAL_ATTENDEES_KEY = "initialAttendees"
     }
 }
