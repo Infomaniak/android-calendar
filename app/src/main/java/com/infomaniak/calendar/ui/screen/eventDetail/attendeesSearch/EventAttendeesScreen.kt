@@ -57,6 +57,7 @@ fun EventAttendeesScreen(
 
     LaunchedEffect(occurrenceId) {
         occurrenceId?.let { viewModel.setOccurrenceId(occurrenceId) }
+        viewModel.attendeesSearchState.value.updateSearchQuery("")
     }
 
     Box(modifier = modifier.fillMaxSize()) {
