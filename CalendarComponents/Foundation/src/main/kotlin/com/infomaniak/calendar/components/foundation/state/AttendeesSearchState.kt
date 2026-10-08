@@ -91,6 +91,11 @@ class AttendeesSearchState(
     }
 }
 
+/**
+ * Remembers saveable attendee-search state initialized from attendees, results, and query.
+ *
+ * Mutations to its snapshot collections update consumers and are restored after state recreation.
+ */
 @Composable
 fun rememberSaveableAttendeesSearchState(
     attendees: SnapshotStateSet<AttendeeUi>,
