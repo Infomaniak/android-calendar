@@ -20,6 +20,5 @@ package com.infomaniak.calendar.components.foundation.theme
 import androidx.compose.ui.unit.dp
 
 object Dimens {
-
     val FloatingToolbarElevation = 3.dp
 }

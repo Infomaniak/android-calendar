@@ -17,13 +17,15 @@
  */
 package com.infomaniak.calendar.components.day
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.day.component.MultiDayView
+import com.infomaniak.calendar.components.day.component.MultiDayPager
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
@@ -54,7 +56,7 @@ fun ThreeDayPager(
     val firstDay = selectedDate()
     val dates = remember(firstDay) { List(DAY_COUNT) { firstDay.plus(it, DateTimeUnit.DAY) } }
 
-    MultiDayView(
+    MultiDayPager(
         dates = dates,
         eventsOf = eventsOf,
         state = state,
@@ -77,6 +79,7 @@ private fun ThreeDayPagerPreview() {
             state = rememberDayTimelineState({}),
             weekNumbering = WeekNumbering.ISO_8601,
             onEventClick = {},
+            headerModifier = Modifier.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)),
         )
     }
 }

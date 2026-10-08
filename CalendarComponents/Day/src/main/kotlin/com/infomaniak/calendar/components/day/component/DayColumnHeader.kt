@@ -40,10 +40,10 @@ import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
 
 @Composable
-internal fun DayColumnHeader(date: LocalDate) {
+internal fun DayColumnHeader(date: LocalDate, modifier: Modifier = Modifier) {
     val today by rememberToday()
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
         Text(
             text = date.formatShortDayNameUppercase(),
             style = MaterialTheme.typography.labelMedium,

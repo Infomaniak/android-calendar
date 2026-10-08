@@ -38,7 +38,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults.DividerHeight
+import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
@@ -107,7 +107,7 @@ internal fun DayView(
             }
 
             if (events.allDay.isNotEmpty()) {
-                HorizontalDivider(thickness = DividerHeight)
+                HorizontalDivider(thickness = EventLayoutDefaults.GridLineThickness)
             }
         }
     }
