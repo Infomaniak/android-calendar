@@ -192,6 +192,35 @@ class AlarmSchedulerTest {
     }
 
     @Test
+    fun `every alarm is registered again once exact alarm access is granted`() {
+        val nowMs = 1_000_000L
+        val alarms = listOf(
+            testAlarm(id = "alarm-1", firesAtMs = nowMs + 1000),
+            testAlarm(id = "alarm-2", firesAtMs = nowMs + 2000),
+        )
+        val inexactPlan = AlarmScheduler.computeAlarmSyncPlan(
+            upcomingAlarms = alarms,
+            previouslyScheduledIds = emptySet(),
+            registeredAlarms = emptyMap(),
+            nowMs = nowMs,
+            isExact = false,
+        )
+
+        val plan = AlarmScheduler.computeAlarmSyncPlan(
+            upcomingAlarms = alarms,
+            previouslyScheduledIds = inexactPlan.wantedIds(),
+            registeredAlarms = inexactPlan.registered(),
+            nowMs = nowMs,
+            isExact = true,
+        )
+
+        assertTrue(plan.toCancel.isEmpty())
+        assertTrue(plan.unchanged.isEmpty())
+        assertEquals(listOf("alarm-1", "alarm-2"), plan.toSchedule.map { it.alarmId })
+        assertTrue(plan.toSchedule.all { it.isExact })
+    }
+
+    @Test
     fun `an alarm registered by this process is cancelled once unwanted, even without its persisted id`() {
         val nowMs = 1_000_000L
         val initialPlan = AlarmScheduler.computeAlarmSyncPlan(
