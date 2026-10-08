@@ -38,5 +38,3 @@ fun SavedStateHandle.attendeesSearchState(): AttendeesSearchState = saveable(
         attendees = mutableStateSetOf(),
     )
 }
-
-
