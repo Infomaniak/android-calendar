@@ -19,7 +19,6 @@ package com.infomaniak.calendar.ui.screen.eventDetail.creation
 
 import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -30,11 +29,17 @@ import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberSaveableEventFormState
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 
 @Composable
-fun EventCreationScreen(modifier: Modifier = Modifier, viewModel: EventCreationViewModel = viewModel()) {
+fun EventCreationScreen(
+    goBack: () -> Unit,
+    goToEventsAttendees: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: EventCreationViewModel = viewModel(),
+) {
     val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
     val state = rememberSaveableEventFormState(
         calendars = eventFormCalendars?.calendars ?: emptyList(),
@@ -45,6 +50,8 @@ fun EventCreationScreen(modifier: Modifier = Modifier, viewModel: EventCreationV
         state = state,
         onSubmit = { viewModel.submitEvent(state.toEventDraft() ?: return@EventCreationScreen) },
         modifier = modifier,
+        goBack = goBack,
+        goToEventsAttendees = goToEventsAttendees,
     )
 }
 
@@ -52,15 +59,22 @@ fun EventCreationScreen(modifier: Modifier = Modifier, viewModel: EventCreationV
 private fun EventCreationScreen(
     state: EventFormState,
     onSubmit: () -> Unit,
+    goBack: () -> Unit,
+    goToEventsAttendees: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
-        topBar = { TopAppBar(title = { Text("EventCreationScreen") }) },
+        topBar = {
+            TopAppBar(
+                navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
+                title = {},
+            )
+        },
         modifier = modifier,
     ) { contentPadding ->
         EventForm(
             state = state,
-            onAttendeesClick = { /*TODO[eventForm]*/ },
+            onAttendeesClick = { goToEventsAttendees() },
             contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
         )
     }
@@ -75,6 +89,6 @@ private fun EventCreationScreenPreview() {
             initialCalendar = previewEventDetailCalendar,
         )
 
-        EventCreationScreen(state = state, onSubmit = {})
+        EventCreationScreen(state = state, onSubmit = {}, goBack = {}, goToEventsAttendees = {})
     }
 }

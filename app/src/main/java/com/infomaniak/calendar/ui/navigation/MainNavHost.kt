@@ -106,7 +106,10 @@ private fun baseEntryProvider(
         MonthScreen()
     }
     entry<NavDestination.EventCreation>(metadata = metaDataOf(ResponsiveDialog)) {
-        EventCreationScreen()
+        EventCreationScreen(
+            goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
+            goToEventsAttendees = { backStack.addOnce(NavDestination.EventAttendees()) },
+        )
     }
     entry<NavDestination.EventDetail>(metadata = metaDataOf(ResponsiveDialog)) { destination ->
         EventDetailScreen(
