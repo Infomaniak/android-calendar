@@ -45,8 +45,8 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Respon
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
 import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
 import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
-import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.EventAttendeesScreen
 import com.infomaniak.calendar.ui.screen.day.DayScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.EventAttendeesScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
@@ -106,7 +106,10 @@ private fun baseEntryProvider(
         MonthScreen()
     }
     entry<NavDestination.EventCreation>(metadata = metaDataOf(ResponsiveDialog)) {
-        EventCreationScreen()
+        EventCreationScreen(
+            goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
+            goToEventsAttendees = { backStack.addOnce(NavDestination.EventAttendees()) },
+        )
     }
     entry<NavDestination.EventDetail>(metadata = metaDataOf(ResponsiveDialog)) { destination ->
         EventDetailScreen(
@@ -120,6 +123,7 @@ private fun baseEntryProvider(
         EventEditScreen(
             occurrenceId = destination.occurrenceId,
             goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
+            goToEventAttendees = { backStack.addOnce(NavDestination.EventAttendees(destination.occurrenceId)) },
         )
     }
     entry<NavDestination.EventAttendees>(metadata = metaDataOf(ResponsiveDialog)) { destination ->

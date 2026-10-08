@@ -45,41 +45,51 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceI
 
 @Composable
 fun EventAttendeesScreen(
-    occurrenceId: OccurrenceId,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
+    occurrenceId: OccurrenceId? = null,
     viewModel: EventAttendeesViewModel = viewModel(),
 ) {
     val state = viewModel.eventDetailUi.collectAsStateWithLifecycle().value
 
     LaunchedEffect(occurrenceId) {
-        viewModel.setOccurrenceId(occurrenceId)
+        occurrenceId?.let { viewModel.setOccurrenceId(occurrenceId) }
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-        when (state) {
-            EventDetailUiState.Loading -> Unit // This happens too quickly, so no need to show anything
-            EventDetailUiState.Unavailable -> {
-                val snackbarHostState = LocalSharedSnackbarHostState.current
-                val eventMissingMessage = stringResource(R.string.eventOccurrenceNotFound)
+        if (occurrenceId == null) {
+            val attendeesSearchState = rememberSaveableAttendeesSearchState(attendees = emptyList(), contacts = emptyList())
 
-                LaunchedEffect(occurrenceId) {
-                    snackbarHostState?.showSnackbar(eventMissingMessage)
-                    goBack()
+            EventAttendeesScreen(
+                attendeesSearchState = attendeesSearchState,
+                goBack = goBack,
+            )
+        } else {
+            when (state) {
+                EventDetailUiState.Loading -> Unit // This happens too quickly, so no need to show anything
+                EventDetailUiState.Unavailable -> {
+                    val snackbarHostState = LocalSharedSnackbarHostState.current
+                    val eventMissingMessage = stringResource(R.string.eventOccurrenceNotFound)
+
+                    LaunchedEffect(occurrenceId) {
+                        snackbarHostState?.showSnackbar(eventMissingMessage)
+                        goBack()
+                    }
+                }
+                is EventDetailUiState.Success -> {
+                    val attendeesSearchState = rememberSaveableAttendeesSearchState(
+                        attendees = state.eventDetail.attendees.all,
+                        contacts = state.eventDetail.attendees.all,
+                    )
+
+                    EventAttendeesScreen(
+                        attendeesSearchState = attendeesSearchState,
+                        goBack = goBack,
+                    )
                 }
             }
-            is EventDetailUiState.Success -> {
-                val attendeesSearchState = rememberSaveableAttendeesSearchState(
-                    attendees = state.eventDetail.attendees.all,
-                    contacts = state.eventDetail.attendees.all,
-                )
-
-                EventAttendeesScreen(
-                    attendeesSearchState = attendeesSearchState,
-                    goBack = goBack,
-                )
-            }
         }
+
     }
 }
 

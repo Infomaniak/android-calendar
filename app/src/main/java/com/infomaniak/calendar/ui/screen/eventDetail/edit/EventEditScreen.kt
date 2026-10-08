@@ -34,6 +34,7 @@ import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberSaveableEventFormState
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.theme.CalendarTheme
@@ -44,6 +45,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceI
 fun EventEditScreen(
     occurrenceId: OccurrenceId,
     goBack: () -> Unit,
+    goToEventAttendees: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventEditViewModel = viewModel(),
 ) {
@@ -69,6 +71,7 @@ fun EventEditScreen(
     EventEditScreen(
         uiState = uiState,
         goBack = goBack,
+        goToEventAttendees = goToEventAttendees,
         modifier = modifier,
         sharedTransitionScope = LocalSharedTransitionScope.current,
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
@@ -79,12 +82,18 @@ fun EventEditScreen(
 private fun EventEditScreen(
     uiState: EventEditScreenState,
     goBack: () -> Unit,
+    goToEventAttendees: () -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     Scaffold(
-        topBar = { TopAppBar(title = {}) },
+        topBar = {
+            TopAppBar(
+                navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
+                title = {},
+            )
+        },
     ) { contentPadding ->
         when (uiState) {
             // Coming from the detail screen, the shared flow is already warm, so this is only hit when entering edit directly or
@@ -92,7 +101,7 @@ private fun EventEditScreen(
             EventEditScreenState.Loading -> Unit
             is EventEditScreenState.Success -> EventForm(
                 state = uiState.eventFormState,
-                onAttendeesClick = { /*TODO[eventForm]*/ },
+                onAttendeesClick = goToEventAttendees,
                 modifier = modifier,
                 contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                 sharedTransitionScope = sharedTransitionScope,
@@ -123,6 +132,7 @@ private fun Preview() {
                     ),
                 ),
                 goBack = {},
+                goToEventAttendees = {},
             )
         }
     }
