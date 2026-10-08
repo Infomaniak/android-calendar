@@ -178,6 +178,9 @@ class AlarmScheduler @Inject constructor(
             }
         }.onFailure { exception ->
             Log.w(TAG, "Failed to schedule alarm for ${registration.alarmId}", exception)
+            // Its PendingIntent may have been updated while the AlarmManager still holds it as it was: as it's no longer
+            // tracked, cancel it rather than let it fire at its previous time
+            cancelAlarm(registration.alarmId)
         }.isSuccess
     }
 
