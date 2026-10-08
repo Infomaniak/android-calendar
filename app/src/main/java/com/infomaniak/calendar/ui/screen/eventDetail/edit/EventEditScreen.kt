@@ -71,7 +71,7 @@ fun EventEditScreen(
     EventEditScreen(
         uiState = uiState,
         goBack = goBack,
-        goToAttendeesScreen = goToEventAttendees,
+        goToEventAttendees = goToEventAttendees,
         modifier = modifier,
         sharedTransitionScope = LocalSharedTransitionScope.current,
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
@@ -82,7 +82,7 @@ fun EventEditScreen(
 private fun EventEditScreen(
     uiState: EventEditScreenState,
     goBack: () -> Unit,
-    goToAttendeesScreen: () -> Unit,
+    goToEventAttendees: () -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
@@ -101,7 +101,7 @@ private fun EventEditScreen(
             EventEditScreenState.Loading -> Unit
             is EventEditScreenState.Success -> EventForm(
                 state = uiState.eventFormState,
-                onAttendeesClick = goToAttendeesScreen,
+                onAttendeesClick = goToEventAttendees,
                 modifier = modifier,
                 contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                 sharedTransitionScope = sharedTransitionScope,
@@ -132,7 +132,7 @@ private fun Preview() {
                     ),
                 ),
                 goBack = {},
-                goToAttendeesScreen = {},
+                goToEventAttendees = {},
             )
         }
     }
