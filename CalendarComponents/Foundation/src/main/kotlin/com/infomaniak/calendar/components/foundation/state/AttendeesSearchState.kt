@@ -18,13 +18,11 @@
 package com.infomaniak.calendar.components.foundation.state
 
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.runtime.saveable.autoSaver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateSet
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
@@ -35,24 +33,11 @@ class AttendeesSearchState(
     val results: SnapshotStateList<AttendeeUi>,
     val attendees: SnapshotStateSet<AttendeeUi>,
 ) {
-    fun updateSearchQuery(query: String) {
-        searchQueryTextFieldState.setTextAndPlaceCursorAtEnd(query)
-    }
-
-    fun reset(invitedAttendees: List<AttendeeUi> = emptyList()) {
-        Snapshot.withMutableSnapshot {
-            updateSearchQuery("")
-            results.clear()
-            results.addAll(invitedAttendees)
-            attendees.clear()
-            attendees.addAll(invitedAttendees)
-        }
-    }
-
     object Saver : androidx.compose.runtime.saveable.Saver<AttendeesSearchState, List<Any>> {
         private val resultsSaver = autoSaver<SnapshotStateList<AttendeeUi>>()
         private val attendeesSaver = autoSaver<SnapshotStateSet<AttendeeUi>>()
 
+        // TextFieldState.Saver.restore() never returns null, and both autoSaver also never return null
         override fun SaverScope.save(value: AttendeesSearchState): List<Any> = listOf(
             with(TextFieldState.Saver) { save(value.searchQueryTextFieldState)!! },
             with(resultsSaver) { save(value.results)!! },
@@ -75,7 +60,7 @@ class AttendeesSearchState(
 @Composable
 fun rememberSaveableAttendeesSearchState(
     attendees: SnapshotStateSet<AttendeeUi>,
-    results: SnapshotStateList<AttendeeUi> ,
+    results: SnapshotStateList<AttendeeUi>,
     searchQuery: String = "",
 ): AttendeesSearchState = rememberSaveable(saver = AttendeesSearchState.Saver) {
     AttendeesSearchState(
