@@ -36,6 +36,7 @@ import com.infomaniak.calendar.components.eventdetail.form.rememberSaveableEvent
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.EventAttendeesViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
@@ -56,7 +57,7 @@ fun EventCreationScreen(
     )
 
     LaunchedEffect(Unit) {
-        eventAttendeesViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
+        eventAttendeesViewModel.setAttendeesSearchState(AttendeesSearchUiState.Success(viewModel.attendeesSearchState))
     }
 
     EventCreationScreen(

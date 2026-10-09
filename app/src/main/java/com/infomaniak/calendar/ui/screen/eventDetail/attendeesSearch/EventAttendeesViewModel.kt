@@ -17,14 +17,8 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch
 
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateSetOf
 import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
-import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
-import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
@@ -36,23 +30,18 @@ import kotlinx.coroutines.flow.asStateFlow
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey(EventAttendeesViewModel::class)
-class EventAttendeesViewModel(
-    private val getEventDetailUiUseCase: GetEventDetailUiUseCase,
-) : ViewModel() {
+class EventAttendeesViewModel : ViewModel() {
+    private val _attendeesSearchState: MutableStateFlow<AttendeesSearchUiState> = MutableStateFlow(AttendeesSearchUiState.Loading)
+    val attendeesSearchState: StateFlow<AttendeesSearchUiState> = _attendeesSearchState.asStateFlow()
 
-    val eventDetailUi: StateFlow<EventDetailUiState> = getEventDetailUiUseCase.eventDetailUi
-    val emptyAttendeesSearchState = AttendeesSearchState(
-        searchQueryTextFieldState = TextFieldState(),
-        results = mutableStateListOf(),
-        attendees = mutableStateSetOf(),
-    )
-    private val _attendeesSearchState: MutableStateFlow<AttendeesSearchState> = MutableStateFlow(emptyAttendeesSearchState)
-    val attendeesSearchState: StateFlow<AttendeesSearchState> = _attendeesSearchState.asStateFlow()
-
-    fun setOccurrenceId(occurrenceId: OccurrenceId) = getEventDetailUiUseCase.setOccurrenceId(occurrenceId)
-
-    fun setAttendeesSearchState(attendeesSearchState: AttendeesSearchState) {
+    fun setAttendeesSearchState(attendeesSearchState: AttendeesSearchUiState) {
         _attendeesSearchState.value = attendeesSearchState
     }
+}
+
+sealed interface AttendeesSearchUiState {
+    /** The parent screen hasn't provided its [AttendeesSearchState] yet. */
+    data object Loading : AttendeesSearchUiState
+    data class Success(val state: AttendeesSearchState) : AttendeesSearchUiState
 }
 

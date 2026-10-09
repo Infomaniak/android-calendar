@@ -50,6 +50,7 @@ import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
+import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.EventAttendeesViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
@@ -77,7 +78,7 @@ fun EventDetailScreen(
 
     LaunchedEffect(occurrenceId) {
         viewModel.setOccurrenceId(occurrenceId)
-        eventAttendeesViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
+        eventAttendeesViewModel.setAttendeesSearchState(AttendeesSearchUiState.Success(viewModel.attendeesSearchState))
     }
 
     EventDetailScreen(
