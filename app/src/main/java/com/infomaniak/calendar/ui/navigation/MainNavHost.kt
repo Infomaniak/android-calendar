@@ -19,7 +19,7 @@ package com.infomaniak.calendar.ui.navigation
 
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.scene.SceneStrategy
@@ -69,18 +68,18 @@ fun MainNavHost(
 ) {
     SharedTransitionLayout {
         CompositionLocalProvider(LocalSharedTransitionScope provides this@SharedTransitionLayout) {
-            val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-            val baseEntryProvider = baseEntryProvider(
-                backStack = backStack,
-                defaultCalendarView = defaultCalendarView,
-            )
+            val windowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass
+
             NavDisplay(
                 backStack = backStack,
                 entryDecorators = listOf(
                     rememberSaveableStateHolderNavEntryDecorator(),
                     rememberSharedViewModelStoreNavEntryDecorator(),
                 ),
-                entryProvider = createEntryProvider(backStack, defaultCalendarView, baseEntryProvider),
+                entryProvider = baseEntryProvider(
+                    backStack = backStack,
+                    defaultCalendarView = defaultCalendarView,
+                ),
                 sceneDecoratorStrategies = sceneDecoratorStrategies(backStack, onCalendarViewSelected),
                 sceneStrategies = sceneStrategies(windowSizeClass),
                 sharedTransitionScope = this@SharedTransitionLayout,
@@ -91,14 +90,86 @@ fun MainNavHost(
     }
 }
 
-@Composable
-private fun createEntryProvider(
+private fun baseEntryProvider(
     backStack: NavBackStack<NavKey>,
     defaultCalendarView: NavDestination.CalendarView,
-    baseEntryProvider: (NavKey) -> NavEntry<NavKey>,
-): (NavKey) -> NavEntry<NavKey> = { destination ->
-    if (destination is NavDestination.EventAttendees) {
-        NavEntry(
+): (NavKey) -> NavEntry<NavKey> = { key ->
+    when (val destination = key as NavDestination) {
+        is NavDestination.CalendarView.Planning -> NavEntry(
+            key = destination,
+            metadata = metaDataOf(FloatingToolbarWithFab, Drawer),
+        ) {
+            PlanningScreen(
+                goToEventCreation = { backStack.addOnce(NavDestination.EventCreation) },
+                goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) },
+            )
+        }
+        is NavDestination.CalendarView.Day -> NavEntry(
+            key = destination,
+            metadata = metaDataOf(FloatingToolbarWithFab, Drawer),
+        ) {
+            DayScreen(goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) })
+        }
+        is NavDestination.CalendarView.ThreeDays -> NavEntry(
+            key = destination,
+            metadata = metaDataOf(FloatingToolbarWithFab, Drawer),
+        ) {
+            ThreeDayScreen()
+        }
+        is NavDestination.CalendarView.Week -> NavEntry(
+            key = destination,
+            metadata = metaDataOf(FloatingToolbarWithFab, Drawer),
+        ) {
+            WeekScreen()
+        }
+        is NavDestination.CalendarView.Month -> NavEntry(
+            key = destination,
+            metadata = metaDataOf(FloatingToolbarWithFab, Drawer),
+        ) {
+            MonthScreen()
+        }
+        is NavDestination.EventCreation -> NavEntry(
+            key = destination,
+            contentKey = destination.toContentKey(),
+            metadata = metaDataOf(ResponsiveDialog),
+        ) {
+            EventCreationScreen(
+                goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
+                goToEventsAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
+            )
+        }
+        is NavDestination.EventDetail -> NavEntry(
+            key = destination,
+            contentKey = destination.toContentKey(),
+            metadata = metaDataOf(ResponsiveDialog),
+        ) {
+            EventDetailScreen(
+                occurrenceId = destination.occurrenceId,
+                goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
+                goToEdit = { backStack.addOnce(NavDestination.EventEdit(destination.occurrenceId)) },
+                goToEventAttendees = {
+                    backStack.addOnce(
+                        NavDestination.EventAttendees(parent = destination, occurrenceId = destination.occurrenceId),
+                    )
+                },
+            )
+        }
+        is NavDestination.EventEdit -> NavEntry(
+            key = destination,
+            contentKey = destination.toContentKey(),
+            metadata = metaDataOf(ResponsiveDialog),
+        ) {
+            EventEditScreen(
+                occurrenceId = destination.occurrenceId,
+                goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
+                goToEventAttendees = {
+                    backStack.addOnce(
+                        NavDestination.EventAttendees(parent = destination, occurrenceId = destination.occurrenceId),
+                    )
+                },
+            )
+        }
+        is NavDestination.EventAttendees -> NavEntry(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog) + SharedViewModelStoreNavEntryDecorator.parent(destination.parent.toContentKey()),
         ) {
@@ -107,90 +178,32 @@ private fun createEntryProvider(
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
         }
-    } else {
-        baseEntryProvider(destination)
-    }
-}
-
-private fun baseEntryProvider(
-    backStack: NavBackStack<NavKey>,
-    defaultCalendarView: NavDestination.CalendarView,
-): (NavKey) -> NavEntry<NavKey> = entryProvider {
-    entry<NavDestination.CalendarView.Planning>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-        PlanningScreen(
-            goToEventCreation = { backStack.addOnce(NavDestination.EventCreation) },
-            goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) },
-        )
-    }
-    entry<NavDestination.CalendarView.Day>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-        DayScreen(goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) })
-    }
-    entry<NavDestination.CalendarView.ThreeDays>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-        ThreeDayScreen()
-    }
-    entry<NavDestination.CalendarView.Week>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-        WeekScreen()
-    }
-    entry<NavDestination.CalendarView.Month>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-        MonthScreen()
-    }
-    entry<NavDestination.EventCreation>(
-        clazzContentKey = { key -> key.toContentKey() },
-        metadata = metaDataOf(ResponsiveDialog),
-    ) { destination ->
-        EventCreationScreen(
-            goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
-            goToEventsAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
-        )
-    }
-    entry<NavDestination.EventDetail>(
-        clazzContentKey = { key -> key.toContentKey() },
-        metadata = metaDataOf(ResponsiveDialog),
-    ) { destination ->
-        EventDetailScreen(
-            occurrenceId = destination.occurrenceId,
-            goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
-            goToEdit = { backStack.addOnce(NavDestination.EventEdit(destination.occurrenceId)) },
-            goToEventAttendees = {
-                backStack.addOnce(
-                    NavDestination.EventAttendees(parent = destination, occurrenceId = destination.occurrenceId),
-                )
-            },
-        )
-    }
-    entry<NavDestination.EventEdit>(
-        clazzContentKey = { key -> key.toContentKey() },
-        metadata = metaDataOf(ResponsiveDialog),
-    ) { destination ->
-        EventEditScreen(
-            occurrenceId = destination.occurrenceId,
-            goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
-            goToEventAttendees = {
-                backStack.addOnce(
-                    NavDestination.EventAttendees(parent = destination, occurrenceId = destination.occurrenceId),
-                )
-            },
-        )
-    }
-    entry<NavDestination.Accounts.List> {
-        AccountsListScreen(
-            onBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
-            onAddAccount = { backStack.addOnce(NavDestination.Onboarding(onlyLogin = true)) },
-            onAccountClick = { userId -> backStack.addOnce(NavDestination.Accounts.Actions(userId)) },
-        )
-    }
-    entry<NavDestination.Accounts.Actions> { destination ->
-        AccountActionsScreen(
-            userId = destination.userId,
-            onBack = { backStack.popOrReplaceRoot(NavDestination.Accounts.List) },
-        )
-    }
-    entry<NavDestination.Onboarding> { destination ->
-        OnboardingScreen(
-            onlyLogin = destination.onlyLogin,
-            goToCalendarView = { backStack.replaceRoot(defaultCalendarView) },
-            onPopBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
-        )
+        is NavDestination.Accounts.List -> NavEntry(
+            key = destination,
+        ) {
+            AccountsListScreen(
+                onBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
+                onAddAccount = { backStack.addOnce(NavDestination.Onboarding(onlyLogin = true)) },
+                onAccountClick = { userId -> backStack.addOnce(NavDestination.Accounts.Actions(userId)) },
+            )
+        }
+        is NavDestination.Accounts.Actions -> NavEntry(
+            key = destination,
+        ) {
+            AccountActionsScreen(
+                userId = destination.userId,
+                onBack = { backStack.popOrReplaceRoot(NavDestination.Accounts.List) },
+            )
+        }
+        is NavDestination.Onboarding -> NavEntry(
+            key = destination,
+        ) {
+            OnboardingScreen(
+                onlyLogin = destination.onlyLogin,
+                goToCalendarView = { backStack.replaceRoot(defaultCalendarView) },
+                onPopBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
+            )
+        }
     }
 }
 
