@@ -60,6 +60,7 @@ fun EventEditScreen(
 ) {
     val eventDetailUiState = viewModel.eventDetailUi.collectAsStateWithLifecycle().value
     val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
+
     val uiState = when (eventDetailUiState) {
         EventDetailUiState.Loading -> EventEditScreenState.Loading
         is EventDetailUiState.Success -> {
@@ -148,7 +149,7 @@ private fun Preview() {
                         initialText = "Meeting on how to find funny preview titles",
                         attendeesSearchState = AttendeesSearchState(
                             searchQueryTextFieldState = TextFieldState(),
-                            attendees = remember {mutableStateSetOf<AttendeeUi>().apply { addAll(previewAttendees) } },
+                            attendees = remember { mutableStateSetOf<AttendeeUi>().apply { addAll(previewAttendees) } },
                             results = remember { mutableStateListOf() },
                         ),
                     ),
