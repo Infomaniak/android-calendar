@@ -26,6 +26,7 @@ app/src/main/java/com/infomaniak/calendar/
 ├── MainApplication.kt              # Application class, initialises Metro AppGraph, Sentry and Matomo
 ├── MainActivity.kt                 # Single Activity, hosts Compose content
 ├── MatomoCalendar.kt               # Matomo tracker (implements Core's Matomo interface)
+├── notification/                   # Event notifications & AlarmManager scheduling (AlarmScheduler, AlarmReceiver, BootReceiver, NotificationHelper)
 ├── di/
 │   ├── AppGraph.kt                 # Metro @DependencyGraph (AppScope) — inherits CalendarCoreGraph, ViewModelGraph (metrox) + worker support
 │   └── metroAndroidExtensions/     # Portable Metro↔Android glue (no :app coupling)
@@ -93,6 +94,22 @@ app/
   bound concretely by `CalendarViewModelFactory`), set as `defaultViewModelProviderFactory` in `MainActivity`.
   In Composables, use the standard `viewModel<MyViewModel>()` from `androidx.lifecycle.viewmodel.compose`.
 - **Edge-to-edge**: Call `enableEdgeToEdge()` in `onCreate` before `setContent` (already wired in `MainActivity`).
+- **Event reminders**: `AlarmScheduler` (`AppScope` singleton, started from `MainApplication`) mirrors
+  `CalendarManager.observeUpcomingAlarms` (device alarms only: `DISPLAY` / `AUDIO`, max 400 over 30 days) into exact
+  `AlarmManager` alarms. `AlarmReceiver` posts the notification (tap opens `EventDetail`), `BootReceiver` reschedules on
+  boot, app update, time / time zone change and once exact alarm access is granted. The 30-day window doesn't follow the
+  clock, so each refresh also sets an inexact, non-wakeup `ACTION_REFRESH_ALARMS` alarm one day later (handled by
+  `AlarmReceiver`) to move it forward.
+  Each process registers every alarm once (the system may have dropped them while it was dead: force stop, hibernation,
+  revoked exact alarm access), then only registers alarms whose content (`AlarmRegistration`) changed. Failed
+  registrations aren't kept (neither in memory nor in the persisted `scheduledAlarmIds`), so they're retried next sync,
+  and are cancelled, since a failed replacement may leave the previous alarm in place.
+  Receivers await `AlarmScheduler.syncUpcomingAlarms` (capped at 8 s, within their `goAsync()` budget) before finishing:
+  a process started for a broadcast may be killed or frozen as soon as it's over.
+  `MainActivity` requests the `POST_NOTIFICATIONS` runtime permission (Android 13+) on each fresh start (skipped on
+  recreation). Exact alarms need no request: `USE_EXACT_ALARM` on API 33+, `SCHEDULE_EXACT_ALARM` on API 31–32 (falls
+  back to inexact alarms while the user revokes it; exactness is part of `AlarmRegistration`, so they're all registered
+  again as exact ones once it's granted back).
 - **Shared logic**: Prefer reusing models / logic from `com.infomaniak.multiplatform_calendar.*` instead of duplicating
   Android-only equivalents.
 - **KISS / SOLID**: Keep Composables focused; extract reusable pieces into small `@Composable` functions.

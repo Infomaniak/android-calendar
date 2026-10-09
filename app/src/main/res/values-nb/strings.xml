@@ -28,6 +28,11 @@
     <string name="eventOccurrenceNotFound">Denne hendelsen er ikke lenger tilgjengelig.</string>
     <string name="helpTitle">Hjelp</string>
     <string name="monthTitle">Måned</string>
+    <string name="notificationAllDay">Hele dagen</string>
+    <string name="notificationChannelEventRemindersDescription">Varsler om kommende arrangementer og påminnelser</string>
+    <string name="notificationChannelEventRemindersTitle">Hendelsespåminnelser</string>
+    <string name="notificationDefaultDescription">Hendelsesvarsel</string>
+    <string name="notificationDefaultEventTitle">Påminnelse om arrangement</string>
     <string name="planningTitle">Planlegging</string>
     <string name="settingsTitle">Innstillinger</string>
     <string name="signOutAccountAlertConfirm">Logg ut av kontoen</string>

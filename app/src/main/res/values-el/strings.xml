@@ -28,6 +28,11 @@
     <string name="eventOccurrenceNotFound">Αυτή η εκδήλωση δεν είναι πλέον διαθέσιμη.</string>
     <string name="helpTitle">Βοήθεια</string>
     <string name="monthTitle">Μήνας</string>
+    <string name="notificationAllDay">Όλη την ημέρα</string>
+    <string name="notificationChannelEventRemindersDescription">Ειδοποιήσεις για επερχόμενες εκδηλώσεις και υπενθυμίσεις</string>
+    <string name="notificationChannelEventRemindersTitle">Υπενθυμίσεις εκδηλώσεων</string>
+    <string name="notificationDefaultDescription">Συναγερμός συμβάντος</string>
+    <string name="notificationDefaultEventTitle">Υπενθύμιση συμβάντος</string>
     <string name="planningTitle">Προγραμματισμός</string>
     <string name="settingsTitle">Ρυθμίσεις</string>
     <string name="signOutAccountAlertConfirm">Αποσύνδεση από τον λογαριασμό</string>

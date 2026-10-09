@@ -28,6 +28,11 @@
     <string name="eventOccurrenceNotFound">To wydarzenie nie jest już dostępne.</string>
     <string name="helpTitle">Pomoc</string>
     <string name="monthTitle">Miesiąc</string>
+    <string name="notificationAllDay">Cały dzień</string>
+    <string name="notificationChannelEventRemindersDescription">Powiadomienia o nadchodzących wydarzeniach i przypomnieniach</string>
+    <string name="notificationChannelEventRemindersTitle">Przypomnienia o wydarzeniach</string>
+    <string name="notificationDefaultDescription">Alarm zdarzenia</string>
+    <string name="notificationDefaultEventTitle">Przypomnienie o wydarzeniu</string>
     <string name="planningTitle">Planowanie</string>
     <string name="settingsTitle">Ustawienia</string>
     <string name="signOutAccountAlertConfirm">Wyloguj się z konta</string>

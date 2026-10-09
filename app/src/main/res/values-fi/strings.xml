@@ -28,6 +28,11 @@
     <string name="eventOccurrenceNotFound">Tämä tapahtuma ei ole enää saatavilla.</string>
     <string name="helpTitle">Apua</string>
     <string name="monthTitle">Kuukausi</string>
+    <string name="notificationAllDay">Koko päivä</string>
+    <string name="notificationChannelEventRemindersDescription">Ilmoitukset tulevista tapahtumista ja muistutuksista</string>
+    <string name="notificationChannelEventRemindersTitle">Tapahtumamuistutukset</string>
+    <string name="notificationDefaultDescription">Tapahtumahälytys</string>
+    <string name="notificationDefaultEventTitle">Tapahtumamuistutus</string>
     <string name="planningTitle">Suunnittelu</string>
     <string name="settingsTitle">Asetukset</string>
     <string name="signOutAccountAlertConfirm">Kirjaudu ulos tililtä</string>

@@ -28,6 +28,11 @@
     <string name="eventOccurrenceNotFound">Denne begivenhed er ikke længere tilgængelig.</string>
     <string name="helpTitle">Hjælp</string>
     <string name="monthTitle">Måned</string>
+    <string name="notificationAllDay">Hele dagen</string>
+    <string name="notificationChannelEventRemindersDescription">Notifikationer om kommende arrangementer og påmindelser</string>
+    <string name="notificationChannelEventRemindersTitle">Begivenhedspåmindelser</string>
+    <string name="notificationDefaultDescription">Hændelsesalarm</string>
+    <string name="notificationDefaultEventTitle">Begivenhedspåmindelse</string>
     <string name="planningTitle">Planlægning</string>
     <string name="settingsTitle">Indstillinger</string>
     <string name="signOutAccountAlertConfirm">Log ud af kontoen</string>

@@ -28,6 +28,11 @@
     <string name="eventOccurrenceNotFound">Dit evenement is niet meer beschikbaar.</string>
     <string name="helpTitle">Hulp</string>
     <string name="monthTitle">Maand</string>
+    <string name="notificationAllDay">De hele dag</string>
+    <string name="notificationChannelEventRemindersDescription">Meldingen voor aankomende evenementen en herinneringen</string>
+    <string name="notificationChannelEventRemindersTitle">Herinneringen aan evenementen</string>
+    <string name="notificationDefaultDescription">Gebeurteniswaarschuwing</string>
+    <string name="notificationDefaultEventTitle">Gebeurtenisherinnering</string>
     <string name="planningTitle">Planning</string>
     <string name="settingsTitle">Instellingen</string>
     <string name="signOutAccountAlertConfirm">Meld je af bij het account</string>
