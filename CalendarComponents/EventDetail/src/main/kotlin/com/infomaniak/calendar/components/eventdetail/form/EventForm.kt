@@ -25,6 +25,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateSetOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +39,7 @@ import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElemen
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 
 /**
@@ -62,7 +65,7 @@ fun EventForm(
 
         Section {
             AttendeesButton(
-                attendees = state.attendeesState.value,
+                attendees = state.attendeesState.attendees.toList(),
                 onClick = onAttendeesClick,
                 modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
             )
@@ -86,7 +89,8 @@ private fun Preview() {
                     calendars = listOf(previewEventDetailCalendar),
                     initialCalendar = previewEventDetailCalendar,
                     initialText = "Event title",
-                    initialAttendees = previewAttendees,
+                    initialAttendees = remember { mutableStateSetOf<AttendeeUi>().apply { addAll(previewAttendees) } },
+                    attendeesSearchState = null,
                 ),
                 onAttendeesClick = {},
                 contentPadding = PaddingValues(16.dp),

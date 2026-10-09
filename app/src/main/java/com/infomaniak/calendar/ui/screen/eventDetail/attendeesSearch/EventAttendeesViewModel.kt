@@ -18,22 +18,30 @@
 package com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch
 
 import androidx.lifecycle.ViewModel
-import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
-import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 @Inject
 @ContributesIntoMap(AppScope::class)
-@ViewModelKey
-class EventAttendeesViewModel(private val getEventDetailUiUseCase: GetEventDetailUiUseCase) : ViewModel() {
+@ViewModelKey(EventAttendeesViewModel::class)
+class EventAttendeesViewModel : ViewModel() {
+    private val _attendeesSearchState: MutableStateFlow<AttendeesSearchUiState> = MutableStateFlow(AttendeesSearchUiState.Loading)
+    val attendeesSearchState: StateFlow<AttendeesSearchUiState> = _attendeesSearchState.asStateFlow()
 
-    val eventDetailUi: StateFlow<EventDetailUiState> = getEventDetailUiUseCase.eventDetailUi
+    fun setAttendeesSearchState(attendeesSearchState: AttendeesSearchState) {
+        _attendeesSearchState.value = AttendeesSearchUiState.Success(attendeesSearchState)
+    }
+}
 
-    fun setOccurrenceId(occurrenceId: OccurrenceId) = getEventDetailUiUseCase.setOccurrenceId(occurrenceId)
+sealed interface AttendeesSearchUiState {
+    /** The parent screen hasn't provided its [AttendeesSearchState] yet. */
+    data object Loading : AttendeesSearchUiState
+    data class Success(val state: AttendeesSearchState) : AttendeesSearchUiState
 }
 

@@ -20,11 +20,15 @@ package com.infomaniak.calendar.ui.screen.eventDetail.edit
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.plus
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateSetOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,9 +38,13 @@ import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberSaveableEventFormState
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.preview.previewAttendees
+import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
+import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.EventAttendeesViewModel
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
@@ -48,24 +56,33 @@ fun EventEditScreen(
     goToEventAttendees: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventEditViewModel = viewModel(),
+    eventAttendeesViewModel: EventAttendeesViewModel = viewModel(),
 ) {
     val eventDetailUiState = viewModel.eventDetailUi.collectAsStateWithLifecycle().value
     val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
+
     val uiState = when (eventDetailUiState) {
         EventDetailUiState.Loading -> EventEditScreenState.Loading
-        is EventDetailUiState.Success -> EventEditScreenState.Success(
-            rememberSaveableEventFormState(
-                calendars = eventFormCalendars?.calendars ?: emptyList(),
-                initialCalendar = eventFormCalendars?.initialCalendar,
-                initialText = eventDetailUiState.eventDetail.title,
-                initialAttendees = eventDetailUiState.eventDetail.attendees.all,
-            ),
-        )
+        is EventDetailUiState.Success -> {
+            EventEditScreenState.Success(
+                rememberSaveableEventFormState(
+                    calendars = eventFormCalendars?.calendars ?: emptyList(),
+                    initialCalendar = eventFormCalendars?.initialCalendar,
+                    initialText = eventDetailUiState.eventDetail.title,
+                    initialAttendees = viewModel.attendeesSearchState.attendees,
+                    attendeesSearchState = viewModel.attendeesSearchState,
+                ),
+            )
+        }
         EventDetailUiState.Unavailable -> EventEditScreenState.Unavailable
     }
 
     LaunchedEffect(occurrenceId) {
         viewModel.setOccurrenceId(occurrenceId)
+    }
+
+    LaunchedEffect(occurrenceId, viewModel.attendeesSearchState) {
+        eventAttendeesViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
     }
 
     EventEditScreen(
@@ -129,6 +146,11 @@ private fun Preview() {
                         calendars = listOf(previewEventDetailCalendar),
                         initialCalendar = previewEventDetailCalendar,
                         initialText = "Meeting on how to find funny preview titles",
+                        attendeesSearchState = AttendeesSearchState(
+                            searchQueryTextFieldState = TextFieldState(),
+                            attendees = remember { mutableStateSetOf<AttendeeUi>().apply { addAll(previewAttendees) } },
+                            results = remember { mutableStateListOf() },
+                        ),
                     ),
                 ),
                 goBack = {},

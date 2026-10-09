@@ -26,7 +26,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateSetOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,62 +37,32 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.attendeessearch.AttendeesSearch
-import com.infomaniak.calendar.components.attendeessearch.state.AttendeesSearchState
-import com.infomaniak.calendar.components.attendeessearch.state.rememberSaveableAttendeesSearchState
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
+import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
+import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
-import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
-import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
+import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 
 @Composable
 fun EventAttendeesScreen(
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
-    occurrenceId: OccurrenceId? = null,
-    viewModel: EventAttendeesViewModel = viewModel(),
+    eventAttendeesViewModel: EventAttendeesViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
-    val state = viewModel.eventDetailUi.collectAsStateWithLifecycle().value
-
-    LaunchedEffect(occurrenceId) {
-        occurrenceId?.let { viewModel.setOccurrenceId(occurrenceId) }
-    }
+    val attendeesSearchUi by eventAttendeesViewModel.attendeesSearchState.collectAsStateWithLifecycle()
 
     Box(modifier = modifier.fillMaxSize()) {
-        if (occurrenceId == null) {
-            val attendeesSearchState = rememberSaveableAttendeesSearchState(attendees = emptyList(), contacts = emptyList())
-
-            EventAttendeesScreen(
-                attendeesSearchState = attendeesSearchState,
-                goBack = goBack,
-            )
-        } else {
-            when (state) {
-                EventDetailUiState.Loading -> Unit // This happens too quickly, so no need to show anything
-                EventDetailUiState.Unavailable -> {
-                    val snackbarHostState = LocalSharedSnackbarHostState.current
-                    val eventMissingMessage = stringResource(R.string.eventOccurrenceNotFound)
-
-                    LaunchedEffect(occurrenceId) {
-                        snackbarHostState?.showSnackbar(eventMissingMessage)
-                        goBack()
-                    }
-                }
-                is EventDetailUiState.Success -> {
-                    val attendeesSearchState = rememberSaveableAttendeesSearchState(
-                        attendees = state.eventDetail.attendees.all,
-                        contacts = state.eventDetail.attendees.all,
-                    )
-
-                    EventAttendeesScreen(
-                        attendeesSearchState = attendeesSearchState,
-                        goBack = goBack,
-                    )
-                }
+        when (val attendeesSearchState = attendeesSearchUi) {
+            AttendeesSearchUiState.Loading -> Unit // The parent provides it right away, so nothing to show
+            is AttendeesSearchUiState.Success -> {
+                EventAttendeesScreen(
+                    attendeesSearchState = attendeesSearchState.state,
+                    goBack = goBack,
+                )
             }
         }
-
     }
 }
 
@@ -124,8 +97,8 @@ private fun EventAttendeesSearchScreenPreview() {
     CalendarThemeForPreview {
         EventAttendeesScreen(
             attendeesSearchState = rememberSaveableAttendeesSearchState(
-                attendees = previewAttendees,
-                contacts = previewAttendees,
+                attendees = remember { mutableStateSetOf<AttendeeUi>().apply { addAll(previewAttendees) } },
+                results = remember { mutableStateListOf<AttendeeUi>().apply { addAll(previewAttendees) } },
             ),
             goBack = {},
         )
