@@ -57,7 +57,7 @@ fun EventCreationScreen(
     )
 
     LaunchedEffect(Unit) {
-        eventAttendeesViewModel.setAttendeesSearchState(AttendeesSearchUiState.Success(viewModel.attendeesSearchState))
+        eventAttendeesViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
     }
 
     EventCreationScreen(

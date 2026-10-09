@@ -34,8 +34,8 @@ class EventAttendeesViewModel : ViewModel() {
     private val _attendeesSearchState: MutableStateFlow<AttendeesSearchUiState> = MutableStateFlow(AttendeesSearchUiState.Loading)
     val attendeesSearchState: StateFlow<AttendeesSearchUiState> = _attendeesSearchState.asStateFlow()
 
-    fun setAttendeesSearchState(attendeesSearchState: AttendeesSearchUiState) {
-        _attendeesSearchState.value = attendeesSearchState
+    fun setAttendeesSearchState(attendeesSearchState: AttendeesSearchState) {
+        _attendeesSearchState.value = AttendeesSearchUiState.Success(attendeesSearchState)
     }
 }
 
