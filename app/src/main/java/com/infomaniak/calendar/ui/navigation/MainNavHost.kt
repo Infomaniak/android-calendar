@@ -100,7 +100,7 @@ private fun createEntryProvider(
     if (destination is NavDestination.EventAttendees) {
         NavEntry(
             key = destination,
-            metadata = metaDataOf(ResponsiveDialog) + SharedViewModelStoreNavEntryDecorator.parent(destination.parent.toString()),
+            metadata = metaDataOf(ResponsiveDialog) + SharedViewModelStoreNavEntryDecorator.parent(destination.parent.toContentKey()),
         ) {
             EventAttendeesScreen(
                 occurrenceId = destination.occurrenceId,
@@ -135,7 +135,7 @@ private fun baseEntryProvider(
         MonthScreen()
     }
     entry<NavDestination.EventCreation>(
-        clazzContentKey = { key -> key.toString() },
+        clazzContentKey = { key -> key.toContentKey() },
         metadata = metaDataOf(ResponsiveDialog),
     ) {
         EventCreationScreen(
@@ -144,7 +144,7 @@ private fun baseEntryProvider(
         )
     }
     entry<NavDestination.EventDetail>(
-        clazzContentKey = { key -> key.toString() },
+        clazzContentKey = { key -> key.toContentKey() },
         metadata = metaDataOf(ResponsiveDialog),
     ) { destination ->
         EventDetailScreen(
@@ -162,7 +162,7 @@ private fun baseEntryProvider(
         )
     }
     entry<NavDestination.EventEdit>(
-        clazzContentKey = { key -> key.toString() },
+        clazzContentKey = { key -> key.toContentKey() },
         metadata = metaDataOf(ResponsiveDialog),
     ) { destination ->
         EventEditScreen(
@@ -245,6 +245,8 @@ private fun sceneDecoratorStrategies(
 
     return listOf(navigationStrategy, drawerStrategy)
 }
+
+fun NavKey.toContentKey() = this.toString()
 
 private fun NavBackStack<NavKey>.getLastCalendarView(): NavDestination.CalendarView? {
     return this.filterIsInstance<NavDestination.CalendarView>().lastOrNull()
