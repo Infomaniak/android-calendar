@@ -53,16 +53,12 @@ fun EventAttendeesScreen(
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
     occurrenceId: OccurrenceId? = null,
-    viewModel: EventAttendeesViewModel = viewModel(
-        viewModelStoreOwner = checkNotNull(LocalSharedViewModelStoreOwner.current) {
-            "EventAttendeesScreen requires a shared parent ViewModelStoreOwner"
-        },
-    ),
+    parentSharedViewModel: EventAttendeesViewModel = viewModel(viewModelStoreOwner = LocalSharedViewModelStoreOwner.current),
 ) {
-    val eventDetailUi = viewModel.eventDetailUi.collectAsStateWithLifecycle().value
+    val eventDetailUi = parentSharedViewModel.eventDetailUi.collectAsStateWithLifecycle().value
 
     LaunchedEffect(occurrenceId) {
-        occurrenceId?.let { viewModel.setOccurrenceId(occurrenceId) }
+        occurrenceId?.let { parentSharedViewModel.setOccurrenceId(occurrenceId) }
     }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -78,7 +74,7 @@ fun EventAttendeesScreen(
                 }
             }
             is EventDetailUiState.Success -> {
-                val attendeesSearchState = viewModel.attendeesSearchState.collectAsStateWithLifecycle().value
+                val attendeesSearchState = parentSharedViewModel.attendeesSearchState.collectAsStateWithLifecycle().value
                 EventAttendeesScreen(
                     attendeesSearchState = attendeesSearchState,
                     goBack = goBack,
