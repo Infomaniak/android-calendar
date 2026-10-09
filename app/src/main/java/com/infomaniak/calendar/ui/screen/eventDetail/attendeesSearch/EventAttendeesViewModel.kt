@@ -52,7 +52,7 @@ class EventAttendeesViewModel(
 
     @OptIn(SavedStateHandleSaveableApi::class)
     private var savedAttendeesSearchState by savedStateHandle.saveable(
-        stateSaver = AttendeesSearchState.saver(),
+        stateSaver = AttendeesSearchState.Saver,
     ) {
         mutableStateOf(
             AttendeesSearchState(
