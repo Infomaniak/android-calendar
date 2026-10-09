@@ -26,7 +26,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
@@ -43,40 +43,22 @@ import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
-import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
-import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 
 @Composable
 fun EventAttendeesScreen(
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
-    occurrenceId: OccurrenceId? = null,
     eventAttendeesViewModel: EventAttendeesViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
-    val eventDetailUi = eventAttendeesViewModel.eventDetailUi.collectAsStateWithLifecycle().value
-
-    LaunchedEffect(occurrenceId) {
-        occurrenceId?.let { eventAttendeesViewModel.setOccurrenceId(occurrenceId) }
-    }
+    val attendeesSearchUi by eventAttendeesViewModel.attendeesSearchState.collectAsStateWithLifecycle()
 
     Box(modifier = modifier.fillMaxSize()) {
-        when (eventDetailUi) {
-            EventDetailUiState.Loading -> Unit // This happens too quickly, so no need to show anything
-            EventDetailUiState.Unavailable -> {
-                val snackbarHostState = LocalSharedSnackbarHostState.current
-                val eventMissingMessage = stringResource(R.string.eventOccurrenceNotFound)
-
-                LaunchedEffect(occurrenceId) {
-                    snackbarHostState?.showSnackbar(eventMissingMessage)
-                    goBack()
-                }
-            }
-            is EventDetailUiState.Success -> {
-                val attendeesSearchState = eventAttendeesViewModel.attendeesSearchState.collectAsStateWithLifecycle().value
+        when (val attendeesSearchState = attendeesSearchUi) {
+            AttendeesSearchUiState.Loading -> Unit // The parent provides it right away, so nothing to show
+            is AttendeesSearchUiState.Success -> {
                 EventAttendeesScreen(
-                    attendeesSearchState = attendeesSearchState,
+                    attendeesSearchState = attendeesSearchState.state,
                     goBack = goBack,
                 )
             }

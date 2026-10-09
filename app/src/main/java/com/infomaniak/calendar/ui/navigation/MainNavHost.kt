@@ -147,11 +147,7 @@ private fun baseEntryProvider(
                 occurrenceId = destination.occurrenceId,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
                 goToEdit = { backStack.addOnce(NavDestination.EventEdit(destination.occurrenceId)) },
-                goToEventAttendees = {
-                    backStack.addOnce(
-                        NavDestination.EventAttendees(parent = destination, occurrenceId = destination.occurrenceId),
-                    )
-                },
+                goToEventAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
             )
         }
         is NavDestination.EventEdit -> NavEntry(
@@ -162,11 +158,7 @@ private fun baseEntryProvider(
             EventEditScreen(
                 occurrenceId = destination.occurrenceId,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
-                goToEventAttendees = {
-                    backStack.addOnce(
-                        NavDestination.EventAttendees(parent = destination, occurrenceId = destination.occurrenceId),
-                    )
-                },
+                goToEventAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
             )
         }
         is NavDestination.EventAttendees -> NavEntry(
@@ -174,7 +166,6 @@ private fun baseEntryProvider(
             metadata = metaDataOf(ResponsiveDialog) + SharedViewModelStoreNavEntryDecorator.parent(destination.parent.toContentKey()),
         ) {
             EventAttendeesScreen(
-                occurrenceId = destination.occurrenceId,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
         }
