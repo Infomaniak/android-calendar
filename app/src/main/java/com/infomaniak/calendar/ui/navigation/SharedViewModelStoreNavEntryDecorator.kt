@@ -98,8 +98,8 @@ class SharedViewModelStoreNavEntryDecorator<T : Any>(
         val parentContentKey = entry.metadata[ParentKey]
         if (parentContentKey != null) {
             val parentOwner = rememberViewModelStoreOwner(
-                parentContentKey,
-                viewModelStoreProvider,
+                key = parentContentKey,
+                provider = viewModelStoreProvider,
                 savedStateRegistryOwner = LocalSavedStateRegistryOwner.current,
             )
 
