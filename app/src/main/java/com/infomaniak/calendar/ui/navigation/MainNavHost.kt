@@ -137,10 +137,10 @@ private fun baseEntryProvider(
     entry<NavDestination.EventCreation>(
         clazzContentKey = { key -> key.toContentKey() },
         metadata = metaDataOf(ResponsiveDialog),
-    ) {
+    ) { destination ->
         EventCreationScreen(
             goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
-            goToEventsAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = NavDestination.EventCreation)) },
+            goToEventsAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
         )
     }
     entry<NavDestination.EventDetail>(
@@ -153,10 +153,7 @@ private fun baseEntryProvider(
             goToEdit = { backStack.addOnce(NavDestination.EventEdit(destination.occurrenceId)) },
             goToEventAttendees = {
                 backStack.addOnce(
-                    NavDestination.EventAttendees(
-                        parent = NavDestination.EventDetail(destination.occurrenceId),
-                        occurrenceId = destination.occurrenceId,
-                    ),
+                    NavDestination.EventAttendees(parent = destination, occurrenceId = destination.occurrenceId),
                 )
             },
         )
@@ -170,10 +167,7 @@ private fun baseEntryProvider(
             goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             goToEventAttendees = {
                 backStack.addOnce(
-                    NavDestination.EventAttendees(
-                        parent = NavDestination.EventEdit(destination.occurrenceId),
-                        occurrenceId = destination.occurrenceId,
-                    ),
+                    NavDestination.EventAttendees(parent = destination, occurrenceId = destination.occurrenceId),
                 )
             },
         )
