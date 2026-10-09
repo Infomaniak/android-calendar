@@ -87,7 +87,6 @@ fun EventDetailScreen(
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
         goBack = goBack,
         goToEdit = goToEdit,
-        updateAttendees = viewModel::addAttendeesToState,
         onLocationClick = { location -> openLocationInMapApp(context, location) },
         goToEventAttendees = goToEventAttendees,
         modifier = modifier,
@@ -102,7 +101,6 @@ private fun EventDetailScreen(
     goToEdit: () -> Unit,
     goToEventAttendees: () -> Unit,
     onLocationClick: (String) -> Unit,
-    updateAttendees: (List<AttendeeUi>) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
@@ -137,7 +135,6 @@ private fun EventDetailScreen(
         when (state) {
             EventDetailUiState.Loading -> Unit // Loaded locally, always fast, no need for a specific progress indicator UI
             is EventDetailUiState.Success -> {
-                updateAttendees(state.eventDetail.attendees.all)
                 val copyFeedbackMessage = stringResource(RCommon.string.linkCopied)
 
                 EventDetail(
@@ -195,7 +192,6 @@ private fun Preview() {
                 uiState = { EventDetailUiState.Success(previewEventDetail) },
                 goBack = {},
                 goToEdit = {},
-                updateAttendees = {},
                 goToEventAttendees = {},
                 onLocationClick = {},
             )
