@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -41,6 +42,7 @@ import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -51,48 +53,38 @@ fun EventAttendeesScreen(
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
     occurrenceId: OccurrenceId? = null,
-    viewModel: EventAttendeesViewModel = viewModel(),
+    viewModel: EventAttendeesViewModel = viewModel(
+        viewModelStoreOwner = checkNotNull(LocalSharedViewModelStoreOwner.current) {
+            "EventAttendeesScreen requires a shared parent ViewModelStoreOwner"
+        },
+    ),
 ) {
     val eventDetailUi = viewModel.eventDetailUi.collectAsStateWithLifecycle().value
 
     LaunchedEffect(occurrenceId) {
         occurrenceId?.let { viewModel.setOccurrenceId(occurrenceId) }
-        viewModel.attendeesSearchState.value.updateSearchQuery("")
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-        if (occurrenceId == null) {
-            val attendeesSearchState = rememberSaveableAttendeesSearchState(
-                attendees = remember { mutableStateSetOf() },
-                results = emptyList(),
-            )
+        when (eventDetailUi) {
+            EventDetailUiState.Loading -> Unit // This happens too quickly, so no need to show anything
+            EventDetailUiState.Unavailable -> {
+                val snackbarHostState = LocalSharedSnackbarHostState.current
+                val eventMissingMessage = stringResource(R.string.eventOccurrenceNotFound)
 
-            EventAttendeesScreen(
-                attendeesSearchState = attendeesSearchState,
-                goBack = goBack,
-            )
-        } else {
-            when (eventDetailUi) {
-                EventDetailUiState.Loading -> Unit // This happens too quickly, so no need to show anything
-                EventDetailUiState.Unavailable -> {
-                    val snackbarHostState = LocalSharedSnackbarHostState.current
-                    val eventMissingMessage = stringResource(R.string.eventOccurrenceNotFound)
-
-                    LaunchedEffect(occurrenceId) {
-                        snackbarHostState?.showSnackbar(eventMissingMessage)
-                        goBack()
-                    }
-                }
-                is EventDetailUiState.Success -> {
-                    val attendeesSearchState = viewModel.attendeesSearchState.collectAsStateWithLifecycle().value
-                    EventAttendeesScreen(
-                        attendeesSearchState = attendeesSearchState,
-                        goBack = goBack,
-                    )
+                LaunchedEffect(occurrenceId) {
+                    snackbarHostState?.showSnackbar(eventMissingMessage)
+                    goBack()
                 }
             }
+            is EventDetailUiState.Success -> {
+                val attendeesSearchState = viewModel.attendeesSearchState.collectAsStateWithLifecycle().value
+                EventAttendeesScreen(
+                    attendeesSearchState = attendeesSearchState,
+                    goBack = goBack,
+                )
+            }
         }
-
     }
 }
 
@@ -128,7 +120,7 @@ private fun EventAttendeesSearchScreenPreview() {
         EventAttendeesScreen(
             attendeesSearchState = rememberSaveableAttendeesSearchState(
                 attendees = remember { mutableStateSetOf<AttendeeUi>().apply { addAll(previewAttendees) } },
-                results = previewAttendees,
+                results = remember { mutableStateListOf<AttendeeUi>().apply { addAll(previewAttendees) } },
             ),
             goBack = {},
         )

@@ -28,6 +28,7 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.scene.SceneStrategy
 import androidx.navigation3.ui.NavDisplay
@@ -69,10 +70,17 @@ fun MainNavHost(
     SharedTransitionLayout {
         CompositionLocalProvider(LocalSharedTransitionScope provides this@SharedTransitionLayout) {
             val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-
+            val baseEntryProvider = baseEntryProvider(
+                backStack = backStack,
+                defaultCalendarView = defaultCalendarView,
+            )
             NavDisplay(
                 backStack = backStack,
-                entryProvider = baseEntryProvider(backStack, defaultCalendarView),
+                entryDecorators = listOf(
+                    rememberSaveableStateHolderNavEntryDecorator(),
+                    rememberSharedViewModelStoreNavEntryDecorator(),
+                ),
+                entryProvider = createEntryProvider(backStack, defaultCalendarView, baseEntryProvider),
                 sceneDecoratorStrategies = sceneDecoratorStrategies(backStack, onCalendarViewSelected),
                 sceneStrategies = sceneStrategies(windowSizeClass),
                 sharedTransitionScope = this@SharedTransitionLayout,
@@ -80,6 +88,27 @@ fun MainNavHost(
                 popTransitionSpec = { NavigationTransition.contentTransform },
             )
         }
+    }
+}
+
+@Composable
+private fun createEntryProvider(
+    backStack: NavBackStack<NavKey>,
+    defaultCalendarView: NavDestination.CalendarView,
+    baseEntryProvider: (NavKey) -> NavEntry<NavKey>,
+): (NavKey) -> NavEntry<NavKey> = { destination ->
+    if (destination is NavDestination.EventAttendees) {
+        NavEntry(
+            key = destination,
+            metadata = metaDataOf(ResponsiveDialog) + SharedViewModelStoreNavEntryDecorator.parent(destination.parent.toString()),
+        ) {
+            EventAttendeesScreen(
+                occurrenceId = destination.occurrenceId,
+                goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
+            )
+        }
+    } else {
+        baseEntryProvider(destination)
     }
 }
 
@@ -105,31 +134,48 @@ private fun baseEntryProvider(
     entry<NavDestination.CalendarView.Month>(metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
         MonthScreen()
     }
-    entry<NavDestination.EventCreation>(metadata = metaDataOf(ResponsiveDialog)) {
+    entry<NavDestination.EventCreation>(
+        clazzContentKey = { key -> key.toString() },
+        metadata = metaDataOf(ResponsiveDialog),
+    ) {
         EventCreationScreen(
             goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
-            goToEventsAttendees = { backStack.addOnce(NavDestination.EventAttendees()) },
+            goToEventsAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = NavDestination.EventCreation)) },
         )
     }
-    entry<NavDestination.EventDetail>(metadata = metaDataOf(ResponsiveDialog)) { destination ->
+    entry<NavDestination.EventDetail>(
+        clazzContentKey = { key -> key.toString() },
+        metadata = metaDataOf(ResponsiveDialog),
+    ) { destination ->
         EventDetailScreen(
             occurrenceId = destination.occurrenceId,
             goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             goToEdit = { backStack.addOnce(NavDestination.EventEdit(destination.occurrenceId)) },
-            goToEventAttendees = { backStack.addOnce(NavDestination.EventAttendees(destination.occurrenceId)) },
+            goToEventAttendees = {
+                backStack.addOnce(
+                    NavDestination.EventAttendees(
+                        parent = NavDestination.EventDetail(destination.occurrenceId),
+                        occurrenceId = destination.occurrenceId,
+                    ),
+                )
+            },
         )
     }
-    entry<NavDestination.EventEdit>(metadata = metaDataOf(ResponsiveDialog)) { destination ->
+    entry<NavDestination.EventEdit>(
+        clazzContentKey = { key -> key.toString() },
+        metadata = metaDataOf(ResponsiveDialog),
+    ) { destination ->
         EventEditScreen(
             occurrenceId = destination.occurrenceId,
             goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
-            goToEventAttendees = { backStack.addOnce(NavDestination.EventAttendees(destination.occurrenceId)) },
-        )
-    }
-    entry<NavDestination.EventAttendees>(metadata = metaDataOf(ResponsiveDialog)) { destination ->
-        EventAttendeesScreen(
-            occurrenceId = destination.occurrenceId,
-            goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
+            goToEventAttendees = {
+                backStack.addOnce(
+                    NavDestination.EventAttendees(
+                        parent = NavDestination.EventEdit(destination.occurrenceId),
+                        occurrenceId = destination.occurrenceId,
+                    ),
+                )
+            },
         )
     }
     entry<NavDestination.Accounts.List> {

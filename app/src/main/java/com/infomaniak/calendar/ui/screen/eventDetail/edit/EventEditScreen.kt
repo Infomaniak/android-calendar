@@ -63,6 +63,7 @@ fun EventEditScreen(
     val uiState = when (eventDetailUiState) {
         EventDetailUiState.Loading -> EventEditScreenState.Loading
         is EventDetailUiState.Success -> {
+            viewModel.addAttendeesToSearchState(eventDetailUiState.eventDetail.attendees.all)
             EventEditScreenState.Success(
                 rememberSaveableEventFormState(
                     calendars = eventFormCalendars?.calendars ?: emptyList(),
