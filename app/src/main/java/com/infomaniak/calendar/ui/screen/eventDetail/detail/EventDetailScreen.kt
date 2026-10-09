@@ -45,6 +45,7 @@ import com.infomaniak.calendar.components.eventdetail.detail.EventDetail
 import com.infomaniak.calendar.components.eventdetail.detail.component.ParticipationStatusButtonsToolbar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
@@ -85,6 +86,7 @@ fun EventDetailScreen(
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
         goBack = goBack,
         goToEdit = goToEdit,
+        updateAttendees = viewModel::addAttendeesToState,
         onLocationClick = { location -> openLocationInMapApp(context, location) },
         goToEventAttendees = goToEventAttendees,
         modifier = modifier,
@@ -99,6 +101,7 @@ private fun EventDetailScreen(
     goToEdit: () -> Unit,
     goToEventAttendees: () -> Unit,
     onLocationClick: (String) -> Unit,
+    updateAttendees: (List<AttendeeUi>) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
@@ -133,6 +136,7 @@ private fun EventDetailScreen(
         when (state) {
             EventDetailUiState.Loading -> Unit // Loaded locally, always fast, no need for a specific progress indicator UI
             is EventDetailUiState.Success -> {
+                updateAttendees(state.eventDetail.attendees.all)
                 val copyFeedbackMessage = stringResource(RCommon.string.linkCopied)
 
                 EventDetail(
@@ -190,6 +194,7 @@ private fun Preview() {
                 uiState = { EventDetailUiState.Success(previewEventDetail) },
                 goBack = {},
                 goToEdit = {},
+                updateAttendees = {},
                 goToEventAttendees = {},
                 onLocationClick = {},
             )

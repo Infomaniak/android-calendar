@@ -20,16 +20,14 @@ package com.infomaniak.calendar.ui.screen.eventDetail.edit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.screen.eventDetail.EventFormCalendarsUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventFormCalendars
-import com.infomaniak.calendar.utils.OccurrenceAttendeesLoader
 import com.infomaniak.calendar.utils.attendeesSearchState
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
-import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -43,7 +41,6 @@ import kotlinx.coroutines.flow.StateFlow
 class EventEditViewModel(
     @Assisted private val savedStateHandle: SavedStateHandle,
     private val getEventDetailUiUseCase: GetEventDetailUiUseCase,
-    private val calendarManager: CalendarManager,
     eventFormCalendarsUseCase: EventFormCalendarsUseCase,
 ) : ViewModel() {
     val eventDetailUi = getEventDetailUiUseCase.eventDetailUi
@@ -51,17 +48,12 @@ class EventEditViewModel(
     val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase
         .editionCalendars(getEventDetailUiUseCase.eventCalendar)
 
-    private val attendeesLoader = OccurrenceAttendeesLoader(
-        scope = viewModelScope,
-        savedStateHandle = savedStateHandle,
-        calendarManager = calendarManager,
-        state = attendeesSearchState,
-        preserveRestoredSelections = true,
-    )
-
     fun setOccurrenceId(occurrenceId: OccurrenceId) {
         getEventDetailUiUseCase.setOccurrenceId(occurrenceId)
-        attendeesLoader.load(occurrenceId)
+    }
+
+    fun addAttendeesToSearchState(attendees: List<AttendeeUi>) {
+        attendeesSearchState.attendees.addAll(attendees)
     }
 
     @AssistedFactory

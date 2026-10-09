@@ -22,6 +22,7 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
@@ -62,10 +63,10 @@ fun rememberSaveableEventFormState(
 ): EventFormState {
     val colorState = rememberSaveable(initialCalendar == null, stateSaver = ColorSaver) { mutableStateOf(initialCalendar?.color) }
 
-    val attendeesState = attendeesSearchState
-        ?: rememberSaveableAttendeesSearchState(
-            attendees = initialAttendees,
-        )
+    val attendeesState = attendeesSearchState ?: rememberSaveableAttendeesSearchState(
+        attendees = initialAttendees,
+        results = remember { mutableStateListOf() },
+    )
 
     return EventFormState(
         titleTextState = rememberTextFieldState(initialText),
