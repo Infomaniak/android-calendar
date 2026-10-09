@@ -244,7 +244,7 @@ private fun sceneDecoratorStrategies(
     return listOf(navigationStrategy, drawerStrategy)
 }
 
-fun NavKey.toContentKey() = this.toString()
+private fun NavKey.toContentKey() = this.toString()
 
 private fun NavBackStack<NavKey>.getLastCalendarView(): NavDestination.CalendarView? {
     return this.filterIsInstance<NavDestination.CalendarView>().lastOrNull()
