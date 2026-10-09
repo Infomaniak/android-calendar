@@ -78,7 +78,7 @@ fun EventDetailScreen(
 
     LaunchedEffect(occurrenceId) {
         viewModel.setOccurrenceId(occurrenceId)
-        eventAttendeesViewModel.setAttendeesSearchState(AttendeesSearchUiState.Success(viewModel.attendeesSearchState))
+        eventAttendeesViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
     }
 
     EventDetailScreen(

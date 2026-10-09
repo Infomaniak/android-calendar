@@ -44,7 +44,6 @@ import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
-import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.EventAttendeesViewModel
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
@@ -83,7 +82,7 @@ fun EventEditScreen(
     }
 
     LaunchedEffect(occurrenceId, viewModel.attendeesSearchState) {
-        eventAttendeesViewModel.setAttendeesSearchState(AttendeesSearchUiState.Success(viewModel.attendeesSearchState))
+        eventAttendeesViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
     }
 
     EventEditScreen(
