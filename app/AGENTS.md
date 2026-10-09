@@ -44,8 +44,10 @@ app/src/main/java/com/infomaniak/calendar/
 │   └── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
 └── ui/
     ├── navigation/
-    │   ├── MainNavHost.kt          # Top-level NavDisplay with entryProvider
-    │   └── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventAttendees, Accounts, Onboarding)
+    │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
+    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), Accounts, Onboarding)
+    │   └── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
+    │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
     ├── screen/
     │   ├── day/                   # DayScreen + DayViewModel + DayUiState + DayEventGroupingExt
     │   ├── threeDays/             # ThreeDayScreen — placeholder 3-day view
@@ -55,7 +57,8 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── accounts/              # AccountsListScreen + AccountActionsScreen + AccountsViewModel + AccountItem
     │                              # Drawer-backed account list, per-account detail/logout screen, and remove-account flow
     │   ├── eventCreation/         # EventCreationScreen
-    │   ├── eventDetail/           # EventDetailScreen + EventAttendeesScreen + EventAttendee + EventDetailViewModel
+    │   ├── eventDetail/           # EventDetailScreen + EventEditScreen + EventCreationScreen + their ViewModels, and
+    │                              # attendeesSearch/ (EventAttendeesScreen + EventAttendeesViewModel shared with its parent)
     │   └── onboarding/            # OnboardingScreen + CrossAppLoginViewModel
     └── theme/
         ├── Theme.kt                # CalendarTheme Composable (Material 3 color schemes)
@@ -85,8 +88,19 @@ app/
 
 - **Single Activity**: `MainActivity` hosts all Compose content via `setContent { CalendarTheme { Surface { MainNavHost() } } }`.
 - **Compose-only UI**: No XML layouts / ViewBinding; use Material 3 components.
-- **Navigation**: Uses Jetpack Navigation 3 (`NavDisplay` + `entryProvider`). Each screen defines its own `NavKey`
-  data object and an `EntryProviderScope<NavKey>` extension (e.g., `home()`). Top-level wiring lives in `MainNavHost`.
+- **Navigation**: Uses Jetpack Navigation 3 (`NavDisplay`). Destinations are `NavDestination` keys, and
+  `MainNavHost.baseEntryProvider` maps each key to a `NavEntry` with a manual `when` (not the `entryProvider { entry<…> }`
+  DSL): the DSL can't read the key while building `metadata`, which `EventAttendees` needs in order to declare its parent.
+  Entries are decorated with `rememberSaveableStateHolderNavEntryDecorator()` followed by
+  `rememberSharedViewModelStoreNavEntryDecorator()`, in that order.
+- **Sharing a ViewModel between a parent entry and a child entry**: the child's key carries its parent
+  (`EventAttendees(parent)`), and its metadata uses `SharedViewModelStoreNavEntryDecorator.parent(parent.toContentKey())`.
+  The parent entry must set `contentKey = destination.toContentKey()`, so both resolve the same store. The child reads the
+  parent's store through `LocalSharedViewModelStoreOwner.current`, passed as a default parameter
+  (`viewModel(LocalSharedViewModelStoreOwner.current)`); the parent calls plain `viewModel()`. Currently used for
+  `EventAttendeesViewModel`: each of EventCreation / EventDetail / EventEdit owns its own instance, and the parent
+  provides its `AttendeesSearchState` to it. The child shows nothing until that state is provided
+  (`AttendeesSearchUiState.Loading`).
 - **DI**: Metro `@DependencyGraph` (`AppGraph`) scoped to `AppScope`. ViewModels are auto-registered
   via multibinding (`@ContributesIntoMap` + `@ViewModelKey`) and resolved through the `metrox-viewmodel`
   `MetroViewModelFactory` (exposed as `metroViewModelFactory` by the `ViewModelGraph` the graph implements,
