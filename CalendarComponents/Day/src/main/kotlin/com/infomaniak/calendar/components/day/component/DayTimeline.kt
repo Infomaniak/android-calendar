@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,7 +31,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
 import com.infomaniak.calendar.components.day.model.DayEvents
-import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.pinchToZoom
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
@@ -41,12 +39,11 @@ import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlin.time.Clock
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 
-private val LocalDateTime.minuteOfDay: Int get() = hour * MINUTES_PER_HOUR + minute
-
+/** A single day's hour grid, carrying its timed events, under the hour gutter's labels. */
 @Composable
 internal fun DayTimeline(
     date: LocalDate,
@@ -57,26 +54,23 @@ internal fun DayTimeline(
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val currentDateTime by rememberCurrentDateTime()
+    val gutterWidth = DayTimelineDefaults.HourGutterWidth
+    val endPadding = DayTimelineDefaults.TimelineEndPadding
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .padding(contentPadding.onlyHorizontal())
-            .verticalScroll(state.scrollState, enabled = !state.isPinching)
-            .padding(
-                top = HourLabelOverhang + contentPadding.calculateTopPadding(),
-                bottom = DayTimelineDefaults.BottomPadding + contentPadding.calculateBottomPadding(),
-            )
-            // Inside the padding: a pinch reads its own y as an hour, so it has to start
-            // counting where the first hour line is drawn, not where the padding begins.
-            .pinchToZoom(state),
+            .verticalTimelineScroll(state, contentPadding)
+            .pinchToZoom(state), // Pinch to zoom after scroll which adds some more paddings
     ) {
-        HourLabels(state = state, modifier = Modifier.width(DayTimelineDefaults.HourGutterWidth))
+        HourLabels(state = state, modifier = Modifier.width(gutterWidth))
+
         HourLines(
             state = state,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = DayTimelineDefaults.HourGutterWidth, end = DayTimelineDefaults.TimelineEndPadding),
+                .padding(start = gutterWidth, end = endPadding),
         )
 
         TimedEventsColumn(
@@ -85,14 +79,16 @@ internal fun DayTimeline(
             onEventClick = onEventClick,
             modifier = Modifier
                 .matchParentSize()
-                .padding(start = DayTimelineDefaults.HourGutterWidth, end = DayTimelineDefaults.TimelineEndPadding),
+                .padding(start = gutterWidth, end = endPadding),
         )
 
         if (currentDateTime.date == date) {
             CurrentTimeIndicator(
                 minuteOfDay = currentDateTime.minuteOfDay,
                 state = state,
-                modifier = Modifier.matchParentSize(),
+                modifier = Modifier
+                    .matchParentSize()
+                    .padding(start = gutterWidth - EsdsTheme.spacing.md, end = endPadding),
             )
         }
     }

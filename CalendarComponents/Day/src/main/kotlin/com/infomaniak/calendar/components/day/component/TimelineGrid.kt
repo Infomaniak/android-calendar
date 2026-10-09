@@ -17,10 +17,14 @@
  */
 package com.infomaniak.calendar.components.day.component
 
+import androidx.compose.foundation.OverscrollEffect
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberOverscrollEffect
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -59,6 +63,30 @@ private val HourLabelStyle: TextStyle
  */
 internal val HourLabelOverhang: Dp
     @Composable @ReadOnlyComposable get() = with(LocalDensity.current) { HourLabelStyle.lineHeight.toDp() / 2 }
+
+/**
+ * Scrolls the day vertically, with room above for midnight's label and below for the last events to
+ * clear whatever overlays the bottom of the screen.
+ *
+ * A pinch reads its own y as an hour, so any [pinchToZoom][com.infomaniak.calendar.components.day.pinchToZoom]
+ * goes after this modifier, inside the padding: it has to start counting where the first hour line
+ * is drawn, not where the padding begins.
+ *
+ * Several of them can share the same [state], as long as they are all as tall: they then scroll as
+ * one. Each would stretch on its own on reaching an end though, so [overscrollEffect] is better left
+ * out for them.
+ */
+@Composable
+internal fun Modifier.verticalTimelineScroll(
+    state: DayTimelineState,
+    contentPadding: PaddingValues,
+    overscrollEffect: OverscrollEffect? = rememberOverscrollEffect(),
+): Modifier = this
+    .verticalScroll(state.scrollState, overscrollEffect, enabled = !state.isPinching)
+    .padding(
+        top = HourLabelOverhang + contentPadding.calculateTopPadding(),
+        bottom = DayTimelineDefaults.BottomPadding + contentPadding.calculateBottomPadding(),
+    )
 
 /** A line at every hour, across the whole width it is given. */
 @Composable
