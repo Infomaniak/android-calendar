@@ -90,10 +90,6 @@ android {
     }
 }
 
-composeCompiler {
-    stabilityConfigurationFiles = listOf(rootProject.layout.projectDirectory.file("stability_config.conf"))
-}
-
 kotlin {
     compilerOptions {
         jvmTarget = JvmTarget.fromTarget(javaVersion.toString())

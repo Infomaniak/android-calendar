@@ -260,18 +260,21 @@ All CalendarComponents source lives **in this repository**. Changes to these mod
    `kmp.minSdk` (`multiplatform-calendar/gradle.properties`) and its own Gradle wrapper version. When bumping AGP major
    versions, also check the required minimum Gradle version for that AGP release. AGP 9's built-in Kotlin support means
    `core.plugins.kotlin.android` must not be applied anywhere (see `app/AGENTS.md`).
-4. **Norm separation**:
+4. **Compose stability**: The root `build.gradle.kts` hands `stability_config.conf` to every module applying the Compose
+   compiler plugin (`:app` and the CalendarComponents alike), so a type listed there (e.g. `kotlin.collections.List`) is
+   stable in all of them. Add types to that file rather than configuring `composeCompiler` per module.
+5. **Norm separation**:
     - App norms → `app/AGENTS.md`
     - Multi-module / build / submodule / CalendarComponents norms → this file
     - KMP library norms → `multiplatform-calendar` submodule repository
     - Core library norms → `Core` submodule repository (`Core/AGENTS.md`)
-5. **When working on**:
+6. **When working on**:
     - `app/src/...` → read `app/AGENTS.md`
     - `CalendarComponents/...` → read the CalendarComponents section in this file
     - Build files / submodule pointer → read this file
     - KMP shared code → switch to the `multiplatform-calendar` repository
     - Core shared code → switch to the `Core` (`android-core`) repository
-6. **Keep AGENTS.md up to date**: For every change to the architecture, build layout, module structure, conventions,
+7. **Keep AGENTS.md up to date**: For every change to the architecture, build layout, module structure, conventions,
    commands, or anything else that should be reflected in AGENTS.md, you **must** update the relevant AGENTS.md file
    (this one for cross-cutting/build/submodule changes, `app/AGENTS.md` for app-specific changes) as part of the same
    change. If a change is worth notifying agents about, it belongs in AGENTS.md.
