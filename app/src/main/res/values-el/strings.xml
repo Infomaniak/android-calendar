@@ -19,7 +19,9 @@
     <string name="accountsTitle">Λογαριασμοί</string>
     <string name="attendeesSearchTitle">Προσθήκη συμμετεχόντων</string>
     <string name="buttonAddAccount">Προσθήκη λογαριασμού</string>
+    <string name="buttonDeleteAllEvents">Όλες οι εκδηλώσεις</string>
     <string name="buttonDeleteEvent">Διαγραφή αυτής της εκδήλωσης</string>
+    <string name="buttonDeleteThisAndFollowingEvents">Αυτή και οι επόμενες εκδηλώσεις</string>
     <string name="buttonLogOut">Αποσύνδεση</string>
     <string name="contentDescriptionBack">Πίσω</string>
     <string name="contentDescriptionInbox">Άνοιγμα εισερχομένων</string>
@@ -27,6 +29,7 @@
     <string name="contentDescriptionToolbarCurrentViewButton">Τρέχουσα προβολή: %s. Πατήστε για να αλλάξετε την προβολή.</string>
     <string name="dayTitle">Ημέρα</string>
     <string name="deleteEventAlertTitle">Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτή την εκδήλωση;</string>
+    <string name="deleteRecurringEventAlertTitle">Ποιες εκδηλώσεις θέλετε να διαγράψετε;</string>
     <string name="eventOccurrenceNotFound">Αυτή η εκδήλωση δεν είναι πλέον διαθέσιμη.</string>
     <string name="helpTitle">Βοήθεια</string>
     <string name="monthTitle">Μήνας</string>

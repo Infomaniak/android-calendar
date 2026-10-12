@@ -19,7 +19,9 @@
     <string name="accountsTitle">Accounts</string>
     <string name="attendeesSearchTitle">Deelnemers toevoegen</string>
     <string name="buttonAddAccount">Een account toevoegen</string>
+    <string name="buttonDeleteAllEvents">Alle evenementen</string>
     <string name="buttonDeleteEvent">Dit evenement verwijderen</string>
+    <string name="buttonDeleteThisAndFollowingEvents">Dit en alle volgende evenementen</string>
     <string name="buttonLogOut">Uitloggen</string>
     <string name="contentDescriptionBack">Terug</string>
     <string name="contentDescriptionInbox">Postvak IN openen</string>
@@ -27,6 +29,7 @@
     <string name="contentDescriptionToolbarCurrentViewButton">Huidige weergave: %s. Tik om de weergave te wijzigen.</string>
     <string name="dayTitle">Dag</string>
     <string name="deleteEventAlertTitle">Weet u zeker dat u dit evenement wilt verwijderen?</string>
+    <string name="deleteRecurringEventAlertTitle">Welke evenementen wilt u verwijderen?</string>
     <string name="eventOccurrenceNotFound">Dit evenement is niet meer beschikbaar.</string>
     <string name="helpTitle">Hulp</string>
     <string name="monthTitle">Maand</string>

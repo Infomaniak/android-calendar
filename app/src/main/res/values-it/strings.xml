@@ -19,7 +19,9 @@
     <string name="accountsTitle">Conti</string>
     <string name="attendeesSearchTitle">Aggiungi partecipanti</string>
     <string name="buttonAddAccount">Aggiungi un account</string>
+    <string name="buttonDeleteAllEvents">Tutti gli eventi</string>
     <string name="buttonDeleteEvent">Elimina questo evento</string>
+    <string name="buttonDeleteThisAndFollowingEvents">Questo evento e i successivi</string>
     <string name="buttonLogOut">Esci</string>
     <string name="contentDescriptionBack">Indietro</string>
     <string name="contentDescriptionInbox">Apri la posta in arrivo</string>
@@ -27,6 +29,7 @@
     <string name="contentDescriptionToolbarCurrentViewButton">Vista attuale: %s. Toccare per cambiare vista.</string>
     <string name="dayTitle">Giorno</string>
     <string name="deleteEventAlertTitle">Vuoi davvero eliminare questo evento?</string>
+    <string name="deleteRecurringEventAlertTitle">Quali eventi vuoi eliminare?</string>
     <string name="eventOccurrenceNotFound">Questo evento non è più disponibile.</string>
     <string name="helpTitle">Aiuto</string>
     <string name="monthTitle">Mese</string>
