@@ -30,6 +30,7 @@ import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 @Composable
 internal fun AttendeesList(
     attendees: () -> List<AttendeeUi>,
+    onRemove: (AttendeeUi) -> Unit,
     modifier: Modifier = Modifier,
     onClick: ((AttendeeUi) -> Unit)? = null,
     isEnabled: (AttendeeUi) -> Boolean = { true },
@@ -49,6 +50,8 @@ internal fun AttendeesList(
                 enabled = isEnabled(attendee),
                 modifier = Modifier.animateItem(),
             )
+            // TODO
+            SwipeableEventAttendee(attendee = attendee, onRemove = onRemove)
         }
     }
 }
@@ -58,5 +61,6 @@ internal fun AttendeesList(
 private fun AttendeesListPreview() {
     AttendeesList(
         attendees = { previewAttendees },
+        onRemove = {},
     )
 }

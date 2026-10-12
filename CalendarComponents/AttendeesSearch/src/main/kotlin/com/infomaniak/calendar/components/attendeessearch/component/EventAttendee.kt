@@ -19,21 +19,32 @@ package com.infomaniak.calendar.components.attendeessearch.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxDefaults
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -47,6 +58,7 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import kotlin.math.abs
 
 @Composable
 internal fun EventAttendee(
@@ -100,6 +112,48 @@ internal fun EventAttendee(
 }
 
 @Composable
+internal fun SwipeableEventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier, onRemove: (AttendeeUi) -> Unit) {
+
+    val state = rememberSwipeToDismissBoxState(SwipeToDismissBoxValue.Settled, SwipeToDismissBoxDefaults.positionalThreshold)
+
+    SwipeToDismissBox(
+        state = state,
+        enableDismissFromStartToEnd = false,
+        onDismiss = { direction ->
+            if (direction == SwipeToDismissBoxValue.EndToStart) {
+                onRemove(attendee)
+            }
+        },
+        content = {
+            EventAttendee(attendee)
+        },
+        backgroundContent = {
+            when (state.dismissDirection) {
+                SwipeToDismissBoxValue.EndToStart -> {
+                    BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+                        val maxWidthPx = with(LocalDensity.current) { maxWidth.toPx() }
+                        val progress = abs(state.requireOffset() / maxWidthPx)
+                        Icon(
+                            painterResource(R.drawable.ic_trash),
+                            contentDescription = "Delete",
+                            modifier = Modifier
+                                .width(maxWidth * progress)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.error)
+                                .padding(EsdsTheme.spacing.xl),
+                            tint = Color.White,
+                        )
+                    }
+                }
+                SwipeToDismissBoxValue.StartToEnd,
+                SwipeToDismissBoxValue.Settled -> Unit
+            }
+        },
+        modifier = modifier,
+    )
+}
+
+@Composable
 private fun AttendeeParticipationStatus(status: ParticipationStatus, isOrganizer: Boolean, modifier: Modifier = Modifier) {
     return ParticipationStatusText(
         text = stringResource(status.labelRes),
@@ -128,6 +182,23 @@ private fun ParticipationStatusText(text: String, color: Color, isOrganizer: Boo
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun SwipeableAttendeePreview() {
+    Surface {
+        SwipeableEventAttendee(
+            AttendeeUi(
+                "alice@example.com#Alice",
+                "alice@example.com",
+                "Alice",
+                ParticipationStatus.Accepted,
+                true,
+            ),
+            onRemove = {},
+        )
     }
 }
 
