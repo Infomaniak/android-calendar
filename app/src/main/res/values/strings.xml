@@ -19,12 +19,17 @@
     <string name="accountsTitle">Accounts</string>
     <string name="attendeesSearchTitle">Add attendees</string>
     <string name="buttonAddAccount">Add an account</string>
+    <string name="buttonDeleteAllEvents">All the events</string>
+    <string name="buttonDeleteEvent">Delete this event</string>
+    <string name="buttonDeleteThisAndFollowingEvents">This and following events</string>
     <string name="buttonLogOut">Log Out</string>
     <string name="contentDescriptionBack">Back</string>
     <string name="contentDescriptionInbox">Open inbox</string>
     <string name="contentDescriptionMenuDrawer">Open menu</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Current view: %s. Tap to change view.</string>
     <string name="dayTitle">Day</string>
+    <string name="deleteEventAlertTitle">Are you sure you want to delete this event?</string>
+    <string name="deleteRecurringEventAlertTitle">Which events do you want to delete?</string>
     <string name="eventOccurrenceNotFound">This event is no longer available.</string>
     <string name="helpTitle">Help</string>
     <string name="monthTitle">Month</string>
