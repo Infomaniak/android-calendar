@@ -27,6 +27,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+/**
+ * Shares the [AttendeesSearchState] instance between the parent screen and the attendees search screen.
+ *
+ * To do so, we explicitly share the instance of the view model between the two screens using a [SharedViewModelStoreNavEntryDecorator].
+ */
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey(EventAttendeesViewModel::class)
@@ -44,4 +49,3 @@ sealed interface AttendeesSearchUiState {
     data object Loading : AttendeesSearchUiState
     data class Success(val state: AttendeesSearchState) : AttendeesSearchUiState
 }
-
