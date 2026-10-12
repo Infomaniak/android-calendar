@@ -43,7 +43,7 @@ import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
-import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
@@ -61,7 +61,7 @@ internal fun DayView(
     events: DayEvents,
     state: DayTimelineState,
     weekNumbering: WeekNumbering,
-    onEventClick: (EventUi.Normal) -> Unit,
+    onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
     headerModifier: Modifier = Modifier,
     timelineModifier: Modifier = Modifier,

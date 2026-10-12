@@ -21,7 +21,7 @@ import androidx.compose.runtime.Immutable
 import kotlin.time.Instant
 
 @Immutable
-data class SimpleEventUi(
+data class SimpleEventSummaryUi(
     override val id: String,
     override val title: String,
     override val location: String?,
@@ -32,4 +32,4 @@ data class SimpleEventUi(
     override val colors: EventColorsUi,
     override val hasAttendees: Boolean,
     override val myStatus: ParticipationStatus?,
-) : EventUi.Normal
+) : EventSummaryUi.Normal

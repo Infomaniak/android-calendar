@@ -25,12 +25,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -41,7 +39,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatTimeRange
 import com.infomaniak.calendar.components.resources.R
@@ -52,7 +50,7 @@ import kotlin.time.Instant
 
 @Composable
 fun EventItem(
-    event: EventUi.Normal,
+    event: EventSummaryUi.Normal,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     allDayTrailingContent: @Composable () -> Unit = {},
@@ -183,7 +181,7 @@ private fun TrailingIcons(trailingIcons: Set<EventIcons>) {
     }
 }
 
-fun EventUi.Normal.toEventIcons(): Set<EventIcons> = buildSet {
+fun EventSummaryUi.Normal.toEventIcons(): Set<EventIcons> = buildSet {
     if (location != null) add(EventIcons.Location)
     if (hasAttendees) add(EventIcons.Attendees)
     // TODO: Detect kMeet links

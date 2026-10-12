@@ -22,11 +22,11 @@ import kotlinx.datetime.LocalDate
 import kotlin.time.Instant
 
 @Immutable
-sealed interface EventUi {
+sealed interface EventSummaryUi {
     val id: String
 
     @Immutable
-    interface Normal : EventUi {
+    interface Normal : EventSummaryUi {
         val title: String
         val location: String?
         val status: EventStatus
@@ -39,12 +39,12 @@ sealed interface EventUi {
     }
 
     @Immutable
-    data object TodayEmptyState : EventUi {
+    data object TodayEmptyState : EventSummaryUi {
         override val id: String = TODAY_EMPTY_STATE_ID
     }
 
     @Immutable
-    data class EmptyState(val date: LocalDate) : EventUi {
+    data class EmptyState(val date: LocalDate) : EventSummaryUi {
         override val id: String = "${date}_$EMPTY_STATE_ID"
     }
 

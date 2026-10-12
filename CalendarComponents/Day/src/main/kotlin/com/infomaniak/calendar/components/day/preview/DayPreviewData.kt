@@ -22,9 +22,9 @@ import androidx.compose.ui.graphics.toArgb
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.TimedEvent
 import com.infomaniak.calendar.components.foundation.models.EventStatus
-import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
-import com.infomaniak.calendar.components.foundation.models.SimpleEventUi
+import com.infomaniak.calendar.components.foundation.models.SimpleEventSummaryUi
 import com.infomaniak.calendar.components.foundation.preview.EventColorsUiFactory
 import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.LocalDateTime
@@ -79,10 +79,10 @@ private fun previewEvent(
     color: Color,
     location: String? = null,
     myStatus: ParticipationStatus? = ParticipationStatus.Accepted,
-): EventUi.Normal {
+): EventSummaryUi.Normal {
     val today = Clock.today(previewTimeZone)
 
-    return SimpleEventUi(
+    return SimpleEventSummaryUi(
         id = "$title-$startHour:$startMinute",
         title = title,
         location = location,

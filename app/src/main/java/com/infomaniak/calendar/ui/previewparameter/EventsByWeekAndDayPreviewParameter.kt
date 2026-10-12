@@ -24,7 +24,7 @@ import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
-import com.infomaniak.calendar.ui.model.OccurrenceEventUi
+import com.infomaniak.calendar.ui.model.OccurrenceEventSummaryUi
 import com.infomaniak.calendar.ui.screen.planning.EventsByWeekAndDay
 import com.infomaniak.calendar.ui.screen.planning.toEventColorsUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
@@ -44,13 +44,13 @@ private fun eventUi(
     end: String,
     location: String? = null,
     color: Color = Color(0xFF2196F3),
-): OccurrenceEventUi {
+): OccurrenceEventSummaryUi {
     val attendees = listOf(
         AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Accepted),
         AttendeeUi("bob@example.com#Bob", "bob@example.com", "Bob", ParticipationStatus.Tentative),
     )
 
-    return OccurrenceEventUi(
+    return OccurrenceEventSummaryUi(
         id = id,
         occurrenceId = OccurrenceId.Master(EventId(id)),
         title = title,

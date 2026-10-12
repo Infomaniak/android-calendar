@@ -51,7 +51,7 @@ import com.infomaniak.calendar.components.event.EventItemCard
 import com.infomaniak.calendar.components.event.EventItemCardDefaults
 import com.infomaniak.calendar.components.event.toEventIcons
 import com.infomaniak.calendar.components.event.toEventItemStatus
-import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatTimeRange
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlin.math.roundToInt
@@ -108,7 +108,7 @@ internal fun ResizableEventItem(
  */
 @Composable
 private fun EventDetails(
-    event: EventUi.Normal,
+    event: EventSummaryUi.Normal,
     titleSizing: TitleSizing,
     visibleHeight: () -> Float,
     textDecoration: TextDecoration?,

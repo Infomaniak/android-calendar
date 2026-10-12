@@ -39,7 +39,7 @@ import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.model.TimedEvent
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
-import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import kotlin.math.roundToInt
 
 /** Places every card where the solver put it, relative to its own start edge. */
@@ -47,7 +47,7 @@ import kotlin.math.roundToInt
 internal fun ResizableEventLayout(
     timedEvents: List<TimedEvent>,
     placements: List<EventPlacement>,
-    onEventClick: (EventUi.Normal) -> Unit,
+    onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current

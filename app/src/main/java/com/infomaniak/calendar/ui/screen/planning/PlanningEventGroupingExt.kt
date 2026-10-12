@@ -18,7 +18,7 @@
 package com.infomaniak.calendar.ui.screen.planning
 
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
-import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.utils.toEventUi
@@ -43,7 +43,7 @@ import kotlin.time.Clock
  * ascending so the result can be consumed directly by a calendar UI. Days are keyed by full date
  * (not day-of-month) so a week that straddles two months stays in chronological order.
  */
-typealias EventsByWeekAndDay = SortedMap<YearWeek, SortedMap<LocalDate, List<EventUi>>>
+typealias EventsByWeekAndDay = SortedMap<YearWeek, SortedMap<LocalDate, List<EventSummaryUi>>>
 
 /**
  * Groups already day-split events ([EventDaySlice]s, keyed by day) by the [week][YearWeek] they fall
@@ -51,18 +51,18 @@ typealias EventsByWeekAndDay = SortedMap<YearWeek, SortedMap<LocalDate, List<Eve
  *
  * The input is expected to come from `CalendarManager.observeDaySlices`, i.e. already grouped by day
  * and sorted within each day (all-day first, then by start time). A multi-day event therefore yields
- * one [EventUi] per day it covers, each carrying that day's clamped [start][EventUi.Normal.start] /
- * [end][EventUi.Normal.end] bounds (converted to an absolute instant in [timeZone]).
+ * one [EventSummaryUi] per day it covers, each carrying that day's clamped [start][EventSummaryUi.Normal.start] /
+ * [end][EventSummaryUi.Normal.end] bounds (converted to an absolute instant in [timeZone]).
  *
  * Weeks are resolved using [weekNumbering] (ISO-8601 by default). Today is guaranteed to have an
- * entry: an empty day gets a single [EventUi.TodayEmptyState] placeholder.
+ * entry: an empty day gets a single [EventSummaryUi.TodayEmptyState] placeholder.
  */
 @Suppress("UNCHECKED_CAST") // Shows the exposed list as non-mutable
 suspend fun Map<LocalDate, List<EventDaySlice>>.groupByWeekAndDay(
     weekNumbering: WeekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
     timeZone: TimeZone = TimeZone.currentSystemDefault(),
 ): EventsByWeekAndDay = withContext(Dispatchers.Default) {
-    val eventsByWeekAndDay = sortedMapOf<YearWeek, SortedMap<LocalDate, MutableList<EventUi>>>()
+    val eventsByWeekAndDay = sortedMapOf<YearWeek, SortedMap<LocalDate, MutableList<EventSummaryUi>>>()
 
     val firstDate = keys.firstOrNull() ?: return@withContext eventsByWeekAndDay as EventsByWeekAndDay
     val lastDate = keys.lastOrNull() ?: return@withContext eventsByWeekAndDay as EventsByWeekAndDay
@@ -73,7 +73,7 @@ suspend fun Map<LocalDate, List<EventDaySlice>>.groupByWeekAndDay(
         var date = week.firstDay
         while (date <= week.lastDay) {
             days[date] = this@groupByWeekAndDay[date]
-                ?.mapTo(mutableListOf<EventUi>()) { it.toEventUi(timeZone) }
+                ?.mapTo(mutableListOf<EventSummaryUi>()) { it.toEventUi(timeZone) }
                 .ensureHasEntry(date, timeZone)
             date = date.plus(DatePeriod(days = 1))
         }
@@ -82,9 +82,9 @@ suspend fun Map<LocalDate, List<EventDaySlice>>.groupByWeekAndDay(
     return@withContext eventsByWeekAndDay as EventsByWeekAndDay
 }
 
-private fun MutableList<EventUi>?.ensureHasEntry(date: LocalDate, timeZone: TimeZone): MutableList<EventUi> {
+private fun MutableList<EventSummaryUi>?.ensureHasEntry(date: LocalDate, timeZone: TimeZone): MutableList<EventSummaryUi> {
     val events = this ?: mutableListOf()
-    if (events.isEmpty()) events.add(if (date == Clock.today(timeZone)) EventUi.TodayEmptyState else EventUi.EmptyState(date))
+    if (events.isEmpty()) events.add(if (date == Clock.today(timeZone)) EventSummaryUi.TodayEmptyState else EventSummaryUi.EmptyState(date))
     return events
 }
 
