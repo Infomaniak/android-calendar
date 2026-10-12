@@ -31,12 +31,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSerializable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavBackStack
-import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.serialization.NavBackStackSerializer
+import androidx.navigation3.runtime.serialization.NavKeySerializer
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
 import com.infomaniak.calendar.extensions.appGraph
@@ -100,7 +101,7 @@ private fun MainContent(
     // Blank surface while the last selected calendar view is being read from the data value which is instantaneous
     val startDestination =
         if (userLoadState is UserLoadState.Loaded.Disconnected) NavDestination.Onboarding() else (lastCalendarView ?: return)
-    val backStack = rememberNavBackStack(startDestination)
+    val backStack = rememberNavDestinationBackStack(startDestination)
 
     CompositionLocalProvider(
         LocalVisibleDayState provides visibleDayState,
@@ -118,6 +119,15 @@ private fun MainContent(
     }
 }
 
+@Composable
+private fun rememberNavDestinationBackStack(vararg elements: NavDestination): NavBackStack<NavDestination> {
+    return rememberSerializable(
+        serializer = NavBackStackSerializer(elementSerializer = NavKeySerializer()),
+    ) {
+        NavBackStack(*elements)
+    }
+}
+
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 private fun ObserveSyncError(loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError>) {
@@ -132,7 +142,7 @@ private fun ObserveSyncError(loadingEventsError: ReceiveChannel<SyncEventsManage
 }
 
 @Composable
-private fun NavigateToOnboardingIfLastUserIsDisconnected(backStack: NavBackStack<NavKey>, isUserLoaded: Boolean) {
+private fun NavigateToOnboardingIfLastUserIsDisconnected(backStack: NavBackStack<NavDestination>, isUserLoaded: Boolean) {
     LaunchedEffect(isUserLoaded) {
         if (isUserLoaded.not()) {
             backStack.replaceRoot(NavDestination.Onboarding())
