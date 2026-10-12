@@ -18,14 +18,10 @@
 package com.infomaniak.calendar.ui.screen.eventDetail.creation
 
 import androidx.compose.foundation.layout.plus
-import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateSetOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,10 +30,8 @@ import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberSaveableEventFormState
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
-import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
-import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchUiState
-import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.EventAttendeesViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 
@@ -47,7 +41,7 @@ fun EventCreationScreen(
     goToEventsAttendees: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventCreationViewModel = viewModel(),
-    eventAttendeesViewModel: EventAttendeesViewModel = viewModel(),
+    attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
 ) {
     val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
     val state = rememberSaveableEventFormState(
@@ -57,7 +51,7 @@ fun EventCreationScreen(
     )
 
     LaunchedEffect(Unit) {
-        eventAttendeesViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
+        attendeesSearchSharedDataViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
     }
 
     EventCreationScreen(

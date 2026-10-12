@@ -46,18 +46,18 @@ import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
-fun EventAttendeesScreen(
+fun AttendeesSearchScreen(
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
-    eventAttendeesViewModel: EventAttendeesViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
+    attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
-    val attendeesSearchUi by eventAttendeesViewModel.attendeesSearchState.collectAsStateWithLifecycle()
+    val attendeesSearchUi by attendeesSearchSharedDataViewModel.attendeesSearchState.collectAsStateWithLifecycle()
 
     Box(modifier = modifier.fillMaxSize()) {
         when (val attendeesSearchState = attendeesSearchUi) {
             AttendeesSearchUiState.Loading -> Unit // The parent provides it right away, so nothing to show
             is AttendeesSearchUiState.Success -> {
-                EventAttendeesScreen(
+                AttendeesSearchScreen(
                     attendeesSearchState = attendeesSearchState.state,
                     goBack = goBack,
                 )
@@ -68,7 +68,7 @@ fun EventAttendeesScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun EventAttendeesScreen(
+private fun AttendeesSearchScreen(
     attendeesSearchState: AttendeesSearchState,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -95,7 +95,7 @@ private fun EventAttendeesScreen(
 @Composable
 private fun EventAttendeesSearchScreenPreview() {
     CalendarThemeForPreview {
-        EventAttendeesScreen(
+        AttendeesSearchScreen(
             attendeesSearchState = rememberSaveableAttendeesSearchState(
                 attendees = remember { mutableStateSetOf<AttendeeUi>().apply { addAll(previewAttendees) } },
                 results = remember { mutableStateListOf<AttendeeUi>().apply { addAll(previewAttendees) } },

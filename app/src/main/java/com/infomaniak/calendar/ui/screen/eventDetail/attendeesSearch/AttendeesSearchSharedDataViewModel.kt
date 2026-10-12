@@ -19,6 +19,7 @@ package com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch
 
 import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
+import com.infomaniak.calendar.ui.navigation.SharedViewModelStoreNavEntryDecorator
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
@@ -34,8 +35,8 @@ import kotlinx.coroutines.flow.asStateFlow
  */
 @Inject
 @ContributesIntoMap(AppScope::class)
-@ViewModelKey(EventAttendeesViewModel::class)
-class EventAttendeesViewModel : ViewModel() {
+@ViewModelKey
+class AttendeesSearchSharedDataViewModel : ViewModel() {
     private val _attendeesSearchState: MutableStateFlow<AttendeesSearchUiState> = MutableStateFlow(AttendeesSearchUiState.Loading)
     val attendeesSearchState: StateFlow<AttendeesSearchUiState> = _attendeesSearchState.asStateFlow()
 

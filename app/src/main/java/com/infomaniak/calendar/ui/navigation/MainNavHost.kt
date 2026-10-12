@@ -46,7 +46,7 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDa
 import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
 import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
 import com.infomaniak.calendar.ui.screen.day.DayScreen
-import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.EventAttendeesScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
@@ -158,7 +158,7 @@ private fun baseEntryProvider(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog) + SharedViewModelStoreNavEntryDecorator.parent(destination.parent.toContentKey()),
         ) {
-            EventAttendeesScreen(
+            AttendeesSearchScreen(
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
         }

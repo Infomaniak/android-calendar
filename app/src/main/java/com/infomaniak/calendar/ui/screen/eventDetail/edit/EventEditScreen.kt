@@ -44,7 +44,7 @@ import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
-import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.EventAttendeesViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
@@ -56,7 +56,7 @@ fun EventEditScreen(
     goToEventAttendees: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventEditViewModel = viewModel(),
-    eventAttendeesViewModel: EventAttendeesViewModel = viewModel(),
+    attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
 ) {
     val eventDetailUiState = viewModel.eventDetailUi.collectAsStateWithLifecycle().value
     val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
@@ -82,7 +82,7 @@ fun EventEditScreen(
     }
 
     LaunchedEffect(occurrenceId, viewModel.attendeesSearchState) {
-        eventAttendeesViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
+        attendeesSearchSharedDataViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
     }
 
     EventEditScreen(
