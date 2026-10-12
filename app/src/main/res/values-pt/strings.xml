@@ -19,12 +19,14 @@
     <string name="accountsTitle">Contas</string>
     <string name="attendeesSearchTitle">Adicionar participantes</string>
     <string name="buttonAddAccount">Adicionar uma conta</string>
+    <string name="buttonDeleteEvent">Eliminar este evento</string>
     <string name="buttonLogOut">Sair</string>
     <string name="contentDescriptionBack">Voltar</string>
     <string name="contentDescriptionInbox">Abrir a caixa de entrada</string>
     <string name="contentDescriptionMenuDrawer">Abrir menu</string>
     <string name="contentDescriptionToolbarCurrentViewButton">Vista atual: %s. Toque para mudar de vista.</string>
     <string name="dayTitle">Dia</string>
+    <string name="deleteEventAlertTitle">Tem a certeza de que pretende eliminar este evento?</string>
     <string name="eventOccurrenceNotFound">Este evento já não está disponível.</string>
     <string name="helpTitle">Ajuda</string>
     <string name="monthTitle">Mês</string>

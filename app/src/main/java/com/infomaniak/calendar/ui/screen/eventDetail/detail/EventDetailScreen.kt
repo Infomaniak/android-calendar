@@ -22,6 +22,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -56,6 +57,7 @@ import com.infomaniak.calendar.utils.nestedScrollToolbar
 import com.infomaniak.calendar.utils.rememberFloatingToolbarExitScrollBehavior
 import com.infomaniak.core.common.extensions.safeStartActivity
 import com.infomaniak.core.ui.compose.basics.rememberClipboardCopyManager
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
@@ -92,6 +94,7 @@ fun EventDetailScreen(
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
         goBack = goBack,
         goToEdit = goToEdit,
+        onDelete = {},
         onLocationClick = { location -> openLocationInMapApp(context, location) },
         goToEventAttendees = goToEventAttendees,
         modifier = modifier,
@@ -105,6 +108,7 @@ private fun EventDetailScreen(
     goBack: () -> Unit,
     goToEdit: () -> Unit,
     goToEventAttendees: () -> Unit,
+    onDelete: () -> Unit,
     onLocationClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -123,6 +127,11 @@ private fun EventDetailScreen(
                 actions = {
                     val canEdit = (state as? EventDetailUiState.Success)?.eventDetail?.canEdit == true
                     TopAppBarButtons.EditButton(onClick = goToEdit, enabled = canEdit)
+                    TopAppBarButtons.DeleteButton(
+                        onClick = onDelete,
+                        enabled = canEdit,
+                        modifier = Modifier.padding(end = EsdsTheme.spacing.lg),
+                    )
                 },
             )
         },
