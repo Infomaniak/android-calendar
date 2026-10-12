@@ -26,7 +26,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.screen.eventDetail.EventFormCalendarsUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventFormCalendars
-import com.infomaniak.calendar.utils.attendeesSearchState
+import com.infomaniak.calendar.utils.saveableAttendeesSearchState
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -43,7 +43,7 @@ class EventCreationViewModel(
     eventFormCalendarsUseCase: EventFormCalendarsUseCase,
 ) : ViewModel() {
     val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase.creationCalendars
-    val attendeesSearchState: AttendeesSearchState = savedStateHandle.attendeesSearchState()
+    val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
 
     fun submitEvent(eventDraft: EventDraft) {
         // TODO

@@ -20,17 +20,15 @@ package com.infomaniak.calendar.utils
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateSetOf
-import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 
 private const val ATTENDEES_SEARCH_STATE_KEY = "attendeesSearchState"
 
 @OptIn(SavedStateHandleSaveableApi::class)
-fun SavedStateHandle.attendeesSearchState(attendees: SnapshotStateSet<AttendeeUi> = mutableStateSetOf()): AttendeesSearchState {
+fun SavedStateHandle.saveableAttendeesSearchState(): AttendeesSearchState {
     return saveable(
         key = ATTENDEES_SEARCH_STATE_KEY,
         saver = AttendeesSearchState.Saver,
@@ -38,7 +36,7 @@ fun SavedStateHandle.attendeesSearchState(attendees: SnapshotStateSet<AttendeeUi
         AttendeesSearchState(
             searchQueryTextFieldState = TextFieldState(),
             results = mutableStateListOf(),
-            attendees = attendees,
+            attendees = mutableStateSetOf(),
         )
     }
 }

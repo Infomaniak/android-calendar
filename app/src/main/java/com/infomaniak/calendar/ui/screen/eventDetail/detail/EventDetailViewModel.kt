@@ -25,7 +25,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
-import com.infomaniak.calendar.utils.attendeesSearchState
+import com.infomaniak.calendar.utils.saveableAttendeesSearchState
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
@@ -44,7 +44,7 @@ class EventDetailViewModel(
     private val getEventDetailUiUseCase: GetEventDetailUiUseCase,
 ) : ViewModel() {
     val eventDetailUi = getEventDetailUiUseCase.eventDetailUi
-    val attendeesSearchState: AttendeesSearchState = savedStateHandle.attendeesSearchState()
+    val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
 
     init {
         viewModelScope.launch {
