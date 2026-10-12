@@ -19,8 +19,9 @@ package com.infomaniak.calendar.ui.navigation
 
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import com.infomaniak.calendar.ui.navigation.replaceRoot
 
-fun NavBackStack<NavKey>.replaceRoot(destination: NavKey) {
+fun <T : NavKey> NavBackStack<T>.replaceRoot(destination: T) {
     if (isEmpty()) {
         add(destination)
         return
@@ -30,10 +31,10 @@ fun NavBackStack<NavKey>.replaceRoot(destination: NavKey) {
     while (size > 1) removeAt(0)
 }
 
-fun NavBackStack<NavKey>.popOrReplaceRoot(fallback: NavKey) {
+fun <T : NavKey> NavBackStack<T>.popOrReplaceRoot(fallback: T) {
     if (size <= 1) replaceRoot(fallback) else removeLastOrNull()
 }
 
-fun NavBackStack<NavKey>.addOnce(destination: NavKey) {
+fun <T : NavKey> NavBackStack<T>.addOnce(destination: T) {
     if (lastOrNull() != destination) add(destination)
 }

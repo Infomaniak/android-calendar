@@ -15,25 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch
+package com.infomaniak.calendar.ui.screen.eventDetail.utils
 
-import androidx.lifecycle.ViewModel
+import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
-import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
-import dev.zacsweers.metro.AppScope
-import dev.zacsweers.metro.ContributesIntoMap
-import dev.zacsweers.metro.Inject
-import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterIsInstance
 
-@Inject
-@ContributesIntoMap(AppScope::class)
-@ViewModelKey
-class EventAttendeesViewModel(private val getEventDetailUiUseCase: GetEventDetailUiUseCase) : ViewModel() {
-
-    val eventDetailUi: StateFlow<EventDetailUiState> = getEventDetailUiUseCase.eventDetailUi
-
-    fun setOccurrenceId(occurrenceId: OccurrenceId) = getEventDetailUiUseCase.setOccurrenceId(occurrenceId)
+suspend fun StateFlow<EventDetailUiState>.synchronizeTo(attendeesSearchState: AttendeesSearchState) {
+    filterIsInstance<EventDetailUiState.Success>().collect { event ->
+        attendeesSearchState.attendees.clear()
+        attendeesSearchState.attendees.addAll(event.eventDetail.attendees.all)
+    }
 }
-

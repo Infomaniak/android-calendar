@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -30,6 +31,7 @@ import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberSaveableEventFormState
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 
@@ -39,12 +41,18 @@ fun EventCreationScreen(
     goToEventsAttendees: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventCreationViewModel = viewModel(),
+    attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
 ) {
     val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
     val state = rememberSaveableEventFormState(
         calendars = eventFormCalendars?.calendars ?: emptyList(),
         initialCalendar = eventFormCalendars?.initialCalendar,
+        attendeesSearchState = viewModel.attendeesSearchState,
     )
+
+    LaunchedEffect(Unit) {
+        attendeesSearchSharedDataViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
+    }
 
     EventCreationScreen(
         state = state,

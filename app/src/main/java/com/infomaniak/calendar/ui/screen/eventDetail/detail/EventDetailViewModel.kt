@@ -17,19 +17,45 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.detail
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewmodel.CreationExtras
+import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
+import com.infomaniak.calendar.ui.screen.eventDetail.utils.synchronizeTo
+import com.infomaniak.calendar.utils.saveableAttendeesSearchState
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
-import dev.zacsweers.metro.Inject
-import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
+import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
 
-@Inject
-@ContributesIntoMap(AppScope::class)
-@ViewModelKey
-class EventDetailViewModel(private val getEventDetailUiUseCase: GetEventDetailUiUseCase) : ViewModel() {
+@AssistedInject
+class EventDetailViewModel(
+    @Assisted private val savedStateHandle: SavedStateHandle,
+    private val getEventDetailUiUseCase: GetEventDetailUiUseCase,
+) : ViewModel() {
     val eventDetailUi = getEventDetailUiUseCase.eventDetailUi
+    val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
 
-    fun setOccurrenceId(occurrenceId: OccurrenceId) = getEventDetailUiUseCase.setOccurrenceId(occurrenceId)
+    fun setOccurrenceId(occurrenceId: OccurrenceId) {
+        getEventDetailUiUseCase.setOccurrenceId(occurrenceId)
+    }
+
+    suspend fun synchronizeAttendeesSearchState() {
+        eventDetailUi.synchronizeTo(attendeesSearchState)
+    }
+
+    @AssistedFactory
+    @ViewModelAssistedFactoryKey(EventDetailViewModel::class)
+    @ContributesIntoMap(AppScope::class)
+    fun interface Factory : ViewModelAssistedFactory {
+        override fun create(extras: CreationExtras): EventDetailViewModel = create(extras.createSavedStateHandle())
+
+        fun create(@Assisted savedStateHandle: SavedStateHandle): EventDetailViewModel
+    }
 }
