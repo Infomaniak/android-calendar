@@ -18,11 +18,12 @@
 package com.infomaniak.calendar.components.day
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
-object DayTimelineDefaults {
+object TimelineDefaults {
     val HourHeight: Dp = 64.dp
     val MinHourHeight: Dp = 64.dp
     val MaxHourHeight: Dp = 200.dp
@@ -33,7 +34,7 @@ object DayTimelineDefaults {
      * the events and the current time indicator all stop at the same x, so they share this value.
      */
     val TimelineEndPadding: Dp
-        @Composable get() = EsdsTheme.spacing.xl
+        @Composable @ReadOnlyComposable get() = EsdsTheme.spacing.xl
 
     /**
      * Room kept under the last hour. The floating toolbar hovers over the bottom of the screen

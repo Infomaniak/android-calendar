@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import com.infomaniak.calendar.components.day.DayTimelineDefaults
+import com.infomaniak.calendar.components.day.TimelineDefaults
 import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.model.TimedEvent
@@ -87,7 +87,7 @@ internal fun TimedEventsColumn(
 private fun TimedEventsColumnPreview() {
     Surface {
         val timedEvents = previewDayEvents.timed
-        val hourHeight = DayTimelineDefaults.HourHeight
+        val hourHeight = TimelineDefaults.HourHeight
         val firstEventOffset = with(LocalDensity.current) {
             (hourHeight * timedEvents.minOf { it.startMinuteOfDay } / MINUTES_PER_HOUR).toPx()
         }

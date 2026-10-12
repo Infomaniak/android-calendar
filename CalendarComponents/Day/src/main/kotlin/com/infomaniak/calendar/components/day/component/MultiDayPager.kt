@@ -52,13 +52,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.day.DayTimelineDefaults
+import com.infomaniak.calendar.components.day.TimelineDefaults
 import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults.GridLineThickness
 import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.pinchToZoom
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
-import com.infomaniak.calendar.components.day.state.DayTimelineState
+import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
@@ -80,7 +80,7 @@ import kotlin.time.Clock
 internal fun MultiDayPager(
     dates: List<LocalDate>,
     eventsOf: (LocalDate) -> DayEvents,
-    state: DayTimelineState,
+    state: TimelineState,
     weekNumbering: WeekNumbering,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
@@ -117,14 +117,14 @@ internal fun MultiDayPager(
 private fun MultiDayTimeline(
     dates: List<LocalDate>,
     eventsOf: (LocalDate) -> DayEvents,
-    state: DayTimelineState,
+    state: TimelineState,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val currentDateTime by rememberCurrentDateTime()
-    val gutterWidth = DayTimelineDefaults.HourGutterWidth
-    val endPadding = DayTimelineDefaults.TimelineEndPadding
+    val gutterWidth = TimelineDefaults.HourGutterWidth
+    val endPadding = TimelineDefaults.TimelineEndPadding
 
     Box(
         modifier = modifier
@@ -228,11 +228,11 @@ private fun DayColumns(
 ) {
     Row(
         verticalAlignment = verticalAlignment,
-        modifier = modifier.padding(end = DayTimelineDefaults.TimelineEndPadding),
+        modifier = modifier.padding(end = TimelineDefaults.TimelineEndPadding),
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.width(DayTimelineDefaults.HourGutterWidth),
+            modifier = Modifier.width(TimelineDefaults.HourGutterWidth),
         ) {
             gutter()
         }

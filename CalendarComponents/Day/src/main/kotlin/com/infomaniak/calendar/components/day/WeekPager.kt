@@ -28,7 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.component.MultiDayPager
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
-import com.infomaniak.calendar.components.day.state.DayTimelineState
+import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
@@ -48,7 +48,7 @@ private const val DAYS_PER_WEEK = 7
 fun WeekPager(
     selectedDate: () -> LocalDate,
     eventsOf: (LocalDate) -> DayEvents,
-    state: DayTimelineState,
+    state: TimelineState,
     weekNumbering: WeekNumbering,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,

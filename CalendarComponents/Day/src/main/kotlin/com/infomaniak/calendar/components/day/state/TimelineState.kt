@@ -31,7 +31,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
-import com.infomaniak.calendar.components.day.DayTimelineDefaults
+import com.infomaniak.calendar.components.day.TimelineDefaults
 import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import kotlinx.coroutines.flow.dropWhile
@@ -52,10 +52,10 @@ private const val INITIAL_VISIBLE_HOUR = 8
 @Composable
 fun rememberDayTimelineState(
     onHourHeightSaveRequest: suspend (Dp) -> Unit,
-    initialHourHeight: Dp = DayTimelineDefaults.HourHeight,
+    initialHourHeight: Dp = TimelineDefaults.HourHeight,
     scrollState: ScrollState = rememberScrollState(),
-): DayTimelineState {
-    val state = remember(scrollState) { DayTimelineState(initialHourHeight, scrollState) }
+): TimelineState {
+    val state = remember(scrollState) { TimelineState(initialHourHeight, scrollState) }
     val density = LocalDensity.current
 
     LaunchedEffect(state) {
@@ -84,7 +84,7 @@ fun rememberDayTimelineState(
  * write per pinch, and nothing left waiting on a timer that leaving the screen would cancel.
  */
 @Composable
-private fun SaveHourHeight(timelineState: DayTimelineState, onHourHeightChanged: suspend (Dp) -> Unit) {
+private fun SaveHourHeight(timelineState: TimelineState, onHourHeightChanged: suspend (Dp) -> Unit) {
     LaunchedEffect(timelineState) {
         snapshotFlow { timelineState.isPinching }
             .dropWhile { isPinching -> !isPinching }
@@ -94,14 +94,14 @@ private fun SaveHourHeight(timelineState: DayTimelineState, onHourHeightChanged:
 }
 
 /**
- * Vertical geometry of the day view: how tall an hour is, where the timeline is scrolled, and the
+ * Vertical geometry of the days views: how tall an hour is, where the timeline is scrolled, and the
  * translation between a minute of the day and a vertical offset.
  *
  * A single instance is shared by every page of the day pager, so swiping to another day keeps the
  * same zoom level and the same scroll position.
  */
 @Stable
-class DayTimelineState(initialHourHeight: Dp, val scrollState: ScrollState) {
+class TimelineState(initialHourHeight: Dp, val scrollState: ScrollState) {
 
     private var clampedHourHeight by mutableStateOf(initialHourHeight.coerceToAllowedRange())
 
@@ -170,7 +170,7 @@ class DayTimelineState(initialHourHeight: Dp, val scrollState: ScrollState) {
     }
 
     private fun Dp.coerceToAllowedRange(): Dp {
-        return coerceIn(DayTimelineDefaults.MinHourHeight, DayTimelineDefaults.MaxHourHeight)
+        return coerceIn(TimelineDefaults.MinHourHeight, TimelineDefaults.MaxHourHeight)
     }
 }
 

@@ -35,7 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.day.DayTimelineDefaults
+import com.infomaniak.calendar.components.day.TimelineDefaults
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.event.EventItem
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
@@ -68,7 +68,7 @@ internal fun AllDayEventsBand(
             textAlign = TextAlign.End,
             // The label stays inside the gutter so the chips still begin where the events do.
             modifier = Modifier
-                .width(DayTimelineDefaults.HourGutterWidth)
+                .width(TimelineDefaults.HourGutterWidth)
                 .padding(end = EsdsTheme.spacing.lg),
         )
 
@@ -78,7 +78,7 @@ internal fun AllDayEventsBand(
             horizontalArrangement = Arrangement.spacedBy(spacing),
             modifier = Modifier
                 .weight(1f)
-                .padding(end = DayTimelineDefaults.TimelineEndPadding)
+                .padding(end = TimelineDefaults.TimelineEndPadding)
                 .heightIn(max = ChipHeight * WHOLE_ROWS + spacing * WHOLE_ROWS + NextRowPeek),
         ) {
             itemsIndexed(

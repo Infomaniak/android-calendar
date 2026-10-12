@@ -40,11 +40,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
-import com.infomaniak.calendar.components.day.DayTimelineDefaults
+import com.infomaniak.calendar.components.day.TimelineDefaults
 import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults
 import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
-import com.infomaniak.calendar.components.day.state.DayTimelineState
+import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.theme.ComponentColors
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortTimeLabel
@@ -78,19 +78,19 @@ internal val HourLabelOverhang: Dp
  */
 @Composable
 internal fun Modifier.verticalTimelineScroll(
-    state: DayTimelineState,
+    state: TimelineState,
     contentPadding: PaddingValues,
     overscrollEffect: OverscrollEffect? = rememberOverscrollEffect(),
 ): Modifier = this
     .verticalScroll(state.scrollState, overscrollEffect, enabled = !state.isPinching)
     .padding(
         top = HourLabelOverhang + contentPadding.calculateTopPadding(),
-        bottom = DayTimelineDefaults.BottomPadding + contentPadding.calculateBottomPadding(),
+        bottom = TimelineDefaults.BottomPadding + contentPadding.calculateBottomPadding(),
     )
 
 /** A line at every hour, across the whole width it is given. */
 @Composable
-internal fun HourLines(state: DayTimelineState, modifier: Modifier = Modifier) {
+internal fun HourLines(state: TimelineState, modifier: Modifier = Modifier) {
     val color = ComponentColors.GridDividerColor
 
     Box(
@@ -113,10 +113,10 @@ internal fun HourLines(state: DayTimelineState, modifier: Modifier = Modifier) {
 
 /**
  * The hour labels alone, each centred on the line it names, across the width it is given: usually
- * [DayTimelineDefaults.HourGutterWidth]. Pair it with [HourLines] sharing the same [state].
+ * [TimelineDefaults.HourGutterWidth]. Pair it with [HourLines] sharing the same [state].
  */
 @Composable
-internal fun HourLabels(state: DayTimelineState, modifier: Modifier = Modifier) {
+internal fun HourLabels(state: TimelineState, modifier: Modifier = Modifier) {
     Layout(
         modifier = modifier.timelineHeight(state),
         content = { for (hour in FIRST_LABELLED_HOUR until HOURS_PER_DAY) HourLabel(hour) },
@@ -135,7 +135,7 @@ internal fun HourLabels(state: DayTimelineState, modifier: Modifier = Modifier) 
 }
 
 /** Makes the composable as tall as the whole day at the zoom level of [state]. */
-private fun Modifier.timelineHeight(state: DayTimelineState): Modifier = layout { measurable, constraints ->
+private fun Modifier.timelineHeight(state: TimelineState): Modifier = layout { measurable, constraints ->
     val height = state.timelineHeight.roundToPx()
     val placeable = measurable.measure(constraints.copy(minHeight = height, maxHeight = height))
 
@@ -160,12 +160,12 @@ private fun TimelineGridPreview() {
         val state = rememberDayTimelineState({})
 
         Box {
-            HourLabels(state = state, modifier = Modifier.width(DayTimelineDefaults.HourGutterWidth))
+            HourLabels(state = state, modifier = Modifier.width(TimelineDefaults.HourGutterWidth))
             HourLines(
                 state = state,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = DayTimelineDefaults.HourGutterWidth, end = DayTimelineDefaults.TimelineEndPadding),
+                    .padding(start = TimelineDefaults.HourGutterWidth, end = TimelineDefaults.TimelineEndPadding),
             )
         }
     }

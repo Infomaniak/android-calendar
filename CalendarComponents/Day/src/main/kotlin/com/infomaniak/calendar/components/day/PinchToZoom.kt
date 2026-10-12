@@ -24,10 +24,10 @@ import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.input.pointer.pointerInput
-import com.infomaniak.calendar.components.day.state.DayTimelineState
+import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.PinchAnchor
 
-internal fun Modifier.pinchToZoom(state: DayTimelineState): Modifier = pointerInput(state) {
+internal fun Modifier.pinchToZoom(state: TimelineState): Modifier = pointerInput(state) {
     awaitEachGesture {
         awaitFirstDown(requireUnconsumed = false)
         var anchor: PinchAnchor? = null

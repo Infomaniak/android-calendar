@@ -19,12 +19,7 @@ package com.infomaniak.calendar.ui.effects
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.unit.Dp
-import com.infomaniak.calendar.components.day.state.DayTimelineState
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
-import kotlinx.coroutines.flow.dropWhile
-import kotlinx.coroutines.flow.filterNot
 
 
 /**

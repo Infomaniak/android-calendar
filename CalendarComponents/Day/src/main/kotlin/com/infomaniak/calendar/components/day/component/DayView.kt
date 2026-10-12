@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
-import com.infomaniak.calendar.components.day.state.DayTimelineState
+import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
@@ -59,7 +59,7 @@ import kotlin.time.Clock
 internal fun DayView(
     date: LocalDate,
     events: DayEvents,
-    state: DayTimelineState,
+    state: TimelineState,
     weekNumbering: WeekNumbering,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,

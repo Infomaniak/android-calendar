@@ -28,12 +28,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.day.DayTimelineDefaults
+import com.infomaniak.calendar.components.day.TimelineDefaults
 import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.pinchToZoom
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
-import com.infomaniak.calendar.components.day.state.DayTimelineState
+import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
@@ -48,14 +48,14 @@ import kotlinx.datetime.LocalDate
 internal fun DayTimeline(
     date: LocalDate,
     events: DayEvents,
-    state: DayTimelineState,
+    state: TimelineState,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val currentDateTime by rememberCurrentDateTime()
-    val gutterWidth = DayTimelineDefaults.HourGutterWidth
-    val endPadding = DayTimelineDefaults.TimelineEndPadding
+    val gutterWidth = TimelineDefaults.HourGutterWidth
+    val endPadding = TimelineDefaults.TimelineEndPadding
 
     Box(
         modifier = modifier
@@ -114,7 +114,7 @@ private fun DayTimelineZoomedOutPreview() {
         DayTimeline(
             date = Clock.today(),
             events = previewDayEvents,
-            state = rememberDayTimelineState({}, initialHourHeight = DayTimelineDefaults.MinHourHeight),
+            state = rememberDayTimelineState({}, initialHourHeight = TimelineDefaults.MinHourHeight),
             onEventClick = {},
         )
     }
