@@ -23,7 +23,6 @@ import com.infomaniak.calendar.components.day.model.toTimedEvent
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.utils.toEventUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
-import com.infomaniak.multiplatform_core.account.domain.model.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
@@ -40,25 +39,23 @@ typealias DayEventsByDate = Map<LocalDate, DayEvents>
  * the grid. Everything else becomes a [TimedEvent] positioned in minutes within its own day.
  */
 suspend fun Map<LocalDate, List<EventDaySlice>>.toDayEventsByDate(
-    emailsByUserId: Map<AccountId, String>,
     timeZone: TimeZone,
 ): DayEventsByDate = withContext(Dispatchers.Default) {
     mapValues { (date, slices) ->
         coroutineContext.ensureActive()
-        slices.toDayEvents(date, emailsByUserId, timeZone)
+        slices.toDayEvents(date, timeZone)
     }
 }
 
 private fun List<EventDaySlice>.toDayEvents(
     date: LocalDate,
-    emailsByUserId: Map<AccountId, String>,
     timeZone: TimeZone,
 ): DayEvents {
     val allDay = mutableListOf<EventUi.Normal>()
     val timed = mutableListOf<TimedEvent>()
 
     forEach { slice ->
-        val event = slice.toEventUi(emailsByUserId, timeZone)
+        val event = slice.toEventUi(timeZone)
         if (slice.fillsWholeDay) allDay.add(event) else timed.add(event.toTimedEvent(date, timeZone))
     }
 

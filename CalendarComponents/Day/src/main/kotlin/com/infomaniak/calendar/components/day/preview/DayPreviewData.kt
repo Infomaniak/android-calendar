@@ -21,8 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.TimedEvent
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
-import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
@@ -36,16 +34,6 @@ import kotlin.time.Clock
 
 private val previewTimeZone = TimeZone.currentSystemDefault()
 
-private val acceptedByMe = Attendees(
-    all = listOf(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Accepted)),
-    me = AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Accepted),
-)
-
-private val declinedByMe = Attendees(
-    all = listOf(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Declined)),
-    me = AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Declined),
-)
-
 internal val previewDayEvents: DayEvents by lazy {
     DayEvents(
         allDay = listOf(
@@ -56,10 +44,10 @@ internal val previewDayEvents: DayEvents by lazy {
         ),
         timed = listOf(
             previewTimedEvent("Aller courir au bord du lac", 7, 0, 8, 0, "Ouchy-Olympique", Color(0xFF3B82F6)),
-            previewTimedEvent("Meeting dev", 8, 5, 8, 35, null, Color(0xFFD4426E), attendees = declinedByMe),
+            previewTimedEvent("Meeting dev", 8, 5, 8, 35, null, Color(0xFFD4426E), ParticipationStatus.Declined),
             previewTimedEvent("Revue roadmap app Drive", 9, 0, 11, 0, "Salle American Diner", Color(0xFF8B5CF6)),
             previewTimedEvent("Revue design Calendar", 11, 15, 12, 15, "Salle Hard Rock", Color(0xFFE5B94E)),
-            previewTimedEvent("Revue design kSuite", 11, 15, 12, 15, "Salle Hard Rock", Color(0xFF3B82F6), declinedByMe),
+            previewTimedEvent("Revue design kSuite", 11, 15, 12, 15, "Salle Hard Rock", Color(0xFF3B82F6), ParticipationStatus.Declined),
             previewTimedEvent("Revue design kMeet", 11, 45, 12, 45, "Salle Hard Rock", Color(0xFFD4426E)),
             previewTimedEvent("Repas du mois avec l'équipe", 13, 0, 14, 0, "L'Atelier Robuchon", Color(0xFF10B981)),
         ),
@@ -74,9 +62,9 @@ private fun previewTimedEvent(
     endMinute: Int,
     location: String?,
     color: Color,
-    attendees: Attendees = acceptedByMe,
+    myStatus: ParticipationStatus? = ParticipationStatus.Accepted,
 ): TimedEvent = TimedEvent(
-    event = previewEvent(title, startHour, startMinute, endHour, endMinute, false, color, location, attendees),
+    event = previewEvent(title, startHour, startMinute, endHour, endMinute, false, color, location, myStatus),
     startMinuteOfDay = startHour * 60 + startMinute,
     endMinuteOfDay = endHour * 60 + endMinute,
 )
@@ -90,7 +78,7 @@ private fun previewEvent(
     isAllDay: Boolean,
     color: Color,
     location: String? = null,
-    attendees: Attendees = acceptedByMe,
+    myStatus: ParticipationStatus? = ParticipationStatus.Accepted,
 ): EventUi.Normal {
     val today = Clock.today(previewTimeZone)
 
@@ -103,6 +91,7 @@ private fun previewEvent(
         end = LocalDateTime(today.year, today.month, today.day, endHour, endMinute).toInstant(previewTimeZone),
         isAllDay = isAllDay,
         colors = EventColorsUiFactory.dummyEventColorsUiFactory.create(color.toArgb()),
-        attendees = attendees,
+        hasAttendees = myStatus != null,
+        myStatus = myStatus,
     )
 }

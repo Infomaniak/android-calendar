@@ -34,7 +34,8 @@ sealed interface EventUi {
         val end: Instant
         val isAllDay: Boolean
         val colors: EventColorsUi
-        val attendees: Attendees
+        val hasAttendees: Boolean
+        val myStatus: ParticipationStatus?
     }
 
     @Immutable

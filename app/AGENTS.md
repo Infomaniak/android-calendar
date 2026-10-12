@@ -39,10 +39,11 @@ app/src/main/java/com/infomaniak/calendar/
 │   ├── VisibleDateManager.kt       # App-scoped: single visible-date source, restored/saved by MainViewModel
 │   └── VisibleMonthManager.kt      # App-scoped: event dots derived from the shared visible date's month
 ├── utils/
-│   ├── AttendeeExt.kt              # KMP Attendee → Attendees mapping, shared by the two event UI models below
-│   ├── EventDaySliceExt.kt         # KMP EventDaySlice → EventUi mapping, shared by every calendar view
+│   ├── AttendeeExt.kt              # KMP Attendee → Attendees mapping for event detail
+│   ├── EventDaySliceExt.kt         # KMP EventDaySlice → OccurrenceEventUi mapping, shared by every calendar view
 │   └── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
 └── ui/
+    ├── model/                     # OccurrenceEventUi calendar item carrying KMP OccurrenceId and attendee summary
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
     │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), Accounts, Onboarding)

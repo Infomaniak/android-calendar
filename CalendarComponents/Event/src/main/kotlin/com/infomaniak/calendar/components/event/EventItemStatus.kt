@@ -48,9 +48,9 @@ import kotlin.time.Duration.Companion.minutes
 
 fun EventUi.Normal.toEventItemStatus(): EventItemStatus {
     if (status == EventStatus.Cancelled) return EventItemStatus.Declined(colors)
-    val me = attendees.me ?: return EventItemStatus.Default(colors)
+    val participationStatus = myStatus ?: return EventItemStatus.Default(colors)
 
-    return when (me.status) {
+    return when (participationStatus) {
         ParticipationStatus.Accepted -> EventItemStatus.Default(colors)
         ParticipationStatus.Declined -> EventItemStatus.Declined(colors)
         ParticipationStatus.Tentative -> EventItemStatus.Maybe(colors)

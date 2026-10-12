@@ -30,5 +30,6 @@ data class SimpleEventUi(
     override val end: Instant,
     override val isAllDay: Boolean,
     override val colors: EventColorsUi,
-    override val attendees: Attendees,
+    override val hasAttendees: Boolean,
+    override val myStatus: ParticipationStatus?,
 ) : EventUi.Normal

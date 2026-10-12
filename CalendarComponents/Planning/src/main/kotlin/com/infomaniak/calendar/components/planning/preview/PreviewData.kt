@@ -20,8 +20,6 @@ package com.infomaniak.calendar.components.planning.preview
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
-import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
@@ -57,12 +55,6 @@ class WeekEventsPreviewParameter : PreviewParameterProvider<Map<YearWeek, Map<Lo
     }
 }
 
-private val dummyAttendees = listOf(
-    AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Accepted),
-    AttendeeUi("bob@example.com#Bob", "bob@example.com", "Bob", ParticipationStatus.Tentative),
-    AttendeeUi("carol@example.com#Carol", "carol@example.com", "Carol", ParticipationStatus.NeedsAction),
-)
-
 private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalDate, List<EventUi>>> {
     val timeZone = TimeZone.currentSystemDefault()
 
@@ -83,7 +75,8 @@ private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalD
             end = instantAt(date, hour + 1),
             isAllDay = false,
             colors = EventColorsUiFactory.dummyEventColorsUiFactory.create(color.toArgb()),
-            attendees = Attendees(dummyAttendees, dummyAttendees.first()),
+            hasAttendees = true,
+            myStatus = ParticipationStatus.Accepted,
         )
     }
 

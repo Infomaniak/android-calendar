@@ -18,10 +18,10 @@
 package com.infomaniak.calendar.ui.model
 
 import androidx.compose.runtime.Immutable
-import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlin.time.Instant
 
@@ -36,7 +36,8 @@ data class OccurrenceEventUi(
     override val end: Instant,
     override val isAllDay: Boolean,
     override val colors: EventColorsUi,
-    override val attendees: Attendees,
+    override val hasAttendees: Boolean,
+    override val myStatus: ParticipationStatus?,
 ) : EventUi.Normal
 
 /** All [EventUi.Normal] used in the app are [OccurrenceEventUi] and we need to cast it to get the occurrence id back */

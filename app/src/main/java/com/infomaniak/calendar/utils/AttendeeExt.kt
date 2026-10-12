@@ -41,7 +41,7 @@ fun Attendee.toAttendeeUi(): AttendeeUi = AttendeeUi(
     isOrganizer = isOrganizer,
 )
 
-private fun KmpParticipationStatus.toParticipationStatus(): ParticipationStatus = when (this) {
+internal fun KmpParticipationStatus.toParticipationStatus(): ParticipationStatus = when (this) {
     KmpParticipationStatus.Accepted -> ParticipationStatus.Accepted
     KmpParticipationStatus.Declined -> ParticipationStatus.Declined
     KmpParticipationStatus.Tentative -> ParticipationStatus.Tentative
