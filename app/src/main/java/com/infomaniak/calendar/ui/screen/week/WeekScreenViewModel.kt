@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
 
@@ -51,9 +52,10 @@ class WeekScreenViewModel(
     private val timeZone = TimeZone.currentSystemDefault()
 
     // TODO: Only load the days around the visible ones
-    val eventsByDate: StateFlow<DayEventsByDate> = dayEventsLoader
-        .observeEventsByDate(dayEventsLoader.dateRangeAround(Clock.today(timeZone)), timeZone)
-        .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
+    val dateRange: ClosedRange<LocalDate> = dayEventsLoader.dateRangeAround(Clock.today(timeZone))
+
+    val eventsByDate: StateFlow<DayEventsByDate> = dayEventsLoader.observeEventsByDate(dateRange, timeZone)
+        .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = emptyMap())
 
     val eventDots = visibleMonthManager.eventDots
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())

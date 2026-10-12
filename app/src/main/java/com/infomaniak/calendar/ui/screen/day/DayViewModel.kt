@@ -57,7 +57,11 @@ class DayViewModel(
 
     val dayUiState: StateFlow<DayUiState> = dayEventsLoader.observeEventsByDate(dateRange, timeZone)
         .map { eventsByDate -> DayUiState.Success({ eventsByDate }) }
-        .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = DayUiState.Loading)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = DayUiState.Loading,
+        )
 
     val eventDots = visibleMonthManager.eventDots
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
