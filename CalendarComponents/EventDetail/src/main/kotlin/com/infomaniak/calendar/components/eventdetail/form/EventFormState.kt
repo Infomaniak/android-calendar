@@ -56,9 +56,9 @@ class EventFormState(
 fun rememberSaveableEventFormState(
     calendars: List<EventDetailCalendar>,
     initialCalendar: EventDetailCalendar?,
-    initialAttendees: SnapshotStateSet<AttendeeUi> = remember { mutableStateSetOf() },
     initialText: String = "",
     initialIsKMeetUrlEnabled: Boolean = false,
+    initialAttendees: SnapshotStateSet<AttendeeUi> = remember { mutableStateSetOf() },
     attendeesSearchState: AttendeesSearchState? = null,
 ): EventFormState {
     val colorState = rememberSaveable(initialCalendar == null, stateSaver = ColorSaver) { mutableStateOf(initialCalendar?.color) }
