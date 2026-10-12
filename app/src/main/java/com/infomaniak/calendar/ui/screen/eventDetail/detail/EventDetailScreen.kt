@@ -76,6 +76,13 @@ fun EventDetailScreen(
 
     LaunchedEffect(occurrenceId) {
         viewModel.setOccurrenceId(occurrenceId)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.synchronizeAttendeesSearchState()
+    }
+
+    LaunchedEffect(viewModel.attendeesSearchState) {
         attendeesSearchSharedDataViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
     }
 

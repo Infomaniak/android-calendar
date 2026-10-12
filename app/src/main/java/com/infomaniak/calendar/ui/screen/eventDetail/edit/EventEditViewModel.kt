@@ -20,13 +20,12 @@ package com.infomaniak.calendar.ui.screen.eventDetail.edit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
-import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.EventFormCalendarsUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventFormCalendars
+import com.infomaniak.calendar.ui.screen.eventDetail.utils.synchronizeTo
 import com.infomaniak.calendar.utils.saveableAttendeesSearchState
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
@@ -37,9 +36,6 @@ import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 @AssistedInject
 class EventEditViewModel(
@@ -52,15 +48,12 @@ class EventEditViewModel(
     val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase
         .editionCalendars(getEventDetailUiUseCase.eventCalendar)
 
-    init {
-        viewModelScope.launch {
-            val event = eventDetailUi.filterIsInstance<EventDetailUiState.Success>().first().eventDetail
-            attendeesSearchState.attendees.addAll(event.attendees.all)
-        }
-    }
-
     fun setOccurrenceId(occurrenceId: OccurrenceId) {
         getEventDetailUiUseCase.setOccurrenceId(occurrenceId)
+    }
+
+    suspend fun synchronizeAttendeesSearchState() {
+        eventDetailUi.synchronizeTo(attendeesSearchState)
     }
 
     @AssistedFactory
