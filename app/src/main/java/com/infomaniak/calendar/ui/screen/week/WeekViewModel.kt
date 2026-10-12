@@ -24,7 +24,7 @@ import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.DayEventsLoader
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.manager.VisibleMonthManager
-import com.infomaniak.calendar.ui.screen.day.DayEventsByDate
+import com.infomaniak.calendar.ui.screen.day.TimelineUiState
 import com.infomaniak.core.common.utils.today
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
@@ -33,6 +33,7 @@ import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -54,8 +55,13 @@ class WeekViewModel(
     // TODO: Only load the days around the visible ones
     val dateRange: ClosedRange<LocalDate> = dayEventsLoader.dateRangeAround(Clock.today(timeZone))
 
-    val eventsByDate: StateFlow<DayEventsByDate> = dayEventsLoader.observeEventsByDate(dateRange, timeZone)
-        .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = emptyMap())
+    val uiState: StateFlow<TimelineUiState> = dayEventsLoader.observeEventsByDate(dateRange, timeZone)
+        .map(TimelineUiState::Success)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = TimelineUiState.Loading,
+        )
 
     val eventDots = visibleMonthManager.eventDots
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())

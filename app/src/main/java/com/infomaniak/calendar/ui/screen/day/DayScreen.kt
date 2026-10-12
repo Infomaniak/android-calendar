@@ -30,7 +30,6 @@ import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
 import com.infomaniak.calendar.components.day.DayPager
-import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
@@ -58,7 +57,7 @@ fun DayScreen(
     modifier: Modifier = Modifier,
     viewModel: DayViewModel = viewModel(),
 ) {
-    val eventsByDate by viewModel.eventsByDate.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
     val eventDots by viewModel.eventDots.collectAsStateWithLifecycle()
 
@@ -75,7 +74,7 @@ fun DayScreen(
 
     DayScreen(
         goToEventDetail = goToEventDetail,
-        eventsByDate = { eventsByDate },
+        uiState = { uiState },
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventDots },
         visibleDayState = visibleDayState,
@@ -88,7 +87,7 @@ fun DayScreen(
 @Composable
 private fun DayScreen(
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
-    eventsByDate: () -> DayEventsByDate,
+    uiState: () -> TimelineUiState,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     visibleDayState: VisibleDayState,
@@ -121,7 +120,7 @@ private fun DayScreen(
         DayPager(
             dateRange = dateRange,
             selectedDate = { visibleDayState.visibleDate },
-            eventsOf = { eventsByDate()[it] ?: DayEvents.Empty },
+            eventsOf = { uiState().eventsOf(it) },
             state = timelineState,
             weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
             onVisibleDateChanged = { visibleDayState.updateVisibleDate(it) },
@@ -148,7 +147,7 @@ private fun Preview() {
         CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
             DayScreen(
                 goToEventDetail = {},
-                eventsByDate = { emptyMap() },
+                uiState = { TimelineUiState.Success(emptyMap()) },
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
                 visibleDayState = visibleDayState,
