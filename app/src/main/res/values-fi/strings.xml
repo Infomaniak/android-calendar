@@ -19,7 +19,9 @@
     <string name="accountsTitle">Tilit</string>
     <string name="attendeesSearchTitle">Lisää osallistujia</string>
     <string name="buttonAddAccount">Lisää tili</string>
+    <string name="buttonDeleteAllEvents">Kaikki tapahtumat</string>
     <string name="buttonDeleteEvent">Poista tämä tapahtuma</string>
+    <string name="buttonDeleteThisAndFollowingEvents">Tämä ja seuraavat tapahtumat</string>
     <string name="buttonLogOut">Kirjaudu ulos</string>
     <string name="contentDescriptionBack">Takaisin</string>
     <string name="contentDescriptionInbox">Avaa saapuneet</string>
@@ -27,6 +29,7 @@
     <string name="contentDescriptionToolbarCurrentViewButton">Nykyinen näkymä: %s. Napauta vaihtaaksesi näkymää.</string>
     <string name="dayTitle">Päivä</string>
     <string name="deleteEventAlertTitle">Haluatko varmasti poistaa tämän tapahtuman?</string>
+    <string name="deleteRecurringEventAlertTitle">Mitkä tapahtumat haluat poistaa?</string>
     <string name="eventOccurrenceNotFound">Tämä tapahtuma ei ole enää saatavilla.</string>
     <string name="helpTitle">Apua</string>
     <string name="monthTitle">Kuukausi</string>

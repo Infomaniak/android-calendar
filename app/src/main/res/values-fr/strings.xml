@@ -19,7 +19,9 @@
     <string name="accountsTitle">Comptes</string>
     <string name="attendeesSearchTitle">Ajouter des invités</string>
     <string name="buttonAddAccount">Ajouter un compte</string>
+    <string name="buttonDeleteAllEvents">Tous les évènements</string>
     <string name="buttonDeleteEvent">Supprimer cet évènement</string>
+    <string name="buttonDeleteThisAndFollowingEvents">Cet évènement et les suivants</string>
     <string name="buttonLogOut">Se déconnecter</string>
     <string name="contentDescriptionBack">Retour</string>
     <string name="contentDescriptionInbox">Ouvrir la boîte de réception</string>
@@ -27,6 +29,7 @@
     <string name="contentDescriptionToolbarCurrentViewButton">Vue actuelle : %s. Appuyez pour changer de vue.</string>
     <string name="dayTitle">Jour</string>
     <string name="deleteEventAlertTitle">Voulez-vous vraiment supprimer cet évènement ?</string>
+    <string name="deleteRecurringEventAlertTitle">Quels évènements souhaitez-vous supprimer ?</string>
     <string name="eventOccurrenceNotFound">Cet évènement n’est plus disponible.</string>
     <string name="helpTitle">Aide</string>
     <string name="monthTitle">Mois</string>

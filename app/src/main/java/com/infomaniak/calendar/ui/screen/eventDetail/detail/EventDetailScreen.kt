@@ -33,6 +33,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -51,6 +54,9 @@ import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventDialog
+import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventScope
+import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteRecurrentEventDialog
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.calendar.utils.nestedScrollToolbar
@@ -95,6 +101,7 @@ fun EventDetailScreen(
         goBack = goBack,
         goToEdit = goToEdit,
         onDelete = {},
+        onDeleteRecurrent = {},
         onLocationClick = { location -> openLocationInMapApp(context, location) },
         goToEventAttendees = goToEventAttendees,
         modifier = modifier,
@@ -109,6 +116,7 @@ private fun EventDetailScreen(
     goToEdit: () -> Unit,
     goToEventAttendees: () -> Unit,
     onDelete: () -> Unit,
+    onDeleteRecurrent: (DeleteEventScope) -> Unit,
     onLocationClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -118,6 +126,8 @@ private fun EventDetailScreen(
     val state = uiState()
     val scrollState = rememberScrollState()
     val floatingToolbarScrollBehavior = rememberFloatingToolbarExitScrollBehavior(scrollState.canScrollForward)
+    var showSingleEventDeleteDialog by remember { mutableStateOf(false) }
+    var showRecurrentEventDeleteDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -128,7 +138,7 @@ private fun EventDetailScreen(
                     val canEdit = (state as? EventDetailUiState.Success)?.eventDetail?.canEdit == true
                     TopAppBarButtons.EditButton(onClick = goToEdit, enabled = canEdit)
                     TopAppBarButtons.DeleteButton(
-                        onClick = onDelete,
+                        onClick = { showRecurrentEventDeleteDialog = true }, // TODO: check which one we should open
                         enabled = canEdit,
                         modifier = Modifier.padding(end = EsdsTheme.spacing.lg),
                     )
@@ -163,6 +173,20 @@ private fun EventDetailScreen(
                     sharedTransitionScope = sharedTransitionScope,
                     animatedVisibilityScope = animatedVisibilityScope,
                 )
+
+                if (showSingleEventDeleteDialog) {
+                    DeleteEventDialog(
+                        onDismiss = { showSingleEventDeleteDialog = false },
+                        onDelete = onDelete,
+                    )
+                }
+
+                if (showRecurrentEventDeleteDialog) {
+                    DeleteRecurrentEventDialog(
+                        onDismiss = { showRecurrentEventDeleteDialog = false },
+                        onDelete = onDeleteRecurrent,
+                    )
+                }
             }
             EventDetailUiState.Unavailable -> LaunchedEffect(Unit) { goBack() }
         }
@@ -207,6 +231,8 @@ private fun Preview() {
                 goBack = {},
                 goToEdit = {},
                 goToEventAttendees = {},
+                onDelete = {},
+                onDeleteRecurrent = {},
                 onLocationClick = {},
             )
         }
