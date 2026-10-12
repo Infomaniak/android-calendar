@@ -95,39 +95,29 @@ private fun baseEntryProvider(
     defaultCalendarView: NavDestination.CalendarView,
 ): (NavDestination) -> NavEntry<NavDestination> = { destination ->
     when (destination) {
-        is NavDestination.CalendarView.Planning -> NavEntry(
-            key = destination,
-            metadata = metaDataOf(FloatingToolbarWithFab, Drawer),
-        ) {
+        is NavDestination.CalendarView.Planning -> NavEntry(destination, metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
             PlanningScreen(
                 goToEventCreation = { backStack.addOnce(NavDestination.EventCreation) },
                 goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) },
             )
         }
-        is NavDestination.CalendarView.Day -> NavEntry(
-            key = destination,
-            metadata = metaDataOf(FloatingToolbarWithFab, Drawer),
-        ) {
+
+        is NavDestination.CalendarView.Day -> NavEntry(destination, metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
             DayScreen(goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) })
         }
-        is NavDestination.CalendarView.ThreeDays -> NavEntry(
-            key = destination,
-            metadata = metaDataOf(FloatingToolbarWithFab, Drawer),
-        ) {
+
+        is NavDestination.CalendarView.ThreeDays -> NavEntry(destination, metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
             ThreeDayScreen()
         }
-        is NavDestination.CalendarView.Week -> NavEntry(
-            key = destination,
-            metadata = metaDataOf(FloatingToolbarWithFab, Drawer),
-        ) {
+
+        is NavDestination.CalendarView.Week -> NavEntry(destination, metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
             WeekScreen()
         }
-        is NavDestination.CalendarView.Month -> NavEntry(
-            key = destination,
-            metadata = metaDataOf(FloatingToolbarWithFab, Drawer),
-        ) {
+
+        is NavDestination.CalendarView.Month -> NavEntry(destination, metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
             MonthScreen()
         }
+
         is NavDestination.EventCreation -> NavEntry(
             key = destination,
             contentKey = destination.toContentKey(),
@@ -138,6 +128,7 @@ private fun baseEntryProvider(
                 goToEventsAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
             )
         }
+
         is NavDestination.EventDetail -> NavEntry(
             key = destination,
             contentKey = destination.toContentKey(),
@@ -150,6 +141,7 @@ private fun baseEntryProvider(
                 goToEventAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
             )
         }
+
         is NavDestination.EventEdit -> NavEntry(
             key = destination,
             contentKey = destination.toContentKey(),
@@ -161,6 +153,7 @@ private fun baseEntryProvider(
                 goToEventAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
             )
         }
+
         is NavDestination.EventAttendees -> NavEntry(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog) + SharedViewModelStoreNavEntryDecorator.parent(destination.parent.toContentKey()),
@@ -169,26 +162,23 @@ private fun baseEntryProvider(
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
         }
-        is NavDestination.Accounts.List -> NavEntry(
-            key = destination,
-        ) {
+
+        is NavDestination.Accounts.List -> NavEntry(destination) {
             AccountsListScreen(
                 onBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
                 onAddAccount = { backStack.addOnce(NavDestination.Onboarding(onlyLogin = true)) },
                 onAccountClick = { userId -> backStack.addOnce(NavDestination.Accounts.Actions(userId)) },
             )
         }
-        is NavDestination.Accounts.Actions -> NavEntry(
-            key = destination,
-        ) {
+
+        is NavDestination.Accounts.Actions -> NavEntry(destination) {
             AccountActionsScreen(
                 userId = destination.userId,
                 onBack = { backStack.popOrReplaceRoot(NavDestination.Accounts.List) },
             )
         }
-        is NavDestination.Onboarding -> NavEntry(
-            key = destination,
-        ) {
+
+        is NavDestination.Onboarding -> NavEntry(destination) {
             OnboardingScreen(
                 onlyLogin = destination.onlyLogin,
                 goToCalendarView = { backStack.replaceRoot(defaultCalendarView) },
