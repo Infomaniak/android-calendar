@@ -63,17 +63,15 @@ fun EventEditScreen(
 
     val uiState = when (eventDetailUiState) {
         EventDetailUiState.Loading -> EventEditScreenState.Loading
-        is EventDetailUiState.Success -> {
-            EventEditScreenState.Success(
-                rememberSaveableEventFormState(
-                    calendars = eventFormCalendars?.calendars ?: emptyList(),
-                    initialCalendar = eventFormCalendars?.initialCalendar,
-                    initialText = eventDetailUiState.eventDetail.title,
-                    initialAttendees = viewModel.attendeesSearchState.attendees,
-                    attendeesSearchState = viewModel.attendeesSearchState,
-                ),
-            )
-        }
+        is EventDetailUiState.Success -> EventEditScreenState.Success(
+            rememberSaveableEventFormState(
+                calendars = eventFormCalendars?.calendars ?: emptyList(),
+                initialCalendar = eventFormCalendars?.initialCalendar,
+                initialText = eventDetailUiState.eventDetail.title,
+                initialAttendees = viewModel.attendeesSearchState.attendees,
+                attendeesSearchState = viewModel.attendeesSearchState,
+            ),
+        )
         EventDetailUiState.Unavailable -> EventEditScreenState.Unavailable
     }
 
