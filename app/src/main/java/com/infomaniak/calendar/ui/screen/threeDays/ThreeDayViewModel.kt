@@ -21,25 +21,39 @@ import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.data.CalendarDataValues
+import com.infomaniak.calendar.manager.DayEventsLoader
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.manager.VisibleMonthManager
+import com.infomaniak.calendar.ui.screen.day.DayEventsByDate
+import com.infomaniak.core.common.utils.today
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.datetime.TimeZone
+import kotlin.time.Clock
 
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
 class ThreeDayViewModel(
+    dayEventsLoader: DayEventsLoader,
     syncEventsManager: SyncEventsManager,
     visibleMonthManager: VisibleMonthManager,
     private val calendarDataValues: CalendarDataValues,
 ) : ViewModel() {
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
+
+    private val timeZone = TimeZone.currentSystemDefault()
+
+    // TODO: Only load the days around the visible ones
+    val eventsByDate: StateFlow<DayEventsByDate> = dayEventsLoader
+        .observeEventsByDate(dayEventsLoader.dateRangeAround(Clock.today(timeZone)), timeZone)
+        .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
 
     val eventDots = visibleMonthManager.eventDots
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())

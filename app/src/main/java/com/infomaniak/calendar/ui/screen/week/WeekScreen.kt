@@ -41,15 +41,23 @@ import com.infomaniak.calendar.components.foundation.state.rememberVisibleDaySta
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
+import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
+import com.infomaniak.calendar.ui.screen.day.DayEventsByDate
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.datetime.LocalDate
 
 @Composable
-fun WeekScreen(modifier: Modifier = Modifier, viewModel: WeekScreenViewModel = viewModel()) {
+fun WeekScreen(
+    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: WeekScreenViewModel = viewModel(),
+) {
+    val eventsByDate by viewModel.eventsByDate.collectAsStateWithLifecycle()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
     val eventDots by viewModel.eventDots.collectAsStateWithLifecycle()
 
@@ -65,6 +73,8 @@ fun WeekScreen(modifier: Modifier = Modifier, viewModel: WeekScreenViewModel = v
     ApplyJumpRequests(visibleDayState)
 
     WeekScreen(
+        goToEventDetail = goToEventDetail,
+        eventsByDate = { eventsByDate },
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventDots },
         visibleDayState = visibleDayState,
@@ -75,6 +85,8 @@ fun WeekScreen(modifier: Modifier = Modifier, viewModel: WeekScreenViewModel = v
 
 @Composable
 private fun WeekScreen(
+    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
+    eventsByDate: () -> DayEventsByDate,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     visibleDayState: VisibleDayState,
@@ -106,10 +118,10 @@ private fun WeekScreen(
     ) { contentPadding ->
         WeekPager(
             selectedDate = { visibleDayState.visibleDate },
-            eventsOf = { DayEvents.Empty }, // TODO: Observe the events of the days in view
+            eventsOf = { eventsByDate()[it] ?: DayEvents.Empty },
             state = timelineState,
             weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
-            onEventClick = {},
+            onEventClick = { goToEventDetail(it.occurrenceId) },
             headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
             timelineModifier = Modifier.hazeSource(hazeState),
             contentPadding = contentPadding,
@@ -127,6 +139,8 @@ private fun WeekScreenPreview() {
         val visibleDayState = rememberVisibleDayState()
         CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
             WeekScreen(
+                goToEventDetail = {},
+                eventsByDate = { emptyMap() },
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
                 visibleDayState = visibleDayState,
