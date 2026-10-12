@@ -32,7 +32,6 @@ import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -44,27 +43,22 @@ import kotlin.time.Clock
 class DayViewModel(
     dayEventsLoader: DayEventsLoader,
     syncEventsManager: SyncEventsManager,
-    private val calendarDataValues: CalendarDataValues,
     visibleMonthManager: VisibleMonthManager,
+    private val calendarDataValues: CalendarDataValues,
 ) : ViewModel() {
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
-
-    val hourHeight: Flow<Dp> = calendarDataValues.dayViewHourHeight.flow
 
     private val timeZone = TimeZone.currentSystemDefault()
 
     val dateRange: ClosedRange<LocalDate> = dayEventsLoader.dateRangeAround(Clock.today(timeZone))
 
-    val dayUiState: StateFlow<DayUiState> = dayEventsLoader.observeEventsByDate(dateRange, timeZone)
-        .map { eventsByDate -> DayUiState.Success({ eventsByDate }) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = DayUiState.Loading,
-        )
+    val eventsByDate: StateFlow<DayEventsByDate> = dayEventsLoader.observeEventsByDate(dateRange, timeZone)
+        .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = emptyMap())
 
     val eventDots = visibleMonthManager.eventDots
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
+
+    val hourHeight: Flow<Dp> = calendarDataValues.dayViewHourHeight.flow
 
     suspend fun saveHourHeight(hourHeight: Dp) = calendarDataValues.dayViewHourHeight.setValue(hourHeight)
 }

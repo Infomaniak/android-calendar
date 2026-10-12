@@ -55,7 +55,7 @@ import kotlinx.datetime.LocalDate
 fun WeekScreen(
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: WeekScreenViewModel = viewModel(),
+    viewModel: WeekViewModel = viewModel(),
 ) {
     val eventsByDate by viewModel.eventsByDate.collectAsStateWithLifecycle()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
@@ -134,7 +134,7 @@ private fun WeekScreen(
 
 @Preview
 @Composable
-private fun WeekScreenPreview() {
+private fun Preview() {
     CalendarThemeForPreview {
         val visibleDayState = rememberVisibleDayState()
         CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
