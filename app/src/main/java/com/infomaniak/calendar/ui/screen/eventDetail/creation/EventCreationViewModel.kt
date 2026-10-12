@@ -20,7 +20,6 @@ package com.infomaniak.calendar.ui.screen.eventDetail.creation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
@@ -35,10 +34,7 @@ import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.stateIn
 
 @OptIn(SavedStateHandleSaveableApi::class)
 @AssistedInject
@@ -46,7 +42,6 @@ class EventCreationViewModel(
     @Assisted savedStateHandle: SavedStateHandle,
     eventFormCalendarsUseCase: EventFormCalendarsUseCase,
 ) : ViewModel() {
-    val uiState = flowOf(Unit).stateIn(viewModelScope, SharingStarted.Lazily, Unit)
     val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase.creationCalendars
     val attendeesSearchState: AttendeesSearchState = savedStateHandle.attendeesSearchState()
 
