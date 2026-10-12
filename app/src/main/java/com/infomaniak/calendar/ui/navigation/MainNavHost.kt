@@ -62,7 +62,7 @@ import kotlin.time.Clock
 
 @Composable
 fun MainNavHost(
-    backStack: NavBackStack<NavKey>,
+    backStack: NavBackStack<NavDestination>,
     defaultCalendarView: NavDestination.CalendarView,
     onCalendarViewSelected: (NavDestination.CalendarView) -> Unit,
 ) {
@@ -91,10 +91,10 @@ fun MainNavHost(
 }
 
 private fun baseEntryProvider(
-    backStack: NavBackStack<NavKey>,
+    backStack: NavBackStack<NavDestination>,
     defaultCalendarView: NavDestination.CalendarView,
-): (NavKey) -> NavEntry<NavKey> = { key ->
-    when (val destination = key as NavDestination) {
+): (NavDestination) -> NavEntry<NavDestination> = { destination ->
+    when (destination) {
         is NavDestination.CalendarView.Planning -> NavEntry(
             key = destination,
             metadata = metaDataOf(FloatingToolbarWithFab, Drawer),
@@ -199,16 +199,16 @@ private fun baseEntryProvider(
 }
 
 @Composable
-private fun sceneStrategies(windowSizeClass: WindowSizeClass): List<SceneStrategy<NavKey>> {
+private fun <T : NavKey> sceneStrategies(windowSizeClass: WindowSizeClass): List<SceneStrategy<T>> {
     // ResponsiveDialogSceneStrategy holds the scene of the ongoing dialog, it must survive recompositions.
     return remember(windowSizeClass) { listOf(ResponsiveDialogSceneStrategy(windowSizeClass)) }
 }
 
 private fun sceneDecoratorStrategies(
-    backStack: NavBackStack<NavKey>,
+    backStack: NavBackStack<NavDestination>,
     onCalendarViewSelected: (NavDestination.CalendarView) -> Unit,
-): List<SceneDecoratorStrategy<NavKey>> {
-    val navigationStrategy: NavigationDecoratorStrategy<NavKey> =
+): List<SceneDecoratorStrategy<NavDestination>> {
+    val navigationStrategy: NavigationDecoratorStrategy<NavDestination> =
         NavigationDecoratorStrategy(
             floatingToolbar = {
                 val visibleDayState = LocalVisibleDayState.current
@@ -230,7 +230,7 @@ private fun sceneDecoratorStrategies(
             },
         )
 
-    val drawerStrategy = DrawerDecoratorStrategy<NavKey>(
+    val drawerStrategy = DrawerDecoratorStrategy<NavDestination>(
         drawer = { content ->
             MenuDrawer(
                 content = content,
@@ -246,6 +246,6 @@ private fun sceneDecoratorStrategies(
 
 private fun NavKey.toContentKey() = this.toString()
 
-private fun NavBackStack<NavKey>.getLastCalendarView(): NavDestination.CalendarView? {
+private fun NavBackStack<NavDestination>.getLastCalendarView(): NavDestination.CalendarView? {
     return this.filterIsInstance<NavDestination.CalendarView>().lastOrNull()
 }
