@@ -31,7 +31,6 @@ import com.infomaniak.calendar.components.calendar.component.ExpandableCalendarD
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
 import com.infomaniak.calendar.components.day.WeekPager
-import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
@@ -43,7 +42,7 @@ import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
-import com.infomaniak.calendar.ui.screen.day.DayEventsByDate
+import com.infomaniak.calendar.ui.screen.day.TimelineUiState
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
@@ -57,7 +56,7 @@ fun WeekScreen(
     modifier: Modifier = Modifier,
     viewModel: WeekViewModel = viewModel(),
 ) {
-    val eventsByDate by viewModel.eventsByDate.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
     val eventDots by viewModel.eventDots.collectAsStateWithLifecycle()
 
@@ -74,7 +73,7 @@ fun WeekScreen(
 
     WeekScreen(
         goToEventDetail = goToEventDetail,
-        eventsByDate = { eventsByDate },
+        uiState = { uiState },
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventDots },
         visibleDayState = visibleDayState,
@@ -86,7 +85,7 @@ fun WeekScreen(
 @Composable
 private fun WeekScreen(
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
-    eventsByDate: () -> DayEventsByDate,
+    uiState: () -> TimelineUiState,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     visibleDayState: VisibleDayState,
@@ -118,7 +117,7 @@ private fun WeekScreen(
     ) { contentPadding ->
         WeekPager(
             selectedDate = { visibleDayState.visibleDate },
-            eventsOf = { eventsByDate()[it] ?: DayEvents.Empty },
+            eventsOf = { uiState().eventsOf(it) },
             state = timelineState,
             weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
             onEventClick = { goToEventDetail(it.occurrenceId) },
@@ -140,7 +139,7 @@ private fun Preview() {
         CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
             WeekScreen(
                 goToEventDetail = {},
-                eventsByDate = { emptyMap() },
+                uiState = { TimelineUiState.Success(emptyMap()) },
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
                 visibleDayState = visibleDayState,
