@@ -50,10 +50,10 @@ app/src/main/java/com/infomaniak/calendar/
     │   └── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
     ├── screen/
-    │   ├── day/                   # DayScreen + DayViewModel + DayUiState + DayEventGroupingExt + DayEventsLoader
+    │   ├── day/                   # DayScreen + DayViewModel + DayEventGroupingExt + DayEventsLoader
     │                              # (loads the day-sliced events shared by the day, 3 days and week views)
     │   ├── threeDays/             # ThreeDayScreen + ThreeDayViewModel — 3-day view (events via DayEventsLoader)
-    │   ├── week/                  # WeekScreen + WeekScreenViewModel — week view (events via DayEventsLoader)
+    │   ├── week/                  # WeekScreen + WeekViewModel — week view (events via DayEventsLoader)
     │   ├── month/                 # MonthScreen + MonthViewModel
     │   ├── planning/              # PlanningScreen + PlanningViewModel + PlanningEventGroupingExt
     │   ├── accounts/              # AccountsListScreen + AccountActionsScreen + AccountsViewModel + AccountItem

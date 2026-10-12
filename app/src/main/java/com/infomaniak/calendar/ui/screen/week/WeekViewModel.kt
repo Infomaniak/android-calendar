@@ -41,7 +41,7 @@ import kotlin.time.Clock
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
-class WeekScreenViewModel(
+class WeekViewModel(
     dayEventsLoader: DayEventsLoader,
     syncEventsManager: SyncEventsManager,
     visibleMonthManager: VisibleMonthManager,
