@@ -43,7 +43,7 @@ fun DeleteEventDialog(
                     onDismiss()
                 },
             ) {
-                Text(stringResource(R.string.buttonDeleteEvent), color = MaterialTheme.colorScheme.error)
+                Text(stringResource(RCore.string.deleteButton), color = MaterialTheme.colorScheme.error)
             }
         },
         dismissButton = {

@@ -72,14 +72,8 @@ fun DeleteRecurrentEventDialog(
                             .padding(vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        RadioButton(
-                            selected = selectedScope == scope,
-                            onClick = null,
-                        )
-                        Text(
-                            text = stringResource(scope.labelRes),
-                            modifier = Modifier.padding(start = 16.dp),
-                        )
+                        RadioButton(selected = selectedScope == scope, onClick = null)
+                        Text(text = stringResource(scope.labelRes), modifier = Modifier.padding(start = 16.dp))
                     }
                 }
             }
@@ -91,10 +85,7 @@ fun DeleteRecurrentEventDialog(
                     onDismiss()
                 },
             ) {
-                Text(
-                    stringResource(R.string.buttonDeleteEvent),
-                    color = MaterialTheme.colorScheme.error,
-                )
+                Text(stringResource(RCore.string.deleteButton), color = MaterialTheme.colorScheme.error)
             }
         },
         dismissButton = {
