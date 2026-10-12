@@ -69,36 +69,28 @@ enum class DateState(
 private fun Preview() {
     @Composable
     fun Item(state: DateState) {
-        DayCircle(
-            state = state,
-            modifier = Modifier.size(40.dp),
-        ) {
-            Text(
-                text = "1",
-                style = MaterialTheme.typography.bodyLarge,
-            )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(state.name)
+            DayCircle(
+                state = state,
+                modifier = Modifier.size(40.dp),
+            ) {
+                Text(
+                    text = "1",
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+            }
+
         }
     }
 
     MaterialTheme {
         Surface {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(DateState.None.name)
-                    Item(DateState.None)
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(DateState.Selected.name)
-                    Item(DateState.Selected)
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(DateState.Today.name)
-                    Item(DateState.Today)
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(DateState.NotMonth.name)
-                    Item(DateState.NotMonth)
-                }
+                Item(DateState.None)
+                Item(DateState.Selected)
+                Item(DateState.Today)
+                Item(DateState.NotMonth)
             }
         }
     }
