@@ -88,7 +88,9 @@ internal fun Modifier.verticalTimelineScroll(
         bottom = TimelineDefaults.BottomPadding + contentPadding.calculateBottomPadding(),
     )
 
-/** A line at every hour, across the whole width it is given. */
+/**
+ * A line at every hour, across the whole width it is given. Midnight is drawn again at the bottom so the grid closes on a line.
+ */
 @Composable
 internal fun HourLines(state: TimelineState, modifier: Modifier = Modifier) {
     val color = ComponentColors.GridDividerColor
@@ -97,7 +99,7 @@ internal fun HourLines(state: TimelineState, modifier: Modifier = Modifier) {
         modifier = modifier
             .timelineHeight(state)
             .drawBehind {
-                for (hour in FIRST_LABELLED_HOUR until HOURS_PER_DAY) {
+                for (hour in FIRST_LABELLED_HOUR..HOURS_PER_DAY) {
                     val y = state.verticalOffsetOf(hour * MINUTES_PER_HOUR).toPx()
 
                     drawLine(
@@ -113,13 +115,14 @@ internal fun HourLines(state: TimelineState, modifier: Modifier = Modifier) {
 
 /**
  * The hour labels alone, each centred on the line it names, across the width it is given: usually
- * [TimelineDefaults.HourGutterWidth]. Pair it with [HourLines] sharing the same [state].
+ * [TimelineDefaults.HourGutterWidth]. Midnight is labelled again at the bottom. Pair it with
+ * [HourLines] sharing the same [state].
  */
 @Composable
 internal fun HourLabels(state: TimelineState, modifier: Modifier = Modifier) {
     Layout(
         modifier = modifier.timelineHeight(state),
-        content = { for (hour in FIRST_LABELLED_HOUR until HOURS_PER_DAY) HourLabel(hour) },
+        content = { for (hour in FIRST_LABELLED_HOUR..HOURS_PER_DAY) HourLabel(hour) },
     ) { measurables, constraints ->
         val labels = measurables.map { it.measure(Constraints(maxWidth = constraints.maxWidth)) }
 
@@ -145,7 +148,7 @@ private fun Modifier.timelineHeight(state: TimelineState): Modifier = layout { m
 @Composable
 private fun HourLabel(hour: Int, modifier: Modifier = Modifier) {
     Text(
-        text = LocalTime(hour, 0).formatShortTimeLabel(),
+        text = LocalTime(hour % HOURS_PER_DAY, 0).formatShortTimeLabel(),
         style = HourLabelStyle,
         color = MaterialTheme.colorScheme.onSurface,
         maxLines = 1,
