@@ -161,7 +161,7 @@ private fun MultiDayTimeline(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .verticalDivider(),
+                        .verticalEndDivider(),
                 ) {
                     TimedEventsColumn(
                         events = eventsOf(date).timed,
@@ -250,18 +250,11 @@ private fun RowScope.DayColumn(content: @Composable () -> Unit) {
     }
 }
 
-/** A vertical line, by default it's drawn at the end of the component */
+/** A vertical line, drawn at the end of the component */
 @Composable
 @ReadOnlyComposable
-private fun Modifier.verticalDivider(
-    position: DayColumnDividerPosition? = null,
-    color: Color = ComponentColors.GridDividerColor,
-): Modifier = drawBehind {
-    val x = when (position) {
-        DayColumnDividerPosition.Start -> 0f
-        DayColumnDividerPosition.End -> size.width
-        null -> if (layoutDirection == LayoutDirection.Ltr) size.width else 0f
-    }
+private fun Modifier.verticalEndDivider(color: Color = ComponentColors.GridDividerColor): Modifier = drawBehind {
+    val x = if (layoutDirection == LayoutDirection.Ltr) size.width else 0f
     drawLine(
         color = color,
         start = Offset(x, 0f),
@@ -271,10 +264,6 @@ private fun Modifier.verticalDivider(
 }
 @Composable
 private fun PaddingValues.onlyHorizontalAndTop(): PaddingValues = onlyHorizontal() + PaddingValues(top = calculateTopPadding())
-
-internal enum class DayColumnDividerPosition {
-    Start, End
-}
 
 private val previewDates = Clock.today().let { today -> List(3) { today.plus(it, DateTimeUnit.DAY) } }
 
