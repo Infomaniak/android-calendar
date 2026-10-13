@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
+import com.infomaniak.calendar.components.eventdetail.component.Recurrence
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
 import com.infomaniak.calendar.components.eventdetail.detail.component.Calendar
@@ -79,7 +80,12 @@ fun EventDetail(
     Column(modifier = modifier.padding(contentPadding)) {
         with(eventDetail) {
             Title(dotColor = eventColor, title = title, modifier = Modifier.eventSharedElement(EventSharedElement.Title))
+
             DateAndTime(start, end, isAllDay)
+
+            eventDetail.getRecurrenceText?.let {
+                Recurrence(it)
+            }
 
             Section {
                 if (attendees.all.isNotEmpty()) {
@@ -143,6 +149,7 @@ private fun PreviewEventDetail() {
         calendarColor = Color.Blue,
         calendarName = "Vacation",
         title = "Event Title",
+        getRecurrenceText = { "Every week on Monday" },
         start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
         end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
         isAllDay = false,

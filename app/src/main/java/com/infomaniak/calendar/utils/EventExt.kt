@@ -30,6 +30,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.TimeBlockin
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.AlarmAction
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.AlarmTrigger
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.EventAlarm
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.toLocalizedRecurrenceString
 import com.infomaniak.multiplatform_core.account.domain.model.AccountId
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
@@ -46,6 +47,7 @@ fun Event.toEventDetailUi(calendar: Calendar, emailsByUserId: Map<AccountId, Str
     start = timing.toDetailTiming(isStart = true),
     end = timing.toDetailTiming(isStart = false),
     isAllDay = timing.isAllDay,
+    getRecurrenceText = if (isOccurrence) ::toLocalizedRecurrenceString else null,
     attendees = attendees.toAttendees(accountId, emailsByUserId),
     kMeetUrl = null, // TODO[eventDetail]: Not carried by the KMP model yet
     location = location,
