@@ -167,7 +167,9 @@ private fun MultiDayTimeline(
                         events = eventsOf(date).timed,
                         hourHeight = state.hourHeight,
                         onEventClick = onEventClick,
-                        modifier = Modifier.matchParentSize(),
+                        modifier = Modifier
+                            .matchParentSize()
+                            .padding(horizontal = 1.dp),
                     )
 
                     if (currentDateTime.date == date) {
