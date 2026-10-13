@@ -25,8 +25,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -39,6 +40,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
+import kotlin.time.Duration.Companion.seconds
 
 /** Observes the events the day, 3 days and week views show, sorted per day into all-day and timed events. */
 @Inject
@@ -59,7 +61,11 @@ class DayEventsLoader(private val calendarManager: CalendarManager, visibleDateM
                 TimelineUiState.Success(slices.toDayEventsByDate(timeZone))
             }
         }
-        .stateIn(scope = useCaseScope, started = WhileSubscribed(5_000), initialValue = TimelineUiState.Loading)
+        .stateIn(
+            scope = useCaseScope,
+            started = SharingStarted.WhileSubscribed(5.seconds),
+            initialValue = TimelineUiState.Loading,
+        )
 
     companion object {
         // Used by the day, 3 days and week views. For now, only load what's needed for the week view and reused it for the day and 3 days as well.
