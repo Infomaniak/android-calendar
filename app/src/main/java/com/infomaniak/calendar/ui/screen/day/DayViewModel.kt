@@ -24,6 +24,7 @@ import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.DayEventsLoader
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.manager.VisibleMonthManager
+import com.infomaniak.calendar.ui.model.TimelineUiState
 import com.infomaniak.core.common.utils.today
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap

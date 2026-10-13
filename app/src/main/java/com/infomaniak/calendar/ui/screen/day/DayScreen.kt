@@ -39,6 +39,7 @@ import com.infomaniak.calendar.components.foundation.state.rememberVisibleDaySta
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
+import com.infomaniak.calendar.ui.model.TimelineUiState
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState

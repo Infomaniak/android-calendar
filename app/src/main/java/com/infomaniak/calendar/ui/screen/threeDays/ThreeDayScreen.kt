@@ -42,7 +42,7 @@ import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
-import com.infomaniak.calendar.ui.screen.day.TimelineUiState
+import com.infomaniak.calendar.ui.model.TimelineUiState
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId

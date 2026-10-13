@@ -17,8 +17,8 @@
  */
 package com.infomaniak.calendar.manager
 
-import com.infomaniak.calendar.ui.screen.day.DayEventsByDate
-import com.infomaniak.calendar.ui.screen.day.toDayEventsByDate
+import com.infomaniak.calendar.utils.DayEventsByDate
+import com.infomaniak.calendar.utils.toDayEventsByDate
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
