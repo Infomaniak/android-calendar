@@ -37,21 +37,22 @@ app/src/main/java/com/infomaniak/calendar/
 ├── manager/
 │   ├── SyncEventsManager.kt        # App-scoped: downloads + syncs the events of the months around the visible date
 │   ├── VisibleDateManager.kt       # App-scoped: single visible-date source, restored/saved by MainViewModel
-│   └── VisibleMonthManager.kt      # App-scoped: event dots derived from the shared visible date's month
+│   ├── VisibleMonthManager.kt      # App-scoped: event dots derived from the shared visible date's month
+│   └── DayEventsLoader.kt          # App-scoped: loads day-sliced events shared by calendar views
 ├── utils/
 │   ├── AttendeeExt.kt              # KMP Attendee → Attendees mapping for event detail
+│   ├── DayEventGroupingExt.kt      # Groups day-sliced events for calendar views
 │   ├── EventDaySliceExt.kt         # KMP EventDaySlice → OccurrenceEventUi mapping, shared by every calendar view
 │   └── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
 └── ui/
-    ├── model/                     # OccurrenceEventUi calendar item carrying KMP OccurrenceId and attendee summary
+    ├── model/                     # OccurrenceEventUi calendar item and TimelineUiState
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
     │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), Accounts, Onboarding)
     │   └── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
     ├── screen/
-    │   ├── day/                   # DayScreen + DayViewModel + TimelineUiState + DayEventGroupingExt + DayEventsLoader
-    │                              # (loads the day-sliced events shared by the day, 3 days and week views)
+    │   ├── day/                   # DayScreen + DayViewModel
     │   ├── threeDays/             # ThreeDayScreen + ThreeDayViewModel — 3-day view (events via DayEventsLoader)
     │   ├── week/                  # WeekScreen + WeekViewModel — week view (events via DayEventsLoader)
     │   ├── month/                 # MonthScreen + MonthViewModel
