@@ -33,7 +33,6 @@ import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -51,16 +50,9 @@ class DayViewModel(
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
 
     private val timeZone = TimeZone.currentSystemDefault()
+    val dateRange: ClosedRange<LocalDate> = DayEventsLoader.dateRangeAround(Clock.today(timeZone))
 
-    val dateRange: ClosedRange<LocalDate> = dayEventsLoader.dateRangeAround(Clock.today(timeZone))
-
-    val uiState: StateFlow<TimelineUiState> = dayEventsLoader.observeEventsByDate(dateRange, timeZone)
-        .map(TimelineUiState::Success)
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = TimelineUiState.Loading,
-        )
+    val uiState: StateFlow<TimelineUiState> = dayEventsLoader.observeEventsByDate
 
     val eventDots = visibleMonthManager.eventDots
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())

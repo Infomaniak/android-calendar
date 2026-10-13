@@ -17,13 +17,22 @@
  */
 package com.infomaniak.calendar.manager
 
-import com.infomaniak.calendar.utils.DayEventsByDate
+import com.infomaniak.calendar.ui.model.TimelineUiState
 import com.infomaniak.calendar.utils.toDayEventsByDate
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -33,25 +42,33 @@ import kotlinx.datetime.plus
 
 /** Observes the events the day, 3 days and week views show, sorted per day into all-day and timed events. */
 @Inject
-class DayEventsLoader(private val calendarManager: CalendarManager) {
-    /** The days around [today] whose events are loaded. */
-    fun dateRangeAround(today: LocalDate): ClosedRange<LocalDate> {
-        return today.minus(DAY_RANGE_DAYS, DateTimeUnit.DAY)..today.plus(DAY_RANGE_DAYS, DateTimeUnit.DAY)
-    }
+class DayEventsLoader(private val calendarManager: CalendarManager, visibleDateManager: VisibleDateManager) {
+    private val useCaseScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+    private val dateRange = visibleDateManager.visibleDateFlow.map(::dateRangeAround)
+    private val timeZone = flowOf(TimeZone.currentSystemDefault()) // TODO: Adapt to user settings
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun observeEventsByDate(
-        dateRange: ClosedRange<LocalDate>,
-        timeZone: TimeZone,
-    ): Flow<DayEventsByDate> = calendarManager.observeDaySlices(
-        start = dateRange.start.atStartOfDayIn(timeZone),
-        end = dateRange.endInclusive.atStartOfDayIn(timeZone),
-        timeZone = timeZone,
-    ).mapLatest { slices ->
-        slices.toDayEventsByDate(timeZone)
-    }
+    val observeEventsByDate: StateFlow<TimelineUiState> = combine(dateRange, timeZone, ::Pair)
+        .flatMapLatest { (dateRange, timeZone) ->
+            calendarManager.observeDaySlices(
+                start = dateRange.start.atStartOfDayIn(timeZone),
+                end = dateRange.endInclusive.atStartOfDayIn(timeZone),
+                timeZone = timeZone,
+            ).mapLatest { slices ->
+                TimelineUiState.Success(slices.toDayEventsByDate(timeZone))
+            }
+        }
+        .stateIn(scope = useCaseScope, started = WhileSubscribed(5_000), initialValue = TimelineUiState.Loading)
 
-    private companion object {
-        const val DAY_RANGE_DAYS = 250
+    companion object {
+        // Used by the day, 3 days and week views. For now, only load what's needed for the week view and reused it for the day and 3 days as well.
+        private const val DAY_AGO = 7
+        private const val DAY_AFTER = 14
+
+        /** The days around [today] whose events are loaded. */
+        fun dateRangeAround(today: LocalDate): ClosedRange<LocalDate> {
+            return today.minus(DAY_AGO, DateTimeUnit.DAY)..today.plus(DAY_AFTER, DateTimeUnit.DAY)
+        }
     }
 }

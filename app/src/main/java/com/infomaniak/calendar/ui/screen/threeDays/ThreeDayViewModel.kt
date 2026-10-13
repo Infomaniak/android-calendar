@@ -25,7 +25,6 @@ import com.infomaniak.calendar.manager.DayEventsLoader
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.manager.VisibleMonthManager
 import com.infomaniak.calendar.ui.model.TimelineUiState
-import com.infomaniak.core.common.utils.today
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
@@ -33,11 +32,7 @@ import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlin.time.Clock
 
 @Inject
 @ContributesIntoMap(AppScope::class)
@@ -50,18 +45,7 @@ class ThreeDayViewModel(
 ) : ViewModel() {
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
 
-    private val timeZone = TimeZone.currentSystemDefault()
-
-    // TODO: Only load the days around the visible ones
-    val dateRange: ClosedRange<LocalDate> = dayEventsLoader.dateRangeAround(Clock.today(timeZone))
-
-    val uiState: StateFlow<TimelineUiState> = dayEventsLoader.observeEventsByDate(dateRange, timeZone)
-        .map(TimelineUiState::Success)
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = TimelineUiState.Loading,
-        )
+    val uiState: StateFlow<TimelineUiState> = dayEventsLoader.observeEventsByDate
 
     val eventDots = visibleMonthManager.eventDots
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
