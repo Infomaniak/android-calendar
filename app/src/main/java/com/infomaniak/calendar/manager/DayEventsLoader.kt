@@ -20,7 +20,9 @@ package com.infomaniak.calendar.manager
 import com.infomaniak.calendar.ui.model.TimelineUiState
 import com.infomaniak.calendar.utils.toDayEventsByDate
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
+import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -43,6 +45,7 @@ import kotlinx.datetime.plus
 import kotlin.time.Duration.Companion.seconds
 
 /** Observes the events the day, 3 days and week views show, sorted per day into all-day and timed events. */
+@SingleIn(AppScope::class)
 @Inject
 class DayEventsLoader(private val calendarManager: CalendarManager, visibleDateManager: VisibleDateManager) {
     private val useCaseScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
