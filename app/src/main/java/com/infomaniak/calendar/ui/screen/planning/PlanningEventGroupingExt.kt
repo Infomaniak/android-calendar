@@ -26,7 +26,6 @@ import com.infomaniak.calendar.utils.toThemedColorUi
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
-import com.infomaniak.multiplatform_core.account.domain.model.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
@@ -60,7 +59,6 @@ typealias EventsByWeekAndDay = SortedMap<YearWeek, SortedMap<LocalDate, List<Eve
  */
 @Suppress("UNCHECKED_CAST") // Shows the exposed list as non-mutable
 suspend fun Map<LocalDate, List<EventDaySlice>>.groupByWeekAndDay(
-    emailsByUserId: Map<AccountId, String>,
     weekNumbering: WeekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
     timeZone: TimeZone = TimeZone.currentSystemDefault(),
 ): EventsByWeekAndDay = withContext(Dispatchers.Default) {
@@ -75,7 +73,7 @@ suspend fun Map<LocalDate, List<EventDaySlice>>.groupByWeekAndDay(
         var date = week.firstDay
         while (date <= week.lastDay) {
             days[date] = this@groupByWeekAndDay[date]
-                ?.mapTo(mutableListOf<EventUi>()) { it.toEventUi(emailsByUserId, timeZone) }
+                ?.mapTo(mutableListOf<EventUi>()) { it.toEventUi(timeZone) }
                 .ensureHasEntry(date, timeZone)
             date = date.plus(DatePeriod(days = 1))
         }

@@ -104,12 +104,13 @@ It wraps mutable Compose state, so hosts can share the same date with their View
 String resources follow the single-module pattern — all strings consumed by any CalendarComponents module are declared in 
 `:CalendarComponents:Resources` so consumers never have to manage per-module string tags.
 
-`EventUi.Normal` is an **interface**, not a data class: it declares only what the components need to draw an event.
-The consumer implements it and is free to carry its own identity alongside — the components never read anything beyond
-the declared properties, and hand the instance itself back through their click callbacks. That is how the app attaches
-the KMP `OccurrenceId` to every event (`OccurrenceEventUi`) and recovers it on click, without `OccurrenceId` ever
-appearing in these modules. `SimpleEventUi` is the ready-made implementation for consumers with nothing extra to carry
-(previews, simple hosts).
+`EventUi.Normal` is an **interface**, not a data class: it declares only what the components need to draw an event,
+including attendee summary state rather than a full attendee list. The consumer implements it and is free to carry its
+own identity alongside — the components never read anything beyond the declared properties, and hand the instance itself
+back through their click callbacks. The app uses `OccurrenceEventUi` for KMP day-slice summaries, carrying only attendee
+summary state rather than full attendee details. It carries the KMP `OccurrenceId` without that type appearing in these
+modules. `SimpleEventUi` is the ready-made implementation for consumers with nothing extra to carry (previews, simple
+hosts).
 
 The consequence is that reading consumer-specific data back out of a clicked event requires a cast on the consumer's
 side (the app does it once, in the `EventUi.Normal.occurrenceId` extension). Prefer this over making `EventUi.Normal`

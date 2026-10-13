@@ -21,7 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
-import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
@@ -61,7 +60,8 @@ private fun eventUi(
         end = Instant.parse(end),
         isAllDay = false,
         colors = EventColors.from(color.toArgb(), color.toArgb()).toEventColorsUi(),
-        attendees = Attendees(attendees, attendees.first()),
+        hasAttendees = attendees.isNotEmpty(),
+        myStatus = attendees.firstOrNull()?.status,
     )
 }
 

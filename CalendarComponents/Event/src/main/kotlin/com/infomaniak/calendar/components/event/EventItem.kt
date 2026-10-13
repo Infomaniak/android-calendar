@@ -185,7 +185,7 @@ private fun TrailingIcons(trailingIcons: Set<EventIcons>) {
 
 fun EventUi.Normal.toEventIcons(): Set<EventIcons> = buildSet {
     if (location != null) add(EventIcons.Location)
-    if (attendees.all.isNotEmpty()) add(EventIcons.Attendees)
+    if (hasAttendees) add(EventIcons.Attendees)
     // TODO: Detect kMeet links
 }
 

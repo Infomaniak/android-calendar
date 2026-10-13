@@ -24,14 +24,15 @@ import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Classification
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventBounds
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.TimeBlocking
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.AlarmAction
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.AlarmTrigger
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.EventAlarm
 import com.infomaniak.multiplatform_core.account.domain.model.AccountId
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
+import kotlinx.datetime.LocalTime
 
 /**
  * Translation of the KMP event model into the UI model consumed by the EventDetail component,
@@ -42,8 +43,8 @@ fun Event.toEventDetailUi(calendar: Calendar, emailsByUserId: Map<AccountId, Str
     calendarColor = Color(colors.calendarSourceColor.argb),
     calendarName = calendar.displayName,
     title = title,
-    start = getDetailTiming(timing.start, timing.startTimeZone),
-    end = getDetailTiming(timing.end, timing.endTimeZone),
+    start = timing.toDetailTiming(isStart = true),
+    end = timing.toDetailTiming(isStart = false),
     isAllDay = timing.isAllDay,
     attendees = attendees.toAttendees(accountId, emailsByUserId),
     kMeetUrl = null, // TODO[eventDetail]: Not carried by the KMP model yet
@@ -58,16 +59,14 @@ fun Event.toEventDetailUi(calendar: Calendar, emailsByUserId: Map<AccountId, Str
     canEdit = canEdit,
 )
 
-/**
- *  A wall-clock without a time zone is floating: it is read in whatever zone the reader is in.
- *
- *  A wall-clock + a time zone is ambiguous during DST repeated hours. During such a day, like the 25th of oct. 2026,
- *  2:30 AM occurs twice at the Europe/Paris time zone. This conversion method handles the collapsing of the both possibilities
- *  instants into a single one.
- **/
-private fun getDetailTiming(wallClock: LocalDateTime, timeZone: TimeZone?): EventDetailTiming = when (timeZone) {
-    null -> EventDetailTiming.Floating(wallClock)
-    else -> EventDetailTiming.Precise(wallClock.toInstant(timeZone), timeZone)
+private fun EventTiming.toDetailTiming(isStart: Boolean): EventDetailTiming = when (val bounds = bounds) {
+    is EventBounds.AllDay -> EventDetailTiming.Floating(
+        LocalDateTime(date = if (isStart) bounds.start else bounds.end, time = LocalTime(0, 0)),
+    )
+    is EventBounds.Floating -> EventDetailTiming.Floating(if (isStart) bounds.start else bounds.end)
+    is EventBounds.Zoned -> (if (isStart) bounds.start else bounds.end).let {
+        EventDetailTiming.Precise(it.instant, it.timeZone)
+    }
 }
 
 private fun EventAlarm.toNotification(): EventDetailUi.Notification? {

@@ -21,7 +21,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.manager.VisibleMonthManager
-import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
@@ -32,9 +31,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
@@ -47,7 +44,6 @@ import kotlin.time.Clock
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
 class PlanningViewModel(
-    accountUtils: AccountUtils,
     calendarManager: CalendarManager,
     syncEventsManager: SyncEventsManager,
     visibleMonthManager: VisibleMonthManager,
@@ -60,13 +56,11 @@ class PlanningViewModel(
     private val startDate = today.minus(PLANNING_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
     private val endDate = today.plus(PLANNING_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
 
-    private val emailsByUserId = accountUtils.emailsByUserId.shareIn(viewModelScope, SharingStarted.Eagerly, 1)
-
     @OptIn(ExperimentalCoroutinesApi::class)
     val planningUiState: StateFlow<PlanningUiState> = calendarManager
         .observeDaySlices(startDate, endDate, timeZone)
         .mapLatest {
-            val events = it.groupByWeekAndDay(emailsByUserId.first())
+            val events = it.groupByWeekAndDay()
             PlanningUiState.Success({ events })
         }
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = PlanningUiState.Loading)
