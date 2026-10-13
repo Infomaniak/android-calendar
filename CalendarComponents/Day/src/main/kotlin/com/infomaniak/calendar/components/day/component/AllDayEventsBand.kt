@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.DayTimelineDefaults
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.event.EventItem
-import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
@@ -51,8 +51,8 @@ private val NextRowPeek = 12.dp
 
 @Composable
 internal fun AllDayEventsBand(
-    events: List<EventUi.Normal>,
-    onEventClick: (EventUi.Normal) -> Unit,
+    events: List<EventSummaryUi.Normal>,
+    onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (events.isEmpty()) return

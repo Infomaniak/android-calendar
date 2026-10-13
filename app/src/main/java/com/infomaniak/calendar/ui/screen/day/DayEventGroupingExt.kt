@@ -20,7 +20,7 @@ package com.infomaniak.calendar.ui.screen.day
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.TimedEvent
 import com.infomaniak.calendar.components.day.model.toTimedEvent
-import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.utils.toEventUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
 import kotlinx.coroutines.Dispatchers
@@ -51,7 +51,7 @@ private fun List<EventDaySlice>.toDayEvents(
     date: LocalDate,
     timeZone: TimeZone,
 ): DayEvents {
-    val allDay = mutableListOf<EventUi.Normal>()
+    val allDay = mutableListOf<EventSummaryUi.Normal>()
     val timed = mutableListOf<TimedEvent>()
 
     forEach { slice ->

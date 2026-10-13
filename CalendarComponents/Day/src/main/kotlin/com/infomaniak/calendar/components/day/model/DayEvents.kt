@@ -18,7 +18,7 @@
 package com.infomaniak.calendar.components.day.model
 
 import androidx.compose.runtime.Immutable
-import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -30,7 +30,7 @@ const val MINUTES_PER_DAY: Int = HOURS_PER_DAY * MINUTES_PER_HOUR
 
 @Immutable
 data class DayEvents(
-    val allDay: List<EventUi.Normal>,
+    val allDay: List<EventSummaryUi.Normal>,
     val timed: List<TimedEvent>,
 ) {
     companion object {
@@ -40,14 +40,14 @@ data class DayEvents(
 
 @Immutable
 data class TimedEvent(
-    val event: EventUi.Normal,
+    val event: EventSummaryUi.Normal,
     val startMinuteOfDay: Int,
     val endMinuteOfDay: Int,
 ) {
     val durationMinutes: Int = endMinuteOfDay - startMinuteOfDay
 }
 
-fun EventUi.Normal.toTimedEvent(date: LocalDate, timeZone: TimeZone): TimedEvent = TimedEvent(
+fun EventSummaryUi.Normal.toTimedEvent(date: LocalDate, timeZone: TimeZone): TimedEvent = TimedEvent(
     event = this,
     startMinuteOfDay = start.minuteOfDayWithin(date, timeZone),
     endMinuteOfDay = end.minuteOfDayWithin(date, timeZone),

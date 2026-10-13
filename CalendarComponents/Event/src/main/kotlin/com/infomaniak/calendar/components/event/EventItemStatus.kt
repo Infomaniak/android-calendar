@@ -39,14 +39,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.EventStatus
-import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
 import com.infomaniak.core.ui.compose.theme.LocalIsThemeDarkMode
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
 
-fun EventUi.Normal.toEventItemStatus(): EventItemStatus {
+fun EventSummaryUi.Normal.toEventItemStatus(): EventItemStatus {
     if (status == EventStatus.Cancelled) return EventItemStatus.Declined(colors)
     val participationStatus = myStatus ?: return EventItemStatus.Default(colors)
 

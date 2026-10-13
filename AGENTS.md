@@ -107,15 +107,15 @@ String resources follow the single-module pattern — all strings consumed by an
 `EventUi.Normal` is an **interface**, not a data class: it declares only what the components need to draw an event,
 including attendee summary state rather than a full attendee list. The consumer implements it and is free to carry its
 own identity alongside — the components never read anything beyond the declared properties, and hand the instance itself
-back through their click callbacks. The app uses `OccurrenceEventUi` for KMP day-slice summaries, carrying only attendee
+back through their click callbacks. The app uses `OccurrenceEventSummaryUi` for KMP day-slice summaries, carrying only attendee
 summary state rather than full attendee details. It carries the KMP `OccurrenceId` without that type appearing in these
-modules. `SimpleEventUi` is the ready-made implementation for consumers with nothing extra to carry (previews, simple
+modules. `SimpleEventSummaryUi` is the ready-made implementation for consumers with nothing extra to carry (previews, simple
 hosts).
 
 The consequence is that reading consumer-specific data back out of a clicked event requires a cast on the consumer's
 side (the app does it once, in the `EventUi.Normal.occurrenceId` extension). Prefer this over making `EventUi.Normal`
 generic: a type parameter there would have to be threaded through every type that transports an event (`DayEvents`,
-`TimedEvent`, `Planning`, `DayView`, …), and since `Planning` dispatches over the sealed `EventUi` hierarchy it could
+`TimedEvent`, `Planning`, `DayView`, …), and since `Planning` dispatches over the sealed `EventSummaryUi` hierarchy it could
 only narrow to `Normal<*>` and would still need an unchecked cast — an unsafe one, this time inside the library.
 
 ### Flavors
@@ -136,7 +136,7 @@ When adding a new CalendarComponents module, apply the flavor-aware plugin if it
 
 | Gradle path                       | Package                                          | Purpose                                                                                                                   |
 |-----------------------------------|--------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
-| `:CalendarComponents:Foundation`  | `com.infomaniak.calendar.components.foundation`  | Shared models (`EventUi`, `YearWeek`, `WeekNumbering`) and base Compose components (`DayCircle`, `DateState`) used by all other CalendarComponents modules. |
+| `:CalendarComponents:Foundation`  | `com.infomaniak.calendar.components.foundation`  | Shared models (`EventSummaryUi`, `YearWeek`, `WeekNumbering`) and base Compose components (`DayCircle`, `DateState`) used by all other CalendarComponents modules. |
 | `:CalendarComponents:Resources`   | `com.infomaniak.calendar.components.resources`   | String-only module: `res/values/strings.xml` (+ translations). No Kotlin code, no Compose. Centralises all CalendarComponents string resources. |
 | `:CalendarComponents:Event`       | `com.infomaniak.calendar.components.event`       | `EventItem` Composable — renders a single event row. Re-exports Foundation via `api`. |
 | `:CalendarComponents:Planning`    | `com.infomaniak.calendar.components.planning`    | `Planning` Composable — a `LazyColumn` with ISO week headers and per-day event lists. Also provides the `stickyWithinItem` `Modifier` extension. Re-exports Foundation via `api` (its types appear in `Planning`'s public signature); Event and Resources are internal implementation details and stay `implementation`. Week header design is a **placeholder**. |

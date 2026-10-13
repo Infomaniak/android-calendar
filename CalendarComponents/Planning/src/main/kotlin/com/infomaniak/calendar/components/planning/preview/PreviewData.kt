@@ -21,9 +21,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.infomaniak.calendar.components.foundation.models.EventStatus
-import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
-import com.infomaniak.calendar.components.foundation.models.SimpleEventUi
+import com.infomaniak.calendar.components.foundation.models.SimpleEventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.foundation.preview.EventColorsUiFactory
@@ -38,8 +38,8 @@ import kotlinx.datetime.toInstant
 import kotlin.time.Clock
 import kotlin.time.Instant
 
-class WeekEventsPreviewParameter : PreviewParameterProvider<Map<YearWeek, Map<LocalDate, List<EventUi>>>> {
-    override val values: Sequence<Map<YearWeek, Map<LocalDate, List<EventUi>>>> = sequenceOf(
+class WeekEventsPreviewParameter : PreviewParameterProvider<Map<YearWeek, Map<LocalDate, List<EventSummaryUi>>>> {
+    override val values: Sequence<Map<YearWeek, Map<LocalDate, List<EventSummaryUi>>>> = sequenceOf(
         todayPreviewWeekEvents,
         passingYearPreviewWeekEvents,
     )
@@ -55,7 +55,7 @@ class WeekEventsPreviewParameter : PreviewParameterProvider<Map<YearWeek, Map<Lo
     }
 }
 
-private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalDate, List<EventUi>>> {
+private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalDate, List<EventSummaryUi>>> {
     val timeZone = TimeZone.currentSystemDefault()
 
     val pastDay = targetDay.minus(5, DateTimeUnit.DAY)
@@ -65,8 +65,8 @@ private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalD
         return LocalDateTime(date.year, date.month.ordinal + 1, date.day, hour, minute).toInstant(timeZone)
     }
 
-    fun event(date: LocalDate, hour: Int, title: String, location: String? = null, color: Color = Color(0xFF4285F4)): EventUi {
-        return SimpleEventUi(
+    fun event(date: LocalDate, hour: Int, title: String, location: String? = null, color: Color = Color(0xFF4285F4)): EventSummaryUi {
+        return SimpleEventSummaryUi(
             id = "$date-$hour",
             title = title,
             location = location,
@@ -94,6 +94,6 @@ private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalD
     ).groupForPlanning()
 }
 
-private fun List<Pair<LocalDate, List<EventUi>>>.groupForPlanning(): Map<YearWeek, Map<LocalDate, List<EventUi>>> =
+private fun List<Pair<LocalDate, List<EventSummaryUi>>>.groupForPlanning(): Map<YearWeek, Map<LocalDate, List<EventSummaryUi>>> =
     groupBy { (date, _) -> WeekNumbering.ISO_8601.weekOf(date) }
         .mapValues { (_, pairs) -> pairs.associate { (date, events) -> date to events } }

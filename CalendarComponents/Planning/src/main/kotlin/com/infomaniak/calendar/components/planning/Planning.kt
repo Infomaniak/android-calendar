@@ -38,7 +38,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.EventItem
 import com.infomaniak.calendar.components.event.EventItemDefaults
-import com.infomaniak.calendar.components.foundation.models.EventUi
+import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.foundation.state.DateState
 import com.infomaniak.calendar.components.foundation.state.rememberToday
@@ -53,9 +53,9 @@ import kotlinx.datetime.LocalDate
 
 @Composable
 fun Planning(
-    weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
+    weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventSummaryUi>>>,
     goToEventCreation: () -> Unit,
-    onEventClick: (EventUi.Normal) -> Unit,
+    onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(),
@@ -73,9 +73,9 @@ fun Planning(
 @Composable
 private fun Timeline(
     lazyListState: LazyListState,
-    weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventUi>>>,
+    weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventSummaryUi>>>,
     goToEventCreation: () -> Unit,
-    onEventClick: (EventUi.Normal) -> Unit,
+    onEventClick: (EventSummaryUi.Normal) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
@@ -123,7 +123,7 @@ private fun Timeline(
 
 @Composable
 private fun Event(
-    event: EventUi,
+    event: EventSummaryUi,
     date: LocalDate,
     today: LocalDate,
     lazyListState: LazyListState,
@@ -131,7 +131,7 @@ private fun Event(
     itemKey: PlanningItemKey,
     sectionItemKeys: List<PlanningItemKey>,
     goToEventCreation: () -> Unit,
-    onEventClick: (EventUi.Normal) -> Unit,
+    onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -148,7 +148,7 @@ private fun Event(
         )
 
         when (event) {
-            is EventUi.Normal -> {
+            is EventSummaryUi.Normal -> {
                 EventItem(
                     event = event,
                     onClick = { onEventClick(event) },
@@ -156,8 +156,8 @@ private fun Event(
                     allDayTrailingContent = EventItemDefaults.AllDayLabel,
                 )
             }
-            is EventUi.TodayEmptyState -> TodayEmptyState(onClick = goToEventCreation, Modifier.fillMaxWidth())
-            is EventUi.EmptyState -> OtherDayEmptyState(onClick = goToEventCreation, Modifier.fillMaxWidth())
+            is EventSummaryUi.TodayEmptyState -> TodayEmptyState(onClick = goToEventCreation, Modifier.fillMaxWidth())
+            is EventSummaryUi.EmptyState -> OtherDayEmptyState(onClick = goToEventCreation, Modifier.fillMaxWidth())
         }
     }
 }
@@ -169,11 +169,11 @@ private val YearWeek.label: String
         return "$week - $dateRange"
     }
 
-private fun EventUi.toItemKey(date: LocalDate): PlanningItemKey = PlanningItemKey.Event(date = date, id = id)
+private fun EventSummaryUi.toItemKey(date: LocalDate): PlanningItemKey = PlanningItemKey.Event(date = date, id = id)
 
 @Preview
 @Composable
-private fun PreviewPlanning(@PreviewParameter(WeekEventsPreviewParameter::class) weekEvents: Map<YearWeek, Map<LocalDate, List<EventUi>>>) {
+private fun PreviewPlanning(@PreviewParameter(WeekEventsPreviewParameter::class) weekEvents: Map<YearWeek, Map<LocalDate, List<EventSummaryUi>>>) {
     Surface {
         Planning(goToEventCreation = {}, onEventClick = {}, weekEvents = { weekEvents })
     }
