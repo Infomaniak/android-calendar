@@ -252,7 +252,6 @@ private fun RowScope.DayColumn(content: @Composable () -> Unit) {
 
 /** A vertical line, drawn at the end of the component */
 @Composable
-@ReadOnlyComposable
 private fun Modifier.verticalEndDivider(color: Color = ComponentColors.GridDividerColor): Modifier = drawBehind {
     val x = if (layoutDirection == LayoutDirection.Ltr) size.width else 0f
     drawLine(

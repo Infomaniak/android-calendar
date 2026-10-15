@@ -19,9 +19,8 @@ package com.infomaniak.calendar.components.foundation.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 
 object ComponentColors {
     val GridDividerColor
-        @Composable @ReadOnlyComposable get() = MaterialTheme.colorScheme.outlineVariant
+        @Composable get() = MaterialTheme.colorScheme.outlineVariant
 }

@@ -18,7 +18,6 @@
 package com.infomaniak.calendar.components.day
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -34,7 +33,7 @@ object TimelineDefaults {
      * the events and the current time indicator all stop at the same x, so they share this value.
      */
     val TimelineEndPadding: Dp
-        @Composable @ReadOnlyComposable get() = EsdsTheme.spacing.xl
+        @Composable get() = EsdsTheme.spacing.xl
 
     /**
      * Room kept under the last hour. The floating toolbar hovers over the bottom of the screen
