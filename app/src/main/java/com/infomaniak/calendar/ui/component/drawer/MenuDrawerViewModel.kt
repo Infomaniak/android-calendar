@@ -19,6 +19,7 @@ package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.calendar.BuildConfig
 import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.ui.component.drawer.model.CalendarUi
@@ -73,7 +74,7 @@ class MenuDrawerViewModel(
     }
 
     fun onCalendarLongClicked(selectedId: CalendarId) {
-        viewModelScope.launch { calendarManager.showOnlyCalendar(selectedId) }
+        if (BuildConfig.DEBUG) viewModelScope.launch { calendarManager.showOnlyCalendar(selectedId) }
     }
 
     fun onAccountExpandedChanged(userId: Int, isExpanded: Boolean) {
