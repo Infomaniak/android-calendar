@@ -32,11 +32,11 @@ import com.infomaniak.calendar.components.resources.R
 @Composable
 internal fun AllDaySwitch(
     checked: () -> Boolean,
-    onToggle: (isChecked: Boolean) -> Unit,
+    onCheckedChange: (isChecked: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
 ) {
-    ListItemSwitch(checked, onToggle, modifier, shapes = shapes) {
+    ListItemSwitch(checked, onCheckedChange, modifier, shapes = shapes) {
         Text(stringResource(id = R.string.notificationAllDay))
     }
 }
@@ -46,7 +46,7 @@ internal fun AllDaySwitch(
 private fun Preview() {
     MaterialTheme {
         Surface {
-            AllDaySwitch(checked = { true }, onToggle = {})
+            AllDaySwitch(checked = { true }, onCheckedChange = {})
         }
     }
 }

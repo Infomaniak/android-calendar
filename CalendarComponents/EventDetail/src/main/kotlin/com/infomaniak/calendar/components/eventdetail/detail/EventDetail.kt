@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
+import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatus
 import com.infomaniak.calendar.components.eventdetail.component.Recurrence
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
@@ -45,7 +46,6 @@ import com.infomaniak.calendar.components.eventdetail.detail.component.DateAndTi
 import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
-import com.infomaniak.calendar.components.eventdetail.detail.component.OccupiedStatus
 import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
@@ -129,7 +129,7 @@ fun EventDetail(
             }
 
             Section {
-                OccupiedStatus(isOccupied)
+                OccupiedStatus(isOccupied, modifier = Modifier.eventSharedElement(EventSharedElement.OccupiedStatus))
 
                 if (classification != null) {
                     ClassificationStatus(classification)

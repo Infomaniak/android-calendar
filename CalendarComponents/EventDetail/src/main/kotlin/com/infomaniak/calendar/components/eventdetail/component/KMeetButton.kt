@@ -74,11 +74,11 @@ internal fun KMeetButton(
 @Composable
 internal fun KMeetButtonSwitch(
     checked: () -> Boolean,
-    onToggle: (isChecked: Boolean) -> Unit,
+    onCheckedChange: (isChecked: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
 ) {
-    ListItemSwitch(checked, onToggle, modifier, shapes, leadingContent = { KMeetIcon() }) {
+    ListItemSwitch(checked, onCheckedChange, modifier, shapes, leadingContent = { KMeetIcon() }) {
         Text(stringResource(id = R.string.kMeetMeeting))
     }
 }
@@ -123,7 +123,7 @@ private fun PreviewKMeetButton() {
 private fun PreviewKMeetButtonSwitch() {
     MaterialTheme {
         Surface {
-            KMeetButtonSwitch(checked = { true }, onToggle = {})
+            KMeetButtonSwitch(checked = { true }, onCheckedChange = {})
         }
     }
 }

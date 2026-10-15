@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitch
+import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
 import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
@@ -65,8 +66,8 @@ fun EventForm(
         )
 
         AllDaySwitch(
-            checked = { state.isAllDay.value },
-            onToggle = { isChecked -> state.isAllDay.value = isChecked },
+            checked = state.isAllDay::value,
+            onCheckedChange = { isChecked -> state.isAllDay.value = isChecked },
         )
 
         Section {
@@ -77,9 +78,17 @@ fun EventForm(
             )
 
             KMeetButtonSwitch(
-                checked = { state.isKMeetUrlEnabled.value },
-                onToggle = { isChecked -> state.isKMeetUrlEnabled.value = isChecked },
+                checked = state.isKMeetUrlEnabled::value,
+                onCheckedChange = { isChecked -> state.isKMeetUrlEnabled.value = isChecked },
                 modifier = Modifier.eventSharedElement(EventSharedElement.KMeet),
+            )
+        }
+
+        Section {
+            OccupiedStatusSwitch(
+                checked = state.isOccupied::value,
+                onCheckedChange = { isChecked -> state.isOccupied.value = isChecked },
+                modifier = Modifier.eventSharedElement(EventSharedElement.OccupiedStatus),
             )
         }
     }
