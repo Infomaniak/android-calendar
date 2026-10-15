@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.multiDays.threeDays
+package com.infomaniak.calendar.ui.screen.multiDays
 
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.ViewModel
@@ -34,10 +34,13 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 
+/**
+ * View model for all the logic that's shared between the three days and week screens.
+ */
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
-class ThreeDayViewModel(
+class MultiDaysViewModel(
     dayEventsLoader: DayEventsLoader,
     syncEventsManager: SyncEventsManager,
     visibleMonthManager: VisibleMonthManager,

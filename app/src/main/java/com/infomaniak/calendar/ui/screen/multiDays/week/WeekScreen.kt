@@ -43,6 +43,7 @@ import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
 import com.infomaniak.calendar.ui.model.TimelineUiState
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
+import com.infomaniak.calendar.ui.screen.multiDays.MultiDaysViewModel
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
@@ -54,7 +55,7 @@ import kotlinx.datetime.LocalDate
 fun WeekScreen(
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: WeekViewModel = viewModel(),
+    viewModel: MultiDaysViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
