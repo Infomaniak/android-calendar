@@ -30,7 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.day.DayTimelineDefaults
+import com.infomaniak.calendar.components.day.TimelineDefaults
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDayWithShortMonth
 import com.infomaniak.calendar.components.resources.R
@@ -48,7 +48,7 @@ internal fun DayHeader(
 ) {
     Row(
         // Starts where the events do, past the gutter the hours and the all-day label sit in.
-        modifier = modifier.padding(start = DayTimelineDefaults.HourGutterWidth),
+        modifier = modifier.padding(start = TimelineDefaults.HourGutterWidth),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),
     ) {

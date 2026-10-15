@@ -17,9 +17,21 @@
  */
 package com.infomaniak.calendar.components.foundation.state
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.foundation.component.DayCircle
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 enum class DateState(
     val containerColor: @Composable () -> Color,
@@ -46,8 +58,40 @@ enum class DateState(
     ),
     NotMonth(
         containerColor = { Color.Transparent },
-        contentColor = { MaterialTheme.colorScheme.onSurface.copy(0.38f) },
+        contentColor = { MaterialTheme.colorScheme.onSurface.copy(EsdsTheme.opacity.medium) },
         borderColor = { Color.Transparent },
         showDots = false,
     ),
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    @Composable
+    fun Item(state: DateState) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(state.name)
+            DayCircle(
+                state = state,
+                modifier = Modifier.size(40.dp),
+            ) {
+                Text(
+                    text = "1",
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+            }
+
+        }
+    }
+
+    MaterialTheme {
+        Surface {
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Item(DateState.None)
+                Item(DateState.Selected)
+                Item(DateState.Today)
+                Item(DateState.NotMonth)
+            }
+        }
+    }
 }

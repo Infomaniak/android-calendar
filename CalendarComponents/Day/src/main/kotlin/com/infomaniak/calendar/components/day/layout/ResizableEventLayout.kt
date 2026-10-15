@@ -32,7 +32,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
-import com.infomaniak.calendar.components.day.DayTimelineDefaults
+import com.infomaniak.calendar.components.day.TimelineDefaults
 import com.infomaniak.calendar.components.day.component.ResizableEventItem
 import com.infomaniak.calendar.components.day.component.titleSizingFor
 import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
@@ -104,7 +104,7 @@ private fun ResizableEventLayoutPreview() {
         val density = LocalDensity.current
         val timedEvents = previewDayEvents.timed
         val config = eventLayoutConfig()
-        val pixelsPerMinute = with(density) { DayTimelineDefaults.HourHeight.toPx() } / MINUTES_PER_HOUR
+        val pixelsPerMinute = with(density) { TimelineDefaults.HourHeight.toPx() } / MINUTES_PER_HOUR
 
         BoxWithConstraints {
             val placements = remember(density, config, constraints.maxWidth) {
@@ -121,7 +121,7 @@ private fun ResizableEventLayoutPreview() {
                 modifier = Modifier
                     .verticalScroll(rememberScrollState(initial = (firstEventMinute * pixelsPerMinute).roundToInt()))
                     .fillMaxWidth()
-                    .height(DayTimelineDefaults.HourHeight * HOURS_PER_DAY),
+                    .height(TimelineDefaults.HourHeight * HOURS_PER_DAY),
             ) {
                 ResizableEventLayout(
                     timedEvents = timedEvents,

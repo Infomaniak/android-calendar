@@ -33,7 +33,7 @@ import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnS
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
 import com.infomaniak.calendar.components.day.DayPager
 import com.infomaniak.calendar.components.day.model.DayEvents
-import com.infomaniak.calendar.components.day.state.DayTimelineState
+import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
@@ -95,7 +95,7 @@ private fun DayScreen(
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     visibleDayState: VisibleDayState,
-    timelineState: DayTimelineState,
+    timelineState: TimelineState,
     dateRange: ClosedRange<LocalDate>,
     modifier: Modifier = Modifier,
 ) {
@@ -144,7 +144,7 @@ private fun DayScreen(
 @Composable
 private fun SuccessDay(
     visibleDayState: VisibleDayState,
-    timelineState: DayTimelineState,
+    timelineState: TimelineState,
     dateRange: ClosedRange<LocalDate>,
     eventsByDate: () -> DayEventsByDate,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,

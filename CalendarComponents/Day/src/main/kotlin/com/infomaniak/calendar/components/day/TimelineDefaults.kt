@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
-object DayTimelineDefaults {
+object TimelineDefaults {
     val HourHeight: Dp = 64.dp
     val MinHourHeight: Dp = 64.dp
     val MaxHourHeight: Dp = 200.dp

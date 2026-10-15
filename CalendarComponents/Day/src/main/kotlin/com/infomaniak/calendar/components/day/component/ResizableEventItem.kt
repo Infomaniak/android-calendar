@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
-import com.infomaniak.calendar.components.day.DayTimelineDefaults
+import com.infomaniak.calendar.components.day.TimelineDefaults
 import com.infomaniak.calendar.components.day.model.TimedEvent
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.event.EventIcons
@@ -334,7 +334,7 @@ private fun TextUnit.roundedToStep(): TextUnit = ((value / TitleSizeStep.value).
 @Composable
 private fun ResizableEventItemPreview() {
     Surface {
-        val cardHeight = DayTimelineDefaults.HourHeight
+        val cardHeight = TimelineDefaults.HourHeight
         val cardHeightPx = with(LocalDensity.current) { cardHeight.toPx() }
 
         ResizableEventItem(
