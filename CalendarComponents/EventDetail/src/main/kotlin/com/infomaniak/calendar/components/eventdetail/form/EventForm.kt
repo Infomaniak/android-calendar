@@ -35,6 +35,7 @@ import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitch
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
+import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
@@ -61,6 +62,11 @@ fun EventForm(
             dotColor = state.colorState.value ?: Color.Transparent, // Temporarily hide the dot until we get the actual color
             textFieldState = state.titleTextState,
             modifier = Modifier.eventSharedElement(EventSharedElement.Title),
+        )
+
+        AllDaySwitch(
+            checked = { state.isAllDay.value },
+            onToggle = { isChecked -> state.isAllDay.value = isChecked },
         )
 
         Section {

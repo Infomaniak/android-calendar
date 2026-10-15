@@ -40,6 +40,7 @@ import com.infomaniak.calendar.components.foundation.state.rememberSaveableAtten
 class EventFormState(
     val titleTextState: TextFieldState,
     val colorState: MutableState<Color?>,
+    val isAllDay: MutableState<Boolean>,
     val attendeesState: AttendeesSearchState,
     val isKMeetUrlEnabled: MutableState<Boolean>,
     val calendars: List<EventDetailCalendar>,
@@ -47,6 +48,7 @@ class EventFormState(
     fun toEventDraft(): EventDraft? = EventDraft(
         title = titleTextState.text.toString(),
         color = colorState.value ?: return null,
+        isAllDay = isAllDay.value,
         attendees = attendeesState.attendees.toList(),
         isKMeetUrlEnabled = isKMeetUrlEnabled.value,
     )
@@ -57,6 +59,7 @@ fun rememberSaveableEventFormState(
     calendars: List<EventDetailCalendar>,
     initialCalendar: EventDetailCalendar?,
     initialText: String = "",
+    initialIsAllDay: Boolean = false,
     initialIsKMeetUrlEnabled: Boolean = false,
     initialAttendees: SnapshotStateSet<AttendeeUi> = remember { mutableStateSetOf() },
     attendeesSearchState: AttendeesSearchState? = null,
@@ -71,6 +74,7 @@ fun rememberSaveableEventFormState(
     return EventFormState(
         titleTextState = rememberTextFieldState(initialText),
         colorState = colorState,
+        isAllDay = rememberSaveable { mutableStateOf(initialIsAllDay) },
         attendeesState = attendeesState,
         isKMeetUrlEnabled = rememberSaveable { mutableStateOf(initialIsKMeetUrlEnabled) },
         calendars = calendars,
