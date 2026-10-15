@@ -26,4 +26,5 @@ data class EventDraft(
     val isAllDay: Boolean,
     val attendees: List<AttendeeUi>,
     val isKMeetUrlEnabled: Boolean,
+    val isOccupied: Boolean,
 )

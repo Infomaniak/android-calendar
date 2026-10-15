@@ -33,7 +33,7 @@ import com.infomaniak.calendar.components.resources.R
 @Composable
 internal fun ListItemSwitch(
     checked: () -> Boolean,
-    onToggle: (isChecked: Boolean) -> Unit,
+    onCheckedChange: (isChecked: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
     leadingContent: @Composable (() -> Unit)? = null,
@@ -43,10 +43,10 @@ internal fun ListItemSwitch(
 
     ListItem(
         checked = checked(),
-        onCheckedChange = onToggle,
+        onCheckedChange = onCheckedChange,
         content = content,
         leadingContent = leadingContent,
-        trailingContent = { Switch(checked = checked(), onCheckedChange = onToggle) },
+        trailingContent = { Switch(checked = checked(), onCheckedChange = onCheckedChange) },
         modifier = modifier,
         colors = ListItemDefaults.colors(
             selectedContainerColor = defaultColors.containerColor,
@@ -66,7 +66,7 @@ private fun Preview() {
         Surface {
             ListItemSwitch(
                 checked = { true },
-                onToggle = {},
+                onCheckedChange = {},
                 content = { Text(stringResource(id = R.string.kMeetMeeting)) },
             )
         }
