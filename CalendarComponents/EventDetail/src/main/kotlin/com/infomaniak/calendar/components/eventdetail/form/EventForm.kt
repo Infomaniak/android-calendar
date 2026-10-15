@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
+import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitch
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.Section
@@ -89,6 +90,12 @@ fun EventForm(
                 checked = state.isOccupied::value,
                 onCheckedChange = { isChecked -> state.isOccupied.value = isChecked },
                 modifier = Modifier.eventSharedElement(EventSharedElement.OccupiedStatus),
+            )
+
+            ClassificationStatusSwitch(
+                checked = state.isPublic::value,
+                onCheckedChange = { isChecked -> state.isPublic.value = isChecked },
+                modifier = Modifier.eventSharedElement(EventSharedElement.ClassificationStatus),
             )
         }
     }

@@ -44,6 +44,7 @@ class EventFormState(
     val attendeesState: AttendeesSearchState,
     val isKMeetUrlEnabled: MutableState<Boolean>,
     val isOccupied: MutableState<Boolean>,
+    val isPublic: MutableState<Boolean>,
     val calendars: List<EventDetailCalendar>,
 ) {
     fun toEventDraft(): EventDraft? = EventDraft(
@@ -53,6 +54,7 @@ class EventFormState(
         attendees = attendeesState.attendees.toList(),
         isKMeetUrlEnabled = isKMeetUrlEnabled.value,
         isOccupied = isOccupied.value,
+        isPublic = isPublic.value,
     )
 }
 
@@ -66,6 +68,7 @@ fun rememberSaveableEventFormState(
     initialAttendees: SnapshotStateSet<AttendeeUi> = remember { mutableStateSetOf() },
     attendeesSearchState: AttendeesSearchState? = null,
     initialIsOccupied: Boolean = true,
+    initialIsPublic: Boolean = true,
 ): EventFormState {
     val colorState = rememberSaveable(initialCalendar == null, stateSaver = ColorSaver) { mutableStateOf(initialCalendar?.color) }
 
@@ -81,6 +84,7 @@ fun rememberSaveableEventFormState(
         attendeesState = attendeesState,
         isKMeetUrlEnabled = rememberSaveable { mutableStateOf(initialIsKMeetUrlEnabled) },
         isOccupied = rememberSaveable { mutableStateOf(initialIsOccupied) },
+        isPublic = rememberSaveable { mutableStateOf(initialIsPublic) },
         calendars = calendars,
     )
 }

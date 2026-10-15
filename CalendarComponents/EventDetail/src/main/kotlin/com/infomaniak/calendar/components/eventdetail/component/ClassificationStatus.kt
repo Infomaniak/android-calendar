@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.detail.component
+package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.component.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.resources.R
 
@@ -36,9 +35,26 @@ import com.infomaniak.calendar.components.resources.R
 internal fun ClassificationStatus(classification: EventDetailUi.Classification, modifier: Modifier = Modifier) {
     ListItem(
         content = { Text(text = stringResource(classification.label)) },
-        leadingContent = { ItemIcon(painterResource(R.drawable.ic_lock)) },
+        leadingContent = { ClassificationIcon() },
         modifier = modifier,
     )
+}
+
+@Composable
+internal fun ClassificationStatusSwitch(
+    checked: () -> Boolean,
+    onCheckedChange: (isChecked: Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
+) {
+    ListItemSwitch(checked, onCheckedChange, modifier, shapes, leadingContent = { ClassificationIcon() }) {
+        Text(text = stringResource(EventDetailUi.Classification.Public.label))
+    }
+}
+
+@Composable
+private fun ClassificationIcon() {
+    ItemIcon(painterResource(R.drawable.ic_lock))
 }
 
 @Preview
@@ -48,6 +64,19 @@ private fun PreviewClassificationStatus() {
         Surface {
             Column {
                 EventDetailUi.Classification.entries.forEach { ClassificationStatus(classification = it) }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewClassificationStatusSwitch() {
+    MaterialTheme {
+        Surface {
+            Column {
+                ClassificationStatusSwitch(checked = { true }, onCheckedChange = {})
+                ClassificationStatusSwitch(checked = { false }, onCheckedChange = {})
             }
         }
     }
