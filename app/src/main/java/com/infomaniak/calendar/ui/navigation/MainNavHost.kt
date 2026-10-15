@@ -53,8 +53,8 @@ import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
-import com.infomaniak.calendar.ui.screen.threeDays.ThreeDayScreen
-import com.infomaniak.calendar.ui.screen.week.WeekScreen
+import com.infomaniak.calendar.ui.screen.multiDays.threeDays.ThreeDayScreen
+import com.infomaniak.calendar.ui.screen.multiDays.week.WeekScreen
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.utils.NavigationTransition
 import com.infomaniak.core.common.utils.today

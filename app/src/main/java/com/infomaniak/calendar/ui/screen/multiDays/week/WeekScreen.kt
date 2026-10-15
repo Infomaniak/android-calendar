@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.threeDays
+package com.infomaniak.calendar.ui.screen.multiDays.week
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.TopAppBarDefaults
@@ -30,7 +30,7 @@ import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendarDefaults
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
-import com.infomaniak.calendar.components.day.ThreeDayPager
+import com.infomaniak.calendar.components.day.WeekPager
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
@@ -51,10 +51,10 @@ import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.datetime.LocalDate
 
 @Composable
-fun ThreeDayScreen(
+fun WeekScreen(
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ThreeDayViewModel = viewModel(),
+    viewModel: WeekViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
@@ -71,7 +71,7 @@ fun ThreeDayScreen(
 
     ApplyJumpRequests(visibleDayState)
 
-    ThreeDayScreen(
+    WeekScreen(
         goToEventDetail = goToEventDetail,
         uiState = { uiState },
         isLoadingEvents = { isLoadingEvents },
@@ -83,7 +83,7 @@ fun ThreeDayScreen(
 }
 
 @Composable
-private fun ThreeDayScreen(
+private fun WeekScreen(
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     uiState: () -> TimelineUiState,
     isLoadingEvents: () -> Boolean,
@@ -115,7 +115,7 @@ private fun ThreeDayScreen(
         },
         modifier = modifier,
     ) { contentPadding ->
-        ThreeDayPager(
+        WeekPager(
             selectedDate = { visibleDayState.visibleDate },
             eventsOf = { uiState().eventsOf(it) },
             state = timelineState,
@@ -137,7 +137,7 @@ private fun Preview() {
     CalendarThemeForPreview {
         val visibleDayState = rememberVisibleDayState()
         CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
-            ThreeDayScreen(
+            WeekScreen(
                 goToEventDetail = {},
                 uiState = { TimelineUiState.Success(emptyMap()) },
                 isLoadingEvents = { false },
