@@ -17,7 +17,7 @@
  */
 package com.infomaniak.calendar.ui.component.drawer
 
-import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ListItem
@@ -27,6 +27,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.ui.component.drawer.model.CalendarUi
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -40,14 +43,16 @@ fun DrawerCalendarItem(
     calendar: CalendarUi,
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    onCalendarLongClick: (CalendarId) -> Unit = {},
 ) {
     ListItem(
         modifier = modifier
-            .toggleable(
-                value = calendar.isVisible,
-                onValueChange = { onCalendarVisibilityChange(calendar.id, it) },
+            .combinedClickable(
                 role = Role.Checkbox,
-            ),
+                onClick = { onCalendarVisibilityChange(calendar.id, !calendar.isVisible) },
+                onLongClick = { onCalendarLongClick(calendar.id) },
+            )
+            .semantics { toggleableState = ToggleableState(calendar.isVisible) },
         colors = ListItemDefaults.colors(Color.Transparent),
         content = {
             Text(calendar.displayName)
