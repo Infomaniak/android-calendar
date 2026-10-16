@@ -18,11 +18,11 @@
 package com.infomaniak.calendar.ui.screen.eventDetail
 
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
-import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.mapState
 import com.infomaniak.calendar.utils.toEventDetailCalendar
 import com.infomaniak.calendar.utils.toEventDetailUi
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
@@ -59,7 +59,6 @@ import kotlin.time.Duration.Companion.seconds
 class GetEventDetailUiUseCase @Inject constructor(
     accountUtils: AccountUtils,
     private val calendarManager: CalendarManager,
-    private val cachedCalendarManager: CachedCalendarManager,
 ) {
     private val useCaseScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
@@ -72,34 +71,60 @@ class GetEventDetailUiUseCase @Inject constructor(
         .flatMapLatest { occurrenceId -> calendarManager.observeOccurrence(occurrenceId) }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val eventAndCalendarFlow: StateFlow<Pair<Event, Calendar>?> = eventFlow
+    private val eventAndCalendarFlow: StateFlow<EventAndCalendarState> = eventFlow
         .flatMapLatest { event ->
             if (event == null) {
-                flowOf(null)
+                flowOf(EventAndCalendarState.EventNotFound)
             } else {
-                cachedCalendarManager
-                    .calendars
-                    .map { it.find { calendar -> calendar.id == event.calendarId } }
-                    .map { calendar -> calendar?.let { event to it } }
+                calendarManager
+                    .observeCalendar(event.calendarId)
+                    .map { calendar ->
+                        if (calendar == null) {
+                            val eventDetail = "masterEventId=${event.masterEventId}" +
+                                    ", occurrenceId=${event.occurrenceId}" +
+                                    ", calendarId=${event.calendarId}" +
+                                    ", accountId=${event.accountId}"
+                            SentryLog.w(TAG, "Event with no calendar for $eventDetail")
+                            EventAndCalendarState.Loading
+                        } else {
+                            EventAndCalendarState.Success(event, calendar)
+                        }
+                    }
             }
         }
-        .stateIn(useCaseScope, SharingStarted.WhileSubscribed(5.seconds), null)
+        .stateIn(useCaseScope, SharingStarted.WhileSubscribed(5.seconds), EventAndCalendarState.Loading)
 
-    val eventDetailUi: StateFlow<EventDetailUiState> = eventAndCalendarFlow
-        .combine(accountUtils.emailsByUserId) { eventAndCalendar, emailsByUserId ->
-            val (event, calendar) = eventAndCalendar ?: return@combine EventDetailUiState.Unavailable
-
-            event
-                .toEventDetailUi(calendar, emailsByUserId)
-                .let(EventDetailUiState::Success)
+    val eventDetailUi: StateFlow<EventDetailUiState> = combine(
+        eventAndCalendarFlow,
+        accountUtils.emailsByUserId,
+    ) { eventAndCalendarState, emailsByUserId ->
+        val (event, calendar) = when (eventAndCalendarState) {
+            EventAndCalendarState.EventNotFound -> return@combine EventDetailUiState.Unavailable
+            EventAndCalendarState.Loading -> return@combine EventDetailUiState.Loading
+            is EventAndCalendarState.Success -> eventAndCalendarState
         }
+
+        event
+            .toEventDetailUi(calendar, emailsByUserId)
+            .let(EventDetailUiState::Success)
+    }
         .stateIn(useCaseScope, SharingStarted.WhileSubscribed(5.seconds), EventDetailUiState.Loading)
 
     val eventCalendar: StateFlow<EventDetailCalendar?> = eventAndCalendarFlow.mapState(useCaseScope, SharingStarted.Eagerly) {
-        it?.second?.toEventDetailCalendar()
+        (it as? EventAndCalendarState.Success)?.calendar?.toEventDetailCalendar()
     }
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) {
         occurrenceIdFlow.value = occurrenceId
     }
+
+    companion object {
+        private const val TAG = "GetEventDetailUiUseCase"
+    }
+}
+
+private sealed interface EventAndCalendarState {
+    object Loading : EventAndCalendarState
+    data class Success(val event: Event, val calendar: Calendar) : EventAndCalendarState
+    object EventNotFound : EventAndCalendarState
 }
