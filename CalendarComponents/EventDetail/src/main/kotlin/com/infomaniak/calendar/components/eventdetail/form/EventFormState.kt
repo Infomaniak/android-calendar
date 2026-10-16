@@ -28,13 +28,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 
+/**
+ * @param dateAndTimeState Can be null so it can be initialized in two steps after the data has been read from disk.
+ */
 @Stable
 class EventFormState(
     val titleTextState: TextFieldState,
     val colorState: MutableState<Color?>,
     val isAllDay: MutableState<Boolean>,
+    val dateAndTimeState: DateAndTimeState?,
     val attendeesState: AttendeesSearchState,
     val isKMeetUrlEnabled: MutableState<Boolean>,
     val isOccupied: MutableState<Boolean>,
@@ -56,10 +61,12 @@ class EventFormState(
 fun rememberDefaultEventForm(
     calendars: List<EventDetailCalendar>,
     initialCalendar: EventDetailCalendar?,
+    dateAndTimeState: DateAndTimeState?,
     attendeesSearchState: AttendeesSearchState,
 ): EventFormState = rememberEventFormState(
     calendars = calendars,
     initialCalendar = initialCalendar,
+    dateAndTimeState = dateAndTimeState,
     initialText = "",
     initialIsAllDay = false,
     initialIsKMeetUrlEnabled = false,
@@ -72,6 +79,7 @@ fun rememberDefaultEventForm(
 fun rememberEventFormState(
     calendars: List<EventDetailCalendar>,
     initialCalendar: EventDetailCalendar?,
+    dateAndTimeState: DateAndTimeState?,
     initialText: String,
     initialIsAllDay: Boolean,
     initialIsKMeetUrlEnabled: Boolean,
@@ -85,6 +93,7 @@ fun rememberEventFormState(
         titleTextState = rememberTextFieldState(initialText),
         colorState = colorState,
         isAllDay = rememberSaveable { mutableStateOf(initialIsAllDay) },
+        dateAndTimeState = dateAndTimeState,
         attendeesState = attendeesSearchState,
         isKMeetUrlEnabled = rememberSaveable { mutableStateOf(initialIsKMeetUrlEnabled) },
         isOccupied = rememberSaveable { mutableStateOf(initialIsOccupied) },

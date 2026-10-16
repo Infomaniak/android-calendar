@@ -40,6 +40,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -107,9 +108,21 @@ internal fun DateAndTime(
     )
 }
 
+/**
+ * [dateAndTimeState] can be null so it can be initialized in two steps after the data has been read from disk. The item will be
+ * empty but still take its final size as to not create a jarring experience when the data loads in dynamically.
+ */
 @Composable
-internal fun DateAndTimeEditable(dateAndTimeState: DateAndTimeState, modifier: Modifier = Modifier) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs)) {
+internal fun DateAndTimeEditable(dateAndTimeState: DateAndTimeState?, modifier: Modifier = Modifier) {
+    val shouldDisplay = dateAndTimeState != null
+    val dateAndTimeState = dateAndTimeState ?: DateAndTimeState.Dummy
+
+    Column(
+        modifier = modifier
+            .alpha(if (shouldDisplay) 1f else 0f)
+            .padding(horizontal = EsdsTheme.spacing.xs),
+        verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
+    ) {
         PointInTimeEditable(dateAndTimeState.start)
         PointInTimeEditable(dateAndTimeState.end)
     }

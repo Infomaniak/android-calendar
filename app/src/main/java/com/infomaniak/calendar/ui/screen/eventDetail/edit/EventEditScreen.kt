@@ -36,8 +36,11 @@ import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberEventFormState
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
+import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
@@ -47,7 +50,8 @@ import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSe
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
-import kotlinx.coroutines.channels.consumeEach
+import kotlinx.datetime.TimeZone
+import kotlin.time.Duration.Companion.hours
 
 @Composable
 fun EventEditScreen(
@@ -67,6 +71,7 @@ fun EventEditScreen(
             rememberEventFormState(
                 calendars = eventFormCalendars?.calendars ?: emptyList(),
                 initialCalendar = eventFormCalendars?.initialCalendar,
+                dateAndTimeState = rememberEventDateState(eventDetailUiState.eventDetail),
                 initialText = eventDetailUiState.eventDetail.title,
                 initialIsAllDay = eventDetailUiState.eventDetail.isAllDay,
                 initialIsKMeetUrlEnabled = eventDetailUiState.eventDetail.kMeetUrl != null,
@@ -136,6 +141,24 @@ private fun EventEditScreen(
     }
 }
 
+@Composable
+private fun rememberEventDateState(eventDetailUi: EventDetailUi): DateAndTimeState {
+    val start = eventDetailUi.start.atLocale
+    val end = eventDetailUi.end.atLocale
+
+    return rememberDateAndTimeState(
+        startDate = start.date,
+        startTime = start.time,
+        startTimeZone = eventDetailUi.start.timeZone,
+        endDate = end.date,
+        endTime = end.time,
+        endTimeZone = eventDetailUi.end.timeZone,
+    )
+}
+
+private val EventDetailTiming.timeZone: TimeZone
+    get() = (this as? EventDetailTiming.Precise)?.timeZone ?: TimeZone.currentSystemDefault()
+
 private sealed interface EventEditScreenState {
     object Loading : EventEditScreenState
     data class Success(val eventFormState: EventFormState) : EventEditScreenState
@@ -151,6 +174,7 @@ private fun Preview() {
                     rememberEventFormState(
                         calendars = listOf(previewEventDetailCalendar),
                         initialCalendar = previewEventDetailCalendar,
+                        dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
                         initialText = "Meeting on how to find funny preview titles",
                         attendeesSearchState = rememberSaveableAttendeesSearchState(
                             attendees = remember { mutableStateSetOf(*previewAttendees.toTypedArray()) },

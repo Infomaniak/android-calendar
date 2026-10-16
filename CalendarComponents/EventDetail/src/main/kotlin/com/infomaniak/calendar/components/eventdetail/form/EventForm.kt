@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatusSwitch
+import com.infomaniak.calendar.components.eventdetail.component.DateAndTimeEditable
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitch
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.Section
@@ -41,7 +42,10 @@ import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventShare
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
+import kotlinx.datetime.TimeZone
+import kotlin.time.Duration.Companion.hours
 
 /**
  * Reusable component for both the creation and the edition of an event.
@@ -67,6 +71,11 @@ fun EventForm(
         AllDaySwitch(
             checked = state.isAllDay::value,
             onCheckedChange = { isChecked -> state.isAllDay.value = isChecked },
+        )
+
+        DateAndTimeEditable(
+            dateAndTimeState = state.dateAndTimeState,
+            modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
         )
 
         Section {
@@ -108,6 +117,7 @@ private fun Preview() {
                 state = rememberEventFormState(
                     calendars = listOf(previewEventDetailCalendar),
                     initialCalendar = previewEventDetailCalendar,
+                    dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
                     initialText = "Event title",
                     attendeesSearchState = rememberSaveableAttendeesSearchState(),
                     initialIsAllDay = true,
