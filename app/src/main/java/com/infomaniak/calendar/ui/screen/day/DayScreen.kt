@@ -17,9 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.day
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -32,7 +30,6 @@ import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
 import com.infomaniak.calendar.components.day.DayPager
-import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
@@ -40,15 +37,14 @@ import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
-import com.infomaniak.calendar.ui.component.ScreenLoader
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
+import com.infomaniak.calendar.ui.model.TimelineUiState
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
-import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.datetime.DateTimeUnit
@@ -60,38 +56,39 @@ import kotlinx.datetime.plus
 fun DayScreen(
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     modifier: Modifier = Modifier,
-    dayViewModel: DayViewModel = viewModel(),
+    viewModel: DayViewModel = viewModel(),
 ) {
-    val dayUiState by dayViewModel.dayUiState.collectAsStateWithLifecycle()
-    val isLoadingEvents by dayViewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
-    val eventsDots by dayViewModel.eventDots.collectAsStateWithLifecycle(initialValue = emptyMap())
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
+    val eventDots by viewModel.eventDots.collectAsStateWithLifecycle()
+
     val visibleDayState = LocalVisibleDayState.current ?: return
     // The timeline scrolls to its opening hour as soon as it is measured, and counts that scroll in
     // hour heights: it is built once the stored height is known, or it would open hours off.
-    val storedHourHeight by dayViewModel.hourHeight.collectAsStateWithLifecycle(initialValue = null)
+    val storedHourHeight by viewModel.hourHeight.collectAsStateWithLifecycle(initialValue = null)
     val timelineState = rememberDayTimelineState(
         initialHourHeight = storedHourHeight ?: return,
-        onHourHeightSaveRequest = dayViewModel::saveHourHeight,
+        onHourHeightSaveRequest = viewModel::saveHourHeight,
     )
 
     ApplyJumpRequests(visibleDayState)
 
     DayScreen(
-        modifier = modifier,
         goToEventDetail = goToEventDetail,
-        dayUiState = { dayUiState },
+        uiState = { uiState },
+        isLoadingEvents = { isLoadingEvents },
+        eventsDots = { eventDots },
         visibleDayState = visibleDayState,
         timelineState = timelineState,
-        dateRange = dayViewModel.dateRange,
-        isLoadingEvents = { isLoadingEvents },
-        eventsDots = { eventsDots },
+        dateRange = viewModel.dateRange,
+        modifier = modifier,
     )
 }
 
 @Composable
 private fun DayScreen(
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
-    dayUiState: () -> DayUiState,
+    uiState: () -> TimelineUiState,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     visibleDayState: VisibleDayState,
@@ -121,55 +118,29 @@ private fun DayScreen(
         },
         modifier = modifier,
     ) { contentPadding ->
-        when (val state = dayUiState()) {
-            is DayUiState.Loading -> ScreenLoader(modifier = Modifier.padding(contentPadding))
-            is DayUiState.Success -> {
-                SuccessDay(
-                    visibleDayState = visibleDayState,
-                    timelineState = timelineState,
-                    dateRange = dateRange,
-                    eventsByDate = state.eventsByDate,
-                    goToEventDetail = goToEventDetail,
-                    hazeState = hazeState,
-                    contentPadding = contentPadding,
-                    // Placed here rather than on each page: the hour grid's vertical scroll reaches it through
-                    // the pager, which only consumes the horizontal axis.
-                    modifier = Modifier.collapseCalendarOnScroll(calendarExpansionState),
-                )
-            }
-        }
+        DayPager(
+            dateRange = dateRange,
+            selectedDate = { visibleDayState.visibleDate },
+            eventsOf = { uiState().eventsOf(it) },
+            state = timelineState,
+            weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
+            onVisibleDateChanged = { visibleDayState.updateVisibleDate(it) },
+            onEventClick = { goToEventDetail(it.occurrenceId) },
+            headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
+            timelineModifier = Modifier.hazeSource(hazeState),
+            contentPadding = contentPadding,
+            // Placed here rather than on each page: the hour grid's vertical scroll reaches it through
+            // the pager, which only consumes the horizontal axis.
+            modifier = Modifier
+                .fillMaxSize()
+                .collapseCalendarOnScroll(calendarExpansionState),
+        )
     }
-}
-
-@Composable
-private fun SuccessDay(
-    visibleDayState: VisibleDayState,
-    timelineState: TimelineState,
-    dateRange: ClosedRange<LocalDate>,
-    eventsByDate: () -> DayEventsByDate,
-    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
-    hazeState: HazeState,
-    contentPadding: PaddingValues,
-    modifier: Modifier = Modifier,
-) {
-    DayPager(
-        dateRange = dateRange,
-        selectedDate = { visibleDayState.visibleDate },
-        eventsOf = { eventsByDate()[it] ?: DayEvents.Empty },
-        state = timelineState,
-        weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
-        onVisibleDateChanged = { visibleDayState.updateVisibleDate(it) },
-        onEventClick = { goToEventDetail(it.occurrenceId) },
-        headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
-        timelineModifier = Modifier.hazeSource(hazeState),
-        contentPadding = contentPadding,
-        modifier = modifier.fillMaxSize(),
-    )
 }
 
 @Preview
 @Composable
-private fun DayScreenPreview() {
+private fun Preview() {
     CalendarThemeForPreview {
         val visibleDayState = rememberVisibleDayState()
         val date = visibleDayState.visibleDate
@@ -177,7 +148,7 @@ private fun DayScreenPreview() {
         CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
             DayScreen(
                 goToEventDetail = {},
-                dayUiState = { DayUiState.Success({ emptyMap() }) },
+                uiState = { TimelineUiState.Success(emptyMap()) },
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
                 visibleDayState = visibleDayState,

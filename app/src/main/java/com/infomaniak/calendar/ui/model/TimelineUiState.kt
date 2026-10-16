@@ -15,9 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.day
+package com.infomaniak.calendar.ui.model
 
-sealed interface DayUiState {
-    data object Loading : DayUiState
-    data class Success(val eventsByDate: () -> DayEventsByDate) : DayUiState
+import com.infomaniak.calendar.components.day.model.DayEvents
+import com.infomaniak.calendar.utils.DayEventsByDate
+import kotlinx.datetime.LocalDate
+
+/** The events of a day, 3 days or week screen; its grid shows empty while they load. */
+sealed interface TimelineUiState {
+    fun eventsOf(date: LocalDate): DayEvents
+
+    data object Loading : TimelineUiState {
+        override fun eventsOf(date: LocalDate) = DayEvents.Empty
+    }
+
+    data class Success(val eventsByDate: DayEventsByDate) : TimelineUiState {
+        override fun eventsOf(date: LocalDate) = eventsByDate[date] ?: DayEvents.Empty
+    }
 }

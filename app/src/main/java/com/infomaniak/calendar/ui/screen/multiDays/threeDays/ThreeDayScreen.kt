@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.threeDays
+package com.infomaniak.calendar.ui.screen.multiDays.threeDays
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.TopAppBarDefaults
@@ -31,7 +31,6 @@ import com.infomaniak.calendar.components.calendar.component.ExpandableCalendarD
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
 import com.infomaniak.calendar.components.day.ThreeDayPager
-import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
@@ -41,15 +40,24 @@ import com.infomaniak.calendar.components.foundation.state.rememberVisibleDaySta
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
+import com.infomaniak.calendar.ui.model.TimelineUiState
+import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
+import com.infomaniak.calendar.ui.screen.multiDays.MultiDaysViewModel
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.datetime.LocalDate
 
 @Composable
-fun ThreeDayScreen(modifier: Modifier = Modifier, viewModel: ThreeDayViewModel = viewModel()) {
+fun ThreeDayScreen(
+    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: MultiDaysViewModel = viewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
     val eventDots by viewModel.eventDots.collectAsStateWithLifecycle()
 
@@ -65,6 +73,8 @@ fun ThreeDayScreen(modifier: Modifier = Modifier, viewModel: ThreeDayViewModel =
     ApplyJumpRequests(visibleDayState)
 
     ThreeDayScreen(
+        goToEventDetail = goToEventDetail,
+        uiState = { uiState },
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventDots },
         visibleDayState = visibleDayState,
@@ -75,6 +85,8 @@ fun ThreeDayScreen(modifier: Modifier = Modifier, viewModel: ThreeDayViewModel =
 
 @Composable
 private fun ThreeDayScreen(
+    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
+    uiState: () -> TimelineUiState,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     visibleDayState: VisibleDayState,
@@ -106,10 +118,10 @@ private fun ThreeDayScreen(
     ) { contentPadding ->
         ThreeDayPager(
             selectedDate = { visibleDayState.visibleDate },
-            eventsOf = { DayEvents.Empty }, // TODO: Observe the events of the days in view
+            eventsOf = { uiState().eventsOf(it) },
             state = timelineState,
             weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
-            onEventClick = {},
+            onEventClick = { goToEventDetail(it.occurrenceId) },
             headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
             timelineModifier = Modifier.hazeSource(hazeState),
             contentPadding = contentPadding,
@@ -127,6 +139,8 @@ private fun Preview() {
         val visibleDayState = rememberVisibleDayState()
         CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
             ThreeDayScreen(
+                goToEventDetail = {},
+                uiState = { TimelineUiState.Success(emptyMap()) },
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
                 visibleDayState = visibleDayState,
