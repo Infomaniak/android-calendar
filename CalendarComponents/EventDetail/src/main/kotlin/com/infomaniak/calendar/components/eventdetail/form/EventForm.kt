@@ -32,11 +32,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
+import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitch
+import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
+import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
+import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
@@ -63,6 +67,11 @@ fun EventForm(
             modifier = Modifier.eventSharedElement(EventSharedElement.Title),
         )
 
+        AllDaySwitch(
+            checked = state.isAllDay::value,
+            onCheckedChange = { isChecked -> state.isAllDay.value = isChecked },
+        )
+
         Section {
             AttendeesButton(
                 attendees = state.attendeesState.attendees.toList(),
@@ -71,9 +80,23 @@ fun EventForm(
             )
 
             KMeetButtonSwitch(
-                checked = { state.isKMeetUrlEnabled.value },
-                onToggle = { isChecked -> state.isKMeetUrlEnabled.value = isChecked },
-                modifier = Modifier.eventSharedElement(EventSharedElement.KMeet),
+                checked = state.isKMeetUrlEnabled::value,
+                onCheckedChange = { isChecked -> state.isKMeetUrlEnabled.value = isChecked },
+                modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
+            )
+        }
+
+        Section {
+            OccupiedStatusSwitch(
+                checked = state.isOccupied::value,
+                onCheckedChange = { isChecked -> state.isOccupied.value = isChecked },
+                modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus),
+            )
+
+            ClassificationStatusSwitch(
+                checked = state.isPublic::value,
+                onCheckedChange = { isChecked -> state.isPublic.value = isChecked },
+                modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
             )
         }
     }

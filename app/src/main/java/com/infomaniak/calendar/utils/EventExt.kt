@@ -57,7 +57,7 @@ fun Event.toEventDetailUi(calendar: Calendar, emailsByUserId: Map<AccountId, Str
     files = emptyList(), // TODO[eventDetail]: Not carried by the KMP model yet
     notifications = alarms.mapNotNull { it.toNotification() },
     isOccupied = timeBlocking != TimeBlocking.DoesNotBlock, // null is considered as occupied
-    classification = classification?.toClassification(),
+    classification = classification.toClassification(),
     canEdit = canEdit,
 )
 
@@ -86,7 +86,8 @@ private fun EventAlarm.toNotification(): EventDetailUi.Notification? {
     )
 }
 
-private fun Classification.toClassification(): EventDetailUi.Classification? = when (this) {
+private fun Classification?.toClassification(): EventDetailUi.Classification? = when (this) {
+    null,
     Classification.Public -> EventDetailUi.Classification.Public
     Classification.Private -> EventDetailUi.Classification.Private
     Classification.Confidential -> EventDetailUi.Classification.Confidential

@@ -26,11 +26,10 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
@@ -75,28 +74,13 @@ internal fun KMeetButton(
 @Composable
 internal fun KMeetButtonSwitch(
     checked: () -> Boolean,
-    onToggle: (isChecked: Boolean) -> Unit,
+    onCheckedChange: (isChecked: Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
 ) {
-    val defaultColors = ListItemDefaults.colors()
-
-    ListItem(
-        checked = checked(),
-        onCheckedChange = onToggle,
-        content = { Text(stringResource(id = R.string.kMeetMeeting)) },
-        leadingContent = { KMeetIcon() },
-        trailingContent = { Switch(checked = checked(), onCheckedChange = onToggle) },
-        modifier = modifier,
-        colors = ListItemDefaults.colors(
-            selectedContainerColor = defaultColors.containerColor,
-            selectedContentColor = defaultColors.contentColor,
-            selectedLeadingContentColor = defaultColors.leadingContentColor,
-            selectedTrailingContentColor = defaultColors.trailingContentColor,
-            selectedSupportingContentColor = defaultColors.supportingContentColor,
-            selectedOverlineContentColor = defaultColors.overlineContentColor,
-        ),
-        shapes = ClickableItemDefaults.ClickableItemShapes,
-    )
+    ListItemSwitch(checked, onCheckedChange, modifier, shapes, leadingContent = { KMeetIcon() }) {
+        Text(stringResource(id = R.string.kMeetMeeting))
+    }
 }
 
 @Composable
@@ -139,7 +123,7 @@ private fun PreviewKMeetButton() {
 private fun PreviewKMeetButtonSwitch() {
     MaterialTheme {
         Surface {
-            KMeetButtonSwitch(checked = { true }, onToggle = {})
+            KMeetButtonSwitch(checked = { true }, onCheckedChange = {})
         }
     }
 }

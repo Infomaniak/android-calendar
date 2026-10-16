@@ -15,10 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.detail.component
+package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -27,16 +28,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.component.ItemIcon
 import com.infomaniak.calendar.components.resources.R
 
 @Composable
 internal fun OccupiedStatus(isOccupied: Boolean, modifier: Modifier = Modifier) {
     ListItem(
         content = { Text(text = stringResource(if (isOccupied) R.string.occupiedLabel else R.string.availableLabel)) },
-        leadingContent = { ItemIcon(painterResource(R.drawable.ic_briefcase)) },
+        leadingContent = { OccupiedIcon() },
         modifier = modifier,
     )
+}
+
+@Composable
+internal fun OccupiedStatusSwitch(
+    checked: () -> Boolean,
+    onCheckedChange: (isChecked: Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
+) {
+    ListItemSwitch(checked, onCheckedChange, modifier, shapes, leadingContent = { OccupiedIcon() }) {
+        Text(text = stringResource(R.string.occupiedLabel))
+    }
+}
+
+@Composable
+private fun OccupiedIcon() {
+    ItemIcon(painterResource(R.drawable.ic_briefcase))
 }
 
 @Preview
@@ -47,6 +64,19 @@ private fun PreviewOccupiedStatus() {
             Column {
                 OccupiedStatus(isOccupied = true)
                 OccupiedStatus(isOccupied = false)
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewSwitch() {
+    MaterialTheme {
+        Surface {
+            Column {
+                OccupiedStatusSwitch(checked = { true }, onCheckedChange = {})
+                OccupiedStatusSwitch(checked = { false }, onCheckedChange = {})
             }
         }
     }

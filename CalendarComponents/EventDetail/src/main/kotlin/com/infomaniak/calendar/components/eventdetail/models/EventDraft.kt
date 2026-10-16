@@ -23,6 +23,9 @@ import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 data class EventDraft(
     val title: String,
     val color: Color,
+    val isAllDay: Boolean,
     val attendees: List<AttendeeUi>,
     val isKMeetUrlEnabled: Boolean,
+    val isOccupied: Boolean,
+    val isPublic: Boolean,
 )
