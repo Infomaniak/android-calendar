@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatusSwitch
+import com.infomaniak.calendar.components.eventdetail.component.DateAndTimeEditable
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitch
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.Section
@@ -70,6 +71,11 @@ fun EventForm(
         AllDaySwitch(
             checked = state.isAllDay::value,
             onCheckedChange = { isChecked -> state.isAllDay.value = isChecked },
+        )
+
+        DateAndTimeEditable(
+            dateAndTimeState = state.dateAndTimeState,
+            modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
         )
 
         Section {

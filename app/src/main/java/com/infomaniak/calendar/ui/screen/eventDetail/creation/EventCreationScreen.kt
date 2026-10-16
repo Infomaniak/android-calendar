@@ -30,10 +30,13 @@ import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberSaveableEventFormState
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
+import kotlinx.coroutines.flow.first
+import kotlinx.datetime.TimeZone
 
 @Composable
 fun EventCreationScreen(
@@ -48,6 +51,7 @@ fun EventCreationScreen(
         calendars = eventFormCalendars?.calendars ?: emptyList(),
         initialCalendar = eventFormCalendars?.initialCalendar,
         attendeesSearchState = viewModel.attendeesSearchState,
+        dateAndTimeState = rememberDateAndTimeState(viewModel.defaultEventDuration, TimeZone.currentSystemDefault()), // TODO: Wait for the defaultEventDuration
     )
 
     LaunchedEffect(Unit) {

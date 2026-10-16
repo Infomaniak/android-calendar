@@ -32,6 +32,9 @@ import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
+import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
+import com.infomaniak.calendar.components.eventdetail.state.rememberEmptyDateAndTimeState
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
@@ -41,6 +44,7 @@ class EventFormState(
     val titleTextState: TextFieldState,
     val colorState: MutableState<Color?>,
     val isAllDay: MutableState<Boolean>,
+    val dateAndTimeState: DateAndTimeState,
     val attendeesState: AttendeesSearchState,
     val isKMeetUrlEnabled: MutableState<Boolean>,
     val isOccupied: MutableState<Boolean>,
@@ -62,6 +66,7 @@ class EventFormState(
 fun rememberSaveableEventFormState(
     calendars: List<EventDetailCalendar>,
     initialCalendar: EventDetailCalendar?,
+    dateAndTimeState: DateAndTimeState,
     initialText: String = "",
     initialIsAllDay: Boolean = false,
     initialIsKMeetUrlEnabled: Boolean = false,
@@ -81,6 +86,7 @@ fun rememberSaveableEventFormState(
         titleTextState = rememberTextFieldState(initialText),
         colorState = colorState,
         isAllDay = rememberSaveable { mutableStateOf(initialIsAllDay) },
+        dateAndTimeState = dateAndTimeState,
         attendeesState = attendeesState,
         isKMeetUrlEnabled = rememberSaveable { mutableStateOf(initialIsKMeetUrlEnabled) },
         isOccupied = rememberSaveable { mutableStateOf(initialIsOccupied) },

@@ -24,6 +24,8 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
+import com.infomaniak.calendar.data.CalendarDataValues
+import com.infomaniak.calendar.data.SettingsDataValues
 import com.infomaniak.calendar.ui.screen.eventDetail.EventFormCalendarsUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventFormCalendars
 import com.infomaniak.calendar.utils.saveableAttendeesSearchState
@@ -41,9 +43,12 @@ import kotlinx.coroutines.flow.StateFlow
 class EventCreationViewModel(
     @Assisted savedStateHandle: SavedStateHandle,
     eventFormCalendarsUseCase: EventFormCalendarsUseCase,
+    settingsDataValues: SettingsDataValues,
 ) : ViewModel() {
     val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase.creationCalendars
     val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
+
+    val defaultEventDuration = settingsDataValues.defaultEventDuration.flow
 
     fun submitEvent(eventDraft: EventDraft) {
         // TODO

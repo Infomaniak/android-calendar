@@ -82,7 +82,7 @@ fun EventDetail(
         with(eventDetail) {
             Title(dotColor = eventColor, title = title, modifier = Modifier.eventSharedElement(EventSharedElement.Title))
 
-            DateAndTime(start, end, isAllDay)
+            DateAndTime(start, end, isAllDay, Modifier.eventSharedBounds(EventSharedElement.DateAndTime))
 
             eventDetail.getRecurrenceText?.let {
                 Recurrence(it)

@@ -78,6 +78,7 @@ internal fun ProvideEventSharedTransition(
 
 internal enum class EventSharedElement {
     Title,
+    DateAndTime,
     Attendees,
     KMeet,
     OccupiedStatus,
