@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.detail.component
+package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,12 +38,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.eventdetail.component.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatCityName
@@ -126,7 +126,7 @@ private fun PointInTimeEditable(
         OutlinedButton(onClick = {}, shapes = shapes) { Text(pointInTime.date.formatShortDateWithYear()) }
         OutlinedButton(onClick = {}, shapes = shapes) { Text(pointInTime.time.formatExplicitTimeLabel()) }
 
-        Box(Modifier.weight(1f), contentAlignment = androidx.compose.ui.Alignment.CenterEnd) {
+        Box(Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
             TextButton(
                 onClick = {},
                 colors = ButtonDefaults.textButtonColors(contentColor = LocalContentColor.current),
