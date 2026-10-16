@@ -22,6 +22,7 @@ import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.mapState
 import com.infomaniak.calendar.utils.toEventDetailCalendar
 import com.infomaniak.calendar.utils.toEventDetailUi
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
@@ -78,7 +79,16 @@ class GetEventDetailUiUseCase @Inject constructor(
                 calendarManager
                     .observeCalendar(event.calendarId)
                     .map { calendar ->
-                        if (calendar == null) EventAndCalendarState.Loading else EventAndCalendarState.Success(event, calendar)
+                        if (calendar == null) {
+                            val eventDetail = "masterEventId=${event.masterEventId}" +
+                                    ", occurrenceId=${event.occurrenceId}" +
+                                    ", calendarId=${event.calendarId}" +
+                                    ", accountId=${event.accountId}"
+                            SentryLog.w(TAG, "Event with no calendar for $eventDetail")
+                            EventAndCalendarState.Loading
+                        } else {
+                            EventAndCalendarState.Success(event, calendar)
+                        }
                     }
             }
         }
@@ -106,6 +116,10 @@ class GetEventDetailUiUseCase @Inject constructor(
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) {
         occurrenceIdFlow.value = occurrenceId
+    }
+
+    companion object {
+        private const val TAG = "GetEventDetailUiUseCase"
     }
 }
 
