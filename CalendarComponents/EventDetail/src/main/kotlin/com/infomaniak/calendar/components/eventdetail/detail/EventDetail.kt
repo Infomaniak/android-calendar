@@ -52,6 +52,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
+import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
@@ -100,7 +101,7 @@ fun EventDetail(
                     KMeetButton(
                         onJoin = onJoinKMeet,
                         onCopy = onCopyKMeet,
-                        modifier = Modifier.eventSharedElement(EventSharedElement.KMeet),
+                        modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
                     )
                 }
 
@@ -129,12 +130,12 @@ fun EventDetail(
             }
 
             Section {
-                OccupiedStatus(isOccupied, modifier = Modifier.eventSharedElement(EventSharedElement.OccupiedStatus))
+                OccupiedStatus(isOccupied, modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus))
 
                 if (classification != null) {
                     ClassificationStatus(
                         classification = classification,
-                        modifier = Modifier.eventSharedElement(EventSharedElement.ClassificationStatus),
+                        modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
                     )
                 }
 

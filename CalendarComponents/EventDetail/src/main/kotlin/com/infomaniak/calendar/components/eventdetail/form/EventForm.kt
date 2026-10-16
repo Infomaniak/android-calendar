@@ -40,6 +40,7 @@ import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
 import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
+import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
@@ -81,7 +82,7 @@ fun EventForm(
             KMeetButtonSwitch(
                 checked = state.isKMeetUrlEnabled::value,
                 onCheckedChange = { isChecked -> state.isKMeetUrlEnabled.value = isChecked },
-                modifier = Modifier.eventSharedElement(EventSharedElement.KMeet),
+                modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
             )
         }
 
@@ -89,13 +90,13 @@ fun EventForm(
             OccupiedStatusSwitch(
                 checked = state.isOccupied::value,
                 onCheckedChange = { isChecked -> state.isOccupied.value = isChecked },
-                modifier = Modifier.eventSharedElement(EventSharedElement.OccupiedStatus),
+                modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus),
             )
 
             ClassificationStatusSwitch(
                 checked = state.isPublic::value,
                 onCheckedChange = { isChecked -> state.isPublic.value = isChecked },
-                modifier = Modifier.eventSharedElement(EventSharedElement.ClassificationStatus),
+                modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
             )
         }
     }
