@@ -17,26 +17,48 @@
  */
 package com.infomaniak.calendar.components.eventdetail.detail.component
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
+import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatCityName
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRangeWithZone
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatExplicitTimeLabel
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortDateWithYear
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
 import kotlinx.datetime.minus
@@ -83,6 +105,43 @@ internal fun DateAndTime(
         },
         modifier = modifier,
     )
+}
+
+@Composable
+internal fun DateAndTimeEditable(dateAndTimeState: DateAndTimeState, modifier: Modifier = Modifier) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs)) {
+        PointInTimeEditable(dateAndTimeState.start)
+        PointInTimeEditable(dateAndTimeState.end)
+    }
+}
+
+@Composable
+private fun PointInTimeEditable(
+    pointInTime: DateAndTimeState.PointInTime,
+    modifier: Modifier = Modifier,
+) {
+    val shapes = ButtonDefaults.shapes(MaterialTheme.shapes.medium, CircleShape)
+
+    Row(horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.lg), modifier = modifier) {
+        OutlinedButton(onClick = {}, shapes = shapes) { Text(pointInTime.date.formatShortDateWithYear()) }
+        OutlinedButton(onClick = {}, shapes = shapes) { Text(pointInTime.time.formatExplicitTimeLabel()) }
+
+        Box(Modifier.weight(1f), contentAlignment = androidx.compose.ui.Alignment.CenterEnd) {
+            TextButton(
+                onClick = {},
+                colors = ButtonDefaults.textButtonColors(contentColor = LocalContentColor.current),
+                shapes = shapes,
+            ) {
+                Icon(
+                    painterResource(R.drawable.ic_globe),
+                    contentDescription = null,
+                    modifier = Modifier.size(EsdsTheme.icon.sizeSm),
+                )
+                Spacer(modifier = Modifier.width(EsdsTheme.spacing.md))
+                Text(pointInTime.timeZone.formatCityName(), maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+        }
+    }
 }
 
 @Preview
@@ -156,6 +215,29 @@ private fun PreviewDateAndTime() {
                     isAllDay = true,
                 )
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewEditable() {
+    MaterialTheme {
+        Surface {
+            DateAndTimeEditable(
+                dateAndTimeState = DateAndTimeState(
+                    start = DateAndTimeState.PointInTime(
+                        date = remember { mutableStateOf(LocalDate(2026, 5, 20)) },
+                        time = remember { mutableStateOf(LocalTime(8, 10)) },
+                        timeZone = remember { mutableStateOf(TimeZone.currentSystemDefault()) },
+                    ),
+                    end = DateAndTimeState.PointInTime(
+                        date = remember { mutableStateOf(LocalDate(2026, 5, 20)) },
+                        time = remember { mutableStateOf(LocalTime(9, 0)) },
+                        timeZone = remember { mutableStateOf(TimeZone.currentSystemDefault()) },
+                    ),
+                ),
+            )
         }
     }
 }

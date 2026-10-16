@@ -30,6 +30,7 @@ private const val FULL_DATE_WITH_YEAR_SKELETON = "yEEEEdMMMM"
 
 private const val SHORT_DAY_NAME_PATTERN = "EEE"
 private const val DAY_WITH_SHORT_MONTH_PATTERN = "EEEE - d MMM"
+private const val SHORT_DATE_WITH_YEAR_PATTERN = "d MMM y"
 
 //region Exposed formatting methods
 /** `W` */
@@ -57,6 +58,12 @@ fun LocalDate.formatDayWithShortMonth(): String {
 /** `Wednesday, May 20, 2026`, for labels that have to stand on their own such as content descriptions. */
 @Composable
 fun LocalDate.formatFullDateWithYear(): String = format(FULL_DATE_WITH_YEAR_SKELETON, currentLocale())
+
+/** `21 Dec 2026`, keeping this layout without any comma in every language. */
+@Composable
+fun LocalDate.formatShortDateWithYear(): String {
+    return toJavaLocalDate().format(fixedFormatter(SHORT_DATE_WITH_YEAR_PATTERN, currentLocale()))
+}
 //endregion
 
 //region Underlying testable logic
