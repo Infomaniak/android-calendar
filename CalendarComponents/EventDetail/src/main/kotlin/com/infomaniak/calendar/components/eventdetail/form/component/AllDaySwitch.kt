@@ -17,12 +17,14 @@
  */
 package com.infomaniak.calendar.components.eventdetail.form.component
 
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.ClickableItemDefaults
@@ -36,7 +38,13 @@ internal fun AllDaySwitch(
     modifier: Modifier = Modifier,
     shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
 ) {
-    ListItemSwitch(checked, onCheckedChange, modifier, shapes = shapes) {
+    ListItemSwitch(
+        checked = checked,
+        onCheckedChange = onCheckedChange,
+        modifier = modifier,
+        shapes = shapes,
+        leadingContent = { Icon(painterResource(R.drawable.ic_calendar), contentDescription = null) },
+    ) {
         Text(stringResource(id = R.string.notificationAllDay))
     }
 }
