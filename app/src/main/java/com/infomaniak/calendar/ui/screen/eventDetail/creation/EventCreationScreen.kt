@@ -30,8 +30,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
-import com.infomaniak.calendar.components.eventdetail.form.rememberSaveableEventFormState
+import com.infomaniak.calendar.components.eventdetail.form.rememberDefaultEventForm
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -46,7 +47,7 @@ fun EventCreationScreen(
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
 ) {
     val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
-    val state = rememberSaveableEventFormState(
+    val state = rememberDefaultEventForm(
         calendars = eventFormCalendars?.calendars ?: emptyList(),
         initialCalendar = eventFormCalendars?.initialCalendar,
         attendeesSearchState = viewModel.attendeesSearchState,
@@ -97,9 +98,10 @@ private fun EventCreationScreen(
 @Composable
 private fun EventCreationScreenPreview() {
     CalendarThemeForPreview {
-        val state = rememberSaveableEventFormState(
+        val state = rememberDefaultEventForm(
             calendars = listOf(previewEventDetailCalendar),
             initialCalendar = previewEventDetailCalendar,
+            attendeesSearchState = rememberSaveableAttendeesSearchState(),
         )
 
         EventCreationScreen(state = state, onSubmit = {}, goBack = {}, goToEventsAttendees = {})
