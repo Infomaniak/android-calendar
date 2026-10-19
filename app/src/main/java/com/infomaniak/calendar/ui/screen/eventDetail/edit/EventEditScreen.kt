@@ -37,6 +37,7 @@ import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberSaveableEventFormState
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
@@ -68,8 +69,11 @@ fun EventEditScreen(
                 calendars = eventFormCalendars?.calendars ?: emptyList(),
                 initialCalendar = eventFormCalendars?.initialCalendar,
                 initialText = eventDetailUiState.eventDetail.title,
+                initialIsAllDay = eventDetailUiState.eventDetail.isAllDay,
                 initialAttendees = viewModel.attendeesSearchState.attendees,
                 attendeesSearchState = viewModel.attendeesSearchState,
+                initialIsOccupied = eventDetailUiState.eventDetail.isOccupied,
+                initialIsPublic = eventDetailUiState.eventDetail.classification == EventDetailUi.Classification.Public,
             ),
         )
         EventDetailUiState.Unavailable -> EventEditScreenState.Unavailable
