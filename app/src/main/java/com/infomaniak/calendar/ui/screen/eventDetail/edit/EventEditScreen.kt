@@ -20,7 +20,9 @@ package com.infomaniak.calendar.ui.screen.eventDetail.edit
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.plus
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
@@ -110,6 +112,8 @@ private fun EventEditScreen(
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
+    val scrollState = rememberScrollState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -117,6 +121,7 @@ private fun EventEditScreen(
                 title = {},
             )
         },
+        modifier = modifier,
     ) { contentPadding ->
         when (uiState) {
             // Coming from the detail screen, the shared flow is already warm, so this is only hit when entering edit directly or
@@ -125,7 +130,7 @@ private fun EventEditScreen(
             is EventEditScreenState.Success -> EventForm(
                 state = uiState.eventFormState,
                 onAttendeesClick = goToEventAttendees,
-                modifier = modifier,
+                modifier = Modifier.verticalScroll(scrollState),
                 contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
