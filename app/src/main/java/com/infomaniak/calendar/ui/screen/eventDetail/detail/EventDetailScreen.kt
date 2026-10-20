@@ -99,7 +99,9 @@ fun EventDetailScreen(
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
         goBack = goBack,
         goToEdit = goToEdit,
-        onDelete = {},
+        onDelete = {
+            //TODO[DeleteEvent]: Needs to be wired
+        },
         onLocationClick = { location -> openLocationInMapApp(context, location) },
         goToEventAttendees = goToEventAttendees,
         modifier = modifier,

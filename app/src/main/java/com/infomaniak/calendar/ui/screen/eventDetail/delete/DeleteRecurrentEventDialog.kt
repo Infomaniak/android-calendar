@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.delete
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.AlertDialog
@@ -41,12 +40,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.R as RCore
-
-enum class DeleteEventScope(@StringRes val labelRes: Int) {
-    ThisEvent(R.string.buttonDeleteEvent),
-    ThisAndFollowingEvents(R.string.buttonDeleteThisAndFollowingEvents),
-    AllEvents(R.string.buttonDeleteAllEvents),
-}
 
 @Composable
 fun DeleteRecurrentEventDialog(onDelete: (DeleteEventScope) -> Unit, onDismiss: () -> Unit) {
