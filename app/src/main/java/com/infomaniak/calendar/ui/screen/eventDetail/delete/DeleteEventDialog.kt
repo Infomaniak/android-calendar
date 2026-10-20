@@ -17,45 +17,31 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.delete
 
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.common.R as RCore
 
 @Composable
-fun DeleteEventDialog(
-    onDelete: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.deleteEventAlertTitle)) },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onDelete()
-                    onDismiss()
-                },
-            ) {
-                Text(stringResource(RCore.string.deleteButton), color = MaterialTheme.colorScheme.error)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(RCore.string.buttonCancel)) }
-        },
-    )
+fun DeleteEventDialog(isRecurrent: () -> Boolean, onDelete: (DeleteEventScope) -> Unit, onDismiss: () -> Unit) {
+    if (isRecurrent()) {
+        DeleteRecurrentEventDialog(onDelete = onDelete, onDismiss = onDismiss)
+    } else {
+        DeleteSingleEventDialog(onDelete = { onDelete(DeleteEventScope.ThisEvent) }, onDismiss = onDismiss)
+    }
 }
 
-@Preview(showBackground = true)
+@Preview(showSystemUi = true)
 @Composable
-private fun DeleteEventDialogPreview() {
+private fun DeleteEventDialogSinglePreview() {
     CalendarThemeForPreview {
-        DeleteEventDialog(onDelete = {}, onDismiss = {})
+        DeleteEventDialog(isRecurrent = { false }, onDelete = {}, onDismiss = {})
+    }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+private fun DeleteEventDialogRecurrentPreview() {
+    CalendarThemeForPreview {
+        DeleteEventDialog(isRecurrent = { true }, onDelete = {}, onDismiss = {})
     }
 }

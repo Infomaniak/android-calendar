@@ -19,12 +19,12 @@ package com.infomaniak.calendar.ui.screen.eventDetail.delete
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -34,12 +34,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.R as RCore
 
 enum class DeleteEventScope(@StringRes val labelRes: Int) {
@@ -49,10 +49,7 @@ enum class DeleteEventScope(@StringRes val labelRes: Int) {
 }
 
 @Composable
-fun DeleteRecurrentEventDialog(
-    onDelete: (DeleteEventScope) -> Unit,
-    onDismiss: () -> Unit,
-) {
+fun DeleteRecurrentEventDialog(onDelete: (DeleteEventScope) -> Unit, onDismiss: () -> Unit) {
     var selectedScope by rememberSaveable { mutableStateOf(DeleteEventScope.ThisEvent) }
 
     AlertDialog(
@@ -61,31 +58,31 @@ fun DeleteRecurrentEventDialog(
         text = {
             Column(Modifier.selectableGroup()) {
                 DeleteEventScope.entries.forEach { scope ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .selectable(
-                                selected = selectedScope == scope,
-                                onClick = { selectedScope = scope },
-                                role = Role.RadioButton,
-                            )
-                            .padding(vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
+                    val isSelected = selectedScope == scope
+
+                    ListItem(
+                        selected = isSelected,
+                        onClick = { selectedScope = scope },
+                        leadingContent = { RadioButton(selected = isSelected, onClick = null) },
+                        colors = ListItemDefaults.colors(containerColor = AlertDialogDefaults.containerColor),
                     ) {
-                        RadioButton(selected = selectedScope == scope, onClick = null)
-                        Text(text = stringResource(scope.labelRes), modifier = Modifier.padding(start = 16.dp))
+                        Text(stringResource(scope.labelRes))
                     }
                 }
             }
         },
         confirmButton = {
             TextButton(
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = MaterialTheme.colorScheme.error,
+                    containerColor = Color.Transparent,
+                ),
                 onClick = {
                     onDelete(selectedScope)
                     onDismiss()
                 },
             ) {
-                Text(stringResource(RCore.string.deleteButton), color = MaterialTheme.colorScheme.error)
+                Text(stringResource(RCore.string.deleteButton))
             }
         },
         dismissButton = {
@@ -94,4 +91,12 @@ fun DeleteRecurrentEventDialog(
             }
         },
     )
+}
+
+@Preview(showSystemUi = true)
+@Composable
+private fun DeleteRecurrentEventDialogPreview() {
+    CalendarThemeForPreview {
+        DeleteRecurrentEventDialog(onDelete = {}, onDismiss = {})
+    }
 }

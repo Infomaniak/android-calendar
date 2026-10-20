@@ -48,6 +48,7 @@ fun Event.toEventDetailUi(calendar: Calendar, emailsByUserId: Map<AccountId, Str
     end = timing.toDetailTiming(isStart = false),
     isAllDay = timing.isAllDay,
     getRecurrenceText = if (isOccurrence) ::toLocalizedRecurrenceString else null,
+    isOccurrence = isOccurrence,
     attendees = attendees.toAttendees(accountId, emailsByUserId),
     kMeetUrl = null, // TODO[eventDetail]: Not carried by the KMP model yet
     location = location,

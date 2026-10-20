@@ -150,6 +150,7 @@ private fun PreviewEventDetail() {
         calendarName = "Vacation",
         title = "Event Title",
         getRecurrenceText = { "Every week on Monday" },
+        isOccurrence = true,
         start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
         end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
         isAllDay = false,

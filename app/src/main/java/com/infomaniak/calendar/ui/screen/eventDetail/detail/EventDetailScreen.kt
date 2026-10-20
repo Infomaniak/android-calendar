@@ -34,7 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -56,7 +56,6 @@ import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventDialog
 import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventScope
-import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteRecurrentEventDialog
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.calendar.utils.nestedScrollToolbar
@@ -101,7 +100,6 @@ fun EventDetailScreen(
         goBack = goBack,
         goToEdit = goToEdit,
         onDelete = {},
-        onDeleteRecurrent = {},
         onLocationClick = { location -> openLocationInMapApp(context, location) },
         goToEventAttendees = goToEventAttendees,
         modifier = modifier,
@@ -115,8 +113,7 @@ private fun EventDetailScreen(
     goBack: () -> Unit,
     goToEdit: () -> Unit,
     goToEventAttendees: () -> Unit,
-    onDelete: () -> Unit,
-    onDeleteRecurrent: (DeleteEventScope) -> Unit,
+    onDelete: (DeleteEventScope) -> Unit,
     onLocationClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -126,8 +123,7 @@ private fun EventDetailScreen(
     val state = uiState()
     val scrollState = rememberScrollState()
     val floatingToolbarScrollBehavior = rememberFloatingToolbarExitScrollBehavior(scrollState.canScrollForward)
-    var showSingleEventDeleteDialog by remember { mutableStateOf(false) }
-    var showRecurrentEventDeleteDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -138,7 +134,7 @@ private fun EventDetailScreen(
                     val canEdit = (state as? EventDetailUiState.Success)?.eventDetail?.canEdit == true
                     TopAppBarButtons.EditButton(onClick = goToEdit, enabled = canEdit)
                     TopAppBarButtons.DeleteButton(
-                        onClick = { showRecurrentEventDeleteDialog = true }, // TODO: check which one we should open
+                        onClick = { showDeleteDialog = true },
                         enabled = canEdit,
                         modifier = Modifier.padding(end = EsdsTheme.spacing.lg),
                     )
@@ -174,17 +170,11 @@ private fun EventDetailScreen(
                     animatedVisibilityScope = animatedVisibilityScope,
                 )
 
-                if (showSingleEventDeleteDialog) {
+                if (showDeleteDialog) {
                     DeleteEventDialog(
-                        onDismiss = { showSingleEventDeleteDialog = false },
+                        isRecurrent = { state.eventDetail.isOccurrence },
                         onDelete = onDelete,
-                    )
-                }
-
-                if (showRecurrentEventDeleteDialog) {
-                    DeleteRecurrentEventDialog(
-                        onDismiss = { showRecurrentEventDeleteDialog = false },
-                        onDelete = onDeleteRecurrent,
+                        onDismiss = { showDeleteDialog = false },
                     )
                 }
             }
@@ -212,6 +202,7 @@ private fun Preview() {
         end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
         isAllDay = false,
         getRecurrenceText = { "Every week on Monday" },
+        isOccurrence = true,
         attendees = Attendees(all = emptyList(), me = null),
         kMeetUrl = null,
         location = "Salle Tokyo",
@@ -233,7 +224,6 @@ private fun Preview() {
                 goToEdit = {},
                 goToEventAttendees = {},
                 onDelete = {},
-                onDeleteRecurrent = {},
                 onLocationClick = {},
             )
         }
