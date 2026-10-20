@@ -21,12 +21,13 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.calendar.ui.modifier.sharedElement
 import com.infomaniak.calendar.ui.theme.CalendarTheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Plus
 
 private const val FAB_KEY = "FAB"
 
@@ -37,7 +38,7 @@ fun CalendarFab(onClick: () -> Unit, modifier: Modifier = Modifier) {
         onClick = onClick,
     ) {
         Icon(
-            painter = painterResource(R.drawable.ic_plus),
+            imageVector = EsdsIcons.Plus.Medium,
             contentDescription = stringResource(R.string.contentDescriptionCreateEvent),
         )
     }

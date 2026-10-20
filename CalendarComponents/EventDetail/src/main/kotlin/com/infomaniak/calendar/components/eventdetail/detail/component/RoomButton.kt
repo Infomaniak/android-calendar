@@ -31,6 +31,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.DoorOpen
 import java.util.Locale
 
 @Composable
@@ -42,7 +44,7 @@ internal fun RoomButton(
 ) {
     ClickableItem(
         text = room.title,
-        leadingIconRes = R.drawable.ic_door_open,
+        leadingIcon = EsdsIcons.DoorOpen,
         supportingContent = {
             val locale = LocalLocale.current.platformLocale
 

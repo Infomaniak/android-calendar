@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.ui.component.drawer
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,6 +28,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.CircleUser
+import com.infomaniak.designsystem.icons.symbols.Cog
+import com.infomaniak.designsystem.icons.symbols.Headset
+import com.infomaniak.designsystem.icons.symbols.Symbol
 
 @Composable
 fun MenuList(
@@ -51,9 +55,9 @@ private fun MenuListPreview() {
     CalendarThemeForPreview {
         MenuList(
             menuOptions = listOf(
-                MenuOption(R.string.accountsTitle, R.drawable.ic_circle_user, {}),
-                MenuOption(R.string.settingsTitle, R.drawable.ic_cog, {}),
-                MenuOption(R.string.helpTitle, R.drawable.ic_headset, {}),
+                MenuOption(R.string.accountsTitle, EsdsIcons.CircleUser, {}),
+                MenuOption(R.string.settingsTitle, EsdsIcons.Cog, {}),
+                MenuOption(R.string.helpTitle, EsdsIcons.Headset, {}),
             ),
         )
     }
@@ -61,6 +65,6 @@ private fun MenuListPreview() {
 
 data class MenuOption(
     @StringRes val itemNameRes: Int,
-    @DrawableRes val itemIcon: Int,
+    val itemIcon: Symbol,
     val itemAction: () -> Unit,
 )

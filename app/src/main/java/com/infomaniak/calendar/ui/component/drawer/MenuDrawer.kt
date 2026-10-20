@@ -41,6 +41,10 @@ import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.CircleUser
+import com.infomaniak.designsystem.icons.symbols.Cog
+import com.infomaniak.designsystem.icons.symbols.Headset
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import kotlinx.coroutines.launch
 
@@ -132,17 +136,17 @@ private fun drawerMenuOptions(
     return listOf(
         MenuOption(
             itemNameRes = R.string.accountsTitle,
-            itemIcon = R.drawable.ic_circle_user,
+            itemIcon = EsdsIcons.CircleUser,
             itemAction = onManageAccounts,
         ),
         MenuOption(
             itemNameRes = R.string.settingsTitle,
-            itemIcon = R.drawable.ic_cog,
+            itemIcon = EsdsIcons.Cog,
             itemAction = onSettings,
         ),
         MenuOption(
             itemNameRes = R.string.helpTitle,
-            itemIcon = R.drawable.ic_headset,
+            itemIcon = EsdsIcons.Headset,
             itemAction = onHelp,
         ),
     )

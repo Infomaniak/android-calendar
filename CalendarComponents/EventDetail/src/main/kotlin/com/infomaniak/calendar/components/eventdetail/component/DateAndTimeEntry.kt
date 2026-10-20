@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
@@ -50,7 +49,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,8 +56,9 @@ import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatCityName
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatExplicitTimeLabel
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortDateWithYear
-import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Globe
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
@@ -130,11 +129,7 @@ private fun TimeZoneButton(
             colors = ButtonDefaults.textButtonColors(contentColor = LocalContentColor.current),
             shapes = shapes,
         ) {
-            Icon(
-                painterResource(R.drawable.ic_globe),
-                contentDescription = null,
-                modifier = Modifier.size(EsdsTheme.icon.sizeSm),
-            )
+            Icon(EsdsIcons.Globe.Small, contentDescription = null)
             Spacer(modifier = Modifier.width(EsdsTheme.spacing.md))
             Text(entry.timeZone.formatCityName(), maxLines = 1, overflow = TextOverflow.Ellipsis)
         }

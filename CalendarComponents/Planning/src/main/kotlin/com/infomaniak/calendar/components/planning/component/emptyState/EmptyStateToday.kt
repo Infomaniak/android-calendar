@@ -26,11 +26,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Plus
 
 @Composable
 internal fun TodayEmptyState(onClick: () -> Unit, modifier: Modifier = Modifier) {
@@ -41,7 +42,7 @@ internal fun TodayEmptyState(onClick: () -> Unit, modifier: Modifier = Modifier)
             shapes = ButtonDefaults.shapes(shape = EsdsTheme.radius.xl, pressedShape = EsdsTheme.radius.xl),
         ) {
             Icon(
-                painter = painterResource(R.drawable.ic_plus),
+                imageVector = EsdsIcons.Plus.Small,
                 contentDescription = null,
                 modifier = Modifier.size(ButtonDefaults.IconSize),
             )

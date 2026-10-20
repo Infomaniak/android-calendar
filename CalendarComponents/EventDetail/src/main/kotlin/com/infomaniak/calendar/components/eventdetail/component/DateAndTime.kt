@@ -27,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
@@ -36,9 +35,10 @@ import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeS
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRangeWithZone
-import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Clock
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -57,7 +57,7 @@ internal fun DateAndTime(
     modifier: Modifier = Modifier,
 ) {
     ListItem(
-        leadingContent = { ItemIcon(painterResource(R.drawable.ic_clock)) },
+        leadingContent = { ItemIcon(EsdsIcons.Clock) },
         content = {
             val startAtLocale = start.atLocale
             val endAtLocale = end.atLocale

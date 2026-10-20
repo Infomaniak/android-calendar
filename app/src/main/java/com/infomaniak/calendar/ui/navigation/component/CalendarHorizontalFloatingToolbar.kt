@@ -35,10 +35,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.foundation.theme.Dimens
 import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.modifier.sharedElement
@@ -46,6 +44,8 @@ import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.CalendarNumberOne
 import com.infomaniak.calendar.components.resources.R as RComponents
 
 private const val FLOATING_TOOLBARBAR_KEY = "FloatingToolbar"
@@ -123,7 +123,7 @@ private fun ContentFloatingToolbar(
     Row(modifier = modifier) {
         IconButton(onClick = onCurrentDayClicked) {
             Icon(
-                painter = painterResource(R.drawable.ic_calendar_number_one),
+                imageVector = EsdsIcons.CalendarNumberOne.Medium,
                 contentDescription = stringResource(RComponents.string.contentDescriptionToday),
             )
         }

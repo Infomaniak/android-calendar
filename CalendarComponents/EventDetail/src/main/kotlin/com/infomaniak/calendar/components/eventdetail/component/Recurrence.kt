@@ -25,9 +25,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.CircularArrowsClockwise
 
 @Composable
 internal fun Recurrence(text: suspend () -> String?, modifier: Modifier = Modifier) {
@@ -37,7 +37,7 @@ internal fun Recurrence(text: suspend () -> String?, modifier: Modifier = Modifi
 
     ListItem(
         modifier = modifier,
-        leadingContent = { ItemIcon(painterResource(R.drawable.ic_circular_arrows_clockwise)) },
+        leadingContent = { ItemIcon(EsdsIcons.CircularArrowsClockwise) },
         content = { recurrenceText?.let { Text(text = it) } },
     )
 }
