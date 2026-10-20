@@ -24,6 +24,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.util.Locale
+import kotlin.time.Instant
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
@@ -37,5 +38,25 @@ class TimeZoneFormatterTest {
     @Test
     fun `formatLocalizedCityName translates the city in the given locale`() {
         assertEquals("Wien", TimeZone.of("Europe/Vienna").formatLocalizedCityName(Locale.GERMAN))
+    }
+
+    @Test
+    fun `time zone search details are formatted in English`() {
+        val zurich = TimeZone.of("Europe/Zurich")
+        val summer = Instant.parse("2026-07-01T12:00:00Z")
+
+        assertEquals("Central European Summer Time", zurich.formatLongName(Locale.US, summer))
+        assertEquals("Zurich, Switzerland", zurich.formatCityAndCountry(Locale.US))
+        assertEquals("GMT+2", zurich.formatUtcOffset(Locale.US, summer))
+    }
+
+    @Test
+    fun `time zone search details are translated in the given locale`() {
+        val zurich = TimeZone.of("Europe/Zurich")
+        val summer = Instant.parse("2026-07-01T12:00:00Z")
+
+        assertEquals("heure d’été d’Europe centrale", zurich.formatLongName(Locale.FRENCH, summer))
+        assertEquals("Zurich, Suisse", zurich.formatCityAndCountry(Locale.FRENCH))
+        assertEquals("UTC+2", zurich.formatUtcOffset(Locale.FRENCH, summer))
     }
 }

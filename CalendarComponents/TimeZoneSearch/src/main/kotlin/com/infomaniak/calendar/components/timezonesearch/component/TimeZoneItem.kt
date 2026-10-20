@@ -15,35 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.attendeessearch.component
+package com.infomaniak.calendar.components.timezonesearch.component
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.calendar.components.timezonesearch.models.TimeZoneUi
+import kotlinx.datetime.TimeZone
 
 @Composable
-internal fun EmptyState(text: String, modifier: Modifier = Modifier) {
-    // TODO: improve empty state
-    Box(
-        modifier = modifier.fillMaxSize().padding(top = EsdsTheme.spacing.lg),
-        contentAlignment = Alignment.TopCenter,
-    ) {
-        Text(text, style = MaterialTheme.typography.labelMedium)
-    }
+internal fun TimeZoneItem(timeZone: TimeZoneUi, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    ListItem(
+        onClick = onClick,
+        overlineContent = { Text(timeZone.name) },
+        content = { Text(timeZone.location) },
+        supportingContent = { Text(timeZone.utcOffset) },
+        modifier = modifier,
+    )
 }
 
 @Preview
 @Composable
-private fun EmptyStatePreview() {
+private fun Preview() {
     Surface {
-        EmptyState(text = "Empty state")
+        TimeZoneItem(
+            timeZone = TimeZoneUi(TimeZone.of("Europe/Zurich")),
+            onClick = {},
+        )
     }
 }
