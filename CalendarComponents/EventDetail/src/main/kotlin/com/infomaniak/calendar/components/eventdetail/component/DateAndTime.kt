@@ -18,50 +18,25 @@
 package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TimePickerDialog
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
-import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatCityName
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRangeWithZone
-import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatExplicitTimeLabel
-import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortDateWithYear
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -70,13 +45,10 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.atTime
 import kotlinx.datetime.minus
 import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
-import kotlin.time.Instant
 
 @Composable
 internal fun DateAndTime(
@@ -135,8 +107,10 @@ internal fun DateAndTimeEditable(dateAndTimeState: DateAndTimeState?, modifier: 
             .padding(horizontal = EsdsTheme.spacing.xs),
         verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
     ) {
-        PointInTimeEditable(dateAndTimeState.start)
-        PointInTimeEditable(dateAndTimeState.end)
+        with(dateAndTimeState) {
+            PointInTimeEditable(start, onDatePicked = { start.pickDate(it) }, onTimePicked = { start.pickTime(it) })
+            PointInTimeEditable(end, onDatePicked = { end.pickDate(it) }, onTimePicked = { end.pickTime(it) })
+        }
     }
 }
 

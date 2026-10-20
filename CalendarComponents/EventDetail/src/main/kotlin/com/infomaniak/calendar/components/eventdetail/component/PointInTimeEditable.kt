@@ -66,6 +66,8 @@ import kotlin.time.Instant
 @Composable
 internal fun PointInTimeEditable(
     pointInTime: DateAndTimeState.PointInTime,
+    onDatePicked: (LocalDate) -> Unit,
+    onTimePicked: (LocalTime) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val shapes = ButtonDefaults.shapes(MaterialTheme.shapes.medium, CircleShape)
@@ -101,7 +103,7 @@ internal fun PointInTimeEditable(
     if (isDatePickerVisible) {
         DateSelectionDialog(
             initialDate = pointInTime.date,
-            onDateSelected = { pointInTime.date = it },
+            onDateSelected = onDatePicked,
             onDismissRequest = { isDatePickerVisible = false },
         )
     }
@@ -109,7 +111,7 @@ internal fun PointInTimeEditable(
     if (isTimePickerVisible) {
         TimeSelectionDialog(
             initialTime = pointInTime.time,
-            onTimeSelected = { pointInTime.time = it },
+            onTimeSelected = onTimePicked,
             onDismissRequest = { isTimePickerVisible = false },
         )
     }
@@ -176,6 +178,8 @@ private fun Preview() {
                     time = remember { mutableStateOf(LocalTime(14, 41)) },
                     timeZone = remember { mutableStateOf(TimeZone.UTC) },
                 ),
+                onDatePicked = {},
+                onTimePicked = {},
             )
         }
     }

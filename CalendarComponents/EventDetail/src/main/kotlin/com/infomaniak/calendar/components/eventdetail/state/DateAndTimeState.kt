@@ -30,6 +30,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toKotlinLocalDateTime
@@ -37,12 +38,33 @@ import kotlinx.datetime.toLocalDateTime
 import java.time.temporal.ChronoUnit
 import kotlin.time.Clock
 import kotlin.time.Duration
+import kotlin.time.Instant
 
 @Stable
 data class DateAndTimeState(
     val start: PointInTime,
     val end: PointInTime,
 ) {
+    internal fun PointInTime.pickDate(date: LocalDate) = edit { this.date = date }
+
+    internal fun PointInTime.pickTime(time: LocalTime) = edit { this.time = time }
+
+    private fun PointInTime.edit(change: () -> Unit) {
+        val previousInterval = end.instant - start.instant
+        change()
+        applyCorrections(isEditingStart = this == start, previousInterval)
+    }
+
+    /** Single place adjusting the other values after the user picked a new one. */
+    private fun applyCorrections(isEditingStart: Boolean, previousInterval: Duration) {
+        if (isEditingStart) {
+            end.instant = start.instant + previousInterval
+        } else {
+            val isOverlapping = start.instant > end.instant
+            if (isOverlapping) start.instant = end.instant - previousInterval
+        }
+    }
+
     @Stable
     class PointInTime(
         date: MutableState<LocalDate>,
@@ -55,7 +77,16 @@ data class DateAndTimeState(
             internal set
         var timeZone by timeZone
             internal set
+
+        internal var instant: Instant
+            get() = date.atTime(time).toInstant(timeZone)
+            set(value) {
+                val dateTime = value.toLocalDateTime(timeZone)
+                date = dateTime.date
+                time = dateTime.time
+            }
     }
+
 
     companion object {
         /**
