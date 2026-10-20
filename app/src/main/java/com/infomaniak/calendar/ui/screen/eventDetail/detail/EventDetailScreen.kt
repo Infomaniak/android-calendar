@@ -22,6 +22,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
@@ -47,6 +48,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.detail.EventDetail
 import com.infomaniak.calendar.components.eventdetail.detail.component.ParticipationStatusButtonsToolbar
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
@@ -134,12 +136,11 @@ private fun EventDetailScreen(
                 title = {},
                 actions = {
                     val canEdit = (state as? EventDetailUiState.Success)?.eventDetail?.canEdit == true
-                    TopAppBarButtons.EditButton(onClick = goToEdit, enabled = canEdit)
-                    TopAppBarButtons.DeleteButton(
-                        onClick = { showDeleteDialog = true },
-                        enabled = canEdit,
-                        modifier = Modifier.padding(end = EsdsTheme.spacing.lg),
-                    )
+
+                    Row(modifier = Modifier.padding(end = EsdsTheme.spacing.lg)) {
+                        TopAppBarButtons.EditButton(onClick = goToEdit, enabled = canEdit)
+                        TopAppBarButtons.EventDeleteButton(onClick = { showDeleteDialog = true }, enabled = canEdit)
+                    }
                 },
             )
         },
@@ -174,9 +175,9 @@ private fun EventDetailScreen(
 
                 if (showDeleteDialog) {
                     DeleteEventDialog(
-                        isRecurrent = { state.eventDetail.isOccurrence },
+                        isRecurrent = { state.eventDetail.recurrence is EventDetailRecurrence.Recurrence },
                         onDelete = onDelete,
-                        onDismiss = { showDeleteDialog = false },
+                        onDismissRequest = { showDeleteDialog = false },
                     )
                 }
             }
@@ -203,8 +204,7 @@ private fun Preview() {
         start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
         end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
         isAllDay = false,
-        getRecurrenceText = { "Every week on Monday" },
-        isOccurrence = true,
+        recurrence = EventDetailRecurrence.Recurrence(getText = { "Every week on Monday" }),
         attendees = Attendees(all = emptyList(), me = null),
         kMeetUrl = null,
         location = "Salle Tokyo",

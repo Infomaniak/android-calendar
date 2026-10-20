@@ -34,7 +34,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
@@ -42,11 +41,11 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.R as RCore
 
 @Composable
-fun DeleteRecurrentEventDialog(onDelete: (DeleteEventScope) -> Unit, onDismiss: () -> Unit) {
+fun DeleteRecurrentEventDialog(onDelete: (DeleteEventScope) -> Unit, onDismissRequest: () -> Unit) {
     var selectedScope by rememberSaveable { mutableStateOf(DeleteEventScope.ThisEvent) }
 
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = onDismissRequest,
         title = { Text(stringResource(R.string.deleteRecurringEventAlertTitle)) },
         text = {
             Column(Modifier.selectableGroup()) {
@@ -66,20 +65,17 @@ fun DeleteRecurrentEventDialog(onDelete: (DeleteEventScope) -> Unit, onDismiss: 
         },
         confirmButton = {
             TextButton(
-                colors = ButtonDefaults.buttonColors(
-                    contentColor = MaterialTheme.colorScheme.error,
-                    containerColor = Color.Transparent,
-                ),
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
                 onClick = {
                     onDelete(selectedScope)
-                    onDismiss()
+                    onDismissRequest()
                 },
             ) {
                 Text(stringResource(RCore.string.deleteButton))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = onDismissRequest) {
                 Text(stringResource(RCore.string.buttonCancel))
             }
         },
@@ -90,6 +86,6 @@ fun DeleteRecurrentEventDialog(onDelete: (DeleteEventScope) -> Unit, onDismiss: 
 @Composable
 private fun DeleteRecurrentEventDialogPreview() {
     CalendarThemeForPreview {
-        DeleteRecurrentEventDialog(onDelete = {}, onDismiss = {})
+        DeleteRecurrentEventDialog(onDelete = {}, onDismissRequest = {})
     }
 }

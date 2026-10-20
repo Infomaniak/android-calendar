@@ -35,7 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.BackButton
-import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.DeleteButton
+import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.EventDeleteButton
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.DrawerIconButton
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.EditButton
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.InboxButton
@@ -102,7 +102,7 @@ object TopAppBarButtons {
     }
 
     @Composable
-    fun DeleteButton(modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
+    fun EventDeleteButton(modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
         TooltipIconButton(
             painter = painterResource(RComponents.drawable.ic_trash),
             contentDescription = stringResource(R.string.buttonDeleteEvent),
@@ -176,8 +176,8 @@ private fun EditButtonPreview() {
 
 @Preview
 @Composable
-private fun DeleteButtonPreview() {
+private fun EventDeleteButtonPreview() {
     CalendarThemeForPreview {
-        DeleteButton(onClick = {})
+        EventDeleteButton(onClick = {})
     }
 }

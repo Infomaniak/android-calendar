@@ -22,11 +22,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
-fun DeleteEventDialog(isRecurrent: () -> Boolean, onDelete: (DeleteEventScope) -> Unit, onDismiss: () -> Unit) {
+fun DeleteEventDialog(isRecurrent: () -> Boolean, onDelete: (DeleteEventScope) -> Unit, onDismissRequest: () -> Unit) {
     if (isRecurrent()) {
-        DeleteRecurrentEventDialog(onDelete = onDelete, onDismiss = onDismiss)
+        DeleteRecurrentEventDialog(onDelete = onDelete, onDismissRequest = onDismissRequest)
     } else {
-        DeleteSingleEventDialog(onDelete = { onDelete(DeleteEventScope.ThisEvent) }, onDismiss = onDismiss)
+        DeleteSingleEventDialog(onDelete = { onDelete(DeleteEventScope.ThisEvent) }, onDismissRequest = onDismissRequest)
     }
 }
 
@@ -34,7 +34,7 @@ fun DeleteEventDialog(isRecurrent: () -> Boolean, onDelete: (DeleteEventScope) -
 @Composable
 private fun DeleteEventDialogSinglePreview() {
     CalendarThemeForPreview {
-        DeleteEventDialog(isRecurrent = { false }, onDelete = {}, onDismiss = {})
+        DeleteEventDialog(isRecurrent = { false }, onDelete = {}, onDismissRequest = {})
     }
 }
 
@@ -42,6 +42,6 @@ private fun DeleteEventDialogSinglePreview() {
 @Composable
 private fun DeleteEventDialogRecurrentPreview() {
     CalendarThemeForPreview {
-        DeleteEventDialog(isRecurrent = { true }, onDelete = {}, onDismiss = {})
+        DeleteEventDialog(isRecurrent = { true }, onDelete = {}, onDismissRequest = {})
     }
 }

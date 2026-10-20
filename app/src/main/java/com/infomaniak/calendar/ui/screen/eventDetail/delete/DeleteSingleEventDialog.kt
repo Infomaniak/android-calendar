@@ -31,26 +31,23 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.R as RCore
 
 @Composable
-fun DeleteSingleEventDialog(onDelete: () -> Unit, onDismiss: () -> Unit) {
+fun DeleteSingleEventDialog(onDelete: () -> Unit, onDismissRequest: () -> Unit) {
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = onDismissRequest,
         title = { Text(stringResource(R.string.deleteEventAlertTitle)) },
         confirmButton = {
             TextButton(
                 onClick = {
                     onDelete()
-                    onDismiss()
+                    onDismissRequest()
                 },
-                colors = ButtonDefaults.buttonColors(
-                    contentColor = MaterialTheme.colorScheme.error,
-                    containerColor = Color.Transparent,
-                ),
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
             ) {
-                Text(stringResource(RCore.string.deleteButton), color = MaterialTheme.colorScheme.error)
+                Text(stringResource(RCore.string.deleteButton))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(RCore.string.buttonCancel)) }
+            TextButton(onClick = onDismissRequest) { Text(stringResource(RCore.string.buttonCancel)) }
         },
     )
 }
@@ -59,6 +56,6 @@ fun DeleteSingleEventDialog(onDelete: () -> Unit, onDismiss: () -> Unit) {
 @Composable
 private fun DeleteSingleEventDialogPreview() {
     CalendarThemeForPreview {
-        DeleteSingleEventDialog(onDelete = {}, onDismiss = {})
+        DeleteSingleEventDialog(onDelete = {}, onDismissRequest = {})
     }
 }
