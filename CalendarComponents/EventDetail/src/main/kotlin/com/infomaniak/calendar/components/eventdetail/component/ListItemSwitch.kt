@@ -46,7 +46,7 @@ internal fun ListItemSwitch(
         onCheckedChange = onCheckedChange,
         content = content,
         leadingContent = leadingContent,
-        trailingContent = { Switch(checked = checked(), onCheckedChange = onCheckedChange) },
+        trailingContent = { Switch(checked = checked(), onCheckedChange = null) },
         modifier = modifier,
         colors = ListItemDefaults.colors(
             selectedContainerColor = defaultColors.containerColor,
