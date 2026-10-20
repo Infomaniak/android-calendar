@@ -27,6 +27,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
@@ -35,13 +37,20 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDialog
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,10 +70,13 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.atTime
 import kotlinx.datetime.minus
 import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
+import kotlin.time.Instant
 
 @Composable
 internal fun DateAndTime(
@@ -125,35 +137,6 @@ internal fun DateAndTimeEditable(dateAndTimeState: DateAndTimeState?, modifier: 
     ) {
         PointInTimeEditable(dateAndTimeState.start)
         PointInTimeEditable(dateAndTimeState.end)
-    }
-}
-
-@Composable
-private fun PointInTimeEditable(
-    pointInTime: DateAndTimeState.PointInTime,
-    modifier: Modifier = Modifier,
-) {
-    val shapes = ButtonDefaults.shapes(MaterialTheme.shapes.medium, CircleShape)
-
-    Row(horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.lg), modifier = modifier) {
-        OutlinedButton(onClick = {}, shapes = shapes) { Text(pointInTime.date.formatShortDateWithYear()) }
-        OutlinedButton(onClick = {}, shapes = shapes) { Text(pointInTime.time.formatExplicitTimeLabel()) }
-
-        Box(Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
-            TextButton(
-                onClick = {},
-                colors = ButtonDefaults.textButtonColors(contentColor = LocalContentColor.current),
-                shapes = shapes,
-            ) {
-                Icon(
-                    painterResource(R.drawable.ic_globe),
-                    contentDescription = null,
-                    modifier = Modifier.size(EsdsTheme.icon.sizeSm),
-                )
-                Spacer(modifier = Modifier.width(EsdsTheme.spacing.md))
-                Text(pointInTime.timeZone.formatCityName(), maxLines = 1, overflow = TextOverflow.Ellipsis)
-            }
-        }
     }
 }
 
