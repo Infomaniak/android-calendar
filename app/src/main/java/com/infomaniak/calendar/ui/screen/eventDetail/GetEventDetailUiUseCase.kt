@@ -19,7 +19,6 @@ package com.infomaniak.calendar.ui.screen.eventDetail
 
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.utils.account.AccountUtils
-import com.infomaniak.calendar.utils.mapState
 import com.infomaniak.calendar.utils.toEventDetailCalendar
 import com.infomaniak.calendar.utils.toEventDetailUi
 import com.infomaniak.core.sentry.SentryLog
@@ -27,51 +26,40 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
-import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
-import dev.zacsweers.metro.SingleIn
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlin.time.Duration.Companion.seconds
 
-/**
- * Observes the [EventDetailUiState] of the occurrence set through [setOccurrenceId].
- *
- * There is a single shared flow, and it is what makes the detail -> edit transition work: both screens display the same
- * occurrence, so [distinctUntilChanged] turns edit's [setOccurrenceId] into a no-op and [SharingStarted.WhileSubscribed] keeps
- * the state warm in between. Edit therefore composes its first frame with an already loaded event, instead of going through
- * [EventDetailUiState.Displayable.Loading] again and having nothing to animate towards.
- */
-@SingleIn(AppScope::class)
 class GetEventDetailUiUseCase @Inject constructor(
-    accountUtils: AccountUtils,
+    private val accountUtils: AccountUtils,
     private val calendarManager: CalendarManager,
 ) {
-    private val useCaseScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    fun eventDetailUi(occurrenceId: OccurrenceId): Flow<EventDetailUiState> = combine(
+        eventAndCalendar(occurrenceId),
+        accountUtils.emailsByUserId,
+    ) { eventAndCalendarState, emailsByUserId ->
+        val (event, calendar) = when (eventAndCalendarState) {
+            EventAndCalendarState.EventNotFound -> return@combine EventDetailUiState.Unavailable
+            EventAndCalendarState.Loading -> return@combine EventDetailUiState.Displayable.Loading
+            is EventAndCalendarState.Success -> eventAndCalendarState
+        }
 
-    private val occurrenceIdFlow = MutableStateFlow<OccurrenceId?>(null)
+        event
+            .toEventDetailUi(calendar, emailsByUserId)
+            .let(EventDetailUiState.Displayable::Success)
+    }
+
+    fun eventCalendar(occurrenceId: OccurrenceId): Flow<EventDetailCalendar?> = eventAndCalendar(occurrenceId).map {
+        (it as? EventAndCalendarState.Success)?.calendar?.toEventDetailCalendar()
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val eventFlow = occurrenceIdFlow
-        .filterNotNull()
-        .distinctUntilChanged()
-        .flatMapLatest { occurrenceId -> calendarManager.observeOccurrence(occurrenceId) }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val eventAndCalendarFlow: StateFlow<EventAndCalendarState> = eventFlow
+    private fun eventAndCalendar(occurrenceId: OccurrenceId): Flow<EventAndCalendarState> = calendarManager
+        .observeOccurrence(occurrenceId)
         .flatMapLatest { event ->
             if (event == null) {
                 flowOf(EventAndCalendarState.EventNotFound)
@@ -92,31 +80,6 @@ class GetEventDetailUiUseCase @Inject constructor(
                     }
             }
         }
-        .stateIn(useCaseScope, SharingStarted.WhileSubscribed(5.seconds), EventAndCalendarState.Loading)
-
-    val eventDetailUi: StateFlow<EventDetailUiState> = combine(
-        eventAndCalendarFlow,
-        accountUtils.emailsByUserId,
-    ) { eventAndCalendarState, emailsByUserId ->
-        val (event, calendar) = when (eventAndCalendarState) {
-            EventAndCalendarState.EventNotFound -> return@combine EventDetailUiState.Unavailable
-            EventAndCalendarState.Loading -> return@combine EventDetailUiState.Displayable.Loading
-            is EventAndCalendarState.Success -> eventAndCalendarState
-        }
-
-        event
-            .toEventDetailUi(calendar, emailsByUserId)
-            .let(EventDetailUiState.Displayable::Success)
-    }
-        .stateIn(useCaseScope, SharingStarted.WhileSubscribed(5.seconds), EventDetailUiState.Displayable.Loading)
-
-    val eventCalendar: StateFlow<EventDetailCalendar?> = eventAndCalendarFlow.mapState(useCaseScope, SharingStarted.Eagerly) {
-        (it as? EventAndCalendarState.Success)?.calendar?.toEventDetailCalendar()
-    }
-
-    fun setOccurrenceId(occurrenceId: OccurrenceId) {
-        occurrenceIdFlow.value = occurrenceId
-    }
 
     companion object {
         private const val TAG = "GetEventDetailUiUseCase"

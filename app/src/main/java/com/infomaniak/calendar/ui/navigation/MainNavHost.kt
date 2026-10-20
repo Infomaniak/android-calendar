@@ -148,7 +148,9 @@ private fun baseEntryProvider(
         is NavDestination.EventEdit -> NavEntry(
             key = destination,
             contentKey = destination.toContentKey(),
-            metadata = metaDataOf(ResponsiveDialog),
+            metadata = metaDataOf(ResponsiveDialog) + SharedViewModelStoreNavEntryDecorator.parent(
+                NavDestination.EventDetail(destination.occurrenceId).toContentKey(),
+            ),
         ) {
             EventEditScreen(
                 occurrenceId = destination.occurrenceId,

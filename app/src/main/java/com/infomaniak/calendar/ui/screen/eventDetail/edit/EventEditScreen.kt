@@ -49,6 +49,8 @@ import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
+import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
+import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
@@ -67,11 +69,12 @@ fun EventEditScreen(
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventEditViewModel = viewModel(),
+    eventDetailSharedDataViewModel: EventDetailSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current),
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
     timeZoneSearchResultViewModel: TimeZoneSearchResultViewModel = viewModel(),
 ) {
-    val eventDetailUiState = viewModel.eventDetailUi.collectAsStateWithLifecycle().value
-    val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
+    val eventDetailUiState = eventDetailSharedDataViewModel.eventDetailUi.collectAsStateWithLifecycle().value
+    val eventFormCalendars = eventDetailSharedDataViewModel.eventFormCalendars.collectAsStateWithLifecycle().value
 
     val uiState = when (eventDetailUiState) {
         EventDetailUiState.Displayable.Loading -> EventEditScreenState.Loading
@@ -92,15 +95,15 @@ fun EventEditScreen(
     }
 
     LaunchedEffect(occurrenceId) {
-        viewModel.setOccurrenceId(occurrenceId)
+        eventDetailSharedDataViewModel.setOccurrenceId(occurrenceId)
     }
 
     LaunchedEffect(Unit) {
-        viewModel.synchronizeAttendeesSearchState()
+        viewModel.synchronizeAttendeesSearchState(eventDetailSharedDataViewModel.eventDetailUi)
     }
 
     LaunchedEffect(Unit) {
-        for (request in viewModel.goBackRequests) goBack()
+        for (request in eventDetailSharedDataViewModel.editGoBackRequests) goBack()
     }
 
     val dateAndTimeState = (uiState as? EventEditScreenState.Success)?.eventFormState?.dateAndTimeState

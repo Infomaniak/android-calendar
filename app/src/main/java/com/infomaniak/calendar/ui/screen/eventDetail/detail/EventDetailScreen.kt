@@ -56,6 +56,7 @@ import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.screen.eventDetail.DeleteEventResult
+import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventDialog
@@ -82,24 +83,25 @@ fun EventDetailScreen(
     goToEventAttendees: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),
+    eventDetailSharedDataViewModel: EventDetailSharedDataViewModel = viewModel(),
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
 ) {
     val context = LocalContext.current
     val snackbarHostState = LocalSharedSnackbarHostState.current
     val coroutineScope = rememberCoroutineScope()
-    val uiState by viewModel.eventDetailUi.collectAsStateWithLifecycle()
+    val uiState by eventDetailSharedDataViewModel.eventDetailUi.collectAsStateWithLifecycle()
     val errorText = stringResource(RCore.string.anErrorHasOccurred)
 
     LaunchedEffect(occurrenceId) {
-        viewModel.setOccurrenceId(occurrenceId)
+        eventDetailSharedDataViewModel.setOccurrenceId(occurrenceId)
     }
 
     LaunchedEffect(Unit) {
-        viewModel.synchronizeAttendeesSearchState()
+        viewModel.synchronizeAttendeesSearchState(eventDetailSharedDataViewModel.eventDetailUi)
     }
 
     LaunchedEffect(Unit) {
-        for (request in viewModel.goBackRequests) goBack()
+        for (request in eventDetailSharedDataViewModel.detailGoBackRequests) goBack()
     }
 
     LaunchedEffect(viewModel.attendeesSearchState) {
