@@ -39,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.net.toUri
@@ -53,6 +54,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
+import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventDialog
@@ -68,6 +70,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceI
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 import com.infomaniak.core.common.R as RCommon
+import com.infomaniak.core.common.R as RCore
 
 @Composable
 fun EventDetailScreen(
@@ -80,6 +83,8 @@ fun EventDetailScreen(
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
+    val snackbarHostState = LocalSharedSnackbarHostState.current
     val uiState by viewModel.eventDetailUi.collectAsStateWithLifecycle()
 
     LaunchedEffect(occurrenceId) {
@@ -100,8 +105,10 @@ fun EventDetailScreen(
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
         goBack = goBack,
         goToEdit = goToEdit,
-        onDelete = {
-            //TODO[DeleteEvent]: Needs to be wired
+        onDelete = { deleteEventScope ->
+            viewModel.deleteEvent(occurrenceId, deleteEventScope) {
+                snackbarHostState?.showSnackbar(message = resources.getString(RCore.string.anErrorHasOccurred))
+            }
         },
         onLocationClick = { location -> openLocationInMapApp(context, location) },
         goToEventAttendees = goToEventAttendees,

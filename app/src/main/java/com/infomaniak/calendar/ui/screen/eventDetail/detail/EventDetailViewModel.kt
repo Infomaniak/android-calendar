@@ -20,11 +20,15 @@ package com.infomaniak.calendar.ui.screen.eventDetail.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
+import com.infomaniak.calendar.ui.screen.eventDetail.EventComposerUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
+import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventScope
 import com.infomaniak.calendar.ui.screen.eventDetail.utils.synchronizeTo
 import com.infomaniak.calendar.utils.saveableAttendeesSearchState
+import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
@@ -33,11 +37,13 @@ import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
+import kotlinx.coroutines.launch
 
 @AssistedInject
 class EventDetailViewModel(
     @Assisted private val savedStateHandle: SavedStateHandle,
     private val getEventDetailUiUseCase: GetEventDetailUiUseCase,
+    private val eventComposerUseCase: EventComposerUseCase,
 ) : ViewModel() {
     val eventDetailUi = getEventDetailUiUseCase.eventDetailUi
     val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
@@ -48,6 +54,14 @@ class EventDetailViewModel(
 
     suspend fun synchronizeAttendeesSearchState() {
         eventDetailUi.synchronizeTo(attendeesSearchState)
+    }
+
+    fun deleteEvent(occurrenceId: OccurrenceId, deleteEventScope: DeleteEventScope, onError: () -> Unit) {
+        viewModelScope.launch {
+            runCatching {
+                eventComposerUseCase.deleteEvent(occurrenceId, deleteEventScope)
+            }.cancellable().onFailure { onError() }
+        }
     }
 
     @AssistedFactory
