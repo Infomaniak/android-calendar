@@ -19,6 +19,8 @@ package com.infomaniak.calendar.ui.screen.eventDetail.edit
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -47,6 +49,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 
 @Composable
@@ -95,6 +98,7 @@ fun EventEditScreen(
         goBack = goBack,
         goToEventAttendees = goToEventAttendees,
         modifier = modifier,
+        onSubmit = { /** TODO */ },
         sharedTransitionScope = LocalSharedTransitionScope.current,
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
     )
@@ -105,6 +109,7 @@ private fun EventEditScreen(
     uiState: EventEditScreenState,
     goBack: () -> Unit,
     goToEventAttendees: () -> Unit,
+    onSubmit: () -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
@@ -115,6 +120,7 @@ private fun EventEditScreen(
         topBar = {
             TopAppBar(
                 navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
+                actions = { Row(Modifier.padding(end = EsdsTheme.spacing.lg)) { TopAppBarButtons.SaveButton(onClick = onSubmit) } },
                 title = {},
             )
         },
@@ -165,6 +171,7 @@ private fun Preview() {
                 ),
                 goBack = {},
                 goToEventAttendees = {},
+                onSubmit = {},
             )
         }
     }
