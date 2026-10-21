@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -58,7 +57,6 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 private const val AVATAR_STACK_LIMIT = 4
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun AttendeesButton(
     attendees: List<AttendeeUi>,

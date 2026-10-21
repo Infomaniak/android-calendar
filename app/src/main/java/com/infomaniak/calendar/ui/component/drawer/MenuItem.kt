@@ -18,7 +18,6 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +35,6 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.CustomColors
 import com.infomaniak.calendar.components.resources.R as RComponents
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MenuItem(
     menuOption: MenuOption,

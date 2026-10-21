@@ -18,7 +18,6 @@
 package com.infomaniak.calendar.utils
 
 import androidx.compose.animation.core.animate
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.FloatingToolbarExitDirection
 import androidx.compose.material3.FloatingToolbarScrollBehavior
@@ -29,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.window.core.layout.WindowSizeClass.Companion.HEIGHT_DP_MEDIUM_LOWER_BOUND
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun rememberFloatingToolbarExitScrollBehavior(
     canScrollForward: Boolean,
@@ -52,7 +50,6 @@ private fun hasSmallHeightScreen(): Boolean {
     return !currentWindowAdaptiveInfo().windowSizeClass.isHeightAtLeastBreakpoint(HEIGHT_DP_MEDIUM_LOWER_BOUND)
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 fun Modifier.nestedScrollToolbar(floatingToolbarScrollBehavior: FloatingToolbarScrollBehavior?): Modifier {
     if (floatingToolbarScrollBehavior == null) return this
     return nestedScroll(floatingToolbarScrollBehavior)

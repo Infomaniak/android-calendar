@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.ui.navigation.state
 
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarDefaults.floatingToolbarVerticalNestedScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -50,7 +49,6 @@ class ToolbarScrollableState(private val _isExpanded: MutableState<Boolean>) {
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun Modifier.scrollableToolbar(): Modifier {
     val localToolbarScrollableState: ToolbarScrollableState = LocalToolbarScrollableState.current ?: return this

@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
@@ -51,7 +50,6 @@ import com.infomaniak.calendar.components.resources.R
 
 private const val COLLAPSED_MAX_LINES = 3
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun DescriptionCollapsibleButton(description: String, contentPadding: PaddingValues = PaddingValues()) {
     var isCollapsed by rememberSaveable { mutableStateOf(true) }

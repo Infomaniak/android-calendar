@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -33,7 +32,6 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun TodayEmptyState(onClick: () -> Unit, modifier: Modifier = Modifier) {
     EmptyStateContainer(modifier = modifier) {
