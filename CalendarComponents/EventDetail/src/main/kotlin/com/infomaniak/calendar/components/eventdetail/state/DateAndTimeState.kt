@@ -45,6 +45,7 @@ import kotlin.time.Instant
 data class DateAndTimeState(
     val start: PointInTime,
     val end: PointInTime,
+    val hasEndEverBeenTouched: MutableState<Boolean>,
 ) {
     internal fun PointInTime.pickDate(date: LocalDate) = edit { this.date = date }
 
@@ -52,16 +53,22 @@ data class DateAndTimeState(
 
     private fun PointInTime.edit(change: () -> Unit) {
         val previousInterval = end.instant - start.instant
+
         change()
-        applyCorrections(isEditingStart = this == start, previousInterval)
+
+        val isEditingStart = this == start
+        if (isEditingStart.not()) hasEndEverBeenTouched.value = true
+
+        applyCorrections(isEditingStart, previousInterval)
     }
 
     /** Single place adjusting the other values after the user picked a new one. */
     private fun applyCorrections(isEditingStart: Boolean, previousInterval: Duration) {
+        val isOverlapping = start.instant > end.instant
+
         if (isEditingStart) {
-            end.instant = start.instant + previousInterval
+            if (isOverlapping || hasEndEverBeenTouched.value.not()) end.instant = start.instant + previousInterval
         } else {
-            val isOverlapping = start.instant > end.instant
             if (isOverlapping) start.instant = end.instant - previousInterval
         }
     }
@@ -104,6 +111,7 @@ data class DateAndTimeState(
                 time = mutableStateOf(LocalTime(11, 0)),
                 timeZone = mutableStateOf(TimeZone.UTC),
             ),
+            hasEndEverBeenTouched = mutableStateOf(false),
         )
     }
 }
@@ -186,7 +194,9 @@ fun rememberDateAndTimeState(
         timeZone = rememberSaveable(stateSaver = TimeZoneSaver) { mutableStateOf(endTimeZone) },
     )
 
-    return remember { DateAndTimeState(start = start, end = end) }
+    val hasEndEverBeenTouched = rememberSaveable { mutableStateOf(false) }
+
+    return remember { DateAndTimeState(start = start, end = end, hasEndEverBeenTouched = hasEndEverBeenTouched) }
 }
 
 private val TimeZoneSaver = Saver<TimeZone, String>(

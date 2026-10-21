@@ -206,6 +206,7 @@ private fun PreviewEditable() {
                         time = remember { mutableStateOf(LocalTime(9, 0)) },
                         timeZone = remember { mutableStateOf(TimeZone.currentSystemDefault()) },
                     ),
+                    hasEndEverBeenTouched = remember { mutableStateOf(false) },
                 ),
             )
         }
