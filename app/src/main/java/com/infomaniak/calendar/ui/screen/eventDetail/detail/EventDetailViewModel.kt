@@ -25,6 +25,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.screen.eventDetail.DeleteEventResult
 import com.infomaniak.calendar.ui.screen.eventDetail.EventComposerUseCase
+import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventScope
 import com.infomaniak.calendar.ui.screen.eventDetail.utils.synchronizeTo
@@ -38,7 +39,14 @@ import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 @AssistedInject
 class EventDetailViewModel(
@@ -47,7 +55,13 @@ class EventDetailViewModel(
     private val eventComposerUseCase: EventComposerUseCase,
 ) : ViewModel() {
     val eventDetailUi = getEventDetailUiUseCase.eventDetailUi
-    val isEventUnavailable = getEventDetailUiUseCase.isEventUnavailable
+        .filterIsInstance<EventDetailUiState.Displayable>()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), EventDetailUiState.Loading)
+
+    val goBackRequests: Flow<Unit> = getEventDetailUiUseCase.eventDetailUi
+        .filterIsInstance<EventDetailUiState.Unavailable>()
+        .map {}
+
     val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) {

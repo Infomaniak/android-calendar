@@ -20,8 +20,10 @@ package com.infomaniak.calendar.ui.screen.eventDetail.edit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
+import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.EventFormCalendarsUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventFormCalendars
@@ -35,7 +37,15 @@ import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlin.time.Duration.Companion.seconds
 
 @AssistedInject
 class EventEditViewModel(
@@ -44,7 +54,13 @@ class EventEditViewModel(
     eventFormCalendarsUseCase: EventFormCalendarsUseCase,
 ) : ViewModel() {
     val eventDetailUi = getEventDetailUiUseCase.eventDetailUi
-    val isEventUnavailable = getEventDetailUiUseCase.isEventUnavailable
+        .filterIsInstance<EventDetailUiState.Displayable>()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), EventDetailUiState.Loading)
+
+    val goBackRequests: Flow<Unit> = getEventDetailUiUseCase.eventDetailUi
+        .filter { it == EventDetailUiState.Unavailable }
+        .map {}
+
     val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
     val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase
         .editionCalendars(getEventDetailUiUseCase.eventCalendar)

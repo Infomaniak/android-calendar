@@ -47,7 +47,6 @@ import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSe
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
-import kotlinx.coroutines.flow.first
 
 @Composable
 fun EventEditScreen(
@@ -86,8 +85,7 @@ fun EventEditScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.isEventUnavailable.first { it }
-        goBack()
+        viewModel.goBackRequests.collect { goBack() }
     }
 
     LaunchedEffect(viewModel.attendeesSearchState) {

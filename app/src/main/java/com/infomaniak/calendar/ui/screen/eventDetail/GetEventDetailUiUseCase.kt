@@ -33,7 +33,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -95,24 +94,26 @@ class GetEventDetailUiUseCase @Inject constructor(
         }
         .stateIn(useCaseScope, SharingStarted.WhileSubscribed(5.seconds), EventAndCalendarState.Loading)
 
-    private val displayableEventAndCalendarFlow = eventAndCalendarFlow.filterIsInstance<EventAndCalendarState.Success>()
-
     val eventDetailUi: StateFlow<EventDetailUiState> = combine(
-        displayableEventAndCalendarFlow,
+        eventAndCalendarFlow,
         accountUtils.emailsByUserId,
-    ) { (event, calendar), emailsByUserId ->
+    ) { eventAndCalendarState, emailsByUserId ->
+        val (event, calendar) = when (eventAndCalendarState) {
+            EventAndCalendarState.EventNotFound -> return@combine EventDetailUiState.Unavailable
+            EventAndCalendarState.Loading -> return@combine EventDetailUiState.Loading
+            is EventAndCalendarState.Success -> eventAndCalendarState
+        }
+
         event
             .toEventDetailUi(calendar, emailsByUserId)
             .let(EventDetailUiState::Success)
     }
         .stateIn(useCaseScope, SharingStarted.WhileSubscribed(5.seconds), EventDetailUiState.Loading)
 
-    val eventCalendar: StateFlow<EventDetailCalendar?> = displayableEventAndCalendarFlow
+    val eventCalendar: StateFlow<EventDetailCalendar?> = eventAndCalendarFlow
+        .filterIsInstance<EventAndCalendarState.Success>()
         .map { it.calendar.toEventDetailCalendar() }
         .stateIn(useCaseScope, SharingStarted.Eagerly, null)
-
-    /** The event can't be displayed, because it has been deleted or never existed. */
-    val isEventUnavailable: Flow<Boolean> = eventAndCalendarFlow.map { it == EventAndCalendarState.EventNotFound }
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) {
         occurrenceIdFlow.value = occurrenceId
