@@ -47,6 +47,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSe
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import kotlinx.coroutines.flow.first
 
 @Composable
 fun EventEditScreen(
@@ -74,7 +75,6 @@ fun EventEditScreen(
                 initialIsPublic = eventDetailUiState.eventDetail.classification == EventDetailUi.Classification.Public,
             ),
         )
-        EventDetailUiState.Unavailable -> EventEditScreenState.Unavailable
     }
 
     LaunchedEffect(occurrenceId) {
@@ -83,6 +83,11 @@ fun EventEditScreen(
 
     LaunchedEffect(Unit) {
         viewModel.synchronizeAttendeesSearchState()
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.isEventUnavailable.first { it }
+        goBack()
     }
 
     LaunchedEffect(viewModel.attendeesSearchState) {
@@ -128,7 +133,6 @@ private fun EventEditScreen(
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
             )
-            EventEditScreenState.Unavailable -> LaunchedEffect(Unit) { goBack() }
         }
     }
 }
@@ -136,7 +140,6 @@ private fun EventEditScreen(
 private sealed interface EventEditScreenState {
     object Loading : EventEditScreenState
     data class Success(val eventFormState: EventFormState) : EventEditScreenState
-    object Unavailable : EventEditScreenState
 }
 
 @Preview

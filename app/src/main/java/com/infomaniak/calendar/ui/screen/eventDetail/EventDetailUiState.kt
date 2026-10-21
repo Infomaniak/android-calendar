@@ -22,6 +22,4 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 sealed interface EventDetailUiState {
     data object Loading : EventDetailUiState
     data class Success(val eventDetail: EventDetailUi) : EventDetailUiState
-    /** The event can't be displayed, because it has been deleted or never existed. */
-    data object Unavailable : EventDetailUiState
 }

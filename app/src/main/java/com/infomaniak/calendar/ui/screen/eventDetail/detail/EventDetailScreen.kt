@@ -68,6 +68,7 @@ import com.infomaniak.core.common.extensions.safeStartActivity
 import com.infomaniak.core.ui.compose.basics.rememberClipboardCopyManager
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
@@ -96,6 +97,11 @@ fun EventDetailScreen(
 
     LaunchedEffect(Unit) {
         viewModel.synchronizeAttendeesSearchState()
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.isEventUnavailable.first { it }
+        goBack()
     }
 
     LaunchedEffect(viewModel.attendeesSearchState) {
@@ -190,7 +196,6 @@ private fun EventDetailScreen(
                     )
                 }
             }
-            EventDetailUiState.Unavailable -> LaunchedEffect(Unit) { goBack() }
         }
     }
 }

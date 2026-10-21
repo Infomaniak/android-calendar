@@ -47,6 +47,7 @@ class EventDetailViewModel(
     private val eventComposerUseCase: EventComposerUseCase,
 ) : ViewModel() {
     val eventDetailUi = getEventDetailUiUseCase.eventDetailUi
+    val isEventUnavailable = getEventDetailUiUseCase.isEventUnavailable
     val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) {

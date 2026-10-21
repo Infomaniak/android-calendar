@@ -19,7 +19,6 @@ package com.infomaniak.calendar.ui.screen.eventDetail
 
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.utils.account.AccountUtils
-import com.infomaniak.calendar.utils.mapState
 import com.infomaniak.calendar.utils.toEventDetailCalendar
 import com.infomaniak.calendar.utils.toEventDetailUi
 import com.infomaniak.core.sentry.SentryLog
@@ -34,12 +33,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -94,25 +95,24 @@ class GetEventDetailUiUseCase @Inject constructor(
         }
         .stateIn(useCaseScope, SharingStarted.WhileSubscribed(5.seconds), EventAndCalendarState.Loading)
 
-    val eventDetailUi: StateFlow<EventDetailUiState> = combine(
-        eventAndCalendarFlow,
-        accountUtils.emailsByUserId,
-    ) { eventAndCalendarState, emailsByUserId ->
-        val (event, calendar) = when (eventAndCalendarState) {
-            EventAndCalendarState.EventNotFound -> return@combine EventDetailUiState.Unavailable
-            EventAndCalendarState.Loading -> return@combine EventDetailUiState.Loading
-            is EventAndCalendarState.Success -> eventAndCalendarState
-        }
+    private val displayableEventAndCalendarFlow = eventAndCalendarFlow.filterIsInstance<EventAndCalendarState.Success>()
 
+    val eventDetailUi: StateFlow<EventDetailUiState> = combine(
+        displayableEventAndCalendarFlow,
+        accountUtils.emailsByUserId,
+    ) { (event, calendar), emailsByUserId ->
         event
             .toEventDetailUi(calendar, emailsByUserId)
             .let(EventDetailUiState::Success)
     }
         .stateIn(useCaseScope, SharingStarted.WhileSubscribed(5.seconds), EventDetailUiState.Loading)
 
-    val eventCalendar: StateFlow<EventDetailCalendar?> = eventAndCalendarFlow.mapState(useCaseScope, SharingStarted.Eagerly) {
-        (it as? EventAndCalendarState.Success)?.calendar?.toEventDetailCalendar()
-    }
+    val eventCalendar: StateFlow<EventDetailCalendar?> = displayableEventAndCalendarFlow
+        .map { it.calendar.toEventDetailCalendar() }
+        .stateIn(useCaseScope, SharingStarted.Eagerly, null)
+
+    /** The event can't be displayed, because it has been deleted or never existed. */
+    val isEventUnavailable: Flow<Boolean> = eventAndCalendarFlow.map { it == EventAndCalendarState.EventNotFound }
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) {
         occurrenceIdFlow.value = occurrenceId

@@ -44,6 +44,7 @@ class EventEditViewModel(
     eventFormCalendarsUseCase: EventFormCalendarsUseCase,
 ) : ViewModel() {
     val eventDetailUi = getEventDetailUiUseCase.eventDetailUi
+    val isEventUnavailable = getEventDetailUiUseCase.isEventUnavailable
     val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
     val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase
         .editionCalendars(getEventDetailUiUseCase.eventCalendar)
