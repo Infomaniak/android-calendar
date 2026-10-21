@@ -116,6 +116,38 @@ data class DateAndTimeState(
     }
 }
 
+/**
+ * Used when editing an existing event. It takes exactly all the data as provided in input.
+ */
+@Composable
+fun rememberDateAndTimeState(
+    startDate: LocalDate,
+    startTime: LocalTime,
+    startTimeZone: TimeZone,
+    endDate: LocalDate,
+    endTime: LocalTime,
+    endTimeZone: TimeZone,
+): DateAndTimeState {
+    val start = DateAndTimeState.PointInTime(
+        date = rememberSaveable { mutableStateOf(startDate) },
+        time = rememberSaveable { mutableStateOf(startTime) },
+        timeZone = rememberSaveable(stateSaver = TimeZoneSaver) { mutableStateOf(startTimeZone) },
+    )
+
+    val end = DateAndTimeState.PointInTime(
+        date = rememberSaveable { mutableStateOf(endDate) },
+        time = rememberSaveable { mutableStateOf(endTime) },
+        timeZone = rememberSaveable(stateSaver = TimeZoneSaver) { mutableStateOf(endTimeZone) },
+    )
+
+    val hasEndEverBeenTouched = rememberSaveable { mutableStateOf(false) }
+
+    return remember { DateAndTimeState(start = start, end = end, hasEndEverBeenTouched = hasEndEverBeenTouched) }
+}
+
+/**
+ * Used when creating a new event. It will dynamically compute the right dates to use based on the inputs.
+ */
 @Composable
 fun rememberDateAndTimeState(
     defaultEventDuration: Duration,
@@ -171,32 +203,6 @@ private fun LocalDate.atHeightInTheMorning(timeZone: TimeZone, eventDuration: Du
     val end = start.toInstant(timeZone).plus(eventDuration).toLocalDateTime(timeZone)
 
     return start to end
-}
-
-@Composable
-fun rememberDateAndTimeState(
-    startDate: LocalDate,
-    startTime: LocalTime,
-    startTimeZone: TimeZone,
-    endDate: LocalDate,
-    endTime: LocalTime,
-    endTimeZone: TimeZone,
-): DateAndTimeState {
-    val start = DateAndTimeState.PointInTime(
-        date = rememberSaveable { mutableStateOf(startDate) },
-        time = rememberSaveable { mutableStateOf(startTime) },
-        timeZone = rememberSaveable(stateSaver = TimeZoneSaver) { mutableStateOf(startTimeZone) },
-    )
-
-    val end = DateAndTimeState.PointInTime(
-        date = rememberSaveable { mutableStateOf(endDate) },
-        time = rememberSaveable { mutableStateOf(endTime) },
-        timeZone = rememberSaveable(stateSaver = TimeZoneSaver) { mutableStateOf(endTimeZone) },
-    )
-
-    val hasEndEverBeenTouched = rememberSaveable { mutableStateOf(false) }
-
-    return remember { DateAndTimeState(start = start, end = end, hasEndEverBeenTouched = hasEndEverBeenTouched) }
 }
 
 private val TimeZoneSaver = Saver<TimeZone, String>(
