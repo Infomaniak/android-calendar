@@ -47,5 +47,7 @@ dependencies {
     implementation(core.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     debugImplementation(core.compose.ui.tooling)
+
+    testImplementation(core.junit)
 }
 

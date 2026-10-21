@@ -63,20 +63,20 @@ fun TimeZoneSearch(onTimeZoneClick: (TimeZone) -> Unit, modifier: Modifier = Mod
         when (val results = searchResults) {
             null -> Unit // Still loading
             emptyList<TimeZoneUi>() -> EmptyState(text = stringResource(R.string.emptyStateNoTimeZone))
-            else -> TimeZoneResults(results, onTimeZoneClick)
+            else -> TimeZoneResults(results, searchQuery.text.toString().trim(), onTimeZoneClick)
         }
     }
 }
 
 @Composable
-private fun TimeZoneResults(results: List<TimeZoneUi>, onTimeZoneClick: (TimeZone) -> Unit) {
+private fun TimeZoneResults(results: List<TimeZoneUi>, query: String, onTimeZoneClick: (TimeZone) -> Unit) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = EsdsTheme.spacing.md, vertical = EsdsTheme.spacing.sm),
     ) {
         items(results, key = { it.timeZone.id }) { timeZone ->
-            TimeZoneItem(timeZone, onClick = { onTimeZoneClick(timeZone.timeZone) })
+            TimeZoneItem(timeZone, query, onClick = { onTimeZoneClick(timeZone.timeZone) })
         }
     }
 }

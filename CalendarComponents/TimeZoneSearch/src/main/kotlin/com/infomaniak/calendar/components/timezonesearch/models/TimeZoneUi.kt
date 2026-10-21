@@ -26,19 +26,19 @@ import kotlin.time.Clock
 
 internal data class TimeZoneUi private constructor(
     val timeZone: TimeZone,
-    val name: String,
-    val location: String,
-    val utcOffset: String,
+    val name: SearchableText,
+    val location: SearchableText,
+    val utcOffset: SearchableText,
 ) {
     /** Describes [timeZone] as it is right now, in the user's locale. */
     constructor(timeZone: TimeZone) : this(
         timeZone = timeZone,
-        name = timeZone.formatLongName(Locale.getDefault(), Clock.System.now()),
-        location = timeZone.formatCityAndCountry(Locale.getDefault()),
-        utcOffset = timeZone.formatUtcOffset(Locale.getDefault(), Clock.System.now()),
+        name = SearchableText(timeZone.formatLongName(Locale.getDefault(), Clock.System.now())),
+        location = SearchableText(timeZone.formatCityAndCountry(Locale.getDefault())),
+        utcOffset = SearchableText(timeZone.formatUtcOffset(Locale.getDefault(), Clock.System.now())),
     )
 
-    fun matches(query: String): Boolean = listOf(name, location, utcOffset, timeZone.id).any {
-        it.contains(query, ignoreCase = true)
-    }
+    private val searchableTexts = listOf(name, location, utcOffset, SearchableText(timeZone.id))
+
+    fun matches(query: String): Boolean = searchableTexts.any { it.find(query) != null }
 }
