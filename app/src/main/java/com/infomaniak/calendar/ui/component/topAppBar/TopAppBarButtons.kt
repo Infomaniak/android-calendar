@@ -17,7 +17,9 @@
  */
 package com.infomaniak.calendar.ui.component.topAppBar
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.PlainTooltip
@@ -35,9 +37,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.BackButton
-import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.EventDeleteButton
+import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.CheckmarkButton
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.DrawerIconButton
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.EditButton
+import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.EventDeleteButton
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.InboxButton
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.SearchButton
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
@@ -114,6 +117,21 @@ object TopAppBarButtons {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
+    fun CheckmarkButton(modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
+        TooltipBox(
+            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Below),
+            state = rememberTooltipState(),
+            tooltip = { PlainTooltip { Text(stringResource(R.string.buttonDeleteEvent)) } },
+            modifier = modifier,
+        ) {
+            FilledIconButton(onClick = onClick, enabled = enabled) {
+                Icon(painterResource(R.drawable.ic_check), stringResource(R.string.buttonDeleteEvent))
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
     private fun TooltipIconButton(
         painter: Painter,
         contentDescription: String,
@@ -179,5 +197,16 @@ private fun EditButtonPreview() {
 private fun EventDeleteButtonPreview() {
     CalendarThemeForPreview {
         EventDeleteButton(onClick = {})
+    }
+}
+
+@Preview
+@Composable
+private fun CheckmarkButtonPreview() {
+    CalendarThemeForPreview {
+        Row {
+            CheckmarkButton(onClick = {})
+            CheckmarkButton(onClick = {}, enabled = false)
+        }
     }
 }
