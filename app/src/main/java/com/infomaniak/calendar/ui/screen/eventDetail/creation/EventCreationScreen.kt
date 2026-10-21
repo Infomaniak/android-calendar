@@ -36,6 +36,7 @@ import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeS
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchResultViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 import kotlinx.datetime.LocalDate
@@ -47,10 +48,11 @@ fun EventCreationScreen(
     date: LocalDate,
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
-    goToTimeZoneSearch: () -> Unit,
+    goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventCreationViewModel = viewModel(),
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
+    timeZoneSearchResultViewModel: TimeZoneSearchResultViewModel = viewModel(),
 ) {
     val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
     val defaultEventDuration by viewModel.defaultEventDuration.collectAsStateWithLifecycle(null)
@@ -61,6 +63,10 @@ fun EventCreationScreen(
         dateAndTimeState = defaultEventDuration?.let { rememberDateAndTimeState(it, TimeZone.currentSystemDefault(), date) },
         attendeesSearchState = viewModel.attendeesSearchState,
     )
+
+    LaunchedEffect(state.dateAndTimeState) {
+        timeZoneSearchResultViewModel.applyPickedTimeZonesTo(state.dateAndTimeState)
+    }
 
     LaunchedEffect(Unit) {
         attendeesSearchSharedDataViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
@@ -82,7 +88,7 @@ private fun EventCreationScreen(
     onSubmit: () -> Unit,
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
-    goToTimeZoneSearch: () -> Unit,
+    goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()

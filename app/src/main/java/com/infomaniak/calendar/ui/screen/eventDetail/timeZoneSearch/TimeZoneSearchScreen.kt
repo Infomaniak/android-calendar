@@ -24,13 +24,32 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.timezonesearch.TimeZoneSearch
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.datetime.TimeZone
 
 @Composable
 fun TimeZoneSearchScreen(
+    isStart: Boolean,
+    goBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    timeZoneSearchResultViewModel: TimeZoneSearchResultViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
+) {
+    TimeZoneSearchScreen(
+        onTimeZoneSelected = { timeZone ->
+            timeZoneSearchResultViewModel.pickTimeZone(isStart, timeZone)
+            goBack()
+        },
+        goBack = goBack,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun TimeZoneSearchScreen(
     onTimeZoneSelected: (TimeZone) -> Unit,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,

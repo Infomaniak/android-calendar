@@ -128,7 +128,7 @@ private fun baseEntryProvider(
                 date = destination.date,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
                 goToEventsAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
-                goToTimeZoneSearch = { backStack.addOnce(NavDestination.EventTimeZone) },
+                goToTimeZoneSearch = { isStart -> backStack.addOnce(NavDestination.EventTimeZone(destination, isStart)) },
             )
         }
 
@@ -154,7 +154,7 @@ private fun baseEntryProvider(
                 occurrenceId = destination.occurrenceId,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
                 goToEventAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
-                goToTimeZoneSearch = { backStack.addOnce(NavDestination.EventTimeZone) },
+                goToTimeZoneSearch = { isStart -> backStack.addOnce(NavDestination.EventTimeZone(destination, isStart)) },
             )
         }
 
@@ -167,9 +167,12 @@ private fun baseEntryProvider(
             )
         }
 
-        is NavDestination.EventTimeZone -> NavEntry(destination, metadata = metaDataOf(ResponsiveDialog)) {
+        is NavDestination.EventTimeZone -> NavEntry(
+            key = destination,
+            metadata = metaDataOf(ResponsiveDialog) + SharedViewModelStoreNavEntryDecorator.parent(destination.parent.toContentKey()),
+        ) {
             TimeZoneSearchScreen(
-                onTimeZoneSelected = { backStack.popOrReplaceRoot(defaultCalendarView) },
+                isStart = destination.isStart,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
         }

@@ -56,7 +56,7 @@ import kotlin.time.Duration.Companion.hours
 fun EventForm(
     state: EventFormState,
     onAttendeesClick: () -> Unit,
-    onTimeZoneClick: () -> Unit,
+    onTimeZoneClick: (isStart: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     sharedTransitionScope: SharedTransitionScope? = null,

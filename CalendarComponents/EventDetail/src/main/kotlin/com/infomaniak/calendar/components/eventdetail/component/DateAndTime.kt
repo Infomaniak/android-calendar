@@ -99,7 +99,7 @@ internal fun DateAndTime(
 internal fun DateAndTimeEditable(
     dateAndTimeState: DateAndTimeState?,
     isAllDay: () -> Boolean,
-    onTimeZoneClick: () -> Unit,
+    onTimeZoneClick: (isStart: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val shouldDisplay = dateAndTimeState != null
@@ -117,14 +117,14 @@ internal fun DateAndTimeEditable(
                 isAllDay = isAllDay,
                 onDatePicked = { start.pickDate(it) },
                 onTimePicked = { start.pickTime(it) },
-                onTimeZoneClick = onTimeZoneClick,
+                onTimeZoneClick = { onTimeZoneClick(true) },
             )
             DateAndTimeEntry(
                 entry = end,
                 isAllDay = isAllDay,
                 onDatePicked = { end.pickDate(it) },
                 onTimePicked = { end.pickTime(it) },
-                onTimeZoneClick = onTimeZoneClick,
+                onTimeZoneClick = { onTimeZoneClick(false) },
             )
         }
     }
