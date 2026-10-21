@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.utils
 
 import androidx.compose.ui.graphics.Color
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
@@ -47,7 +48,7 @@ fun Event.toEventDetailUi(calendar: Calendar, emailsByUserId: Map<AccountId, Str
     start = timing.toDetailTiming(isStart = true),
     end = timing.toDetailTiming(isStart = false),
     isAllDay = timing.isAllDay,
-    getRecurrenceText = if (isOccurrence) ::toLocalizedRecurrenceString else null,
+    recurrence = if (isOccurrence) EventDetailRecurrence.Recurrence(::toLocalizedRecurrenceString) else EventDetailRecurrence.Single,
     attendees = attendees.toAttendees(accountId, emailsByUserId),
     kMeetUrl = null, // TODO[eventDetail]: Not carried by the KMP model yet
     location = location,

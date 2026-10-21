@@ -47,6 +47,7 @@ import com.infomaniak.calendar.components.eventdetail.detail.component.LocationB
 import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
 import com.infomaniak.calendar.components.eventdetail.detail.component.OccupiedStatus
 import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
@@ -83,9 +84,7 @@ fun EventDetail(
 
             DateAndTime(start, end, isAllDay)
 
-            eventDetail.getRecurrenceText?.let {
-                Recurrence(it)
-            }
+            if (recurrence is EventDetailRecurrence.Recurrence) Recurrence(recurrence.getText)
 
             Section {
                 if (attendees.all.isNotEmpty()) {
@@ -149,7 +148,7 @@ private fun PreviewEventDetail() {
         calendarColor = Color.Blue,
         calendarName = "Vacation",
         title = "Event Title",
-        getRecurrenceText = { "Every week on Monday" },
+        recurrence = EventDetailRecurrence.Recurrence(getText = { "Every week on Monday" }),
         start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
         end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
         isAllDay = false,

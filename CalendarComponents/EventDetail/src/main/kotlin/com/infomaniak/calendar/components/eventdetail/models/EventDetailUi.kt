@@ -34,7 +34,7 @@ data class EventDetailUi(
     val start: EventDetailTiming,
     val end: EventDetailTiming,
     val isAllDay: Boolean,
-    val getRecurrenceText: (suspend () -> String?)?,
+    val recurrence: EventDetailRecurrence,
     val attendees: Attendees,
     val kMeetUrl: String?,
     val location: String?,
