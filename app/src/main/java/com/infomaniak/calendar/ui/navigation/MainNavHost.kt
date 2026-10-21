@@ -41,6 +41,7 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Metada
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.ResponsiveDialog
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationMetadata
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.ResponsiveDialogSceneStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
 import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
@@ -148,8 +149,9 @@ private fun baseEntryProvider(
         is NavDestination.EventEdit -> NavEntry(
             key = destination,
             contentKey = destination.toContentKey(),
-            metadata = metaDataOf(ResponsiveDialog) + SharedViewModelStoreNavEntryDecorator.parent(
-                NavDestination.EventDetail(destination.occurrenceId).toContentKey(),
+            metadata = metaDataOf(
+                ResponsiveDialog,
+                shareViewModelStoreWith(NavDestination.EventDetail(destination.occurrenceId)),
             ),
         ) {
             EventEditScreen(
@@ -163,7 +165,7 @@ private fun baseEntryProvider(
 
         is NavDestination.EventAttendees -> NavEntry(
             key = destination,
-            metadata = metaDataOf(ResponsiveDialog) + SharedViewModelStoreNavEntryDecorator.parent(destination.parent.toContentKey()),
+            metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
             AttendeesSearchScreen(
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
@@ -254,6 +256,13 @@ private fun sceneDecoratorStrategies(
 }
 
 private fun NavKey.toContentKey() = this.toString()
+
+/**
+ * Shares [destination]'s ViewModelStore with this entry. Its ViewModels are cleared when [destination] is popped.
+ */
+private fun shareViewModelStoreWith(destination: NavDestination): NavigationMetadata = object : NavigationMetadata {
+    override val metadata: Map<String, Any> = SharedViewModelStoreNavEntryDecorator.parent(destination.toContentKey())
+}
 
 private fun NavBackStack<NavDestination>.getLastCalendarView(): NavDestination.CalendarView? {
     return this.filterIsInstance<NavDestination.CalendarView>().lastOrNull()
