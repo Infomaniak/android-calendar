@@ -35,17 +35,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
+import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatus
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
+import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatus
 import com.infomaniak.calendar.components.eventdetail.component.Recurrence
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
 import com.infomaniak.calendar.components.eventdetail.detail.component.Calendar
-import com.infomaniak.calendar.components.eventdetail.detail.component.ClassificationStatus
 import com.infomaniak.calendar.components.eventdetail.detail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
-import com.infomaniak.calendar.components.eventdetail.detail.component.OccupiedStatus
 import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
@@ -53,6 +53,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
+import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
@@ -99,7 +100,7 @@ fun EventDetail(
                     KMeetButton(
                         onJoin = onJoinKMeet,
                         onCopy = onCopyKMeet,
-                        modifier = Modifier.eventSharedElement(EventSharedElement.KMeet),
+                        modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
                     )
                 }
 
@@ -122,16 +123,19 @@ fun EventDetail(
 
             Section {
                 Notifications(
-                    notifications,
+                    notifications = notifications,
                     onNotificationClick = { /*TODO[eventDetail]*/ },
                 )
             }
 
             Section {
-                OccupiedStatus(isOccupied)
+                OccupiedStatus(isOccupied, modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus))
 
                 if (classification != null) {
-                    ClassificationStatus(classification)
+                    ClassificationStatus(
+                        classification = classification,
+                        modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
+                    )
                 }
 
                 Calendar(calendarColor, calendarName)

@@ -18,6 +18,8 @@
 package com.infomaniak.calendar.ui.screen.eventDetail.creation
 
 import androidx.compose.foundation.layout.plus
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -71,6 +73,8 @@ private fun EventCreationScreen(
     goToEventsAttendees: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val scrollState = rememberScrollState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -84,6 +88,7 @@ private fun EventCreationScreen(
             state = state,
             onAttendeesClick = goToEventsAttendees,
             contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
+            modifier = Modifier.verticalScroll(scrollState),
         )
     }
 }

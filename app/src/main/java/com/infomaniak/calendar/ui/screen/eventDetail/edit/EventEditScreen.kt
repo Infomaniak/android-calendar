@@ -20,7 +20,9 @@ package com.infomaniak.calendar.ui.screen.eventDetail.edit
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.plus
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
@@ -37,6 +39,7 @@ import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberSaveableEventFormState
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
@@ -68,8 +71,11 @@ fun EventEditScreen(
                 calendars = eventFormCalendars?.calendars ?: emptyList(),
                 initialCalendar = eventFormCalendars?.initialCalendar,
                 initialText = eventDetailUiState.eventDetail.title,
+                initialIsAllDay = eventDetailUiState.eventDetail.isAllDay,
                 initialAttendees = viewModel.attendeesSearchState.attendees,
                 attendeesSearchState = viewModel.attendeesSearchState,
+                initialIsOccupied = eventDetailUiState.eventDetail.isOccupied,
+                initialIsPublic = eventDetailUiState.eventDetail.classification == EventDetailUi.Classification.Public,
             ),
         )
         EventDetailUiState.Unavailable -> EventEditScreenState.Unavailable
@@ -106,6 +112,8 @@ private fun EventEditScreen(
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
+    val scrollState = rememberScrollState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -113,6 +121,7 @@ private fun EventEditScreen(
                 title = {},
             )
         },
+        modifier = modifier,
     ) { contentPadding ->
         when (uiState) {
             // Coming from the detail screen, the shared flow is already warm, so this is only hit when entering edit directly or
@@ -121,7 +130,7 @@ private fun EventEditScreen(
             is EventEditScreenState.Success -> EventForm(
                 state = uiState.eventFormState,
                 onAttendeesClick = goToEventAttendees,
-                modifier = modifier,
+                modifier = Modifier.verticalScroll(scrollState),
                 contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,

@@ -80,6 +80,8 @@ internal enum class EventSharedElement {
     Title,
     Attendees,
     KMeet,
+    OccupiedStatus,
+    ClassificationStatus,
 }
 
 private data class EventSharedTransition(
