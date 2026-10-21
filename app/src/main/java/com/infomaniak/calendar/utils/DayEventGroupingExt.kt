@@ -15,13 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.day
+package com.infomaniak.calendar.utils
 
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.TimedEvent
 import com.infomaniak.calendar.components.day.model.toTimedEvent
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
-import com.infomaniak.calendar.utils.toEventUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
