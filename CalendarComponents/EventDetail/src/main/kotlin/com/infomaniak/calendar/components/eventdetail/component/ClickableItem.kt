@@ -19,7 +19,6 @@ package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
@@ -36,7 +35,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.resources.R
 
 @Composable
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 internal fun ClickableItem(
     text: String,
     leadingIconRes: Int,
@@ -60,7 +58,6 @@ internal fun ClickableItem(
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 internal fun ClickableItem(
     text: String,
     leadingContent: @Composable () -> Unit,
@@ -92,7 +89,6 @@ internal object ClickableItemDefaults {
         Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null)
     }
 
-    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
     val ClickableItemShapes
         @Composable get() = ListItemDefaults.shapes(MaterialTheme.shapes.large)
 }

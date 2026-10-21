@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.BottomAppBarDefaults
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarScrollBehavior
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
@@ -61,7 +60,6 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
 import com.infomaniak.core.common.R as RCore
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ParticipationStatusButtonsToolbar(
     participationStatus: () -> ParticipationStatus,
@@ -119,7 +117,6 @@ private enum class ParticipationStatusButton(
     Maybe(ParticipationStatus.Tentative, R.drawable.ic_circle_question, RCore.string.buttonMaybe),
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ParticipationStatusButton.colors(): ToggleButtonColors {
     return ToggleButtonDefaults.colors(
@@ -128,7 +125,6 @@ private fun ParticipationStatusButton.colors(): ToggleButtonColors {
     )
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview
 @Composable
 private fun ParticipationStatusButtonsToolbarPreview() {

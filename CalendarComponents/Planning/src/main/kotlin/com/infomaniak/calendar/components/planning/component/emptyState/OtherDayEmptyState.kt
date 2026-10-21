@@ -17,13 +17,11 @@
  */
 package com.infomaniak.calendar.components.planning.component.emptyState
 
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun OtherDayEmptyState(onClick: () -> Unit, modifier: Modifier = Modifier) {
     EmptyStateContainer(modifier = modifier, onClick = onClick)

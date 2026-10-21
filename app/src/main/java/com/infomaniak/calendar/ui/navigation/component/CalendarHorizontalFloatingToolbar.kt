@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,7 +50,6 @@ import com.infomaniak.calendar.components.resources.R as RComponents
 
 private const val FLOATING_TOOLBARBAR_KEY = "FloatingToolbar"
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CalendarHorizontalFloatingToolbar(
     onNavigationButtonClicked: (NavDestination.CalendarView) -> Unit,
@@ -72,7 +70,6 @@ fun CalendarHorizontalFloatingToolbar(
     )
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun CalendarHorizontalFloatingToolbar(
     onNavigationButtonClicked: (NavDestination.CalendarView) -> Unit,
@@ -137,7 +134,6 @@ private fun ContentFloatingToolbar(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun DropdownIconButton(
     onNavigationButtonClicked: (NavDestination.CalendarView) -> Unit,
