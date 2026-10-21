@@ -30,6 +30,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
+import kotlinx.datetime.atTime
 
 /**
  * @param dateAndTimeState Can be null so it can be initialized in two steps after the data has been read from disk.
@@ -46,15 +47,23 @@ class EventFormState(
     val isPublic: MutableState<Boolean>,
     val calendars: List<EventDetailCalendar>,
 ) {
-    fun toEventDraft(): EventDraft? = EventDraft(
-        title = titleTextState.text.toString(),
-        color = colorState.value ?: return null,
-        isAllDay = isAllDay.value,
-        attendees = attendeesState.attendees.toList(),
-        isKMeetUrlEnabled = isKMeetUrlEnabled.value,
-        isOccupied = isOccupied.value,
-        isPublic = isPublic.value,
-    )
+    fun toEventDraft(): EventDraft? {
+        dateAndTimeState ?: return null
+
+        return EventDraft(
+            title = titleTextState.text.toString(),
+            color = colorState.value ?: return null,
+            isAllDay = isAllDay.value,
+            start = dateAndTimeState.start.date.atTime(dateAndTimeState.start.time),
+            startTimeZone = dateAndTimeState.start.timeZone,
+            end = dateAndTimeState.end.date.atTime(dateAndTimeState.end.time),
+            endTimeZone = dateAndTimeState.end.timeZone,
+            attendees = attendeesState.attendees.toList(),
+            isKMeetUrlEnabled = isKMeetUrlEnabled.value,
+            isOccupied = isOccupied.value,
+            isPublic = isPublic.value,
+        )
+    }
 }
 
 @Composable
