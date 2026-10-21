@@ -17,8 +17,8 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.model
 
-import com.infomaniak.calendar.components.eventdetail.form.rememberSaveableEventFormState
+import com.infomaniak.calendar.components.eventdetail.form.rememberEventFormState
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 
-/** The calendars an event form can be filled with, in the shape expected by [rememberSaveableEventFormState]. */
+/** The calendars an event form can be filled with, in the shape expected by [rememberEventFormState]. */
 data class EventFormCalendars(val calendars: List<EventDetailCalendar>, val initialCalendar: EventDetailCalendar)

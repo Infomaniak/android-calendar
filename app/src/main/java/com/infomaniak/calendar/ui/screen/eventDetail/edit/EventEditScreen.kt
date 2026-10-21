@@ -21,14 +21,12 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -38,12 +36,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
-import com.infomaniak.calendar.components.eventdetail.form.rememberSaveableEventFormState
+import com.infomaniak.calendar.components.eventdetail.form.rememberEventFormState
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
-import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
+import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
@@ -67,12 +64,12 @@ fun EventEditScreen(
     val uiState = when (eventDetailUiState) {
         EventDetailUiState.Loading -> EventEditScreenState.Loading
         is EventDetailUiState.Success -> EventEditScreenState.Success(
-            rememberSaveableEventFormState(
+            rememberEventFormState(
                 calendars = eventFormCalendars?.calendars ?: emptyList(),
                 initialCalendar = eventFormCalendars?.initialCalendar,
                 initialText = eventDetailUiState.eventDetail.title,
                 initialIsAllDay = eventDetailUiState.eventDetail.isAllDay,
-                initialAttendees = viewModel.attendeesSearchState.attendees,
+                initialIsKMeetUrlEnabled = eventDetailUiState.eventDetail.kMeetUrl != null,
                 attendeesSearchState = viewModel.attendeesSearchState,
                 initialIsOccupied = eventDetailUiState.eventDetail.isOccupied,
                 initialIsPublic = eventDetailUiState.eventDetail.classification == EventDetailUi.Classification.Public,
@@ -153,15 +150,17 @@ private fun Preview() {
         Surface {
             EventEditScreen(
                 uiState = EventEditScreenState.Success(
-                    rememberSaveableEventFormState(
+                    rememberEventFormState(
                         calendars = listOf(previewEventDetailCalendar),
                         initialCalendar = previewEventDetailCalendar,
                         initialText = "Meeting on how to find funny preview titles",
-                        attendeesSearchState = AttendeesSearchState(
-                            searchQueryTextFieldState = TextFieldState(),
-                            attendees = remember { mutableStateSetOf<AttendeeUi>().apply { addAll(previewAttendees) } },
-                            results = remember { mutableStateListOf() },
+                        attendeesSearchState = rememberSaveableAttendeesSearchState(
+                            attendees = remember { mutableStateSetOf(*previewAttendees.toTypedArray()) },
                         ),
+                        initialIsAllDay = false,
+                        initialIsKMeetUrlEnabled = false,
+                        initialIsOccupied = true,
+                        initialIsPublic = true,
                     ),
                 ),
                 goBack = {},
