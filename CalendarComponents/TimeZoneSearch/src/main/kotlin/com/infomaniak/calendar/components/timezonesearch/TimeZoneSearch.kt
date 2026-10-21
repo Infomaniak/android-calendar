@@ -53,7 +53,7 @@ fun TimeZoneSearch(onTimeZoneClick: (TimeZone) -> Unit, modifier: Modifier = Mod
     val searchResults by produceState<List<TimeZoneUi>?>(initialValue = null, locale) {
         val timeZones = withContext(Dispatchers.Default) { availableTimeZones() }
         snapshotFlow { searchQuery.text.toString().trim() }.collectLatest { query ->
-            value = timeZones.filter { it.matches(query) }
+            value = if (query.isEmpty()) timeZones else timeZones.filter { it.matches(query) }
         }
     }
 

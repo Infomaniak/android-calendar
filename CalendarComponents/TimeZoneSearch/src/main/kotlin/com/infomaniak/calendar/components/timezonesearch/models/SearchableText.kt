@@ -51,4 +51,7 @@ internal class SearchableText(val text: String) {
 private val COMBINING_MARKS = Regex("\\p{M}")
 
 /** `Ü` -> `u` */
-private fun Char.toSearchable(): String = Normalizer.normalize(toString(), Normalizer.Form.NFD).replace(COMBINING_MARKS, "").lowercase()
+private fun Char.toSearchable(): String {
+    if (code < 128) return lowercase() // ASCII has no accents, skip the costly normalization
+    return Normalizer.normalize(toString(), Normalizer.Form.NFD).replace(COMBINING_MARKS, "").lowercase()
+}

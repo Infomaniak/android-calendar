@@ -29,7 +29,8 @@ private const val WORLD_REGION = "001"
 /** One entry per real-world location, skipping ICU zones unknown to kotlinx-datetime. */
 internal fun availableTimeZones(): List<TimeZoneUi> {
     val ids = if (SDK_INT >= 28) canonicalLocationIds() else canonicalLocationIdsBeforeApi28()
-    return ids.filter { it in TimeZone.availableZoneIds }.map { TimeZoneUi(TimeZone.of(it)) }
+    val knownIds = TimeZone.availableZoneIds // Would otherwise be copied on each access
+    return ids.filter { it in knownIds }.map { TimeZoneUi(TimeZone.of(it)) }
 }
 
 @RequiresApi(28)
