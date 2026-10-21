@@ -73,6 +73,7 @@ internal fun DateAndTimeEntry(
     isAllDay: () -> Boolean,
     onDatePicked: (LocalDate) -> Unit,
     onTimePicked: (LocalTime) -> Unit,
+    onTimeZoneClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isDatePickerVisible by rememberSaveable { mutableStateOf(false) }
@@ -95,7 +96,7 @@ internal fun DateAndTimeEntry(
         }
 
         AnimatedVisibility(!isAllDay(), enter = enter, exit = exit, modifier = Modifier.weight(1f)) {
-            TimeZoneButton(entry, shapes, onClick = {})
+            TimeZoneButton(entry, shapes, onClick = onTimeZoneClick)
         }
     }
 
@@ -204,6 +205,7 @@ private fun Preview() {
                 isAllDay = { false },
                 onDatePicked = {},
                 onTimePicked = {},
+                onTimeZoneClick = {},
             )
         }
     }

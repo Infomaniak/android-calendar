@@ -63,6 +63,7 @@ fun EventEditScreen(
     occurrenceId: OccurrenceId,
     goBack: () -> Unit,
     goToEventAttendees: () -> Unit,
+    goToTimeZoneSearch: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventEditViewModel = viewModel(),
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
@@ -108,6 +109,7 @@ fun EventEditScreen(
         uiState = uiState,
         goBack = goBack,
         goToEventAttendees = goToEventAttendees,
+        goToTimeZoneSearch = goToTimeZoneSearch,
         modifier = modifier,
         onSubmit = { /** TODO */ },
         sharedTransitionScope = LocalSharedTransitionScope.current,
@@ -120,6 +122,7 @@ private fun EventEditScreen(
     uiState: EventEditScreenState,
     goBack: () -> Unit,
     goToEventAttendees: () -> Unit,
+    goToTimeZoneSearch: () -> Unit,
     onSubmit: (RecurrentEventScope) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -148,6 +151,7 @@ private fun EventEditScreen(
                 EventForm(
                     state = uiState.eventFormState,
                     onAttendeesClick = goToEventAttendees,
+                    onTimeZoneClick = goToTimeZoneSearch,
                     modifier = Modifier.verticalScroll(scrollState),
                     contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                     sharedTransitionScope = sharedTransitionScope,
@@ -209,6 +213,7 @@ private fun Preview() {
                 ),
                 goBack = {},
                 goToEventAttendees = {},
+                goToTimeZoneSearch = {},
                 onSubmit = {},
             )
         }

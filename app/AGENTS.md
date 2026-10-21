@@ -48,7 +48,7 @@ app/src/main/java/com/infomaniak/calendar/
     ├── model/                     # OccurrenceEventUi calendar item carrying KMP OccurrenceId and attendee summary; TimelineUiState
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
-    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), Accounts, Onboarding)
+    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), EventTimeZone, Accounts, Onboarding)
     │   └── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
     ├── screen/
@@ -62,6 +62,7 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── eventCreation/         # EventCreationScreen
     │   ├── eventDetail/           # EventDetailScreen + EventEditScreen + EventCreationScreen + their ViewModels, and
     │                              # attendeesSearch/ (EventAttendeesScreen + EventAttendeesViewModel shared with its parent)
+    │                              # timeZoneSearch/ (TimeZoneSearchScreen)
     │   └── onboarding/            # OnboardingScreen + CrossAppLoginViewModel
     └── theme/
         ├── Theme.kt                # CalendarTheme Composable (Material 3 color schemes)

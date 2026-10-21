@@ -96,7 +96,12 @@ internal fun DateAndTime(
  * empty but still take its final size as to not create a jarring experience when the data loads in dynamically.
  */
 @Composable
-internal fun DateAndTimeEditable(dateAndTimeState: DateAndTimeState?, isAllDay: () -> Boolean, modifier: Modifier = Modifier) {
+internal fun DateAndTimeEditable(
+    dateAndTimeState: DateAndTimeState?,
+    isAllDay: () -> Boolean,
+    onTimeZoneClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val shouldDisplay = dateAndTimeState != null
     val dateAndTimeState = dateAndTimeState ?: DateAndTimeState.Dummy
 
@@ -107,8 +112,20 @@ internal fun DateAndTimeEditable(dateAndTimeState: DateAndTimeState?, isAllDay: 
         verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
     ) {
         with(dateAndTimeState) {
-            DateAndTimeEntry(start, isAllDay, onDatePicked = { start.pickDate(it) }, onTimePicked = { start.pickTime(it) })
-            DateAndTimeEntry(end, isAllDay, onDatePicked = { end.pickDate(it) }, onTimePicked = { end.pickTime(it) })
+            DateAndTimeEntry(
+                entry = start,
+                isAllDay = isAllDay,
+                onDatePicked = { start.pickDate(it) },
+                onTimePicked = { start.pickTime(it) },
+                onTimeZoneClick = onTimeZoneClick,
+            )
+            DateAndTimeEntry(
+                entry = end,
+                isAllDay = isAllDay,
+                onDatePicked = { end.pickDate(it) },
+                onTimePicked = { end.pickTime(it) },
+                onTimeZoneClick = onTimeZoneClick,
+            )
         }
     }
 }
@@ -203,6 +220,7 @@ private fun PreviewEditable() {
                     endTimeZone = TimeZone.currentSystemDefault(),
                 ),
                 isAllDay = { false },
+                onTimeZoneClick = {},
             )
         }
     }

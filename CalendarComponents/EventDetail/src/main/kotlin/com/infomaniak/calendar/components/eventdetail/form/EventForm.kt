@@ -56,6 +56,7 @@ import kotlin.time.Duration.Companion.hours
 fun EventForm(
     state: EventFormState,
     onAttendeesClick: () -> Unit,
+    onTimeZoneClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -76,6 +77,7 @@ fun EventForm(
         DateAndTimeEditable(
             dateAndTimeState = state.dateAndTimeState,
             isAllDay = state.isAllDay::value,
+            onTimeZoneClick = onTimeZoneClick,
             modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
         )
 
@@ -127,6 +129,7 @@ private fun Preview() {
                     initialIsPublic = true,
                 ),
                 onAttendeesClick = {},
+                onTimeZoneClick = {},
                 contentPadding = PaddingValues(16.dp),
             )
         }

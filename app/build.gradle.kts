@@ -152,6 +152,7 @@ dependencies {
     implementation(project(":CalendarComponents:EventDetail"))
     implementation(project(":CalendarComponents:AttendeesSearch"))
     implementation(project(":CalendarComponents:Planning"))
+    implementation(project(":CalendarComponents:TimeZoneSearch"))
     implementation(project(":CalendarComponents:Foundation"))
     implementation(project(":CalendarComponents:Resources"))
 

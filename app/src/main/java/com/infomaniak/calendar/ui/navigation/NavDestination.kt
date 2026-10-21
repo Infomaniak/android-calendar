@@ -81,4 +81,7 @@ sealed interface NavDestination : NavKey {
 
     @Serializable
     data class EventCreation(val date: LocalDate) : NavDestination
+
+    @Serializable
+    data object EventTimeZone : NavDestination
 }

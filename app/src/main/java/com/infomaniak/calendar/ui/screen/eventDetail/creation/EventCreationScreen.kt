@@ -47,6 +47,7 @@ fun EventCreationScreen(
     date: LocalDate,
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
+    goToTimeZoneSearch: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventCreationViewModel = viewModel(),
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
@@ -71,6 +72,7 @@ fun EventCreationScreen(
         modifier = modifier,
         goBack = goBack,
         goToEventsAttendees = goToEventsAttendees,
+        goToTimeZoneSearch = goToTimeZoneSearch,
     )
 }
 
@@ -80,6 +82,7 @@ private fun EventCreationScreen(
     onSubmit: () -> Unit,
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
+    goToTimeZoneSearch: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -91,6 +94,7 @@ private fun EventCreationScreen(
         EventForm(
             state = state,
             onAttendeesClick = goToEventsAttendees,
+            onTimeZoneClick = goToTimeZoneSearch,
             contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
             modifier = Modifier.verticalScroll(scrollState),
         )
@@ -108,6 +112,6 @@ private fun EventCreationScreenPreview() {
             attendeesSearchState = rememberSaveableAttendeesSearchState(),
         )
 
-        EventCreationScreen(state = state, onSubmit = {}, goBack = {}, goToEventsAttendees = {})
+        EventCreationScreen(state = state, onSubmit = {}, goBack = {}, goToEventsAttendees = {}, goToTimeZoneSearch = {})
     }
 }

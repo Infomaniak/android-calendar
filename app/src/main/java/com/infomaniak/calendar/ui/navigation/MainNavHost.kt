@@ -50,6 +50,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSe
 import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
@@ -127,6 +128,7 @@ private fun baseEntryProvider(
                 date = destination.date,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
                 goToEventsAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
+                goToTimeZoneSearch = { backStack.addOnce(NavDestination.EventTimeZone) },
             )
         }
 
@@ -152,6 +154,7 @@ private fun baseEntryProvider(
                 occurrenceId = destination.occurrenceId,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
                 goToEventAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
+                goToTimeZoneSearch = { backStack.addOnce(NavDestination.EventTimeZone) },
             )
         }
 
@@ -160,6 +163,13 @@ private fun baseEntryProvider(
             metadata = metaDataOf(ResponsiveDialog) + SharedViewModelStoreNavEntryDecorator.parent(destination.parent.toContentKey()),
         ) {
             AttendeesSearchScreen(
+                goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
+            )
+        }
+
+        is NavDestination.EventTimeZone -> NavEntry(destination, metadata = metaDataOf(ResponsiveDialog)) {
+            TimeZoneSearchScreen(
+                onTimeZoneSelected = { backStack.popOrReplaceRoot(defaultCalendarView) },
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
         }
