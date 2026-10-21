@@ -17,6 +17,9 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -25,6 +28,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonShapes
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Icon
@@ -66,37 +70,32 @@ import kotlin.time.Instant
 @Composable
 internal fun PointInTimeEditable(
     pointInTime: DateAndTimeState.PointInTime,
+    isAllDay: () -> Boolean,
     onDatePicked: (LocalDate) -> Unit,
     onTimePicked: (LocalTime) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val shapes = ButtonDefaults.shapes(MaterialTheme.shapes.medium, CircleShape)
     var isDatePickerVisible by rememberSaveable { mutableStateOf(false) }
     var isTimePickerVisible by rememberSaveable { mutableStateOf(false) }
+
+    val shapes = ButtonDefaults.shapes(MaterialTheme.shapes.medium, CircleShape)
+    val effectSpec = MaterialTheme.motionScheme.fastEffectsSpec<Float>()
+    val enter = fadeIn(effectSpec)
+    val exit = fadeOut(effectSpec)
 
     Row(horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.lg), modifier = modifier) {
         OutlinedButton(onClick = { isDatePickerVisible = true }, shapes = shapes) {
             Text(pointInTime.date.formatShortDateWithYear())
         }
 
-        OutlinedButton(onClick = { isTimePickerVisible = true }, shapes = shapes) {
-            Text(pointInTime.time.formatExplicitTimeLabel())
+        AnimatedVisibility(!isAllDay(), enter = enter, exit = exit) {
+            OutlinedButton(onClick = { isTimePickerVisible = true }, shapes = shapes) {
+                Text(pointInTime.time.formatExplicitTimeLabel())
+            }
         }
 
-        Box(Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
-            TextButton(
-                onClick = {},
-                colors = ButtonDefaults.textButtonColors(contentColor = LocalContentColor.current),
-                shapes = shapes,
-            ) {
-                Icon(
-                    painterResource(R.drawable.ic_globe),
-                    contentDescription = null,
-                    modifier = Modifier.size(EsdsTheme.icon.sizeSm),
-                )
-                Spacer(modifier = Modifier.width(EsdsTheme.spacing.md))
-                Text(pointInTime.timeZone.formatCityName(), maxLines = 1, overflow = TextOverflow.Ellipsis)
-            }
+        AnimatedVisibility(!isAllDay(), enter = enter, exit = exit, modifier = Modifier.weight(1f)) {
+            TimeZoneButton(pointInTime, shapes, onClick = {})
         }
     }
 
@@ -114,6 +113,30 @@ internal fun PointInTimeEditable(
             onTimeSelected = onTimePicked,
             onDismissRequest = { isTimePickerVisible = false },
         )
+    }
+}
+
+@Composable
+private fun TimeZoneButton(
+    pointInTime: DateAndTimeState.PointInTime,
+    shapes: ButtonShapes,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier, contentAlignment = Alignment.CenterEnd) {
+        TextButton(
+            onClick = onClick,
+            colors = ButtonDefaults.textButtonColors(contentColor = LocalContentColor.current),
+            shapes = shapes,
+        ) {
+            Icon(
+                painterResource(R.drawable.ic_globe),
+                contentDescription = null,
+                modifier = Modifier.size(EsdsTheme.icon.sizeSm),
+            )
+            Spacer(modifier = Modifier.width(EsdsTheme.spacing.md))
+            Text(pointInTime.timeZone.formatCityName(), maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
     }
 }
 
@@ -178,6 +201,7 @@ private fun Preview() {
                     time = remember { mutableStateOf(LocalTime(14, 41)) },
                     timeZone = remember { mutableStateOf(TimeZone.UTC) },
                 ),
+                isAllDay = { false },
                 onDatePicked = {},
                 onTimePicked = {},
             )

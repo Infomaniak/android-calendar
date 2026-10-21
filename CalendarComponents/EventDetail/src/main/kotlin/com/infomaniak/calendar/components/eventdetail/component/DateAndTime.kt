@@ -25,8 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
@@ -34,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
+import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRangeWithZone
@@ -97,7 +96,7 @@ internal fun DateAndTime(
  * empty but still take its final size as to not create a jarring experience when the data loads in dynamically.
  */
 @Composable
-internal fun DateAndTimeEditable(dateAndTimeState: DateAndTimeState?, modifier: Modifier = Modifier) {
+internal fun DateAndTimeEditable(dateAndTimeState: DateAndTimeState?, isAllDay: () -> Boolean, modifier: Modifier = Modifier) {
     val shouldDisplay = dateAndTimeState != null
     val dateAndTimeState = dateAndTimeState ?: DateAndTimeState.Dummy
 
@@ -108,8 +107,8 @@ internal fun DateAndTimeEditable(dateAndTimeState: DateAndTimeState?, modifier: 
         verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
     ) {
         with(dateAndTimeState) {
-            PointInTimeEditable(start, onDatePicked = { start.pickDate(it) }, onTimePicked = { start.pickTime(it) })
-            PointInTimeEditable(end, onDatePicked = { end.pickDate(it) }, onTimePicked = { end.pickTime(it) })
+            PointInTimeEditable(start, isAllDay, onDatePicked = { start.pickDate(it) }, onTimePicked = { start.pickTime(it) })
+            PointInTimeEditable(end, isAllDay, onDatePicked = { end.pickDate(it) }, onTimePicked = { end.pickTime(it) })
         }
     }
 }
@@ -195,19 +194,15 @@ private fun PreviewEditable() {
     MaterialTheme {
         Surface {
             DateAndTimeEditable(
-                dateAndTimeState = DateAndTimeState(
-                    start = DateAndTimeState.PointInTime(
-                        date = remember { mutableStateOf(LocalDate(2026, 5, 20)) },
-                        time = remember { mutableStateOf(LocalTime(8, 10)) },
-                        timeZone = remember { mutableStateOf(TimeZone.currentSystemDefault()) },
-                    ),
-                    end = DateAndTimeState.PointInTime(
-                        date = remember { mutableStateOf(LocalDate(2026, 5, 20)) },
-                        time = remember { mutableStateOf(LocalTime(9, 0)) },
-                        timeZone = remember { mutableStateOf(TimeZone.currentSystemDefault()) },
-                    ),
-                    hasEndEverBeenTouched = remember { mutableStateOf(false) },
+                dateAndTimeState = rememberDateAndTimeState(
+                    startDate = LocalDate(2026, 5, 20),
+                    startTime = LocalTime(8, 10),
+                    startTimeZone = TimeZone.currentSystemDefault(),
+                    endDate = LocalDate(2026, 5, 20),
+                    endTime = LocalTime(9, 0),
+                    endTimeZone = TimeZone.currentSystemDefault(),
                 ),
+                isAllDay = { false },
             )
         }
     }

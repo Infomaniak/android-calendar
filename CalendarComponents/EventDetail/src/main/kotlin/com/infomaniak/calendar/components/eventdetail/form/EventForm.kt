@@ -75,6 +75,7 @@ fun EventForm(
 
         DateAndTimeEditable(
             dateAndTimeState = state.dateAndTimeState,
+            isAllDay = state.isAllDay::value,
             modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
         )
 
