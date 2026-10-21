@@ -51,7 +51,16 @@ data class DateAndTimeState(
 
     fun Entry.pickTime(time: LocalTime) = edit { this.time = time }
 
-    fun Entry.pickTimeZone(timeZone: TimeZone) = edit { this.timeZone = timeZone }
+    fun Entry.pickTimeZone(timeZone: TimeZone) = edit {
+        val isEditingStart = this == start
+        if (isEditingStart) {
+            val areEntriesSynced = start.timeZone == end.timeZone
+            if (areEntriesSynced) end.timeZone = timeZone
+            start.timeZone = timeZone
+        } else {
+            end.timeZone = timeZone
+        }
+    }
 
     private fun Entry.edit(change: () -> Unit) {
         // TODO: This interval displacement doesn't work if the user is setting an all day event and the time component of
