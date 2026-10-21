@@ -71,13 +71,14 @@ class DayEventsLoader(private val calendarManager: CalendarManager, visibleDateM
         )
 
     companion object {
-        // Used by the day, 3 days and week views. For now, only load what's needed for the week view and reused it for the day and 3 days as well.
-        private const val DAY_AGO = 7
-        private const val DAY_AFTER = 14
+        // Used by the day, 3 days and week views. For now, only load what's needed for the week view and reused it for the day
+        // and 3 days as well. We need 14 rather than 7 days because the week view can be on the first and last day of the week,
+        // which require to load 14 days to make sure both the next and previous week are fully loaded.
+        private const val DAYS_AROUND = 14
 
         /** The days around [today] whose events are loaded. */
         fun dateRangeAround(today: LocalDate): ClosedRange<LocalDate> {
-            return today.minus(DAY_AGO, DateTimeUnit.DAY)..today.plus(DAY_AFTER, DateTimeUnit.DAY)
+            return today.minus(DAYS_AROUND, DateTimeUnit.DAY)..today.plus(DAYS_AROUND, DateTimeUnit.DAY)
         }
     }
 }
