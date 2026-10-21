@@ -1,6 +1,6 @@
 [versions]
-material3 = "1.5.0-alpha29" # Remove when composeBom use same version or higher
-calendarCore = "0.15.0"
+material3 = "1.5.0-beta01" # Remove when composeBom use same version or higher
+calendarCore = "0.16.0"
 designsystem = "0.3.0"
 haze = "2.0.1"
 kizitonwoseCalendar = "2.10.1"
