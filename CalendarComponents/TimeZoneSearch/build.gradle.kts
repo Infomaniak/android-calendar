@@ -37,9 +37,11 @@ dependencies {
     api(project(":CalendarComponents:Foundation"))
     implementation(project(":CalendarComponents:Resources"))
 
-    api(kmpCalendar.kotlinx.datetime)
+    implementation(core.infomaniak.core.ui.compose.basics)
 
     implementation(libs.infomaniak.designsystem.foundation)
+
+    api(kmpCalendar.kotlinx.datetime)
 
     implementation(platform(core.compose.bom))
     implementation(core.compose.foundation)
@@ -50,4 +52,3 @@ dependencies {
 
     testImplementation(core.junit)
 }
-

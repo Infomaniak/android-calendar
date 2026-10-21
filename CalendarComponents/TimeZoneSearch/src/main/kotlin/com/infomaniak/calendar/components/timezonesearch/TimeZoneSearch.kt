@@ -18,8 +18,10 @@
 package com.infomaniak.calendar.components.timezonesearch
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -39,6 +41,7 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.calendar.components.timezonesearch.component.TimeZoneItem
 import com.infomaniak.calendar.components.timezonesearch.models.TimeZoneUi
 import com.infomaniak.calendar.components.timezonesearch.models.availableTimeZones
+import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -46,7 +49,11 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.TimeZone
 
 @Composable
-fun TimeZoneSearch(onTimeZoneClick: (TimeZone) -> Unit, modifier: Modifier = Modifier) {
+fun TimeZoneSearch(
+    onTimeZoneClick: (TimeZone) -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
     val locale = LocalLocale.current.platformLocale
     val searchQuery = rememberTextFieldState()
 
@@ -57,23 +64,39 @@ fun TimeZoneSearch(onTimeZoneClick: (TimeZone) -> Unit, modifier: Modifier = Mod
         }
     }
 
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier
+            .padding(contentPadding.onlyHorizontal())
+            .padding(top = contentPadding.calculateTopPadding()),
+    ) {
         SearchBar(searchState = searchQuery, placeholder = stringResource(android.R.string.search_go))
 
         when (val results = searchResults) {
             null -> Unit // Still loading
-            emptyList<TimeZoneUi>() -> EmptyState(text = stringResource(R.string.emptyStateNoTimeZone))
-            else -> TimeZoneResults(results, searchQuery.text.toString().trim(), onTimeZoneClick)
+            emptyList<TimeZoneUi>() -> EmptyState(
+                text = stringResource(R.string.emptyStateNoTimeZone),
+                modifier = Modifier.padding(bottom = contentPadding.calculateBottomPadding()),
+            )
+            else -> TimeZoneResults(
+                results = results,
+                query = searchQuery.text.toString().trim(),
+                onTimeZoneClick = onTimeZoneClick,
+                contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
+            )
         }
     }
 }
 
 @Composable
-private fun TimeZoneResults(results: List<TimeZoneUi>, query: String, onTimeZoneClick: (TimeZone) -> Unit) {
+private fun TimeZoneResults(
+    results: List<TimeZoneUi>,
+    query: String,
+    onTimeZoneClick: (TimeZone) -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = EsdsTheme.spacing.md, vertical = EsdsTheme.spacing.sm),
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = contentPadding + PaddingValues(horizontal = EsdsTheme.spacing.md, vertical = EsdsTheme.spacing.sm),
     ) {
         items(results, key = { it.timeZone.id }) { timeZone ->
             TimeZoneItem(timeZone, query, onClick = { onTimeZoneClick(timeZone.timeZone) })

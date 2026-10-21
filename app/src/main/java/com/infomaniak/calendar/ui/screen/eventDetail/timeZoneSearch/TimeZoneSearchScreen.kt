@@ -62,12 +62,11 @@ private fun TimeZoneSearchScreen(
             )
         },
         modifier = modifier,
-    ) { paddingValues ->
+    ) { contentPadding ->
         TimeZoneSearch(
             onTimeZoneClick = onTimeZoneSelected,
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = contentPadding,
         )
     }
 }
