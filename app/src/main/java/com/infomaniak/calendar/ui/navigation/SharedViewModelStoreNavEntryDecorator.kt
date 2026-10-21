@@ -85,12 +85,11 @@ class SharedViewModelStoreNavEntryDecorator<T : Any>(
     onPop = { key -> viewModelStoreProvider.clearKey(key) },
     decorate = { entry ->
         val localContentKey = entry.contentKey
-        val localOwner =
-            rememberViewModelStoreOwner(
-                localContentKey,
-                viewModelStoreProvider,
-                savedStateRegistryOwner = LocalSavedStateRegistryOwner.current,
-            )
+        val localOwner = rememberViewModelStoreOwner(
+            key = localContentKey,
+            provider = viewModelStoreProvider,
+            savedStateRegistryOwner = LocalSavedStateRegistryOwner.current,
+        )
 
         val localValues: MutableList<ProvidedValue<*>> = mutableListOf(LocalViewModelStoreOwner provides localOwner)
 
