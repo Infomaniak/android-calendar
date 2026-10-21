@@ -27,5 +27,5 @@ import kotlin.time.Duration.Companion.hours
 
 @SingleIn(AppScope::class)
 class SettingsDataValues @Inject constructor(appContext: Context) : DataValues(appContext, name = "settingsData") {
-    val defaultEventDuration = dataValue<Duration>(key = "defaultEventDuration", defaultValue = 1.hours)
+    val defaultEventDuration = dataValue(key = "defaultEventDuration", defaultValue = 1.hours)
 }
