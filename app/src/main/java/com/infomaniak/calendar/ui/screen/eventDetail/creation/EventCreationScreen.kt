@@ -38,11 +38,13 @@ import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlin.time.Duration.Companion.hours
 
 @Composable
 fun EventCreationScreen(
+    date: LocalDate,
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
     modifier: Modifier = Modifier,
@@ -55,7 +57,7 @@ fun EventCreationScreen(
     val state = rememberDefaultEventForm(
         calendars = eventFormCalendars?.calendars ?: emptyList(),
         initialCalendar = eventFormCalendars?.initialCalendar,
-        dateAndTimeState = defaultEventDuration?.let { rememberDateAndTimeState(it, TimeZone.currentSystemDefault()) },
+        dateAndTimeState = defaultEventDuration?.let { rememberDateAndTimeState(it, TimeZone.currentSystemDefault(), date) },
         attendeesSearchState = viewModel.attendeesSearchState,
     )
 

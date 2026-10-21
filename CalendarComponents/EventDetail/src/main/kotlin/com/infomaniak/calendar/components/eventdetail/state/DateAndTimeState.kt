@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
@@ -108,8 +109,12 @@ data class DateAndTimeState(
 }
 
 @Composable
-fun rememberDateAndTimeState(defaultEventDuration: Duration, timeZone: TimeZone): DateAndTimeState {
-    val (start, end) = computeDefaultValues(timeZone, defaultEventDuration)
+fun rememberDateAndTimeState(
+    defaultEventDuration: Duration,
+    timeZone: TimeZone,
+    date: LocalDate = Clock.today(timeZone),
+): DateAndTimeState {
+    val (start, end) = computeDefaultValues(date, timeZone, defaultEventDuration)
 
     return rememberDateAndTimeState(
         startDate = start.date,
@@ -122,13 +127,39 @@ fun rememberDateAndTimeState(defaultEventDuration: Duration, timeZone: TimeZone)
 }
 
 /**
- * Computes default start and end values for a new event. The start is the next full hour, and the end is [eventDuration] after the start.
+ * Computes default start and end values for a new event.
+ *
+ * The start is the next full hour if the date is today, and the end is [eventDuration] after the start.
+ * Otherwise, the start is 8:00 AM on the given date, and the end is [eventDuration] after the start.
  */
-private fun computeDefaultValues(timeZone: TimeZone, eventDuration: Duration): Pair<LocalDateTime, LocalDateTime> {
-    val nowJavaDateTime = Clock.System.now().toLocalDateTime(timeZone).toJavaLocalDateTime()
+private fun computeDefaultValues(
+    date: LocalDate,
+    timeZone: TimeZone,
+    eventDuration: Duration,
+): Pair<LocalDateTime, LocalDateTime> {
+    val isToday = date == Clock.today(timeZone)
+
+    val (start, end) = if (isToday) {
+        Clock.System.now().nextWholeHour(timeZone, eventDuration)
+    } else {
+        date.atHeightInTheMorning(timeZone, eventDuration)
+    }
+
+    return start to end
+}
+
+private fun Instant.nextWholeHour(timeZone: TimeZone, eventDuration: Duration): Pair<LocalDateTime, LocalDateTime> {
+    val nowJavaDateTime = toLocalDateTime(timeZone).toJavaLocalDateTime()
     val startJava = nowJavaDateTime.truncatedTo(ChronoUnit.HOURS).plusHours(1)
 
     val start = startJava.toKotlinLocalDateTime()
+    val end = start.toInstant(timeZone).plus(eventDuration).toLocalDateTime(timeZone)
+
+    return start to end
+}
+
+private fun LocalDate.atHeightInTheMorning(timeZone: TimeZone, eventDuration: Duration): Pair<LocalDateTime, LocalDateTime> {
+    val start = atTime(8, 0)
     val end = start.toInstant(timeZone).plus(eventDuration).toLocalDateTime(timeZone)
 
     return start to end

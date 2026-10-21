@@ -54,7 +54,7 @@ import kotlinx.datetime.LocalDate
 @Composable
 fun Planning(
     weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventSummaryUi>>>,
-    goToEventCreation: () -> Unit,
+    goToEventCreation: (LocalDate) -> Unit,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
@@ -74,7 +74,7 @@ fun Planning(
 private fun Timeline(
     lazyListState: LazyListState,
     weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventSummaryUi>>>,
-    goToEventCreation: () -> Unit,
+    goToEventCreation: (LocalDate) -> Unit,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
@@ -130,7 +130,7 @@ private fun Event(
     sectionSizing: SectionSizing,
     itemKey: PlanningItemKey,
     sectionItemKeys: List<PlanningItemKey>,
-    goToEventCreation: () -> Unit,
+    goToEventCreation: (LocalDate) -> Unit,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -156,8 +156,8 @@ private fun Event(
                     allDayTrailingContent = EventItemDefaults.AllDayLabel,
                 )
             }
-            is EventSummaryUi.TodayEmptyState -> TodayEmptyState(onClick = goToEventCreation, Modifier.fillMaxWidth())
-            is EventSummaryUi.EmptyState -> OtherDayEmptyState(onClick = goToEventCreation, Modifier.fillMaxWidth())
+            is EventSummaryUi.TodayEmptyState -> TodayEmptyState(onClick = { goToEventCreation(date) }, Modifier.fillMaxWidth())
+            is EventSummaryUi.EmptyState -> OtherDayEmptyState(onClick = { goToEventCreation(date) }, Modifier.fillMaxWidth())
         }
     }
 }
