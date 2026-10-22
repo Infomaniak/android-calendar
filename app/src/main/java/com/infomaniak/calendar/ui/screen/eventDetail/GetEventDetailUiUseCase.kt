@@ -19,6 +19,7 @@ package com.infomaniak.calendar.ui.screen.eventDetail
 
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.calendar.utils.mapState
 import com.infomaniak.calendar.utils.toEventDetailCalendar
 import com.infomaniak.calendar.utils.toEventDetailUi
 import com.infomaniak.core.sentry.SentryLog
@@ -39,7 +40,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -53,7 +53,7 @@ import kotlin.time.Duration.Companion.seconds
  * There is a single shared flow, and it is what makes the detail -> edit transition work: both screens display the same
  * occurrence, so [distinctUntilChanged] turns edit's [setOccurrenceId] into a no-op and [SharingStarted.WhileSubscribed] keeps
  * the state warm in between. Edit therefore composes its first frame with an already loaded event, instead of going through
- * [EventDetailUiState.Loading] again and having nothing to animate towards.
+ * [EventDetailUiState.Displayable.Loading] again and having nothing to animate towards.
  */
 @SingleIn(AppScope::class)
 class GetEventDetailUiUseCase @Inject constructor(
@@ -100,20 +100,19 @@ class GetEventDetailUiUseCase @Inject constructor(
     ) { eventAndCalendarState, emailsByUserId ->
         val (event, calendar) = when (eventAndCalendarState) {
             EventAndCalendarState.EventNotFound -> return@combine EventDetailUiState.Unavailable
-            EventAndCalendarState.Loading -> return@combine EventDetailUiState.Loading
+            EventAndCalendarState.Loading -> return@combine EventDetailUiState.Displayable.Loading
             is EventAndCalendarState.Success -> eventAndCalendarState
         }
 
         event
             .toEventDetailUi(calendar, emailsByUserId)
-            .let(EventDetailUiState::Success)
+            .let(EventDetailUiState.Displayable::Success)
     }
-        .stateIn(useCaseScope, SharingStarted.WhileSubscribed(5.seconds), EventDetailUiState.Loading)
+        .stateIn(useCaseScope, SharingStarted.WhileSubscribed(5.seconds), EventDetailUiState.Displayable.Loading)
 
-    val eventCalendar: StateFlow<EventDetailCalendar?> = eventAndCalendarFlow
-        .filterIsInstance<EventAndCalendarState.Success>()
-        .map { it.calendar.toEventDetailCalendar() }
-        .stateIn(useCaseScope, SharingStarted.Eagerly, null)
+    val eventCalendar: StateFlow<EventDetailCalendar?> = eventAndCalendarFlow.mapState(useCaseScope, SharingStarted.Eagerly) {
+        (it as? EventAndCalendarState.Success)?.calendar?.toEventDetailCalendar()
+    }
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) {
         occurrenceIdFlow.value = occurrenceId

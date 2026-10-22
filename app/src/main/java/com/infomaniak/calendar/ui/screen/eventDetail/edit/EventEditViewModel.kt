@@ -37,13 +37,13 @@ import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.flow.stateIn
 import kotlin.time.Duration.Companion.seconds
 
@@ -55,15 +55,19 @@ class EventEditViewModel(
 ) : ViewModel() {
     val eventDetailUi = getEventDetailUiUseCase.eventDetailUi
         .filterIsInstance<EventDetailUiState.Displayable>()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), EventDetailUiState.Loading)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), EventDetailUiState.Displayable.Loading)
 
-    val goBackRequests: Flow<Unit> = getEventDetailUiUseCase.eventDetailUi
-        .filter { it == EventDetailUiState.Unavailable }
-        .map {}
+    val goBackRequests: ReceiveChannel<EventDetailUiState.Unavailable> = getEventDetailUiUseCase.eventDetailUi
+        .filterIsInstance<EventDetailUiState.Unavailable>()
+        .produceIn(viewModelScope)
 
     val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
-    val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase
-        .editionCalendars(getEventDetailUiUseCase.eventCalendar)
+
+    private val eventCalendar = getEventDetailUiUseCase.eventCalendar
+        .filterNotNull()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), getEventDetailUiUseCase.eventCalendar.value)
+
+    val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase.editionCalendars(eventCalendar)
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) {
         getEventDetailUiUseCase.setOccurrenceId(occurrenceId)

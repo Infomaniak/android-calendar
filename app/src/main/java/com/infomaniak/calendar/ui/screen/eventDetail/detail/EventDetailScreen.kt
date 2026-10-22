@@ -99,7 +99,7 @@ fun EventDetailScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.goBackRequests.collect { goBack() }
+        for (request in viewModel.goBackRequests) goBack()
     }
 
     LaunchedEffect(viewModel.attendeesSearchState) {
@@ -148,7 +148,7 @@ private fun EventDetailScreen(
                 navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
                 title = {},
                 actions = {
-                    val canEdit = (state as? EventDetailUiState.Success)?.eventDetail?.canEdit == true
+                    val canEdit = (state as? EventDetailUiState.Displayable.Success)?.eventDetail?.canEdit == true
 
                     Row(modifier = Modifier.padding(end = EsdsTheme.spacing.lg)) {
                         TopAppBarButtons.EditButton(onClick = goToEdit, enabled = canEdit)
@@ -158,7 +158,7 @@ private fun EventDetailScreen(
             )
         },
         bottomBar = {
-            (state as? EventDetailUiState.Success)?.eventDetail?.attendees?.me?.let { me ->
+            (state as? EventDetailUiState.Displayable.Success)?.eventDetail?.attendees?.me?.let { me ->
                 ParticipationStatusButtonsToolbar(
                     participationStatus = { me.status },
                     onParticipationStatusChange = { /*TODO[eventDetail]*/ },
@@ -169,8 +169,9 @@ private fun EventDetailScreen(
         modifier = modifier.nestedScrollToolbar(floatingToolbarScrollBehavior),
     ) { scaffoldContentPadding ->
         when (state) {
-            EventDetailUiState.Loading -> Unit // Loaded locally, always fast, no need for a specific progress indicator UI
-            is EventDetailUiState.Success -> {
+            // Loaded locally, always fast, no need for a specific progress indicator UI
+            EventDetailUiState.Displayable.Loading -> Unit
+            is EventDetailUiState.Displayable.Success -> {
                 val copyFeedbackMessage = stringResource(RCommon.string.linkCopied)
 
                 EventDetail(
@@ -233,7 +234,7 @@ private fun Preview() {
     CalendarThemeForPreview {
         Surface {
             EventDetailScreen(
-                uiState = { EventDetailUiState.Success(previewEventDetail) },
+                uiState = { EventDetailUiState.Displayable.Success(previewEventDetail) },
                 goBack = {},
                 goToEdit = {},
                 goToEventAttendees = {},
