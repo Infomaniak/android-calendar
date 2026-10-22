@@ -17,19 +17,19 @@
  */
 package com.infomaniak.calendar.notification
 
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventBounds
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventSummary
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.ZonedWallClock
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.AlarmAction
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.AlarmTrigger
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.EventAlarm
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.TriggerRelation
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.UpcomingAlarm
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.UpcomingAlarmId
-import com.infomaniak.multiplatform_core.account.domain.model.AccountId
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import org.junit.Assert.assertEquals
@@ -250,22 +250,23 @@ class AlarmSchedulerTest {
     }
 
     private fun testAlarm(id: String, firesAtMs: Long, title: String = "Test Event $id"): UpcomingAlarm {
-        val eventId = EventId("event://$id")
-        val event = Event(
-            masterEventId = eventId,
-            occurrenceId = OccurrenceId.Master(eventId),
-            calendarId = CalendarId("calendar://test"),
-            accountId = AccountId(1L),
+        val event = EventSummary(
+            occurrenceId = OccurrenceId.Master(EventId("event://$id")),
             title = title,
-            timing = EventTiming(
-                start = LocalDateTime(2026, 9, 18, 10, 0),
-                end = LocalDateTime(2026, 9, 18, 11, 0),
-                startTimeZone = TimeZone.UTC,
-                endTimeZone = TimeZone.UTC,
-                isAllDay = false,
-            ),
+            location = null,
+            status = null,
             colors = EventColors.from(eventSourceColor = 0, calendarSourceColor = 0),
-            canEdit = true,
+            timing = EventTiming(
+                bounds = EventBounds.Zoned(
+                    start = ZonedWallClock(LocalDateTime(2026, 9, 18, 10, 0), TimeZone.UTC),
+                    end = ZonedWallClock(LocalDateTime(2026, 9, 18, 11, 0), TimeZone.UTC),
+                ),
+            ),
+            hasAttendees = false,
+            hasMeetRoom = false,
+            isBookable = false,
+            isRecurring = false,
+            myStatus = null,
         )
         return UpcomingAlarm(
             id = createUpcomingAlarmId(id),
