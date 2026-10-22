@@ -33,9 +33,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.eventdetail.component.ItemIconDefaults
+import com.infomaniak.calendar.components.eventdetail.component.items.ItemIconDefaults
 import com.infomaniak.calendar.components.resources.R
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
 internal fun Calendar(calendarColor: Color, calendarName: String, modifier: Modifier = Modifier) {

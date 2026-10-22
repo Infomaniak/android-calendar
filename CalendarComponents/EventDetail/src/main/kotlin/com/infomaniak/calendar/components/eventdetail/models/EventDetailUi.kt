@@ -17,11 +17,9 @@
  */
 package com.infomaniak.calendar.components.eventdetail.models
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.filetypes.FileType
