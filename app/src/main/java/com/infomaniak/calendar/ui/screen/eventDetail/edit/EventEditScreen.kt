@@ -99,7 +99,7 @@ fun EventEditScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.synchronizeAttendeesSearchState(eventDetailSharedDataViewModel.eventDetailUi)
+        viewModel.initAttendeesSearchState(eventDetailSharedDataViewModel.eventDetailUi)
     }
 
     LaunchedEffect(Unit) {

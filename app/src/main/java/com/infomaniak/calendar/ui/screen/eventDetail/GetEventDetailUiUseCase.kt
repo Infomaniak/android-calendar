@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.toEventDetailCalendar
 import com.infomaniak.calendar.utils.toEventDetailUi
@@ -48,13 +47,10 @@ class GetEventDetailUiUseCase @Inject constructor(
             is EventAndCalendarState.Success -> eventAndCalendarState
         }
 
-        event
-            .toEventDetailUi(calendar, emailsByUserId)
-            .let(EventDetailUiState.Displayable::Success)
-    }
-
-    fun eventCalendar(occurrenceId: OccurrenceId): Flow<EventDetailCalendar?> = eventAndCalendar(occurrenceId).map {
-        (it as? EventAndCalendarState.Success)?.calendar?.toEventDetailCalendar()
+        EventDetailUiState.Displayable.Success(
+            eventDetail = event.toEventDetailUi(calendar, emailsByUserId),
+            calendar = calendar.toEventDetailCalendar(),
+        )
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

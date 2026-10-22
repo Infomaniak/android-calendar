@@ -23,7 +23,6 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
-import com.infomaniak.calendar.ui.screen.eventDetail.utils.synchronizeTo
 import com.infomaniak.calendar.utils.saveableAttendeesSearchState
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
@@ -32,14 +31,25 @@ import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
 
 @AssistedInject
 class EventEditViewModel(@Assisted private val savedStateHandle: SavedStateHandle) : ViewModel() {
     val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
 
-    suspend fun synchronizeAttendeesSearchState(eventDetailUi: StateFlow<EventDetailUiState>) {
-        eventDetailUi.synchronizeTo(attendeesSearchState)
+    private var areAttendeesInitialized: Boolean
+        get() = savedStateHandle[ARE_ATTENDEES_INITIALIZED_KEY] ?: false
+        set(value) {
+            savedStateHandle[ARE_ATTENDEES_INITIALIZED_KEY] = value
+        }
+
+    suspend fun initAttendeesSearchState(eventDetailUi: Flow<EventDetailUiState>) {
+        if (areAttendeesInitialized) return
+        val event = eventDetailUi.filterIsInstance<EventDetailUiState.Displayable.Success>().first()
+        attendeesSearchState.attendees.addAll(event.eventDetail.attendees.all)
+        areAttendeesInitialized = true
     }
 
     @AssistedFactory
@@ -49,5 +59,9 @@ class EventEditViewModel(@Assisted private val savedStateHandle: SavedStateHandl
         override fun create(extras: CreationExtras): EventEditViewModel = create(extras.createSavedStateHandle())
 
         fun create(@Assisted savedStateHandle: SavedStateHandle): EventEditViewModel
+    }
+
+    companion object {
+        private const val ARE_ATTENDEES_INITIALIZED_KEY = "areAttendeesInitialized"
     }
 }
