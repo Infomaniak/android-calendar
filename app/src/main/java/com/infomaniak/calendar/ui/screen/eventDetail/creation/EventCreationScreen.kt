@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -33,7 +32,7 @@ import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberDefaultEventForm
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
-import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
@@ -77,12 +76,7 @@ private fun EventCreationScreen(
     val scrollState = rememberScrollState()
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
-                title = {},
-            )
-        },
+        topBar = { SubmitTopAppBar(goBack = goBack, onSubmit = onSubmit) },
         modifier = modifier,
     ) { contentPadding ->
         EventForm(

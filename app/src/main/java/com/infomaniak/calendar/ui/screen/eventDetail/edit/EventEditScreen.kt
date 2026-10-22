@@ -24,7 +24,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateSetOf
@@ -41,7 +40,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
-import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
@@ -95,6 +94,7 @@ fun EventEditScreen(
         goBack = goBack,
         goToEventAttendees = goToEventAttendees,
         modifier = modifier,
+        onSubmit = { /** TODO */ },
         sharedTransitionScope = LocalSharedTransitionScope.current,
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
     )
@@ -105,6 +105,7 @@ private fun EventEditScreen(
     uiState: EventEditScreenState,
     goBack: () -> Unit,
     goToEventAttendees: () -> Unit,
+    onSubmit: () -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
@@ -112,12 +113,7 @@ private fun EventEditScreen(
     val scrollState = rememberScrollState()
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
-                title = {},
-            )
-        },
+        topBar = { SubmitTopAppBar(goBack = goBack, onSubmit = onSubmit) },
         modifier = modifier,
     ) { contentPadding ->
         when (uiState) {
@@ -165,6 +161,7 @@ private fun Preview() {
                 ),
                 goBack = {},
                 goToEventAttendees = {},
+                onSubmit = {},
             )
         }
     }

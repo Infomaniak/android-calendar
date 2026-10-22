@@ -17,7 +17,9 @@
  */
 package com.infomaniak.calendar.ui.component.topAppBar
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.PlainTooltip
@@ -35,10 +37,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.BackButton
-import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.EventDeleteButton
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.DrawerIconButton
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.EditButton
+import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.EventDeleteButton
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.InboxButton
+import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.SaveButton
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.SearchButton
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -46,7 +49,11 @@ import kotlinx.coroutines.launch
 import com.infomaniak.calendar.components.resources.R as RComponents
 import com.infomaniak.core.common.R as RCommon
 
+
 object TopAppBarButtons {
+    @OptIn(ExperimentalMaterial3Api::class)
+    private val TooltipIconButtonAnchorPosition = TooltipAnchorPosition.Below
+
     @Composable
     fun InboxButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
         TooltipIconButton(
@@ -114,6 +121,23 @@ object TopAppBarButtons {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
+    fun SaveButton(modifier: Modifier = Modifier, enabled: () -> Boolean = { true }, onClick: () -> Unit) {
+        val contentDescription = stringResource(RCommon.string.buttonSave)
+
+        TooltipBox(
+            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipIconButtonAnchorPosition),
+            state = rememberTooltipState(),
+            tooltip = { PlainTooltip { Text(contentDescription) } },
+            modifier = modifier,
+        ) {
+            FilledIconButton(onClick = onClick, enabled = enabled()) {
+                Icon(painterResource(R.drawable.ic_check), contentDescription)
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
     private fun TooltipIconButton(
         painter: Painter,
         contentDescription: String,
@@ -122,7 +146,7 @@ object TopAppBarButtons {
         enabled: Boolean = true,
     ) {
         TooltipBox(
-            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Below),
+            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipIconButtonAnchorPosition),
             state = rememberTooltipState(),
             tooltip = { PlainTooltip { Text(contentDescription) } },
             modifier = modifier,
@@ -179,5 +203,16 @@ private fun EditButtonPreview() {
 private fun EventDeleteButtonPreview() {
     CalendarThemeForPreview {
         EventDeleteButton(onClick = {})
+    }
+}
+
+@Preview
+@Composable
+private fun SaveButtonPreview() {
+    CalendarThemeForPreview {
+        Row {
+            SaveButton(onClick = {})
+            SaveButton(onClick = {}, enabled = { false })
+        }
     }
 }
