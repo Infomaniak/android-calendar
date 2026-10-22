@@ -18,7 +18,6 @@
 package com.infomaniak.calendar.ui.screen.eventDetail
 
 import com.infomaniak.calendar.utils.account.AccountUtils
-import com.infomaniak.calendar.utils.toEventDetailCalendar
 import com.infomaniak.calendar.utils.toEventDetailUi
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
@@ -37,8 +36,8 @@ class GetEventDetailUiUseCase @Inject constructor(
     private val accountUtils: AccountUtils,
     private val calendarManager: CalendarManager,
 ) {
-    fun eventDetailUi(occurrenceId: OccurrenceId): Flow<EventDetailUiState> = combine(
-        eventAndCalendar(occurrenceId),
+    fun eventDetailUi(eventAndCalendar: Flow<EventAndCalendarState>): Flow<EventDetailUiState> = combine(
+        eventAndCalendar,
         accountUtils.emailsByUserId,
     ) { eventAndCalendarState, emailsByUserId ->
         val (event, calendar) = when (eventAndCalendarState) {
@@ -47,14 +46,13 @@ class GetEventDetailUiUseCase @Inject constructor(
             is EventAndCalendarState.Success -> eventAndCalendarState
         }
 
-        EventDetailUiState.Displayable.Success(
-            eventDetail = event.toEventDetailUi(calendar, emailsByUserId),
-            calendar = calendar.toEventDetailCalendar(),
-        )
+        event
+            .toEventDetailUi(calendar, emailsByUserId)
+            .let(EventDetailUiState.Displayable::Success)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun eventAndCalendar(occurrenceId: OccurrenceId): Flow<EventAndCalendarState> = calendarManager
+    fun eventAndCalendar(occurrenceId: OccurrenceId): Flow<EventAndCalendarState> = calendarManager
         .observeOccurrence(occurrenceId)
         .flatMapLatest { event ->
             if (event == null) {
@@ -82,7 +80,7 @@ class GetEventDetailUiUseCase @Inject constructor(
     }
 }
 
-private sealed interface EventAndCalendarState {
+sealed interface EventAndCalendarState {
     object Loading : EventAndCalendarState
     data class Success(val event: Event, val calendar: Calendar) : EventAndCalendarState
     object EventNotFound : EventAndCalendarState

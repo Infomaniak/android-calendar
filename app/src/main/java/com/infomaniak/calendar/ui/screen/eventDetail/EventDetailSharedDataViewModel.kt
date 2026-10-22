@@ -57,9 +57,13 @@ class EventDetailSharedDataViewModel(
     private val occurrenceIdFlow = MutableStateFlow<OccurrenceId?>(null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val eventDetailUiState: StateFlow<EventDetailUiState> = occurrenceIdFlow
+    private val eventAndCalendar: StateFlow<EventAndCalendarState> = occurrenceIdFlow
         .filterNotNull()
-        .flatMapLatest(getEventDetailUiUseCase::eventDetailUi)
+        .flatMapLatest(getEventDetailUiUseCase::eventAndCalendar)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), EventAndCalendarState.Loading)
+
+    private val eventDetailUiState: StateFlow<EventDetailUiState> = getEventDetailUiUseCase
+        .eventDetailUi(eventAndCalendar)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), EventDetailUiState.Displayable.Loading)
 
     val eventDetailUi: StateFlow<EventDetailUiState.Displayable> = eventDetailUiState
@@ -70,7 +74,7 @@ class EventDetailSharedDataViewModel(
     val editGoBackRequests: ReceiveChannel<EventDetailUiState.Unavailable> = goBackRequests()
 
     val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase
-        .editionCalendars(eventDetailUi.map { (it as? EventDetailUiState.Displayable.Success)?.calendar })
+        .editionCalendars(eventAndCalendar.filterIsInstance<EventAndCalendarState.Success>().map { it.calendar })
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), null)
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) {

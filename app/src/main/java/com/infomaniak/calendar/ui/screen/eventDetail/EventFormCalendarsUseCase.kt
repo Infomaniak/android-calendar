@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventFormCalendars
 import com.infomaniak.calendar.utils.combineStates
@@ -55,9 +54,9 @@ class EventFormCalendarsUseCase @Inject constructor(private val cachedCalendarMa
     }
 
     /** All writable calendars, preselecting the edited event's [initialCalendar]. */
-    fun editionCalendars(initialCalendar: Flow<EventDetailCalendar?>): Flow<EventFormCalendars?> {
+    fun editionCalendars(initialCalendar: Flow<Calendar?>): Flow<EventFormCalendars?> {
         return combine(cachedCalendarManager.writableCalendars, initialCalendar) { calendars, initial ->
-            initial?.let { EventFormCalendars(calendars.map(Calendar::toEventDetailCalendar), it) }
+            initial?.let { EventFormCalendars(calendars.map(Calendar::toEventDetailCalendar), it.toEventDetailCalendar()) }
         }
     }
 }

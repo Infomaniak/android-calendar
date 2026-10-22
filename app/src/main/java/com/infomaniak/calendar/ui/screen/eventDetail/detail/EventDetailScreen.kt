@@ -51,7 +51,6 @@ import com.infomaniak.calendar.components.eventdetail.detail.component.Participa
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
-import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
@@ -237,7 +236,7 @@ private fun Preview() {
     CalendarThemeForPreview {
         Surface {
             EventDetailScreen(
-                uiState = { EventDetailUiState.Displayable.Success(previewEventDetail, previewEventDetailCalendar) },
+                uiState = { EventDetailUiState.Displayable.Success(previewEventDetail) },
                 goBack = {},
                 goToEdit = {},
                 goToEventAttendees = {},
