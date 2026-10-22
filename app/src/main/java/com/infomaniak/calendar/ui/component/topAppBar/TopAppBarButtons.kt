@@ -49,7 +49,11 @@ import kotlinx.coroutines.launch
 import com.infomaniak.calendar.components.resources.R as RComponents
 import com.infomaniak.core.common.R as RCommon
 
+
 object TopAppBarButtons {
+    @OptIn(ExperimentalMaterial3Api::class)
+    private val TooltipIconButtonAnchorPosition = TooltipAnchorPosition.Below
+
     @Composable
     fun InboxButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
         TooltipIconButton(
@@ -117,16 +121,16 @@ object TopAppBarButtons {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun SaveButton(modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
+    fun SaveButton(modifier: Modifier = Modifier, enabled: () -> Boolean = { true }, onClick: () -> Unit) {
         val contentDescription = stringResource(RCommon.string.buttonSave)
 
         TooltipBox(
-            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Below),
+            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipIconButtonAnchorPosition),
             state = rememberTooltipState(),
             tooltip = { PlainTooltip { Text(contentDescription) } },
             modifier = modifier,
         ) {
-            FilledIconButton(onClick = onClick, enabled = enabled) {
+            FilledIconButton(onClick = onClick, enabled = enabled()) {
                 Icon(painterResource(R.drawable.ic_check), contentDescription)
             }
         }
@@ -142,7 +146,7 @@ object TopAppBarButtons {
         enabled: Boolean = true,
     ) {
         TooltipBox(
-            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Below),
+            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipIconButtonAnchorPosition),
             state = rememberTooltipState(),
             tooltip = { PlainTooltip { Text(contentDescription) } },
             modifier = modifier,
@@ -208,7 +212,7 @@ private fun SaveButtonPreview() {
     CalendarThemeForPreview {
         Row {
             SaveButton(onClick = {})
-            SaveButton(onClick = {}, enabled = false)
+            SaveButton(onClick = {}, enabled = { false })
         }
     }
 }

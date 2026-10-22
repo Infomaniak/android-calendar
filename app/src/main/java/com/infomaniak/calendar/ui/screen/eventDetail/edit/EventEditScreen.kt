@@ -19,14 +19,11 @@ package com.infomaniak.calendar.ui.screen.eventDetail.edit
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateSetOf
@@ -43,13 +40,12 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
-import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 
 @Composable
@@ -117,13 +113,7 @@ private fun EventEditScreen(
     val scrollState = rememberScrollState()
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
-                actions = { Row(Modifier.padding(end = EsdsTheme.spacing.lg)) { TopAppBarButtons.SaveButton(onClick = onSubmit) } },
-                title = {},
-            )
-        },
+        topBar = { SubmitTopAppBar(goBack = goBack, onSubmit = onSubmit) },
         modifier = modifier,
     ) { contentPadding ->
         when (uiState) {
