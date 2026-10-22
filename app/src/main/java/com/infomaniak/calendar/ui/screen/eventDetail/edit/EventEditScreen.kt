@@ -26,8 +26,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,6 +40,7 @@ import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberEventFormState
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
@@ -47,6 +52,7 @@ import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
@@ -68,7 +74,7 @@ fun EventEditScreen(
     val uiState = when (eventDetailUiState) {
         EventDetailUiState.Displayable.Loading -> EventEditScreenState.Loading
         is EventDetailUiState.Displayable.Success -> EventEditScreenState.Success(
-            rememberEventFormState(
+            eventFormState = rememberEventFormState(
                 calendars = eventFormCalendars?.calendars ?: emptyList(),
                 initialCalendar = eventFormCalendars?.initialCalendar,
                 dateAndTimeState = rememberEventDateState(eventDetailUiState.eventDetail),
@@ -79,6 +85,7 @@ fun EventEditScreen(
                 initialIsOccupied = eventDetailUiState.eventDetail.isOccupied,
                 initialIsPublic = eventDetailUiState.eventDetail.classification == EventDetailUi.Classification.Public,
             ),
+            isRecurrent = eventDetailUiState.eventDetail.recurrence is EventDetailRecurrence.Recurrence,
         )
     }
 
@@ -114,29 +121,44 @@ private fun EventEditScreen(
     uiState: EventEditScreenState,
     goBack: () -> Unit,
     goToEventAttendees: () -> Unit,
-    onSubmit: () -> Unit,
+    onSubmit: (RecurrentEventScope) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val scrollState = rememberScrollState()
+    var showEditRecurrentEventDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
-        topBar = { SubmitTopAppBar(goBack = goBack, onSubmit = onSubmit) },
+        topBar = {
+            SubmitTopAppBar(
+                goBack = goBack,
+                onSubmit = {
+                    val isRecurrent = (uiState as? EventEditScreenState.Success)?.isRecurrent == true
+                    if (isRecurrent) showEditRecurrentEventDialog = true else onSubmit(RecurrentEventScope.ThisEvent)
+                },
+            )
+        },
         modifier = modifier,
     ) { contentPadding ->
         when (uiState) {
             // Coming from the detail screen, the shared flow is already warm, so this is only hit when entering edit directly or
             // recreating the activity, but it still will be loaded from disk which is fast enough.
             EventEditScreenState.Loading -> Unit
-            is EventEditScreenState.Success -> EventForm(
-                state = uiState.eventFormState,
-                onAttendeesClick = goToEventAttendees,
-                modifier = Modifier.verticalScroll(scrollState),
-                contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
-                sharedTransitionScope = sharedTransitionScope,
-                animatedVisibilityScope = animatedVisibilityScope,
-            )
+            is EventEditScreenState.Success -> {
+                EventForm(
+                    state = uiState.eventFormState,
+                    onAttendeesClick = goToEventAttendees,
+                    modifier = Modifier.verticalScroll(scrollState),
+                    contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope,
+                )
+
+                if (showEditRecurrentEventDialog) {
+                    EditRecurrentEventDialog(onEdit = onSubmit, onDismissRequest = { showEditRecurrentEventDialog = false })
+                }
+            }
         }
     }
 }
@@ -161,7 +183,7 @@ private val EventDetailTiming.timeZone: TimeZone
 
 private sealed interface EventEditScreenState {
     object Loading : EventEditScreenState
-    data class Success(val eventFormState: EventFormState) : EventEditScreenState
+    data class Success(val eventFormState: EventFormState, val isRecurrent: Boolean) : EventEditScreenState
 }
 
 @Preview
@@ -171,7 +193,7 @@ private fun Preview() {
         Surface {
             EventEditScreen(
                 uiState = EventEditScreenState.Success(
-                    rememberEventFormState(
+                    eventFormState = rememberEventFormState(
                         calendars = listOf(previewEventDetailCalendar),
                         initialCalendar = previewEventDetailCalendar,
                         dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
@@ -184,6 +206,7 @@ private fun Preview() {
                         initialIsOccupied = true,
                         initialIsPublic = true,
                     ),
+                    isRecurrent = false,
                 ),
                 goBack = {},
                 goToEventAttendees = {},

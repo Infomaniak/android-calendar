@@ -30,6 +30,7 @@
     <string name="dayTitle">Tag</string>
     <string name="deleteEventAlertTitle">Möchten Sie diesen Anlass wirklich löschen?</string>
     <string name="deleteRecurringEventAlertTitle">Welche Anlässe möchten Sie löschen?</string>
+    <string name="editRecurringEventAlertTitle">Welche Anlässe möchten Sie bearbeiten?</string>
     <string name="eventOccurrenceNotFound">Dieser Anlass ist nicht mehr verfügbar.</string>
     <string name="helpTitle">Hilfe</string>
     <string name="monthTitle">Monat</string>

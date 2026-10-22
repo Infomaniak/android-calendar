@@ -30,6 +30,7 @@
     <string name="dayTitle">Dia</string>
     <string name="deleteEventAlertTitle">Tem a certeza de que pretende eliminar este evento?</string>
     <string name="deleteRecurringEventAlertTitle">Que eventos pretende eliminar?</string>
+    <string name="editRecurringEventAlertTitle">Que eventos deseja editar?</string>
     <string name="eventOccurrenceNotFound">Este evento já não está disponível.</string>
     <string name="helpTitle">Ajuda</string>
     <string name="monthTitle">Mês</string>

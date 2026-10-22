@@ -30,6 +30,7 @@
     <string name="dayTitle">Ημέρα</string>
     <string name="deleteEventAlertTitle">Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτή την εκδήλωση;</string>
     <string name="deleteRecurringEventAlertTitle">Ποιες εκδηλώσεις θέλετε να διαγράψετε;</string>
+    <string name="editRecurringEventAlertTitle">Ποιες εκδηλώσεις θέλετε να επεξεργαστείτε;</string>
     <string name="eventOccurrenceNotFound">Αυτή η εκδήλωση δεν είναι πλέον διαθέσιμη.</string>
     <string name="helpTitle">Βοήθεια</string>
     <string name="monthTitle">Μήνας</string>
