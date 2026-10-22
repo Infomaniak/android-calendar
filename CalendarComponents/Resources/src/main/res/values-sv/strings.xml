@@ -42,7 +42,6 @@
     </plurals>
     <string name="availableLabel">Ledig</string>
     <string name="buttonJoin">Gå med</string>
-    <string name="confidentialLabel">Konfidentiell</string>
     <string name="contentDescriptionCreateEvent">Skapa ett evenemang</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d händelse</item>

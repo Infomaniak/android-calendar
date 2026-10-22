@@ -131,12 +131,10 @@ fun EventDetail(
             Section {
                 OccupiedStatus(isOccupied, modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus))
 
-                if (classification != null) {
-                    ClassificationStatus(
-                        classification = classification,
-                        modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
-                    )
-                }
+                ClassificationStatus(
+                    classification = classification,
+                    modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
+                )
 
                 Calendar(calendarColor, calendarName)
             }

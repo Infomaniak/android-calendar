@@ -42,7 +42,6 @@
     </plurals>
     <string name="availableLabel">Ledig</string>
     <string name="buttonJoin">Bli med</string>
-    <string name="confidentialLabel">Konfidensiell</string>
     <string name="contentDescriptionCreateEvent">Opprett en hendelse</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d hendelse</item>
