@@ -27,7 +27,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.DeleteEventResult
 import com.infomaniak.calendar.ui.screen.eventDetail.EventComposerUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
-import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventScope
+import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.screen.eventDetail.utils.synchronizeTo
 import com.infomaniak.calendar.utils.saveableAttendeesSearchState
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
@@ -72,11 +72,11 @@ class EventDetailViewModel(
         eventDetailUi.synchronizeTo(attendeesSearchState)
     }
 
-    suspend fun deleteEvent(occurrenceId: OccurrenceId, deleteEventScope: DeleteEventScope): DeleteEventResult {
+    suspend fun deleteEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope): DeleteEventResult {
         val result = CompletableDeferred<DeleteEventResult>()
 
         viewModelScope.launch {
-            result.complete(eventComposerUseCase.deleteEvent(occurrenceId, deleteEventScope))
+            result.complete(eventComposerUseCase.deleteEvent(occurrenceId, scope))
         }
 
         return result.await()

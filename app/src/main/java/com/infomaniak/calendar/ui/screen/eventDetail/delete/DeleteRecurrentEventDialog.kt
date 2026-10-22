@@ -17,68 +17,24 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.delete
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AlertDialogDefaults
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
+import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
+import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScopeDialog
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.R as RCore
 
 @Composable
-fun DeleteRecurrentEventDialog(onDelete: (DeleteEventScope) -> Unit, onDismissRequest: () -> Unit) {
-    var selectedScope by rememberSaveable { mutableStateOf(DeleteEventScope.ThisEvent) }
-
-    AlertDialog(
+fun DeleteRecurrentEventDialog(onDelete: (RecurrentEventScope) -> Unit, onDismissRequest: () -> Unit) {
+    RecurrentEventScopeDialog(
+        title = stringResource(R.string.deleteRecurringEventAlertTitle),
+        confirmLabel = stringResource(RCore.string.deleteButton),
+        onConfirm = onDelete,
         onDismissRequest = onDismissRequest,
-        title = { Text(stringResource(R.string.deleteRecurringEventAlertTitle)) },
-        text = {
-            Column(Modifier.selectableGroup()) {
-                DeleteEventScope.entries.forEach { scope ->
-                    val isSelected = selectedScope == scope
-
-                    ListItem(
-                        selected = isSelected,
-                        onClick = { selectedScope = scope },
-                        leadingContent = { RadioButton(selected = isSelected, onClick = null) },
-                        colors = ListItemDefaults.colors(containerColor = AlertDialogDefaults.containerColor),
-                    ) {
-                        Text(stringResource(scope.labelRes))
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(
-                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
-                onClick = {
-                    onDelete(selectedScope)
-                    onDismissRequest()
-                },
-            ) {
-                Text(stringResource(RCore.string.deleteButton))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(stringResource(RCore.string.buttonCancel))
-            }
-        },
+        confirmColor = MaterialTheme.colorScheme.error,
     )
 }
 

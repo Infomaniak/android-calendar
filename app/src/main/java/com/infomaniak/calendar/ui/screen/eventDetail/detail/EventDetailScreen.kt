@@ -59,7 +59,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.DeleteEventResult
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventDialog
-import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventScope
+import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.calendar.utils.nestedScrollToolbar
@@ -112,9 +112,9 @@ fun EventDetailScreen(
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
         goBack = goBack,
         goToEdit = goToEdit,
-        onDelete = { deleteEventScope ->
+        onDelete = { scope ->
             coroutineScope.launch {
-                val result = viewModel.deleteEvent(occurrenceId, deleteEventScope)
+                val result = viewModel.deleteEvent(occurrenceId, scope)
                 if (result == DeleteEventResult.Error) snackbarHostState?.showSnackbar(message = errorText)
             }
         },
@@ -130,7 +130,7 @@ private fun EventDetailScreen(
     goBack: () -> Unit,
     goToEdit: () -> Unit,
     goToEventAttendees: () -> Unit,
-    onDelete: (DeleteEventScope) -> Unit,
+    onDelete: (RecurrentEventScope) -> Unit,
     onLocationClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
