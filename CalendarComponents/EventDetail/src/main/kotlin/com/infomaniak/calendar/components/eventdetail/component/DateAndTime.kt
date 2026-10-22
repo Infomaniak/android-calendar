@@ -107,8 +107,8 @@ internal fun DateAndTimeEditable(dateAndTimeState: DateAndTimeState?, isAllDay: 
         verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
     ) {
         with(dateAndTimeState) {
-            PointInTimeEditable(start, isAllDay, onDatePicked = { start.pickDate(it) }, onTimePicked = { start.pickTime(it) })
-            PointInTimeEditable(end, isAllDay, onDatePicked = { end.pickDate(it) }, onTimePicked = { end.pickTime(it) })
+            DateAndTimeEntry(start, isAllDay, onDatePicked = { start.pickDate(it) }, onTimePicked = { start.pickTime(it) })
+            DateAndTimeEntry(end, isAllDay, onDatePicked = { end.pickDate(it) }, onTimePicked = { end.pickTime(it) })
         }
     }
 }

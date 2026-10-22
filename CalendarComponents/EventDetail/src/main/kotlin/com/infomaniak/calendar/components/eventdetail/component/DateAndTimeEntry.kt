@@ -68,8 +68,8 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
 @Composable
-internal fun PointInTimeEditable(
-    pointInTime: DateAndTimeState.PointInTime,
+internal fun DateAndTimeEntry(
+    entry: DateAndTimeState.Entry,
     isAllDay: () -> Boolean,
     onDatePicked: (LocalDate) -> Unit,
     onTimePicked: (LocalTime) -> Unit,
@@ -85,23 +85,23 @@ internal fun PointInTimeEditable(
 
     Row(horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.lg), modifier = modifier) {
         OutlinedButton(onClick = { isDatePickerVisible = true }, shapes = shapes) {
-            Text(pointInTime.date.formatShortDateWithYear())
+            Text(entry.date.formatShortDateWithYear())
         }
 
         AnimatedVisibility(!isAllDay(), enter = enter, exit = exit) {
             OutlinedButton(onClick = { isTimePickerVisible = true }, shapes = shapes) {
-                Text(pointInTime.time.formatExplicitTimeLabel())
+                Text(entry.time.formatExplicitTimeLabel())
             }
         }
 
         AnimatedVisibility(!isAllDay(), enter = enter, exit = exit, modifier = Modifier.weight(1f)) {
-            TimeZoneButton(pointInTime, shapes, onClick = {})
+            TimeZoneButton(entry, shapes, onClick = {})
         }
     }
 
     if (isDatePickerVisible) {
         DateSelectionDialog(
-            initialDate = pointInTime.date,
+            initialDate = entry.date,
             onDateSelected = onDatePicked,
             onDismissRequest = { isDatePickerVisible = false },
         )
@@ -109,7 +109,7 @@ internal fun PointInTimeEditable(
 
     if (isTimePickerVisible) {
         TimeSelectionDialog(
-            initialTime = pointInTime.time,
+            initialTime = entry.time,
             onTimeSelected = onTimePicked,
             onDismissRequest = { isTimePickerVisible = false },
         )
@@ -118,7 +118,7 @@ internal fun PointInTimeEditable(
 
 @Composable
 private fun TimeZoneButton(
-    pointInTime: DateAndTimeState.PointInTime,
+    entry: DateAndTimeState.Entry,
     shapes: ButtonShapes,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -135,7 +135,7 @@ private fun TimeZoneButton(
                 modifier = Modifier.size(EsdsTheme.icon.sizeSm),
             )
             Spacer(modifier = Modifier.width(EsdsTheme.spacing.md))
-            Text(pointInTime.timeZone.formatCityName(), maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(entry.timeZone.formatCityName(), maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
 }
@@ -195,8 +195,8 @@ private fun CancelButton(onClick: () -> Unit) {
 private fun Preview() {
     MaterialTheme {
         Surface {
-            PointInTimeEditable(
-                pointInTime = DateAndTimeState.PointInTime(
+            DateAndTimeEntry(
+                entry = DateAndTimeState.Entry(
                     date = remember { mutableStateOf(LocalDate(2026, 10, 20)) },
                     time = remember { mutableStateOf(LocalTime(14, 41)) },
                     timeZone = remember { mutableStateOf(TimeZone.UTC) },

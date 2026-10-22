@@ -43,15 +43,15 @@ import kotlin.time.Instant
 
 @Stable
 data class DateAndTimeState(
-    val start: PointInTime,
-    val end: PointInTime,
+    val start: Entry,
+    val end: Entry,
     val hasEndEverBeenTouched: MutableState<Boolean>,
 ) {
-    internal fun PointInTime.pickDate(date: LocalDate) = edit { this.date = date }
+    internal fun Entry.pickDate(date: LocalDate) = edit { this.date = date }
 
-    internal fun PointInTime.pickTime(time: LocalTime) = edit { this.time = time }
+    internal fun Entry.pickTime(time: LocalTime) = edit { this.time = time }
 
-    private fun PointInTime.edit(change: () -> Unit) {
+    private fun Entry.edit(change: () -> Unit) {
         val previousInterval = end.instant - start.instant
 
         change()
@@ -74,7 +74,7 @@ data class DateAndTimeState(
     }
 
     @Stable
-    class PointInTime(
+    class Entry(
         date: MutableState<LocalDate>,
         time: MutableState<LocalTime>,
         timeZone: MutableState<TimeZone>,
@@ -101,12 +101,12 @@ data class DateAndTimeState(
          * Dummy instance just to have something non-null to compute layout sizes on
          */
         val Dummy = DateAndTimeState(
-            start = PointInTime(
+            start = Entry(
                 date = mutableStateOf(LocalDate(2000, 12, 31)),
                 time = mutableStateOf(LocalTime(11, 0)),
                 timeZone = mutableStateOf(TimeZone.UTC),
             ),
-            end = PointInTime(
+            end = Entry(
                 date = mutableStateOf(LocalDate(2000, 12, 31)),
                 time = mutableStateOf(LocalTime(11, 0)),
                 timeZone = mutableStateOf(TimeZone.UTC),
@@ -128,13 +128,13 @@ fun rememberDateAndTimeState(
     endTime: LocalTime,
     endTimeZone: TimeZone,
 ): DateAndTimeState {
-    val start = DateAndTimeState.PointInTime(
+    val start = DateAndTimeState.Entry(
         date = rememberSaveable { mutableStateOf(startDate) },
         time = rememberSaveable { mutableStateOf(startTime) },
         timeZone = rememberSaveable(stateSaver = TimeZoneSaver) { mutableStateOf(startTimeZone) },
     )
 
-    val end = DateAndTimeState.PointInTime(
+    val end = DateAndTimeState.Entry(
         date = rememberSaveable { mutableStateOf(endDate) },
         time = rememberSaveable { mutableStateOf(endTime) },
         timeZone = rememberSaveable(stateSaver = TimeZoneSaver) { mutableStateOf(endTimeZone) },
