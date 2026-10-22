@@ -19,10 +19,10 @@
     <string name="accountsTitle">Konta</string>
     <string name="attendeesSearchTitle">Dodaj uczestników</string>
     <string name="buttonAddAccount">Dodaj konto</string>
-    <string name="buttonDeleteAllEvents">Wszystkie wydarzenia</string>
-    <string name="buttonDeleteEvent">Usuń to wydarzenie</string>
-    <string name="buttonDeleteThisAndFollowingEvents">To i wszystkie kolejne wydarzenia</string>
+    <string name="buttonAllEvents">Wszystkie wydarzenia</string>
     <string name="buttonLogOut">Wyloguj się</string>
+    <string name="buttonThisAndFollowingEvents">To i wszystkie kolejne wydarzenia</string>
+    <string name="buttonThisEvent">To wydarzenie</string>
     <string name="contentDescriptionBack">Wstecz</string>
     <string name="contentDescriptionInbox">Otwórz skrzynkę odbiorczą</string>
     <string name="contentDescriptionMenuDrawer">Otwórz menu</string>

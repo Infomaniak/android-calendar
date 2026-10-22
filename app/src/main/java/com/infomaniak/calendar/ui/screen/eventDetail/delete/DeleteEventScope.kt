@@ -21,7 +21,7 @@ import androidx.annotation.StringRes
 import com.infomaniak.calendar.R
 
 enum class DeleteEventScope(@StringRes val labelRes: Int) {
-    ThisEvent(R.string.buttonDeleteEvent),
-    ThisAndFollowingEvents(R.string.buttonDeleteThisAndFollowingEvents),
-    AllEvents(R.string.buttonDeleteAllEvents),
+    ThisEvent(R.string.buttonThisEvent),
+    ThisAndFollowingEvents(R.string.buttonThisAndFollowingEvents),
+    AllEvents(R.string.buttonAllEvents),
 }

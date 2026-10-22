@@ -112,7 +112,7 @@ object TopAppBarButtons {
     fun EventDeleteButton(modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
         TooltipIconButton(
             painter = painterResource(RComponents.drawable.ic_trash),
-            contentDescription = stringResource(R.string.buttonDeleteEvent),
+            contentDescription = stringResource(RCommon.string.deleteButton),
             onClick = onClick,
             modifier = modifier,
             enabled = enabled,

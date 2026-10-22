@@ -19,10 +19,10 @@
     <string name="accountsTitle">Tilit</string>
     <string name="attendeesSearchTitle">Lisää osallistujia</string>
     <string name="buttonAddAccount">Lisää tili</string>
-    <string name="buttonDeleteAllEvents">Kaikki tapahtumat</string>
-    <string name="buttonDeleteEvent">Poista tämä tapahtuma</string>
-    <string name="buttonDeleteThisAndFollowingEvents">Tämä ja seuraavat tapahtumat</string>
+    <string name="buttonAllEvents">Kaikki tapahtumat</string>
     <string name="buttonLogOut">Kirjaudu ulos</string>
+    <string name="buttonThisAndFollowingEvents">Tämä ja seuraavat tapahtumat</string>
+    <string name="buttonThisEvent">Tämä tapahtuma</string>
     <string name="contentDescriptionBack">Takaisin</string>
     <string name="contentDescriptionInbox">Avaa saapuneet</string>
     <string name="contentDescriptionMenuDrawer">Avaa valikko</string>

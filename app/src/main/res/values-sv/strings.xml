@@ -19,10 +19,10 @@
     <string name="accountsTitle">Konton</string>
     <string name="attendeesSearchTitle">Lägg till deltagare</string>
     <string name="buttonAddAccount">Lägg till ett konto</string>
-    <string name="buttonDeleteAllEvents">Alla evenemang</string>
-    <string name="buttonDeleteEvent">Ta bort detta evenemang</string>
-    <string name="buttonDeleteThisAndFollowingEvents">Detta och alla följande evenemang</string>
+    <string name="buttonAllEvents">Alla evenemang</string>
     <string name="buttonLogOut">Logga ut</string>
+    <string name="buttonThisAndFollowingEvents">Detta och alla följande evenemang</string>
+    <string name="buttonThisEvent">Detta evenemang</string>
     <string name="contentDescriptionBack">Tillbaka</string>
     <string name="contentDescriptionInbox">Öppna inkorgen</string>
     <string name="contentDescriptionMenuDrawer">Öppna meny</string>

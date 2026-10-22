@@ -19,10 +19,10 @@
     <string name="accountsTitle">Accounts</string>
     <string name="attendeesSearchTitle">Deelnemers toevoegen</string>
     <string name="buttonAddAccount">Een account toevoegen</string>
-    <string name="buttonDeleteAllEvents">Alle evenementen</string>
-    <string name="buttonDeleteEvent">Dit evenement verwijderen</string>
-    <string name="buttonDeleteThisAndFollowingEvents">Dit en alle volgende evenementen</string>
+    <string name="buttonAllEvents">Alle evenementen</string>
     <string name="buttonLogOut">Uitloggen</string>
+    <string name="buttonThisAndFollowingEvents">Dit en alle volgende evenementen</string>
+    <string name="buttonThisEvent">Dit evenement</string>
     <string name="contentDescriptionBack">Terug</string>
     <string name="contentDescriptionInbox">Postvak IN openen</string>
     <string name="contentDescriptionMenuDrawer">Menu openen</string>
