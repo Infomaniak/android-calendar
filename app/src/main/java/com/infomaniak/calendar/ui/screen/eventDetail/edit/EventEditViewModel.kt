@@ -20,8 +20,10 @@ package com.infomaniak.calendar.ui.screen.eventDetail.edit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
+import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.EventFormCalendarsUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventFormCalendars
@@ -35,7 +37,15 @@ import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.produceIn
+import kotlinx.coroutines.flow.stateIn
+import kotlin.time.Duration.Companion.seconds
 
 @AssistedInject
 class EventEditViewModel(
@@ -44,9 +54,20 @@ class EventEditViewModel(
     eventFormCalendarsUseCase: EventFormCalendarsUseCase,
 ) : ViewModel() {
     val eventDetailUi = getEventDetailUiUseCase.eventDetailUi
+        .filterIsInstance<EventDetailUiState.Displayable>()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), EventDetailUiState.Displayable.Loading)
+
+    val goBackRequests: ReceiveChannel<EventDetailUiState.Unavailable> = getEventDetailUiUseCase.eventDetailUi
+        .filterIsInstance<EventDetailUiState.Unavailable>()
+        .produceIn(viewModelScope)
+
     val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
-    val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase
-        .editionCalendars(getEventDetailUiUseCase.eventCalendar)
+
+    private val eventCalendar = getEventDetailUiUseCase.eventCalendar
+        .filterNotNull()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), getEventDetailUiUseCase.eventCalendar.value)
+
+    val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase.editionCalendars(eventCalendar)
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) {
         getEventDetailUiUseCase.setOccurrenceId(occurrenceId)

@@ -47,6 +47,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSe
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import kotlinx.coroutines.channels.consumeEach
 
 @Composable
 fun EventEditScreen(
@@ -61,8 +62,8 @@ fun EventEditScreen(
     val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
 
     val uiState = when (eventDetailUiState) {
-        EventDetailUiState.Loading -> EventEditScreenState.Loading
-        is EventDetailUiState.Success -> EventEditScreenState.Success(
+        EventDetailUiState.Displayable.Loading -> EventEditScreenState.Loading
+        is EventDetailUiState.Displayable.Success -> EventEditScreenState.Success(
             rememberEventFormState(
                 calendars = eventFormCalendars?.calendars ?: emptyList(),
                 initialCalendar = eventFormCalendars?.initialCalendar,
@@ -74,7 +75,6 @@ fun EventEditScreen(
                 initialIsPublic = eventDetailUiState.eventDetail.classification == EventDetailUi.Classification.Public,
             ),
         )
-        EventDetailUiState.Unavailable -> EventEditScreenState.Unavailable
     }
 
     LaunchedEffect(occurrenceId) {
@@ -83,6 +83,10 @@ fun EventEditScreen(
 
     LaunchedEffect(Unit) {
         viewModel.synchronizeAttendeesSearchState()
+    }
+
+    LaunchedEffect(Unit) {
+        for (request in viewModel.goBackRequests) goBack()
     }
 
     LaunchedEffect(viewModel.attendeesSearchState) {
@@ -128,7 +132,6 @@ private fun EventEditScreen(
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
             )
-            EventEditScreenState.Unavailable -> LaunchedEffect(Unit) { goBack() }
         }
     }
 }
@@ -136,7 +139,6 @@ private fun EventEditScreen(
 private sealed interface EventEditScreenState {
     object Loading : EventEditScreenState
     data class Success(val eventFormState: EventFormState) : EventEditScreenState
-    object Unavailable : EventEditScreenState
 }
 
 @Preview

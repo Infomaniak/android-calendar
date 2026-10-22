@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 
 suspend fun StateFlow<EventDetailUiState>.synchronizeTo(attendeesSearchState: AttendeesSearchState) {
-    filterIsInstance<EventDetailUiState.Success>().collect { event ->
+    filterIsInstance<EventDetailUiState.Displayable.Success>().collect { event ->
         attendeesSearchState.attendees.clear()
         attendeesSearchState.attendees.addAll(event.eventDetail.attendees.all)
     }
