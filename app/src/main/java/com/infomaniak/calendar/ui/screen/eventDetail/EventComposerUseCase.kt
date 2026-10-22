@@ -17,4 +17,33 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
-// TODO: add all the edit, create and delete functions for events here
+import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventScope
+import com.infomaniak.core.common.cancellable
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.recurrence.RecurrenceScope
+import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
+import dev.zacsweers.metro.Inject
+
+/**
+ * Single entry point for the screens that create, edit or delete events
+ */
+class EventComposerUseCase @Inject constructor(private val calendarManager: CalendarManager) {
+    suspend fun deleteEvent(occurrenceId: OccurrenceId, deleteEventScope: DeleteEventScope): DeleteEventResult {
+        return runCatching {
+            val event = calendarManager.getOccurrence(occurrenceId) ?: return DeleteEventResult.Error
+            calendarManager.deleteEvent(event.targetFor(deleteEventScope.toRecurrenceScope()))
+            DeleteEventResult.Success
+        }.cancellable().getOrDefault(DeleteEventResult.Error)
+    }
+}
+
+sealed interface DeleteEventResult {
+    object Success : DeleteEventResult
+    object Error : DeleteEventResult
+}
+
+private fun DeleteEventScope.toRecurrenceScope(): RecurrenceScope = when (this) {
+    DeleteEventScope.ThisEvent -> RecurrenceScope.ThisOccurrence
+    DeleteEventScope.ThisAndFollowingEvents -> RecurrenceScope.ThisAndFollowing
+    DeleteEventScope.AllEvents -> RecurrenceScope.AllOccurrences
+}
