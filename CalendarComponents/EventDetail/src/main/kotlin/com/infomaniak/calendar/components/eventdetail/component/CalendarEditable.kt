@@ -15,14 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.detail.component
+package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -33,33 +32,46 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.eventdetail.component.items.DropDownItem
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIconDefaults
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.resources.R
 
 @Composable
-internal fun Calendar(calendarColor: Color, calendarName: String, modifier: Modifier = Modifier) {
-    ListItem(
+internal fun CalendarEditable(
+    eventDetailCalendar: EventDetailCalendar,
+    calendars: List<EventDetailCalendar>,
+    modifier: Modifier = Modifier,
+) {
+    DropDownItem(
+        onClick = {},
         content = { Text(stringResource(id = R.string.sectionCalendarHeader)) },
-        leadingContent = {
-            Box(
-                modifier = Modifier
-                    .size(ItemIconDefaults.size)
-                    .padding(1.dp)
-                    .clip(CircleShape)
-                    .background(calendarColor),
-            )
+        trailingContent = {
+            Dot(eventDetailCalendar.color)
+            Text(text = eventDetailCalendar.name, style = MaterialTheme.typography.labelLarge)
         },
-        trailingContent = { Text(text = calendarName, style = MaterialTheme.typography.labelLarge) },
         modifier = modifier,
+    )
+}
+
+@Composable
+private fun Dot(calendarColor: Color) {
+    Box(
+        modifier = Modifier
+            .size(ItemIconDefaults.size)
+            .padding(1.dp)
+            .clip(CircleShape)
+            .background(calendarColor),
     )
 }
 
 @Preview
 @Composable
-private fun PreviewCalendar() {
+private fun Preview() {
     MaterialTheme {
         Surface {
-            Calendar(calendarColor = Color.Blue, calendarName = "Vacation")
+            CalendarEditable(eventDetailCalendar = previewEventDetailCalendar, calendars = listOf(previewEventDetailCalendar))
         }
     }
 }
