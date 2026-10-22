@@ -107,6 +107,8 @@ fun EventForm(
                 onCheckedChange = { isChecked -> state.isPublic.value = isChecked },
                 modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
             )
+
+
         }
     }
 }
@@ -123,7 +125,7 @@ private fun Preview() {
                     dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
                     initialText = "Event title",
                     attendeesSearchState = rememberSaveableAttendeesSearchState(),
-                    initialIsAllDay = true,
+                    initialIsAllDay = false,
                     initialIsKMeetUrlEnabled = false,
                     initialIsOccupied = true,
                     initialIsPublic = true,
