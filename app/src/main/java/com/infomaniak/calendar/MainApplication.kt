@@ -22,6 +22,7 @@ import android.os.StrictMode
 import com.infomaniak.calendar.crossAppLogin.DeviceInfoUpdateWorker
 import com.infomaniak.calendar.di.AppGraph
 import com.infomaniak.calendar.di.metroAndroidExtensions.MetroApplication
+import com.infomaniak.calendar.notification.NotificationHelper
 import com.infomaniak.calendar.utils.CaldavDebugConfig
 import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.core.common.AssociatedUserDataCleanable
@@ -35,11 +36,14 @@ import dev.zacsweers.metro.createGraphFactory
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 class MainApplication : Application(), MetroApplication {
     override val appGraph by lazy { createGraphFactory<AppGraph.Factory>().create(applicationContext) }
-    private val applicationScope = CoroutineScope(Dispatchers.Default + CoroutineName(this::class.java.simpleName))
+    private val applicationScope = CoroutineScope(
+        SupervisorJob() + Dispatchers.Default + CoroutineName(this::class.java.simpleName),
+    )
 
     override fun onCreate() {
         super.onCreate()
@@ -58,6 +62,9 @@ class MainApplication : Application(), MetroApplication {
 
         MatomoCalendar.addTrackingCallbackForDebugLog()
         initCrossAppLogin()
+
+        NotificationHelper.initNotificationChannels(this)
+        appGraph.alarmScheduler.startObserving(applicationScope)
 
         initStoredAccounts()
         appGraph.cachedCalendarManager // Start loading calendars now so they're ready before any screen needs them
