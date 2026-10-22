@@ -42,7 +42,6 @@
     </plurals>
     <string name="availableLabel">Beschikbaar</string>
     <string name="buttonJoin">Lid worden</string>
-    <string name="confidentialLabel">Vertrouwelijk</string>
     <string name="contentDescriptionCreateEvent">Een evenement maken</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d evenement</item>

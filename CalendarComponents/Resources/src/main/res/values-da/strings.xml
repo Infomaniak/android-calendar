@@ -42,7 +42,6 @@
     </plurals>
     <string name="availableLabel">Ledig</string>
     <string name="buttonJoin">Tilmeld dig</string>
-    <string name="confidentialLabel">Fortrolig</string>
     <string name="contentDescriptionCreateEvent">Opret en begivenhed</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d begivenhed</item>

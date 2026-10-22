@@ -87,10 +87,7 @@ private fun EventAlarm.toNotification(): EventDetailUi.Notification? {
     )
 }
 
-private fun Classification?.toClassification(): EventDetailUi.Classification? = when (this) {
-    null,
+private fun Classification.toClassification(): EventDetailUi.Classification = when (this) {
     Classification.Public -> EventDetailUi.Classification.Public
     Classification.Private -> EventDetailUi.Classification.Private
-    Classification.Confidential -> EventDetailUi.Classification.Confidential
-    is Classification.Custom -> null
 }

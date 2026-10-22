@@ -44,7 +44,7 @@ data class EventDetailUi(
     val files: List<File>,
     val notifications: List<Notification>,
     val isOccupied: Boolean,
-    val classification: Classification?,
+    val classification: Classification,
     val canEdit: Boolean,
 ) {
     data class Room(val title: String, val seats: Int, val floor: Int)
@@ -67,6 +67,5 @@ data class EventDetailUi(
     enum class Classification(@StringRes val label: Int) {
         Public(R.string.publicLabel),
         Private(R.string.privateLabel),
-        Confidential(R.string.confidentialLabel),
     }
 }

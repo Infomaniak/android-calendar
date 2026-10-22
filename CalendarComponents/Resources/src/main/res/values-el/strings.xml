@@ -42,7 +42,6 @@
     </plurals>
     <string name="availableLabel">Διαθέσιμο</string>
     <string name="buttonJoin">Εγγραφή</string>
-    <string name="confidentialLabel">Εμπιστευτικό</string>
     <string name="contentDescriptionCreateEvent">Δημιουργία εκδήλωσης</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d γεγονός</item>

@@ -42,7 +42,6 @@
     </plurals>
     <string name="availableLabel">Vapaa</string>
     <string name="buttonJoin">Liity mukaan</string>
-    <string name="confidentialLabel">Luottamuksellinen</string>
     <string name="contentDescriptionCreateEvent">Luo tapahtuma</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d tapahtuma</item>

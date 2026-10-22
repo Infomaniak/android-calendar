@@ -42,7 +42,6 @@
     </plurals>
     <string name="availableLabel">Available</string>
     <string name="buttonJoin">Join</string>
-    <string name="confidentialLabel">Confidential</string>
     <string name="contentDescriptionCreateEvent">Create an event</string>
     <plurals name="contentDescriptionEventCount">
         <item quantity="one">%1$d event</item>
