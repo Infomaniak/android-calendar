@@ -17,6 +17,9 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.creation
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
@@ -54,11 +57,21 @@ class EventCreationViewModel(
 
     val defaultEventDuration = settingsDataValues.defaultEventDuration.flow
 
-    suspend fun submitEvent(eventDraft: EventDraft): SaveEventResult {
+    var isSaving by mutableStateOf(false)
+        private set
+
+    /** `null` while a save is already running: the request is ignored. */
+    suspend fun submitEvent(eventDraft: EventDraft): SaveEventResult? {
+        if (isSaving) return null
+
+        isSaving = true
         val result = CompletableDeferred<SaveEventResult>()
 
         viewModelScope.launch {
-            result.complete(eventComposerUseCase.createEvent(eventDraft))
+            val saveResult = eventComposerUseCase.createEvent(eventDraft)
+            // Still saving on success: the form closes, a tap during its exit must not save it again
+            if (saveResult == SaveEventResult.Error) isSaving = false
+            result.complete(saveResult)
         }
 
         return result.await()

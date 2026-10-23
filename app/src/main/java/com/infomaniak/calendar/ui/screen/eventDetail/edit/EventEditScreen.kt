@@ -140,9 +140,11 @@ fun EventEditScreen(
                 when (viewModel.submitEvent(occurrenceId, scope, eventDraft)) {
                     SaveEventResult.Success -> goBack()
                     SaveEventResult.Error -> snackbarHostState?.showSnackbar(message = errorText)
+                    null -> Unit
                 }
             }
         },
+        isSaving = { viewModel.isSaving },
         sharedTransitionScope = LocalSharedTransitionScope.current,
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
     )
@@ -155,6 +157,7 @@ private fun EventEditScreen(
     goToEventAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     onSubmit: (RecurrentEventScope) -> Unit,
+    isSaving: () -> Boolean,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
@@ -170,6 +173,7 @@ private fun EventEditScreen(
                     val isRecurrent = (uiState as? EventEditScreenState.Success)?.isRecurrent == true
                     if (isRecurrent) showEditRecurrentEventDialog = true else onSubmit(RecurrentEventScope.ThisEvent)
                 },
+                isSubmitting = isSaving,
             )
         },
         modifier = modifier,
@@ -249,6 +253,7 @@ private fun Preview() {
                 goToEventAttendees = {},
                 goToTimeZoneSearch = {},
                 onSubmit = {},
+                isSaving = { false },
             )
         }
     }
