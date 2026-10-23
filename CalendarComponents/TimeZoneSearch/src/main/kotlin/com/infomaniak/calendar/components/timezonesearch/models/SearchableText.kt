@@ -40,7 +40,7 @@ internal class SearchableText(val text: String) {
     /** Range of [text] matching [query], or null if there is none. */
     fun find(query: String): IntRange? {
         val searchableQuery = buildString { query.forEach { append(it.toSearchable()) } }
-        val start = searchable.indexOf(searchableQuery).takeIf { it >= 0 } ?: return null
+        val start = searchable.indexOf(searchableQuery, ignoreCase = true).takeIf { it >= 0 } ?: return null
         return sourceIndexAt(start) until sourceIndexAt(start + searchableQuery.length)
     }
 
