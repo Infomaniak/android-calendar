@@ -189,7 +189,7 @@ private fun EventDetailScreen(
 
                 if (showDeleteDialog) {
                     DeleteEventDialog(
-                        isRecurrent = { state.eventDetail.recurrence is EventDetailRecurrence.Recurrence },
+                        isRecurrent = { state.eventDetail.isRecurrent },
                         onDelete = onDelete,
                         onDismissRequest = { showDeleteDialog = false },
                     )
