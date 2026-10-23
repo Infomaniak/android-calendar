@@ -174,7 +174,7 @@ private fun baseEntryProvider(
 
         is NavDestination.EventTimeZone -> NavEntry(
             key = destination,
-            metadata = metaDataOf(ResponsiveDialog) + SharedViewModelStoreNavEntryDecorator.parent(destination.parent.toContentKey()),
+            metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
             TimeZoneSearchScreen(
                 isStart = destination.isStart,
