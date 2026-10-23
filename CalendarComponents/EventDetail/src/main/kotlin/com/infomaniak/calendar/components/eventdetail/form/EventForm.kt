@@ -25,6 +25,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,6 +42,7 @@ import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
 import com.infomaniak.calendar.components.eventdetail.form.component.AddReminderButton
 import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
+import com.infomaniak.calendar.components.eventdetail.form.component.ReminderOffsetDialog
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
@@ -95,7 +100,18 @@ fun EventForm(
         }
 
         Section {
-            AddReminderButton(onClick = {})
+            var isReminderOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
+
+            AddReminderButton(onClick = { isReminderOffsetDialogVisible = true })
+
+            if (isReminderOffsetDialogVisible) {
+                ReminderOffsetDialog(
+                    selectedOffset = null,
+                    onOffsetSelect = { isReminderOffsetDialogVisible = false }, // TODO: Wire the selected offset to the event reminders
+                    onCustomClick = {}, // TODO: Open the custom reminder editor
+                    onDismissRequest = { isReminderOffsetDialogVisible = false },
+                )
+            }
         }
 
         Section {

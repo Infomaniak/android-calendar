@@ -17,6 +17,7 @@
   -->
 <resources>
     <string name="addEventLabel">Lisää</string>
+    <string name="alarmOffsetNone">Ei mitään</string>
     <string name="allDayLabel">Koko päivän</string>
     <string name="attendees">Osallistujat</string>
     <plurals name="attendeesAcceptedCount">
@@ -53,6 +54,7 @@
     <string name="contentDescriptionHasLocation">On sijainti</string>
     <string name="contentDescriptionSearch">Haku</string>
     <string name="contentDescriptionToday">Tänään</string>
+    <string name="customAlarmLabel">Mukautettu</string>
     <plurals name="dayAmount">
         <item quantity="one">%d päivä</item>
         <item quantity="other">%d päivää</item>

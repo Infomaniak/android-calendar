@@ -17,6 +17,7 @@
   -->
 <resources>
     <string name="addEventLabel">Ajouter</string>
+    <string name="alarmOffsetNone">Aucun</string>
     <string name="allDayLabel">Journée</string>
     <string name="attendees">Invités</string>
     <plurals name="attendeesAcceptedCount">
@@ -53,6 +54,7 @@
     <string name="contentDescriptionHasLocation">A un emplacement</string>
     <string name="contentDescriptionSearch">Rechercher</string>
     <string name="contentDescriptionToday">Aujourd’hui</string>
+    <string name="customAlarmLabel">Personnalisé</string>
     <plurals name="dayAmount">
         <item quantity="one">%d jour</item>
         <item quantity="other">%d jours</item>
