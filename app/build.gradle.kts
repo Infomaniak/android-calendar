@@ -171,6 +171,7 @@ dependencies {
     implementation(core.infomaniak.core.onboarding)
     implementation(core.infomaniak.core.datavalue)
     implementation(core.infomaniak.core.sentry)
+    implementation(core.infomaniak.core.ui.compose.basicbutton)
     implementation(core.infomaniak.core.ui.compose.basics)
     implementation(core.infomaniak.core.ui.compose.margin)
     implementation(core.infomaniak.core.ui.compose.preview)
