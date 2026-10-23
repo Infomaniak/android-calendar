@@ -62,6 +62,7 @@ class EventDetailSharedDataViewModel(
         .flatMapLatest(eventLoader::eventAndCalendar)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), EventAndCalendarState.Loading)
 
+    //region Event detail UI
     private val eventDetailUiState: StateFlow<EventDetailUiState> = eventLoader
         .eventDetailUi(eventAndCalendar)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), EventDetailUiState.Displayable.Loading)
@@ -73,10 +74,13 @@ class EventDetailSharedDataViewModel(
     val goBackRequests: ReceiveChannel<EventDetailUiState.Unavailable> = eventDetailUiState
         .filterIsInstance<EventDetailUiState.Unavailable>()
         .produceIn(viewModelScope)
+    //endregion
 
+    //region Calendars
     val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase
         .editionCalendars(eventAndCalendar.filterIsInstance<EventAndCalendarState.Success>().map { it.calendar })
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), null)
+    //endregion
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) {
         occurrenceIdFlow.value = occurrenceId
