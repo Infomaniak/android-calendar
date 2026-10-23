@@ -43,6 +43,7 @@ app/src/main/java/com/infomaniak/calendar/
 │   ├── AttendeeExt.kt              # KMP Attendee → Attendees mapping for event detail
 │   ├── DayEventGroupingExt.kt      # Groups day-sliced events for calendar views
 │   ├── EventDaySliceExt.kt         # KMP EventDaySlice → OccurrenceEventUi mapping, shared by every calendar view
+│   ├── EventDraftExt.kt            # EventDraft → KMP EventEditData for creation and edition: a new form field is one line in `applyTo`
 │   └── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
 └── ui/
     ├── model/                     # OccurrenceEventUi calendar item carrying KMP OccurrenceId and attendee summary; TimelineUiState

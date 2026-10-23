@@ -17,17 +17,50 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
+import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
+import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.calendar.utils.account.accountId
+import com.infomaniak.calendar.utils.applyTo
+import com.infomaniak.calendar.utils.toNewEventEditData
 import com.infomaniak.core.common.cancellable
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.Organizer
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.recurrence.RecurrenceScope
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.Inject
+import kotlinx.coroutines.flow.first
 
 /**
  * Single entry point for the screens that create, edit or delete events
  */
-class EventComposerUseCase @Inject constructor(private val calendarManager: CalendarManager) {
+class EventComposerUseCase @Inject constructor(
+    private val calendarManager: CalendarManager,
+    private val cachedCalendarManager: CachedCalendarManager,
+    private val accountUtils: AccountUtils,
+) {
+    suspend fun createEvent(eventDraft: EventDraft): SaveEventResult {
+        return runCatching {
+            val defaultOrganizer = accountUserOf(CalendarId(eventDraft.calendarId))
+            calendarManager.createEvent(eventDraft.toNewEventEditData(defaultOrganizer))
+            SaveEventResult.Success
+        }.cancellable().getOrDefault(SaveEventResult.Error)
+    }
+
+    suspend fun updateEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope, eventDraft: EventDraft): SaveEventResult {
+        return runCatching {
+            val event = calendarManager.getOccurrence(occurrenceId) ?: return SaveEventResult.Error
+            val editData = calendarManager.getEditData(occurrenceId) ?: return SaveEventResult.Error
+            calendarManager.updateEvent(
+                target = event.targetFor(scope.toRecurrenceScope()),
+                data = eventDraft.applyTo(editData, defaultOrganizer = accountUserOf(editData.calendarId)),
+            )
+            SaveEventResult.Success
+        }.cancellable().getOrDefault(SaveEventResult.Error)
+    }
+
     suspend fun deleteEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope): DeleteEventResult {
         return runCatching {
             val event = calendarManager.getOccurrence(occurrenceId) ?: return DeleteEventResult.Error
@@ -35,6 +68,17 @@ class EventComposerUseCase @Inject constructor(private val calendarManager: Cale
             DeleteEventResult.Success
         }.cancellable().getOrDefault(DeleteEventResult.Error)
     }
+
+    private suspend fun accountUserOf(calendarId: CalendarId): Organizer? {
+        val accountId = cachedCalendarManager.calendars.value.find { it.id == calendarId }?.accountId ?: return null
+        val user = accountUtils.users.first().find { it.accountId == accountId } ?: return null
+        return Organizer(email = user.email, displayName = user.displayName)
+    }
+}
+
+sealed interface SaveEventResult {
+    object Success : SaveEventResult
+    object Error : SaveEventResult
 }
 
 sealed interface DeleteEventResult {

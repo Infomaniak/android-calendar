@@ -50,7 +50,7 @@ fun Event.toEventDetailUi(calendar: Calendar, emailsByUserId: Map<AccountId, Str
     isAllDay = timing.isAllDay,
     recurrence = if (isOccurrence) EventDetailRecurrence.Recurrence(::toLocalizedRecurrenceString) else EventDetailRecurrence.Single,
     attendees = attendees.toAttendees(accountId, emailsByUserId),
-    kMeetUrl = null, // TODO[eventDetail]: Not carried by the KMP model yet
+    kMeetUrl = meetRoomUrl,
     location = location,
     room = null, // TODO[eventDetail]: Not carried by the KMP model yet
     urlLink = null, // TODO[eventDetail]: Not carried by the KMP model yet
