@@ -17,14 +17,21 @@
  */
 package com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation
 
-enum class MetadataSceneStrategy(val metadata: Map<String, Any>) {
+enum class MetadataSceneStrategy(override val metadata: Map<String, Any>) : NavigationMetadata {
     FloatingToolbarWithFab(metadata = mapOf(SHOULD_SHOW_FLOATING_TOOLBAR_WITH_FAB to true)),
     Drawer(metadata = mapOf(SHOULD_SHOW_DRAWER to true)),
     ResponsiveDialog(metadata = mapOf(SHOULD_SHOW_RESPONSIVE_DIALOG to true)),
 }
 
-fun metaDataOf(vararg strategies: MetadataSceneStrategy): Map<String, Any> {
-    return buildMap { strategies.forEach { putAll(it.metadata) } }
+fun metaDataOf(vararg items: NavigationMetadata): Map<String, Any> = buildMap {
+    items.forEach {
+        with(it) { applyMetadata() }
+    }
+}
+
+interface NavigationMetadata {
+    val metadata: Map<String, Any>
+    fun MutableMap<String, Any>.applyMetadata() = putAll(metadata)
 }
 
 const val SHOULD_SHOW_RESPONSIVE_DIALOG = "ShouldShowResponsiveDialog"
