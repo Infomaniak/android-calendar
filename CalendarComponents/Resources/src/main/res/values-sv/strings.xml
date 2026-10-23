@@ -17,6 +17,7 @@
   -->
 <resources>
     <string name="addEventLabel">Lägg till</string>
+    <string name="alarmOffsetNone">Ingen</string>
     <string name="allDayLabel">Hela dagen</string>
     <string name="attendees">Deltagare</string>
     <plurals name="attendeesAcceptedCount">
@@ -53,6 +54,7 @@
     <string name="contentDescriptionHasLocation">Har en plats</string>
     <string name="contentDescriptionSearch">Sök</string>
     <string name="contentDescriptionToday">Idag</string>
+    <string name="customAlarmLabel">Anpassad</string>
     <plurals name="dayAmount">
         <item quantity="one">%d dag</item>
         <item quantity="other">%d dagar</item>
