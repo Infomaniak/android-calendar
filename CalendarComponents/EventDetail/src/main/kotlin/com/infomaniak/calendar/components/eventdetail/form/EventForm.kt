@@ -38,6 +38,7 @@ import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitc
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
+import com.infomaniak.calendar.components.eventdetail.form.component.AddReminderButton
 import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
 import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
@@ -96,6 +97,10 @@ fun EventForm(
                 onCheckedChange = { isChecked -> state.isKMeetUrlEnabled.value = isChecked },
                 modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
             )
+        }
+
+        Section(EventSharedElement.Divider3) {
+            AddReminderButton(onClick = {})
         }
 
         Section(EventSharedElement.Divider4) {

@@ -41,6 +41,7 @@
         <item quantity="other">%1$d talvez</item>
     </plurals>
     <string name="availableLabel">Disponível</string>
+    <string name="buttonAddReminder">Adicionar um lembrete</string>
     <string name="buttonJoin">Juntar</string>
     <string name="contentDescriptionCreateEvent">Criar um evento</string>
     <plurals name="contentDescriptionEventCount">
