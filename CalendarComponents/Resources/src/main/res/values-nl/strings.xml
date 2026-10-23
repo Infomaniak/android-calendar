@@ -41,6 +41,7 @@
         <item quantity="other">%1$d misschien</item>
     </plurals>
     <string name="availableLabel">Beschikbaar</string>
+    <string name="buttonAddReminder">Herinnering toevoegen</string>
     <string name="buttonJoin">Lid worden</string>
     <string name="contentDescriptionCreateEvent">Een evenement maken</string>
     <plurals name="contentDescriptionEventCount">
