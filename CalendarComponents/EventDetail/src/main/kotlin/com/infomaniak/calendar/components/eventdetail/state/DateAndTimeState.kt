@@ -52,6 +52,9 @@ data class DateAndTimeState(
     internal fun Entry.pickTime(time: LocalTime) = edit { this.time = time }
 
     private fun Entry.edit(change: () -> Unit) {
+        // TODO: This interval displacement doesn't work if the user is setting an all day event and the time component of
+        //  both entries are at 0:00 and the range comprises a day of 23 or 25 hours.
+        //  Adapt the interval computation to take into account days 23 or 25 hours. Changing the date, should not change the time.
         val previousInterval = end.instant - start.instant
 
         change()
