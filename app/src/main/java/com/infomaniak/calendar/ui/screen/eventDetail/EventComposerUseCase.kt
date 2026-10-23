@@ -17,7 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
-import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventScope
+import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.recurrence.RecurrenceScope
@@ -28,10 +28,10 @@ import dev.zacsweers.metro.Inject
  * Single entry point for the screens that create, edit or delete events
  */
 class EventComposerUseCase @Inject constructor(private val calendarManager: CalendarManager) {
-    suspend fun deleteEvent(occurrenceId: OccurrenceId, deleteEventScope: DeleteEventScope): DeleteEventResult {
+    suspend fun deleteEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope): DeleteEventResult {
         return runCatching {
             val event = calendarManager.getOccurrence(occurrenceId) ?: return DeleteEventResult.Error
-            calendarManager.deleteEvent(event.targetFor(deleteEventScope.toRecurrenceScope()))
+            calendarManager.deleteEvent(event.targetFor(scope.toRecurrenceScope()))
             DeleteEventResult.Success
         }.cancellable().getOrDefault(DeleteEventResult.Error)
     }
@@ -42,8 +42,8 @@ sealed interface DeleteEventResult {
     object Error : DeleteEventResult
 }
 
-private fun DeleteEventScope.toRecurrenceScope(): RecurrenceScope = when (this) {
-    DeleteEventScope.ThisEvent -> RecurrenceScope.ThisOccurrence
-    DeleteEventScope.ThisAndFollowingEvents -> RecurrenceScope.ThisAndFollowing
-    DeleteEventScope.AllEvents -> RecurrenceScope.AllOccurrences
+private fun RecurrentEventScope.toRecurrenceScope(): RecurrenceScope = when (this) {
+    RecurrentEventScope.ThisEvent -> RecurrenceScope.ThisOccurrence
+    RecurrentEventScope.ThisAndFollowingEvents -> RecurrenceScope.ThisAndFollowing
+    RecurrentEventScope.AllEvents -> RecurrenceScope.AllOccurrences
 }

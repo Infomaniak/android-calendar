@@ -47,6 +47,8 @@ data class EventDetailUi(
     val classification: Classification,
     val canEdit: Boolean,
 ) {
+    val isRecurrent get() = recurrence is EventDetailRecurrence.Recurrence
+
     data class Room(val title: String, val seats: Int, val floor: Int)
 
     @Immutable

@@ -19,10 +19,10 @@
     <string name="accountsTitle">Kontoer</string>
     <string name="attendeesSearchTitle">Legg til deltakere</string>
     <string name="buttonAddAccount">Legg til en konto</string>
-    <string name="buttonDeleteAllEvents">Alle hendelsene</string>
-    <string name="buttonDeleteEvent">Slett denne hendelsen</string>
-    <string name="buttonDeleteThisAndFollowingEvents">Denne og alle påfølgende hendelser</string>
+    <string name="buttonAllEvents">Alle hendelsene</string>
     <string name="buttonLogOut">Logg ut</string>
+    <string name="buttonThisAndFollowingEvents">Denne og alle påfølgende hendelser</string>
+    <string name="buttonThisEvent">Denne hendelsen</string>
     <string name="contentDescriptionBack">Tilbake</string>
     <string name="contentDescriptionInbox">Åpne innboksen</string>
     <string name="contentDescriptionMenuDrawer">Åpne meny</string>
@@ -30,6 +30,7 @@
     <string name="dayTitle">Dag</string>
     <string name="deleteEventAlertTitle">Er du sikker på at du vil slette denne hendelsen?</string>
     <string name="deleteRecurringEventAlertTitle">Hvilke hendelser vil du slette?</string>
+    <string name="editRecurringEventAlertTitle">Hvilke hendelser vil du redigere?</string>
     <string name="eventOccurrenceNotFound">Denne hendelsen er ikke lenger tilgjengelig.</string>
     <string name="helpTitle">Hjelp</string>
     <string name="monthTitle">Måned</string>

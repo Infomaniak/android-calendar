@@ -19,14 +19,15 @@ package com.infomaniak.calendar.ui.screen.eventDetail.delete
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
-fun DeleteEventDialog(isRecurrent: () -> Boolean, onDelete: (DeleteEventScope) -> Unit, onDismissRequest: () -> Unit) {
+fun DeleteEventDialog(isRecurrent: () -> Boolean, onDelete: (RecurrentEventScope) -> Unit, onDismissRequest: () -> Unit) {
     if (isRecurrent()) {
         DeleteRecurrentEventDialog(onDelete = onDelete, onDismissRequest = onDismissRequest)
     } else {
-        DeleteSingleEventDialog(onDelete = { onDelete(DeleteEventScope.ThisEvent) }, onDismissRequest = onDismissRequest)
+        DeleteSingleEventDialog(onDelete = { onDelete(RecurrentEventScope.ThisEvent) }, onDismissRequest = onDismissRequest)
     }
 }
 

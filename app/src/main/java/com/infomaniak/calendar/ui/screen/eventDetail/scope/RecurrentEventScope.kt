@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.eventDetail.delete
+package com.infomaniak.calendar.ui.screen.eventDetail.scope
 
 import androidx.annotation.StringRes
 import com.infomaniak.calendar.R
 
-enum class DeleteEventScope(@StringRes val labelRes: Int) {
-    ThisEvent(R.string.buttonDeleteEvent),
-    ThisAndFollowingEvents(R.string.buttonDeleteThisAndFollowingEvents),
-    AllEvents(R.string.buttonDeleteAllEvents),
+enum class RecurrentEventScope(@StringRes val labelRes: Int) {
+    ThisEvent(R.string.buttonThisEvent),
+    ThisAndFollowingEvents(R.string.buttonThisAndFollowingEvents),
+    AllEvents(R.string.buttonAllEvents),
 }
