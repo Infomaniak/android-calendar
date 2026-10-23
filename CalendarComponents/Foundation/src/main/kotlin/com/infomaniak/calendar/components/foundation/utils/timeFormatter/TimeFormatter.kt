@@ -41,6 +41,10 @@ fun LocalTime.formatShortTimeLabel(): String {
 
     return toJavaLocalTime().format(fixedFormatter(pattern, currentLocale()))
 }
+
+/** `08:00`, or `08:00 AM` when the user is not on 24 hours format. */
+@Composable
+fun LocalTime.formatExplicitTimeLabel(): String = formatTime(currentLocale(), isUsing24HourFormat())
 //endregion
 
 //region Underlying testable logic

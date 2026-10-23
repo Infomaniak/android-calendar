@@ -97,7 +97,7 @@ private fun baseEntryProvider(
     when (destination) {
         is NavDestination.CalendarView.Planning -> NavEntry(destination, metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
             PlanningScreen(
-                goToEventCreation = { backStack.addOnce(NavDestination.EventCreation) },
+                goToEventCreation = { backStack.addOnce(NavDestination.EventCreation(it)) },
                 goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) },
             )
         }
@@ -124,6 +124,7 @@ private fun baseEntryProvider(
             metadata = metaDataOf(ResponsiveDialog),
         ) {
             EventCreationScreen(
+                date = destination.date,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
                 goToEventsAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
             )
@@ -212,7 +213,9 @@ private fun sceneDecoratorStrategies(
                     currentDestination = { backStack.getLastCalendarView() },
                     floatingActionButton = {
                         CalendarFab(
-                            onClick = { backStack.addOnce(NavDestination.EventCreation) },
+                            onClick = {
+                                backStack.addOnce(NavDestination.EventCreation(visibleDayState?.visibleDate ?: Clock.today()))
+                            },
                             modifier = Modifier.fillMaxSize(),
                         )
                     },

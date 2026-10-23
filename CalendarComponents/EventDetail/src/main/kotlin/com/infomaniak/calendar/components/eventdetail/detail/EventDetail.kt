@@ -42,7 +42,7 @@ import com.infomaniak.calendar.components.eventdetail.component.Recurrence
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
 import com.infomaniak.calendar.components.eventdetail.detail.component.Calendar
-import com.infomaniak.calendar.components.eventdetail.detail.component.DateAndTime
+import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
@@ -83,7 +83,7 @@ fun EventDetail(
         with(eventDetail) {
             Title(dotColor = eventColor, title = title, modifier = Modifier.eventSharedElement(EventSharedElement.Title))
 
-            DateAndTime(start, end, isAllDay)
+            DateAndTime(start, end, isAllDay, Modifier.eventSharedBounds(EventSharedElement.DateAndTime))
 
             if (recurrence is EventDetailRecurrence.Recurrence) Recurrence(recurrence.getText)
 

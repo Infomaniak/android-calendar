@@ -15,8 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.detail.component
+package com.infomaniak.calendar.components.eventdetail.component
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ListItem
@@ -25,18 +26,23 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.eventdetail.component.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
+import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
+import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRangeWithZone
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
 import kotlinx.datetime.minus
@@ -83,6 +89,28 @@ internal fun DateAndTime(
         },
         modifier = modifier,
     )
+}
+
+/**
+ * [dateAndTimeState] can be null so it can be initialized in two steps after the data has been read from disk. The item will be
+ * empty but still take its final size as to not create a jarring experience when the data loads in dynamically.
+ */
+@Composable
+internal fun DateAndTimeEditable(dateAndTimeState: DateAndTimeState?, isAllDay: () -> Boolean, modifier: Modifier = Modifier) {
+    val shouldDisplay = dateAndTimeState != null
+    val dateAndTimeState = dateAndTimeState ?: DateAndTimeState.Dummy
+
+    Column(
+        modifier = modifier
+            .alpha(if (shouldDisplay) 1f else 0f)
+            .padding(horizontal = EsdsTheme.spacing.xs),
+        verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
+    ) {
+        with(dateAndTimeState) {
+            DateAndTimeEntry(start, isAllDay, onDatePicked = { start.pickDate(it) }, onTimePicked = { start.pickTime(it) })
+            DateAndTimeEntry(end, isAllDay, onDatePicked = { end.pickDate(it) }, onTimePicked = { end.pickTime(it) })
+        }
+    }
 }
 
 @Preview
@@ -156,6 +184,26 @@ private fun PreviewDateAndTime() {
                     isAllDay = true,
                 )
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewEditable() {
+    MaterialTheme {
+        Surface {
+            DateAndTimeEditable(
+                dateAndTimeState = rememberDateAndTimeState(
+                    startDate = LocalDate(2026, 5, 20),
+                    startTime = LocalTime(8, 10),
+                    startTimeZone = TimeZone.currentSystemDefault(),
+                    endDate = LocalDate(2026, 5, 20),
+                    endTime = LocalTime(9, 0),
+                    endTimeZone = TimeZone.currentSystemDefault(),
+                ),
+                isAllDay = { false },
+            )
         }
     }
 }

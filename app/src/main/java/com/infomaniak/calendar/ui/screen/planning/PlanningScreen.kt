@@ -54,7 +54,7 @@ import kotlinx.datetime.LocalDate
 
 @Composable
 fun PlanningScreen(
-    goToEventCreation: () -> Unit,
+    goToEventCreation: (LocalDate) -> Unit,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PlanningViewModel = viewModel(),
@@ -77,7 +77,7 @@ fun PlanningScreen(
 
 @Composable
 private fun PlanningScreen(
-    goToEventCreation: () -> Unit,
+    goToEventCreation: (LocalDate) -> Unit,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     planningUiState: () -> PlanningUiState,
     isLoadingEvents: () -> Boolean,
@@ -131,7 +131,7 @@ private fun PlanningScreen(
 private fun SuccessPlanning(
     events: () -> EventsByWeekAndDay,
     contentPadding: PaddingValues,
-    goToEventCreation: () -> Unit,
+    goToEventCreation: (LocalDate) -> Unit,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     visibleDayState: VisibleDayState,
     modifier: Modifier = Modifier,

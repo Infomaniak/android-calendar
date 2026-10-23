@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -31,14 +32,19 @@ import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberDefaultEventForm
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlin.time.Duration.Companion.hours
 
 @Composable
 fun EventCreationScreen(
+    date: LocalDate,
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
     modifier: Modifier = Modifier,
@@ -46,9 +52,12 @@ fun EventCreationScreen(
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
 ) {
     val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
+    val defaultEventDuration by viewModel.defaultEventDuration.collectAsStateWithLifecycle(null)
+
     val state = rememberDefaultEventForm(
         calendars = eventFormCalendars?.calendars ?: emptyList(),
         initialCalendar = eventFormCalendars?.initialCalendar,
+        dateAndTimeState = defaultEventDuration?.let { rememberDateAndTimeState(it, TimeZone.currentSystemDefault(), date) },
         attendeesSearchState = viewModel.attendeesSearchState,
     )
 
@@ -95,6 +104,7 @@ private fun EventCreationScreenPreview() {
         val state = rememberDefaultEventForm(
             calendars = listOf(previewEventDetailCalendar),
             initialCalendar = previewEventDetailCalendar,
+            dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
             attendeesSearchState = rememberSaveableAttendeesSearchState(),
         )
 
