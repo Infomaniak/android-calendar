@@ -62,11 +62,7 @@ class EventLoader @Inject constructor(
                     .observeCalendar(event.calendarId)
                     .map { calendar ->
                         if (calendar == null) {
-                            val eventDetail = "masterEventId=${event.masterEventId}" +
-                                    ", occurrenceId=${event.occurrenceId}" +
-                                    ", calendarId=${event.calendarId}" +
-                                    ", accountId=${event.accountId}"
-                            SentryLog.w(TAG, "Event with no calendar for $eventDetail")
+                            SentryLog.w(TAG, "Event with no calendar for ${event.toLogString()}")
                             EventAndCalendarState.Loading
                         } else {
                             EventAndCalendarState.Success(event, calendar)
@@ -79,6 +75,11 @@ class EventLoader @Inject constructor(
         private const val TAG = "EventLoader"
     }
 }
+
+private fun Event.toLogString(): String = "masterEventId=$masterEventId" +
+        ", occurrenceId=$occurrenceId" +
+        ", calendarId=$calendarId" +
+        ", accountId=$accountId"
 
 sealed interface EventAndCalendarState {
     object Loading : EventAndCalendarState
