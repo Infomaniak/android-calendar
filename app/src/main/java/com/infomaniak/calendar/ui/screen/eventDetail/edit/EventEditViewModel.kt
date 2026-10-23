@@ -17,6 +17,9 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.edit
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
@@ -56,6 +59,9 @@ class EventEditViewModel(
             savedStateHandle[ARE_ATTENDEES_INITIALIZED_KEY] = value
         }
 
+    var isSaving by mutableStateOf(false)
+        private set
+
     suspend fun initAttendeesSearchState(eventDetailUi: Flow<EventDetailUiState>) {
         if (areAttendeesInitialized) return
         val event = eventDetailUi.filterIsInstance<EventDetailUiState.Displayable.Success>().first()
@@ -63,11 +69,18 @@ class EventEditViewModel(
         areAttendeesInitialized = true
     }
 
-    suspend fun submitEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope, eventDraft: EventDraft): SaveEventResult {
+    /** `null` while a save is already running: the request is ignored. */
+    suspend fun submitEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope, eventDraft: EventDraft): SaveEventResult? {
+        if (isSaving) return null
+
+        isSaving = true
         val result = CompletableDeferred<SaveEventResult>()
 
         viewModelScope.launch {
-            result.complete(eventComposerUseCase.updateEvent(occurrenceId, scope, eventDraft))
+            val saveResult = eventComposerUseCase.updateEvent(occurrenceId, scope, eventDraft)
+            // Still saving on success: the form closes, a tap during its exit must not save it again
+            if (saveResult == SaveEventResult.Error) isSaving = false
+            result.complete(saveResult)
         }
 
         return result.await()
