@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.attendeessearch.component
+package com.infomaniak.calendar.components.foundation.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
-internal fun EmptyState(text: String, modifier: Modifier = Modifier) {
+fun EmptyState(text: String, modifier: Modifier = Modifier) {
     // TODO: improve empty state
     Box(
         modifier = modifier.fillMaxSize().padding(top = EsdsTheme.spacing.lg),

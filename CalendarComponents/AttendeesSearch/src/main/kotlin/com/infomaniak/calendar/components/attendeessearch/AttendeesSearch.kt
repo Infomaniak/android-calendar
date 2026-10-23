@@ -30,8 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.attendeessearch.component.AttendeesList
-import com.infomaniak.calendar.components.attendeessearch.component.EmptyState
-import com.infomaniak.calendar.components.attendeessearch.component.SearchBar
+import com.infomaniak.calendar.components.foundation.component.EmptyState
+import com.infomaniak.calendar.components.foundation.component.SearchBar
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
@@ -54,6 +54,7 @@ fun AttendeesSearch(
     Column(modifier = modifier) {
         SearchBar(
             searchState = attendeesSearchState.searchQueryTextFieldState,
+            placeholder = stringResource(R.string.searchForAttendees),
         )
         if (attendeesList.isEmpty()) {
             EmptyState(text = stringResource(R.string.attendeesEmptyState))

@@ -57,6 +57,7 @@
         <item quantity="other">%d dias</item>
     </plurals>
     <string name="descriptionTitle">Descrição</string>
+    <string name="emptyStateNoTimeZone">Nenhum fuso horário encontrado</string>
     <string name="eventTitle">Título do evento</string>
     <plurals name="hourAmount">
         <item quantity="one">%d hora</item>

@@ -39,6 +39,7 @@ dependencies {
 
     implementation(core.infomaniak.core.avatar)
     implementation(core.infomaniak.core.common)
+    implementation(core.infomaniak.core.ui.compose.margin)
     implementation(core.infomaniak.core.ui.compose.theme)
     implementation(libs.infomaniak.designsystem.foundation)
 

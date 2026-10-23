@@ -52,6 +52,7 @@ import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
+import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchResultViewModel
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
@@ -63,9 +64,11 @@ fun EventEditScreen(
     occurrenceId: OccurrenceId,
     goBack: () -> Unit,
     goToEventAttendees: () -> Unit,
+    goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventEditViewModel = viewModel(),
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
+    timeZoneSearchResultViewModel: TimeZoneSearchResultViewModel = viewModel(),
 ) {
     val eventDetailUiState = viewModel.eventDetailUi.collectAsStateWithLifecycle().value
     val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
@@ -100,6 +103,11 @@ fun EventEditScreen(
         for (request in viewModel.goBackRequests) goBack()
     }
 
+    val dateAndTimeState = (uiState as? EventEditScreenState.Success)?.eventFormState?.dateAndTimeState
+    LaunchedEffect(dateAndTimeState) {
+        timeZoneSearchResultViewModel.applyPickedTimeZonesTo(dateAndTimeState)
+    }
+
     LaunchedEffect(viewModel.attendeesSearchState) {
         attendeesSearchSharedDataViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
     }
@@ -108,6 +116,7 @@ fun EventEditScreen(
         uiState = uiState,
         goBack = goBack,
         goToEventAttendees = goToEventAttendees,
+        goToTimeZoneSearch = goToTimeZoneSearch,
         modifier = modifier,
         onSubmit = { /** TODO */ },
         sharedTransitionScope = LocalSharedTransitionScope.current,
@@ -120,6 +129,7 @@ private fun EventEditScreen(
     uiState: EventEditScreenState,
     goBack: () -> Unit,
     goToEventAttendees: () -> Unit,
+    goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     onSubmit: (RecurrentEventScope) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -148,6 +158,7 @@ private fun EventEditScreen(
                 EventForm(
                     state = uiState.eventFormState,
                     onAttendeesClick = goToEventAttendees,
+                    onTimeZoneClick = goToTimeZoneSearch,
                     modifier = Modifier.verticalScroll(scrollState),
                     contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                     sharedTransitionScope = sharedTransitionScope,
@@ -209,6 +220,7 @@ private fun Preview() {
                 ),
                 goBack = {},
                 goToEventAttendees = {},
+                goToTimeZoneSearch = {},
                 onSubmit = {},
             )
         }

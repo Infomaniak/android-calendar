@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.attendeessearch.component
+package com.infomaniak.calendar.components.foundation.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,15 +37,16 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
 
 @Composable
-internal fun SearchBar(
+fun SearchBar(
     searchState: TextFieldState,
     modifier: Modifier = Modifier,
+    placeholder: String = stringResource(android.R.string.search_go),
 ) {
     SearchBarDefaults.InputField(
         textFieldState = searchState,
         searchBarState = rememberSearchBarState(),
         onSearch = {},
-        placeholder = { Text(stringResource(R.string.searchForAttendees)) },
+        placeholder = { Text(placeholder) },
         leadingIcon = {
             Icon(
                 painter = painterResource(R.drawable.ic_magnifying_glass),
@@ -67,6 +68,6 @@ internal fun SearchBar(
 private fun SearchBarPreview() {
     SearchBar(
         searchState = rememberTextFieldState(),
-        modifier = Modifier,
+        placeholder = "Search",
     )
 }
