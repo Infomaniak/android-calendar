@@ -89,9 +89,11 @@ fun EventCreationScreen(
                 when (viewModel.submitEvent(eventDraft)) {
                     SaveEventResult.Success -> goBack()
                     SaveEventResult.Error -> snackbarHostState?.showSnackbar(message = errorText)
+                    null -> Unit
                 }
             }
         },
+        isSaving = { viewModel.isSaving },
         modifier = modifier,
         goBack = goBack,
         goToEventsAttendees = goToEventsAttendees,
@@ -103,6 +105,7 @@ fun EventCreationScreen(
 private fun EventCreationScreen(
     state: EventFormState,
     onSubmit: () -> Unit,
+    isSaving: () -> Boolean,
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
@@ -111,7 +114,7 @@ private fun EventCreationScreen(
     val scrollState = rememberScrollState()
 
     Scaffold(
-        topBar = { SubmitTopAppBar(goBack = goBack, onSubmit = onSubmit) },
+        topBar = { SubmitTopAppBar(goBack = goBack, onSubmit = onSubmit, isSubmitting = isSaving) },
         modifier = modifier,
     ) { contentPadding ->
         EventForm(
@@ -135,6 +138,13 @@ private fun EventCreationScreenPreview() {
             attendeesSearchState = rememberSaveableAttendeesSearchState(),
         )
 
-        EventCreationScreen(state = state, onSubmit = {}, goBack = {}, goToEventsAttendees = {}, goToTimeZoneSearch = {})
+        EventCreationScreen(
+            state = state,
+            onSubmit = {},
+            isSaving = { false },
+            goBack = {},
+            goToEventsAttendees = {},
+            goToTimeZoneSearch = {},
+        )
     }
 }

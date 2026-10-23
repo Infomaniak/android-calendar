@@ -20,7 +20,6 @@ package com.infomaniak.calendar.ui.component.topAppBar
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -155,13 +154,6 @@ object TopAppBarButtons {
                     .minimumInteractiveComponentSize()
                     .size(IconButtonDefaults.smallContainerSize()),
                 shape = IconButtonDefaults.filledShape,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colors.containerColor,
-                    contentColor = colors.contentColor,
-                    disabledContainerColor = colors.disabledContainerColor,
-                    disabledContentColor = colors.disabledContentColor,
-                ),
-                elevation = null,
                 enabled = enabled,
                 showIndeterminateProgress = isLoading,
                 contentPadding = PaddingValues(),
