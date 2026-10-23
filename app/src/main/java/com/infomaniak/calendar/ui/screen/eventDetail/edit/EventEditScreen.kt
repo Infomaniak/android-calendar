@@ -143,8 +143,8 @@ private fun EventEditScreen(
 
 @Composable
 private fun rememberEventDateState(eventDetailUi: EventDetailUi): DateAndTimeState {
-    val start = eventDetailUi.start.atLocale
-    val end = eventDetailUi.end.atLocale
+    val start = eventDetailUi.start.atTimeZone
+    val end = eventDetailUi.end.atTimeZone
 
     return rememberDateAndTimeState(
         startDate = start.date,
