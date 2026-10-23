@@ -58,7 +58,9 @@ import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSear
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
 import kotlin.time.Duration.Companion.hours
 
 @Composable
@@ -181,12 +183,14 @@ private fun EventEditScreen(
 private fun rememberEventDateState(eventDetailUi: EventDetailUi): DateAndTimeState {
     val start = eventDetailUi.start.atTimeZone
     val end = eventDetailUi.end.atTimeZone
+    // KMP ends an all-day event on the day after it, the form shows its last day
+    val endDate = if (eventDetailUi.isAllDay) end.date.minus(1, DateTimeUnit.DAY) else end.date
 
     return rememberDateAndTimeState(
         startDate = start.date,
         startTime = start.time,
         startTimeZone = eventDetailUi.start.timeZone,
-        endDate = end.date,
+        endDate = endDate,
         endTime = end.time,
         endTimeZone = eventDetailUi.end.timeZone,
     )
