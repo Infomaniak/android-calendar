@@ -41,6 +41,7 @@
         <item quantity="other">%1$d ίσως</item>
     </plurals>
     <string name="availableLabel">Διαθέσιμο</string>
+    <string name="buttonAddReminder">Προσθήκη υπενθύμισης</string>
     <string name="buttonJoin">Εγγραφή</string>
     <string name="contentDescriptionCreateEvent">Δημιουργία εκδήλωσης</string>
     <plurals name="contentDescriptionEventCount">

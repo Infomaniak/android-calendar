@@ -41,6 +41,7 @@
         <item quantity="other">%1$d kanskje</item>
     </plurals>
     <string name="availableLabel">Ledig</string>
+    <string name="buttonAddReminder">Legg til en påminnelse</string>
     <string name="buttonJoin">Bli med</string>
     <string name="contentDescriptionCreateEvent">Opprett en hendelse</string>
     <plurals name="contentDescriptionEventCount">
