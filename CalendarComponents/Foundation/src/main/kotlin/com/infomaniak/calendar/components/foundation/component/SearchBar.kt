@@ -39,8 +39,8 @@ import com.infomaniak.core.ui.compose.margin.Margin
 @Composable
 fun SearchBar(
     searchState: TextFieldState,
-    placeholder: String,
     modifier: Modifier = Modifier,
+    placeholder: String = stringResource(android.R.string.search_go),
 ) {
     SearchBarDefaults.InputField(
         textFieldState = searchState,

@@ -69,7 +69,7 @@ fun TimeZoneSearch(
             .padding(contentPadding.onlyHorizontal())
             .padding(top = contentPadding.calculateTopPadding()),
     ) {
-        SearchBar(searchState = searchQuery, placeholder = stringResource(android.R.string.search_go))
+        SearchBar(searchQuery)
 
         when (val results = searchResults) {
             null -> Unit // Still loading
