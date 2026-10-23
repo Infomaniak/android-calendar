@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.delete
 
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -34,7 +35,7 @@ fun DeleteRecurrentEventDialog(onDelete: (RecurrentEventScope) -> Unit, onDismis
         confirmLabel = stringResource(RCore.string.deleteButton),
         onConfirm = onDelete,
         onDismissRequest = onDismissRequest,
-        confirmColor = MaterialTheme.colorScheme.error,
+        confirmTextButtonColors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
     )
 }
 
