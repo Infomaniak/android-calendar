@@ -175,6 +175,7 @@ dependencies {
     implementation(core.infomaniak.core.ui.compose.margin)
     implementation(core.infomaniak.core.ui.compose.preview)
     implementation(core.infomaniak.core.ui.compose.theme)
+    implementation(libs.infomaniak.designsystem.icons)
     implementation(libs.infomaniak.designsystem.theme.calendar)
 
     implementation(core.kotlinx.serialization.json)

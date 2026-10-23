@@ -23,20 +23,21 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.calendar.components.eventdetail.component.ItemIconDefaults.getSymbolSize
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.ProductKmeet
+import com.infomaniak.designsystem.icons.symbols.Symbol
 
 @Composable
 internal fun ItemIcon(
-    painter: Painter,
+    symbol: Symbol,
     modifier: Modifier = Modifier,
     tint: Color = LocalContentColor.current,
 ) {
-    Icon(painter, null, modifier.size(ItemIconDefaults.size), tint)
+    Icon(getSymbolSize(symbol), null, modifier, tint)
 }
 
 @Composable
@@ -49,11 +50,13 @@ internal fun ItemIcon(
 }
 
 internal object ItemIconDefaults {
+    // Keep these two sizes in sync
     val size @Composable get() = EsdsTheme.icon.sizeSm
+    val getSymbolSize = Symbol::Small
 }
 
 @Preview(name = "ItemIcon")
 @Composable
 private fun PreviewItemIcon() {
-    ItemIcon(painter = painterResource(id = R.drawable.ic_product_kmeet))
+    ItemIcon(EsdsIcons.ProductKmeet)
 }

@@ -26,14 +26,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.CustomColors
-import com.infomaniak.calendar.components.resources.R as RComponents
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.ChevronRight
+import com.infomaniak.designsystem.icons.symbols.CircleUser
 
 @Composable
 fun MenuItem(
@@ -49,15 +50,10 @@ fun MenuItem(
             index = index,
             count = count,
         ),
-        leadingContent = {
-            Icon(
-                painter = painterResource(menuOption.itemIcon),
-                contentDescription = null,
-            )
-        },
+        leadingContent = { Icon(menuOption.itemIcon.Medium, contentDescription = null) },
         trailingContent = {
             Icon(
-                painter = painterResource(RComponents.drawable.ic_chevron_right),
+                imageVector = EsdsIcons.ChevronRight.Medium,
                 contentDescription = null,
             )
         },
@@ -83,7 +79,7 @@ private fun MenuItemPreview() {
         MenuItem(
             menuOption = MenuOption(
                 itemNameRes = R.string.accountsTitle,
-                itemIcon = R.drawable.ic_circle_user,
+                itemIcon = EsdsIcons.CircleUser,
                 itemAction = {},
             ),
             index = 0,

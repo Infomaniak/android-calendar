@@ -30,14 +30,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.ChevronRight
+import com.infomaniak.designsystem.icons.symbols.ProductKmeet
+import com.infomaniak.designsystem.icons.symbols.Symbol
 
 @Composable
 internal fun ClickableItem(
     text: String,
-    leadingIconRes: Int,
+    leadingIcon: Symbol,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
@@ -47,7 +49,7 @@ internal fun ClickableItem(
 ) {
     ClickableItem(
         text = text,
-        leadingContent = { ItemIcon(painterResource(leadingIconRes)) },
+        leadingContent = { ItemIcon(leadingIcon) },
         onClick = onClick,
         modifier = modifier,
         contentPadding = contentPadding,
@@ -86,7 +88,7 @@ internal fun ClickableItem(
 
 internal object ClickableItemDefaults {
     val trailingContent = @Composable {
-        Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null)
+        Icon(EsdsIcons.ChevronRight.Small, contentDescription = null)
     }
 
     val ClickableItemShapes
@@ -100,7 +102,7 @@ private fun Preview() {
         Surface {
             ClickableItem(
                 text = "Clickable item",
-                leadingIconRes = R.drawable.ic_product_kmeet,
+                leadingIcon = EsdsIcons.ProductKmeet,
                 supportingContent = { Text("Supporting content") },
                 onClick = {},
             )

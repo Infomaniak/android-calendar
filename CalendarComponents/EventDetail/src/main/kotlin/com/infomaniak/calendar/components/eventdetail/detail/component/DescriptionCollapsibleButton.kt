@@ -35,7 +35,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,6 +46,9 @@ import com.infomaniak.calendar.components.eventdetail.state.CollapsibleTextState
 import com.infomaniak.calendar.components.eventdetail.state.animateCollapse
 import com.infomaniak.calendar.components.eventdetail.state.rememberCollapsibleTextState
 import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.ChevronDown
+import com.infomaniak.designsystem.icons.symbols.List
 
 private const val COLLAPSED_MAX_LINES = 3
 
@@ -56,14 +58,14 @@ internal fun DescriptionCollapsibleButton(description: String, contentPadding: P
     val descriptionState = rememberCollapsibleTextState(isCollapsed, COLLAPSED_MAX_LINES)
 
     val descriptionTitle = R.string.descriptionTitle
-    val leadingIconRes = R.drawable.ic_list
+    val leadingIcon = EsdsIcons.List.Medium
 
     // Shows or hides the button to toggle the description based on if the text is actually overflowing when collapsed or not.
     if (descriptionState.isOverflowing) {
         ListItem(
             content = { Text(stringResource(descriptionTitle)) },
             supportingContent = { DescriptionContent(description, descriptionState) },
-            leadingContent = { ItemIcon(painterResource(leadingIconRes)) },
+            leadingContent = { ItemIcon(leadingIcon) },
             trailingContent = { AnimatedChevron { isCollapsed } },
             onClick = { isCollapsed = !isCollapsed },
             shapes = ClickableItemDefaults.ClickableItemShapes,
@@ -73,7 +75,7 @@ internal fun DescriptionCollapsibleButton(description: String, contentPadding: P
         ListItem(
             content = { Text(stringResource(descriptionTitle)) },
             supportingContent = { DescriptionContent(description, descriptionState) },
-            leadingContent = { ItemIcon(painterResource(leadingIconRes)) },
+            leadingContent = { ItemIcon(leadingIcon) },
             modifier = Modifier.padding(contentPadding),
         )
     }
@@ -97,7 +99,7 @@ private fun AnimatedChevron(isCollapsed: () -> Boolean) {
     val animatedChevronRotation = animateFloatAsState(if (isCollapsed()) 0f else -180f, label = "Chevron rotation")
 
     Icon(
-        painterResource(R.drawable.ic_chevron_down),
+        imageVector = EsdsIcons.ChevronDown.Small,
         contentDescription = null,
         modifier = Modifier.graphicsLayer { rotationZ = animatedChevronRotation.value },
     )

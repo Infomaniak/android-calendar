@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.ui.navigation.component
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -33,13 +32,19 @@ import androidx.compose.material3.SelectableDropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.ColumnsFour
+import com.infomaniak.designsystem.icons.symbols.ColumnsThree
+import com.infomaniak.designsystem.icons.symbols.GridThreeTwo
+import com.infomaniak.designsystem.icons.symbols.RectangleOverlineUnderline
+import com.infomaniak.designsystem.icons.symbols.RowsTwo
 
 @Composable
 fun FloatingToolbarDropdownMenu(
@@ -72,7 +77,7 @@ fun FloatingToolbarDropdownMenu(
                     selected = item.destination == currentDestination,
                     shapes = MenuDefaults.itemShape(index, DateSelectionItems.entries.count()),
                     text = { Text(stringResource(item.labelRessourceId)) },
-                    leadingIcon = { Icon(painter = painterResource(item.icon), contentDescription = null) },
+                    leadingIcon = { Icon(item.icon, contentDescription = null) },
                     onClick = {
                         onMenuExpanded(false)
                         onNavigationButtonClicked(item.destination)
@@ -87,32 +92,32 @@ fun FloatingToolbarDropdownMenu(
 
 private enum class DateSelectionItems(
     @param:StringRes val labelRessourceId: Int,
-    @DrawableRes val icon: Int,
+    val icon: ImageVector,
     val destination: NavDestination.CalendarView,
 ) {
     Planning(
         labelRessourceId = R.string.planningTitle,
-        icon = R.drawable.ic_rows_two,
+        icon = EsdsIcons.RowsTwo.Medium,
         destination = NavDestination.CalendarView.Planning,
     ),
     Day(
         labelRessourceId = R.string.dayTitle,
-        icon = R.drawable.ic_overline_rectangle_underline,
+        icon = EsdsIcons.RectangleOverlineUnderline.Medium,
         destination = NavDestination.CalendarView.Day,
     ),
     ThreeDays(
         labelRessourceId = R.string.threeDaysTitle,
-        icon = R.drawable.ic_columns_three,
+        icon = EsdsIcons.ColumnsThree.Medium,
         destination = NavDestination.CalendarView.ThreeDays,
     ),
     Week(
         labelRessourceId = R.string.weekTitle,
-        icon = R.drawable.ic_columns_four,
+        icon = EsdsIcons.ColumnsFour.Medium,
         destination = NavDestination.CalendarView.Week,
     ),
     Month(
         labelRessourceId = R.string.monthTitle,
-        icon = R.drawable.ic_grid_three_two,
+        icon = EsdsIcons.GridThreeTwo.Medium,
         destination = NavDestination.CalendarView.Month,
     ),
 }

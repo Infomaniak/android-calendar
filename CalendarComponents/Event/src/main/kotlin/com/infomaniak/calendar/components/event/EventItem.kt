@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.components.event
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,7 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -44,6 +42,11 @@ import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiF
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatTimeRange
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.MapPin
+import com.infomaniak.designsystem.icons.symbols.ProductKmeet
+import com.infomaniak.designsystem.icons.symbols.Symbol
+import com.infomaniak.designsystem.icons.symbols.UsersStacked
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Instant
@@ -188,16 +191,16 @@ fun EventSummaryUi.Normal.toEventIcons(): Set<EventIcons> = buildSet {
 }
 
 enum class EventIcons(
-    @DrawableRes private val icon: Int,
+    private val icon: Symbol,
     @StringRes private val contentDescription: Int,
 ) {
-    Location(R.drawable.ic_map_pin, R.string.contentDescriptionHasLocation),
-    Kmeet(R.drawable.ic_product_kmeet, R.string.contentDescriptionHasKMeetLink),
-    Attendees(R.drawable.ic_users_stacked, R.string.contentDescriptionHasAttendees);
+    Location(EsdsIcons.MapPin, R.string.contentDescriptionHasLocation),
+    Kmeet(EsdsIcons.ProductKmeet, R.string.contentDescriptionHasKMeetLink),
+    Attendees(EsdsIcons.UsersStacked, R.string.contentDescriptionHasAttendees);
 
     @Composable
     fun TrailingIcon(modifier: Modifier = Modifier, size: Dp = TrailingIconSize) {
-        Icon(painterResource(icon), stringResource(contentDescription), modifier = modifier.size(size))
+        Icon(icon.ExtraSmall, stringResource(contentDescription), modifier = modifier.size(size))
     }
 
     companion object {
