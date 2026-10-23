@@ -51,7 +51,7 @@ import kotlin.time.Duration.Companion.seconds
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
 class EventDetailSharedDataViewModel(
-    getEventDetailUiUseCase: GetEventDetailUiUseCase,
+    eventLoader: EventLoader,
     eventFormCalendarsUseCase: EventFormCalendarsUseCase,
 ) : ViewModel() {
     private val occurrenceIdFlow = MutableStateFlow<OccurrenceId?>(null)
@@ -59,10 +59,10 @@ class EventDetailSharedDataViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val eventAndCalendar: StateFlow<EventAndCalendarState> = occurrenceIdFlow
         .filterNotNull()
-        .flatMapLatest(getEventDetailUiUseCase::eventAndCalendar)
+        .flatMapLatest(eventLoader::eventAndCalendar)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), EventAndCalendarState.Loading)
 
-    private val eventDetailUiState: StateFlow<EventDetailUiState> = getEventDetailUiUseCase
+    private val eventDetailUiState: StateFlow<EventDetailUiState> = eventLoader
         .eventDetailUi(eventAndCalendar)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), EventDetailUiState.Displayable.Loading)
 

@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
-class GetEventDetailUiUseCase @Inject constructor(
+class EventLoader @Inject constructor(
     private val accountUtils: AccountUtils,
     private val calendarManager: CalendarManager,
 ) {
@@ -76,7 +76,7 @@ class GetEventDetailUiUseCase @Inject constructor(
         }
 
     companion object {
-        private const val TAG = "GetEventDetailUiUseCase"
+        private const val TAG = "EventLoader"
     }
 }
 
