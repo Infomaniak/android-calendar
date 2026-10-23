@@ -52,10 +52,10 @@ import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
-import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
-import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
 import com.infomaniak.calendar.ui.screen.multiDays.threeDays.ThreeDayScreen
 import com.infomaniak.calendar.ui.screen.multiDays.week.WeekScreen
+import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
+import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.utils.NavigationTransition
 import com.infomaniak.core.common.utils.today
@@ -155,6 +155,7 @@ private fun baseEntryProvider(
             EventEditScreen(
                 occurrenceId = destination.occurrenceId,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
+                goBackToCalendarView = { backStack.popUntilCalendarView(defaultCalendarView) },
                 goToEventAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
                 goToTimeZoneSearch = { isStart -> backStack.addOnce(NavDestination.EventTimeZone(destination, isStart)) },
             )

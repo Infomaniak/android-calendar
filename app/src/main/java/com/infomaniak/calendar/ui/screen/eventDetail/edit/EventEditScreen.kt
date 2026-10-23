@@ -65,6 +65,7 @@ import kotlin.time.Duration.Companion.hours
 fun EventEditScreen(
     occurrenceId: OccurrenceId,
     goBack: () -> Unit,
+    goBackToCalendarView: () -> Unit,
     goToEventAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -103,7 +104,7 @@ fun EventEditScreen(
     }
 
     LaunchedEffect(Unit) {
-        for (request in eventDetailSharedDataViewModel.editGoBackRequests) goBack()
+        for (request in eventDetailSharedDataViewModel.goBackRequests) goBackToCalendarView()
     }
 
     val dateAndTimeState = (uiState as? EventEditScreenState.Success)?.eventFormState?.dateAndTimeState

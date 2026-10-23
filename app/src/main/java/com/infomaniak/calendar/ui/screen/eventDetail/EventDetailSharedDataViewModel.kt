@@ -70,8 +70,9 @@ class EventDetailSharedDataViewModel(
         .filterIsInstance<EventDetailUiState.Displayable>()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), EventDetailUiState.Displayable.Loading)
 
-    val detailGoBackRequests: ReceiveChannel<EventDetailUiState.Unavailable> = goBackRequests()
-    val editGoBackRequests: ReceiveChannel<EventDetailUiState.Unavailable> = goBackRequests()
+    val goBackRequests: ReceiveChannel<EventDetailUiState.Unavailable> = eventDetailUiState
+        .filterIsInstance<EventDetailUiState.Unavailable>()
+        .produceIn(viewModelScope)
 
     val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase
         .editionCalendars(eventAndCalendar.filterIsInstance<EventAndCalendarState.Success>().map { it.calendar })
@@ -80,8 +81,4 @@ class EventDetailSharedDataViewModel(
     fun setOccurrenceId(occurrenceId: OccurrenceId) {
         occurrenceIdFlow.value = occurrenceId
     }
-
-    private fun goBackRequests(): ReceiveChannel<EventDetailUiState.Unavailable> = eventDetailUiState
-        .filterIsInstance<EventDetailUiState.Unavailable>()
-        .produceIn(viewModelScope)
 }

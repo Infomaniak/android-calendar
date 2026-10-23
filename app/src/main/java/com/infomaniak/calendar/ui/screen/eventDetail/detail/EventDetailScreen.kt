@@ -101,7 +101,7 @@ fun EventDetailScreen(
     }
 
     LaunchedEffect(Unit) {
-        for (request in eventDetailSharedDataViewModel.detailGoBackRequests) goBack()
+        for (request in eventDetailSharedDataViewModel.goBackRequests) goBack()
     }
 
     LaunchedEffect(viewModel.attendeesSearchState) {
