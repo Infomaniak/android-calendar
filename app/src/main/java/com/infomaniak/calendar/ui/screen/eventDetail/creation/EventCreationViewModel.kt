@@ -55,11 +55,10 @@ class EventCreationViewModel(
     val defaultEventDuration = settingsDataValues.defaultEventDuration.flow
 
     suspend fun submitEvent(eventDraft: EventDraft): SaveEventResult {
-        val calendar = eventFormCalendars.value?.initialCalendar ?: return SaveEventResult.Error
         val result = CompletableDeferred<SaveEventResult>()
 
         viewModelScope.launch {
-            result.complete(eventComposerUseCase.createEvent(calendar, eventDraft))
+            result.complete(eventComposerUseCase.createEvent(eventDraft))
         }
 
         return result.await()
