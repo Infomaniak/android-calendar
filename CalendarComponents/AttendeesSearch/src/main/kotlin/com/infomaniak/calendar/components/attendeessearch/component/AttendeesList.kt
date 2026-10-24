@@ -29,6 +29,7 @@ import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 @Composable
 internal fun AttendeesList(
     attendees: () -> List<AttendeeUi>,
+    onRemove: (AttendeeUi) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -38,7 +39,7 @@ internal fun AttendeesList(
             items = attendees(),
             key = { attendee -> attendee.key },
         ) { attendee ->
-            EventAttendee(attendee = attendee)
+            SwipeableEventAttendee(attendee = attendee, onRemove = onRemove)
         }
     }
 }
@@ -48,5 +49,6 @@ internal fun AttendeesList(
 private fun AttendeesListPreview() {
     AttendeesList(
         attendees = { previewAttendees },
+        onRemove = {},
     )
 }

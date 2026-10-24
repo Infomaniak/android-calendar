@@ -35,6 +35,10 @@ class AttendeesSearchState(
     val results: SnapshotStateList<AttendeeUi>,
     val attendees: SnapshotStateSet<AttendeeUi>,
 ) {
+    fun removeAttendee(attendee: AttendeeUi) {
+        attendees.remove(attendee)
+    }
+
     object Saver : androidx.compose.runtime.saveable.Saver<AttendeesSearchState, List<Any>> {
         private val resultsSaver = autoSaver<SnapshotStateList<AttendeeUi>>()
         private val attendeesSaver = autoSaver<SnapshotStateSet<AttendeeUi>>()
