@@ -1,0 +1,76 @@
+<!--
+  ~ Infomaniak Calendar - Android
+  ~ Copyright (C) 2026 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="300dp"
+    android:height="300dp"
+    android:viewportWidth="300"
+    android:viewportHeight="300">
+    <group>
+        <clip-path android:pathData="M0,0h300v300h-300z" />
+        <group>
+            <clip-path android:pathData="M0,0h300v300h-300z" />
+            <path
+                android:pathData="M302,150C302,233.95 233.95,302 150,302C66.05,302 -2,233.95 -2,150C-2,66.05 66.05,-2 150,-2C233.95,-2 302,66.05 302,150Z"
+                android:strokeAlpha="0.25"
+                android:fillAlpha="0.25">
+                <aapt:attr name="android:fillColor">
+                    <gradient
+                        android:centerX="150"
+                        android:centerY="150"
+                        android:gradientRadius="152"
+                        android:type="radial">
+                        <item
+                            android:offset="0"
+                            android:color="#FF0A848F" />
+                        <item
+                            android:offset="1"
+                            android:color="#000A848F" />
+                    </gradient>
+                </aapt:attr>
+            </path>
+        </group>
+        <path
+            android:pathData="M218.68,129.49H59.18C51.02,129.49 44.41,136.1 44.41,144.26V176.75C44.41,184.91 51.02,191.52 59.18,191.52H218.68C226.84,191.52 233.45,184.91 233.45,176.75V144.26C233.45,136.1 226.84,129.49 218.68,129.49Z"
+            android:strokeWidth="1.91566"
+            android:fillColor="#4CC6D4"
+            android:fillAlpha="0.4"
+            android:strokeColor="#4CC6D4" />
+        <path
+            android:pathData="M81.33,144.26H66.56C61.67,144.26 57.7,148.22 57.7,153.12V167.89C57.7,172.78 61.67,176.75 66.56,176.75H81.33C86.23,176.75 90.2,172.78 90.2,167.89V153.12C90.2,148.22 86.23,144.26 81.33,144.26Z"
+            android:fillColor="#ffffff" />
+        <path
+            android:pathData="M165.98,147.39H102.08C100.41,147.39 99.05,148.74 99.05,150.41C99.05,152.09 100.41,153.44 102.08,153.44H165.98C167.65,153.44 169.01,152.09 169.01,150.41C169.01,148.74 167.65,147.39 165.98,147.39Z"
+            android:fillColor="#ffffff" />
+        <path
+            android:pathData="M196.25,158.82H101.41C100.11,158.82 99.05,159.88 99.05,161.18C99.05,162.48 100.11,163.53 101.41,163.53H196.25C197.55,163.53 198.6,162.48 198.6,161.18C198.6,159.88 197.55,158.82 196.25,158.82Z"
+            android:fillColor="#ffffff" />
+        <path
+            android:pathData="M158.58,168.91H101.41C100.11,168.91 99.05,169.96 99.05,171.26C99.05,172.57 100.11,173.62 101.41,173.62H158.58C159.88,173.62 160.93,172.57 160.93,171.26C160.93,169.96 159.88,168.91 158.58,168.91Z"
+            android:fillColor="#ffffff" />
+        <path
+            android:pathData="M227.73,161.64C242.54,161.64 254.54,149.63 254.54,134.82C254.54,120.01 242.54,108 227.73,108C212.91,108 200.91,120.01 200.91,134.82C200.91,149.63 212.91,161.64 227.73,161.64Z"
+            android:fillColor="#0A848F" />
+        <path
+            android:pathData="M212.4,119.49h30.65v30.65h-30.65z"
+            android:fillColor="#0A848F" />
+        <path
+            android:pathData="M229.11,145.83C229.37,145.38 229.96,145.22 230.42,145.48C230.87,145.75 231.03,146.33 230.77,146.79C230.46,147.33 230.01,147.77 229.48,148.08C228.95,148.39 228.34,148.55 227.73,148.55C227.11,148.55 226.5,148.39 225.97,148.08C225.43,147.77 224.99,147.33 224.68,146.79C224.42,146.33 224.58,145.75 225.03,145.48C225.49,145.22 226.08,145.38 226.34,145.83C226.48,146.08 226.68,146.28 226.93,146.42C227.17,146.56 227.44,146.63 227.73,146.63C228.01,146.63 228.28,146.56 228.52,146.42C228.76,146.28 228.97,146.08 229.11,145.83ZM234.43,129.71C234.43,127.93 233.72,126.23 232.47,124.97C231.21,123.71 229.5,123.01 227.73,123.01C225.95,123.01 224.24,123.71 222.98,124.97C221.73,126.23 221.02,127.93 221.02,129.71C221.02,132.68 220.55,134.73 219.82,136.3C219.08,137.85 218.11,138.84 217.27,139.71L217.27,139.71C217.23,139.76 217.2,139.82 217.19,139.88C217.18,139.94 217.19,140 217.22,140.06C217.24,140.11 217.28,140.16 217.33,140.2C217.39,140.23 217.45,140.25 217.51,140.25H237.94C238,140.25 238.06,140.23 238.12,140.2C238.17,140.16 238.21,140.11 238.23,140.06C238.26,140 238.27,139.94 238.26,139.88C238.25,139.82 238.22,139.76 238.18,139.72C237.34,138.85 236.37,137.85 235.63,136.3C234.9,134.73 234.43,132.68 234.43,129.71ZM236.35,129.71C236.35,132.48 236.78,134.24 237.37,135.48C237.81,136.41 238.35,137.1 238.95,137.75L239.57,138.4L239.6,138.42C239.89,138.74 240.08,139.14 240.15,139.57C240.22,140 240.16,140.44 239.99,140.83C239.81,141.23 239.52,141.56 239.16,141.8C238.8,142.04 238.38,142.16 237.94,142.16H217.51C217.07,142.16 216.65,142.04 216.29,141.8C215.93,141.56 215.64,141.23 215.46,140.83C215.29,140.43 215.23,139.99 215.3,139.57C215.37,139.14 215.57,138.74 215.86,138.42L215.88,138.4C216.73,137.52 217.49,136.72 218.08,135.48C218.67,134.24 219.1,132.48 219.1,129.71C219.1,127.43 220.01,125.23 221.63,123.61C223.24,122 225.44,121.09 227.73,121.09C230.01,121.09 232.2,122 233.82,123.61C235.44,125.23 236.35,127.43 236.35,129.71Z"
+            android:fillColor="#ffffff" />
+    </group>
+</vector>
