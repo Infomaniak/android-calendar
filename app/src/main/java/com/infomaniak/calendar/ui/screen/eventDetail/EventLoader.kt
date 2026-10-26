@@ -19,6 +19,7 @@ package com.infomaniak.calendar.ui.screen.eventDetail
 
 import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.calendar.utils.toEventDetailCalendarGroups
 import com.infomaniak.calendar.utils.toEventDetailUi
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
@@ -41,8 +42,9 @@ class EventLoader @Inject constructor(
     fun eventDetailUi(eventAndCalendar: Flow<EventAndCalendarState>): Flow<EventDetailUiState> = combine(
         eventAndCalendar,
         cachedCalendarManager.writableCalendars,
+        accountUtils.users,
         accountUtils.emailsByUserId,
-    ) { eventAndCalendarState, writableCalendars, emailsByUserId ->
+    ) { eventAndCalendarState, writableCalendars, users, emailsByUserId ->
         val (event, calendar) = when (eventAndCalendarState) {
             EventAndCalendarState.EventNotFound -> return@combine EventDetailUiState.Unavailable
             EventAndCalendarState.Loading -> return@combine EventDetailUiState.Displayable.Loading
@@ -50,7 +52,7 @@ class EventLoader @Inject constructor(
         }
 
         event
-            .toEventDetailUi(calendar, writableCalendars, emailsByUserId)
+            .toEventDetailUi(calendar, users.toEventDetailCalendarGroups(writableCalendars), emailsByUserId)
             .let(EventDetailUiState.Displayable::Success)
     }
 

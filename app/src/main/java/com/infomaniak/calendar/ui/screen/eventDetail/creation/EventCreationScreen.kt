@@ -34,6 +34,7 @@ import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberDefaultEventForm
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
@@ -66,7 +67,7 @@ fun EventCreationScreen(
     val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
     val defaultEventDuration by viewModel.defaultEventDuration.collectAsStateWithLifecycle(null)
 
-    // Only null if the user has no writable calendar, an event can't be created anywhere then
+    // Null while loading, or if the user has no writable calendar: an event can't be created anywhere then
     val state = eventFormCalendars?.let {
         rememberDefaultEventForm(
             calendars = it.calendars,
@@ -134,7 +135,7 @@ private fun EventCreationScreen(
 private fun EventCreationScreenPreview() {
     CalendarThemeForPreview {
         val state = rememberDefaultEventForm(
-            calendars = listOf(previewEventDetailCalendar),
+            calendars = previewEventDetailCalendarGroups,
             initialCalendar = previewEventDetailCalendar,
             dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
             attendeesSearchState = rememberSaveableAttendeesSearchState(),

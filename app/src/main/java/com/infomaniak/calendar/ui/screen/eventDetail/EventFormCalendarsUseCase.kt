@@ -17,14 +17,12 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventFormCalendars
-import com.infomaniak.calendar.utils.combineStates
-import com.infomaniak.calendar.utils.mapState
+import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.toEventDetailCalendar
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
+import com.infomaniak.calendar.utils.toEventDetailCalendarGroups
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,6 +30,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -40,24 +40,23 @@ import kotlin.time.Duration.Companion.seconds
  * Read-only calendars are filtered out: the user cannot write an event in them, so they must not be offered by the form.
  * The calendars an existing event can be defined in are carried by its [EventDetailUi].
  */
-class EventFormCalendarsUseCase @Inject constructor(private val cachedCalendarManager: CachedCalendarManager) {
+class EventFormCalendarsUseCase @Inject constructor(
+    accountUtils: AccountUtils,
+    cachedCalendarManager: CachedCalendarManager,
+) {
     private val useCaseScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
-    private val writableCalendars: StateFlow<List<EventDetailCalendar>> = cachedCalendarManager.writableCalendars
-        .mapState(useCaseScope, SharingStarted.WhileSubscribed(5.seconds)) { it.map(Calendar::toEventDetailCalendar) }
-
     /**
-     * All writable calendars, preselecting the one the user last created an event in.
+     * All writable calendars grouped by account, preselecting the one the user last created an event in.
      *
-     * Only null if the user has no writable calendar at all.
+     * Null while the users load, or if the user has no writable calendar at all.
      */
-    val creationCalendars: StateFlow<EventFormCalendars?> = combineStates(
-        flow1 = writableCalendars,
-        flow2 = cachedCalendarManager.lastUsedCalendarId,
-        scope = useCaseScope,
-        started = SharingStarted.WhileSubscribed(5.seconds),
-    ) { calendars, lastUsedCalendarId ->
-        val initialCalendar = calendars.firstOrNull { it.id == lastUsedCalendarId } ?: calendars.firstOrNull()
-        initialCalendar?.let { EventFormCalendars(calendars, it) }
-    }
+    val creationCalendars: StateFlow<EventFormCalendars?> = combine(
+        cachedCalendarManager.writableCalendars,
+        cachedCalendarManager.lastUsedCalendarId,
+        accountUtils.users,
+    ) { calendars, lastUsedCalendarId, users ->
+        val initialCalendar = calendars.firstOrNull { it.id.url == lastUsedCalendarId } ?: calendars.firstOrNull()
+        initialCalendar?.let { EventFormCalendars(users.toEventDetailCalendarGroups(calendars), it.toEventDetailCalendar()) }
+    }.stateIn(useCaseScope, SharingStarted.WhileSubscribed(5.seconds), initialValue = null)
 }

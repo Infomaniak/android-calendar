@@ -45,6 +45,7 @@ import com.infomaniak.calendar.components.eventdetail.form.rememberEventFormStat
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
@@ -229,7 +230,7 @@ private fun Preview() {
             EventEditScreen(
                 uiState = EventEditScreenState.Success(
                     eventFormState = rememberEventFormState(
-                        calendars = listOf(previewEventDetailCalendar),
+                        calendars = previewEventDetailCalendarGroups,
                         initialEventColor = previewEventDetailCalendar.color,
                         initialCalendar = previewEventDetailCalendar,
                         dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),

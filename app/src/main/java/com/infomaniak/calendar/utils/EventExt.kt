@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.utils
 
 import androidx.compose.ui.graphics.Color
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
@@ -42,12 +43,12 @@ import kotlinx.datetime.LocalTime
  */
 fun Event.toEventDetailUi(
     calendar: Calendar,
-    writableCalendars: List<Calendar>,
+    calendarGroups: List<EventDetailCalendarGroup>,
     emailsByUserId: Map<AccountId, String>,
 ): EventDetailUi = EventDetailUi(
     eventColor = Color(colors.sourceColor),
     calendar = calendar.toEventDetailCalendar(),
-    calendars = writableCalendars.map(Calendar::toEventDetailCalendar),
+    calendars = calendarGroups,
     title = title,
     start = timing.toDetailTiming(isStart = true),
     end = timing.toDetailTiming(isStart = false),

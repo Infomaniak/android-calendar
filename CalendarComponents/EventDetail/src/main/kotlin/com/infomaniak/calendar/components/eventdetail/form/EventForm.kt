@@ -43,6 +43,7 @@ import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventShare
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import kotlinx.datetime.TimeZone
@@ -109,7 +110,7 @@ fun EventForm(
                 modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
             )
 
-            CalendarEditable(state.calendar, state.calendars)
+            CalendarEditable(state.calendar, state.calendars, onSelect = { calendar -> state.calendar = calendar })
         }
     }
 }
@@ -121,7 +122,7 @@ private fun Preview() {
         Surface {
             EventForm(
                 state = rememberEventFormState(
-                    calendars = listOf(previewEventDetailCalendar),
+                    calendars = previewEventDetailCalendarGroups,
                     initialEventColor = previewEventDetailCalendar.color,
                     initialCalendar = previewEventDetailCalendar,
                     dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),

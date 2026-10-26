@@ -35,7 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
-import com.infomaniak.calendar.components.eventdetail.component.CalendarEditable
+import com.infomaniak.calendar.components.eventdetail.component.Calendar
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatus
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
@@ -56,6 +56,7 @@ import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventShare
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.core.ui.compose.margin.Margin
@@ -137,7 +138,7 @@ fun EventDetail(
                     modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
                 )
 
-                CalendarEditable(calendar, calendars)
+                Calendar(calendar.color, calendar.name)
             }
         }
     }
@@ -149,7 +150,7 @@ private fun PreviewEventDetail() {
     val eventDetail = EventDetailUi(
         eventColor = Color.Red,
         calendar = previewEventDetailCalendar,
-        calendars = listOf(previewEventDetailCalendar),
+        calendars = previewEventDetailCalendarGroups,
         title = "Event Title",
         recurrence = EventDetailRecurrence.Recurrence(getText = { "Every week on Monday" }),
         start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
