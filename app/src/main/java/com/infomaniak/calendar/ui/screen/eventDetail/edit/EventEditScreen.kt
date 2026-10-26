@@ -93,6 +93,7 @@ fun EventEditScreen(
         is EventDetailUiState.Displayable.Success -> EventEditScreenState.Success(
             eventFormState = rememberEventFormState(
                 calendars = eventFormCalendars?.calendars ?: emptyList(),
+                initialEventColor = eventDetailUiState.eventDetail.eventColor,
                 initialCalendar = eventFormCalendars?.initialCalendar,
                 dateAndTimeState = rememberEventDateState(eventDetailUiState.eventDetail),
                 initialText = eventDetailUiState.eventDetail.title,
@@ -230,6 +231,7 @@ private fun Preview() {
                 uiState = EventEditScreenState.Success(
                     eventFormState = rememberEventFormState(
                         calendars = listOf(previewEventDetailCalendar),
+                        initialEventColor = previewEventDetailCalendar.color,
                         initialCalendar = previewEventDetailCalendar,
                         dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
                         initialText = "Meeting on how to find funny preview titles",

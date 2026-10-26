@@ -64,7 +64,7 @@ fun EventForm(
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
     Column(modifier.padding(contentPadding)) {
         TitleEditable(
-            dotColor = state.calendar?.color ?: Color.Transparent, // Temporarily hide the dot until we get the actual color
+            dotColor = state.eventColorState.value ?: Color.Transparent, // Temporarily hide the dot until we get the actual color
             textFieldState = state.titleTextState,
             modifier = Modifier.eventSharedElement(EventSharedElement.Title),
         )
@@ -121,6 +121,7 @@ private fun Preview() {
             EventForm(
                 state = rememberEventFormState(
                     calendars = listOf(previewEventDetailCalendar),
+                    initialEventColor = previewEventDetailCalendar.color,
                     initialCalendar = previewEventDetailCalendar,
                     dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
                     initialText = "Event title",
