@@ -34,6 +34,7 @@ import com.infomaniak.core.avatar.AvatarColors
 import com.infomaniak.core.avatar.LocalAvatarColors
 import com.infomaniak.core.avatar.theme.DarkAvatarColorsScheme
 import com.infomaniak.core.avatar.theme.LightAvatarColorsScheme
+import com.infomaniak.core.ui.compose.basics.bottomsheet.ProvideBottomSheetTheme
 import com.infomaniak.core.ui.compose.theme.LocalIsThemeDarkMode
 import com.infomaniak.core.ui.compose.theme.selectSchemeForContrast
 import com.infomaniak.designsystem.calendar.CalendarDarkHighContrastTheme
@@ -85,8 +86,9 @@ fun CalendarTheme(
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,
-            content = content,
-        )
+        ) {
+            ProvideBottomSheetTheme(content = content)
+        }
     }
 }
 
