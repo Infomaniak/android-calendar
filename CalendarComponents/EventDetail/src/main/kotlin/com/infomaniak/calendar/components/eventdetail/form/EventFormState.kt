@@ -23,7 +23,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
@@ -36,6 +38,7 @@ import kotlinx.datetime.atTime
 @Stable
 class EventFormState(
     val titleTextState: TextFieldState,
+    val eventColorState: MutableState<Color?>,
     val calendarIdState: MutableState<String?>,
     val isAllDay: MutableState<Boolean>,
     val dateAndTimeState: DateAndTimeState?,
@@ -52,6 +55,7 @@ class EventFormState(
 
         return EventDraft(
             title = titleTextState.text.toString(),
+            color = eventColorState.value ?: return null,
             calendarId = calendar?.id ?: return null,
             isAllDay = isAllDay.value,
             start = dateAndTimeState.start.date.atTime(dateAndTimeState.start.time),
@@ -108,3 +112,8 @@ fun rememberEventFormState(
         calendars = calendars,
     )
 }
+
+private val ColorSaver = Saver<Color?, String>(
+    save = { color -> color?.value?.toString() ?: "null" },
+    restore = { stringValue -> if (stringValue == "null") null else Color(stringValue.toULong()) },
+)
