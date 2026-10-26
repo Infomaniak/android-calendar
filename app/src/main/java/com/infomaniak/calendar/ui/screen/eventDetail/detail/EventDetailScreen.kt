@@ -34,7 +34,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -58,8 +57,6 @@ import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
-import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
-import com.infomaniak.calendar.ui.screen.eventDetail.DeleteEventResult
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
@@ -73,11 +70,9 @@ import com.infomaniak.core.common.extensions.safeStartActivity
 import com.infomaniak.core.ui.compose.basics.rememberClipboardCopyManager
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
-import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 import com.infomaniak.core.common.R as RCommon
-import com.infomaniak.core.common.R as RCore
 
 @Composable
 fun EventDetailScreen(
@@ -91,10 +86,7 @@ fun EventDetailScreen(
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
 ) {
     val context = LocalContext.current
-    val snackbarHostState = LocalSharedSnackbarHostState.current
-    val coroutineScope = rememberCoroutineScope()
     val uiState by eventDetailSharedDataViewModel.eventDetailUi.collectAsStateWithLifecycle()
-    val errorText = stringResource(RCore.string.anErrorHasOccurred)
 
     LaunchedEffect(occurrenceId) {
         eventDetailSharedDataViewModel.setOccurrenceId(occurrenceId)
@@ -118,12 +110,7 @@ fun EventDetailScreen(
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
         goBack = goBack,
         goToEdit = goToEdit,
-        onDelete = { scope ->
-            coroutineScope.launch {
-                val result = viewModel.deleteEvent(occurrenceId, scope)
-                if (result == DeleteEventResult.Error) snackbarHostState?.showSnackbar(message = errorText)
-            }
-        },
+        onDelete = { scope -> if (viewModel.deleteEvent(occurrenceId, scope)) goBack() },
         onLocationClick = { location -> openLocationInMapApp(context, location) },
         goToEventAttendees = goToEventAttendees,
         modifier = modifier,

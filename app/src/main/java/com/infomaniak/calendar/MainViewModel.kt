@@ -23,6 +23,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.data.CalendarDataValues
+import com.infomaniak.calendar.manager.BackgroundEventComposer
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.manager.VisibleDateManager
 import com.infomaniak.calendar.ui.navigation.NavDestination
@@ -50,10 +51,12 @@ class MainViewModel(
     @Assisted savedStateHandle: SavedStateHandle,
     private val accountUtils: AccountUtils,
     private val syncEventsManager: SyncEventsManager,
+    backgroundEventComposer: BackgroundEventComposer,
     private val calendarDataValues: CalendarDataValues,
     visibleDateManager: VisibleDateManager,
 ) : ViewModel() {
     val loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError> = syncEventsManager.loadingError
+    val savingEventError: ReceiveChannel<Unit> = backgroundEventComposer.savingError
 
     val uiState: StateFlow<MainUiState> = combine(
         accountUtils.users,
