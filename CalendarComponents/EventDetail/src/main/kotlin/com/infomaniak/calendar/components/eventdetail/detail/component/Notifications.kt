@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -38,8 +37,6 @@ import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatD
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDurationOffset
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
-import com.infomaniak.designsystem.icons.EsdsIcons
-import com.infomaniak.designsystem.icons.symbols.ChevronRight
 import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
@@ -68,7 +65,6 @@ internal fun Notifications(
                         textAlign = TextAlign.End,
                         modifier = Modifier.fillMaxWidth(0.5f),
                     )
-                    Icon(EsdsIcons.ChevronRight.Medium, contentDescription = null)
                 }
             },
             modifier = modifier,

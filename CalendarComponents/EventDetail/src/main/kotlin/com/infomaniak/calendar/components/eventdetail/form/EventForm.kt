@@ -19,6 +19,7 @@ package com.infomaniak.calendar.components.eventdetail.form
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -58,6 +59,7 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import kotlinx.datetime.TimeZone
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 /**
  * Reusable component for both the creation and the edition of an event.
@@ -107,7 +109,7 @@ fun EventForm(
             )
         }
 
-        Section(EventSharedElement.Divider3) {
+        Section(EventSharedElement.Divider3, Modifier.animateContentSize()) {
             var isReminderOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
 
             state.notifications.value.forEach { notification ->
@@ -175,6 +177,9 @@ private fun Preview() {
                     attendees = remember { mutableStateSetOf() },
                     initialIsAllDay = false,
                     initialIsKMeetUrlEnabled = false,
+                    initialNotifications = listOf(
+                        EventDetailUi.Notification(EventDetailUi.Notification.Type.Push, NotificationTime.Offset((-15).minutes)),
+                    ),
                     initialIsOccupied = true,
                     initialIsPublic = true,
                 ),

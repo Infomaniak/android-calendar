@@ -85,7 +85,7 @@ private fun EventTiming.toDetailTiming(isStart: Boolean): EventDetailTiming = wh
     }
 }
 
-private fun EventAlarm.toNotification(): EventDetailUi.Notification? {
+fun EventAlarm.toNotification(): EventDetailUi.Notification? {
 
     return EventDetailUi.Notification(
         type = when (action) {

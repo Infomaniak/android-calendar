@@ -65,7 +65,11 @@ class EventComposerUseCase @Inject constructor(
             val editData = calendarManager.getEditData(occurrenceId) ?: return SaveEventResult.Error
             calendarManager.updateEvent(
                 target = event.targetFor(scope.toRecurrenceScope()),
-                data = eventDraft.applyTo(editData, defaultOrganizer = eventDraft.typedCalendarId.toOrganizer()),
+                data = eventDraft.applyTo(
+                    editData = editData,
+                    storedAlarms = event.alarms,
+                    defaultOrganizer = eventDraft.typedCalendarId.toOrganizer(),
+                ),
             )
 
             calendarDataValues.saveLastUsedCalendar(eventDraft)
