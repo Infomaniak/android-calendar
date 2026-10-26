@@ -41,7 +41,7 @@ internal fun DropDownItem(
     content: @Composable () -> Unit,
     trailingContent: @Composable RowScope.() -> Unit,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     ListItem(
