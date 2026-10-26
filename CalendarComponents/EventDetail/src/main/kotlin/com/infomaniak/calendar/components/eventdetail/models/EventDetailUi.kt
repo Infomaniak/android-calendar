@@ -31,8 +31,7 @@ import com.infomaniak.designsystem.icons.symbols.Symbol
 @Immutable
 data class EventDetailUi(
     val eventColor: Color,
-    val calendarColor: Color,
-    val calendarName: String,
+    val calendar: EventDetailCalendar,
     val title: String,
     val start: EventDetailTiming,
     val end: EventDetailTiming,

@@ -48,9 +48,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.detail.EventDetail
 import com.infomaniak.calendar.components.eventdetail.detail.component.ParticipationStatusButtonsToolbar
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
@@ -90,6 +92,7 @@ fun EventDetailScreen(
     val snackbarHostState = LocalSharedSnackbarHostState.current
     val coroutineScope = rememberCoroutineScope()
     val uiState by eventDetailSharedDataViewModel.eventDetailUi.collectAsStateWithLifecycle()
+    val writableCalendars by eventDetailSharedDataViewModel.writableCalendars.collectAsStateWithLifecycle()
     val errorText = stringResource(RCore.string.anErrorHasOccurred)
 
     LaunchedEffect(occurrenceId) {
@@ -110,6 +113,7 @@ fun EventDetailScreen(
 
     EventDetailScreen(
         uiState = { uiState },
+        calendars = { writableCalendars },
         sharedTransitionScope = LocalSharedTransitionScope.current,
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
         goBack = goBack,
@@ -129,6 +133,7 @@ fun EventDetailScreen(
 @Composable
 private fun EventDetailScreen(
     uiState: () -> EventDetailUiState.Displayable,
+    calendars: () -> List<EventDetailCalendar>,
     goBack: () -> Unit,
     goToEdit: () -> Unit,
     goToEventAttendees: () -> Unit,
@@ -178,6 +183,7 @@ private fun EventDetailScreen(
 
                 EventDetail(
                     eventDetail = state.eventDetail,
+                    calendars = calendars(),
                     onJoinKMeet = { /*TODO[eventDetail]*/ },
                     onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
                     onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
@@ -213,8 +219,7 @@ private fun openLocationInMapApp(context: Context, location: String) {
 private fun Preview() {
     val previewEventDetail = EventDetailUi(
         eventColor = Color.Red,
-        calendarColor = Color.Blue,
-        calendarName = "Vacation",
+        calendar = previewEventDetailCalendar,
         title = "Event title",
         start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
         end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
@@ -237,6 +242,7 @@ private fun Preview() {
         Surface {
             EventDetailScreen(
                 uiState = { EventDetailUiState.Displayable.Success(previewEventDetail) },
+                calendars = { listOf(previewEventDetailCalendar) },
                 goBack = {},
                 goToEdit = {},
                 goToEventAttendees = {},

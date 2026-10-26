@@ -66,15 +66,18 @@ fun EventCreationScreen(
     val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
     val defaultEventDuration by viewModel.defaultEventDuration.collectAsStateWithLifecycle(null)
 
-    val state = rememberDefaultEventForm(
-        calendars = eventFormCalendars?.calendars ?: emptyList(),
-        initialCalendar = eventFormCalendars?.initialCalendar,
-        dateAndTimeState = defaultEventDuration?.let { rememberDateAndTimeState(it, TimeZone.currentSystemDefault(), date) },
-        attendeesSearchState = viewModel.attendeesSearchState,
-    )
+    // Only null if the user has no writable calendar, an event can't be created anywhere then
+    val state = eventFormCalendars?.let {
+        rememberDefaultEventForm(
+            calendars = it.calendars,
+            initialCalendar = it.initialCalendar,
+            dateAndTimeState = defaultEventDuration?.let { rememberDateAndTimeState(it, TimeZone.currentSystemDefault(), date) },
+            attendeesSearchState = viewModel.attendeesSearchState,
+        )
+    }
 
-    LaunchedEffect(state.dateAndTimeState) {
-        timeZoneSearchResultViewModel.applyPickedTimeZonesTo(state.dateAndTimeState)
+    LaunchedEffect(state?.dateAndTimeState) {
+        timeZoneSearchResultViewModel.applyPickedTimeZonesTo(state?.dateAndTimeState)
     }
 
     LaunchedEffect(Unit) {
@@ -84,7 +87,7 @@ fun EventCreationScreen(
     EventCreationScreen(
         state = state,
         onSubmit = {
-            val eventDraft = state.toEventDraft() ?: return@EventCreationScreen
+            val eventDraft = state?.toEventDraft() ?: return@EventCreationScreen
             coroutineScope.launch {
                 when (viewModel.submitEvent(eventDraft)) {
                     SaveEventResult.Success -> goBack()
@@ -101,7 +104,7 @@ fun EventCreationScreen(
 
 @Composable
 private fun EventCreationScreen(
-    state: EventFormState,
+    state: EventFormState?,
     onSubmit: () -> Unit,
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
@@ -114,6 +117,8 @@ private fun EventCreationScreen(
         topBar = { SubmitTopAppBar(goBack = goBack, onSubmit = onSubmit) },
         modifier = modifier,
     ) { contentPadding ->
+        if (state == null) return@Scaffold
+
         EventForm(
             state = state,
             onAttendeesClick = goToEventsAttendees,

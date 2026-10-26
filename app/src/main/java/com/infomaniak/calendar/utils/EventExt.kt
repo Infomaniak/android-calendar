@@ -42,8 +42,7 @@ import kotlinx.datetime.LocalTime
  */
 fun Event.toEventDetailUi(calendar: Calendar, emailsByUserId: Map<AccountId, String>): EventDetailUi = EventDetailUi(
     eventColor = Color(colors.sourceColor),
-    calendarColor = Color(colors.calendarSourceColor.argb),
-    calendarName = calendar.displayName,
+    calendar = calendar.toEventDetailCalendar(),
     title = title,
     start = timing.toDetailTiming(isStart = true),
     end = timing.toDetailTiming(isStart = false),

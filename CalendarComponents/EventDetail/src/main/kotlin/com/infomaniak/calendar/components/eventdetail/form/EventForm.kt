@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
+import com.infomaniak.calendar.components.eventdetail.component.CalendarEditable
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTimeEditable
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitch
@@ -108,7 +109,7 @@ fun EventForm(
                 modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
             )
 
-
+            CalendarEditable(state.calendar, state.calendars)
         }
     }
 }

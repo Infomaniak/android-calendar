@@ -34,12 +34,13 @@ import kotlinx.datetime.atTime
 
 /**
  * @param dateAndTimeState Can be null so it can be initialized in two steps after the data has been read from disk.
+ * @param initialCalendar Fallback for [calendar] if the selected calendar is no longer among [calendars].
  */
 @Stable
 class EventFormState(
     val titleTextState: TextFieldState,
     val eventColorState: MutableState<Color?>,
-    val calendarIdState: MutableState<String?>,
+    val calendarIdState: MutableState<String>,
     val isAllDay: MutableState<Boolean>,
     val dateAndTimeState: DateAndTimeState?,
     val attendeesState: AttendeesSearchState,
@@ -47,8 +48,9 @@ class EventFormState(
     val isOccupied: MutableState<Boolean>,
     val isPublic: MutableState<Boolean>,
     val calendars: List<EventDetailCalendar>,
+    private val initialCalendar: EventDetailCalendar,
 ) {
-    val calendar: EventDetailCalendar? get() = calendars.find { it.id == calendarIdState.value }
+    val calendar: EventDetailCalendar get() = calendars.find { it.id == calendarIdState.value } ?: initialCalendar
 
     fun toEventDraft(): EventDraft? {
         dateAndTimeState ?: return null
@@ -56,7 +58,7 @@ class EventFormState(
         return EventDraft(
             title = titleTextState.text.toString(),
             color = eventColorState.value ?: return null,
-            calendarId = calendar?.id ?: return null,
+            calendarId = calendar.id,
             isAllDay = isAllDay.value,
             start = dateAndTimeState.start.date.atTime(dateAndTimeState.start.time),
             startTimeZone = dateAndTimeState.start.timeZone,
@@ -73,12 +75,12 @@ class EventFormState(
 @Composable
 fun rememberDefaultEventForm(
     calendars: List<EventDetailCalendar>,
-    initialCalendar: EventDetailCalendar?,
+    initialCalendar: EventDetailCalendar,
     dateAndTimeState: DateAndTimeState?,
     attendeesSearchState: AttendeesSearchState,
 ): EventFormState = rememberEventFormState(
     calendars = calendars,
-    initialEventColor = initialCalendar?.color,
+    initialEventColor = initialCalendar.color,
     initialCalendar = initialCalendar,
     dateAndTimeState = dateAndTimeState,
     initialText = "",
@@ -92,8 +94,8 @@ fun rememberDefaultEventForm(
 @Composable
 fun rememberEventFormState(
     calendars: List<EventDetailCalendar>,
-    initialEventColor: Color?, // Can be null while the calendars are loading
-    initialCalendar: EventDetailCalendar?, // Can be null while the calendars are loading
+    initialEventColor: Color,
+    initialCalendar: EventDetailCalendar,
     dateAndTimeState: DateAndTimeState?,
     initialText: String,
     initialIsAllDay: Boolean,
@@ -102,14 +104,12 @@ fun rememberEventFormState(
     initialIsOccupied: Boolean,
     initialIsPublic: Boolean,
 ): EventFormState {
-    val eventColorState = rememberSaveable(initialEventColor == null, stateSaver = ColorSaver) {
-        mutableStateOf(initialEventColor)
-    }
+    val eventColorState = rememberSaveable(stateSaver = ColorSaver) { mutableStateOf(initialEventColor) }
 
     return EventFormState(
         titleTextState = rememberTextFieldState(initialText),
         eventColorState = eventColorState,
-        calendarIdState = rememberSaveable(initialCalendar == null) { mutableStateOf(initialCalendar?.id) },
+        calendarIdState = rememberSaveable { mutableStateOf(initialCalendar.id) },
         isAllDay = rememberSaveable { mutableStateOf(initialIsAllDay) },
         dateAndTimeState = dateAndTimeState,
         attendeesState = attendeesSearchState,
@@ -117,6 +117,7 @@ fun rememberEventFormState(
         isOccupied = rememberSaveable { mutableStateOf(initialIsOccupied) },
         isPublic = rememberSaveable { mutableStateOf(initialIsPublic) },
         calendars = calendars,
+        initialCalendar = initialCalendar,
     )
 }
 

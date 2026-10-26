@@ -86,15 +86,15 @@ fun EventEditScreen(
     val coroutineScope = rememberCoroutineScope()
     val errorText = stringResource(RCore.string.anErrorHasOccurred)
     val eventDetailUiState = eventDetailSharedDataViewModel.eventDetailUi.collectAsStateWithLifecycle().value
-    val eventFormCalendars = eventDetailSharedDataViewModel.eventFormCalendars.collectAsStateWithLifecycle().value
+    val writableCalendars by eventDetailSharedDataViewModel.writableCalendars.collectAsStateWithLifecycle()
 
     val uiState = when (eventDetailUiState) {
         EventDetailUiState.Displayable.Loading -> EventEditScreenState.Loading
         is EventDetailUiState.Displayable.Success -> EventEditScreenState.Success(
             eventFormState = rememberEventFormState(
-                calendars = eventFormCalendars?.calendars ?: emptyList(),
+                calendars = writableCalendars,
                 initialEventColor = eventDetailUiState.eventDetail.eventColor,
-                initialCalendar = eventFormCalendars?.initialCalendar,
+                initialCalendar = eventDetailUiState.eventDetail.calendar,
                 dateAndTimeState = rememberEventDateState(eventDetailUiState.eventDetail),
                 initialText = eventDetailUiState.eventDetail.title,
                 initialIsAllDay = eventDetailUiState.eventDetail.isAllDay,
