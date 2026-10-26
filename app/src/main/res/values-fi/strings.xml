@@ -34,6 +34,14 @@
     <string name="eventOccurrenceNotFound">Tämä tapahtuma ei ole enää saatavilla.</string>
     <string name="helpTitle">Apua</string>
     <string name="monthTitle">Kuukausi</string>
+    <string name="onboardingFourSubtitle">Voit nyt käyttää tapahtumiasi Calendarista.</string>
+    <string name="onboardingFourTitle">Kaikki on valmista</string>
+    <string name="onboardingOneSubtitle">Katso, luo ja jaa tapahtumasi puhelimestasi täysin luottamuksellisesti.</string>
+    <string name="onboardingOneTitle">Kalenterisi, aina mukanasi</string>
+    <string name="onboardingThreeSubtitle">Pääsy yhteystietoihisi helpottaa kalenterien jakamista ja kutsujen lähettämistä.</string>
+    <string name="onboardingThreeTitle">Kutsu osallistujasi</string>
+    <string name="onboardingTwoSubtitle">Saat muistutuksen ennen jokaista tapahtumaa etkä missaa enää tärkeitä tapaamisia.</string>
+    <string name="onboardingTwoTitle">Salli ilmoitukset</string>
     <string name="planningTitle">Suunnittelu</string>
     <string name="settingsTitle">Asetukset</string>
     <string name="signOutAccountAlertConfirm">Kirjaudu ulos tililtä</string>
