@@ -47,7 +47,6 @@ import com.infomaniak.calendar.components.eventdetail.detail.component.Descripti
 import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
 import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
@@ -66,14 +65,11 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
 /**
- * [calendars] are the writable calendars the event can be moved to.
- *
  * [sharedTransitionScope] and [animatedVisibilityScope] animate associated components between detail and editing.
  */
 @Composable
 fun EventDetail(
     eventDetail: EventDetailUi,
-    calendars: List<EventDetailCalendar>,
     onJoinKMeet: () -> Unit,
     onCopyKMeet: () -> Unit,
     onLocationClick: () -> Unit,
@@ -153,6 +149,7 @@ private fun PreviewEventDetail() {
     val eventDetail = EventDetailUi(
         eventColor = Color.Red,
         calendar = previewEventDetailCalendar,
+        calendars = listOf(previewEventDetailCalendar),
         title = "Event Title",
         recurrence = EventDetailRecurrence.Recurrence(getText = { "Every week on Monday" }),
         start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
@@ -193,7 +190,6 @@ private fun PreviewEventDetail() {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     EventDetail(
                         eventDetail = eventDetail,
-                        calendars = listOf(previewEventDetailCalendar),
                         onJoinKMeet = {},
                         onCopyKMeet = {},
                         onLocationClick = {},

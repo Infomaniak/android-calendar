@@ -19,7 +19,6 @@ package com.infomaniak.calendar.ui.screen.eventDetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.ui.navigation.SharedViewModelStoreNavEntryDecorator
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
@@ -51,7 +50,6 @@ import kotlin.time.Duration.Companion.seconds
 @ViewModelKey
 class EventDetailSharedDataViewModel(
     eventLoader: EventLoader,
-    eventFormCalendarsUseCase: EventFormCalendarsUseCase,
 ) : ViewModel() {
     private val occurrenceIdFlow = MutableStateFlow<OccurrenceId?>(null)
 
@@ -73,10 +71,6 @@ class EventDetailSharedDataViewModel(
     val goBackRequests: ReceiveChannel<EventDetailUiState.Unavailable> = eventDetailUiState
         .filterIsInstance<EventDetailUiState.Unavailable>()
         .produceIn(viewModelScope)
-    //endregion
-
-    //region Calendars
-    val writableCalendars: StateFlow<List<EventDetailCalendar>> = eventFormCalendarsUseCase.writableCalendars
     //endregion
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) {

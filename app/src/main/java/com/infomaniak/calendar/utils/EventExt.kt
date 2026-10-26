@@ -40,9 +40,14 @@ import kotlinx.datetime.LocalTime
  * Translation of the KMP event model into the UI model consumed by the EventDetail component,
  * shared by every view that opens an event so they all display it identically.
  */
-fun Event.toEventDetailUi(calendar: Calendar, emailsByUserId: Map<AccountId, String>): EventDetailUi = EventDetailUi(
+fun Event.toEventDetailUi(
+    calendar: Calendar,
+    writableCalendars: List<Calendar>,
+    emailsByUserId: Map<AccountId, String>,
+): EventDetailUi = EventDetailUi(
     eventColor = Color(colors.sourceColor),
     calendar = calendar.toEventDetailCalendar(),
+    calendars = writableCalendars.map(Calendar::toEventDetailCalendar),
     title = title,
     start = timing.toDetailTiming(isStart = true),
     end = timing.toDetailTiming(isStart = false),

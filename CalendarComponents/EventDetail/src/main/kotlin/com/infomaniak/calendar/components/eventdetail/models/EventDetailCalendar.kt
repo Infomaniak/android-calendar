@@ -17,8 +17,10 @@
  */
 package com.infomaniak.calendar.components.eventdetail.models
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
+@Immutable
 data class EventDetailCalendar(
     val id: String,
     val name: String,

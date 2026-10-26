@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.ui.screen.eventDetail
 
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventFormCalendars
 import com.infomaniak.calendar.utils.combineStates
@@ -34,14 +35,15 @@ import kotlinx.coroutines.flow.WhileSubscribed
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * The calendars an event can be created in or moved to, shared by the creation, the detail and the edition screens.
+ * The calendars an event can be created in.
  *
  * Read-only calendars are filtered out: the user cannot write an event in them, so they must not be offered by the form.
+ * The calendars an existing event can be defined in are carried by its [EventDetailUi].
  */
 class EventFormCalendarsUseCase @Inject constructor(private val cachedCalendarManager: CachedCalendarManager) {
     private val useCaseScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
-    val writableCalendars: StateFlow<List<EventDetailCalendar>> = cachedCalendarManager.writableCalendars
+    private val writableCalendars: StateFlow<List<EventDetailCalendar>> = cachedCalendarManager.writableCalendars
         .mapState(useCaseScope, SharingStarted.WhileSubscribed(5.seconds)) { it.map(Calendar::toEventDetailCalendar) }
 
     /**
