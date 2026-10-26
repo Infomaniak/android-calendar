@@ -78,6 +78,7 @@ fun rememberDefaultEventForm(
     attendeesSearchState: AttendeesSearchState,
 ): EventFormState = rememberEventFormState(
     calendars = calendars,
+    initialEventColor = initialCalendar?.color,
     initialCalendar = initialCalendar,
     dateAndTimeState = dateAndTimeState,
     initialText = "",
@@ -91,7 +92,8 @@ fun rememberDefaultEventForm(
 @Composable
 fun rememberEventFormState(
     calendars: List<EventDetailCalendar>,
-    initialCalendar: EventDetailCalendar?,
+    initialEventColor: Color?, // Can be null while the calendars are loading
+    initialCalendar: EventDetailCalendar?, // Can be null while the calendars are loading
     dateAndTimeState: DateAndTimeState?,
     initialText: String,
     initialIsAllDay: Boolean,
@@ -100,8 +102,13 @@ fun rememberEventFormState(
     initialIsOccupied: Boolean,
     initialIsPublic: Boolean,
 ): EventFormState {
+    val eventColorState = rememberSaveable(initialEventColor == null, stateSaver = ColorSaver) {
+        mutableStateOf(initialEventColor)
+    }
+
     return EventFormState(
         titleTextState = rememberTextFieldState(initialText),
+        eventColorState = eventColorState,
         calendarIdState = rememberSaveable(initialCalendar == null) { mutableStateOf(initialCalendar?.id) },
         isAllDay = rememberSaveable { mutableStateOf(initialIsAllDay) },
         dateAndTimeState = dateAndTimeState,
