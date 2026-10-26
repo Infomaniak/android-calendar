@@ -43,7 +43,7 @@ class EventComposerUseCase @Inject constructor(
 ) {
     suspend fun createEvent(eventDraft: EventDraft): SaveEventResult {
         return runCatching {
-            val defaultOrganizer = accountUserOf(CalendarId(eventDraft.calendarId))
+            val defaultOrganizer = CalendarId(eventDraft.calendarId).toOrganizer()
             calendarManager.createEvent(eventDraft.toNewEventEditData(defaultOrganizer))
             SaveEventResult.Success
         }.cancellable().getOrDefault(SaveEventResult.Error)
@@ -55,7 +55,7 @@ class EventComposerUseCase @Inject constructor(
             val editData = calendarManager.getEditData(occurrenceId) ?: return SaveEventResult.Error
             calendarManager.updateEvent(
                 target = event.targetFor(scope.toRecurrenceScope()),
-                data = eventDraft.applyTo(editData, defaultOrganizer = accountUserOf(editData.calendarId)),
+                data = eventDraft.applyTo(editData, defaultOrganizer = editData.calendarId.toOrganizer()),
             )
             SaveEventResult.Success
         }.cancellable().getOrDefault(SaveEventResult.Error)
@@ -69,8 +69,8 @@ class EventComposerUseCase @Inject constructor(
         }.cancellable().getOrDefault(DeleteEventResult.Error)
     }
 
-    private suspend fun accountUserOf(calendarId: CalendarId): Organizer? {
-        val accountId = cachedCalendarManager.calendars.value.find { it.id == calendarId }?.accountId ?: return null
+    private suspend fun CalendarId.toOrganizer(): Organizer? {
+        val accountId = cachedCalendarManager.calendars.value.find { it.id == this }?.accountId ?: return null
         val user = accountUtils.users.first().find { it.accountId == accountId } ?: return null
         return Organizer(email = user.email, displayName = user.displayName)
     }
