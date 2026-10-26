@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
@@ -49,6 +50,7 @@ class EventFormState(
     /** The organizer of the edited event, never updated by the form. There either is one at the start or it will be added right before sending */
     val initialOrganizer: OrganizerUi?,
     val isKMeetUrlEnabled: MutableState<Boolean>,
+    val notifications: MutableState<List<EventDetailUi.Notification>>,
     val isOccupied: MutableState<Boolean>,
     val isPublic: MutableState<Boolean>,
     val calendars: List<EventDetailCalendarGroup>,
@@ -70,6 +72,7 @@ class EventFormState(
             attendees = attendees(),
             initialOrganizer = initialOrganizer,
             isKMeetUrlEnabled = isKMeetUrlEnabled.value,
+            notifications = notifications.value,
             isOccupied = isOccupied.value,
             isPublic = isPublic.value,
         )
@@ -118,6 +121,7 @@ fun rememberEventFormState(
     attendees = attendees,
     initialOrganizer = initialOrganizer,
     isKMeetUrlEnabled = rememberSaveable { mutableStateOf(initialIsKMeetUrlEnabled) },
+    notifications = rememberSaveable { mutableStateOf(emptyList()) },
     isOccupied = rememberSaveable { mutableStateOf(initialIsOccupied) },
     isPublic = rememberSaveable { mutableStateOf(initialIsPublic) },
     calendars = calendars,

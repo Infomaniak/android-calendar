@@ -35,6 +35,7 @@ data class EventDraft(
     val attendees: List<AttendeeUi>,
     val initialOrganizer: OrganizerUi?,
     val isKMeetUrlEnabled: Boolean,
+    val notifications: List<EventDetailUi.Notification>,
     val isOccupied: Boolean,
     val isPublic: Boolean,
 )
