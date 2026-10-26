@@ -231,6 +231,7 @@ private fun Preview() {
                 uiState = EventEditScreenState.Success(
                     eventFormState = rememberEventFormState(
                         calendars = listOf(previewEventDetailCalendar),
+                        initialEventColor = previewEventDetailCalendar.color,
                         initialCalendar = previewEventDetailCalendar,
                         dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
                         initialText = "Meeting on how to find funny preview titles",

@@ -121,6 +121,7 @@ private fun Preview() {
             EventForm(
                 state = rememberEventFormState(
                     calendars = listOf(previewEventDetailCalendar),
+                    initialEventColor = previewEventDetailCalendar.color,
                     initialCalendar = previewEventDetailCalendar,
                     dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
                     initialText = "Event title",
