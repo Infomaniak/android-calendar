@@ -43,6 +43,7 @@ fun EventDraft.applyTo(editData: EventEditData, defaultOrganizer: Organizer?): E
     calendarId = typedCalendarId,
     attendees = attendees.map { AttendeeEdit(email = it.email, displayName = it.displayName) },
     organizer = (editData.organizer ?: defaultOrganizer).takeIf { attendees.isNotEmpty() },
+    // TODO: Write the notifications as alarms
 )
 
 fun EventDraft.toNewEventEditData(defaultOrganizer: Organizer?): EventEditData = applyTo(

@@ -30,6 +30,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateSet
 import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
@@ -47,6 +48,7 @@ class EventFormState(
     val dateAndTimeState: DateAndTimeState?,
     val attendees: SnapshotStateSet<AttendeeUi>,
     val isKMeetUrlEnabled: MutableState<Boolean>,
+    val notifications: MutableState<List<EventDetailUi.Notification>>,
     val isOccupied: MutableState<Boolean>,
     val isPublic: MutableState<Boolean>,
     val calendars: List<EventDetailCalendarGroup>,
@@ -67,6 +69,7 @@ class EventFormState(
             endTimeZone = dateAndTimeState.end.timeZone,
             attendees = attendees.toList(),
             isKMeetUrlEnabled = isKMeetUrlEnabled.value,
+            notifications = notifications.value,
             isOccupied = isOccupied.value,
             isPublic = isPublic.value,
         )
@@ -112,6 +115,7 @@ fun rememberEventFormState(
     dateAndTimeState = dateAndTimeState,
     attendees = attendees,
     isKMeetUrlEnabled = rememberSaveable { mutableStateOf(initialIsKMeetUrlEnabled) },
+    notifications = rememberSaveable { mutableStateOf(emptyList()) },
     isOccupied = rememberSaveable { mutableStateOf(initialIsOccupied) },
     isPublic = rememberSaveable { mutableStateOf(initialIsPublic) },
     calendars = calendars,

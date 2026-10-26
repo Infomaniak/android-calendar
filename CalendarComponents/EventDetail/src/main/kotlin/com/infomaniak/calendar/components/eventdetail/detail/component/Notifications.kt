@@ -77,7 +77,7 @@ internal fun Notifications(
 }
 
 @Composable
-private fun notificationTimeText(time: NotificationTime): String {
+internal fun notificationTimeText(time: NotificationTime): String {
     return when (time) {
         is NotificationTime.Offset -> time.duration.formatDurationOffset()
         is NotificationTime.Absolute -> {
