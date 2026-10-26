@@ -20,11 +20,9 @@ package com.infomaniak.calendar.ui.screen.eventDetail.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
-import com.infomaniak.calendar.ui.screen.eventDetail.DeleteEventResult
-import com.infomaniak.calendar.ui.screen.eventDetail.EventComposerUseCase
+import com.infomaniak.calendar.manager.BackgroundEventComposer
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.screen.eventDetail.utils.synchronizeTo
@@ -37,29 +35,29 @@ import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
 @AssistedInject
 class EventDetailViewModel(
     @Assisted private val savedStateHandle: SavedStateHandle,
-    private val eventComposerUseCase: EventComposerUseCase,
+    private val backgroundEventComposer: BackgroundEventComposer,
 ) : ViewModel() {
     val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
+
+    private var isDeleteRequested = false
 
     suspend fun synchronizeAttendeesSearchState(eventDetailUi: StateFlow<EventDetailUiState>) {
         eventDetailUi.synchronizeTo(attendeesSearchState)
     }
 
-    suspend fun deleteEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope): DeleteEventResult {
-        val result = CompletableDeferred<DeleteEventResult>()
+    /** `false` when the deletion was already requested: the request is ignored. */
+    fun deleteEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope): Boolean {
+        if (isDeleteRequested) return false
+        isDeleteRequested = true
 
-        viewModelScope.launch {
-            result.complete(eventComposerUseCase.deleteEvent(occurrenceId, scope))
-        }
+        backgroundEventComposer.deleteEvent(occurrenceId, scope)
 
-        return result.await()
+        return true
     }
 
     @AssistedFactory

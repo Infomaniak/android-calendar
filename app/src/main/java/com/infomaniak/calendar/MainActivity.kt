@@ -35,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSerializable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -60,6 +61,7 @@ import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.serialization.json.Json
+import com.infomaniak.core.common.R as RCore
 
 class MainActivity : ComponentActivity() {
 
@@ -92,6 +94,7 @@ class MainActivity : ComponentActivity() {
                             uiState = uiState,
                             visibleDayState = rememberVisibleDayState(mainViewModel.visibleDate),
                             loadingEventsError = mainViewModel.loadingEventsError,
+                            savingEventError = mainViewModel.savingEventError,
                             pendingOccurrenceId = pendingOccurrenceId.value,
                             onClearPendingOccurrenceId = { pendingOccurrenceId.value = null },
                             onCalendarViewSelected = mainViewModel::saveCalendarView,
@@ -136,6 +139,7 @@ private fun MainContent(
     uiState: MainUiState.Loaded,
     visibleDayState: VisibleDayState,
     loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError>,
+    savingEventError: ReceiveChannel<Unit>,
     pendingOccurrenceId: OccurrenceId?,
     onClearPendingOccurrenceId: () -> Unit,
     onCalendarViewSelected: (NavDestination.CalendarView) -> Unit,
@@ -159,6 +163,7 @@ private fun MainContent(
         LocalDrawerState provides rememberDrawerState(initialValue = DrawerValue.Closed),
     ) {
         ObserveSyncError(loadingEventsError)
+        ObserveSaveEventError(savingEventError)
         NavigateToOnboardingIfLastUserIsDisconnected(backStack, isUserLoaded = isUserConnected)
         MainNavHost(
             backStack = backStack,
@@ -187,6 +192,16 @@ private fun ObserveSyncError(loadingEventsError: ReceiveChannel<SyncEventsManage
         for (error in loadingEventsError) {
             snackbarHostState.showSnackbar(message = context.getString(error.errorRes))
         }
+    }
+}
+
+@Composable
+private fun ObserveSaveEventError(savingEventError: ReceiveChannel<Unit>) {
+    val snackbarHostState = LocalSharedSnackbarHostState.current ?: return
+    val errorText = stringResource(RCore.string.anErrorHasOccurred)
+
+    LaunchedEffect(Unit) {
+        for (error in savingEventError) snackbarHostState.showSnackbar(message = errorText)
     }
 }
 
