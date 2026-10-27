@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.ui.screen.eventDetail
 
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.utils.account.AccountUtils
@@ -41,11 +42,15 @@ class EventComposerUseCase @Inject constructor(
     private val calendarManager: CalendarManager,
     private val cachedCalendarManager: CachedCalendarManager,
     private val accountUtils: AccountUtils,
+    private val calendarDataValues: CalendarDataValues,
 ) {
     suspend fun createEvent(eventDraft: EventDraft): SaveEventResult {
         return runCatching {
             val defaultOrganizer = eventDraft.typedCalendarId.toOrganizer()
             calendarManager.createEvent(eventDraft.toNewEventEditData(defaultOrganizer))
+
+            calendarDataValues.saveLastUsedCalendar(eventDraft)
+
             SaveEventResult.Success
         }.cancellable().getOrDefault(SaveEventResult.Error)
     }
@@ -58,6 +63,9 @@ class EventComposerUseCase @Inject constructor(
                 target = event.targetFor(scope.toRecurrenceScope()),
                 data = eventDraft.applyTo(editData, defaultOrganizer = eventDraft.typedCalendarId.toOrganizer()),
             )
+
+            calendarDataValues.saveLastUsedCalendar(eventDraft)
+
             SaveEventResult.Success
         }.cancellable().getOrDefault(SaveEventResult.Error)
     }
@@ -75,6 +83,10 @@ class EventComposerUseCase @Inject constructor(
         val user = accountUtils.users.first().find { it.accountId == accountId } ?: return null
         return Organizer(email = user.email, displayName = user.displayName)
     }
+}
+
+private suspend fun CalendarDataValues.saveLastUsedCalendar(eventDraft: EventDraft) {
+    lastUsedCalendarId.setValue(eventDraft.calendarId)
 }
 
 sealed interface SaveEventResult {
