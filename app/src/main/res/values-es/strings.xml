@@ -34,6 +34,11 @@
     <string name="eventOccurrenceNotFound">Este evento ya no está disponible.</string>
     <string name="helpTitle">Ayuda</string>
     <string name="monthTitle">Mes</string>
+    <string name="notificationAllDay">Todo el día</string>
+    <string name="notificationChannelEventRemindersDescription">Notificaciones de eventos próximos y recordatorios</string>
+    <string name="notificationChannelEventRemindersTitle">Recordatorios de eventos</string>
+    <string name="notificationDefaultDescription">Alarma de evento</string>
+    <string name="notificationDefaultEventTitle">Recordatorio de evento</string>
     <string name="onboardingFourSubtitle">Ya puedes acceder a tus eventos desde Calendar.</string>
     <string name="onboardingFourTitle">Todo listo</string>
     <string name="onboardingOneSubtitle">Consulta, crea y comparte tus eventos desde tu teléfono, con total confidencialidad.</string>

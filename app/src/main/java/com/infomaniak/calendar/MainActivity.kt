@@ -17,12 +17,15 @@
  */
 package com.infomaniak.calendar
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Surface
@@ -32,6 +35,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSerializable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
@@ -43,8 +47,10 @@ import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
 import com.infomaniak.calendar.extensions.appGraph
 import com.infomaniak.calendar.manager.SyncEventsManager
+import com.infomaniak.calendar.notification.NotificationHelper
 import com.infomaniak.calendar.ui.navigation.MainNavHost
 import com.infomaniak.calendar.ui.navigation.NavDestination
+import com.infomaniak.calendar.ui.navigation.addOnce
 import com.infomaniak.calendar.ui.navigation.replaceRoot
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
@@ -53,11 +59,16 @@ import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostSta
 import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableState
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarTheme
+import com.infomaniak.core.common.extensions.hasPermission
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.serialization.json.Json
 
 class MainActivity : ComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
+    private val pendingOccurrenceId = mutableStateOf<OccurrenceId?>(null)
+    private val notificationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
         get() = appGraph.metroViewModelFactory
@@ -65,6 +76,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().setKeepOnScreenCondition { mainViewModel.uiState.value == MainUiState.Loading }
         super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) {
+            handleEventIntent(intent)
+            // Only on a fresh start, so a configuration change right after a refusal doesn't ask again
+            requestNotificationPermissionIfNeeded()
+        } else {
+            // On recreation, the already handled intent comes back: only restore a destination not navigated to yet
+            pendingOccurrenceId.value = savedInstanceState.getString(KEY_PENDING_OCCURRENCE_ID)?.toOccurrenceIdOrNull()
+        }
         enableEdgeToEdge()
         if (SDK_INT >= 29) window.isNavigationBarContrastEnforced = false
 
@@ -79,12 +98,48 @@ class MainActivity : ComponentActivity() {
                             uiState = uiState,
                             visibleDayState = rememberVisibleDayState(mainViewModel.visibleDate),
                             loadingEventsError = mainViewModel.loadingEventsError,
+                            pendingOccurrenceId = pendingOccurrenceId.value,
+                            onClearPendingOccurrenceId = { pendingOccurrenceId.value = null },
                             onCalendarViewSelected = mainViewModel::saveCalendarView,
                         )
                     }
                 }
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        pendingOccurrenceId.value?.let { outState.putString(KEY_PENDING_OCCURRENCE_ID, it.toJson()) }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleEventIntent(intent)
+    }
+
+    private fun handleEventIntent(intent: Intent) {
+        // Reopening the app from recents replays the intent its task was created with, so a notification already handled
+        if ((intent.flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0) return
+        val occurrenceIdJson = intent.getStringExtra(NotificationHelper.EXTRA_OCCURRENCE_ID_JSON) ?: return
+        pendingOccurrenceId.value = occurrenceIdJson.toOccurrenceIdOrNull() ?: return
+    }
+
+    private fun OccurrenceId.toJson(): String = Json.encodeToString(OccurrenceId.serializer(), this)
+
+    private fun String.toOccurrenceIdOrNull(): OccurrenceId? {
+        return runCatching { Json.decodeFromString(OccurrenceId.serializer(), this) }.getOrNull()
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (SDK_INT >= 33 && !hasPermission(Manifest.permission.POST_NOTIFICATIONS)) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    companion object {
+        private const val KEY_PENDING_OCCURRENCE_ID = "pendingOccurrenceId"
     }
 }
 
@@ -93,10 +148,21 @@ private fun MainContent(
     uiState: MainUiState.Loaded,
     visibleDayState: VisibleDayState,
     loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError>,
+    pendingOccurrenceId: OccurrenceId?,
+    onClearPendingOccurrenceId: () -> Unit,
     onCalendarViewSelected: (NavDestination.CalendarView) -> Unit,
 ) {
-    val startDestination = if (uiState.isUserConnected) uiState.lastCalendarView else NavDestination.Onboarding()
+    val isUserConnected = uiState.isUserConnected
+    val startDestination = if (isUserConnected) uiState.lastCalendarView else NavDestination.Onboarding()
     val backStack = rememberNavDestinationBackStack(startDestination)
+
+    LaunchedEffect(pendingOccurrenceId, isUserConnected) {
+        val occurrenceId = pendingOccurrenceId ?: return@LaunchedEffect
+        if (isUserConnected) {
+            backStack.addOnce(NavDestination.EventDetail(occurrenceId))
+            onClearPendingOccurrenceId()
+        }
+    }
 
     CompositionLocalProvider(
         LocalVisibleDayState provides visibleDayState,
@@ -105,7 +171,7 @@ private fun MainContent(
         LocalDrawerState provides rememberDrawerState(initialValue = DrawerValue.Closed),
     ) {
         ObserveSyncError(loadingEventsError)
-        NavigateToOnboardingIfLastUserIsDisconnected(backStack, isUserLoaded = uiState.isUserConnected)
+        NavigateToOnboardingIfLastUserIsDisconnected(backStack, isUserLoaded = isUserConnected)
         MainNavHost(
             backStack = backStack,
             defaultCalendarView = uiState.lastCalendarView,

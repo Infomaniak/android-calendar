@@ -34,6 +34,11 @@
     <string name="eventOccurrenceNotFound">To wydarzenie nie jest już dostępne.</string>
     <string name="helpTitle">Pomoc</string>
     <string name="monthTitle">Miesiąc</string>
+    <string name="notificationAllDay">Cały dzień</string>
+    <string name="notificationChannelEventRemindersDescription">Powiadomienia o nadchodzących wydarzeniach i przypomnieniach</string>
+    <string name="notificationChannelEventRemindersTitle">Przypomnienia o wydarzeniach</string>
+    <string name="notificationDefaultDescription">Alarm zdarzenia</string>
+    <string name="notificationDefaultEventTitle">Przypomnienie o wydarzeniu</string>
     <string name="onboardingFourSubtitle">Możesz teraz uzyskać dostęp do swoich wydarzeń z poziomu Calendar.</string>
     <string name="onboardingFourTitle">Wszystko gotowe</string>
     <string name="onboardingOneSubtitle">Przeglądaj, twórz i udostępniaj wydarzenia z telefonu, z pełną poufnością.</string>

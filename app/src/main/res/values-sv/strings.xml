@@ -34,6 +34,11 @@
     <string name="eventOccurrenceNotFound">Det här evenemanget är inte längre tillgängligt.</string>
     <string name="helpTitle">Hjälp</string>
     <string name="monthTitle">Månad</string>
+    <string name="notificationAllDay">Hela dagen</string>
+    <string name="notificationChannelEventRemindersDescription">Notiser för kommande evenemang och påminnelser</string>
+    <string name="notificationChannelEventRemindersTitle">Evenemangspåminnelser</string>
+    <string name="notificationDefaultDescription">Händelsevarning</string>
+    <string name="notificationDefaultEventTitle">Evenemangspåminnelse</string>
     <string name="onboardingFourSubtitle">Du kan nu komma åt dina händelser från Calendar.</string>
     <string name="onboardingFourTitle">Allt är klart</string>
     <string name="onboardingOneSubtitle">Visa, skapa och dela dina händelser från din telefon, med full sekretess.</string>

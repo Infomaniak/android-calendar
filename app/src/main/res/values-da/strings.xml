@@ -34,6 +34,11 @@
     <string name="eventOccurrenceNotFound">Denne begivenhed er ikke længere tilgængelig.</string>
     <string name="helpTitle">Hjælp</string>
     <string name="monthTitle">Måned</string>
+    <string name="notificationAllDay">Hele dagen</string>
+    <string name="notificationChannelEventRemindersDescription">Notifikationer om kommende arrangementer og påmindelser</string>
+    <string name="notificationChannelEventRemindersTitle">Begivenhedspåmindelser</string>
+    <string name="notificationDefaultDescription">Hændelsesalarm</string>
+    <string name="notificationDefaultEventTitle">Begivenhedspåmindelse</string>
     <string name="onboardingFourSubtitle">Du kan nu få adgang til dine begivenheder fra Calendar.</string>
     <string name="onboardingFourTitle">Alt er klart</string>
     <string name="onboardingOneSubtitle">Se, opret og del dine begivenheder fra din telefon, med fuld fortrolighed.</string>

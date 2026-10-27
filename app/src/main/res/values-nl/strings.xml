@@ -34,6 +34,11 @@
     <string name="eventOccurrenceNotFound">Dit evenement is niet meer beschikbaar.</string>
     <string name="helpTitle">Hulp</string>
     <string name="monthTitle">Maand</string>
+    <string name="notificationAllDay">De hele dag</string>
+    <string name="notificationChannelEventRemindersDescription">Meldingen voor aankomende evenementen en herinneringen</string>
+    <string name="notificationChannelEventRemindersTitle">Herinneringen aan evenementen</string>
+    <string name="notificationDefaultDescription">Gebeurteniswaarschuwing</string>
+    <string name="notificationDefaultEventTitle">Gebeurtenisherinnering</string>
     <string name="onboardingFourSubtitle">Je hebt nu toegang tot je afspraken via Calendar.</string>
     <string name="onboardingFourTitle">Alles is klaar</string>
     <string name="onboardingOneSubtitle">Bekijk, maak en deel je afspraken vanaf je telefoon, met volledige privacy.</string>

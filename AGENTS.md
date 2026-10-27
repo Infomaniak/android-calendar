@@ -72,6 +72,9 @@ android-calendar/
   `includeBuild("multiplatform-calendar")` then substitutes `com.infomaniak.multiplaform-calendar:CalendarCore` with the
   `:CalendarCore` project. The app switches between `libs.infomaniak.multiplatform.calendar.core` (published, version
   `calendarCore`) and `libs.infomaniak.multiplatform.calendar.core.submodule` accordingly.
+- **Gradle properties**: `gradle.properties` holds the project-wide Gradle settings (parallel execution, build cache,
+  configuration cache). `org.gradle.tooling.parallel=true` (Gradle 9.4+) makes IDE sync build its models in parallel
+  explicitly: unset, it follows `org.gradle.parallel`, a fallback Gradle has deprecated.
 - **Impact**: Editing `multiplatform-calendar/` or `Core/` affects every consumer of those libraries — changes belong in
   their own repos and PRs.
 
