@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build.VERSION.SDK_INT
@@ -25,7 +24,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Surface
@@ -59,7 +57,6 @@ import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostSta
 import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableState
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarTheme
-import com.infomaniak.core.common.extensions.hasPermission
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.serialization.json.Json
@@ -68,7 +65,6 @@ class MainActivity : ComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
     private val pendingOccurrenceId = mutableStateOf<OccurrenceId?>(null)
-    private val notificationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
         get() = appGraph.metroViewModelFactory
@@ -78,8 +74,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) {
             handleEventIntent(intent)
-            // Only on a fresh start, so a configuration change right after a refusal doesn't ask again
-            requestNotificationPermissionIfNeeded()
         } else {
             // On recreation, the already handled intent comes back: only restore a destination not navigated to yet
             pendingOccurrenceId.value = savedInstanceState.getString(KEY_PENDING_OCCURRENCE_ID)?.toOccurrenceIdOrNull()
@@ -130,12 +124,6 @@ class MainActivity : ComponentActivity() {
 
     private fun String.toOccurrenceIdOrNull(): OccurrenceId? {
         return runCatching { Json.decodeFromString(OccurrenceId.serializer(), this) }.getOrNull()
-    }
-
-    private fun requestNotificationPermissionIfNeeded() {
-        if (SDK_INT >= 33 && !hasPermission(Manifest.permission.POST_NOTIFICATIONS)) {
-            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        }
     }
 
     companion object {
