@@ -39,7 +39,8 @@ app/src/main/java/com/infomaniak/calendar/
 │   ├── SyncEventsManager.kt        # App-scoped: downloads + syncs the events of the months around the visible date
 │   ├── VisibleDateManager.kt       # App-scoped: single visible-date source, restored/saved by MainViewModel
 │   ├── VisibleMonthManager.kt      # App-scoped: event dots derived from the shared visible date's month
-│   └── DayEventsLoader.kt          # App-scoped: loads day-sliced events shared by calendar views
+│   ├── VisibleEventsManager.kt     # App-scoped: one observation of the day-sliced events around the visible date, for every view
+│   └── DayEventsLoader.kt          # App-scoped: VisibleEventsManager's events split into all-day and timed, for the day views
 ├── utils/
 │   ├── AttendeeExt.kt              # KMP Attendee → Attendees mapping for event detail
 │   ├── DayEventGroupingExt.kt      # Groups day-sliced events for calendar views
@@ -58,7 +59,7 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── threeDays/             # ThreeDayScreen + ThreeDayViewModel — 3-day view (events via DayEventsLoader)
     │   ├── week/                  # WeekScreen + WeekViewModel — week view (events via DayEventsLoader)
     │   ├── month/                 # MonthScreen + MonthViewModel
-    │   ├── planning/              # PlanningScreen + PlanningViewModel (events of a window around the visible date) + PlanningEventGroupingExt
+    │   ├── planning/              # PlanningScreen + PlanningViewModel (events from VisibleEventsManager) + PlanningEventGroupingExt
     │   ├── accounts/              # AccountsListScreen + AccountActionsScreen + AccountsViewModel + AccountItem
     │                              # Drawer-backed account list, per-account detail/logout screen, and remove-account flow
     │   ├── eventCreation/         # EventCreationScreen
@@ -187,8 +188,9 @@ files and only the variant being compiled is checked.
 
 - Every date has a fixed item index (`PlanningTimeline`), so loading events never moves the list: the initial position,
   the jumps (`ProcessJumpRequests`) and the reported visible date (`ReportVisibleDate`) are plain index ↔ date conversions.
-- `PlanningViewModel` observes the days around the shared visible date, and only moves that window once the visible date
-  nears one of its edges. A day outside the window shows its indicator alone until it is loaded.
+- `VisibleEventsManager` observes the days around the shared visible date, and only moves that window once the visible
+  date nears one of its edges. The planning and `DayEventsLoader` both derive their UI from it, so switching views reuses
+  the loaded events; the day pager spans `NAVIGABLE_DATES`. A day outside the window shows no event until it is loaded.
 
 ### Commands
 
