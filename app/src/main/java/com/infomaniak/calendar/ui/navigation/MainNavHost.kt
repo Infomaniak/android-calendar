@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -55,7 +56,9 @@ import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSear
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.multiDays.threeDays.ThreeDayScreen
 import com.infomaniak.calendar.ui.screen.multiDays.week.WeekScreen
-import com.infomaniak.calendar.ui.screen.onboarding.OnboardingScreen
+import com.infomaniak.calendar.ui.screen.onboarding.login.LoginOnboardingScreen
+import com.infomaniak.calendar.ui.screen.onboarding.permissions.PermissionsOnboardingPage
+import com.infomaniak.calendar.ui.screen.onboarding.permissions.PermissionsOnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.utils.NavigationTransition
@@ -185,7 +188,7 @@ private fun baseEntryProvider(
         is NavDestination.Accounts.List -> NavEntry(destination) {
             AccountsListScreen(
                 onBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
-                onAddAccount = { backStack.addOnce(NavDestination.Onboarding(onlyLogin = true)) },
+                onAddAccount = { backStack.addOnce(NavDestination.Onboarding.Login(onlyLogin = true)) },
                 onAccountClick = { userId -> backStack.addOnce(NavDestination.Accounts.Actions(userId)) },
             )
         }
@@ -197,12 +200,21 @@ private fun baseEntryProvider(
             )
         }
 
-        is NavDestination.Onboarding -> NavEntry(destination) {
-            OnboardingScreen(
+        is NavDestination.Onboarding.Login -> NavEntry(destination) {
+            val context = LocalContext.current
+
+            LoginOnboardingScreen(
                 onlyLogin = destination.onlyLogin,
-                goToCalendarView = { backStack.replaceRoot(defaultCalendarView) },
+                onLoggedIn = {
+                    val isPermissionMissing = PermissionsOnboardingPage.isAnyPermissionMissing(context)
+                    backStack.replaceRoot(if (isPermissionMissing) NavDestination.Onboarding.Permissions else defaultCalendarView)
+                },
                 onPopBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
             )
+        }
+
+        is NavDestination.Onboarding.Permissions -> NavEntry(destination) {
+            PermissionsOnboardingScreen(goToCalendarView = { backStack.replaceRoot(defaultCalendarView) })
         }
     }
 }

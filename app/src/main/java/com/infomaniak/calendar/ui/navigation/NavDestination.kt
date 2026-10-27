@@ -24,8 +24,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface NavDestination : NavKey {
-    @Serializable
-    data class Onboarding(val onlyLogin: Boolean = false) : NavDestination
+    sealed interface Onboarding : NavDestination {
+        @Serializable
+        data class Login(val onlyLogin: Boolean = false) : Onboarding
+
+        @Serializable
+        data object Permissions : Onboarding
+    }
 
     /**
      * @param storageKey Stable identifier used to store the last selected calendar view in a data value. Must never change even

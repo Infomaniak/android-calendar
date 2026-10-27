@@ -141,7 +141,7 @@ private fun MainContent(
     onCalendarViewSelected: (NavDestination.CalendarView) -> Unit,
 ) {
     val isUserConnected = uiState.isUserConnected
-    val startDestination = if (isUserConnected) uiState.lastCalendarView else NavDestination.Onboarding()
+    val startDestination = if (isUserConnected) uiState.lastCalendarView else NavDestination.Onboarding.Login()
     val backStack = rememberNavDestinationBackStack(startDestination)
 
     LaunchedEffect(pendingOccurrenceId, isUserConnected) {
@@ -194,7 +194,7 @@ private fun ObserveSyncError(loadingEventsError: ReceiveChannel<SyncEventsManage
 private fun NavigateToOnboardingIfLastUserIsDisconnected(backStack: NavBackStack<NavDestination>, isUserLoaded: Boolean) {
     LaunchedEffect(isUserLoaded) {
         if (isUserLoaded.not()) {
-            backStack.replaceRoot(NavDestination.Onboarding())
+            backStack.replaceRoot(NavDestination.Onboarding.Login())
         }
     }
 }
