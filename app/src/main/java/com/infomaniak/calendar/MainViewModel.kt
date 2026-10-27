@@ -26,7 +26,6 @@ import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.manager.VisibleDateManager
 import com.infomaniak.calendar.ui.navigation.NavDestination
-import com.infomaniak.calendar.utils.UserLoadState
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.auth.models.user.User
 import dev.zacsweers.metro.AppScope
@@ -40,6 +39,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -55,12 +55,12 @@ class MainViewModel(
 ) : ViewModel() {
     val loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError> = syncEventsManager.loadingError
 
-    val lastCalendarView: StateFlow<NavDestination.CalendarView?> = calendarDataValues.lastCalendarView.flow
-        .stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
-
-    val usersLoadState: StateFlow<UserLoadState> = accountUtils.users
-        .map { users -> if (users.isEmpty()) UserLoadState.Loaded.Disconnected else UserLoadState.Loaded.Connected }
-        .stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = UserLoadState.Awaiting)
+    val uiState: StateFlow<MainUiState> = combine(
+        accountUtils.users,
+        calendarDataValues.lastCalendarView.flow,
+    ) { users, lastCalendarView ->
+        MainUiState.Loaded(isUserConnected = users.isNotEmpty(), lastCalendarView = lastCalendarView)
+    }.stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = MainUiState.Loading)
 
     val visibleDate = visibleDateManager.visibleDate
 

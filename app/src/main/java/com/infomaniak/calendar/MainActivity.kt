@@ -33,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSerializable
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavBackStack
@@ -52,7 +53,6 @@ import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostSta
 import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableState
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarTheme
-import com.infomaniak.calendar.utils.UserLoadState
 import kotlinx.coroutines.channels.ReceiveChannel
 
 class MainActivity : ComponentActivity() {
@@ -63,23 +63,22 @@ class MainActivity : ComponentActivity() {
         get() = appGraph.metroViewModelFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen().setKeepOnScreenCondition { mainViewModel.uiState.value == MainUiState.Loading }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         if (SDK_INT >= 29) window.isNavigationBarContrastEnforced = false
 
         setContent {
-            val lastCalendarView by mainViewModel.lastCalendarView.collectAsStateWithLifecycle()
-            val currentUserLoadState by mainViewModel.usersLoadState.collectAsStateWithLifecycle()
+            val currentUiState by mainViewModel.uiState.collectAsStateWithLifecycle()
 
             CalendarTheme {
                 Surface {
-                    when (val userLoadState = currentUserLoadState) {
-                        UserLoadState.Awaiting -> Unit // Blank surface while waiting for first result
-                        is UserLoadState.Loaded -> MainContent(
-                            userLoadState = userLoadState,
+                    when (val uiState = currentUiState) {
+                        MainUiState.Loading -> Unit // Covered by the splash screen
+                        is MainUiState.Loaded -> MainContent(
+                            uiState = uiState,
                             visibleDayState = rememberVisibleDayState(mainViewModel.visibleDate),
                             loadingEventsError = mainViewModel.loadingEventsError,
-                            lastCalendarView = { lastCalendarView },
                             onCalendarViewSelected = mainViewModel::saveCalendarView,
                         )
                     }
@@ -91,16 +90,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun MainContent(
-    userLoadState: UserLoadState.Loaded,
+    uiState: MainUiState.Loaded,
     visibleDayState: VisibleDayState,
     loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError>,
-    lastCalendarView: () -> NavDestination.CalendarView?,
     onCalendarViewSelected: (NavDestination.CalendarView) -> Unit,
 ) {
-    val lastCalendarView = lastCalendarView()
-    // Blank surface while the last selected calendar view is being read from the data value which is instantaneous
-    val startDestination =
-        if (userLoadState is UserLoadState.Loaded.Disconnected) NavDestination.Onboarding() else (lastCalendarView ?: return)
+    val startDestination = if (uiState.isUserConnected) uiState.lastCalendarView else NavDestination.Onboarding()
     val backStack = rememberNavDestinationBackStack(startDestination)
 
     CompositionLocalProvider(
@@ -110,10 +105,10 @@ private fun MainContent(
         LocalDrawerState provides rememberDrawerState(initialValue = DrawerValue.Closed),
     ) {
         ObserveSyncError(loadingEventsError)
-        NavigateToOnboardingIfLastUserIsDisconnected(backStack, isUserLoaded = userLoadState is UserLoadState.Loaded.Connected)
+        NavigateToOnboardingIfLastUserIsDisconnected(backStack, isUserLoaded = uiState.isUserConnected)
         MainNavHost(
             backStack = backStack,
-            defaultCalendarView = lastCalendarView ?: NavDestination.CalendarView.Default,
+            defaultCalendarView = uiState.lastCalendarView,
             onCalendarViewSelected = onCalendarViewSelected,
         )
     }
