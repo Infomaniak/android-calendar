@@ -24,12 +24,17 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.text.format.DateFormat
+import androidx.compose.ui.unit.Density
 import androidx.core.app.NotificationCompat
+import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
 import com.infomaniak.calendar.MainActivity
 import com.infomaniak.calendar.R
+import com.infomaniak.calendar.utils.toBitmap
 import com.infomaniak.core.notifications.buildNotificationChannel
 import com.infomaniak.core.notifications.createNotificationChannels
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.CalendarNumberOne
 import java.util.Date
 
 object NotificationHelper {
@@ -76,7 +81,7 @@ object NotificationHelper {
         val notificationTitle = title.ifBlank { context.getString(R.string.notificationDefaultEventTitle) }
 
         return NotificationCompat.Builder(context, CHANNEL_EVENT_REMINDERS)
-            .setSmallIcon(R.drawable.ic_calendar_number_one)
+            .setSmallIcon(IconCompat.createWithBitmap(EsdsIcons.CalendarNumberOne.Medium.toBitmap(Density(context))))
             .setContentTitle(notificationTitle)
             .setContentText(contentText)
             .setStyle(NotificationCompat.BigTextStyle().bigText(contentText))

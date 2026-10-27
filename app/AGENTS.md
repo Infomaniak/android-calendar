@@ -129,6 +129,8 @@ app/
   recreation). Exact alarms need no request: `USE_EXACT_ALARM` on API 33+, `SCHEDULE_EXACT_ALARM` on API 31–32 (falls
   back to inexact alarms while the user revokes it; exactness is part of `AlarmRegistration`, so they're all registered
   again as exact ones once it's granted back).
+  Notification small icons use ESDS vectors rendered by `ImageVector.toBitmap` into white-on-transparent bitmaps,
+  wrapped in `IconCompat`; this works without an attached Compose UI, including from `AlarmReceiver`.
 - **Shared logic**: Prefer reusing models / logic from `com.infomaniak.multiplatform_calendar.*` instead of duplicating
   Android-only equivalents.
 - **KISS / SOLID**: Keep Composables focused; extract reusable pieces into small `@Composable` functions.
