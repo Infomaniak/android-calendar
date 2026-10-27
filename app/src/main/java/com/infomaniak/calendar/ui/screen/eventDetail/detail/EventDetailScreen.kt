@@ -56,10 +56,11 @@ import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.screen.eventDetail.DeleteEventResult
+import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventDialog
-import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventScope
+import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.calendar.utils.nestedScrollToolbar
@@ -82,20 +83,25 @@ fun EventDetailScreen(
     goToEventAttendees: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),
+    eventDetailSharedDataViewModel: EventDetailSharedDataViewModel = viewModel(),
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
 ) {
     val context = LocalContext.current
     val snackbarHostState = LocalSharedSnackbarHostState.current
     val coroutineScope = rememberCoroutineScope()
-    val uiState by viewModel.eventDetailUi.collectAsStateWithLifecycle()
+    val uiState by eventDetailSharedDataViewModel.eventDetailUi.collectAsStateWithLifecycle()
     val errorText = stringResource(RCore.string.anErrorHasOccurred)
 
     LaunchedEffect(occurrenceId) {
-        viewModel.setOccurrenceId(occurrenceId)
+        eventDetailSharedDataViewModel.setOccurrenceId(occurrenceId)
     }
 
     LaunchedEffect(Unit) {
-        viewModel.synchronizeAttendeesSearchState()
+        viewModel.synchronizeAttendeesSearchState(eventDetailSharedDataViewModel.eventDetailUi)
+    }
+
+    LaunchedEffect(Unit) {
+        for (request in eventDetailSharedDataViewModel.goBackRequests) goBack()
     }
 
     LaunchedEffect(viewModel.attendeesSearchState) {
@@ -108,9 +114,9 @@ fun EventDetailScreen(
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
         goBack = goBack,
         goToEdit = goToEdit,
-        onDelete = { deleteEventScope ->
+        onDelete = { scope ->
             coroutineScope.launch {
-                val result = viewModel.deleteEvent(occurrenceId, deleteEventScope)
+                val result = viewModel.deleteEvent(occurrenceId, scope)
                 if (result == DeleteEventResult.Error) snackbarHostState?.showSnackbar(message = errorText)
             }
         },
@@ -122,11 +128,11 @@ fun EventDetailScreen(
 
 @Composable
 private fun EventDetailScreen(
-    uiState: () -> EventDetailUiState,
+    uiState: () -> EventDetailUiState.Displayable,
     goBack: () -> Unit,
     goToEdit: () -> Unit,
     goToEventAttendees: () -> Unit,
-    onDelete: (DeleteEventScope) -> Unit,
+    onDelete: (RecurrentEventScope) -> Unit,
     onLocationClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -144,7 +150,7 @@ private fun EventDetailScreen(
                 navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
                 title = {},
                 actions = {
-                    val canEdit = (state as? EventDetailUiState.Success)?.eventDetail?.canEdit == true
+                    val canEdit = (state as? EventDetailUiState.Displayable.Success)?.eventDetail?.canEdit == true
 
                     Row(modifier = Modifier.padding(end = EsdsTheme.spacing.lg)) {
                         TopAppBarButtons.EditButton(onClick = goToEdit, enabled = canEdit)
@@ -154,7 +160,7 @@ private fun EventDetailScreen(
             )
         },
         bottomBar = {
-            (state as? EventDetailUiState.Success)?.eventDetail?.attendees?.me?.let { me ->
+            (state as? EventDetailUiState.Displayable.Success)?.eventDetail?.attendees?.me?.let { me ->
                 ParticipationStatusButtonsToolbar(
                     participationStatus = { me.status },
                     onParticipationStatusChange = { /*TODO[eventDetail]*/ },
@@ -165,8 +171,9 @@ private fun EventDetailScreen(
         modifier = modifier.nestedScrollToolbar(floatingToolbarScrollBehavior),
     ) { scaffoldContentPadding ->
         when (state) {
-            EventDetailUiState.Loading -> Unit // Loaded locally, always fast, no need for a specific progress indicator UI
-            is EventDetailUiState.Success -> {
+            // Loaded locally, always fast, no need for a specific progress indicator UI
+            EventDetailUiState.Displayable.Loading -> Unit
+            is EventDetailUiState.Displayable.Success -> {
                 val copyFeedbackMessage = stringResource(RCommon.string.linkCopied)
 
                 EventDetail(
@@ -184,13 +191,12 @@ private fun EventDetailScreen(
 
                 if (showDeleteDialog) {
                     DeleteEventDialog(
-                        isRecurrent = { state.eventDetail.recurrence is EventDetailRecurrence.Recurrence },
+                        isRecurrent = { state.eventDetail.isRecurrent },
                         onDelete = onDelete,
                         onDismissRequest = { showDeleteDialog = false },
                     )
                 }
             }
-            EventDetailUiState.Unavailable -> LaunchedEffect(Unit) { goBack() }
         }
     }
 }
@@ -230,7 +236,7 @@ private fun Preview() {
     CalendarThemeForPreview {
         Surface {
             EventDetailScreen(
-                uiState = { EventDetailUiState.Success(previewEventDetail) },
+                uiState = { EventDetailUiState.Displayable.Success(previewEventDetail) },
                 goBack = {},
                 goToEdit = {},
                 goToEventAttendees = {},

@@ -25,10 +25,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
+import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Briefcase
 
 @Composable
 internal fun OccupiedStatus(isOccupied: Boolean, modifier: Modifier = Modifier) {
@@ -53,7 +56,7 @@ internal fun OccupiedStatusSwitch(
 
 @Composable
 private fun OccupiedIcon() {
-    ItemIcon(painterResource(R.drawable.ic_briefcase))
+    ItemIcon(EsdsIcons.Briefcase)
 }
 
 @Preview

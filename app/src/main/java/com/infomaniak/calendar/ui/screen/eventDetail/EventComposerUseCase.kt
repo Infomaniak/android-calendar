@@ -17,24 +17,68 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
-import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventScope
+import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.manager.CachedCalendarManager
+import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
+import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.calendar.utils.account.accountId
+import com.infomaniak.calendar.utils.applyTo
+import com.infomaniak.calendar.utils.toNewEventEditData
 import com.infomaniak.core.common.cancellable
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.Organizer
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.recurrence.RecurrenceScope
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.Inject
+import kotlinx.coroutines.flow.first
 
 /**
  * Single entry point for the screens that create, edit or delete events
  */
-class EventComposerUseCase @Inject constructor(private val calendarManager: CalendarManager) {
-    suspend fun deleteEvent(occurrenceId: OccurrenceId, deleteEventScope: DeleteEventScope): DeleteEventResult {
+class EventComposerUseCase @Inject constructor(
+    private val calendarManager: CalendarManager,
+    private val cachedCalendarManager: CachedCalendarManager,
+    private val accountUtils: AccountUtils,
+) {
+    suspend fun createEvent(eventDraft: EventDraft): SaveEventResult {
+        return runCatching {
+            val defaultOrganizer = CalendarId(eventDraft.calendarId).toOrganizer()
+            calendarManager.createEvent(eventDraft.toNewEventEditData(defaultOrganizer))
+            SaveEventResult.Success
+        }.cancellable().getOrDefault(SaveEventResult.Error)
+    }
+
+    suspend fun updateEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope, eventDraft: EventDraft): SaveEventResult {
+        return runCatching {
+            val event = calendarManager.getOccurrence(occurrenceId) ?: return SaveEventResult.Error
+            val editData = calendarManager.getEditData(occurrenceId) ?: return SaveEventResult.Error
+            calendarManager.updateEvent(
+                target = event.targetFor(scope.toRecurrenceScope()),
+                data = eventDraft.applyTo(editData, defaultOrganizer = editData.calendarId.toOrganizer()),
+            )
+            SaveEventResult.Success
+        }.cancellable().getOrDefault(SaveEventResult.Error)
+    }
+
+    suspend fun deleteEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope): DeleteEventResult {
         return runCatching {
             val event = calendarManager.getOccurrence(occurrenceId) ?: return DeleteEventResult.Error
-            calendarManager.deleteEvent(event.targetFor(deleteEventScope.toRecurrenceScope()))
+            calendarManager.deleteEvent(event.targetFor(scope.toRecurrenceScope()))
             DeleteEventResult.Success
         }.cancellable().getOrDefault(DeleteEventResult.Error)
     }
+
+    private suspend fun CalendarId.toOrganizer(): Organizer? {
+        val accountId = cachedCalendarManager.calendars.value.find { it.id == this }?.accountId ?: return null
+        val user = accountUtils.users.first().find { it.accountId == accountId } ?: return null
+        return Organizer(email = user.email, displayName = user.displayName)
+    }
+}
+
+sealed interface SaveEventResult {
+    object Success : SaveEventResult
+    object Error : SaveEventResult
 }
 
 sealed interface DeleteEventResult {
@@ -42,8 +86,8 @@ sealed interface DeleteEventResult {
     object Error : DeleteEventResult
 }
 
-private fun DeleteEventScope.toRecurrenceScope(): RecurrenceScope = when (this) {
-    DeleteEventScope.ThisEvent -> RecurrenceScope.ThisOccurrence
-    DeleteEventScope.ThisAndFollowingEvents -> RecurrenceScope.ThisAndFollowing
-    DeleteEventScope.AllEvents -> RecurrenceScope.AllOccurrences
+private fun RecurrentEventScope.toRecurrenceScope(): RecurrenceScope = when (this) {
+    RecurrentEventScope.ThisEvent -> RecurrenceScope.ThisOccurrence
+    RecurrentEventScope.ThisAndFollowingEvents -> RecurrenceScope.ThisAndFollowing
+    RecurrentEventScope.AllEvents -> RecurrenceScope.AllOccurrences
 }

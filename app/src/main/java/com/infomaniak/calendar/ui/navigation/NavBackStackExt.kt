@@ -35,6 +35,11 @@ fun <T : NavKey> NavBackStack<T>.popOrReplaceRoot(fallback: T) {
     if (size <= 1) replaceRoot(fallback) else removeLastOrNull()
 }
 
+fun NavBackStack<NavDestination>.popUntilCalendarView(fallback: NavDestination.CalendarView) {
+    val calendarViewIndex = indexOfLast { it is NavDestination.CalendarView }
+    if (calendarViewIndex == -1) replaceRoot(fallback) else subList(calendarViewIndex + 1, size).clear()
+}
+
 fun <T : NavKey> NavBackStack<T>.addOnce(destination: T) {
     if (lastOrNull() != destination) add(destination)
 }

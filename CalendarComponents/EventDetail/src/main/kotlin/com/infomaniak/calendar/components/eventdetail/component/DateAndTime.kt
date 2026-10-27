@@ -1,0 +1,228 @@
+/*
+ * Infomaniak Calendar - Android
+ * Copyright (C) 2026 Infomaniak Network SA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.infomaniak.calendar.components.eventdetail.component
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
+import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
+import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateRange
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRange
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRangeWithZone
+import com.infomaniak.core.common.utils.today
+import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
+import kotlinx.datetime.minus
+import kotlinx.datetime.toInstant
+import kotlin.time.Clock
+
+@Composable
+internal fun DateAndTime(
+    start: EventDetailTiming,
+    end: EventDetailTiming,
+    isAllDay: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    ListItem(
+        leadingContent = { ItemIcon(EsdsIcons.Clock) },
+        content = {
+            val startAtLocale = start.atLocale
+            val endAtLocale = end.atLocale
+            Text(
+                text = if (isAllDay) {
+                    // Dates coming from KMP are exclusive so we need to subtract one day from the date to make it inclusive
+                    formatDateRange(startAtLocale.date, endAtLocale.date - DatePeriod(days = 1))
+                } else {
+                    formatDateTimeRange(startAtLocale, endAtLocale)
+                },
+                style = MaterialTheme.typography.bodyLarge,
+            )
+        },
+        supportingContent = {
+            // Floating events and all day events never need to display UTC offset
+            if (isAllDay || start !is EventDetailTiming.Precise || end !is EventDetailTiming.Precise) return@ListItem
+
+            if (start.utcOffsetAtTimeZone != start.utcOffsetAtLocale || end.utcOffsetAtTimeZone != end.utcOffsetAtLocale) {
+                Text(
+                    text = formatDateTimeRangeWithZone(
+                        start = start.atTimeZone,
+                        startUtcOffset = start.utcOffsetAtTimeZone,
+                        end = end.atTimeZone,
+                        endUtcOffset = end.utcOffsetAtTimeZone,
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+        },
+        modifier = modifier,
+    )
+}
+
+/**
+ * [dateAndTimeState] can be null so it can be initialized in two steps after the data has been read from disk. The item will be
+ * empty but still take its final size as to not create a jarring experience when the data loads in dynamically.
+ */
+@Composable
+internal fun DateAndTimeEditable(
+    dateAndTimeState: DateAndTimeState?,
+    isAllDay: () -> Boolean,
+    onTimeZoneClick: (isStart: Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val shouldDisplay = dateAndTimeState != null
+    val dateAndTimeState = dateAndTimeState ?: DateAndTimeState.Dummy
+
+    Column(
+        modifier = modifier
+            .alpha(if (shouldDisplay) 1f else 0f)
+            .padding(horizontal = EsdsTheme.spacing.xs),
+        verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
+    ) {
+        with(dateAndTimeState) {
+            DateAndTimeEntry(
+                entry = start,
+                isAllDay = isAllDay,
+                onDatePicked = { start.pickDate(it) },
+                onTimePicked = { start.pickTime(it) },
+                onTimeZoneClick = { onTimeZoneClick(true) },
+            )
+            DateAndTimeEntry(
+                entry = end,
+                isAllDay = isAllDay,
+                onDatePicked = { end.pickDate(it) },
+                onTimePicked = { end.pickTime(it) },
+                onTimeZoneClick = { onTimeZoneClick(false) },
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewDateAndTime() {
+    val localTimeZone = TimeZone.currentSystemDefault()
+    val parisTimeZone = TimeZone.of("Europe/Paris")
+    val tokyoTimeZone = TimeZone.of("Asia/Tokyo")
+    val today = LocalDateTime.parse("2026-05-20T08:00:00")
+    val laterToday = LocalDateTime.parse("2026-05-20T09:00:00")
+    val tomorrow = LocalDateTime.parse("2026-05-21T09:00:00")
+
+    // A null time zone represents a floating (timezone-less) side of the event.
+    @Composable
+    fun DateAndTimeComponent(
+        startTimeZone: TimeZone? = localTimeZone,
+        endTimeZone: TimeZone? = localTimeZone,
+        start: LocalDateTime = today,
+        end: LocalDateTime = laterToday,
+        isAllDay: Boolean = false,
+    ) {
+        DateAndTime(
+            start = if (isAllDay || startTimeZone == null) {
+                EventDetailTiming.Floating(start)
+            } else {
+                EventDetailTiming.Precise(start.toInstant(startTimeZone), startTimeZone)
+            },
+            end = if (isAllDay || endTimeZone == null) {
+                EventDetailTiming.Floating(end)
+            } else {
+                EventDetailTiming.Precise(end.toInstant(endTimeZone), endTimeZone)
+            },
+            isAllDay = isAllDay,
+        )
+    }
+
+    @Composable
+    fun PreviewSectionHeadline(text: String) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
+        )
+    }
+
+    MaterialTheme {
+        Surface {
+            Column {
+                PreviewSectionHeadline("Same day")
+                DateAndTimeComponent(start = Clock.today().atTime(8, 0), end = Clock.today().atTime(9, 0))
+                DateAndTimeComponent(
+                    start = Clock.today().atTime(8, 0),
+                    end = Clock.today().atTime(9, 0),
+                    startTimeZone = tokyoTimeZone,
+                )
+
+                PreviewSectionHeadline("Special timezones")
+                DateAndTimeComponent(startTimeZone = null, endTimeZone = null)
+                DateAndTimeComponent(startTimeZone = parisTimeZone, endTimeZone = tokyoTimeZone)
+
+                PreviewSectionHeadline("Multi days")
+                DateAndTimeComponent(end = tomorrow)
+                DateAndTimeComponent(endTimeZone = tokyoTimeZone)
+
+                PreviewSectionHeadline("All day")
+                DateAndTimeComponent(startTimeZone = parisTimeZone, endTimeZone = parisTimeZone, isAllDay = true)
+                DateAndTimeComponent(
+                    startTimeZone = parisTimeZone,
+                    endTimeZone = parisTimeZone,
+                    end = LocalDateTime.parse("2026-05-22T09:00:00"),
+                    isAllDay = true,
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewEditable() {
+    MaterialTheme {
+        Surface {
+            DateAndTimeEditable(
+                dateAndTimeState = rememberDateAndTimeState(
+                    startDate = LocalDate(2026, 5, 20),
+                    startTime = LocalTime(8, 10),
+                    startTimeZone = TimeZone.currentSystemDefault(),
+                    endDate = LocalDate(2026, 5, 20),
+                    endTime = LocalTime(9, 0),
+                    endTimeZone = TimeZone.currentSystemDefault(),
+                ),
+                isAllDay = { false },
+                onTimeZoneClick = {},
+            )
+        }
+    }
+}

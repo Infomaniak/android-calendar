@@ -57,6 +57,7 @@
         <item quantity="other">%d ημέρες</item>
     </plurals>
     <string name="descriptionTitle">Περιγραφή</string>
+    <string name="emptyStateNoTimeZone">Δεν βρέθηκαν ζώνες ώρας</string>
     <string name="eventTitle">Τίτλος εκδήλωσης</string>
     <plurals name="hourAmount">
         <item quantity="one">%d ώρα</item>

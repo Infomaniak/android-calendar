@@ -19,11 +19,18 @@ package com.infomaniak.calendar.components.eventdetail.models
 
 import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
 
 data class EventDraft(
     val title: String,
     val color: Color,
+    val calendarId: String,
     val isAllDay: Boolean,
+    val start: LocalDateTime,
+    val startTimeZone: TimeZone,
+    val end: LocalDateTime,
+    val endTimeZone: TimeZone,
     val attendees: List<AttendeeUi>,
     val isKMeetUrlEnabled: Boolean,
     val isOccupied: Boolean,

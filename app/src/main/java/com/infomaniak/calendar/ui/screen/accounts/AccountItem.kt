@@ -31,18 +31,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.core.ui.compose.preview.previewparameter.dummyUserOf
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.ChevronRight
 
 @Composable
 fun AccountItem(
@@ -115,7 +115,7 @@ fun AccountItemContent(user: User, isClickable: Boolean, modifier: Modifier = Mo
         trailingContent = {
             if (isClickable) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_chevron_right),
+                    imageVector = EsdsIcons.ChevronRight.Medium,
                     contentDescription = null,
                 )
             }

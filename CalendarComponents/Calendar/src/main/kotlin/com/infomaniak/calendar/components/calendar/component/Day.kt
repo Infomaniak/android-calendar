@@ -17,12 +17,9 @@
  */
 package com.infomaniak.calendar.components.calendar.component
 
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -52,7 +49,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalViewConfiguration
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -64,12 +60,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.foundation.component.DayCircle
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
-import com.infomaniak.calendar.components.foundation.state.DateState
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
+import com.infomaniak.calendar.components.foundation.state.DateState
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatFullDateWithYear
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Plus
 import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
 
@@ -199,7 +197,7 @@ private fun EventDots(dots: List<EventColorsUi>, modifier: Modifier = Modifier) 
         }
         if (hasOverflow) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_plus),
+                imageVector = EsdsIcons.Plus.ExtraSmall,
                 contentDescription = null,
                 modifier = Modifier.size(DOT_SIZE),
             )

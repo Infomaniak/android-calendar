@@ -23,7 +23,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -31,26 +34,48 @@ import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberDefaultEventForm
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
+import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
+import com.infomaniak.calendar.ui.screen.eventDetail.SaveEventResult
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchResultViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
+import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlin.time.Duration.Companion.hours
+import com.infomaniak.core.common.R as RCore
 
 @Composable
 fun EventCreationScreen(
+    date: LocalDate,
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
+    goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventCreationViewModel = viewModel(),
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
+    timeZoneSearchResultViewModel: TimeZoneSearchResultViewModel = viewModel(),
 ) {
+    val snackbarHostState = LocalSharedSnackbarHostState.current
+    val coroutineScope = rememberCoroutineScope()
+    val errorText = stringResource(RCore.string.anErrorHasOccurred)
     val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
+    val defaultEventDuration by viewModel.defaultEventDuration.collectAsStateWithLifecycle(null)
+
     val state = rememberDefaultEventForm(
         calendars = eventFormCalendars?.calendars ?: emptyList(),
         initialCalendar = eventFormCalendars?.initialCalendar,
+        dateAndTimeState = defaultEventDuration?.let { rememberDateAndTimeState(it, TimeZone.currentSystemDefault(), date) },
         attendeesSearchState = viewModel.attendeesSearchState,
     )
+
+    LaunchedEffect(state.dateAndTimeState) {
+        timeZoneSearchResultViewModel.applyPickedTimeZonesTo(state.dateAndTimeState)
+    }
 
     LaunchedEffect(Unit) {
         attendeesSearchSharedDataViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
@@ -58,10 +83,19 @@ fun EventCreationScreen(
 
     EventCreationScreen(
         state = state,
-        onSubmit = { viewModel.submitEvent(state.toEventDraft() ?: return@EventCreationScreen) },
+        onSubmit = {
+            val eventDraft = state.toEventDraft() ?: return@EventCreationScreen
+            coroutineScope.launch {
+                when (viewModel.submitEvent(eventDraft)) {
+                    SaveEventResult.Success -> goBack()
+                    SaveEventResult.Error -> snackbarHostState?.showSnackbar(message = errorText)
+                }
+            }
+        },
         modifier = modifier,
         goBack = goBack,
         goToEventsAttendees = goToEventsAttendees,
+        goToTimeZoneSearch = goToTimeZoneSearch,
     )
 }
 
@@ -71,6 +105,7 @@ private fun EventCreationScreen(
     onSubmit: () -> Unit,
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
+    goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -82,6 +117,7 @@ private fun EventCreationScreen(
         EventForm(
             state = state,
             onAttendeesClick = goToEventsAttendees,
+            onTimeZoneClick = goToTimeZoneSearch,
             contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
             modifier = Modifier.verticalScroll(scrollState),
         )
@@ -95,9 +131,10 @@ private fun EventCreationScreenPreview() {
         val state = rememberDefaultEventForm(
             calendars = listOf(previewEventDetailCalendar),
             initialCalendar = previewEventDetailCalendar,
+            dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
             attendeesSearchState = rememberSaveableAttendeesSearchState(),
         )
 
-        EventCreationScreen(state = state, onSubmit = {}, goBack = {}, goToEventsAttendees = {})
+        EventCreationScreen(state = state, onSubmit = {}, goBack = {}, goToEventsAttendees = {}, goToTimeZoneSearch = {})
     }
 }

@@ -44,12 +44,13 @@ app/src/main/java/com/infomaniak/calendar/
 │   ├── AttendeeExt.kt              # KMP Attendee → Attendees mapping for event detail
 │   ├── DayEventGroupingExt.kt      # Groups day-sliced events for calendar views
 │   ├── EventDaySliceExt.kt         # KMP EventDaySlice → OccurrenceEventUi mapping, shared by every calendar view
+│   ├── EventDraftExt.kt            # EventDraft → KMP EventEditData for creation and edition: a new form field is one line in `applyTo`
 │   └── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
 └── ui/
     ├── model/                     # OccurrenceEventUi calendar item carrying KMP OccurrenceId and attendee summary; TimelineUiState
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
-    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), Accounts, Onboarding)
+    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), EventTimeZone(parent, isStart), Accounts, Onboarding)
     │   └── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
     ├── screen/
@@ -63,6 +64,7 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── eventCreation/         # EventCreationScreen
     │   ├── eventDetail/           # EventDetailScreen + EventEditScreen + EventCreationScreen + their ViewModels, and
     │                              # attendeesSearch/ (EventAttendeesScreen + EventAttendeesViewModel shared with its parent)
+    │                              # timeZoneSearch/ (TimeZoneSearchScreen + TimeZoneSearchResultViewModel channel back to its parent)
     │   └── onboarding/            # OnboardingScreen + CrossAppLoginViewModel
     └── theme/
         ├── Theme.kt                # CalendarTheme Composable (Material 3 color schemes)

@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatusSwitch
+import com.infomaniak.calendar.components.eventdetail.component.DateAndTimeEditable
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitch
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.Section
@@ -41,7 +42,10 @@ import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventShare
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
+import kotlinx.datetime.TimeZone
+import kotlin.time.Duration.Companion.hours
 
 /**
  * Reusable component for both the creation and the edition of an event.
@@ -52,6 +56,7 @@ import com.infomaniak.calendar.components.foundation.state.rememberSaveableAtten
 fun EventForm(
     state: EventFormState,
     onAttendeesClick: () -> Unit,
+    onTimeZoneClick: (isStart: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -59,7 +64,7 @@ fun EventForm(
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
     Column(modifier.padding(contentPadding)) {
         TitleEditable(
-            dotColor = state.colorState.value ?: Color.Transparent, // Temporarily hide the dot until we get the actual color
+            dotColor = state.eventColorState.value ?: Color.Transparent, // Temporarily hide the dot until we get the actual color
             textFieldState = state.titleTextState,
             modifier = Modifier.eventSharedElement(EventSharedElement.Title),
         )
@@ -67,6 +72,13 @@ fun EventForm(
         AllDaySwitch(
             checked = state.isAllDay::value,
             onCheckedChange = { isChecked -> state.isAllDay.value = isChecked },
+        )
+
+        DateAndTimeEditable(
+            dateAndTimeState = state.dateAndTimeState,
+            isAllDay = state.isAllDay::value,
+            onTimeZoneClick = onTimeZoneClick,
+            modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
         )
 
         Section {
@@ -95,6 +107,8 @@ fun EventForm(
                 onCheckedChange = { isChecked -> state.isPublic.value = isChecked },
                 modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
             )
+
+
         }
     }
 }
@@ -107,15 +121,18 @@ private fun Preview() {
             EventForm(
                 state = rememberEventFormState(
                     calendars = listOf(previewEventDetailCalendar),
+                    initialEventColor = previewEventDetailCalendar.color,
                     initialCalendar = previewEventDetailCalendar,
+                    dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
                     initialText = "Event title",
                     attendeesSearchState = rememberSaveableAttendeesSearchState(),
-                    initialIsAllDay = true,
+                    initialIsAllDay = false,
                     initialIsKMeetUrlEnabled = false,
                     initialIsOccupied = true,
                     initialIsPublic = true,
                 ),
                 onAttendeesClick = {},
+                onTimeZoneClick = {},
                 contentPadding = PaddingValues(16.dp),
             )
         }

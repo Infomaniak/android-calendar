@@ -39,11 +39,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.calendar.ui.theme.CustomColors
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.avatar.components.Avatar
@@ -51,6 +49,8 @@ import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.core.ui.compose.preview.previewparameter.dummyUserOf
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.ChevronDown
 
 @Composable
 fun DrawerAccountItem(user: User, isExpanded: () -> Boolean, onAccountExpanded: () -> Unit, modifier: Modifier = Modifier) {
@@ -85,9 +85,8 @@ fun DrawerAccountItem(user: User, isExpanded: () -> Boolean, onAccountExpanded: 
             Icon(
                 modifier = Modifier
                     .padding(vertical = Margin.Mini, horizontal = Margin.Micro)
-                    .size(20.dp)
                     .rotate(rotation),
-                painter = painterResource(R.drawable.ic_chevron_down),
+                imageVector = EsdsIcons.ChevronDown.Small,
                 contentDescription = null,
             )
         }

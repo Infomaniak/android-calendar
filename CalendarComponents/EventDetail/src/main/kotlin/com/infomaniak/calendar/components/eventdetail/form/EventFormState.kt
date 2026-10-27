@@ -28,38 +28,59 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
+import kotlinx.datetime.atTime
 
+/**
+ * @param dateAndTimeState Can be null so it can be initialized in two steps after the data has been read from disk.
+ */
 @Stable
 class EventFormState(
     val titleTextState: TextFieldState,
-    val colorState: MutableState<Color?>,
+    val eventColorState: MutableState<Color?>,
+    val calendarIdState: MutableState<String?>,
     val isAllDay: MutableState<Boolean>,
+    val dateAndTimeState: DateAndTimeState?,
     val attendeesState: AttendeesSearchState,
     val isKMeetUrlEnabled: MutableState<Boolean>,
     val isOccupied: MutableState<Boolean>,
     val isPublic: MutableState<Boolean>,
     val calendars: List<EventDetailCalendar>,
 ) {
-    fun toEventDraft(): EventDraft? = EventDraft(
-        title = titleTextState.text.toString(),
-        color = colorState.value ?: return null,
-        isAllDay = isAllDay.value,
-        attendees = attendeesState.attendees.toList(),
-        isKMeetUrlEnabled = isKMeetUrlEnabled.value,
-        isOccupied = isOccupied.value,
-        isPublic = isPublic.value,
-    )
+    val calendar: EventDetailCalendar? get() = calendars.find { it.id == calendarIdState.value }
+
+    fun toEventDraft(): EventDraft? {
+        dateAndTimeState ?: return null
+
+        return EventDraft(
+            title = titleTextState.text.toString(),
+            color = eventColorState.value ?: return null,
+            calendarId = calendar?.id ?: return null,
+            isAllDay = isAllDay.value,
+            start = dateAndTimeState.start.date.atTime(dateAndTimeState.start.time),
+            startTimeZone = dateAndTimeState.start.timeZone,
+            end = dateAndTimeState.end.date.atTime(dateAndTimeState.end.time),
+            endTimeZone = dateAndTimeState.end.timeZone,
+            attendees = attendeesState.attendees.toList(),
+            isKMeetUrlEnabled = isKMeetUrlEnabled.value,
+            isOccupied = isOccupied.value,
+            isPublic = isPublic.value,
+        )
+    }
 }
 
 @Composable
 fun rememberDefaultEventForm(
     calendars: List<EventDetailCalendar>,
     initialCalendar: EventDetailCalendar?,
+    dateAndTimeState: DateAndTimeState?,
     attendeesSearchState: AttendeesSearchState,
 ): EventFormState = rememberEventFormState(
     calendars = calendars,
+    initialEventColor = initialCalendar?.color,
     initialCalendar = initialCalendar,
+    dateAndTimeState = dateAndTimeState,
     initialText = "",
     initialIsAllDay = false,
     initialIsKMeetUrlEnabled = false,
@@ -71,7 +92,9 @@ fun rememberDefaultEventForm(
 @Composable
 fun rememberEventFormState(
     calendars: List<EventDetailCalendar>,
-    initialCalendar: EventDetailCalendar?,
+    initialEventColor: Color?, // Can be null while the calendars are loading
+    initialCalendar: EventDetailCalendar?, // Can be null while the calendars are loading
+    dateAndTimeState: DateAndTimeState?,
     initialText: String,
     initialIsAllDay: Boolean,
     initialIsKMeetUrlEnabled: Boolean,
@@ -79,12 +102,16 @@ fun rememberEventFormState(
     initialIsOccupied: Boolean,
     initialIsPublic: Boolean,
 ): EventFormState {
-    val colorState = rememberSaveable(initialCalendar == null, stateSaver = ColorSaver) { mutableStateOf(initialCalendar?.color) }
+    val eventColorState = rememberSaveable(initialEventColor == null, stateSaver = ColorSaver) {
+        mutableStateOf(initialEventColor)
+    }
 
     return EventFormState(
         titleTextState = rememberTextFieldState(initialText),
-        colorState = colorState,
+        eventColorState = eventColorState,
+        calendarIdState = rememberSaveable(initialCalendar == null) { mutableStateOf(initialCalendar?.id) },
         isAllDay = rememberSaveable { mutableStateOf(initialIsAllDay) },
+        dateAndTimeState = dateAndTimeState,
         attendeesState = attendeesSearchState,
         isKMeetUrlEnabled = rememberSaveable { mutableStateOf(initialIsKMeetUrlEnabled) },
         isOccupied = rememberSaveable { mutableStateOf(initialIsOccupied) },

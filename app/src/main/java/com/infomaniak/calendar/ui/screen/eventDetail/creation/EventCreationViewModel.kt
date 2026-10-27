@@ -20,10 +20,15 @@ package com.infomaniak.calendar.ui.screen.eventDetail.creation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
+import com.infomaniak.calendar.data.CalendarDataValues
+import com.infomaniak.calendar.data.SettingsDataValues
+import com.infomaniak.calendar.ui.screen.eventDetail.EventComposerUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.EventFormCalendarsUseCase
+import com.infomaniak.calendar.ui.screen.eventDetail.SaveEventResult
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventFormCalendars
 import com.infomaniak.calendar.utils.saveableAttendeesSearchState
 import dev.zacsweers.metro.AppScope
@@ -33,18 +38,30 @@ import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 @AssistedInject
 class EventCreationViewModel(
     @Assisted savedStateHandle: SavedStateHandle,
     eventFormCalendarsUseCase: EventFormCalendarsUseCase,
+    settingsDataValues: SettingsDataValues,
+    private val eventComposerUseCase: EventComposerUseCase,
 ) : ViewModel() {
     val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase.creationCalendars
     val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
 
-    fun submitEvent(eventDraft: EventDraft) {
-        // TODO
+    val defaultEventDuration = settingsDataValues.defaultEventDuration.flow
+
+    suspend fun submitEvent(eventDraft: EventDraft): SaveEventResult {
+        val result = CompletableDeferred<SaveEventResult>()
+
+        viewModelScope.launch {
+            result.complete(eventComposerUseCase.createEvent(eventDraft))
+        }
+
+        return result.await()
     }
 
     @AssistedFactory

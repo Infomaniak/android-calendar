@@ -147,13 +147,14 @@ sentry {
 }
 
 dependencies {
+    implementation(project(":CalendarComponents:AttendeesSearch"))
     implementation(project(":CalendarComponents:Calendar"))
     implementation(project(":CalendarComponents:Day"))
     implementation(project(":CalendarComponents:EventDetail"))
-    implementation(project(":CalendarComponents:AttendeesSearch"))
-    implementation(project(":CalendarComponents:Planning"))
     implementation(project(":CalendarComponents:Foundation"))
+    implementation(project(":CalendarComponents:Planning"))
     implementation(project(":CalendarComponents:Resources"))
+    implementation(project(":CalendarComponents:TimeZoneSearch"))
 
     if (useCalendarCoreCompositeBuild) {
         implementation(libs.infomaniak.multiplatform.calendar.core.submodule)
@@ -175,6 +176,7 @@ dependencies {
     implementation(core.infomaniak.core.ui.compose.margin)
     implementation(core.infomaniak.core.ui.compose.preview)
     implementation(core.infomaniak.core.ui.compose.theme)
+    implementation(libs.infomaniak.designsystem.icons)
     implementation(libs.infomaniak.designsystem.theme.calendar)
 
     implementation(core.kotlinx.serialization.json)

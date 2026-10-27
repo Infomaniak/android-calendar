@@ -37,13 +37,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentYear
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatMonthAndOptionalYear
-import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.ChevronDown
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.yearMonth
 
@@ -74,7 +74,7 @@ fun AnimatedMonthYearText(
         ) {
             Text(text = targetDate.yearMonth.formatMonthAndOptionalYear(currentYear))
             Icon(
-                painter = painterResource(R.drawable.ic_chevron_down),
+                imageVector = EsdsIcons.ChevronDown.Medium,
                 contentDescription = null,
                 // Read at draw time so the chevron turns with the finger, not one recomposition behind it.
                 modifier = Modifier.graphicsLayer { rotationZ = CHEVRON_EXPANDED_ROTATION * expansionProgress() },

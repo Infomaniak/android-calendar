@@ -57,6 +57,7 @@
         <item quantity="other">%d päivää</item>
     </plurals>
     <string name="descriptionTitle">Kuvaus</string>
+    <string name="emptyStateNoTimeZone">Aikavyöhykkeitä ei löytynyt</string>
     <string name="eventTitle">Tapahtuman nimi</string>
     <plurals name="hourAmount">
         <item quantity="one">%d tunti</item>

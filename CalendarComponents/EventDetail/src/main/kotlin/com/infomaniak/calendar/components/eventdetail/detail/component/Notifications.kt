@@ -28,18 +28,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.component.ClickableItem
+import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTime
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDurationOffset
-import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.ChevronRight
 import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
@@ -57,7 +57,7 @@ internal fun Notifications(
     notifications.forEach { notification ->
         ClickableItem(
             text = stringResource(notification.type.label),
-            leadingIconRes = notification.type.icon,
+            leadingIcon = notification.type.icon,
             onClick = { onNotificationClick() },
             contentPadding = contentPadding,
             trailingContent = {
@@ -68,7 +68,7 @@ internal fun Notifications(
                         textAlign = TextAlign.End,
                         modifier = Modifier.fillMaxWidth(0.5f),
                     )
-                    Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null)
+                    Icon(EsdsIcons.ChevronRight.Medium, contentDescription = null)
                 }
             },
             modifier = modifier,

@@ -36,12 +36,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus.Accepted
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus.Declined
@@ -54,6 +54,9 @@ import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.ChevronRight
+import com.infomaniak.designsystem.icons.symbols.UsersStacked
 
 private const val AVATAR_STACK_LIMIT = 4
 
@@ -67,7 +70,7 @@ internal fun AttendeesButton(
     ClickableItem(
         contentPadding = contentPadding,
         onClick = onClick,
-        leadingIconRes = R.drawable.ic_users_stacked,
+        leadingIcon = EsdsIcons.UsersStacked,
         text = if (attendees.isEmpty()) {
             stringResource(R.string.attendees)
         } else {
@@ -85,7 +88,7 @@ internal fun AttendeesButton(
                 } else {
                     StackedAvatars(attendees)
                 }
-                Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null)
+                Icon(EsdsIcons.ChevronRight.Small, contentDescription = null)
             }
         },
         modifier = modifier,

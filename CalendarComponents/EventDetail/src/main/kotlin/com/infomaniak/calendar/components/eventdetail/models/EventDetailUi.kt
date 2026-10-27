@@ -17,13 +17,16 @@
  */
 package com.infomaniak.calendar.components.eventdetail.models
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.filetypes.FileType
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Bell
+import com.infomaniak.designsystem.icons.symbols.BubbleTopRightCircle
+import com.infomaniak.designsystem.icons.symbols.Symbol
 
 @Immutable
 data class EventDetailUi(
@@ -47,6 +50,8 @@ data class EventDetailUi(
     val classification: Classification,
     val canEdit: Boolean,
 ) {
+    val isRecurrent get() = recurrence is EventDetailRecurrence.Recurrence
+
     data class Room(val title: String, val seats: Int, val floor: Int)
 
     @Immutable
@@ -57,9 +62,9 @@ data class EventDetailUi(
     @Immutable
     data class Notification(val type: Type, val time: NotificationTime) {
         @Immutable
-        enum class Type(@DrawableRes val icon: Int, @StringRes val label: Int) {
-            Email(R.drawable.ic_bell, R.string.notificationTypeEmail),
-            Push(R.drawable.ic_bubble_top_right_circle, R.string.notificationTypePush),
+        enum class Type(val icon: Symbol, @StringRes val label: Int) {
+            Email(EsdsIcons.Bell, R.string.notificationTypeEmail),
+            Push(EsdsIcons.BubbleTopRightCircle, R.string.notificationTypePush),
         }
     }
 

@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventFormCalendars
 import com.infomaniak.calendar.utils.combineStates
@@ -27,9 +26,11 @@ import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.combine
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -53,14 +54,9 @@ class EventFormCalendarsUseCase @Inject constructor(private val cachedCalendarMa
     }
 
     /** All writable calendars, preselecting the edited event's [initialCalendar]. */
-    fun editionCalendars(initialCalendar: StateFlow<EventDetailCalendar?>): StateFlow<EventFormCalendars?> {
-        return combineStates(
-            flow1 = cachedCalendarManager.writableCalendars,
-            flow2 = initialCalendar,
-            scope = useCaseScope,
-            started = SharingStarted.WhileSubscribed(5.seconds),
-        ) { calendars, initial ->
-            initial?.let { EventFormCalendars(calendars.map(Calendar::toEventDetailCalendar), it) }
+    fun editionCalendars(initialCalendar: Flow<Calendar?>): Flow<EventFormCalendars?> {
+        return combine(cachedCalendarManager.writableCalendars, initialCalendar) { calendars, initial ->
+            initial?.let { EventFormCalendars(calendars.map(Calendar::toEventDetailCalendar), it.toEventDetailCalendar()) }
         }
     }
 }

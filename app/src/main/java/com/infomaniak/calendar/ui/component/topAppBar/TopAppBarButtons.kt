@@ -31,8 +31,6 @@ import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
@@ -45,6 +43,15 @@ import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.SaveButto
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.SearchButton
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.ArrowLeft
+import com.infomaniak.designsystem.icons.symbols.Check
+import com.infomaniak.designsystem.icons.symbols.Inbox
+import com.infomaniak.designsystem.icons.symbols.List
+import com.infomaniak.designsystem.icons.symbols.MagnifyingGlass
+import com.infomaniak.designsystem.icons.symbols.Pen
+import com.infomaniak.designsystem.icons.symbols.Symbol
+import com.infomaniak.designsystem.icons.symbols.Trash
 import kotlinx.coroutines.launch
 import com.infomaniak.calendar.components.resources.R as RComponents
 import com.infomaniak.core.common.R as RCommon
@@ -57,7 +64,7 @@ object TopAppBarButtons {
     @Composable
     fun InboxButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
         TooltipIconButton(
-            painter = painterResource(R.drawable.ic_inbox),
+            symbol = EsdsIcons.Inbox,
             contentDescription = stringResource(R.string.contentDescriptionInbox),
             onClick = onClick,
             modifier = modifier,
@@ -67,7 +74,7 @@ object TopAppBarButtons {
     @Composable
     fun SearchButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
         TooltipIconButton(
-            painter = painterResource(R.drawable.ic_magnifying_glass),
+            symbol = EsdsIcons.MagnifyingGlass,
             contentDescription = stringResource(RComponents.string.contentDescriptionSearch),
             onClick = onClick,
             modifier = modifier,
@@ -80,7 +87,7 @@ object TopAppBarButtons {
         val calendarDrawerState = LocalDrawerState.current
 
         TooltipIconButton(
-            painter = painterResource(R.drawable.ic_list),
+            symbol = EsdsIcons.List,
             contentDescription = stringResource(R.string.contentDescriptionMenuDrawer),
             onClick = { scope.launch { calendarDrawerState?.open() } },
             modifier = modifier,
@@ -90,7 +97,7 @@ object TopAppBarButtons {
     @Composable
     fun BackButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
         TooltipIconButton(
-            painter = painterResource(R.drawable.ic_arrow_back),
+            symbol = EsdsIcons.ArrowLeft,
             contentDescription = stringResource(R.string.contentDescriptionBack),
             onClick = onClick,
             modifier = modifier,
@@ -100,7 +107,7 @@ object TopAppBarButtons {
     @Composable
     fun EditButton(modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
         TooltipIconButton(
-            painter = painterResource(RComponents.drawable.ic_pen),
+            symbol = EsdsIcons.Pen,
             contentDescription = stringResource(RCommon.string.edit),
             onClick = onClick,
             modifier = modifier,
@@ -111,8 +118,8 @@ object TopAppBarButtons {
     @Composable
     fun EventDeleteButton(modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
         TooltipIconButton(
-            painter = painterResource(RComponents.drawable.ic_trash),
-            contentDescription = stringResource(R.string.buttonDeleteEvent),
+            symbol = EsdsIcons.Trash,
+            contentDescription = stringResource(RCommon.string.deleteButton),
             onClick = onClick,
             modifier = modifier,
             enabled = enabled,
@@ -131,7 +138,7 @@ object TopAppBarButtons {
             modifier = modifier,
         ) {
             FilledIconButton(onClick = onClick, enabled = enabled()) {
-                Icon(painterResource(R.drawable.ic_check), contentDescription)
+                Icon(EsdsIcons.Check.Medium, contentDescription)
             }
         }
     }
@@ -139,7 +146,7 @@ object TopAppBarButtons {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun TooltipIconButton(
-        painter: Painter,
+        symbol: Symbol,
         contentDescription: String,
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
@@ -152,7 +159,7 @@ object TopAppBarButtons {
             modifier = modifier,
         ) {
             IconButton(onClick, enabled = enabled) {
-                Icon(painter, contentDescription)
+                Icon(symbol.Medium, contentDescription)
             }
         }
     }

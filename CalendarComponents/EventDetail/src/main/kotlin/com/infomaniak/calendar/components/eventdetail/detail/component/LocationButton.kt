@@ -23,8 +23,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.component.ClickableItem
-import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.MapPin
 
 @Composable
 internal fun LocationButton(
@@ -35,7 +36,7 @@ internal fun LocationButton(
 ) {
     ClickableItem(
         text = location,
-        leadingIconRes = R.drawable.ic_map_pin,
+        leadingIcon = EsdsIcons.MapPin,
         onClick = onClick,
         contentPadding = contentPadding,
         modifier = modifier,

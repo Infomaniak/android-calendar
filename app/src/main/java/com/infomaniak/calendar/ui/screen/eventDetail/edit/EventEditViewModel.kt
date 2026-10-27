@@ -20,12 +20,14 @@ package com.infomaniak.calendar.ui.screen.eventDetail.edit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
-import com.infomaniak.calendar.ui.screen.eventDetail.EventFormCalendarsUseCase
-import com.infomaniak.calendar.ui.screen.eventDetail.GetEventDetailUiUseCase
-import com.infomaniak.calendar.ui.screen.eventDetail.model.EventFormCalendars
-import com.infomaniak.calendar.ui.screen.eventDetail.utils.synchronizeTo
+import com.infomaniak.calendar.ui.screen.eventDetail.EventComposerUseCase
+import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
+import com.infomaniak.calendar.ui.screen.eventDetail.SaveEventResult
+import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.utils.saveableAttendeesSearchState
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
@@ -35,25 +37,40 @@ import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @AssistedInject
 class EventEditViewModel(
     @Assisted private val savedStateHandle: SavedStateHandle,
-    private val getEventDetailUiUseCase: GetEventDetailUiUseCase,
-    eventFormCalendarsUseCase: EventFormCalendarsUseCase,
+    private val eventComposerUseCase: EventComposerUseCase,
 ) : ViewModel() {
-    val eventDetailUi = getEventDetailUiUseCase.eventDetailUi
     val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
-    val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase
-        .editionCalendars(getEventDetailUiUseCase.eventCalendar)
 
-    fun setOccurrenceId(occurrenceId: OccurrenceId) {
-        getEventDetailUiUseCase.setOccurrenceId(occurrenceId)
+    private var areAttendeesInitialized: Boolean
+        get() = savedStateHandle[ARE_ATTENDEES_INITIALIZED_KEY] ?: false
+        set(value) {
+            savedStateHandle[ARE_ATTENDEES_INITIALIZED_KEY] = value
+        }
+
+    suspend fun initAttendeesSearchState(eventDetailUi: Flow<EventDetailUiState>) {
+        if (areAttendeesInitialized) return
+        val event = eventDetailUi.filterIsInstance<EventDetailUiState.Displayable.Success>().first()
+        attendeesSearchState.attendees.addAll(event.eventDetail.attendees.all)
+        areAttendeesInitialized = true
     }
 
-    suspend fun synchronizeAttendeesSearchState() {
-        eventDetailUi.synchronizeTo(attendeesSearchState)
+    suspend fun submitEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope, eventDraft: EventDraft): SaveEventResult {
+        val result = CompletableDeferred<SaveEventResult>()
+
+        viewModelScope.launch {
+            result.complete(eventComposerUseCase.updateEvent(occurrenceId, scope, eventDraft))
+        }
+
+        return result.await()
     }
 
     @AssistedFactory
@@ -63,5 +80,9 @@ class EventEditViewModel(
         override fun create(extras: CreationExtras): EventEditViewModel = create(extras.createSavedStateHandle())
 
         fun create(@Assisted savedStateHandle: SavedStateHandle): EventEditViewModel
+    }
+
+    companion object {
+        private const val ARE_ATTENDEES_INITIALIZED_KEY = "areAttendeesInitialized"
     }
 }

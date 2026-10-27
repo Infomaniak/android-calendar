@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.components.eventdetail.detail.component
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -45,7 +44,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -54,10 +52,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.theme.Dimens
-import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.core.theme.EsdsTheme
-import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.CircleCheck
+import com.infomaniak.designsystem.icons.symbols.CircleCross
+import com.infomaniak.designsystem.icons.symbols.CircleQuestion
+import com.infomaniak.designsystem.icons.symbols.Symbol
 import com.infomaniak.core.common.R as RCore
 
 @Composable
@@ -95,9 +96,8 @@ fun ParticipationStatusButtonsToolbar(
                     modifier = Modifier.semantics { role = Role.RadioButton },
                 ) {
                     Icon(
-                        painter = painterResource(participationStatusButton.icon),
+                        imageVector = participationStatusButton.icon.Small,
                         contentDescription = null,
-                        modifier = Modifier.size(ToggleButtonDefaults.IconSize),
                     )
                     Spacer(modifier = Modifier.size(ToggleButtonDefaults.IconSpacing))
                     Text(stringResource(participationStatusButton.label))
@@ -109,12 +109,12 @@ fun ParticipationStatusButtonsToolbar(
 
 private enum class ParticipationStatusButton(
     val status: ParticipationStatus,
-    @DrawableRes val icon: Int,
+    val icon: Symbol,
     @StringRes val label: Int,
 ) {
-    Yes(ParticipationStatus.Accepted, R.drawable.ic_circle_check, RCore.string.buttonYes),
-    No(ParticipationStatus.Declined, R.drawable.ic_circle_cross, RCore.string.buttonNo),
-    Maybe(ParticipationStatus.Tentative, R.drawable.ic_circle_question, RCore.string.buttonMaybe),
+    Yes(ParticipationStatus.Accepted, EsdsIcons.CircleCheck, RCore.string.buttonYes),
+    No(ParticipationStatus.Declined, EsdsIcons.CircleCross, RCore.string.buttonNo),
+    Maybe(ParticipationStatus.Tentative, EsdsIcons.CircleQuestion, RCore.string.buttonMaybe),
 }
 
 @Composable
