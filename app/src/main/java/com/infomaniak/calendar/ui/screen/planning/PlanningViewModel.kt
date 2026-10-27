@@ -20,9 +20,8 @@ package com.infomaniak.calendar.ui.screen.planning
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.manager.SyncEventsManager
-import com.infomaniak.calendar.manager.VisibleDateManager
+import com.infomaniak.calendar.manager.VisibleEventsManager
 import com.infomaniak.calendar.manager.VisibleMonthManager
-import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
@@ -32,46 +31,26 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.minus
-import kotlinx.datetime.plus
 import kotlin.time.Duration.Companion.seconds
 
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
 class PlanningViewModel(
-    calendarManager: CalendarManager,
     syncEventsManager: SyncEventsManager,
-    visibleDateManager: VisibleDateManager,
+    visibleEventsManager: VisibleEventsManager,
     visibleMonthManager: VisibleMonthManager,
 ) : ViewModel() {
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
 
-    private val timeZone = TimeZone.currentSystemDefault()
-
-    private val loadedDays = visibleDateManager.visibleDateFlow
-        .scan(loadedDaysAround(visibleDateManager.visibleDate.value)) { loadedDays, visibleDate ->
-            if (loadedDays.covers(neededDaysAround(visibleDate))) loadedDays else loadedDaysAround(visibleDate)
-        }
-        .distinctUntilChanged()
-
     @OptIn(ExperimentalCoroutinesApi::class)
-    val planningUiState: StateFlow<PlanningUiState> = loadedDays
-        .flatMapLatest { days ->
-            calendarManager.observeDaySlices(
-                start = days.start.atStartOfDayIn(timeZone),
-                end = days.endInclusive.plus(1, DateTimeUnit.DAY).atStartOfDayIn(timeZone),
-                timeZone = timeZone,
-            ).mapLatest { slices -> PlanningUiState.Success(slices.groupByDay(days, timeZone)) }
+    val planningUiState: StateFlow<PlanningUiState> = visibleEventsManager.loadedEvents
+        .filterNotNull()
+        .mapLatest { loadedEvents ->
+            PlanningUiState.Success(loadedEvents.slicesByDay.groupByDay(loadedEvents.days, loadedEvents.timeZone))
         }
         .stateIn(
             scope = viewModelScope,
@@ -81,24 +60,4 @@ class PlanningViewModel(
 
     val eventDots = visibleMonthManager.eventDots
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
-
-    private fun neededDaysAround(date: LocalDate): ClosedRange<LocalDate> {
-        return date.minus(NEEDED_DAYS_BEFORE, DateTimeUnit.DAY)..date.plus(NEEDED_DAYS_AFTER, DateTimeUnit.DAY)
-    }
-
-    private fun loadedDaysAround(date: LocalDate): ClosedRange<LocalDate> {
-        return date.minus(LOADED_DAYS_BEFORE, DateTimeUnit.DAY)..date.plus(LOADED_DAYS_AFTER, DateTimeUnit.DAY)
-    }
-
-    private fun ClosedRange<LocalDate>.covers(days: ClosedRange<LocalDate>): Boolean {
-        return days.start >= start && days.endInclusive <= endInclusive
-    }
-
-    companion object {
-        // The visible date is the top of the list: the days needed reach further below it than above.
-        private const val NEEDED_DAYS_BEFORE = 7
-        private const val NEEDED_DAYS_AFTER = 21
-        private const val LOADED_DAYS_BEFORE = 28
-        private const val LOADED_DAYS_AFTER = 42
-    }
 }

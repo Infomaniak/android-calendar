@@ -25,7 +25,6 @@ import com.infomaniak.calendar.manager.DayEventsLoader
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.manager.VisibleMonthManager
 import com.infomaniak.calendar.ui.model.TimelineUiState
-import com.infomaniak.core.common.utils.today
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
@@ -34,9 +33,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlin.time.Clock
 
 @Inject
 @ContributesIntoMap(AppScope::class)
@@ -48,9 +44,6 @@ class DayViewModel(
     private val calendarDataValues: CalendarDataValues,
 ) : ViewModel() {
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
-
-    private val timeZone = TimeZone.currentSystemDefault()
-    val dateRange: ClosedRange<LocalDate> = DayEventsLoader.dateRangeAround(Clock.today(timeZone))
 
     val uiState: StateFlow<TimelineUiState> = dayEventsLoader.observeEventsByDate
 

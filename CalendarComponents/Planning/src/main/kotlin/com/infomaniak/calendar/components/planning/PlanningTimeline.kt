@@ -20,6 +20,7 @@ package com.infomaniak.calendar.components.planning
 import androidx.compose.runtime.Immutable
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
+import com.infomaniak.calendar.components.foundation.utils.NAVIGABLE_DATES
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.daysUntil
@@ -28,12 +29,12 @@ import kotlinx.datetime.plus
 /** Gives every date a fixed item index: each week is its header followed by its seven days. */
 @Immutable
 class PlanningTimeline(private val weekNumbering: WeekNumbering) {
-    private val origin = weekNumbering.weekOf(FIRST_DATE).firstDay
+    private val origin = weekNumbering.weekOf(NAVIGABLE_DATES.start).firstDay
 
-    val itemCount: Int = (origin.daysUntil(LAST_DATE) / DAYS_IN_WEEK + 1) * ITEMS_PER_WEEK
+    val itemCount: Int = (origin.daysUntil(NAVIGABLE_DATES.endInclusive) / DAYS_IN_WEEK + 1) * ITEMS_PER_WEEK
 
     fun indexOf(date: LocalDate): Int {
-        val days = origin.daysUntil(date.coerceIn(origin, LAST_DATE))
+        val days = origin.daysUntil(date.coerceIn(origin, NAVIGABLE_DATES.endInclusive))
         return days / DAYS_IN_WEEK * ITEMS_PER_WEEK + 1 + days % DAYS_IN_WEEK
     }
 
@@ -48,8 +49,6 @@ class PlanningTimeline(private val weekNumbering: WeekNumbering) {
     internal fun weekAt(index: Int): YearWeek = weekNumbering.weekOf(dateAt(index))
 
     private companion object {
-        val FIRST_DATE = LocalDate(1900, 1, 1)
-        val LAST_DATE = LocalDate(2199, 12, 31)
         const val DAYS_IN_WEEK = 7
         const val ITEMS_PER_WEEK = DAYS_IN_WEEK + 1
     }
