@@ -134,8 +134,8 @@ app/
   and are cancelled, since a failed replacement may leave the previous alarm in place.
   Receivers await `AlarmScheduler.syncUpcomingAlarms` (capped at 8 s, within their `goAsync()` budget) before finishing:
   a process started for a broadcast may be killed or frozen as soon as it's over.
-  `MainActivity` requests the `POST_NOTIFICATIONS` runtime permission (Android 13+) on each fresh start (skipped on
-  recreation). Exact alarms need no request: `USE_EXACT_ALARM` on API 33+, `SCHEDULE_EXACT_ALARM` on API 31–32 (falls
+  The `POST_NOTIFICATIONS` runtime permission (Android 13+) is only requested by the onboarding's notifications step;
+  `AlarmReceiver` skips posting while notifications are disabled. Exact alarms need no request: `USE_EXACT_ALARM` on API 33+, `SCHEDULE_EXACT_ALARM` on API 31–32 (falls
   back to inexact alarms while the user revokes it; exactness is part of `AlarmRegistration`, so they're all registered
   again as exact ones once it's granted back).
   Notification small icons use ESDS vectors rendered by `ImageVector.toBitmap` into white-on-transparent bitmaps,
