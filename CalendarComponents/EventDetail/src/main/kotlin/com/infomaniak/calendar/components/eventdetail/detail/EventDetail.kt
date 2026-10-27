@@ -138,7 +138,7 @@ fun EventDetail(
                     modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
                 )
 
-                Calendar(calendar.color, calendar.name)
+                Calendar(calendar.color, calendar.name, Modifier.eventSharedBounds(EventSharedElement.Calendar))
             }
         }
     }

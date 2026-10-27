@@ -110,7 +110,12 @@ fun EventForm(
                 modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
             )
 
-            CalendarEditable(state.calendar, state.calendars, onSelect = { calendar -> state.calendar = calendar })
+            CalendarEditable(
+                selectedCalendar = state.calendar,
+                calendars = state.calendars,
+                onSelect = { calendar -> state.calendar = calendar },
+                modifier = Modifier.eventSharedBounds(EventSharedElement.Calendar),
+            )
         }
     }
 }
