@@ -184,6 +184,7 @@ dependencies {
     implementation(platform(core.compose.bom))
     implementation(core.activity.compose)
     implementation(core.androidx.core.ktx)
+    implementation(core.androidx.core.splashscreen)
     implementation(core.androidx.lifecycle.runtime.ktx)
     implementation(core.appcompat)
     implementation(core.compose.ui)
