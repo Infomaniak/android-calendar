@@ -23,6 +23,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
+import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
+import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 /**
@@ -30,12 +32,22 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
  */
 @Composable
 internal fun Section(
+    sharedElementId: EventSharedElement,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     content: @Composable () -> Unit,
 ) {
     Layout(
-        contents = listOf({ Divider(Modifier.padding(contentPadding)) }, content),
+        contents = listOf(
+            {
+                Divider(
+                    Modifier
+                        .padding(contentPadding)
+                        .eventSharedElement(sharedElementId),
+                )
+            },
+            content,
+        ),
         modifier = modifier,
     ) { (dividerMeasurables, contentMeasurables), constraints ->
         if (contentMeasurables.isEmpty()) return@Layout layout(0, 0) {}

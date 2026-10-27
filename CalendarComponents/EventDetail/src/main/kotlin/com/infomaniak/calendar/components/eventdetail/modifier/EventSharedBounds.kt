@@ -84,6 +84,10 @@ internal enum class EventSharedElement {
     OccupiedStatus,
     ClassificationStatus,
     Calendar,
+    Divider1,
+    Divider2,
+    Divider3,
+    Divider4,
 }
 
 private data class EventSharedTransition(

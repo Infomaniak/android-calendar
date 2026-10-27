@@ -83,7 +83,7 @@ fun EventForm(
             modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
         )
 
-        Section {
+        Section(EventSharedElement.Divider1) {
             AttendeesButton(
                 attendees = state.attendeesState.attendees.toList(),
                 onClick = onAttendeesClick,
@@ -97,7 +97,7 @@ fun EventForm(
             )
         }
 
-        Section {
+        Section(EventSharedElement.Divider4) {
             OccupiedStatusSwitch(
                 checked = state.isOccupied::value,
                 onCheckedChange = { isChecked -> state.isOccupied.value = isChecked },
