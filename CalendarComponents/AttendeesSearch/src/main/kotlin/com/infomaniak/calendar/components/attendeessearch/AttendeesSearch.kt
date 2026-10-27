@@ -46,12 +46,13 @@ fun AttendeesSearch(
     attendeesSearchState: AttendeesSearchState,
     modifier: Modifier = Modifier,
 ) {
-    val attendeesList: List<AttendeeUi> =
-        if (attendeesSearchState.searchQueryTextFieldState.text.isBlank()) {
-            attendeesSearchState.attendees.toList()
-        } else {
-            attendeesSearchState.results
-        }
+    val isDisplayingSearchResults = attendeesSearchState.searchQueryTextFieldState.text.isNotBlank()
+
+    val attendeesList: List<AttendeeUi> = if (isDisplayingSearchResults) {
+        attendeesSearchState.results
+    } else {
+        attendeesSearchState.attendees.toList()
+    }
 
     Column(modifier = modifier) {
         SearchBar(
@@ -64,6 +65,11 @@ fun AttendeesSearch(
             AttendeesList(
                 attendees = { attendeesList },
                 modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md, vertical = EsdsTheme.spacing.sm),
+                onClick = if (isDisplayingSearchResults) {
+                    { attendee -> attendeesSearchState.addAttendee(attendee) }
+                } else {
+                    null
+                },
             )
         }
     }

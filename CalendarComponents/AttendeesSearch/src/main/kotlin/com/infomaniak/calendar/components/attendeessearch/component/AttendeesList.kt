@@ -30,6 +30,7 @@ import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 internal fun AttendeesList(
     attendees: () -> List<AttendeeUi>,
     modifier: Modifier = Modifier,
+    onClick: ((AttendeeUi) -> Unit)? = null,
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -38,7 +39,13 @@ internal fun AttendeesList(
             items = attendees(),
             key = { attendee -> attendee.key },
         ) { attendee ->
-            EventAttendee(attendee = attendee)
+            val isDisplayingSearchResults = onClick != null // TODO: Make the input more clear
+            EventAttendee(
+                attendee = attendee,
+                onClick = onClick?.let { { it(attendee) } },
+                enabled = attendee.status == null || !isDisplayingSearchResults,
+                modifier = Modifier.animateItem(),
+            )
         }
     }
 }

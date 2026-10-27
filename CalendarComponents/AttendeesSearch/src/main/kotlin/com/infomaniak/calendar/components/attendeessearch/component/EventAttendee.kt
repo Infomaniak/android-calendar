@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.attendeessearch.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -30,8 +31,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,7 +49,23 @@ import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
-internal fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
+internal fun EventAttendee(
+    attendee: AttendeeUi,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    enabled: Boolean = true,
+) {
+    EventAttendeeContent(
+        attendee,
+        modifier = modifier
+            .clip(ListItemDefaults.shapes().pressedShape)
+            .clickable(enabled = enabled, onClick = { onClick?.invoke() }, role = Role.Button)
+            .alpha(if (enabled) 1f else EsdsTheme.opacity.medium),
+    )
+}
+
+@Composable
+private fun EventAttendeeContent(attendee: AttendeeUi, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .background(ListItemDefaults.colors().containerColor)
@@ -58,6 +78,7 @@ internal fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) 
                 .padding(start = EsdsTheme.spacing.lg)
                 .size(40.dp),
         )
+
         ListItem(
             overlineContent = attendee.status?.let {
                 { AttendeeParticipationStatus(it, attendee.isOrganizer) }
@@ -154,6 +175,6 @@ private fun PreviewAttendeePending() {
 @Composable
 private fun Preview() {
     Surface {
-        EventAttendee(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", null))
+        EventAttendee(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", null), enabled = false)
     }
 }

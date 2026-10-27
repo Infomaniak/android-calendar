@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.foundation.state
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateListOf
@@ -28,6 +29,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateSet
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 
 @Stable
 class AttendeesSearchState(
@@ -35,6 +37,11 @@ class AttendeesSearchState(
     val results: SnapshotStateList<AttendeeUi>,
     val attendees: SnapshotStateSet<AttendeeUi>,
 ) {
+    fun addAttendee(attendee: AttendeeUi) {
+        attendees.add(attendee.copy(status = ParticipationStatus.NeedsAction))
+        searchQueryTextFieldState.clearText()
+    }
+
     object Saver : androidx.compose.runtime.saveable.Saver<AttendeesSearchState, List<Any>> {
         private val resultsSaver = autoSaver<SnapshotStateList<AttendeeUi>>()
         private val attendeesSaver = autoSaver<SnapshotStateSet<AttendeeUi>>()
