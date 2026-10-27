@@ -50,7 +50,7 @@ fun AttendeesSearch(
         if (attendeesSearchState.searchQueryTextFieldState.text.isBlank()) {
             attendeesSearchState.attendees.toList()
         } else {
-            attendeesSearchState.results.toList()
+            attendeesSearchState.results
         }
 
     Column(modifier = modifier) {
