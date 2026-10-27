@@ -39,6 +39,14 @@
     <string name="notificationChannelEventRemindersTitle">Event-Erinnerungen</string>
     <string name="notificationDefaultDescription">Ereignisalarm</string>
     <string name="notificationDefaultEventTitle">Ereigniserinnerung</string>
+    <string name="onboardingFourSubtitle">Du kannst jetzt über Calendar auf deine Anlässe zugreifen.</string>
+    <string name="onboardingFourTitle">Alles bereit</string>
+    <string name="onboardingOneSubtitle">Zeige Anlässe von deinem Telefon aus an, erstelle und teile sie – mit vollem Datenschutz.</string>
+    <string name="onboardingOneTitle">Dein Kalender, überall dabei</string>
+    <string name="onboardingThreeSubtitle">Der Zugriff auf deine Kontakte erleichtert das Teilen deiner Kalender und das Versenden von Einladungen.</string>
+    <string name="onboardingThreeTitle">Lade deine Teilnehmer ein</string>
+    <string name="onboardingTwoSubtitle">Werde vor jedem Anlass benachrichtigt und verpasse keinen wichtigen Termin mehr.</string>
+    <string name="onboardingTwoTitle">Mitteilungen erlauben</string>
     <string name="planningTitle">Planung</string>
     <string name="settingsTitle">Einstellungen</string>
     <string name="signOutAccountAlertConfirm">Sich aus dem Konto abmelden</string>

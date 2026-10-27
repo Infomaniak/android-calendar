@@ -39,6 +39,14 @@
     <string name="notificationChannelEventRemindersTitle">Evenemangspåminnelser</string>
     <string name="notificationDefaultDescription">Händelsevarning</string>
     <string name="notificationDefaultEventTitle">Evenemangspåminnelse</string>
+    <string name="onboardingFourSubtitle">Du kan nu komma åt dina händelser från Calendar.</string>
+    <string name="onboardingFourTitle">Allt är klart</string>
+    <string name="onboardingOneSubtitle">Visa, skapa och dela dina händelser från din telefon, med full sekretess.</string>
+    <string name="onboardingOneTitle">Din kalender, överallt med dig</string>
+    <string name="onboardingThreeSubtitle">Åtkomst till dina kontakter gör det enklare att dela dina kalendrar och skicka inbjudningar.</string>
+    <string name="onboardingThreeTitle">Bjud in dina deltagare</string>
+    <string name="onboardingTwoSubtitle">Bli påmind före varje händelse och missa aldrig ett viktigt möte.</string>
+    <string name="onboardingTwoTitle">Tillåt aviseringar</string>
     <string name="planningTitle">Planering</string>
     <string name="settingsTitle">Inställningar</string>
     <string name="signOutAccountAlertConfirm">Logga ut från kontot</string>

@@ -39,6 +39,14 @@
     <string name="notificationChannelEventRemindersTitle">Rappels d’évènements</string>
     <string name="notificationDefaultDescription">Alarme d’évènement</string>
     <string name="notificationDefaultEventTitle">Rappel d’évènement</string>
+    <string name="onboardingFourSubtitle">Vous pouvez désormais accéder à vos évènements depuis Calendar.</string>
+    <string name="onboardingFourTitle">Tout est prêt</string>
+    <string name="onboardingOneSubtitle">Consultez, créez et partagez vos évènements depuis votre téléphone, en toute confidentialité.</string>
+    <string name="onboardingOneTitle">Votre agenda, partout avec vous</string>
+    <string name="onboardingThreeSubtitle">L’accès à vos contacts facilite le partage de vos calendriers et l’envoi d’invitations.</string>
+    <string name="onboardingThreeTitle">Invitez vos participants</string>
+    <string name="onboardingTwoSubtitle">Soyez prévenu avant chaque évènement et ne manquez plus un rendez-vous important.</string>
+    <string name="onboardingTwoTitle">Autoriser les notifications</string>
     <string name="planningTitle">Planning</string>
     <string name="settingsTitle">Paramètres</string>
     <string name="signOutAccountAlertConfirm">Déconnecter le compte</string>

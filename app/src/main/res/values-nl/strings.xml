@@ -39,6 +39,14 @@
     <string name="notificationChannelEventRemindersTitle">Herinneringen aan evenementen</string>
     <string name="notificationDefaultDescription">Gebeurteniswaarschuwing</string>
     <string name="notificationDefaultEventTitle">Gebeurtenisherinnering</string>
+    <string name="onboardingFourSubtitle">Je hebt nu toegang tot je afspraken via Calendar.</string>
+    <string name="onboardingFourTitle">Alles is klaar</string>
+    <string name="onboardingOneSubtitle">Bekijk, maak en deel je afspraken vanaf je telefoon, met volledige privacy.</string>
+    <string name="onboardingOneTitle">Je agenda, overal bij je</string>
+    <string name="onboardingThreeSubtitle">Toegang tot je contacten maakt het delen van je agenda’s en het versturen van uitnodigingen eenvoudiger.</string>
+    <string name="onboardingThreeTitle">Nodig je deelnemers uit</string>
+    <string name="onboardingTwoSubtitle">Word voor elke afspraak op de hoogte gebracht en mis geen belangrijke afspraak meer.</string>
+    <string name="onboardingTwoTitle">Meldingen toestaan</string>
     <string name="planningTitle">Planning</string>
     <string name="settingsTitle">Instellingen</string>
     <string name="signOutAccountAlertConfirm">Meld je af bij het account</string>

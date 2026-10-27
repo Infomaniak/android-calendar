@@ -65,17 +65,21 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── eventDetail/           # EventDetailScreen + EventEditScreen + EventCreationScreen + their ViewModels, and
     │                              # attendeesSearch/ (EventAttendeesScreen + EventAttendeesViewModel shared with its parent)
     │                              # timeZoneSearch/ (TimeZoneSearchScreen + TimeZoneSearchResultViewModel channel back to its parent)
-    │   └── onboarding/            # OnboardingScreen + CrossAppLoginViewModel
+    │   └── onboarding/            # OnboardingScreen + NextStepButton + CrossAppLoginViewModel, and OnboardingStep: login, then
+    │                              # one step per missing permission (notifications, contacts), then "Start" ("Add an account": login only)
     └── theme/
         ├── Theme.kt                # CalendarTheme Composable (Material 3 color schemes)
         ├── Color.kt / ColorLight.kt / ColorDark.kt  # Color tokens
         └── Type.kt                 # Typography tokens
 
 app/src/main/res/
-├── drawable/                       # Vector drawables (icons, launcher)
+├── drawable/                       # Vector drawables (icons, launcher, onboarding illustrations, splash screen)
+├── drawable-night/                 # Dark variants of the onboarding illustrations
+├── drawable-*dpi/                  # Splash screen branding image for Android < 12 (webp)
 ├── mipmap-*/                       # Launcher icons (per density + adaptive)
 ├── values/                         # colors.xml, strings.xml, themes.xml (default, English)
 ├── values-night/                   # Dark theme overrides
+├── values-v31/                     # Android 12+ splash screen theme
 ├── values-<lang>/                  # Per-language string translations (da, de, el, es, fi, fr, it, nb, nl, pl, pt, sv)
 └── xml/                            # backup_rules.xml, data_extraction_rules.xml
 
@@ -93,6 +97,11 @@ app/
 ### Architecture & Design
 
 - **Single Activity**: `MainActivity` hosts all Compose content via `setContent { CalendarTheme { Surface { MainNavHost() } } }`.
+- **Splash screen**: `androidx.core:core-splashscreen`. `MainActivity` launches with `AppThemeLauncher`, which hands over to
+  `Theme.Calendar` (`postSplashScreenTheme`). The splash and the content read the same state: `MainViewModel.uiState`
+  stays `MainUiState.Loading` until both the users and the last calendar view are read, and the splash stays up meanwhile. Android 12+ draws it from `values-v31/themes.xml` (launcher foreground, `splashscreenBackground`,
+  "powered by infomaniak" branding image); older versions show `drawable/splashscreen_legacy.xml` as window background,
+  since the compat library has no branding image.
 - **Compose-only UI**: No XML layouts / ViewBinding; use Material 3 components.
 - **Navigation**: Uses Jetpack Navigation 3 (`NavDisplay`). Destinations are `NavDestination` keys, and
   `MainNavHost.baseEntryProvider` maps each key to a `NavEntry` with a manual `when` (not the `entryProvider { entry<…> }`

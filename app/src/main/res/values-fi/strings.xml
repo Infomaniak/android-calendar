@@ -39,6 +39,14 @@
     <string name="notificationChannelEventRemindersTitle">Tapahtumamuistutukset</string>
     <string name="notificationDefaultDescription">Tapahtumahälytys</string>
     <string name="notificationDefaultEventTitle">Tapahtumamuistutus</string>
+    <string name="onboardingFourSubtitle">Voit nyt käyttää tapahtumiasi Calendarista.</string>
+    <string name="onboardingFourTitle">Kaikki on valmista</string>
+    <string name="onboardingOneSubtitle">Katso, luo ja jaa tapahtumasi puhelimestasi täysin luottamuksellisesti.</string>
+    <string name="onboardingOneTitle">Kalenterisi, aina mukanasi</string>
+    <string name="onboardingThreeSubtitle">Pääsy yhteystietoihisi helpottaa kalenterien jakamista ja kutsujen lähettämistä.</string>
+    <string name="onboardingThreeTitle">Kutsu osallistujasi</string>
+    <string name="onboardingTwoSubtitle">Saat muistutuksen ennen jokaista tapahtumaa etkä missaa enää tärkeitä tapaamisia.</string>
+    <string name="onboardingTwoTitle">Salli ilmoitukset</string>
     <string name="planningTitle">Suunnittelu</string>
     <string name="settingsTitle">Asetukset</string>
     <string name="signOutAccountAlertConfirm">Kirjaudu ulos tililtä</string>

@@ -39,6 +39,14 @@
     <string name="notificationChannelEventRemindersTitle">Lembretes de eventos</string>
     <string name="notificationDefaultDescription">Alarme de evento</string>
     <string name="notificationDefaultEventTitle">Lembrete de evento</string>
+    <string name="onboardingFourSubtitle">Já pode aceder aos seus eventos a partir do Calendar.</string>
+    <string name="onboardingFourTitle">Está tudo pronto</string>
+    <string name="onboardingOneSubtitle">Consulte, crie e partilhe os seus eventos a partir do telemóvel, com total confidencialidade.</string>
+    <string name="onboardingOneTitle">A sua agenda, sempre consigo</string>
+    <string name="onboardingThreeSubtitle">O acesso aos seus contactos facilita a partilha dos seus calendários e o envio de convites.</string>
+    <string name="onboardingThreeTitle">Convide os seus participantes</string>
+    <string name="onboardingTwoSubtitle">Seja avisado antes de cada evento e não perca mais nenhuma reunião importante.</string>
+    <string name="onboardingTwoTitle">Permitir as notificações</string>
     <string name="planningTitle">Planeamento</string>
     <string name="settingsTitle">Definições</string>
     <string name="signOutAccountAlertConfirm">Sair da conta</string>

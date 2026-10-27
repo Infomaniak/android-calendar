@@ -39,6 +39,14 @@
     <string name="notificationChannelEventRemindersTitle">Event reminders</string>
     <string name="notificationDefaultDescription">Event Alert</string>
     <string name="notificationDefaultEventTitle">Event reminder</string>
+    <string name="onboardingFourSubtitle">You can now access your events from Calendar.</string>
+    <string name="onboardingFourTitle">You’re all set</string>
+    <string name="onboardingOneSubtitle">View, create and share events from your phone, with complete privacy.</string>
+    <string name="onboardingOneTitle">Your calendar, wherever you go</string>
+    <string name="onboardingThreeSubtitle">Access to your contacts makes it easier to share your calendars and send invitations.</string>
+    <string name="onboardingThreeTitle">Invite your attendees</string>
+    <string name="onboardingTwoSubtitle">Get notified before every event and never miss an important appointment.</string>
+    <string name="onboardingTwoTitle">Allow notifications</string>
     <string name="planningTitle">Planning</string>
     <string name="settingsTitle">Settings</string>
     <string name="signOutAccountAlertConfirm">Sign out of the account</string>

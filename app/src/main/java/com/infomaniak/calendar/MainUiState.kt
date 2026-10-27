@@ -15,12 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.utils
+package com.infomaniak.calendar
 
-sealed interface UserLoadState {
-    data object Awaiting : UserLoadState
-    sealed interface Loaded : UserLoadState {
-        data object Connected : Loaded
-        data object Disconnected : Loaded
-    }
+import com.infomaniak.calendar.ui.navigation.NavDestination
+
+sealed interface MainUiState {
+    data object Loading : MainUiState
+    data class Loaded(val isUserConnected: Boolean, val lastCalendarView: NavDestination.CalendarView) : MainUiState
 }
