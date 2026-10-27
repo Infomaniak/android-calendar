@@ -64,15 +64,16 @@ internal enum class OnboardingStep(
         descriptionRes = R.string.onboardingFourSubtitle,
     );
 
-    /** The next step to show: a permission step only while its permission is missing, the last one only after one of them. */
-    fun next(context: Context): OnboardingStep? = entries.drop(ordinal + 1).firstOrNull { step ->
-        when (step) {
-            Login -> false
-            Notifications, Contacts -> {
-                step.permission != null && context.checkSelfPermission(step.permission) != PERMISSION_GRANTED
-            }
-            EverythingReady -> this != Login
-        }
+    /** A permission step only shows while its permission is missing, and the last step only after one of them. */
+    fun next(context: Context): OnboardingStep? = when (this) {
+        Login -> Notifications.ifPermissionMissing(context) ?: Contacts.ifPermissionMissing(context)
+        Notifications -> Contacts.ifPermissionMissing(context) ?: EverythingReady
+        Contacts -> EverythingReady
+        EverythingReady -> null
+    }
+
+    private fun ifPermissionMissing(context: Context): OnboardingStep? = takeIf {
+        permission != null && context.checkSelfPermission(permission) != PERMISSION_GRANTED
     }
 
     fun toOnboardingPage(): OnboardingPage = OnboardingPage(
@@ -90,8 +91,8 @@ internal enum class OnboardingStep(
             DefaultTitleAndDescription(
                 title = stringResource(titleRes),
                 description = stringResource(descriptionRes),
-                titleStyle = MaterialTheme.typography.headlineMedium,
-                descriptionStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                titleStyle = MaterialTheme.typography.headlineSmallEmphasized,
+                descriptionStyle = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
             )
         },
     )
