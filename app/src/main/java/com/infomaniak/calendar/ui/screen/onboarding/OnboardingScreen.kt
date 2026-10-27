@@ -20,14 +20,13 @@ package com.infomaniak.calendar.ui.screen.onboarding
 import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
-import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -37,15 +36,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.infomaniak.calendar.R
 import com.infomaniak.calendar.di.ComposeAppGraph
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.SharedSnackbarHostState
@@ -62,12 +59,11 @@ import com.infomaniak.core.crossapplogin.back.CrossAppLoginFacade.AccountsChecki
 import com.infomaniak.core.crossapplogin.back.ExternalAccount
 import com.infomaniak.core.crossapplogin.front.components.CrossLoginBottomContent
 import com.infomaniak.core.crossapplogin.front.components.NoCrossAppLoginAccountsContent
+import com.infomaniak.core.crossapplogin.front.data.CrossLoginDefaults
 import com.infomaniak.core.login.InfomaniakLogin
 import com.infomaniak.core.network.ApiEnvironment
-import com.infomaniak.core.onboarding.OnboardingPage
 import com.infomaniak.core.onboarding.OnboardingScaffold
 import com.infomaniak.core.onboarding.components.OnboardingComponents
-import com.infomaniak.core.onboarding.components.OnboardingComponents.DefaultTitleAndDescription
 import com.infomaniak.multiplatform_calendar.core.domain.model.account.DavCredentials
 import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
 import com.infomaniak.multiplatform_core.account.domain.model.AccessToken
@@ -95,8 +91,17 @@ fun OnboardingScreen(
     val snackbarHostState = LocalSharedSnackbarHostState.current
     var areButtonsLoading by remember { mutableStateOf(false) }
 
+    var step by rememberSaveable { mutableStateOf(OnboardingStep.Login) }
+
     val accountsCheckingState by crossAppLoginViewModel.accountsCheckingState.collectAsStateWithLifecycle()
     val skippedIds by crossAppLoginViewModel.skippedAccountIds.collectAsStateWithLifecycle()
+
+    fun goToNextStep() {
+        val nextStep = step.next(context)
+        if (nextStep == null) goToCalendarView() else step = nextStep
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(RequestPermission()) { goToNextStep() }
 
     val loginDependencies = OnboardingLoginDependencies(
         context = context,
@@ -105,7 +110,7 @@ fun OnboardingScreen(
         snackbarHostState = snackbarHostState,
         onlyLoginScreen = onlyLogin,
         setButtonsLoading = { areButtonsLoading = it },
-        onNavigateToHome = goToCalendarView,
+        onLoggedIn = { goToNextStep() },
         onPopBack = onPopBack,
     )
     val loginFlowController = rememberOnboardingLoginFlowController(
@@ -119,7 +124,7 @@ fun OnboardingScreen(
     }
 
     OnboardingScreen(
-        onlyLogin = onlyLogin,
+        step = step,
         accountsCheckingState = { accountsCheckingState },
         skippedIds = { skippedIds },
         areLoginButtonsLoading = { areButtonsLoading },
@@ -142,12 +147,15 @@ fun OnboardingScreen(
             loginFlowController.createAccount(CREATE_ACCOUNT_URL, CREATE_ACCOUNT_SUCCESS_HOST, CREATE_ACCOUNT_CANCEL_HOST)
         },
         onSaveSkippedAccounts = { crossAppLoginViewModel.skippedAccountIds.value = it },
+        onNextClicked = {
+            val permission = step.permission
+            if (permission == null) goToNextStep() else permissionLauncher.launch(permission)
+        },
     )
 }
 
 /**
- * @param onlyLogin When `true`, only the last login slide is shown and the carousel is skipped.
- * Use this when reopening onboarding from a multi-account flow to add another account.
+ * @param step The step shown: the login, then the permissions it still lacks, then the end of the onboarding.
  * @param accountsCheckingState The cross-app login facade state (loading / accounts / error).
  * @param skippedIds Cross-app accounts the user has chosen to skip.
  * @param areLoginButtonsLoading Whether the login / sign-up buttons should currently show a loader
@@ -158,46 +166,59 @@ fun OnboardingScreen(
  * @param onCreateAccount Called when the user wants to create a brand new Infomaniak account via
  * the WebView.
  * @param onSaveSkippedAccounts Persists the latest selection of skipped cross-app accounts.
+ * @param onNextClicked Called by the button of every step after the login.
  */
 @Composable
 private fun OnboardingScreen(
-    onlyLogin: Boolean,
+    step: OnboardingStep,
     accountsCheckingState: () -> AccountsCheckingState,
     skippedIds: () -> Set<Long>,
     areLoginButtonsLoading: () -> Boolean,
     onLoginRequest: (accounts: List<ExternalAccount>) -> Unit,
     onCreateAccount: () -> Unit,
     onSaveSkippedAccounts: (Set<Long>) -> Unit,
+    onNextClicked: () -> Unit,
 ) {
-    val pages: List<Page> = if (onlyLogin) listOf(Page.entries.last()) else Page.entries
+    AnimatedContent(
+        targetState = step,
+        transitionSpec = { slideIntoContainer(SlideDirection.Start) togetherWith slideOutOfContainer(SlideDirection.Start) },
+    ) { targetStep ->
+        // A single page per step: the pager can't be swiped and shows no indicator.
+        val pagerState = rememberPagerState(pageCount = { 1 })
 
-    val pagerState = rememberPagerState(pageCount = { pages.size })
-
-    OnboardingScaffold(
-        pagerState = pagerState,
-        onboardingPages = pages.mapIndexed { _, page -> page.toOnboardingPage() },
-        bottomContent = { paddingValues ->
-            OnboardingComponents.CrossLoginBottomContent(
-                modifier = Modifier
+        OnboardingScaffold(
+            pagerState = pagerState,
+            onboardingPages = listOf(targetStep.toOnboardingPage()),
+            bottomContent = { paddingValues ->
+                val modifier = Modifier
                     .padding(paddingValues)
-                    .consumeWindowInsets(paddingValues),
-                pagerState = pagerState,
-                isLoginButtonLoading = areLoginButtonsLoading,
-                accountsCheckingState = accountsCheckingState,
-                skippedIds = skippedIds,
-                onContinueWithSelectedAccounts = { selectedAccounts -> onLoginRequest(selectedAccounts) },
-                onUseAnotherAccountClicked = { onLoginRequest(emptyList()) },
-                onSaveSkippedAccounts = onSaveSkippedAccounts,
-                // Login is always required, regardless of whether cross-app accounts exist.
-                noCrossAppLoginAccountsContent = NoCrossAppLoginAccountsContent.accountRequired(
-                    onLogin = { onLoginRequest(emptyList()) },
-                    onCreateAccount = onCreateAccount,
-                    isLoginButtonLoading = areLoginButtonsLoading,
-                    isSignUpButtonLoading = areLoginButtonsLoading,
-                ),
-            )
-        },
-    )
+                    .consumeWindowInsets(paddingValues)
+
+                if (targetStep == OnboardingStep.Login) {
+                    OnboardingComponents.CrossLoginBottomContent(
+                        modifier = modifier,
+                        pagerState = pagerState,
+                        isLoginButtonLoading = areLoginButtonsLoading,
+                        accountsCheckingState = accountsCheckingState,
+                        skippedIds = skippedIds,
+                        onContinueWithSelectedAccounts = { selectedAccounts -> onLoginRequest(selectedAccounts) },
+                        onUseAnotherAccountClicked = { onLoginRequest(emptyList()) },
+                        onSaveSkippedAccounts = onSaveSkippedAccounts,
+                        // Login is always required, regardless of whether cross-app accounts exist.
+                        noCrossAppLoginAccountsContent = NoCrossAppLoginAccountsContent.accountRequired(
+                            onLogin = { onLoginRequest(emptyList()) },
+                            onCreateAccount = onCreateAccount,
+                            isLoginButtonLoading = areLoginButtonsLoading,
+                            isSignUpButtonLoading = areLoginButtonsLoading,
+                        ),
+                        customization = CrossLoginDefaults.customize(buttonStyle = OnboardingButtonDefaults.crossLoginStyle),
+                    )
+                } else {
+                    NextStepButton(step = targetStep, onClick = onNextClicked, modifier = modifier)
+                }
+            },
+        )
+    }
 }
 
 private suspend fun fetchDavCredentials(
@@ -234,7 +255,7 @@ private fun rememberOnboardingLoginFlowController(
         calendarUsers = listOf(CalendarUser(user, davCredentials)),
         onlyLoginScreen = dependencies.onlyLoginScreen,
         accountUtils = dependencies.accountUtils,
-        onNavigateToHome = dependencies.onNavigateToHome,
+        onLoggedIn = dependencies.onLoggedIn,
         onPopBack = dependencies.onPopBack,
     )
 }
@@ -286,7 +307,7 @@ private suspend fun loginUsers(loginResult: CrossAppLoginFacade.LoginResult, dep
             calendarUsers = calendarUsers,
             onlyLoginScreen = dependencies.onlyLoginScreen,
             accountUtils = dependencies.accountUtils,
-            onNavigateToHome = dependencies.onNavigateToHome,
+            onLoggedIn = dependencies.onLoggedIn,
             onPopBack = dependencies.onPopBack,
         )
     }
@@ -296,68 +317,13 @@ private suspend fun loginUsersIntoTheApp(
     calendarUsers: List<CalendarUser>,
     onlyLoginScreen: Boolean,
     accountUtils: AccountUtils,
-    onNavigateToHome: () -> Unit,
+    onLoggedIn: () -> Unit,
     onPopBack: () -> Unit,
 ) {
     calendarUsers.forEach { calendarUser ->
         accountUtils.addUser(calendarUser = calendarUser)
     }
-    if (onlyLoginScreen) onPopBack() else onNavigateToHome()
-}
-
-/**
- * Dummy slides for now
- */
-private enum class Page(
-    @DrawableRes val illustrationRes: Int,
-    val title: String,
-    val description: String,
-) {
-    PageOne(
-        illustrationRes = R.drawable.illu_onboarding_placeholder,
-        title = "Dummy onboarding title #1",
-        description = "Dummy onboarding description for the first slide. Replace me with the real copy.",
-    ),
-    PageTwo(
-        illustrationRes = R.drawable.illu_onboarding_placeholder,
-        title = "Dummy onboarding title #2",
-        description = "Dummy onboarding description for the second slide. Replace me with the real copy.",
-    ),
-    PageThree(
-        illustrationRes = R.drawable.illu_onboarding_placeholder,
-        title = "Dummy onboarding title #3",
-        description = "Dummy onboarding description for the third slide. Replace me with the real copy.",
-    ),
-    PageFour(
-        illustrationRes = R.drawable.illu_onboarding_placeholder,
-        title = "Sign in to your Infomaniak account",
-        description = "Sign in to start using the Infomaniak Calendar.",
-    );
-
-    fun toOnboardingPage(): OnboardingPage = OnboardingPage(
-        background = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background),
-            )
-        },
-        illustration = {
-            Image(
-                painter = painterResource(illustrationRes),
-                contentDescription = null,
-                modifier = Modifier.size(240.dp),
-            )
-        },
-        text = {
-            DefaultTitleAndDescription(
-                title = title,
-                description = description,
-                titleStyle = MaterialTheme.typography.headlineMedium,
-                descriptionStyle = MaterialTheme.typography.bodyLarge,
-            )
-        },
-    )
+    if (onlyLoginScreen) onPopBack() else onLoggedIn()
 }
 
 private data class OnboardingLoginDependencies(
@@ -367,7 +333,7 @@ private data class OnboardingLoginDependencies(
     val snackbarHostState: SharedSnackbarHostState?,
     val onlyLoginScreen: Boolean,
     val setButtonsLoading: (Boolean) -> Unit,
-    val onNavigateToHome: () -> Unit,
+    val onLoggedIn: () -> Unit,
     val onPopBack: () -> Unit,
 )
 
@@ -377,13 +343,14 @@ private fun OnboardingScreenPreview() {
     MaterialTheme {
         Surface {
             OnboardingScreen(
-                onlyLogin = false,
+                step = OnboardingStep.Login,
                 accountsCheckingState = { AccountsCheckingState(status = AccountsCheckingStatus.UpToDate) },
                 skippedIds = { emptySet() },
                 areLoginButtonsLoading = { false },
                 onLoginRequest = {},
                 onCreateAccount = {},
                 onSaveSkippedAccounts = {},
+                onNextClicked = {},
             )
         }
     }

@@ -34,6 +34,14 @@
     <string name="eventOccurrenceNotFound">Questo evento non è più disponibile.</string>
     <string name="helpTitle">Aiuto</string>
     <string name="monthTitle">Mese</string>
+    <string name="onboardingFourSubtitle">Ora puoi accedere ai tuoi eventi da Calendar.</string>
+    <string name="onboardingFourTitle">Tutto pronto</string>
+    <string name="onboardingOneSubtitle">Consulta, crea e condividi i tuoi eventi dal tuo telefono, in totale riservatezza.</string>
+    <string name="onboardingOneTitle">La tua agenda, sempre con te</string>
+    <string name="onboardingThreeSubtitle">L’accesso ai tuoi contatti facilita la condivisione dei calendari e l’invio di inviti.</string>
+    <string name="onboardingThreeTitle">Invita i tuoi partecipanti</string>
+    <string name="onboardingTwoSubtitle">Ricevi un avviso prima di ogni evento e non perdere più un appuntamento importante.</string>
+    <string name="onboardingTwoTitle">Consenti le notifiche</string>
     <string name="planningTitle">Pianificazione</string>
     <string name="settingsTitle">Impostazioni</string>
     <string name="signOutAccountAlertConfirm">Esci dall’account</string>

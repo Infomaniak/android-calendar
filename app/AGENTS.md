@@ -64,14 +64,16 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── eventDetail/           # EventDetailScreen + EventEditScreen + EventCreationScreen + their ViewModels, and
     │                              # attendeesSearch/ (EventAttendeesScreen + EventAttendeesViewModel shared with its parent)
     │                              # timeZoneSearch/ (TimeZoneSearchScreen + TimeZoneSearchResultViewModel channel back to its parent)
-    │   └── onboarding/            # OnboardingScreen + CrossAppLoginViewModel
+    │   └── onboarding/            # OnboardingScreen + NextStepButton + CrossAppLoginViewModel, and OnboardingStep: login, then
+    │                              # one step per missing permission (notifications, contacts), then "Start" ("Add an account": login only)
     └── theme/
         ├── Theme.kt                # CalendarTheme Composable (Material 3 color schemes)
         ├── Color.kt / ColorLight.kt / ColorDark.kt  # Color tokens
         └── Type.kt                 # Typography tokens
 
 app/src/main/res/
-├── drawable/                       # Vector drawables (icons, launcher)
+├── drawable/                       # Vector drawables (icons, launcher, onboarding illustrations)
+├── drawable-night/                 # Dark variants of the onboarding illustrations
 ├── mipmap-*/                       # Launcher icons (per density + adaptive)
 ├── values/                         # colors.xml, strings.xml, themes.xml (default, English)
 ├── values-night/                   # Dark theme overrides

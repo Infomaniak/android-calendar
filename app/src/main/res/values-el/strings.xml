@@ -34,6 +34,14 @@
     <string name="eventOccurrenceNotFound">Αυτή η εκδήλωση δεν είναι πλέον διαθέσιμη.</string>
     <string name="helpTitle">Βοήθεια</string>
     <string name="monthTitle">Μήνας</string>
+    <string name="onboardingFourSubtitle">Μπορείτε πλέον να έχετε πρόσβαση στις εκδηλώσεις σας από το Calendar.</string>
+    <string name="onboardingFourTitle">Όλα είναι έτοιμα</string>
+    <string name="onboardingOneSubtitle">Δείτε, δημιουργήστε και μοιραστείτε τις εκδηλώσεις σας από το τηλέφωνό σας, με πλήρη εμπιστευτικότητα.</string>
+    <string name="onboardingOneTitle">Το ημερολόγιό σας, παντού μαζί σας</string>
+    <string name="onboardingThreeSubtitle">Η πρόσβαση στις επαφές σας διευκολύνει την κοινή χρήση των ημερολογίων σας και την αποστολή προσκλήσεων.</string>
+    <string name="onboardingThreeTitle">Προσκαλέστε τους συμμετέχοντές σας</string>
+    <string name="onboardingTwoSubtitle">Ειδοποιηθείτε πριν από κάθε εκδήλωση και μην χάνετε ποτέ ένα σημαντικό ραντεβού.</string>
+    <string name="onboardingTwoTitle">Να επιτρέπονται οι ειδοποιήσεις</string>
     <string name="planningTitle">Προγραμματισμός</string>
     <string name="settingsTitle">Ρυθμίσεις</string>
     <string name="signOutAccountAlertConfirm">Αποσύνδεση από τον λογαριασμό</string>
