@@ -25,10 +25,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,19 +45,26 @@ import com.infomaniak.calendar.components.foundation.state.rememberSaveableAtten
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun AttendeesSearchScreen(
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
-    attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
+    viewModel: AttendeesSearchSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
-    val attendeesSearchUi by attendeesSearchSharedDataViewModel.attendeesSearchState.collectAsStateWithLifecycle()
+    val attendeesSearchUi by viewModel.attendeesSearchState.collectAsStateWithLifecycle()
 
     Box(modifier = modifier.fillMaxSize()) {
         when (val attendeesSearchState = attendeesSearchUi) {
             AttendeesSearchUiState.Loading -> Unit // The parent provides it right away, so nothing to show
             is AttendeesSearchUiState.Success -> {
+                LaunchedEffect(attendeesSearchState) {
+                    snapshotFlow { attendeesSearchState.state.searchQueryTextFieldState.text }.collectLatest {
+                        viewModel.search(it.toString())
+                    }
+                }
+
                 AttendeesSearchScreen(
                     attendeesSearchState = attendeesSearchState.state,
                     goBack = goBack,

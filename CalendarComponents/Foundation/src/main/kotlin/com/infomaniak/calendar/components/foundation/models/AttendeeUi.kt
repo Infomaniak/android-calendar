@@ -34,8 +34,8 @@ import kotlinx.parcelize.Parcelize
 data class AttendeeUi(
     val key: String,
     val email: String,
-    val displayName: String? = null,
-    val status: ParticipationStatus,
+    val displayName: String?,
+    val status: ParticipationStatus?,
     val isOrganizer: Boolean = false,
 ) : Parcelable {
     fun initials(): String = (displayName ?: email).computeInitials()

@@ -59,8 +59,8 @@ internal fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) 
                 .size(40.dp),
         )
         ListItem(
-            overlineContent = {
-                AttendeeParticipationStatus(attendee.status, attendee.isOrganizer)
+            overlineContent = attendee.status?.let {
+                { AttendeeParticipationStatus(it, attendee.isOrganizer) }
             },
             supportingContent = if (attendee.displayName.isNullOrEmpty()) {
                 null
@@ -147,5 +147,13 @@ private fun PreviewAttendeeMaybe() {
 private fun PreviewAttendeePending() {
     Surface {
         EventAttendee(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.NeedsAction))
+    }
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    Surface {
+        EventAttendee(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", null))
     }
 }

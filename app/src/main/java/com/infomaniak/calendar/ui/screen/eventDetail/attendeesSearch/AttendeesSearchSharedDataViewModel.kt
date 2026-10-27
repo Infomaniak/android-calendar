@@ -17,9 +17,15 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch
 
+import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.lifecycle.ViewModel
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.navigation.SharedViewModelStoreNavEntryDecorator
+import com.infomaniak.calendar.utils.contactKey
+import com.infomaniak.multiplatform_core.contacts.ContactsManager
+import com.infomaniak.multiplatform_core.contacts.domain.model.Contact
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
@@ -36,12 +42,37 @@ import kotlinx.coroutines.flow.asStateFlow
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
-class AttendeesSearchSharedDataViewModel : ViewModel() {
+class AttendeesSearchSharedDataViewModel(private val contactsManager: ContactsManager) : ViewModel() {
     private val _attendeesSearchState: MutableStateFlow<AttendeesSearchUiState> = MutableStateFlow(AttendeesSearchUiState.Loading)
     val attendeesSearchState: StateFlow<AttendeesSearchUiState> = _attendeesSearchState.asStateFlow()
 
     fun setAttendeesSearchState(attendeesSearchState: AttendeesSearchState) {
         _attendeesSearchState.value = AttendeesSearchUiState.Success(attendeesSearchState)
+    }
+
+    suspend fun search(query: String) {
+        val results = contactsManager.search(query)
+        val state = (attendeesSearchState.value as? AttendeesSearchUiState.Success)?.state ?: return
+        state.results.clear()
+        state.results.addAll(results.toAttendeesUi(state.attendees))
+    }
+}
+
+private fun List<Contact>.toAttendeesUi(attendees: SnapshotStateSet<AttendeeUi>): List<AttendeeUi> {
+    // TODO: Only recompute this map when the attendees set changes, not on every search.
+    val alreadyPresentAttendees = attendees.associateByTo(mutableMapOf()) { it.contactKey }
+
+    return map { contact ->
+        val alreadyPresentAttendee = alreadyPresentAttendees[contact.contactKey]
+        if (alreadyPresentAttendee != null) return@map alreadyPresentAttendee
+
+        return@map AttendeeUi(
+            key = contact.contactKey,
+            displayName = contact.name,
+            email = contact.email,
+            status = null,
+            isOrganizer = false,
+        )
     }
 }
 
