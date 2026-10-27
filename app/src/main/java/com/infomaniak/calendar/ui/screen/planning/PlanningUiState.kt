@@ -17,7 +17,10 @@
  */
 package com.infomaniak.calendar.ui.screen.planning
 
+import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
+import kotlinx.datetime.LocalDate
+
 sealed interface PlanningUiState {
     data object Loading : PlanningUiState
-    data class Success(val eventsByWeekAndDay: () -> EventsByWeekAndDay) : PlanningUiState
+    data class Success(val eventsByDate: Map<LocalDate, List<EventSummaryUi>>) : PlanningUiState
 }
