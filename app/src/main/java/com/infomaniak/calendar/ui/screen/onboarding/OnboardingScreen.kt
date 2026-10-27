@@ -59,6 +59,7 @@ import com.infomaniak.core.crossapplogin.back.CrossAppLoginFacade.AccountsChecki
 import com.infomaniak.core.crossapplogin.back.ExternalAccount
 import com.infomaniak.core.crossapplogin.front.components.CrossLoginBottomContent
 import com.infomaniak.core.crossapplogin.front.components.NoCrossAppLoginAccountsContent
+import com.infomaniak.core.crossapplogin.front.data.CrossLoginDefaults
 import com.infomaniak.core.login.InfomaniakLogin
 import com.infomaniak.core.network.ApiEnvironment
 import com.infomaniak.core.onboarding.OnboardingScaffold
@@ -210,6 +211,7 @@ private fun OnboardingScreen(
                             isLoginButtonLoading = areLoginButtonsLoading,
                             isSignUpButtonLoading = areLoginButtonsLoading,
                         ),
+                        customization = CrossLoginDefaults.customize(buttonStyle = OnboardingButtonDefaults.crossLoginStyle),
                     )
                 } else {
                     NextStepButton(step = targetStep, onClick = onNextClicked, modifier = modifier)

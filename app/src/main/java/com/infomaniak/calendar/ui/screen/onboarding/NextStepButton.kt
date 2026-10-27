@@ -20,6 +20,7 @@ package com.infomaniak.calendar.ui.screen.onboarding
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
@@ -31,7 +32,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.ui.compose.basics.ButtonType
 import com.infomaniak.core.ui.compose.basics.Typography
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.core.common.R as RCore
@@ -53,11 +53,11 @@ internal fun NextStepButton(
     ) {
         Button(
             onClick = onClick,
-            shape = ButtonType.Mail.shape,
+            shapes = OnboardingButtonDefaults.shapes,
             modifier = Modifier
                 .widthIn(max = 400.dp)
-                .fillMaxWidth()
-                .height(ButtonType.Mail.height),
+                .heightIn(min = OnboardingButtonDefaults.Height)
+                .fillMaxWidth(),
         ) {
             val textRes = when (step) {
                 OnboardingStep.EverythingReady -> RCrossAppLogin.string.buttonStart
