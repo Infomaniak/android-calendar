@@ -58,7 +58,7 @@ import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ChevronRight
 import com.infomaniak.designsystem.icons.symbols.UsersStacked
 
-private const val AVATAR_STACK_LIMIT = 4
+private const val AVATAR_STACK_LIMIT = 3
 
 @Composable
 internal fun AttendeesButton(
