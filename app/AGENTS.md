@@ -58,7 +58,7 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── threeDays/             # ThreeDayScreen + ThreeDayViewModel — 3-day view (events via DayEventsLoader)
     │   ├── week/                  # WeekScreen + WeekViewModel — week view (events via DayEventsLoader)
     │   ├── month/                 # MonthScreen + MonthViewModel
-    │   ├── planning/              # PlanningScreen + PlanningViewModel + PlanningEventGroupingExt
+    │   ├── planning/              # PlanningScreen + PlanningViewModel (events of a window around the visible date) + PlanningEventGroupingExt
     │   ├── accounts/              # AccountsListScreen + AccountActionsScreen + AccountsViewModel + AccountItem
     │                              # Drawer-backed account list, per-account detail/logout screen, and remove-account flow
     │   ├── eventCreation/         # EventCreationScreen
@@ -182,6 +182,13 @@ rather than by a runtime `if`:
 
 When touching `CaldavDebugConfig`, keep the debug and release declarations in sync: they are two separate
 files and only the variant being compiled is checked.
+
+### Planning scroll position
+
+- Every date has a fixed item index (`PlanningTimeline`), so loading events never moves the list: the initial position,
+  the jumps (`ProcessJumpRequests`) and the reported visible date (`ReportVisibleDate`) are plain index ↔ date conversions.
+- `PlanningViewModel` observes the days around the shared visible date, and only moves that window once the visible date
+  nears one of its edges. A day outside the window shows its indicator alone until it is loaded.
 
 ### Commands
 

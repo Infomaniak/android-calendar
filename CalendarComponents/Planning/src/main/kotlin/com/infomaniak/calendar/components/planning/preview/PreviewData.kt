@@ -24,8 +24,6 @@ import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.models.SimpleEventSummaryUi
-import com.infomaniak.calendar.components.foundation.models.WeekNumbering
-import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.foundation.preview.EventColorsUiFactory
 import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.DateTimeUnit
@@ -38,8 +36,8 @@ import kotlinx.datetime.toInstant
 import kotlin.time.Clock
 import kotlin.time.Instant
 
-class WeekEventsPreviewParameter : PreviewParameterProvider<Map<YearWeek, Map<LocalDate, List<EventSummaryUi>>>> {
-    override val values: Sequence<Map<YearWeek, Map<LocalDate, List<EventSummaryUi>>>> = sequenceOf(
+class PlanningPreviewParameter : PreviewParameterProvider<Map<LocalDate, List<EventSummaryUi>>> {
+    override val values: Sequence<Map<LocalDate, List<EventSummaryUi>>> = sequenceOf(
         todayPreviewWeekEvents,
         passingYearPreviewWeekEvents,
     )
@@ -55,7 +53,7 @@ class WeekEventsPreviewParameter : PreviewParameterProvider<Map<YearWeek, Map<Lo
     }
 }
 
-private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalDate, List<EventSummaryUi>>> {
+private fun generateEventsAround(targetDay: LocalDate): Map<LocalDate, List<EventSummaryUi>> {
     val timeZone = TimeZone.currentSystemDefault()
 
     val pastDay = targetDay.minus(5, DateTimeUnit.DAY)
@@ -80,7 +78,7 @@ private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalD
         )
     }
 
-    return listOf(
+    val events = mapOf(
         pastDay to listOf(
             event(pastDay, 10, "Team retrospective", "Conference room B"),
         ),
@@ -91,9 +89,10 @@ private fun generateEventsAround(targetDay: LocalDate): Map<YearWeek, Map<LocalD
         futureDay to listOf(
             event(futureDay, 11, "Sprint planning", "Hard rock room"),
         ),
-    ).groupForPlanning()
-}
+    )
 
-private fun List<Pair<LocalDate, List<EventSummaryUi>>>.groupForPlanning(): Map<YearWeek, Map<LocalDate, List<EventSummaryUi>>> =
-    groupBy { (date, _) -> WeekNumbering.ISO_8601.weekOf(date) }
-        .mapValues { (_, pairs) -> pairs.associate { (date, events) -> date to events } }
+    val today = Clock.today()
+    return generateSequence(pastDay) { it.plus(1, DateTimeUnit.DAY) }.takeWhile { it <= futureDay }.associateWith { date ->
+        events[date] ?: listOf(if (date == today) EventSummaryUi.TodayEmptyState else EventSummaryUi.EmptyState(date))
+    }
+}

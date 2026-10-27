@@ -25,6 +25,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -34,16 +36,18 @@ import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
+import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
 import com.infomaniak.calendar.components.planning.Planning
+import com.infomaniak.calendar.components.planning.PlanningTimeline
+import com.infomaniak.calendar.components.planning.preview.PlanningPreviewParameter
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.ScreenLoader
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
-import com.infomaniak.calendar.ui.previewparameter.EventsByWeekAndDayPreviewParameter
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
@@ -110,7 +114,7 @@ private fun PlanningScreen(
         when (val planningUi = planningUiState()) {
             is PlanningUiState.Success -> {
                 SuccessPlanning(
-                    events = planningUi.eventsByWeekAndDay,
+                    eventsByDate = planningUi.eventsByDate,
                     contentPadding = contentPadding + PaddingValues(Margin.Medium),
                     goToEventCreation = goToEventCreation,
                     goToEventDetail = goToEventDetail,
@@ -129,21 +133,25 @@ private fun PlanningScreen(
 
 @Composable
 private fun SuccessPlanning(
-    events: () -> EventsByWeekAndDay,
+    eventsByDate: Map<LocalDate, List<EventSummaryUi>>,
     contentPadding: PaddingValues,
     goToEventCreation: (LocalDate) -> Unit,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     visibleDayState: VisibleDayState,
     modifier: Modifier = Modifier,
 ) {
-    val lazyListState = rememberLazyListState(events().indexOf(visibleDayState.visibleDate))
+    val timeline = remember {
+        PlanningTimeline(WeekNumbering.ISO_8601) //TODO[weekNumbering]: Use week numbering from LocalSettings
+    }
+    val lazyListState = rememberLazyListState(timeline.indexOf(visibleDayState.visibleDate))
 
-    ProcessJumpRequests(lazyListState, visibleDayState, events)
-    ReportVisibleDate(lazyListState, onVisibleDateChanged = visibleDayState::updateVisibleDate)
+    ProcessJumpRequests(lazyListState, visibleDayState, timeline)
+    ReportVisibleDate(lazyListState, timeline, onVisibleDateChanged = visibleDayState::updateVisibleDate)
 
     Planning(
+        timeline = timeline,
+        eventsOf = eventsByDate::get,
         lazyListState = lazyListState,
-        weekEvents = events,
         modifier = modifier
             .scrollableToolbar()
             .fillMaxSize(),
@@ -155,12 +163,12 @@ private fun SuccessPlanning(
 
 @Preview
 @Composable
-private fun Preview(@PreviewParameter(EventsByWeekAndDayPreviewParameter::class) weekEvents: EventsByWeekAndDay) {
+private fun Preview(@PreviewParameter(PlanningPreviewParameter::class) eventsByDate: Map<LocalDate, List<EventSummaryUi>>) {
     CalendarThemeForPreview {
-        val visibleDayState = rememberVisibleDayState()
+        val visibleDayState = rememberVisibleDayState(remember { mutableStateOf(eventsByDate.keys.min()) })
         CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
             PlanningScreen(
-                planningUiState = { PlanningUiState.Success({ weekEvents }) },
+                planningUiState = { PlanningUiState.Success(eventsByDate) },
                 goToEventCreation = {},
                 goToEventDetail = {},
                 isLoadingEvents = { false },

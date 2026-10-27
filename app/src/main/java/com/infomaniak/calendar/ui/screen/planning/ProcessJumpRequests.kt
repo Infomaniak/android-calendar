@@ -20,21 +20,16 @@ package com.infomaniak.calendar.ui.screen.planning
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
+import com.infomaniak.calendar.components.planning.PlanningTimeline
 
 @Composable
-fun ProcessJumpRequests(lazyListState: LazyListState, visibleDayState: VisibleDayState, events: () -> EventsByWeekAndDay) {
-    val currentEventsByWeekAndDay by rememberUpdatedState(events)
-
+fun ProcessJumpRequests(lazyListState: LazyListState, visibleDayState: VisibleDayState, timeline: PlanningTimeline) {
     LaunchedEffect(visibleDayState) {
         for (date in visibleDayState.jumpCommand) {
-            val targetIndex = currentEventsByWeekAndDay().indexOf(date)
-
             // Swallow CancellationException thrown when a user gesture interrupts the programmatic scroll.
             runCatching {
-                lazyListState.scrollToItem(targetIndex)
+                lazyListState.scrollToItem(timeline.indexOf(date))
             }
         }
     }

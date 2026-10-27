@@ -18,27 +18,28 @@
 package com.infomaniak.calendar.components.planning
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.EventItem
 import com.infomaniak.calendar.components.event.EventItemDefaults
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
+import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.foundation.state.DateState
 import com.infomaniak.calendar.components.foundation.state.rememberToday
@@ -46,42 +47,22 @@ import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatS
 import com.infomaniak.calendar.components.planning.component.DayIndicator
 import com.infomaniak.calendar.components.planning.component.emptyState.OtherDayEmptyState
 import com.infomaniak.calendar.components.planning.component.emptyState.TodayEmptyState
-import com.infomaniak.calendar.components.planning.preview.WeekEventsPreviewParameter
+import com.infomaniak.calendar.components.planning.preview.PlanningPreviewParameter
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
 import kotlinx.datetime.LocalDate
 
 @Composable
 fun Planning(
-    weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventSummaryUi>>>,
+    timeline: PlanningTimeline,
+    eventsOf: (LocalDate) -> List<EventSummaryUi>?,
     goToEventCreation: (LocalDate) -> Unit,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    Timeline(
-        lazyListState = lazyListState,
-        weekEvents = weekEvents,
-        goToEventCreation = goToEventCreation,
-        onEventClick = onEventClick,
-        contentPadding = contentPadding,
-        modifier = modifier,
-    )
-}
-
-@Composable
-private fun Timeline(
-    lazyListState: LazyListState,
-    weekEvents: () -> Map<YearWeek, Map<LocalDate, List<EventSummaryUi>>>,
-    goToEventCreation: (LocalDate) -> Unit,
-    onEventClick: (EventSummaryUi.Normal) -> Unit,
-    contentPadding: PaddingValues,
-    modifier: Modifier = Modifier,
-) {
     val today by rememberToday()
-    val events = weekEvents()
-    val sectionSizing = remember { SectionSizing() }
 
     LazyColumn(
         state = lazyListState,
@@ -89,78 +70,79 @@ private fun Timeline(
         contentPadding = contentPadding,
         verticalArrangement = Arrangement.spacedBy(Margin.Mini),
     ) {
-        events.forEach { (week, days) ->
-            item(key = PlanningItemKey.WeekHeader(week.firstDay)) {
-                Text(week.label, modifier = Modifier.padding(bottom = Margin.Medium))
-            }
-
-            days.forEach { (date, events) ->
-                val sectionItemKeys = events.map { it.toItemKey(date) }
-
-                itemsIndexed(events, key = { _, event -> event.toItemKey(date) }) { index, event ->
-                    val itemKey = event.toItemKey(date)
-                    val bottomPadding = if (index == events.lastIndex) Margin.Medium else 0.dp
-
-                    Event(
-                        event = event,
-                        date = date,
-                        today = today,
-                        lazyListState = lazyListState,
-                        sectionSizing = sectionSizing,
-                        itemKey = itemKey,
-                        sectionItemKeys = sectionItemKeys,
-                        goToEventCreation = goToEventCreation,
-                        onEventClick = onEventClick,
-                        modifier = Modifier
-                            .ensureSectionMinHeight(sectionSizing, sectionItemKeys, itemKey)
-                            .padding(bottom = bottomPadding),
-                    )
-                }
+        items(
+            count = timeline.itemCount,
+            contentType = { index -> if (timeline.isWeekHeader(index)) ContentType.WeekHeader else ContentType.Day },
+        ) { index ->
+            if (timeline.isWeekHeader(index)) {
+                Text(timeline.weekAt(index).label, modifier = Modifier.padding(bottom = Margin.Medium))
+            } else {
+                val date = timeline.dateAt(index)
+                Day(
+                    date = date,
+                    events = eventsOf(date),
+                    today = today,
+                    lazyListState = lazyListState,
+                    index = index,
+                    goToEventCreation = goToEventCreation,
+                    onEventClick = onEventClick,
+                )
             }
         }
     }
 }
 
 @Composable
-private fun Event(
-    event: EventSummaryUi,
+private fun Day(
     date: LocalDate,
+    events: List<EventSummaryUi>?,
     today: LocalDate,
     lazyListState: LazyListState,
-    sectionSizing: SectionSizing,
-    itemKey: PlanningItemKey,
-    sectionItemKeys: List<PlanningItemKey>,
+    index: Int,
     goToEventCreation: (LocalDate) -> Unit,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier,
+        modifier = Modifier.padding(bottom = Margin.Medium),
         horizontalArrangement = Arrangement.spacedBy(Margin.Small),
     ) {
         DayIndicator(
             dayName = date.formatShortDayNameUppercase(),
             dayNumber = date.day,
             state = if (date == today) DateState.Today else DateState.None,
-            modifier = Modifier
-                .measureIndicator(sectionSizing)
-                .stickyDayIndicator(lazyListState, itemKey, sectionItemKeys),
+            modifier = Modifier.stickyDayIndicator(lazyListState, index),
         )
 
-        when (event) {
-            is EventSummaryUi.Normal -> {
-                EventItem(
-                    event = event,
-                    onClick = { onEventClick(event) },
-                    modifier = Modifier.fillMaxWidth(),
-                    allDayTrailingContent = EventItemDefaults.AllDayLabel,
-                )
+        Column(verticalArrangement = Arrangement.spacedBy(Margin.Mini)) {
+            events?.forEach { event ->
+                key(event.id) { DayEvent(event, date, goToEventCreation, onEventClick) }
             }
-            is EventSummaryUi.TodayEmptyState -> TodayEmptyState(onClick = { goToEventCreation(date) }, Modifier.fillMaxWidth())
-            is EventSummaryUi.EmptyState -> OtherDayEmptyState(onClick = { goToEventCreation(date) }, Modifier.fillMaxWidth())
         }
     }
 }
+
+@Composable
+private fun DayEvent(
+    event: EventSummaryUi,
+    date: LocalDate,
+    goToEventCreation: (LocalDate) -> Unit,
+    onEventClick: (EventSummaryUi.Normal) -> Unit,
+) {
+    when (event) {
+        is EventSummaryUi.Normal -> {
+            EventItem(
+                event = event,
+                onClick = { onEventClick(event) },
+                modifier = Modifier.fillMaxWidth(),
+                allDayTrailingContent = EventItemDefaults.AllDayLabel,
+            )
+        }
+        is EventSummaryUi.TodayEmptyState -> TodayEmptyState(onClick = { goToEventCreation(date) }, Modifier.fillMaxWidth())
+        is EventSummaryUi.EmptyState -> OtherDayEmptyState(onClick = { goToEventCreation(date) }, Modifier.fillMaxWidth())
+    }
+}
+
+private enum class ContentType { WeekHeader, Day }
 
 private val YearWeek.label: String
     @Composable get() {
@@ -169,12 +151,20 @@ private val YearWeek.label: String
         return "$week - $dateRange"
     }
 
-private fun EventSummaryUi.toItemKey(date: LocalDate): PlanningItemKey = PlanningItemKey.Event(date = date, id = id)
-
 @Preview
 @Composable
-private fun PreviewPlanning(@PreviewParameter(WeekEventsPreviewParameter::class) weekEvents: Map<YearWeek, Map<LocalDate, List<EventSummaryUi>>>) {
+private fun PreviewPlanning(
+    @PreviewParameter(PlanningPreviewParameter::class) eventsByDate: Map<LocalDate, List<EventSummaryUi>>,
+) {
+    val timeline = remember { PlanningTimeline(WeekNumbering.ISO_8601) }
+
     Surface {
-        Planning(goToEventCreation = {}, onEventClick = {}, weekEvents = { weekEvents })
+        Planning(
+            timeline = timeline,
+            eventsOf = eventsByDate::get,
+            goToEventCreation = {},
+            onEventClick = {},
+            lazyListState = rememberLazyListState(timeline.indexOf(eventsByDate.keys.min())),
+        )
     }
 }
