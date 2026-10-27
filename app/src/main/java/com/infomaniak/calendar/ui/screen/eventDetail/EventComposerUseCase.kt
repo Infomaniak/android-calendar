@@ -24,6 +24,7 @@ import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.account.accountId
 import com.infomaniak.calendar.utils.applyTo
 import com.infomaniak.calendar.utils.toNewEventEditData
+import com.infomaniak.calendar.utils.typedCalendarId
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
@@ -43,7 +44,7 @@ class EventComposerUseCase @Inject constructor(
 ) {
     suspend fun createEvent(eventDraft: EventDraft): SaveEventResult {
         return runCatching {
-            val defaultOrganizer = CalendarId(eventDraft.calendarId).toOrganizer()
+            val defaultOrganizer = eventDraft.typedCalendarId.toOrganizer()
             calendarManager.createEvent(eventDraft.toNewEventEditData(defaultOrganizer))
             SaveEventResult.Success
         }.cancellable().getOrDefault(SaveEventResult.Error)
@@ -55,7 +56,7 @@ class EventComposerUseCase @Inject constructor(
             val editData = calendarManager.getEditData(occurrenceId) ?: return SaveEventResult.Error
             calendarManager.updateEvent(
                 target = event.targetFor(scope.toRecurrenceScope()),
-                data = eventDraft.applyTo(editData, defaultOrganizer = editData.calendarId.toOrganizer()),
+                data = eventDraft.applyTo(editData, defaultOrganizer = eventDraft.typedCalendarId.toOrganizer()),
             )
             SaveEventResult.Success
         }.cancellable().getOrDefault(SaveEventResult.Error)

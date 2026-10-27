@@ -30,6 +30,8 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.ZonedWallCl
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.plus
 
+val EventDraft.typedCalendarId: CalendarId get() = CalendarId(calendarId)
+
 /**
  * Writes the form's fields for both creation and edition: a field added to the form only needs its line here.
  * [defaultOrganizer] organizes the event when it gets attendees without having an organizer yet.
@@ -38,6 +40,7 @@ fun EventDraft.applyTo(editData: EventEditData, defaultOrganizer: Organizer?): E
     title = title,
     timing = editData.timing.copy(bounds = bounds()),
     timeBlocking = if (isOccupied) TimeBlocking.Blocks else TimeBlocking.DoesNotBlock,
+    calendarId = typedCalendarId,
     attendees = attendees.map { AttendeeEdit(email = it.email, displayName = it.displayName) },
     organizer = (editData.organizer ?: defaultOrganizer).takeIf { attendees.isNotEmpty() },
 )
@@ -50,7 +53,7 @@ fun EventDraft.toNewEventEditData(defaultOrganizer: Organizer?): EventEditData =
         location = null,
         description = null,
         timeBlocking = null,
-        calendarId = CalendarId(calendarId),
+        calendarId = typedCalendarId,
         eventColor = null,
         alarms = AlarmListEdit.Replace(emptyList()),
         attendees = emptyList(),
