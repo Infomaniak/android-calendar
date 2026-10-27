@@ -102,6 +102,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        mainViewModel.syncContacts()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         pendingOccurrenceId.value?.let { outState.putString(KEY_PENDING_OCCURRENCE_ID, it.toJson()) }
