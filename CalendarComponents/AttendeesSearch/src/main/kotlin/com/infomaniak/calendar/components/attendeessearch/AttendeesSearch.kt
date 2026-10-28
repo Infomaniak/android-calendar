@@ -38,6 +38,8 @@ import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.UserMagnifyingGlass
 
 @Composable
 fun AttendeesSearch(
@@ -57,7 +59,7 @@ fun AttendeesSearch(
             placeholder = stringResource(R.string.searchForAttendees),
         )
         if (attendeesList.isEmpty()) {
-            EmptyState(text = stringResource(R.string.attendeesEmptyState))
+            EmptyState(text = stringResource(R.string.attendeesEmptyState), icon = EsdsIcons.UserMagnifyingGlass)
         } else {
             AttendeesList(
                 attendees = { attendeesList },

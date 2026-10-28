@@ -34,6 +34,7 @@
     <string name="eventOccurrenceNotFound">Dit evenement is niet meer beschikbaar.</string>
     <string name="helpTitle">Hulp</string>
     <string name="monthTitle">Maand</string>
+    <string name="noWritableCalendar">Geen bewerkbare kalender gevonden</string>
     <string name="notificationAllDay">De hele dag</string>
     <string name="notificationChannelEventRemindersDescription">Meldingen voor aankomende evenementen en herinneringen</string>
     <string name="notificationChannelEventRemindersTitle">Herinneringen aan evenementen</string>

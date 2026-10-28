@@ -17,9 +17,12 @@
  */
 package com.infomaniak.calendar.components.foundation.component
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -27,16 +30,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Lock
+import com.infomaniak.designsystem.icons.symbols.Symbol
 
 @Composable
-fun EmptyState(text: String, modifier: Modifier = Modifier) {
+fun EmptyState(text: String, modifier: Modifier = Modifier, icon: Symbol? = null) {
     // TODO: improve empty state
-    Box(
-        modifier = modifier.fillMaxSize().padding(top = EsdsTheme.spacing.lg),
-        contentAlignment = Alignment.TopCenter,
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(top = EsdsTheme.spacing.lg),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xl, Alignment.CenterVertically),
     ) {
-        Text(text, style = MaterialTheme.typography.labelMedium)
+        icon?.let { Icon(icon.ExtraLarge, contentDescription = null) }
+        Text(text, style = MaterialTheme.typography.labelMedium, modifier = Modifier.widthIn(max = 300.dp))
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewIcon() {
+    Surface {
+        EmptyState(text = "Empty state", icon = EsdsIcons.Lock)
     }
 }
 

@@ -40,6 +40,7 @@ dependencies {
     implementation(core.infomaniak.core.ui.compose.basics)
 
     implementation(libs.infomaniak.designsystem.foundation)
+    implementation(libs.infomaniak.designsystem.icons)
 
     api(kmpCalendar.kotlinx.datetime)
 

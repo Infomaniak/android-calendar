@@ -17,7 +17,10 @@
  */
 package com.infomaniak.calendar.components.eventdetail.models
 
+import androidx.compose.runtime.Immutable
+
 /** The calendars of a single account, listed under its [account]. */
+@Immutable
 data class EventDetailCalendarGroup(
     val account: EventDetailAccount,
     val calendars: List<EventDetailCalendar>,

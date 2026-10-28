@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.creation
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -30,20 +31,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberDefaultEventForm
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
+import com.infomaniak.calendar.components.foundation.component.EmptyState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.screen.eventDetail.SaveEventResult
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.model.EventCreationCalendars
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchResultViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.CalendarCross
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -64,11 +70,10 @@ fun EventCreationScreen(
     val snackbarHostState = LocalSharedSnackbarHostState.current
     val coroutineScope = rememberCoroutineScope()
     val errorText = stringResource(RCore.string.anErrorHasOccurred)
-    val eventFormCalendars = viewModel.eventFormCalendars.collectAsStateWithLifecycle().value
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val defaultEventDuration by viewModel.defaultEventDuration.collectAsStateWithLifecycle(null)
 
-    // Null while loading, or if the user has no writable calendar: an event can't be created anywhere then
-    val state = eventFormCalendars?.let {
+    val state = (uiState as? EventCreationUiState.Success)?.calendars?.let {
         rememberDefaultEventForm(
             calendars = it.calendars,
             initialCalendar = it.initialCalendar,
@@ -86,6 +91,7 @@ fun EventCreationScreen(
     }
 
     EventCreationScreen(
+        uiState = uiState,
         state = state,
         onSubmit = {
             val eventDraft = state?.toEventDraft() ?: return@EventCreationScreen
@@ -105,6 +111,7 @@ fun EventCreationScreen(
 
 @Composable
 private fun EventCreationScreen(
+    uiState: EventCreationUiState,
     state: EventFormState?,
     onSubmit: () -> Unit,
     goBack: () -> Unit,
@@ -115,18 +122,26 @@ private fun EventCreationScreen(
     val scrollState = rememberScrollState()
 
     Scaffold(
-        topBar = { SubmitTopAppBar(goBack = goBack, onSubmit = onSubmit) },
+        topBar = { SubmitTopAppBar(goBack = goBack, onSubmit = onSubmit, isSubmitEnabled = { state != null }) },
         modifier = modifier,
     ) { contentPadding ->
-        if (state == null) return@Scaffold
-
-        EventForm(
-            state = state,
-            onAttendeesClick = goToEventsAttendees,
-            onTimeZoneClick = goToTimeZoneSearch,
-            contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
-            modifier = Modifier.verticalScroll(scrollState),
-        )
+        when (uiState) {
+            EventCreationUiState.Loading -> Unit
+            EventCreationUiState.NoWritableCalendar -> EmptyState(
+                text = stringResource(R.string.noWritableCalendar),
+                icon = EsdsIcons.CalendarCross,
+                modifier = Modifier.padding(contentPadding),
+            )
+            is EventCreationUiState.Success -> state?.let {
+                EventForm(
+                    state = it,
+                    onAttendeesClick = goToEventsAttendees,
+                    onTimeZoneClick = goToTimeZoneSearch,
+                    contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
+                    modifier = Modifier.verticalScroll(scrollState),
+                )
+            }
+        }
     }
 }
 
@@ -141,6 +156,37 @@ private fun EventCreationScreenPreview() {
             attendeesSearchState = rememberSaveableAttendeesSearchState(),
         )
 
-        EventCreationScreen(state = state, onSubmit = {}, goBack = {}, goToEventsAttendees = {}, goToTimeZoneSearch = {})
+        EventCreationScreen(
+            uiState = EventCreationUiState.Success(
+                EventCreationCalendars(previewEventDetailCalendarGroups, previewEventDetailCalendar),
+            ),
+            state = state,
+            onSubmit = {},
+            goBack = {},
+            goToEventsAttendees = {},
+            goToTimeZoneSearch = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewEmptyWritableCalendar() {
+    CalendarThemeForPreview {
+        val state = rememberDefaultEventForm(
+            calendars = previewEventDetailCalendarGroups,
+            initialCalendar = previewEventDetailCalendar,
+            dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
+            attendeesSearchState = rememberSaveableAttendeesSearchState(),
+        )
+
+        EventCreationScreen(
+            uiState = EventCreationUiState.NoWritableCalendar,
+            state = state,
+            onSubmit = {},
+            goBack = {},
+            goToEventsAttendees = {},
+            goToTimeZoneSearch = {},
+        )
     }
 }

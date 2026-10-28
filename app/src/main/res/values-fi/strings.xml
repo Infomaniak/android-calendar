@@ -34,6 +34,7 @@
     <string name="eventOccurrenceNotFound">Tämä tapahtuma ei ole enää saatavilla.</string>
     <string name="helpTitle">Apua</string>
     <string name="monthTitle">Kuukausi</string>
+    <string name="noWritableCalendar">Muokattavaa kalenteria ei löytynyt</string>
     <string name="notificationAllDay">Koko päivä</string>
     <string name="notificationChannelEventRemindersDescription">Ilmoitukset tulevista tapahtumista ja muistutuksista</string>
     <string name="notificationChannelEventRemindersTitle">Tapahtumamuistutukset</string>
