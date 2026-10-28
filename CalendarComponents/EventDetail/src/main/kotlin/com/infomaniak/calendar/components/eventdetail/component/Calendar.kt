@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.ListItem
@@ -43,6 +44,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -117,7 +120,8 @@ private fun CalendarChoiceDialog(
         LazyColumn(
             modifier
                 .background(AlertDialogDefaults.containerColor, AlertDialogDefaults.shape)
-                .padding(EsdsTheme.spacing.threeXl),
+                .padding(EsdsTheme.spacing.threeXl)
+                .selectableGroup(),
         ) {
             calendarGroups.forEachIndexed { index, (account, calendars) ->
                 item(key = Key.Title(account.id)) {
@@ -125,7 +129,9 @@ private fun CalendarChoiceDialog(
                     Text(
                         text = account.name,
                         style = MaterialTheme.typography.titleSmall,
-                        modifier = Modifier.padding(top = topPadding, bottom = EsdsTheme.spacing.md),
+                        modifier = Modifier
+                            .padding(top = topPadding, bottom = EsdsTheme.spacing.md)
+                            .semantics { heading() },
                     )
                 }
 
@@ -134,8 +140,8 @@ private fun CalendarChoiceDialog(
                         CalendarChoiceItem(
                             color = calendar.color,
                             name = calendar.name,
-                            isSelected = { calendar.id == selectedCalendar.id },
-                            onCheckedChange = { onSelect(calendar) },
+                            isSelected = calendar.id == selectedCalendar.id,
+                            onClick = { onSelect(calendar) },
                         )
                     }
                 }
@@ -145,13 +151,13 @@ private fun CalendarChoiceDialog(
 }
 
 @Composable
-private fun CalendarChoiceItem(color: Color, name: String, isSelected: () -> Boolean, onCheckedChange: (Boolean) -> Unit) {
+private fun CalendarChoiceItem(color: Color, name: String, isSelected: Boolean, onClick: () -> Unit) {
     ListItem(
         leadingContent = { Dot(color) },
         content = { Text(name) },
-        trailingContent = { RadioButton(selected = isSelected(), onClick = null) },
-        checked = isSelected(),
-        onCheckedChange = onCheckedChange,
+        trailingContent = { RadioButton(selected = isSelected, onClick = null) },
+        selected = isSelected,
+        onClick = onClick,
         shapes = ListItemDefaults.shapes(shape = MaterialTheme.shapes.large),
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
     )
@@ -218,8 +224,8 @@ private fun PreviewChoiceItem() {
             CalendarChoiceItem(
                 color = previewEventDetailCalendar.color,
                 name = previewEventDetailCalendar.name,
-                isSelected = { true },
-                onCheckedChange = {},
+                isSelected = true,
+                onClick = {},
             )
         }
     }
