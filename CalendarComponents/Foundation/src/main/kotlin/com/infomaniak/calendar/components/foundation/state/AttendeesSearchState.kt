@@ -21,6 +21,8 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.saveable.SaverScope
@@ -37,6 +39,8 @@ class AttendeesSearchState(
     val results: SnapshotStateList<AttendeeUi>,
     val attendees: SnapshotStateSet<AttendeeUi>,
 ) {
+    val attendeesEmails by derivedStateOf { attendees.map { it.email } }
+
     fun addAttendee(attendee: AttendeeUi) {
         attendees.add(attendee.copy(status = ParticipationStatus.NeedsAction))
         searchQueryTextFieldState.clearText()

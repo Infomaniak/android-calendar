@@ -83,7 +83,9 @@ fun AttendeesSearch(
                 } else {
                     null
                 },
-                isEnabled = { attendee -> !isDisplayingSearchResults || attendee.status == null },
+                isEnabled = { attendee ->
+                    !isDisplayingSearchResults || attendee.email !in attendeesSearchState.attendeesEmails
+                },
                 contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
             )
         }
