@@ -22,8 +22,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
@@ -35,7 +37,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Cross
 import com.infomaniak.designsystem.icons.symbols.MagnifyingGlass
+import com.infomaniak.core.common.R as RCore
 
 @Composable
 fun SearchBar(
@@ -53,6 +57,16 @@ fun SearchBar(
                 imageVector = EsdsIcons.MagnifyingGlass.Medium,
                 contentDescription = stringResource(R.string.contentDescriptionSearch),
             )
+        },
+        trailingIcon = {
+            if (searchState.text.isNotEmpty()) {
+                IconButton(onClick = { searchState.clearText() }) {
+                    Icon(
+                        imageVector = EsdsIcons.Cross.Medium,
+                        contentDescription = stringResource(RCore.string.contentDescriptionClear),
+                    )
+                }
+            }
         },
         modifier = modifier
             .padding(horizontal = Margin.Small, vertical = Margin.Small)
