@@ -92,6 +92,7 @@ internal fun CalendarEditable(
             Dot(selectedCalendar.color)
             Text(text = selectedCalendar.name, style = MaterialTheme.typography.labelLarge)
         },
+        itemCount = calendars.sumOf { it.calendars.size },
         modifier = modifier,
     )
 
