@@ -25,6 +25,3 @@ data class EventDetailCalendarGroup(
     val account: EventDetailAccount,
     val calendars: List<EventDetailCalendar>,
 )
-
-fun List<EventDetailCalendarGroup>.findCalendar(id: String): EventDetailCalendar? =
-    firstNotNullOfOrNull { group -> group.calendars.find { it.id == id } }
