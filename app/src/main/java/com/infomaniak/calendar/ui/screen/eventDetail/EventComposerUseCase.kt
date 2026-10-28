@@ -27,6 +27,7 @@ import com.infomaniak.calendar.utils.applyTo
 import com.infomaniak.calendar.utils.toNewEventEditData
 import com.infomaniak.calendar.utils.typedCalendarId
 import com.infomaniak.core.common.cancellable
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Organizer
@@ -34,6 +35,9 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.recurrence.
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.flow.first
+import java.io.IOException
+
+private const val TAG = "EventComposerUseCase"
 
 /**
  * Single entry point for the screens that create, edit or delete events
@@ -86,7 +90,15 @@ class EventComposerUseCase @Inject constructor(
 }
 
 private suspend fun CalendarDataValues.saveLastUsedCalendar(eventDraft: EventDraft) {
-    lastUsedCalendarId.setValue(eventDraft.calendarId)
+    runCatching {
+        lastUsedCalendarId.setValue(eventDraft.calendarId)
+    }.cancellable().onFailure {
+        if (it is IOException) {
+            SentryLog.w(TAG, "saveLastUsedCalendar() could not store last used calendar", it)
+        } else {
+            SentryLog.e(TAG, "saveLastUsedCalendar() could not store last used calendar", it)
+        }
+    }
 }
 
 sealed interface SaveEventResult {
