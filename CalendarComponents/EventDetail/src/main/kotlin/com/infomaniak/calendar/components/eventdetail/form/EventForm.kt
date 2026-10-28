@@ -43,10 +43,10 @@ import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitc
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
-import com.infomaniak.calendar.components.eventdetail.form.component.AddReminderButton
 import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
-import com.infomaniak.calendar.components.eventdetail.form.component.ReminderItem
-import com.infomaniak.calendar.components.eventdetail.form.component.ReminderOffsetDialog
+import com.infomaniak.calendar.components.eventdetail.form.component.reminder.AddReminderButton
+import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderItem
+import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderOffsetDialog
 import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
