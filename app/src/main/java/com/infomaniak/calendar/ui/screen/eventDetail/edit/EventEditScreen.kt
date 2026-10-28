@@ -42,6 +42,7 @@ import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberEventFormState
+import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
@@ -93,7 +94,7 @@ fun EventEditScreen(
         is EventDetailUiState.Displayable.Success -> EventEditScreenState.Success(
             eventFormState = rememberEventFormState(
                 calendars = eventDetailUiState.eventDetail.calendars,
-                initialEventColor = eventDetailUiState.eventDetail.eventColor,
+                initialEventColor = eventDetailUiState.eventDetail.eventColorChoice,
                 initialCalendar = eventDetailUiState.eventDetail.calendar,
                 dateAndTimeState = rememberEventDateState(eventDetailUiState.eventDetail),
                 initialText = eventDetailUiState.eventDetail.title,
@@ -231,7 +232,7 @@ private fun Preview() {
                 uiState = EventEditScreenState.Success(
                     eventFormState = rememberEventFormState(
                         calendars = previewEventDetailCalendarGroups,
-                        initialEventColor = previewEventDetailCalendar.color,
+                        initialEventColor = EventColorChoice.Default,
                         initialCalendar = previewEventDetailCalendar,
                         dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
                         initialText = "Meeting on how to find funny preview titles",

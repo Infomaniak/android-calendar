@@ -17,11 +17,10 @@
  */
 package com.infomaniak.calendar.components.eventdetail.models
 
-import android.os.Parcel
 import android.os.Parcelable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
-import kotlinx.parcelize.Parceler
+import com.infomaniak.calendar.components.eventdetail.utils.ColorParceler
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 
@@ -33,8 +32,3 @@ data class EventDetailCalendar(
     val name: String,
     val color: Color,
 ) : Parcelable
-
-private object ColorParceler : Parceler<Color> {
-    override fun create(parcel: Parcel) = Color(parcel.readLong().toULong())
-    override fun Color.write(parcel: Parcel, flags: Int) = parcel.writeLong(value.toLong())
-}

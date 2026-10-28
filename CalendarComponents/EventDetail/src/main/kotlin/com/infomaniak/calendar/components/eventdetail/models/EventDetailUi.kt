@@ -33,7 +33,7 @@ import com.infomaniak.designsystem.icons.symbols.Symbol
  */
 @Immutable
 data class EventDetailUi(
-    val eventColor: Color,
+    val eventColorChoice: EventColorChoice,
     val calendar: EventDetailCalendar,
     val calendars: List<EventDetailCalendarGroup>,
     val title: String,
@@ -54,6 +54,7 @@ data class EventDetailUi(
     val canEdit: Boolean,
 ) {
     val isRecurrent get() = recurrence is EventDetailRecurrence.Recurrence
+    val eventColor get() = eventColorChoice.getColor(calendar)
 
     data class Room(val title: String, val seats: Int, val floor: Int)
 

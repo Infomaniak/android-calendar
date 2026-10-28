@@ -30,7 +30,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
@@ -47,6 +46,7 @@ import com.infomaniak.calendar.components.eventdetail.detail.component.Descripti
 import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
 import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
+import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
@@ -148,7 +148,7 @@ fun EventDetail(
 @Composable
 private fun PreviewEventDetail() {
     val eventDetail = EventDetailUi(
-        eventColor = Color.Red,
+        eventColorChoice = EventColorChoice.Default,
         calendar = previewEventDetailCalendar,
         calendars = previewEventDetailCalendarGroups,
         title = "Event Title",

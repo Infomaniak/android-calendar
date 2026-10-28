@@ -48,6 +48,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.detail.EventDetail
 import com.infomaniak.calendar.components.eventdetail.detail.component.ParticipationStatusButtonsToolbar
+import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
@@ -214,7 +215,7 @@ private fun openLocationInMapApp(context: Context, location: String) {
 @Composable
 private fun Preview() {
     val previewEventDetail = EventDetailUi(
-        eventColor = Color.Red,
+        eventColorChoice = EventColorChoice.Default,
         calendar = previewEventDetailCalendar,
         calendars = previewEventDetailCalendarGroups,
         title = "Event title",

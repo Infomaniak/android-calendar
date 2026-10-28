@@ -26,7 +26,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
@@ -38,6 +37,7 @@ import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSw
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
 import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
+import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
@@ -66,7 +66,7 @@ fun EventForm(
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
     Column(modifier.padding(contentPadding)) {
         TitleEditable(
-            dotColor = state.eventColorState.value ?: Color.Transparent, // Temporarily hide the dot until we get the actual color
+            dotColor = { state.eventColorState.value.getColor(state.calendar) },
             textFieldState = state.titleTextState,
             modifier = Modifier.eventSharedElement(EventSharedElement.Title),
         )
@@ -128,7 +128,7 @@ private fun Preview() {
             EventForm(
                 state = rememberEventFormState(
                     calendars = previewEventDetailCalendarGroups,
-                    initialEventColor = previewEventDetailCalendar.color,
+                    initialEventColor = EventColorChoice.Default,
                     initialCalendar = previewEventDetailCalendar,
                     dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
                     initialText = "Event title",
