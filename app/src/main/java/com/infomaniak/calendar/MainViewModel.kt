@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
@@ -31,6 +30,7 @@ import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.account.accountId
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.common.cancellable
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.multiplatform_core.account.domain.model.AccountId
 import com.infomaniak.multiplatform_core.contacts.ContactsManager
 import dev.zacsweers.metro.AppScope
@@ -132,7 +132,7 @@ class MainViewModel(
         runCatching {
             contactsManager.sync(accountIds)
         }.cancellable().onFailure { throwable ->
-            Log.w(TAG, "Failed to sync contacts", throwable)
+            SentryLog.w(TAG, "Failed to sync contacts", throwable)
         }
     }
 
