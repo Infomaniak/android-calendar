@@ -55,19 +55,11 @@ internal fun EventAttendee(
     onClick: (() -> Unit)? = null,
     enabled: Boolean = true,
 ) {
-    EventAttendeeContent(
-        attendee,
+    Row(
         modifier = modifier
             .clip(ListItemDefaults.shapes().pressedShape)
             .clickable(enabled = enabled, onClick = { onClick?.invoke() }, role = Role.Button)
-            .alpha(if (enabled) 1f else EsdsTheme.opacity.medium),
-    )
-}
-
-@Composable
-private fun EventAttendeeContent(attendee: AttendeeUi, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
+            .alpha(if (enabled) 1f else EsdsTheme.opacity.medium)
             .background(ListItemDefaults.colors().containerColor)
             .padding(start = EsdsTheme.spacing.lg),
         verticalAlignment = Alignment.CenterVertically,
