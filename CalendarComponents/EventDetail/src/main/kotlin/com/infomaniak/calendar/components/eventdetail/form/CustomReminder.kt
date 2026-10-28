@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -35,7 +37,9 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 fun CustomReminder(state: CustomReminderState, modifier: Modifier = Modifier, contentPadding: PaddingValues = PaddingValues()) {
     Column(
         verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xl),
-        modifier = modifier.padding(contentPadding),
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .padding(contentPadding),
     ) {
         ReminderOffsetSection(
             amountTextFieldState = state.amountTextFieldState,
