@@ -58,7 +58,7 @@ internal fun EventAttendee(
     Row(
         modifier = modifier
             .clip(ListItemDefaults.shapes().pressedShape)
-            .clickable(enabled = enabled, onClick = { onClick?.invoke() }, role = Role.Button)
+            .clickableNullable(enabled, onClick, Role.Button)
             .alpha(if (enabled) 1f else EsdsTheme.opacity.medium)
             .background(ListItemDefaults.colors().containerColor)
             .padding(start = EsdsTheme.spacing.lg),
@@ -130,6 +130,14 @@ private fun ParticipationStatusText(text: String, color: Color, isOrganizer: Boo
         }
     }
 }
+
+private fun Modifier.clickableNullable(enabled: Boolean, onClick: (() -> Unit)?, role: Role): Modifier = then(
+    if (onClick == null) {
+        Modifier
+    } else {
+        Modifier.clickable(enabled = enabled, onClick = onClick, role = role)
+    },
+)
 
 @Preview
 @Composable
