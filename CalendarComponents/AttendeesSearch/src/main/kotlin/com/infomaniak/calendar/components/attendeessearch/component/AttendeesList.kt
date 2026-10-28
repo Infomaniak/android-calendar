@@ -32,6 +32,7 @@ internal fun AttendeesList(
     attendees: () -> List<AttendeeUi>,
     modifier: Modifier = Modifier,
     onClick: ((AttendeeUi) -> Unit)? = null,
+    isEnabled: (AttendeeUi) -> Boolean = { true },
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     LazyColumn(
@@ -42,11 +43,10 @@ internal fun AttendeesList(
             items = attendees(),
             key = { attendee -> attendee.key },
         ) { attendee ->
-            val isDisplayingSearchResults = onClick != null // TODO: Make the input more clear
             EventAttendee(
                 attendee = attendee,
                 onClick = onClick?.let { { it(attendee) } },
-                enabled = attendee.status == null || !isDisplayingSearchResults,
+                enabled = isEnabled(attendee),
                 modifier = Modifier.animateItem(),
             )
         }

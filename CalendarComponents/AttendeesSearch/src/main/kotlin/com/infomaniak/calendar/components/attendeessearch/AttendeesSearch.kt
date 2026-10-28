@@ -83,6 +83,7 @@ fun AttendeesSearch(
                 } else {
                     null
                 },
+                isEnabled = { attendee -> !isDisplayingSearchResults || attendee.status == null },
                 contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
             )
         }
