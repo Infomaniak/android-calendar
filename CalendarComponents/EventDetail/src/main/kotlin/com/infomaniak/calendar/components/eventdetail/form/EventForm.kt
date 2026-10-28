@@ -71,6 +71,7 @@ fun EventForm(
     state: EventFormState,
     onAttendeesClick: () -> Unit,
     onTimeZoneClick: (isStart: Boolean) -> Unit,
+    onCustomReminderClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -133,7 +134,10 @@ fun EventForm(
                         }
                         isReminderOffsetDialogVisible = false
                     },
-                    onCustomClick = {}, // TODO: Open the custom reminder editor
+                    onCustomClick = {
+                        isReminderOffsetDialogVisible = false
+                        onCustomReminderClick()
+                    },
                     onDismissRequest = { isReminderOffsetDialogVisible = false },
                 )
             }
@@ -185,6 +189,7 @@ private fun Preview() {
                 ),
                 onAttendeesClick = {},
                 onTimeZoneClick = {},
+                onCustomReminderClick = {},
                 contentPadding = PaddingValues(16.dp),
             )
         }

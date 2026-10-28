@@ -59,6 +59,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailSharedDataViewMo
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.SaveEventResult
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomReminderResultViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchResultViewModel
 import com.infomaniak.calendar.ui.theme.CalendarTheme
@@ -78,11 +79,13 @@ fun EventEditScreen(
     goBackToCalendarView: () -> Unit,
     goToEventAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
+    goToCustomReminder: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventEditViewModel = viewModel(),
     eventDetailSharedDataViewModel: EventDetailSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current),
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
     timeZoneSearchResultViewModel: TimeZoneSearchResultViewModel = viewModel(),
+    customReminderResultViewModel: CustomReminderResultViewModel = viewModel(),
 ) {
     val snackbarHostState = LocalSharedSnackbarHostState.current
     val coroutineScope = rememberCoroutineScope()
@@ -121,9 +124,13 @@ fun EventEditScreen(
         for (request in eventDetailSharedDataViewModel.goBackRequests) goBackToCalendarView()
     }
 
-    val dateAndTimeState = (uiState as? EventEditScreenState.Success)?.eventFormState?.dateAndTimeState
-    LaunchedEffect(dateAndTimeState) {
-        timeZoneSearchResultViewModel.applyPickedTimeZonesTo(dateAndTimeState)
+    val eventFormState = (uiState as? EventEditScreenState.Success)?.eventFormState
+    LaunchedEffect(eventFormState?.dateAndTimeState) {
+        timeZoneSearchResultViewModel.applyPickedTimeZonesTo(eventFormState?.dateAndTimeState)
+    }
+
+    LaunchedEffect(eventFormState) {
+        customReminderResultViewModel.applyAddedRemindersTo(eventFormState)
     }
 
     LaunchedEffect(viewModel.attendeesState) {
@@ -135,6 +142,7 @@ fun EventEditScreen(
         goBack = goBack,
         goToEventAttendees = goToEventAttendees,
         goToTimeZoneSearch = goToTimeZoneSearch,
+        goToCustomReminder = goToCustomReminder,
         modifier = modifier,
         onSubmit = { scope ->
             val eventDraft = (uiState as? EventEditScreenState.Success)?.eventFormState?.toEventDraft() ?: return@EventEditScreen
@@ -156,6 +164,7 @@ private fun EventEditScreen(
     goBack: () -> Unit,
     goToEventAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
+    goToCustomReminder: () -> Unit,
     onSubmit: (RecurrentEventScope) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -185,6 +194,7 @@ private fun EventEditScreen(
                     state = uiState.eventFormState,
                     onAttendeesClick = goToEventAttendees,
                     onTimeZoneClick = goToTimeZoneSearch,
+                    onCustomReminderClick = goToCustomReminder,
                     modifier = Modifier.verticalScroll(scrollState),
                     contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                     sharedTransitionScope = sharedTransitionScope,
@@ -249,6 +259,7 @@ private fun Preview() {
                 goBack = {},
                 goToEventAttendees = {},
                 goToTimeZoneSearch = {},
+                goToCustomReminder = {},
                 onSubmit = {},
             )
         }

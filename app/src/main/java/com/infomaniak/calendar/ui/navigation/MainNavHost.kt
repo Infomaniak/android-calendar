@@ -50,6 +50,7 @@ import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomReminderScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchScreen
@@ -133,6 +134,7 @@ private fun baseEntryProvider(
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
                 goToEventsAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
                 goToTimeZoneSearch = { isStart -> backStack.addOnce(NavDestination.EventTimeZone(destination, isStart)) },
+                goToCustomReminder = { backStack.addOnce(NavDestination.EventCustomReminder(destination)) },
             )
         }
 
@@ -163,6 +165,7 @@ private fun baseEntryProvider(
                 goBackToCalendarView = { backStack.popUntilCalendarView(defaultCalendarView) },
                 goToEventAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
                 goToTimeZoneSearch = { isStart -> backStack.addOnce(NavDestination.EventTimeZone(destination, isStart)) },
+                goToCustomReminder = { backStack.addOnce(NavDestination.EventCustomReminder(destination)) },
             )
         }
 
@@ -183,6 +186,13 @@ private fun baseEntryProvider(
                 isStart = destination.isStart,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
+        }
+
+        is NavDestination.EventCustomReminder -> NavEntry(
+            key = destination,
+            metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
+        ) {
+            CustomReminderScreen(goBack = { backStack.popOrReplaceRoot(defaultCalendarView) })
         }
 
         is NavDestination.Accounts.List -> NavEntry(destination) {

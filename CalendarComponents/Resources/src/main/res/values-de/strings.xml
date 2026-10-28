@@ -79,10 +79,12 @@
     <string name="notificationTypeEmail">E-Mail</string>
     <string name="notificationTypePush">Benachrichtigung</string>
     <string name="occupiedLabel">Beschäftigt</string>
+    <string name="otherReminderAlarmKindLabel">Erinnerungsart</string>
     <string name="participateKMeetTitle">Am kMeet teilnehmen</string>
     <string name="planningNothingPlanned">Nichts geplant</string>
     <string name="privateLabel">Privat</string>
     <string name="publicLabel">Öffentlich</string>
+    <string name="reminderTitle">Erinnerung</string>
     <string name="roomFloorLabel">%s Etage</string>
     <plurals name="roomSeatsLabel">
         <item quantity="one">%d Sitzplatz</item>
@@ -95,6 +97,18 @@
     <string name="statusDeclinedLabel">Abgelehnt</string>
     <string name="statusNeedsActionLabel">Ausstehend</string>
     <string name="statusTentativeLabel">Vielleicht</string>
+    <plurals name="unitDays">
+        <item quantity="one">Tag</item>
+        <item quantity="other">Tage</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">Stunde</item>
+        <item quantity="other">Stunden</item>
+    </plurals>
+    <plurals name="unitMinutes">
+        <item quantity="one">Minute</item>
+        <item quantity="other">Minuten</item>
+    </plurals>
     <plurals name="weekAmount">
         <item quantity="one">%d Woche</item>
         <item quantity="other">%d Wochen</item>
