@@ -73,7 +73,7 @@ fun EventCreationScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val defaultEventDuration by viewModel.defaultEventDuration.collectAsStateWithLifecycle(null)
 
-    val state = (uiState as? EventCreationUiState.Success)?.calendars?.let {
+    val formState = (uiState as? EventCreationUiState.Success)?.calendars?.let {
         rememberDefaultEventForm(
             calendars = it.calendars,
             initialCalendar = it.initialCalendar,
@@ -82,8 +82,8 @@ fun EventCreationScreen(
         )
     }
 
-    LaunchedEffect(state?.dateAndTimeState) {
-        timeZoneSearchResultViewModel.applyPickedTimeZonesTo(state?.dateAndTimeState)
+    LaunchedEffect(formState?.dateAndTimeState) {
+        timeZoneSearchResultViewModel.applyPickedTimeZonesTo(formState?.dateAndTimeState)
     }
 
     LaunchedEffect(Unit) {
@@ -92,9 +92,9 @@ fun EventCreationScreen(
 
     EventCreationScreen(
         uiState = uiState,
-        state = state,
+        formState = formState,
         onSubmit = {
-            val eventDraft = state?.toEventDraft() ?: return@EventCreationScreen
+            val eventDraft = formState?.toEventDraft() ?: return@EventCreationScreen
             coroutineScope.launch {
                 when (viewModel.submitEvent(eventDraft)) {
                     SaveEventResult.Success -> goBack()
@@ -112,7 +112,7 @@ fun EventCreationScreen(
 @Composable
 private fun EventCreationScreen(
     uiState: EventCreationUiState,
-    state: EventFormState?,
+    formState: EventFormState?,
     onSubmit: () -> Unit,
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
@@ -122,7 +122,7 @@ private fun EventCreationScreen(
     val scrollState = rememberScrollState()
 
     Scaffold(
-        topBar = { SubmitTopAppBar(goBack = goBack, onSubmit = onSubmit, isSubmitEnabled = { state != null }) },
+        topBar = { SubmitTopAppBar(goBack = goBack, onSubmit = onSubmit, isSubmitEnabled = { formState != null }) },
         modifier = modifier,
     ) { contentPadding ->
         when (uiState) {
@@ -132,7 +132,7 @@ private fun EventCreationScreen(
                 icon = EsdsIcons.CalendarCross,
                 modifier = Modifier.padding(contentPadding),
             )
-            is EventCreationUiState.Success -> state?.let {
+            is EventCreationUiState.Success -> formState?.let {
                 EventForm(
                     state = it,
                     onAttendeesClick = goToEventsAttendees,
@@ -160,7 +160,7 @@ private fun EventCreationScreenPreview() {
             uiState = EventCreationUiState.Success(
                 EventCreationCalendars(previewEventDetailCalendarGroups, previewEventDetailCalendar),
             ),
-            state = state,
+            formState = state,
             onSubmit = {},
             goBack = {},
             goToEventsAttendees = {},
@@ -182,7 +182,7 @@ private fun PreviewEmptyWritableCalendar() {
 
         EventCreationScreen(
             uiState = EventCreationUiState.NoWritableCalendar,
-            state = state,
+            formState = state,
             onSubmit = {},
             goBack = {},
             goToEventsAttendees = {},
