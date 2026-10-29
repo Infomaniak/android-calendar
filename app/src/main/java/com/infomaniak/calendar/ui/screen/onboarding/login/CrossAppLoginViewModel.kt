@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.onboarding
+package com.infomaniak.calendar.ui.screen.onboarding.login
 
 import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.BuildConfig

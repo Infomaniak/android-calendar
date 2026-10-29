@@ -50,7 +50,7 @@ app/src/main/java/com/infomaniak/calendar/
     ├── model/                     # OccurrenceEventUi calendar item carrying KMP OccurrenceId and attendee summary; TimelineUiState
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
-    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), EventTimeZone(parent, isStart), Accounts, Onboarding)
+    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), EventTimeZone(parent, isStart), Accounts, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
     │   └── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
     ├── screen/
@@ -65,8 +65,11 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── eventDetail/           # EventDetailScreen + EventEditScreen + EventCreationScreen + their ViewModels, and
     │                              # attendeesSearch/ (EventAttendeesScreen + EventAttendeesViewModel shared with its parent)
     │                              # timeZoneSearch/ (TimeZoneSearchScreen + TimeZoneSearchResultViewModel channel back to its parent)
-    │   └── onboarding/            # OnboardingScreen + NextStepButton + CrossAppLoginViewModel, and OnboardingStep: login, then
-    │                              # one step per missing permission (notifications, contacts), then "Start" ("Add an account": login only)
+    │   └── onboarding/            # Two onboardings, each with its own page enum, sharing OnboardingPage + OnboardingButtonDefaults:
+    │                              # login/ (LoginOnboardingScreen + LoginOnboardingPage + CrossAppLoginViewModel): welcome + login;
+    │                              # permissions/ (PermissionsOnboardingScreen + PermissionsOnboardingPage + NextStepButton): a pager
+    │                              # without swipe, one page per missing permission (notifications, contacts), then "Start". After
+    │                              # the login, the navigation only goes to the second one if a permission is missing.
     └── theme/
         ├── Theme.kt                # CalendarTheme Composable (Material 3 color schemes)
         ├── Color.kt / ColorLight.kt / ColorDark.kt  # Color tokens
