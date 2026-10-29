@@ -68,5 +68,7 @@ dependencies {
     implementation(libs.compose.material3)
     debugImplementation(core.compose.ui.tooling)
 
+    api(libs.paging.compose)
+
     implementation(kmpCalendar.kotlinx.datetime)
 }
