@@ -64,6 +64,7 @@ import kotlinx.serialization.json.Json
 class MainActivity : ComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
+    private val contactViewModel: ContactViewModel by viewModels()
     private val pendingOccurrenceId = mutableStateOf<OccurrenceId?>(null)
 
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
@@ -104,7 +105,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        mainViewModel.syncContacts()
+        contactViewModel.syncContacts()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
