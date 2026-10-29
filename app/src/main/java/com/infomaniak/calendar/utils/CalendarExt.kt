@@ -35,5 +35,9 @@ fun Calendar.toEventDetailCalendar(): EventDetailCalendar = EventDetailCalendar(
 fun List<User>.toEventDetailCalendarGroups(calendars: List<Calendar>): List<EventDetailCalendarGroup> =
     withCalendars(calendars).mapNotNull { (user, userCalendars) ->
         if (userCalendars.isEmpty()) return@mapNotNull null
-        EventDetailCalendarGroup(account = EventDetailAccount(id = user.id, name = user.email), calendars = userCalendars.map(Calendar::toEventDetailCalendar))
+
+        EventDetailCalendarGroup(
+            account = EventDetailAccount(id = user.id, name = user.email),
+            calendars = userCalendars.map(Calendar::toEventDetailCalendar),
+        )
     }
