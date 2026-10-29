@@ -56,20 +56,25 @@ fun AttendeesSearchScreen(
     modifier: Modifier = Modifier,
     viewModel: AttendeesSearchSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
-    val attendeesSearchUi by viewModel.attendeesSearchState.collectAsStateWithLifecycle()
+    val attendeesSearchUi by viewModel.attendeesState.collectAsStateWithLifecycle()
 
     Box(modifier = modifier.fillMaxSize()) {
-        when (val attendeesSearchState = attendeesSearchUi) {
+        when (val attendeesState = attendeesSearchUi) {
             AttendeesSearchUiState.Loading -> Unit // The parent provides it right away, so nothing to show
             is AttendeesSearchUiState.Success -> {
+                val attendeesSearchState = rememberSaveableAttendeesSearchState(
+                    attendees = attendeesState.attendees,
+                )
+
                 LaunchedEffect(attendeesSearchState) {
-                    snapshotFlow { attendeesSearchState.state.searchQueryTextFieldState.text }.collectLatest {
+                    snapshotFlow { attendeesSearchState.searchQueryTextFieldState.text }.collectLatest {
                         viewModel.search(it.toString())
                     }
                 }
 
+
                 AttendeesSearchScreen(
-                    attendeesSearchState = attendeesSearchState.state,
+                    attendeesSearchState = attendeesSearchState,
                     goBack = goBack,
                 )
             }

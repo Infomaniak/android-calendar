@@ -19,6 +19,7 @@ package com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch
 
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
@@ -43,18 +44,18 @@ import kotlinx.coroutines.flow.asStateFlow
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
 class AttendeesSearchSharedDataViewModel(private val contactsManager: ContactsManager) : ViewModel() {
-    private val _attendeesSearchState: MutableStateFlow<AttendeesSearchUiState> = MutableStateFlow(AttendeesSearchUiState.Loading)
-    val attendeesSearchState: StateFlow<AttendeesSearchUiState> = _attendeesSearchState.asStateFlow()
+    private val _attendeesState: MutableStateFlow<AttendeesSearchUiState> = MutableStateFlow(AttendeesSearchUiState.Loading)
+    val attendeesState: StateFlow<AttendeesSearchUiState> = _attendeesState.asStateFlow()
 
-    fun setAttendeesSearchState(attendeesSearchState: AttendeesSearchState) {
-        _attendeesSearchState.value = AttendeesSearchUiState.Success(attendeesSearchState)
+    fun setAttendees(attendees: SnapshotStateSet<AttendeeUi>) {
+        _attendeesState.value = AttendeesSearchUiState.Success(attendees)
     }
 
     suspend fun search(query: String) {
         val results = contactsManager.search(query)
-        val uiState = attendeesSearchState.value as? AttendeesSearchUiState.Success ?: return
-        uiState.state.results.clear()
-        uiState.state.results.addAll(results.toAttendeesUi(uiState.alreadyPresentAttendees))
+        val uiState = attendeesState.value as? AttendeesSearchUiState.Success ?: return
+        uiState.attendees.clear()
+        uiState.attendees.addAll(results.toAttendeesUi(uiState.alreadyPresentAttendees))
     }
 }
 
@@ -76,8 +77,8 @@ private fun List<Contact>.toAttendeesUi(alreadyPresentAttendees: Map<String, Att
 sealed interface AttendeesSearchUiState {
     /** The parent screen hasn't provided its [AttendeesSearchState] yet. */
     data object Loading : AttendeesSearchUiState
-    data class Success(val state: AttendeesSearchState) : AttendeesSearchUiState {
+    data class Success(val attendees: SnapshotStateSet<AttendeeUi>) : AttendeesSearchUiState {
         /** Cached by the snapshot system: recomputed only when [AttendeesSearchState.attendees] changes. */
-        val alreadyPresentAttendees: Map<String, AttendeeUi> by derivedStateOf { state.attendees.associateBy { it.contactKey } }
+        val alreadyPresentAttendees: Map<String, AttendeeUi> by derivedStateOf { attendees.associateBy { it.contactKey } }
     }
 }
