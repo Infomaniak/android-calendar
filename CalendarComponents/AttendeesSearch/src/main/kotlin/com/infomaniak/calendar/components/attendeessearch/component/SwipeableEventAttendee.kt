@@ -38,12 +38,16 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -59,6 +63,7 @@ import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Trash
+import kotlinx.coroutines.flow.drop
 import kotlin.math.abs
 import com.infomaniak.core.common.R as RCore
 
@@ -72,11 +77,30 @@ internal fun SwipeableEventAttendee(
     state: SwipeToDismissBoxState = rememberSwipeToDismissBoxState(),
     enableDismissFromEndToStart: () -> Boolean = { true },
 ) {
+    val haptics = LocalHapticFeedback.current
+
+    LaunchedEffect(state) {
+        snapshotFlow { state.targetValue }
+            .drop(1)
+            .collect { target ->
+                haptics.performHapticFeedback(
+                    if (target == SwipeToDismissBoxValue.Settled) {
+                        HapticFeedbackType.LongPress
+                    } else {
+                        HapticFeedbackType.GestureThresholdActivate
+                    },
+                )
+            }
+    }
+
     SwipeToDismissBox(
         state = state,
         enableDismissFromStartToEnd = false,
         enableDismissFromEndToStart = enableDismissFromEndToStart(),
-        onDismiss = { onDismiss() },
+        onDismiss = {
+            haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+            onDismiss()
+        },
         content = {
             EventAttendee(attendee, onClick = onClick, enabled = enabled)
         },
