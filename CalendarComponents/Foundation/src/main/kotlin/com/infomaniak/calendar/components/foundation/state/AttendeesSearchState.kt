@@ -32,6 +32,10 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateSet
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
+import com.infomaniak.core.common.utils.isEmailRfc5321Compliant
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
+import com.infomaniak.core.common.R as RCore
 
 @Stable
 class AttendeesSearchState(
@@ -48,6 +52,29 @@ class AttendeesSearchState(
 
     fun removeAttendee(attendee: AttendeeUi) {
         attendees.remove(attendee)
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    fun addCustomAttendee(email: String = searchQueryTextFieldState.text.toString().trim()): CustomAttendeeResult {
+        if (email in attendeesEmails) return CustomAttendeeResult.AlreadyPresent
+        if (!email.isEmailRfc5321Compliant()) return CustomAttendeeResult.InvalidEmail
+
+        attendees.add(
+            AttendeeUi(
+                key = Uuid.generateV7().toString(),
+                email = email,
+                displayName = null,
+                status = ParticipationStatus.NeedsAction,
+            ),
+        )
+
+        return CustomAttendeeResult.Added
+    }
+
+    enum class CustomAttendeeResult(val messageRes: Int? = null) {
+        Added,
+        AlreadyPresent(RCore.string.emailAlreadyUsed),
+        InvalidEmail(RCore.string.emailInvalid),
     }
 
     object Saver : androidx.compose.runtime.saveable.Saver<AttendeesSearchState, List<Any>> {

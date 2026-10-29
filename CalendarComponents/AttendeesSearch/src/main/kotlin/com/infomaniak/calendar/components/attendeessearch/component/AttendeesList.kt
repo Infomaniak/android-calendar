@@ -17,19 +17,38 @@
  */
 package com.infomaniak.calendar.components.attendeessearch.component
 
+import android.os.Parcelable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.attendeessearch.component.ItemKey.Companion.itemKey
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
+import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Envelope
+import kotlinx.parcelize.Parcelize
 
 @Composable
 internal fun AttendeesList(
     attendees: () -> List<AttendeeUi>,
+    query: () -> String,
+    onAddCustomAttendee: () -> Unit,
     onRemove: (AttendeeUi) -> Unit,
     modifier: Modifier = Modifier,
     onClick: ((AttendeeUi) -> Unit)? = null,
@@ -41,9 +60,10 @@ internal fun AttendeesList(
         modifier = modifier.fillMaxSize(),
         contentPadding = contentPadding,
     ) {
+        val items = attendees()
         items(
-            items = attendees(),
-            key = { attendee -> attendee.key },
+            items = items,
+            key = { attendee -> attendee.itemKey },
         ) { attendee ->
             SwipeableEventAttendee(
                 attendee = attendee,
@@ -54,6 +74,48 @@ internal fun AttendeesList(
                 modifier = Modifier.animateItem(),
             )
         }
+
+        if (items.isNotEmpty() && query().isNotBlank()) {
+            item(key = ItemKey.AddCustomAttendee) {
+                AddCustomAttendee(query = query, onClick = onAddCustomAttendee, modifier = Modifier.animateItem())
+            }
+        }
+    }
+}
+
+@Composable
+internal fun AddCustomAttendee(query: () -> String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    ListItem(
+        modifier = modifier,
+        onClick = onClick,
+        leadingContent = {
+            Box(
+                Modifier
+                    .size(EsdsTheme.icon.sizeXl)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.extendedColorScheme.datavizGray, CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = EsdsIcons.Envelope.Medium,
+                    contentDescription = null,
+                    tint = MaterialTheme.extendedColorScheme.onDatavizGray,
+                )
+            }
+        },
+        content = { Text(query()) },
+        supportingContent = { Text("TODO") },
+    )
+}
+
+private sealed interface ItemKey : Parcelable {
+    @Parcelize
+    data class Attendee(val key: String) : ItemKey
+    @Parcelize
+    object AddCustomAttendee : ItemKey
+
+    companion object {
+        val AttendeeUi.itemKey get() = Attendee(key)
     }
 }
 
@@ -62,6 +124,8 @@ internal fun AttendeesList(
 private fun AttendeesListPreview() {
     AttendeesList(
         attendees = { previewAttendees },
+        query = { "Bob" },
+        onAddCustomAttendee = {},
         onRemove = {},
     )
 }

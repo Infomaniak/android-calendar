@@ -1,8 +1,9 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(core.plugins.infomaniak.android.library.flavor.aware)
     alias(core.plugins.compose.compiler)
+    alias(core.plugins.infomaniak.android.library.flavor.aware)
+    alias(core.plugins.kotlin.parcelize)
 }
 
 val appCompileSdk: Int by rootProject.extra

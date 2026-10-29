@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.attendeessearch.component.AttendeesList
@@ -46,6 +47,7 @@ import com.infomaniak.designsystem.icons.symbols.UserMagnifyingGlass
 @Composable
 fun AttendeesSearch(
     attendeesSearchState: AttendeesSearchState,
+    onShowSnackbar: (message: String) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -68,15 +70,22 @@ fun AttendeesSearch(
             searchState = attendeesSearchState.searchQueryTextFieldState,
             placeholder = stringResource(R.string.searchForAttendees),
         )
-        if (attendeesList.isEmpty()) {
+        if (attendeesSearchState.searchQueryTextFieldState.text.isBlank() && attendeesList.isEmpty()) {
             EmptyState(
                 text = stringResource(R.string.attendeesEmptyState),
                 icon = EsdsIcons.UserMagnifyingGlass,
                 modifier = Modifier.padding(bottom = contentPadding.calculateBottomPadding()),
             )
         } else {
+            val resources = LocalResources.current
+
             AttendeesList(
                 attendees = { attendeesList },
+                query = { attendeesSearchState.searchQueryTextFieldState.text.toString() },
+                onAddCustomAttendee = {
+                    val result = attendeesSearchState.addCustomAttendee()
+                    result.messageRes?.let { onShowSnackbar(resources.getString(it)) }
+                },
                 onRemove = attendeesSearchState::removeAttendee,
                 modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md, vertical = EsdsTheme.spacing.sm),
                 onClick = if (isDisplayingSearchResults) {
@@ -104,6 +113,7 @@ private fun Preview() {
                     attendees = remember { mutableStateSetOf<AttendeeUi>().apply { addAll(previewAttendees) } },
                     results = remember { previewAttendees.toMutableStateList() },
                 ),
+                onShowSnackbar = {},
             )
         }
     }
@@ -119,6 +129,7 @@ private fun PreviewEmptySearchState() {
                     attendees = remember { mutableStateSetOf() },
                     results = remember { mutableStateListOf() },
                 ),
+                onShowSnackbar = {},
             )
         }
     }
