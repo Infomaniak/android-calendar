@@ -17,21 +17,10 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
-import android.os.Parcelable
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,23 +30,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
+import com.infomaniak.calendar.components.eventdetail.component.calendar.CalendarChoiceDialog
+import com.infomaniak.calendar.components.eventdetail.component.calendar.CalendarDot
 import com.infomaniak.calendar.components.eventdetail.component.items.DropDownItem
-import com.infomaniak.calendar.components.eventdetail.component.items.ItemIconDefaults
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
-import kotlinx.parcelize.Parcelize
 
 @Composable
 internal fun Calendar(calendarColor: Color, calendarName: String, modifier: Modifier = Modifier) {
@@ -68,7 +52,7 @@ internal fun Calendar(calendarColor: Color, calendarName: String, modifier: Modi
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),
             ) {
-                Dot(calendarColor)
+                CalendarDot(calendarColor)
                 Text(text = calendarName, style = MaterialTheme.typography.labelLarge)
             }
         },
@@ -89,7 +73,7 @@ internal fun CalendarEditable(
         onClick = { isDialogVisible = true },
         content = { Text(stringResource(id = R.string.sectionCalendarHeader)) },
         trailingContent = {
-            Dot(selectedCalendar.color)
+            CalendarDot(selectedCalendar.color)
             Text(text = selectedCalendar.name, style = MaterialTheme.typography.labelLarge)
         },
         itemCount = calendars.sumOf { it.calendars.size },
@@ -107,79 +91,6 @@ internal fun CalendarEditable(
             onDismissRequest = { isDialogVisible = false },
         )
     }
-}
-
-@Composable
-private fun CalendarChoiceDialog(
-    calendarGroups: List<EventDetailCalendarGroup>,
-    selectedCalendar: EventDetailCalendar,
-    onSelect: (EventDetailCalendar) -> Unit,
-    onDismissRequest: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Dialog(onDismissRequest = onDismissRequest) {
-        LazyColumn(
-            modifier
-                .background(AlertDialogDefaults.containerColor, AlertDialogDefaults.shape)
-                .padding(EsdsTheme.spacing.threeXl)
-                .selectableGroup(),
-        ) {
-            calendarGroups.forEachIndexed { index, (account, calendars) ->
-                item(key = Key.Title(account.id)) {
-                    val topPadding = if (index == 0) 0.dp else EsdsTheme.spacing.threeXl
-                    Text(
-                        text = account.name,
-                        style = MaterialTheme.typography.titleSmall,
-                        modifier = Modifier
-                            .padding(top = topPadding, bottom = EsdsTheme.spacing.md)
-                            .semantics { heading() },
-                    )
-                }
-
-                calendars.forEach { calendar ->
-                    item(key = Key.Calendar(calendar.id)) {
-                        CalendarChoiceItem(
-                            color = calendar.color,
-                            name = calendar.name,
-                            isSelected = calendar.id == selectedCalendar.id,
-                            onClick = { onSelect(calendar) },
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun CalendarChoiceItem(color: Color, name: String, isSelected: Boolean, onClick: () -> Unit) {
-    ListItem(
-        leadingContent = { Dot(color) },
-        content = { Text(name) },
-        trailingContent = { RadioButton(selected = isSelected, onClick = null) },
-        selected = isSelected,
-        onClick = onClick,
-        shapes = ListItemDefaults.shapes(shape = MaterialTheme.shapes.large),
-        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-    )
-}
-
-@Composable
-private fun Dot(calendarColor: Color) {
-    Box(
-        modifier = Modifier
-            .size(ItemIconDefaults.size)
-            .padding(1.dp)
-            .clip(CircleShape)
-            .background(calendarColor),
-    )
-}
-
-private sealed interface Key : Parcelable {
-    @Parcelize
-    data class Title(val id: Int) : Key
-    @Parcelize
-    data class Calendar(val id: String) : Key
 }
 
 @Preview
@@ -212,21 +123,6 @@ private fun PreviewCalendarDialog() {
                 selectedCalendar = previewEventDetailCalendar,
                 onSelect = {},
                 onDismissRequest = {},
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun PreviewChoiceItem() {
-    MaterialTheme {
-        Surface {
-            CalendarChoiceItem(
-                color = previewEventDetailCalendar.color,
-                name = previewEventDetailCalendar.name,
-                isSelected = true,
-                onClick = {},
             )
         }
     }
