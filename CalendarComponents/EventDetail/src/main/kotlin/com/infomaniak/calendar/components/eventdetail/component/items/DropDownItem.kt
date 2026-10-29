@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -34,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.foundation.component.ListItemClickable
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ChevronsUpDown
@@ -47,7 +47,7 @@ internal fun DropDownItem(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    ConditionallyClickableListItem(
+    ListItemClickable(
         onClick = onClick,
         contentPadding = contentPadding + ListItemDefaults.ContentPadding,
         content = content,
@@ -62,32 +62,6 @@ internal fun DropDownItem(
         },
         modifier = modifier,
     )
-}
-
-@Composable
-private fun ConditionallyClickableListItem(
-    onClick: (() -> Unit)?,
-    modifier: Modifier = Modifier,
-    trailingContent: @Composable (() -> Unit)? = null,
-    contentPadding: PaddingValues = ListItemDefaults.ContentPadding,
-    content: @Composable () -> Unit,
-) {
-    if (onClick == null) {
-        ListItem(
-            contentPadding = contentPadding,
-            trailingContent = trailingContent,
-            content = content,
-            modifier = modifier,
-        )
-    } else {
-        ListItem(
-            onClick = onClick,
-            contentPadding = contentPadding,
-            trailingContent = trailingContent,
-            content = content,
-            modifier = modifier,
-        )
-    }
 }
 
 @Preview
