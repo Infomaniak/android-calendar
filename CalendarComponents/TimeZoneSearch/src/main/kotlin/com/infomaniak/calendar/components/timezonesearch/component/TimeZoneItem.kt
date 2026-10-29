@@ -18,16 +18,11 @@
 package com.infomaniak.calendar.components.timezonesearch.component
 
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.timezonesearch.models.SearchableText
+import com.infomaniak.calendar.components.foundation.component.HighlightedText
 import com.infomaniak.calendar.components.timezonesearch.models.TimeZoneUi
 import kotlinx.datetime.TimeZone
 
@@ -39,22 +34,6 @@ internal fun TimeZoneItem(timeZone: TimeZoneUi, query: String, onClick: () -> Un
         content = { HighlightedText(timeZone.location, query) },
         supportingContent = { HighlightedText(timeZone.utcOffset, query) },
         modifier = modifier,
-    )
-}
-
-@Composable
-private fun HighlightedText(text: SearchableText, query: String) {
-    Text(
-        buildAnnotatedString {
-            append(text.text)
-            text.find(query)?.let {
-                addStyle(
-                    style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold),
-                    start = it.first,
-                    end = it.last + 1,
-                )
-            }
-        },
     )
 }
 

@@ -52,6 +52,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.foundation.component.HighlightedText
 import com.infomaniak.calendar.components.foundation.component.ListItemClickable
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
@@ -71,6 +72,7 @@ internal fun SwipeableEventAttendee(
     attendee: AttendeeUi,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    query: () -> String = { "" },
     onClick: (() -> Unit)? = null,
     enabled: Boolean = true,
     state: SwipeToDismissBoxState = rememberSwipeToDismissBoxState(),
@@ -101,7 +103,7 @@ internal fun SwipeableEventAttendee(
             onDismiss()
         },
         content = {
-            EventAttendee(attendee, onClick = onClick, enabled = enabled)
+            EventAttendee(attendee, query = query, onClick = onClick, enabled = enabled)
         },
         backgroundContent = {
             if (state.dismissDirection == SwipeToDismissBoxValue.EndToStart) DeleteBackground(state)
@@ -114,6 +116,7 @@ internal fun SwipeableEventAttendee(
 private fun EventAttendee(
     attendee: AttendeeUi,
     modifier: Modifier = Modifier,
+    query: () -> String = { "" },
     onClick: (() -> Unit)? = null,
     enabled: Boolean = true,
 ) {
@@ -136,8 +139,9 @@ private fun EventAttendee(
             null
         } else {
             {
-                Text(
+                HighlightedText(
                     text = attendee.email,
+                    query = query(),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -145,10 +149,10 @@ private fun EventAttendee(
         },
         content = {
             Column {
-                Text(
+                HighlightedText(
                     text = attendee.displayName ?: attendee.email,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Normal,
+                    query = query(),
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Normal),
                 )
             }
         },
