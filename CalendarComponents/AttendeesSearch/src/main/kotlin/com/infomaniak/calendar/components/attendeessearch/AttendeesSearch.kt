@@ -87,6 +87,7 @@ fun AttendeesSearch(
                 isEnabled = { attendee ->
                     !isDisplayingSearchResults || attendee.email !in attendeesSearchState.attendeesEmails
                 },
+                enableDeletion = { isDisplayingSearchResults.not() },
                 contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
             )
         }

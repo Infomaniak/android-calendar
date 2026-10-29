@@ -33,7 +33,7 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxDefaults
+import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
@@ -44,7 +44,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -58,10 +57,38 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Trash
 import kotlin.math.abs
+import com.infomaniak.core.common.R as RCore
 
 @Composable
-internal fun EventAttendee(
+internal fun SwipeableEventAttendee(
+    attendee: AttendeeUi,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    enabled: Boolean = true,
+    state: SwipeToDismissBoxState = rememberSwipeToDismissBoxState(),
+    enableDismissFromEndToStart: () -> Boolean = { true },
+) {
+    SwipeToDismissBox(
+        state = state,
+        enableDismissFromStartToEnd = false,
+        enableDismissFromEndToStart = enableDismissFromEndToStart(),
+        onDismiss = { onDismiss() },
+        content = {
+            EventAttendee(attendee, onClick = onClick, enabled = enabled)
+        },
+        backgroundContent = {
+            if (state.dismissDirection == SwipeToDismissBoxValue.EndToStart) DeleteBackground(state)
+        },
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun EventAttendee(
     attendee: AttendeeUi,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
@@ -112,45 +139,22 @@ internal fun EventAttendee(
 }
 
 @Composable
-internal fun SwipeableEventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier, onRemove: (AttendeeUi) -> Unit) {
+private fun DeleteBackground(state: SwipeToDismissBoxState) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        val maxWidthPx = with(LocalDensity.current) { maxWidth.toPx() }
+        val progress = abs(state.requireOffset() / maxWidthPx)
 
-    val state = rememberSwipeToDismissBoxState(SwipeToDismissBoxValue.Settled, SwipeToDismissBoxDefaults.positionalThreshold)
-
-    SwipeToDismissBox(
-        state = state,
-        enableDismissFromStartToEnd = false,
-        onDismiss = { direction ->
-            if (direction == SwipeToDismissBoxValue.EndToStart) {
-                onRemove(attendee)
-            }
-        },
-        content = {
-            EventAttendee(attendee)
-        },
-        backgroundContent = {
-            when (state.dismissDirection) {
-                SwipeToDismissBoxValue.EndToStart -> {
-                    BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
-                        val maxWidthPx = with(LocalDensity.current) { maxWidth.toPx() }
-                        val progress = abs(state.requireOffset() / maxWidthPx)
-                        Icon(
-                            painterResource(R.drawable.ic_trash),
-                            contentDescription = "Delete",
-                            modifier = Modifier
-                                .width(maxWidth * progress)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.error)
-                                .padding(EsdsTheme.spacing.xl),
-                            tint = Color.White,
-                        )
-                    }
-                }
-                SwipeToDismissBoxValue.StartToEnd,
-                SwipeToDismissBoxValue.Settled -> Unit
-            }
-        },
-        modifier = modifier,
-    )
+        Icon(
+            imageVector = EsdsIcons.Trash.Medium,
+            contentDescription = stringResource(RCore.string.deleteButton),
+            modifier = Modifier
+                .width(maxWidth * progress)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.error)
+                .padding(EsdsTheme.spacing.xl),
+            tint = Color.White,
+        )
+    }
 }
 
 @Composable
@@ -182,23 +186,6 @@ private fun ParticipationStatusText(text: String, color: Color, isOrganizer: Boo
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-    }
-}
-
-@Preview
-@Composable
-private fun SwipeableAttendeePreview() {
-    Surface {
-        SwipeableEventAttendee(
-            AttendeeUi(
-                "alice@example.com#Alice",
-                "alice@example.com",
-                "Alice",
-                ParticipationStatus.Accepted,
-                true,
-            ),
-            onRemove = {},
-        )
     }
 }
 
@@ -247,5 +234,17 @@ private fun PreviewAttendeePending() {
 private fun Preview() {
     Surface {
         EventAttendee(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", null), enabled = false)
+    }
+}
+
+@Preview
+@Composable
+private fun SwipeableAttendeePreview() {
+    Surface {
+        SwipeableEventAttendee(
+            AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Accepted),
+            onDismiss = {},
+            state = rememberSwipeToDismissBoxState(initialValue = SwipeToDismissBoxValue.EndToStart),
+        )
     }
 }
