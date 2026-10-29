@@ -47,6 +47,7 @@ import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
+import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.coroutines.flow.collectLatest
 
@@ -93,10 +94,13 @@ private fun AttendeesSearchScreen(
         modifier = modifier,
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.union(WindowInsets.ime),
     ) { contentPadding ->
+        val snackbarHostState = LocalSharedSnackbarHostState.current ?: return@Scaffold
+
         AttendeesSearch(
             attendeesSearchState = attendeesSearchState,
             modifier = Modifier.fillMaxWidth(),
             contentPadding = contentPadding,
+            onShowSnackbar = { message -> snackbarHostState.showSnackbar(message = message) },
         )
     }
 }
