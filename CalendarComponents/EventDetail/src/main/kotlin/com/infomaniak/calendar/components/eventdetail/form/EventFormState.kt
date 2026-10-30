@@ -33,6 +33,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import kotlinx.datetime.atTime
 
 /**
@@ -46,6 +47,8 @@ class EventFormState(
     val isAllDay: MutableState<Boolean>,
     val dateAndTimeState: DateAndTimeState?,
     val attendees: SnapshotStateSet<AttendeeUi>,
+    /** The organizer of the edited event, never updated by the form. There either is one at the start or it will be added right before sending */
+    val initialOrganizer: OrganizerUi?,
     val isKMeetUrlEnabled: MutableState<Boolean>,
     val isOccupied: MutableState<Boolean>,
     val isPublic: MutableState<Boolean>,
@@ -66,6 +69,7 @@ class EventFormState(
             end = dateAndTimeState.end.date.atTime(dateAndTimeState.end.time),
             endTimeZone = dateAndTimeState.end.timeZone,
             attendees = attendees.toList(),
+            initialOrganizer = initialOrganizer,
             isKMeetUrlEnabled = isKMeetUrlEnabled.value,
             isOccupied = isOccupied.value,
             isPublic = isPublic.value,
@@ -88,6 +92,7 @@ fun rememberDefaultEventForm(
     initialIsAllDay = false,
     initialIsKMeetUrlEnabled = false,
     attendees = attendees,
+    initialOrganizer = null,
     initialIsOccupied = true,
     initialIsPublic = true,
 )
@@ -102,6 +107,7 @@ fun rememberEventFormState(
     initialIsAllDay: Boolean,
     initialIsKMeetUrlEnabled: Boolean,
     attendees: SnapshotStateSet<AttendeeUi>,
+    initialOrganizer: OrganizerUi?,
     initialIsOccupied: Boolean,
     initialIsPublic: Boolean,
 ): EventFormState = EventFormState(
@@ -111,6 +117,7 @@ fun rememberEventFormState(
     isAllDay = rememberSaveable { mutableStateOf(initialIsAllDay) },
     dateAndTimeState = dateAndTimeState,
     attendees = attendees,
+    initialOrganizer = initialOrganizer,
     isKMeetUrlEnabled = rememberSaveable { mutableStateOf(initialIsKMeetUrlEnabled) },
     isOccupied = rememberSaveable { mutableStateOf(initialIsOccupied) },
     isPublic = rememberSaveable { mutableStateOf(initialIsPublic) },

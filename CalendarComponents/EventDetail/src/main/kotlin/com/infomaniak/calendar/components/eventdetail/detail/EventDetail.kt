@@ -160,6 +160,7 @@ private fun PreviewEventDetail() {
             all = previewAttendees,
             me = previewAttendees.first(),
         ),
+        organizer = null,
         kMeetUrl = "test url",
         location = "Location",
         room = EventDetailUi.Room("Japan room", 5, 3),

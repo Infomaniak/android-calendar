@@ -134,6 +134,7 @@ private fun Preview() {
                     dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
                     initialText = "Event title",
                     attendees = remember { mutableStateSetOf() },
+                    initialOrganizer = null,
                     initialIsAllDay = false,
                     initialIsKMeetUrlEnabled = false,
                     initialIsOccupied = true,

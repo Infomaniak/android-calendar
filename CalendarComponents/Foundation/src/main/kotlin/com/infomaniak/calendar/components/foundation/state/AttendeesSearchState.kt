@@ -24,14 +24,17 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.runtime.saveable.autoSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateSet
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
+import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.core.common.utils.isEmailRfc5321Compliant
 import com.infomaniak.core.common.R as RCore
@@ -42,6 +45,9 @@ class AttendeesSearchState(
     val results: SnapshotStateList<AttendeesSearchResult>,
     val attendees: SnapshotStateSet<AttendeeUi>,
 ) {
+    /** Snapshot of the edited event's organizer, taken once along with the [attendees]. */
+    var initialOrganizer: OrganizerUi? by mutableStateOf(null)
+
     val attendeesEmailsLowercase by derivedStateOf { attendees.map { it.email.lowercase() } }
 
     fun addAttendee(attendee: AttendeeUi) {
@@ -78,8 +84,9 @@ class AttendeesSearchState(
         InvalidEmail(RCore.string.emailInvalid),
     }
 
-    object Saver : androidx.compose.runtime.saveable.Saver<AttendeesSearchState, List<Any>> {
+    object Saver : androidx.compose.runtime.saveable.Saver<AttendeesSearchState, List<Any?>> {
         private val resultsSaver = autoSaver<SnapshotStateList<AttendeesSearchResult>>()
+        private val initialOrganizerSaver = autoSaver<OrganizerUi?>()
         // TODO: Use autoSaver once on Compose 1.13+, SnapshotStateSet only parcels its first element before (b/537461421)
         private val attendeesSaver = androidx.compose.runtime.saveable.Saver<SnapshotStateSet<AttendeeUi>, ArrayList<AttendeeUi>>(
             save = { ArrayList(it) },
@@ -87,18 +94,19 @@ class AttendeesSearchState(
         )
 
         // TextFieldState.Saver.restore() never returns null, and neither do resultsSaver and attendeesSaver
-        override fun SaverScope.save(value: AttendeesSearchState): List<Any> = listOf(
+        override fun SaverScope.save(value: AttendeesSearchState): List<Any?> = listOf(
             with(TextFieldState.Saver) { save(value.searchQueryTextFieldState)!! },
             with(resultsSaver) { save(value.results)!! },
             with(attendeesSaver) { save(value.attendees)!! },
+            with(initialOrganizerSaver) { save(value.initialOrganizer) },
         )
 
         @Suppress("UNCHECKED_CAST")
-        override fun restore(value: List<Any>): AttendeesSearchState = AttendeesSearchState(
-            searchQueryTextFieldState = TextFieldState.Saver.restore(value[0])!!,
-            results = resultsSaver.restore(value[1])!!,
+        override fun restore(value: List<Any?>): AttendeesSearchState = AttendeesSearchState(
+            searchQueryTextFieldState = TextFieldState.Saver.restore(value[0]!!)!!,
+            results = resultsSaver.restore(value[1]!!)!!,
             attendees = attendeesSaver.restore(value[2] as ArrayList<AttendeeUi>)!!,
-        )
+        ).apply { initialOrganizer = value[3]?.let(initialOrganizerSaver::restore) }
     }
 }
 

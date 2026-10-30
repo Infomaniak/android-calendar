@@ -57,6 +57,7 @@ fun Event.toEventDetailUi(
     isAllDay = timing.isAllDay,
     recurrence = if (isOccurrence) EventDetailRecurrence.Recurrence(::toLocalizedRecurrenceString) else EventDetailRecurrence.Single,
     attendees = attendees.toAttendees(accountId, emailsByUserId),
+    organizer = organizer?.toOrganizerUi(),
     kMeetUrl = meetRoomUrl,
     location = location,
     room = null, // TODO[eventDetail]: Not carried by the KMP model yet

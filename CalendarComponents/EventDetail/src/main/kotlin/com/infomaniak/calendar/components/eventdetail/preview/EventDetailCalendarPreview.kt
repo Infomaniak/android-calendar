@@ -27,11 +27,11 @@ val previewEventDetailCalendar by lazy { EventDetailCalendar("Calendar 1", "Vaca
 val previewEventDetailCalendarGroups by lazy {
     listOf(
         EventDetailCalendarGroup(
-            account = EventDetailAccount(id = 1, name = "ellen.joe@ik.me"),
+            account = EventDetailAccount(id = 1, userEmail = "ellen.joe@ik.me"),
             calendars = listOf(previewEventDetailCalendar, EventDetailCalendar("Calendar 2", "Work", Color.Blue)),
         ),
         EventDetailCalendarGroup(
-            account = EventDetailAccount(id = 2, name = "jane.doe@ik.me"),
+            account = EventDetailAccount(id = 2, userEmail = "jane.doe@ik.me"),
             calendars = listOf(EventDetailCalendar("Calendar 3", "Family", Color.Green)),
         ),
     )

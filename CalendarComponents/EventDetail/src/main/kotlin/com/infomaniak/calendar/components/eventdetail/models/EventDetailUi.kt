@@ -21,6 +21,7 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.foundation.models.Attendees
+import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.filetypes.FileType
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -42,6 +43,7 @@ data class EventDetailUi(
     val isAllDay: Boolean,
     val recurrence: EventDetailRecurrence,
     val attendees: Attendees,
+    val organizer: OrganizerUi?,
     val kMeetUrl: String?,
     val location: String?,
     val room: Room?,
