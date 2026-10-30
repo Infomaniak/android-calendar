@@ -72,6 +72,7 @@ internal fun AttendeesList(
                 is AttendeeUi -> SwipeableEventAttendee(
                     attendee = item,
                     onDismiss = { onRemove(item) },
+                    query = query,
                     onClick = onClick?.let { { it(item) } },
                     enabled = isEnabled(item),
                     enableDismissFromEndToStart = enableDeletion,
