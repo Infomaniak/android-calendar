@@ -55,6 +55,8 @@
     <string name="contentDescriptionSearch">Search</string>
     <string name="contentDescriptionToday">Today</string>
     <string name="customAlarmLabel">Custom</string>
+    <!-- TODO: ink translate -->
+    <string name="customRecurrenceLabel">Custom</string>
     <plurals name="dayAmount">
         <item quantity="one">%d day</item>
         <item quantity="other">%d days</item>

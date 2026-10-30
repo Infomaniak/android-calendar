@@ -44,6 +44,7 @@ import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSw
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
 import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
+import com.infomaniak.calendar.components.eventdetail.form.component.recurrence.RecurrenceDialog
 import com.infomaniak.calendar.components.eventdetail.form.component.recurrence.RecurrenceItem
 import com.infomaniak.calendar.components.eventdetail.form.component.recurrence.recurrenceText
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.AddReminderButton
@@ -103,14 +104,27 @@ fun EventForm(
         )
 
         state.dateAndTimeState?.let { dateAndTimeState ->
+            var isRecurrenceDialogVisible by rememberSaveable { mutableStateOf(false) }
+            val start = dateAndTimeState.start.date.atTime(dateAndTimeState.start.time)
+
             RecurrenceItem(
-                text = recurrenceText(
-                    recurrence = state.recurrence.value,
-                    start = dateAndTimeState.start.date.atTime(dateAndTimeState.start.time),
-                    getRecurrenceText = getRecurrenceText,
-                ),
-                onClick = {}, // TODO: Open the recurrence dialog
+                text = recurrenceText(state.recurrence.value, start, getRecurrenceText),
+                onClick = { isRecurrenceDialogVisible = true },
             )
+
+            if (isRecurrenceDialogVisible) {
+                RecurrenceDialog(
+                    selectedRecurrence = state.recurrence.value,
+                    start = start,
+                    getRecurrenceText = getRecurrenceText,
+                    onRecurrenceSelect = { recurrence ->
+                        state.recurrence.value = recurrence
+                        isRecurrenceDialogVisible = false
+                    },
+                    onCustomClick = { isRecurrenceDialogVisible = false }, // TODO: Open the custom recurrence screen
+                    onDismissRequest = { isRecurrenceDialogVisible = false },
+                )
+            }
         }
 
         Section(EventSharedElement.Divider1) {
