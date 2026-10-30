@@ -27,6 +27,7 @@ import java.util.Locale
 
 private const val FULL_DATE_SKELETON = "EEEEdMMMM"
 private const val FULL_DATE_WITH_YEAR_SKELETON = "yEEEEdMMMM"
+private const val DAY_AND_MONTH_SKELETON = "dMMMM"
 
 private const val SHORT_DAY_NAME_PATTERN = "EEE"
 private const val DAY_WITH_SHORT_MONTH_PATTERN = "EEEE - d MMM"
@@ -36,6 +37,17 @@ private const val SHORT_DATE_WITH_YEAR_PATTERN = "d MMM y"
 /** `W` */
 @Composable
 fun DayOfWeek.formatNarrowDayName(): String = toJavaDayOfWeek().getDisplayName(TextStyle.NARROW_STANDALONE, currentLocale())
+
+/** `Wednesday`, written the way it reads within a sentence. */
+@Composable
+fun DayOfWeek.formatDayName(): String = toJavaDayOfWeek().getDisplayName(TextStyle.FULL, currentLocale())
+
+/** `Wed`, without the abbreviation dot some languages add. */
+@Composable
+fun DayOfWeek.formatShortDayName(): String {
+    val locale = currentLocale()
+    return toJavaDayOfWeek().getDisplayName(TextStyle.SHORT_STANDALONE, locale).removeSuffix(".").titlecaseFirstChar(locale)
+}
 
 /** `Wed` */
 @Composable
@@ -58,6 +70,10 @@ fun LocalDate.formatDayWithShortMonth(): String {
 /** `Wednesday, May 20, 2026`, for labels that have to stand on their own such as content descriptions. */
 @Composable
 fun LocalDate.formatFullDateWithYear(): String = format(FULL_DATE_WITH_YEAR_SKELETON, currentLocale())
+
+/** `May 20` */
+@Composable
+fun LocalDate.formatDayAndMonth(): String = format(DAY_AND_MONTH_SKELETON, currentLocale())
 
 /** `21 Dec 2026`, keeping this layout without any comma in every language. */
 @Composable

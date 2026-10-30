@@ -137,7 +137,7 @@ private fun TimeZoneButton(
 }
 
 @Composable
-private fun DateSelectionDialog(initialDate: LocalDate, onDateSelected: (LocalDate) -> Unit, onDismissRequest: () -> Unit) {
+internal fun DateSelectionDialog(initialDate: LocalDate, onDateSelected: (LocalDate) -> Unit, onDismissRequest: () -> Unit) {
     // DatePicker works with UTC midnight millis
     val state = rememberDatePickerState(initialDate.atStartOfDayIn(TimeZone.UTC).toEpochMilliseconds())
 
