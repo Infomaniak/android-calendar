@@ -57,6 +57,8 @@
     <string name="customAlarmLabel">Personnalisé</string>
     <!-- TODO: ink translate -->
     <string name="customRecurrenceLabel">Personnalisée</string>
+    <!-- TODO: ink translate -->
+    <string name="customRecurrenceTitle">Récurrence personnalisée</string>
     <plurals name="dayAmount">
         <item quantity="one">%d jour</item>
         <item quantity="other">%d jours</item>
@@ -87,7 +89,35 @@
     <string name="privateLabel">Privé</string>
     <string name="publicLabel">Public</string>
     <!-- TODO: ink translate -->
+    <string name="recurrenceEndAfterCount">Après un nombre de fois</string>
+    <!-- TODO: ink translate -->
+    <string name="recurrenceEndNever">Jamais</string>
+    <!-- TODO: ink translate -->
+    <string name="recurrenceEndTitle">Se termine</string>
+    <!-- TODO: ink translate -->
+    <string name="recurrenceEndUntilDate">Jusqu’à une date</string>
+    <!-- TODO: ink translate -->
+    <string name="recurrenceFrequencyTitle">Fréquence de répétition</string>
+    <!-- TODO: ink translate -->
+    <string name="recurrenceInMonthOnWeekday">En %1$s, le %2$s %3$s</string>
+    <!-- TODO: ink translate -->
     <string name="recurrenceNone">Ne se répète pas</string>
+    <!-- TODO: ink translate -->
+    <string name="recurrenceOnDate">Le %s</string>
+    <!-- TODO: ink translate -->
+    <string name="recurrenceOnMonthDay">Le %d</string>
+    <!-- TODO: ink translate -->
+    <string name="recurrenceOnWeekday">Le %1$s %2$s</string>
+    <!-- TODO: ink translate -->
+    <string name="recurrenceOrdinalFirst">premier</string>
+    <!-- TODO: ink translate -->
+    <string name="recurrenceOrdinalFourth">quatrième</string>
+    <!-- TODO: ink translate -->
+    <string name="recurrenceOrdinalLast">dernier</string>
+    <!-- TODO: ink translate -->
+    <string name="recurrenceOrdinalSecond">deuxième</string>
+    <!-- TODO: ink translate -->
+    <string name="recurrenceOrdinalThird">troisième</string>
     <string name="reminderTitle">Rappel</string>
     <string name="roomFloorLabel">%s étage</string>
     <plurals name="roomSeatsLabel">
@@ -112,6 +142,21 @@
     <plurals name="unitMinutes">
         <item quantity="one">minute</item>
         <item quantity="other">minutes</item>
+    </plurals>
+    <!-- TODO: ink translate -->
+    <plurals name="unitMonths">
+        <item quantity="one">mois</item>
+        <item quantity="other">mois</item>
+    </plurals>
+    <!-- TODO: ink translate -->
+    <plurals name="unitWeeks">
+        <item quantity="one">semaine</item>
+        <item quantity="other">semaines</item>
+    </plurals>
+    <!-- TODO: ink translate -->
+    <plurals name="unitYears">
+        <item quantity="one">année</item>
+        <item quantity="other">années</item>
     </plurals>
     <plurals name="weekAmount">
         <item quantity="one">%d semaine</item>

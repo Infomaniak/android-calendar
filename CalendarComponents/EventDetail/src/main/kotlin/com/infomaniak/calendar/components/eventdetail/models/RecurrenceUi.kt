@@ -17,7 +17,9 @@
  */
 package com.infomaniak.calendar.components.eventdetail.models
 
+import androidx.annotation.PluralsRes
 import androidx.compose.runtime.Immutable
+import com.infomaniak.calendar.components.resources.R
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import java.io.Serializable
@@ -44,11 +46,11 @@ sealed interface RecurrenceUi : Serializable {
         val end: End,
     ) : RecurrenceUi {
         @Immutable
-        enum class Frequency {
-            Daily,
-            Weekly,
-            Monthly,
-            Yearly,
+        enum class Frequency(@PluralsRes val unitRes: Int) {
+            Daily(R.plurals.unitDays),
+            Weekly(R.plurals.unitWeeks),
+            Monthly(R.plurals.unitMonths),
+            Yearly(R.plurals.unitYears),
         }
 
         @Immutable

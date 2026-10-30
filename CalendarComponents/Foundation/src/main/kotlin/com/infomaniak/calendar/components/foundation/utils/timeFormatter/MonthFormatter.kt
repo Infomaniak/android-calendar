@@ -29,6 +29,10 @@ import kotlin.time.Clock
 @Composable
 fun YearMonth.formatShortMonth(): String = javaMonth().getDisplayName(TextStyle.SHORT, currentLocale())
 
+/** `May`, written the way it reads within a sentence. */
+@Composable
+fun YearMonth.formatMonthName(): String = javaMonth().getDisplayName(TextStyle.FULL, currentLocale())
+
 /** `May` or `May 2024`, gaining the year when the month leaves [currentYear]. */
 @Composable
 fun YearMonth.formatMonthAndOptionalYear(currentYear: Int = Clock.today().year): String {
