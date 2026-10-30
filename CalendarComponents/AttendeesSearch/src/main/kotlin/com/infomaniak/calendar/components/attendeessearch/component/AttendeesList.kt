@@ -88,7 +88,7 @@ internal fun AttendeesList(
 }
 
 @Composable
-internal fun AddCustomAttendee(query: () -> String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun AddCustomAttendee(query: () -> String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     ListItem(
         modifier = modifier,
         onClick = onClick,
