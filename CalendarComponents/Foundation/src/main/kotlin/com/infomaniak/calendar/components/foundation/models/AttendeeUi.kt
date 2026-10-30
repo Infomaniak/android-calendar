@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.computeInitials
 import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Immutable
@@ -36,12 +37,13 @@ data class AttendeeUi(
     val status: ParticipationStatus?,
     val isOrganizer: Boolean = false,
 ) : AttendeesSearchResult {
-    val key: String get() = keyOf(email, displayName)
+    @IgnoredOnParcel
+    val key: String = keyOf(email, displayName)
 
     fun initials(): String = (displayName ?: email).computeInitials()
 
     companion object {
-        /** Single source of attendee keys, matching the KMP `Attendee.key` format. */
+        /** Single source of attendee keys. */
         fun keyOf(email: String, displayName: String?): String = "$email#$displayName"
     }
 }
