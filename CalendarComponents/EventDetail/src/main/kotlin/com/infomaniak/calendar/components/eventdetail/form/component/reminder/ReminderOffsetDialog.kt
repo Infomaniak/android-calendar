@@ -17,26 +17,14 @@
  */
 package com.infomaniak.calendar.components.eventdetail.form.component.reminder
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialogDefaults
-import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.eventdetail.form.component.OptionsDialog
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDurationOffset
 import com.infomaniak.calendar.components.resources.R
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -60,38 +48,15 @@ internal fun ReminderOffsetDialog(
     onCustomClick: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    BasicAlertDialog(onDismissRequest = onDismissRequest) {
-        Surface(
-            shape = AlertDialogDefaults.shape,
-            color = AlertDialogDefaults.containerColor,
-            tonalElevation = AlertDialogDefaults.TonalElevation,
-        ) {
-            Column(
-                Modifier
-                    .selectableGroup()
-                    .verticalScroll(rememberScrollState())
-                    .padding(EsdsTheme.spacing.md),
-            ) {
-                val colors = ListItemDefaults.colors(containerColor = AlertDialogDefaults.containerColor)
-
-                reminderOffsetPresets.forEach { offset ->
-                    val isSelected = offset == selectedOffset
-
-                    ListItem(
-                        selected = isSelected,
-                        onClick = { onOffsetSelect(offset) },
-                        trailingContent = { RadioButton(selected = isSelected, onClick = null) },
-                        colors = colors,
-                    ) {
-                        offset?.let { Text(it.formatDurationOffset()) } ?: Text(stringResource(R.string.alarmOffsetNone))
-                    }
-                }
-
-                ListItem(onClick = onCustomClick, colors = colors) {
-                    Text(stringResource(R.string.customAlarmLabel))
-                }
-            }
-        }
+    OptionsDialog(
+        options = reminderOffsetPresets,
+        selectedOption = selectedOffset,
+        onOptionSelect = onOffsetSelect,
+        customLabel = stringResource(R.string.customAlarmLabel),
+        onCustomClick = onCustomClick,
+        onDismissRequest = onDismissRequest,
+    ) { offset ->
+        offset?.let { Text(it.formatDurationOffset()) } ?: Text(stringResource(R.string.alarmOffsetNone))
     }
 }
 
