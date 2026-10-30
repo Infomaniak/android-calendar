@@ -19,21 +19,35 @@ package com.infomaniak.calendar.components.attendeessearch.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -47,9 +61,58 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Trash
+import kotlinx.coroutines.flow.drop
+import kotlin.math.abs
+import com.infomaniak.core.common.R as RCore
 
 @Composable
-internal fun EventAttendee(
+internal fun SwipeableEventAttendee(
+    attendee: AttendeeUi,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    enabled: Boolean = true,
+    state: SwipeToDismissBoxState = rememberSwipeToDismissBoxState(),
+    enableDismissFromEndToStart: () -> Boolean = { true },
+) {
+    val haptics = LocalHapticFeedback.current
+
+    LaunchedEffect(state) {
+        snapshotFlow { state.targetValue }
+            .drop(1)
+            .collect { target ->
+                haptics.performHapticFeedback(
+                    if (target == SwipeToDismissBoxValue.Settled) {
+                        HapticFeedbackType.LongPress
+                    } else {
+                        HapticFeedbackType.GestureThresholdActivate
+                    },
+                )
+            }
+    }
+
+    SwipeToDismissBox(
+        state = state,
+        enableDismissFromStartToEnd = false,
+        enableDismissFromEndToStart = enableDismissFromEndToStart(),
+        onDismiss = {
+            haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+            onDismiss()
+        },
+        content = {
+            EventAttendee(attendee, onClick = onClick, enabled = enabled)
+        },
+        backgroundContent = {
+            if (state.dismissDirection == SwipeToDismissBoxValue.EndToStart) DeleteBackground(state)
+        },
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun EventAttendee(
     attendee: AttendeeUi,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
@@ -95,6 +158,25 @@ internal fun EventAttendee(
                     )
                 }
             },
+        )
+    }
+}
+
+@Composable
+private fun DeleteBackground(state: SwipeToDismissBoxState) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        val maxWidthPx = with(LocalDensity.current) { maxWidth.toPx() }
+        val progress = abs(state.requireOffset() / maxWidthPx)
+
+        Icon(
+            imageVector = EsdsIcons.Trash.Medium,
+            contentDescription = stringResource(RCore.string.deleteButton),
+            modifier = Modifier
+                .width(maxWidth * progress)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.error)
+                .padding(EsdsTheme.spacing.xl),
+            tint = Color.White,
         )
     }
 }
@@ -176,5 +258,17 @@ private fun PreviewAttendeePending() {
 private fun Preview() {
     Surface {
         EventAttendee(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", null), enabled = false)
+    }
+}
+
+@Preview
+@Composable
+private fun SwipeableAttendeePreview() {
+    Surface {
+        SwipeableEventAttendee(
+            AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Accepted),
+            onDismiss = {},
+            state = rememberSwipeToDismissBoxState(initialValue = SwipeToDismissBoxValue.EndToStart),
+        )
     }
 }

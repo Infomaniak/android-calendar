@@ -46,6 +46,10 @@ class AttendeesSearchState(
         searchQueryTextFieldState.clearText()
     }
 
+    fun removeAttendee(attendee: AttendeeUi) {
+        attendees.remove(attendee)
+    }
+
     object Saver : androidx.compose.runtime.saveable.Saver<AttendeesSearchState, List<Any>> {
         private val resultsSaver = autoSaver<SnapshotStateList<AttendeeUi>>()
         private val attendeesSaver = autoSaver<SnapshotStateSet<AttendeeUi>>()

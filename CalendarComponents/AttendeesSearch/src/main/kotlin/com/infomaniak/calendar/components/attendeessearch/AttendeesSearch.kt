@@ -77,6 +77,7 @@ fun AttendeesSearch(
         } else {
             AttendeesList(
                 attendees = { attendeesList },
+                onRemove = attendeesSearchState::removeAttendee,
                 modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md, vertical = EsdsTheme.spacing.sm),
                 onClick = if (isDisplayingSearchResults) {
                     { attendee -> attendeesSearchState.addAttendee(attendee) }
@@ -86,6 +87,7 @@ fun AttendeesSearch(
                 isEnabled = { attendee ->
                     !isDisplayingSearchResults || attendee.email !in attendeesSearchState.attendeesEmails
                 },
+                enableDeletion = { isDisplayingSearchResults.not() },
                 contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
             )
         }

@@ -30,9 +30,11 @@ import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 @Composable
 internal fun AttendeesList(
     attendees: () -> List<AttendeeUi>,
+    onRemove: (AttendeeUi) -> Unit,
     modifier: Modifier = Modifier,
     onClick: ((AttendeeUi) -> Unit)? = null,
     isEnabled: (AttendeeUi) -> Boolean = { true },
+    enableDeletion: () -> Boolean = { true },
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     LazyColumn(
@@ -43,10 +45,12 @@ internal fun AttendeesList(
             items = attendees(),
             key = { attendee -> attendee.key },
         ) { attendee ->
-            EventAttendee(
+            SwipeableEventAttendee(
                 attendee = attendee,
+                onDismiss = { onRemove(attendee) },
                 onClick = onClick?.let { { it(attendee) } },
                 enabled = isEnabled(attendee),
+                enableDismissFromEndToStart = enableDeletion,
                 modifier = Modifier.animateItem(),
             )
         }
@@ -58,5 +62,6 @@ internal fun AttendeesList(
 private fun AttendeesListPreview() {
     AttendeesList(
         attendees = { previewAttendees },
+        onRemove = {},
     )
 }
