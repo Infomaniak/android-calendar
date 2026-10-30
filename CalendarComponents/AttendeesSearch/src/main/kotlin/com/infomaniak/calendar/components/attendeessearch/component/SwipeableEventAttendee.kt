@@ -18,7 +18,6 @@
 package com.infomaniak.calendar.components.attendeessearch.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,7 +27,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -49,11 +47,12 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.foundation.component.ListItemClickable
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.utils.fromAttendee
@@ -118,48 +117,43 @@ private fun EventAttendee(
     onClick: (() -> Unit)? = null,
     enabled: Boolean = true,
 ) {
-    Row(
+    ListItemClickable(
+        onClick = onClick.takeIf { enabled },
         modifier = modifier
-            .clip(ListItemDefaults.shapes().pressedShape)
-            .clickableNullable(enabled, onClick, Role.Button)
             .alpha(if (enabled) 1f else EsdsTheme.opacity.medium)
-            .background(ListItemDefaults.colors().containerColor)
-            .padding(start = EsdsTheme.spacing.lg),
+            .semantics { if (!enabled) disabled() },
         verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Avatar(
-            avatarType = AvatarType.fromAttendee(attendee),
-            modifier = Modifier
-                .padding(start = EsdsTheme.spacing.lg)
-                .size(40.dp),
-        )
-
-        ListItem(
-            overlineContent = attendee.status?.let {
-                { AttendeeParticipationStatus(it, attendee.isOrganizer) }
-            },
-            supportingContent = if (attendee.displayName.isNullOrEmpty()) {
-                null
-            } else {
-                {
-                    Text(
-                        text = attendee.email,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-            },
-            content = {
-                Column {
-                    Text(
-                        text = attendee.displayName ?: attendee.email,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Normal,
-                    )
-                }
-            },
-        )
-    }
+        leadingContent = {
+            Avatar(
+                avatarType = AvatarType.fromAttendee(attendee),
+                modifier = Modifier.size(EsdsTheme.icon.sizeXl),
+            )
+        },
+        overlineContent = attendee.status?.let {
+            { AttendeeParticipationStatus(it, attendee.isOrganizer) }
+        },
+        supportingContent = if (attendee.displayName.isNullOrEmpty()) {
+            null
+        } else {
+            {
+                Text(
+                    text = attendee.email,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        },
+        content = {
+            Column {
+                Text(
+                    text = attendee.displayName ?: attendee.email,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Normal,
+                )
+            }
+        },
+        shapes = ListItemDefaults.shapes(MaterialTheme.shapes.large),
+    )
 }
 
 @Composable
@@ -212,14 +206,6 @@ private fun ParticipationStatusText(text: String, color: Color, isOrganizer: Boo
         }
     }
 }
-
-private fun Modifier.clickableNullable(enabled: Boolean, onClick: (() -> Unit)?, role: Role): Modifier = then(
-    if (onClick == null) {
-        Modifier
-    } else {
-        Modifier.clickable(enabled = enabled, onClick = onClick, role = role)
-    },
-)
 
 @Preview
 @Composable
