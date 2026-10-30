@@ -15,16 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.utils
+package com.infomaniak.calendar.components.foundation.models
 
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
-import com.infomaniak.multiplatform_core.contacts.domain.model.Contact
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-val Contact.contactKey: String
-    get() = ContactKey(name = name, email = email).toString()
-
-val AttendeeUi.contactKey: String
-    get() = ContactKey(name = displayName, email = email).toString()
-
-/** A unique key that matches between [Contact] and [AttendeeUi] so we can compare them. It's unique for both. */
-private data class ContactKey(val name: String?, val email: String)
+/** An item displayed in the attendees search list, rendered according to its type. */
+sealed interface AttendeesSearchResult : Parcelable {
+    @Parcelize
+    data object AddCustomAttendee : AttendeesSearchResult
+}

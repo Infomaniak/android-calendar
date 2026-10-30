@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Legg til</string>
     <string name="allDayLabel">Hele dagen</string>
+    <string name="attendeeIncompleteEmailMessage">Fullfør e-postadressen for å legge den til</string>
     <string name="attendees">Deltakere</string>
     <plurals name="attendeesAcceptedCount">
         <item quantity="one">%d akseptert</item>
@@ -31,11 +32,13 @@
         <item quantity="one">%d avvist</item>
         <item quantity="other">%d avviste</item>
     </plurals>
-    <string name="attendeesEmptyState">Ingen deltakere funnet</string>
+    <string name="attendeesEmptyStateDescription">Søk etter kontakter for å legge dem til i arrangementet</string>
+    <string name="attendeesEmptyStateTitle">Ingen gjester</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d venter</item>
         <item quantity="other">%d venter</item>
     </plurals>
+    <string name="attendeesSearchPlaceholder">Legg til en gjest</string>
     <plurals name="attendeesTentativeCount">
         <item quantity="one">%1$d kanskje</item>
         <item quantity="other">%1$d kanskje</item>
@@ -85,7 +88,6 @@
         <item quantity="one">%d sete</item>
         <item quantity="other">%d seter</item>
     </plurals>
-    <string name="searchForAttendees">Søk etter deltakere</string>
     <string name="sectionCalendarHeader">Kalender</string>
     <string name="sectionOrganizerHeader">Arrangør</string>
     <string name="statusAcceptedLabel">Godkjent</string>

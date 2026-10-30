@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Dodaj</string>
     <string name="allDayLabel">Przez cały dzień</string>
+    <string name="attendeeIncompleteEmailMessage">Uzupełnij adres e-mail, aby go dodać</string>
     <string name="attendees">Uczestnicy</string>
     <plurals name="attendeesAcceptedCount">
         <item quantity="one">%d zaakceptowany</item>
@@ -37,13 +38,15 @@
         <item quantity="many">%d odrzucone</item>
         <item quantity="other">%d odrzucone</item>
     </plurals>
-    <string name="attendeesEmptyState">Nie znaleziono uczestników</string>
+    <string name="attendeesEmptyStateDescription">Wyszukaj kontakty, aby dodać je do wydarzenia</string>
+    <string name="attendeesEmptyStateTitle">Brak gości</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d oczekujący</item>
         <item quantity="few">%d oczekujących</item>
         <item quantity="many">%d oczekujących</item>
         <item quantity="other">%d oczekujących</item>
     </plurals>
+    <string name="attendeesSearchPlaceholder">Dodaj gościa</string>
     <plurals name="attendeesTentativeCount">
         <item quantity="one">%1$d może</item>
         <item quantity="few">%1$d może</item>
@@ -105,7 +108,6 @@
         <item quantity="many">%d miejsc</item>
         <item quantity="other">%d miejsc</item>
     </plurals>
-    <string name="searchForAttendees">Szukaj uczestników</string>
     <string name="sectionCalendarHeader">Kalendarz</string>
     <string name="sectionOrganizerHeader">Organizator</string>
     <string name="statusAcceptedLabel">Zaakceptowano</string>

@@ -19,8 +19,12 @@ package com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.union
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.Composable
@@ -58,6 +62,7 @@ class NavigationDecoratorStrategy<T : NavKey>(
                             snackbar = { Snackbar(it, modifier = Modifier.sharedElement(SNACKBAR_KEY)) },
                         )
                     },
+                    contentWindowInsets = ScaffoldDefaults.contentWindowInsets.union(WindowInsets.ime),
                 ) { _ ->
                     Content()
                 }

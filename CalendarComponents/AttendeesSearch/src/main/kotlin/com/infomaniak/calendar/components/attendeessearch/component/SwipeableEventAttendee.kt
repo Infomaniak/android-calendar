@@ -211,7 +211,7 @@ private fun ParticipationStatusText(text: String, color: Color, isOrganizer: Boo
 @Composable
 private fun PreviewAttendeeAccepted() {
     Surface {
-        EventAttendee(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Accepted, true))
+        EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted, true))
     }
 }
 
@@ -219,7 +219,7 @@ private fun PreviewAttendeeAccepted() {
 @Composable
 private fun PreviewAttendeeDeclined() {
     Surface {
-        EventAttendee(AttendeeUi("alice@example.com#", "alice@example.com", null, ParticipationStatus.Declined))
+        EventAttendee(AttendeeUi("alice@example.com", null, ParticipationStatus.Declined))
     }
 }
 
@@ -227,7 +227,7 @@ private fun PreviewAttendeeDeclined() {
 @Composable
 private fun PreviewAttendeeMaybe() {
     Surface {
-        EventAttendee(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Tentative))
+        EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Tentative))
     }
 }
 
@@ -235,7 +235,7 @@ private fun PreviewAttendeeMaybe() {
 @Composable
 private fun PreviewAttendeePending() {
     Surface {
-        EventAttendee(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.NeedsAction))
+        EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.NeedsAction))
     }
 }
 
@@ -243,7 +243,7 @@ private fun PreviewAttendeePending() {
 @Composable
 private fun Preview() {
     Surface {
-        EventAttendee(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", null), enabled = false)
+        EventAttendee(AttendeeUi("alice@example.com", "Alice", null), enabled = false)
     }
 }
 
@@ -252,7 +252,7 @@ private fun Preview() {
 private fun SwipeableAttendeePreview() {
     Surface {
         SwipeableEventAttendee(
-            AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Accepted),
+            AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted),
             onDismiss = {},
             state = rememberSwipeToDismissBoxState(initialValue = SwipeToDismissBoxValue.EndToStart),
         )

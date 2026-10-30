@@ -31,27 +31,55 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateSet
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
+import com.infomaniak.core.common.utils.isEmailRfc5321Compliant
+import com.infomaniak.core.common.R as RCore
 
 @Stable
 class AttendeesSearchState(
     val searchQueryTextFieldState: TextFieldState,
-    val results: SnapshotStateList<AttendeeUi>,
+    val results: SnapshotStateList<AttendeesSearchResult>,
     val attendees: SnapshotStateSet<AttendeeUi>,
 ) {
-    val attendeesEmails by derivedStateOf { attendees.map { it.email } }
+    val attendeesEmailsLowercase by derivedStateOf { attendees.map { it.email.lowercase() } }
 
     fun addAttendee(attendee: AttendeeUi) {
-        attendees.add(attendee.copy(status = ParticipationStatus.NeedsAction))
-        searchQueryTextFieldState.clearText()
+        addRawAttendee(attendee.copy(status = ParticipationStatus.NeedsAction))
     }
 
     fun removeAttendee(attendee: AttendeeUi) {
         attendees.remove(attendee)
     }
 
+    fun addCustomAttendee(email: String = searchQueryTextFieldState.text.toString().trim()): CustomAttendeeResult {
+        if (email.lowercase() in attendeesEmailsLowercase) return CustomAttendeeResult.AlreadyPresent
+        if (!email.isEmailRfc5321Compliant()) return CustomAttendeeResult.InvalidEmail
+
+        addRawAttendee(
+            AttendeeUi(
+                email = email,
+                displayName = null,
+                status = ParticipationStatus.NeedsAction,
+            ),
+        )
+
+        return CustomAttendeeResult.Added
+    }
+
+    private fun addRawAttendee(attendee: AttendeeUi) {
+        attendees.add(attendee)
+        searchQueryTextFieldState.clearText()
+    }
+
+    enum class CustomAttendeeResult(val messageRes: Int? = null) {
+        Added,
+        AlreadyPresent(RCore.string.emailAlreadyUsed),
+        InvalidEmail(RCore.string.emailInvalid),
+    }
+
     object Saver : androidx.compose.runtime.saveable.Saver<AttendeesSearchState, List<Any>> {
-        private val resultsSaver = autoSaver<SnapshotStateList<AttendeeUi>>()
+        private val resultsSaver = autoSaver<SnapshotStateList<AttendeesSearchResult>>()
         // TODO: Use autoSaver once on Compose 1.13+, SnapshotStateSet only parcels its first element before (b/537461421)
         private val attendeesSaver = androidx.compose.runtime.saveable.Saver<SnapshotStateSet<AttendeeUi>, ArrayList<AttendeeUi>>(
             save = { ArrayList(it) },
@@ -82,7 +110,7 @@ class AttendeesSearchState(
 @Composable
 fun rememberSaveableAttendeesSearchState(
     attendees: SnapshotStateSet<AttendeeUi> = rememberSaveable { mutableStateSetOf() },
-    results: SnapshotStateList<AttendeeUi> = rememberSaveable { mutableStateListOf() },
+    results: SnapshotStateList<AttendeesSearchResult> = rememberSaveable { mutableStateListOf() },
     searchQuery: String = "",
 ): AttendeesSearchState = rememberSaveable(saver = AttendeesSearchState.Saver) {
     AttendeesSearchState(
