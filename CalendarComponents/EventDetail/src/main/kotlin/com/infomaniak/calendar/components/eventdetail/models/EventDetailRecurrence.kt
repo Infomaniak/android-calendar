@@ -24,6 +24,13 @@ sealed interface EventDetailRecurrence {
     @Immutable
     data object Single : EventDetailRecurrence
 
+    /** @param rule `null` when the form can't describe it. */
     @Immutable
-    data class Recurrence(val getText: suspend () -> String?) : EventDetailRecurrence
+    data class Recurrence(val getText: suspend () -> String?, val rule: RecurrenceUi.Rule?) : EventDetailRecurrence
+
+    val formRecurrence: RecurrenceUi
+        get() = when (this) {
+            Single -> RecurrenceUi.None
+            is Recurrence -> rule ?: RecurrenceUi.Kept
+        }
 }

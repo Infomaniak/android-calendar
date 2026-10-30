@@ -35,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.RecurrenceUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
@@ -84,7 +85,7 @@ fun EventEditScreen(
     }
 
     val uiState = if (eventDetailUiState is EventDetailUiState.Displayable.Success && formState != null) {
-        EventEditScreenState.Success(formState, isRecurring = eventDetailUiState.eventDetail.isRecurring)
+        EventEditScreenState.Success(formState, recurrence = eventDetailUiState.eventDetail.recurrence)
     } else {
         EventEditScreenState.Loading
     }
@@ -145,7 +146,10 @@ private fun EventEditScreen(
                     onLocationClick = navigation.goToLocationSearch,
                     onTimeZoneClick = navigation.goToTimeZoneSearch,
                     onCustomReminderClick = navigation.goToCustomReminder,
-                    getRecurrenceText = RecurrenceUi::toLocalizedString,
+                    getRecurrenceText = { recurrence, start ->
+                        val storedRecurrence = uiState.recurrence as? EventDetailRecurrence.Recurrence
+                        if (recurrence == RecurrenceUi.Kept) storedRecurrence?.getText() else recurrence.toLocalizedString(start)
+                    },
                     modifier = Modifier.verticalScroll(scrollState),
                     contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                     sharedTransitionScope = sharedTransitionScope,
@@ -158,7 +162,9 @@ private fun EventEditScreen(
 
 private sealed interface EventEditScreenState {
     object Loading : EventEditScreenState
-    data class Success(val eventFormState: EventFormState, val isRecurring: Boolean) : EventEditScreenState
+    data class Success(val eventFormState: EventFormState, val recurrence: EventDetailRecurrence) : EventEditScreenState {
+        val isRecurring get() = recurrence is EventDetailRecurrence.Recurrence
+    }
 }
 
 @Preview
@@ -177,7 +183,7 @@ private fun Preview() {
             }
 
             EventEditScreen(
-                uiState = EventEditScreenState.Success(formState, isRecurring = false),
+                uiState = EventEditScreenState.Success(formState, recurrence = EventDetailRecurrence.Single),
                 goBack = {},
                 navigation = EventFormNavigation(
                     goToAttendees = {},

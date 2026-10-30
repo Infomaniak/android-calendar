@@ -27,6 +27,10 @@ sealed interface RecurrenceUi : Serializable {
     @Immutable
     data object None : RecurrenceUi
 
+    /** A stored recurrence the form can't describe, kept as it is unless another one is picked. */
+    @Immutable
+    data object Kept : RecurrenceUi
+
     /**
      * @param daysOfWeek Only read by [Frequency.Weekly]; empty repeats on the start's day.
      * @param monthDay Only read by [Frequency.Monthly] and [Frequency.Yearly], the latter in the start's month.

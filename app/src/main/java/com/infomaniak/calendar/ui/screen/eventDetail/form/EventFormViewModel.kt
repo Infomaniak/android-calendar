@@ -33,7 +33,6 @@ import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.Saver
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
-import com.infomaniak.calendar.components.eventdetail.models.RecurrenceUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource.Static
 import com.infomaniak.calendar.data.SettingsDataValues
 import com.infomaniak.calendar.ui.screen.eventDetail.EventCreationCalendarsUseCase
@@ -111,7 +110,7 @@ class EventFormViewModel(
             endTimeZone = event.end.timeZone,
             hasEndEverBeenTouched = false,
             location = event.location,
-            recurrence = RecurrenceUi.None, // TODO: Read the event recurrence
+            recurrence = event.recurrence.formRecurrence,
             participants = event.attendees.all.toSet(),
             organizerSource = Static(event.organizer),
             isKMeetUrlEnabled = event.kMeetUrl != null,
