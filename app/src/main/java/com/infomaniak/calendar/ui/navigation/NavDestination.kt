@@ -91,4 +91,7 @@ sealed interface NavDestination : NavKey {
 
     @Serializable
     data class EventCustomReminder(val parent: NavDestination) : NavDestination
+
+    @Serializable
+    data class EventCustomRecurrence(val parent: NavDestination, val start: LocalDate) : NavDestination
 }

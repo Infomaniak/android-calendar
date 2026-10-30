@@ -48,6 +48,7 @@ import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.screen.eventDetail.SaveEventResult
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.customRecurrence.CustomRecurrenceSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomReminderResultViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventCreationCalendars
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchResultViewModel
@@ -69,11 +70,13 @@ fun EventCreationScreen(
     goToEventsAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     goToCustomReminder: () -> Unit,
+    goToCustomRecurrence: (start: LocalDate) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventCreationViewModel = viewModel(),
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
     timeZoneSearchResultViewModel: TimeZoneSearchResultViewModel = viewModel(),
     customReminderResultViewModel: CustomReminderResultViewModel = viewModel(),
+    customRecurrenceSharedDataViewModel: CustomRecurrenceSharedDataViewModel = viewModel(),
 ) {
     val snackbarHostState = LocalSharedSnackbarHostState.current
     val coroutineScope = rememberCoroutineScope()
@@ -98,6 +101,10 @@ fun EventCreationScreen(
         customReminderResultViewModel.applyAddedRemindersTo(formState)
     }
 
+    LaunchedEffect(formState) {
+        customRecurrenceSharedDataViewModel.applyPickedRecurrencesTo(formState)
+    }
+
     LaunchedEffect(Unit) {
         attendeesSearchSharedDataViewModel.setAttendees(viewModel.attendeesState)
     }
@@ -119,6 +126,10 @@ fun EventCreationScreen(
         goToEventsAttendees = goToEventsAttendees,
         goToTimeZoneSearch = goToTimeZoneSearch,
         goToCustomReminder = goToCustomReminder,
+        onCustomRecurrenceClick = { start, recurrence ->
+            customRecurrenceSharedDataViewModel.initialRecurrence = recurrence
+            goToCustomRecurrence(start)
+        },
     )
 }
 
@@ -131,6 +142,7 @@ private fun EventCreationScreen(
     goToEventsAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     goToCustomReminder: () -> Unit,
+    onCustomRecurrenceClick: (start: LocalDate, recurrence: RecurrenceUi) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -152,6 +164,7 @@ private fun EventCreationScreen(
                     onAttendeesClick = goToEventsAttendees,
                     onTimeZoneClick = goToTimeZoneSearch,
                     onCustomReminderClick = goToCustomReminder,
+                    onCustomRecurrenceClick = onCustomRecurrenceClick,
                     getRecurrenceText = RecurrenceUi::toLocalizedString,
                     contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                     modifier = Modifier.verticalScroll(scrollState),
@@ -182,6 +195,7 @@ private fun EventCreationScreenPreview() {
             goToEventsAttendees = {},
             goToTimeZoneSearch = {},
             goToCustomReminder = {},
+            onCustomRecurrenceClick = { _, _ -> },
         )
     }
 }
@@ -205,6 +219,7 @@ private fun PreviewEmptyWritableCalendar() {
             goToEventsAttendees = {},
             goToTimeZoneSearch = {},
             goToCustomReminder = {},
+            onCustomRecurrenceClick = { _, _ -> },
         )
     }
 }

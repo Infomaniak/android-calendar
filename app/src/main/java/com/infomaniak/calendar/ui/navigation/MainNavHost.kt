@@ -50,6 +50,7 @@ import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.customRecurrence.CustomRecurrenceScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomReminderScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
@@ -135,6 +136,7 @@ private fun baseEntryProvider(
                 goToEventsAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
                 goToTimeZoneSearch = { isStart -> backStack.addOnce(NavDestination.EventTimeZone(destination, isStart)) },
                 goToCustomReminder = { backStack.addOnce(NavDestination.EventCustomReminder(destination)) },
+                goToCustomRecurrence = { start -> backStack.addOnce(NavDestination.EventCustomRecurrence(destination, start)) },
             )
         }
 
@@ -166,6 +168,7 @@ private fun baseEntryProvider(
                 goToEventAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
                 goToTimeZoneSearch = { isStart -> backStack.addOnce(NavDestination.EventTimeZone(destination, isStart)) },
                 goToCustomReminder = { backStack.addOnce(NavDestination.EventCustomReminder(destination)) },
+                goToCustomRecurrence = { start -> backStack.addOnce(NavDestination.EventCustomRecurrence(destination, start)) },
             )
         }
 
@@ -193,6 +196,13 @@ private fun baseEntryProvider(
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
             CustomReminderScreen(goBack = { backStack.popOrReplaceRoot(defaultCalendarView) })
+        }
+
+        is NavDestination.EventCustomRecurrence -> NavEntry(
+            key = destination,
+            metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
+        ) {
+            CustomRecurrenceScreen(start = destination.start, goBack = { backStack.popOrReplaceRoot(defaultCalendarView) })
         }
 
         is NavDestination.Accounts.List -> NavEntry(destination) {

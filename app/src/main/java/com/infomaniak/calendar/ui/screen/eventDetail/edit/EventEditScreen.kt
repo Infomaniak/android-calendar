@@ -61,6 +61,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailSharedDataViewMo
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.SaveEventResult
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.customRecurrence.CustomRecurrenceSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomReminderResultViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchResultViewModel
@@ -70,6 +71,7 @@ import com.infomaniak.calendar.utils.toLocalizedString
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlin.time.Duration.Companion.hours
@@ -83,12 +85,14 @@ fun EventEditScreen(
     goToEventAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     goToCustomReminder: () -> Unit,
+    goToCustomRecurrence: (start: LocalDate) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventEditViewModel = viewModel(),
     eventDetailSharedDataViewModel: EventDetailSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current),
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
     timeZoneSearchResultViewModel: TimeZoneSearchResultViewModel = viewModel(),
     customReminderResultViewModel: CustomReminderResultViewModel = viewModel(),
+    customRecurrenceSharedDataViewModel: CustomRecurrenceSharedDataViewModel = viewModel(),
 ) {
     val snackbarHostState = LocalSharedSnackbarHostState.current
     val coroutineScope = rememberCoroutineScope()
@@ -137,6 +141,10 @@ fun EventEditScreen(
         customReminderResultViewModel.applyAddedRemindersTo(eventFormState)
     }
 
+    LaunchedEffect(eventFormState) {
+        customRecurrenceSharedDataViewModel.applyPickedRecurrencesTo(eventFormState)
+    }
+
     LaunchedEffect(viewModel.attendeesState) {
         attendeesSearchSharedDataViewModel.setAttendees(viewModel.attendeesState)
     }
@@ -147,6 +155,10 @@ fun EventEditScreen(
         goToEventAttendees = goToEventAttendees,
         goToTimeZoneSearch = goToTimeZoneSearch,
         goToCustomReminder = goToCustomReminder,
+        onCustomRecurrenceClick = { start, recurrence ->
+            customRecurrenceSharedDataViewModel.initialRecurrence = recurrence
+            goToCustomRecurrence(start)
+        },
         modifier = modifier,
         onSubmit = { scope ->
             val eventDraft = (uiState as? EventEditScreenState.Success)?.eventFormState?.toEventDraft() ?: return@EventEditScreen
@@ -169,6 +181,7 @@ private fun EventEditScreen(
     goToEventAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     goToCustomReminder: () -> Unit,
+    onCustomRecurrenceClick: (start: LocalDate, recurrence: RecurrenceUi) -> Unit,
     onSubmit: (RecurrentEventScope) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -199,6 +212,7 @@ private fun EventEditScreen(
                     onAttendeesClick = goToEventAttendees,
                     onTimeZoneClick = goToTimeZoneSearch,
                     onCustomReminderClick = goToCustomReminder,
+                    onCustomRecurrenceClick = onCustomRecurrenceClick,
                     getRecurrenceText = { recurrence, start ->
                         val storedRecurrence = uiState.recurrence as? EventDetailRecurrence.Recurrence
                         if (recurrence == RecurrenceUi.Kept) storedRecurrence?.getText() else recurrence.toLocalizedString(start)
@@ -271,6 +285,7 @@ private fun Preview() {
                 goToEventAttendees = {},
                 goToTimeZoneSearch = {},
                 goToCustomReminder = {},
+                onCustomRecurrenceClick = { _, _ -> },
                 onSubmit = {},
             )
         }
