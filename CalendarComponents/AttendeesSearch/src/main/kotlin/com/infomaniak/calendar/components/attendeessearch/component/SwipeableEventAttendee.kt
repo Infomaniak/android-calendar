@@ -141,7 +141,7 @@ private fun EventAttendee(
             {
                 HighlightedText(
                     text = attendee.email,
-                    query = query(),
+                    query = query,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -151,7 +151,7 @@ private fun EventAttendee(
             Column {
                 HighlightedText(
                     text = attendee.displayName ?: attendee.email,
-                    query = query(),
+                    query = query,
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Normal),
                 )
             }
