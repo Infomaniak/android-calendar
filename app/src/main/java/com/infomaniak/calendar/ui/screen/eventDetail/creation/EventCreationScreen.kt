@@ -25,7 +25,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateSetOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,7 +42,7 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.component.EmptyState
-import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
+import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.screen.eventDetail.SaveEventResult
@@ -78,7 +81,7 @@ fun EventCreationScreen(
             calendars = it.calendars,
             initialCalendar = it.initialCalendar,
             dateAndTimeState = defaultEventDuration?.let { rememberDateAndTimeState(it, TimeZone.currentSystemDefault(), date) },
-            attendeesSearchState = viewModel.attendeesSearchState,
+            attendees = viewModel.attendeesSearchState.attendees,
         )
     }
 
@@ -153,7 +156,7 @@ private fun EventCreationScreenPreview() {
             calendars = previewEventDetailCalendarGroups,
             initialCalendar = previewEventDetailCalendar,
             dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
-            attendeesSearchState = rememberSaveableAttendeesSearchState(),
+            attendees = rememberSaveable { mutableStateSetOf() },
         )
 
         EventCreationScreen(
@@ -177,7 +180,7 @@ private fun PreviewEmptyWritableCalendar() {
             calendars = previewEventDetailCalendarGroups,
             initialCalendar = previewEventDetailCalendar,
             dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
-            attendeesSearchState = rememberSaveableAttendeesSearchState(),
+            attendees = remember { mutableStateSetOf(*previewAttendees.toTypedArray()) },
         )
 
         EventCreationScreen(

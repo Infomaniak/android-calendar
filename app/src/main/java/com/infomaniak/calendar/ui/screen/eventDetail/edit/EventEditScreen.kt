@@ -50,7 +50,6 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
-import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
@@ -100,7 +99,7 @@ fun EventEditScreen(
                 initialText = eventDetailUiState.eventDetail.title,
                 initialIsAllDay = eventDetailUiState.eventDetail.isAllDay,
                 initialIsKMeetUrlEnabled = eventDetailUiState.eventDetail.kMeetUrl != null,
-                attendeesSearchState = viewModel.attendeesSearchState,
+                attendees = viewModel.attendeesSearchState.attendees,
                 initialIsOccupied = eventDetailUiState.eventDetail.isOccupied,
                 initialIsPublic = eventDetailUiState.eventDetail.classification == EventDetailUi.Classification.Public,
             ),
@@ -236,9 +235,7 @@ private fun Preview() {
                         initialCalendar = previewEventDetailCalendar,
                         dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
                         initialText = "Meeting on how to find funny preview titles",
-                        attendeesSearchState = rememberSaveableAttendeesSearchState(
-                            attendees = remember { mutableStateSetOf(*previewAttendees.toTypedArray()) },
-                        ),
+                        attendees = remember { mutableStateSetOf(*previewAttendees.toTypedArray()) },
                         initialIsAllDay = false,
                         initialIsKMeetUrlEnabled = false,
                         initialIsOccupied = true,
