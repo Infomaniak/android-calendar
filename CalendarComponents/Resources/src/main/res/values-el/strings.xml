@@ -17,6 +17,7 @@
   -->
 <resources>
     <string name="addEventLabel">Προσθήκη</string>
+    <string name="alarmOffsetNone">Καμία</string>
     <string name="allDayLabel">Όλη την ημέρα</string>
     <string name="attendees">Συμμετέχοντες</string>
     <plurals name="attendeesAcceptedCount">
@@ -53,6 +54,7 @@
     <string name="contentDescriptionHasLocation">Έχει τοποθεσία</string>
     <string name="contentDescriptionSearch">Αναζήτηση</string>
     <string name="contentDescriptionToday">Σήμερα</string>
+    <string name="customAlarmLabel">Προσαρμοσμένο</string>
     <plurals name="dayAmount">
         <item quantity="one">%d ημέρα</item>
         <item quantity="other">%d ημέρες</item>
