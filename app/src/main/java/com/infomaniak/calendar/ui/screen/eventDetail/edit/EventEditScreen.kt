@@ -100,7 +100,7 @@ fun EventEditScreen(
                 initialText = eventDetailUiState.eventDetail.title,
                 initialIsAllDay = eventDetailUiState.eventDetail.isAllDay,
                 initialIsKMeetUrlEnabled = eventDetailUiState.eventDetail.kMeetUrl != null,
-                attendees = viewModel.attendeesState,
+                attendeesSearchState = viewModel.attendeesSearchState,
                 initialIsOccupied = eventDetailUiState.eventDetail.isOccupied,
                 initialIsPublic = eventDetailUiState.eventDetail.classification == EventDetailUi.Classification.Public,
             ),
@@ -125,8 +125,8 @@ fun EventEditScreen(
         timeZoneSearchResultViewModel.applyPickedTimeZonesTo(dateAndTimeState)
     }
 
-    LaunchedEffect(viewModel.attendeesState) {
-        attendeesSearchSharedDataViewModel.setAttendees(viewModel.attendeesState)
+    LaunchedEffect(viewModel.attendeesSearchState) {
+        attendeesSearchSharedDataViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
     }
 
     EventEditScreen(
@@ -236,7 +236,9 @@ private fun Preview() {
                         initialCalendar = previewEventDetailCalendar,
                         dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
                         initialText = "Meeting on how to find funny preview titles",
-                        attendees = remember { mutableStateSetOf(*previewAttendees.toTypedArray()) },
+                        attendeesSearchState = rememberSaveableAttendeesSearchState(
+                            attendees = remember { mutableStateSetOf(*previewAttendees.toTypedArray()) },
+                        ),
                         initialIsAllDay = false,
                         initialIsKMeetUrlEnabled = false,
                         initialIsOccupied = true,

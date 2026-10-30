@@ -25,8 +25,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateSetOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,6 +45,7 @@ import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElemen
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
+import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import kotlinx.datetime.TimeZone
 import kotlin.time.Duration.Companion.hours
 
@@ -86,7 +85,7 @@ fun EventForm(
 
         Section(EventSharedElement.Divider1) {
             AttendeesButton(
-                attendees = state.attendees.toList(),
+                attendees = state.attendeesState.attendees.toList(),
                 onClick = onAttendeesClick,
                 modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
             )
@@ -133,7 +132,7 @@ private fun Preview() {
                     initialCalendar = previewEventDetailCalendar,
                     dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
                     initialText = "Event title",
-                    attendees = remember { mutableStateSetOf() },
+                    attendeesSearchState = rememberSaveableAttendeesSearchState(),
                     initialIsAllDay = false,
                     initialIsKMeetUrlEnabled = false,
                     initialIsOccupied = true,

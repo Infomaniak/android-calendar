@@ -17,20 +17,18 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.edit
 
-import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.screen.eventDetail.EventComposerUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.SaveEventResult
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
-import com.infomaniak.calendar.utils.saveableAttendeesState
+import com.infomaniak.calendar.utils.saveableAttendeesSearchState
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
@@ -50,7 +48,7 @@ class EventEditViewModel(
     @Assisted private val savedStateHandle: SavedStateHandle,
     private val eventComposerUseCase: EventComposerUseCase,
 ) : ViewModel() {
-    val attendeesState: SnapshotStateSet<AttendeeUi> = savedStateHandle.saveableAttendeesState()
+    val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
 
     private var areAttendeesInitialized: Boolean
         get() = savedStateHandle[ARE_ATTENDEES_INITIALIZED_KEY] ?: false
@@ -61,7 +59,7 @@ class EventEditViewModel(
     suspend fun initAttendeesSearchState(eventDetailUi: Flow<EventDetailUiState>) {
         if (areAttendeesInitialized) return
         val event = eventDetailUi.filterIsInstance<EventDetailUiState.Displayable.Success>().first()
-        attendeesState.addAll(event.eventDetail.attendees.all)
+        attendeesSearchState.attendees.addAll(event.eventDetail.attendees.all)
         areAttendeesInitialized = true
     }
 

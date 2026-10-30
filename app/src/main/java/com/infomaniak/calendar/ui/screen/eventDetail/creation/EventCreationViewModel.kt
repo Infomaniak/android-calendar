@@ -17,19 +17,18 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.creation
 
-import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.data.SettingsDataValues
 import com.infomaniak.calendar.ui.screen.eventDetail.EventComposerUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.EventCreationCalendarsUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.SaveEventResult
-import com.infomaniak.calendar.utils.saveableAttendeesState
+import com.infomaniak.calendar.utils.saveableAttendeesSearchState
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -57,7 +56,7 @@ class EventCreationViewModel(
         .map { calendars -> calendars?.let(EventCreationUiState::Success) ?: EventCreationUiState.NoWritableCalendar }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), EventCreationUiState.Loading)
 
-    val attendeesState: SnapshotStateSet<AttendeeUi> = savedStateHandle.saveableAttendeesState()
+    val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
 
     val defaultEventDuration = settingsDataValues.defaultEventDuration.flow
 
