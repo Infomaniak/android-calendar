@@ -20,6 +20,7 @@ package com.infomaniak.calendar.utils
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
+import com.infomaniak.calendar.components.eventdetail.models.RecurrenceUi
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import com.infomaniak.calendar.ui.screen.eventDetail.AttendeesUpdatePayload
@@ -37,6 +38,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.Alarm
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.EventAlarm
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.TriggerRelation
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 
 val EventDraft.typedCalendarId: CalendarId get() = CalendarId(calendarId)
@@ -51,7 +53,7 @@ fun EventDraft.applyTo(
     defaultOrganizer: Organizer?,
 ): EventEditData = editData.copy(
     title = title,
-    timing = editData.timing.copy(bounds = bounds()),
+    timing = editData.timing.copy(bounds = bounds()).withRecurrence(recurrence, start.date),
     timeBlocking = if (isOccupied) TimeBlocking.Blocks else TimeBlocking.DoesNotBlock,
     calendarId = typedCalendarId,
     attendees = attendees.toAttendeeEdit(),
@@ -103,6 +105,15 @@ private fun EventDraft.bounds(): EventBounds = if (isAllDay) {
 }
 
 private fun OrganizerUi.toOrganizer(): Organizer = Organizer(email, displayName)
+
+/** A rule the form reads the same as the stored one gives it back, so it keeps the parts the form doesn't show. */
+private fun EventTiming.withRecurrence(recurrence: RecurrenceUi, start: LocalDate): EventTiming = when (recurrence) {
+    RecurrenceUi.None -> copy(recurrenceRule = null, rDates = emptyList(), exDates = emptyList())
+    RecurrenceUi.Kept -> this
+    is RecurrenceUi.Rule -> copy(
+        recurrenceRule = recurrenceRule?.takeIf { it.toRecurrenceUi(start) == recurrence } ?: recurrence.toRecurrenceRule(start),
+    )
+}
 
 /**
  * A notification read from a stored alarm gives that alarm back, found by its id, so it keeps the properties the form doesn't show.
