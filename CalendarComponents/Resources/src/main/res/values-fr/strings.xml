@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Ajouter</string>
     <string name="allDayLabel">Journée</string>
+    <string name="attendeeIncompleteEmailMessage">Complétez l’adresse mail pour l’ajouter</string>
     <string name="attendees">Invités</string>
     <plurals name="attendeesAcceptedCount">
         <item quantity="one">%d accepté</item>

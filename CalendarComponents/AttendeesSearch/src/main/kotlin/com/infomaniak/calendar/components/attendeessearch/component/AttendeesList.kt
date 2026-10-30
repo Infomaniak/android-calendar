@@ -35,11 +35,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.attendeessearch.component.ItemKey.Companion.itemKey
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
+import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -106,7 +108,7 @@ internal fun AddCustomAttendee(query: () -> String, onClick: () -> Unit, modifie
             }
         },
         content = { Text(query()) },
-        supportingContent = { Text("TODO") },
+        supportingContent = { Text(stringResource(R.string.attendeeIncompleteEmailMessage)) },
         shapes = ListItemDefaults.shapes(MaterialTheme.shapes.large),
     )
 }

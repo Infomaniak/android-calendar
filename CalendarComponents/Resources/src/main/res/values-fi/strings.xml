@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Lisää</string>
     <string name="allDayLabel">Koko päivän</string>
+    <string name="attendeeIncompleteEmailMessage">Täydennä sähköpostiosoite lisätäksesi sen</string>
     <string name="attendees">Osallistujat</string>
     <plurals name="attendeesAcceptedCount">
         <item quantity="one">%d hyväksytty</item>

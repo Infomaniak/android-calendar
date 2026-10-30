@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Lägg till</string>
     <string name="allDayLabel">Hela dagen</string>
+    <string name="attendeeIncompleteEmailMessage">Fyll i hela e-postadressen för att lägga till den</string>
     <string name="attendees">Deltagare</string>
     <plurals name="attendeesAcceptedCount">
         <item quantity="one">%d accepterad</item>
