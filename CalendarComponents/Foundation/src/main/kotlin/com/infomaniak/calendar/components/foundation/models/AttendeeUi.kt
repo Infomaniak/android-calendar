@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.foundation.models
 
+import android.os.Parcelable
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.compose.material3.MaterialTheme
@@ -38,14 +39,13 @@ data class AttendeeUi(
     val isOrganizer: Boolean = false,
 ) : AttendeesSearchResult {
     @IgnoredOnParcel
-    val key: String = keyOf(email, displayName)
+    val key: Key = Key(email, displayName)
 
     fun initials(): String = (displayName ?: email).computeInitials()
 
-    companion object {
-        /** Single source of attendee keys. */
-        fun keyOf(email: String, displayName: String?): String = "$email#${displayName.orEmpty()}"
-    }
+    /** Identifies an attendee across sources (event, contacts, custom input). */
+    @Parcelize
+    data class Key(val email: String, val displayName: String?) : Parcelable
 }
 
 enum class ParticipationStatus(
