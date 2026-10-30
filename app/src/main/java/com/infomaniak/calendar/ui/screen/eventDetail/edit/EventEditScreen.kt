@@ -147,6 +147,7 @@ private fun EventEditScreen(
                     onLocationClick = navigation.goToLocationSearch,
                     onTimeZoneClick = navigation.goToTimeZoneSearch,
                     onCustomReminderClick = navigation.goToCustomReminder,
+                    onCustomRecurrenceClick = navigation.goToCustomRecurrence,
                     getRecurrenceText = { recurrence, start ->
                         val storedRecurrence = uiState.recurrence as? EventDetailRecurrence.Recurrence
                         if (recurrence == RecurrenceUi.Kept) storedRecurrence?.getText() else recurrence.toLocalizedString(start)
@@ -192,6 +193,7 @@ private fun Preview() {
                     goToTimeZoneSearch = {},
                     goToCustomReminder = {},
                     goToLocationSearch = {},
+                    goToCustomRecurrence = {},
                 ),
                 onSubmit = {},
             )

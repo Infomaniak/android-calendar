@@ -56,6 +56,7 @@ import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.EditableAttendeesSearchScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.customRecurrence.CustomRecurrenceScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomReminderScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
@@ -227,6 +228,13 @@ private fun baseEntryProvider(
             )
         }
 
+        is NavDestination.EventForm.EventCustomRecurrence -> NavEntry(
+            key = destination,
+            metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
+        ) {
+            CustomRecurrenceScreen(goBack = { backStack.popOrReplaceRoot(defaultCalendarView) })
+        }
+
         is NavDestination.Accounts.List -> NavEntry(destination) {
             AccountsListScreen(
                 goBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
@@ -280,6 +288,7 @@ private fun NavBackStack<NavDestination>.eventFormNavigation(
     goToTimeZoneSearch = { isStart -> addOnce(NavDestination.EventForm.EventTimeZone(form, isStart)) },
     goToCustomReminder = { addOnce(NavDestination.EventForm.EventCustomReminder(parent = form)) },
     goToLocationSearch = { addOnce(NavDestination.EventForm.EventLocationSearch(editedOccurrenceId, form)) },
+    goToCustomRecurrence = { addOnce(NavDestination.EventForm.EventCustomRecurrence(parent = form)) },
 )
 
 /**

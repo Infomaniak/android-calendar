@@ -109,5 +109,8 @@ sealed interface NavDestination : NavKey {
 
         @Serializable
         data class EventLocationSearch(val occurrenceId: OccurrenceId? = null, val parent: NavDestination) : EventForm
+
+        @Serializable
+        data class EventCustomRecurrence(val parent: NavDestination) : EventForm
     }
 }

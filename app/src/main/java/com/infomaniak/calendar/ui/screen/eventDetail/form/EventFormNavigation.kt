@@ -22,4 +22,5 @@ data class EventFormNavigation(
     val goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     val goToCustomReminder: () -> Unit,
     val goToLocationSearch: () -> Unit,
+    val goToCustomRecurrence: () -> Unit,
 )

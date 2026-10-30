@@ -128,6 +128,7 @@ private fun EventCreationScreen(
                 onLocationClick = navigation.goToLocationSearch,
                 onTimeZoneClick = navigation.goToTimeZoneSearch,
                 onCustomReminderClick = navigation.goToCustomReminder,
+                onCustomRecurrenceClick = navigation.goToCustomRecurrence,
                 getRecurrenceText = RecurrenceUi::toLocalizedString,
                 contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                 modifier = Modifier.verticalScroll(scrollState),
@@ -165,6 +166,7 @@ private fun EventCreationScreenPreview() {
                 goToTimeZoneSearch = {},
                 goToCustomReminder = {},
                 goToLocationSearch = {},
+                goToCustomRecurrence = {},
             ),
         )
     }
@@ -183,6 +185,7 @@ private fun PreviewEmptyWritableCalendar() {
                 goToTimeZoneSearch = {},
                 goToCustomReminder = {},
                 goToLocationSearch = {},
+                goToCustomRecurrence = {},
             ),
         )
     }

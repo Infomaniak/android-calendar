@@ -91,6 +91,7 @@ fun EventForm(
     onTimeZoneClick: (isStart: Boolean) -> Unit,
     onCustomReminderClick: () -> Unit,
     getRecurrenceText: suspend (RecurrenceUi, start: LocalDateTime) -> String?,
+    onCustomRecurrenceClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -134,7 +135,10 @@ fun EventForm(
                     state.recurrence.value = recurrence
                     isRecurrenceDialogVisible = false
                 },
-                onCustomClick = { isRecurrenceDialogVisible = false }, // TODO: Open the custom recurrence screen
+                onCustomClick = {
+                    isRecurrenceDialogVisible = false
+                    onCustomRecurrenceClick()
+                },
                 onDismissRequest = { isRecurrenceDialogVisible = false },
             )
         }
@@ -305,6 +309,7 @@ private fun Preview() {
                 onTimeZoneClick = {},
                 onCustomReminderClick = {},
                 getRecurrenceText = { recurrence, _ -> (recurrence as? RecurrenceUi.Rule)?.frequency?.name },
+                onCustomRecurrenceClick = {},
                 contentPadding = PaddingValues(16.dp),
             )
         }

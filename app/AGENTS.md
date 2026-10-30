@@ -58,7 +58,7 @@ app/src/main/java/com/infomaniak/calendar/
     │                              # UserCalendarsUi / CalendarSectionUi / CalendarUi / CalendarColorsUi, the calendars as the drawer and other views draw them
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
-    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventDetail, AttendeeSearch(parent: EventForm), EventForm.{EventCreation, EventEdit, EditableAttendeeSearch(parent, config), EventTimeZone(parent, isStart), EventCustomReminder(parent), EventLocationSearch(parent)}, Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
+    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventDetail, AttendeeSearch(parent: EventForm), EventForm.{EventCreation, EventEdit, EditableAttendeeSearch(parent, config), EventTimeZone(parent, isStart), EventCustomReminder(parent), EventLocationSearch(parent), EventCustomRecurrence(parent)}, Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
     │   ├── SharedViewModelStores.kt # `toContentKey` and the `shareViewModelStoreWith(parent)` metadata
     │   ├── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
@@ -91,6 +91,7 @@ app/src/main/java/com/infomaniak/calendar/
     │                              #   A booked room (Location.BookableRoom with a known resource) maps to LocationUi.Room, shown in the detail
     │                              #   and as the form's location, under its building's place, until another location is picked. The room row isn't clickable,
     │                              #   and the form animates the switch when the room goes, e.g. dropped by a calendar switch)
+    │                              # customRecurrence/ (CustomRecurrenceScreen: writes the made recurrence to the form)
     │   └── onboarding/            # Two onboardings, each with its own page enum, sharing OnboardingPage + OnboardingButtonDefaults:
     │                              # login/ (LoginOnboardingScreen + LoginOnboardingPage + CrossAppLoginViewModel): welcome + login;
     │                              # permissions/ (PermissionsOnboardingScreen + PermissionsOnboardingPage + NextStepButton): a pager
