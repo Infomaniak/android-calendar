@@ -51,6 +51,7 @@
         <item quantity="other">%1$d może</item>
     </plurals>
     <string name="availableLabel">Wolny</string>
+    <string name="buttonAddReminder">Dodaj przypomnienie</string>
     <string name="buttonJoin">Dołącz</string>
     <string name="contentDescriptionCreateEvent">Utwórz wydarzenie</string>
     <plurals name="contentDescriptionEventCount">

@@ -41,6 +41,7 @@
         <item quantity="other">%1$d ehkä</item>
     </plurals>
     <string name="availableLabel">Vapaa</string>
+    <string name="buttonAddReminder">Lisää muistutus</string>
     <string name="buttonJoin">Liity mukaan</string>
     <string name="contentDescriptionCreateEvent">Luo tapahtuma</string>
     <plurals name="contentDescriptionEventCount">

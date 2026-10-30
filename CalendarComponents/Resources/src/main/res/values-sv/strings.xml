@@ -41,6 +41,7 @@
         <item quantity="other">%1$d kanske</item>
     </plurals>
     <string name="availableLabel">Ledig</string>
+    <string name="buttonAddReminder">Lägg till en påminnelse</string>
     <string name="buttonJoin">Gå med</string>
     <string name="contentDescriptionCreateEvent">Skapa ett evenemang</string>
     <plurals name="contentDescriptionEventCount">
