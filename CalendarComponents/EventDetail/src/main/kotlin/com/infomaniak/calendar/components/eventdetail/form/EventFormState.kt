@@ -31,6 +31,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.components.eventdetail.models.RecurrenceUi
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerUi
@@ -46,6 +47,7 @@ class EventFormState(
     selectedCalendarState: MutableState<EventDetailCalendar>,
     val isAllDay: MutableState<Boolean>,
     val dateAndTimeState: DateAndTimeState?,
+    val recurrence: MutableState<RecurrenceUi>,
     val attendees: () -> List<AttendeeUi>,
     /** The organizer of the edited event, never updated by the form. There either is one at the start or it will be added right before sending */
     val initialOrganizer: OrganizerUi?,
@@ -92,6 +94,7 @@ fun rememberDefaultEventForm(
     dateAndTimeState = dateAndTimeState,
     initialText = "",
     initialIsAllDay = false,
+    initialRecurrence = RecurrenceUi.None,
     initialIsKMeetUrlEnabled = false,
     initialNotifications = emptyList(),
     attendees = attendees,
@@ -108,6 +111,7 @@ fun rememberEventFormState(
     dateAndTimeState: DateAndTimeState?,
     initialText: String,
     initialIsAllDay: Boolean,
+    initialRecurrence: RecurrenceUi,
     initialIsKMeetUrlEnabled: Boolean,
     initialNotifications: List<EventDetailUi.Notification>,
     attendees: () -> List<AttendeeUi>,
@@ -120,6 +124,7 @@ fun rememberEventFormState(
     selectedCalendarState = rememberSaveable { mutableStateOf(initialCalendar) },
     isAllDay = rememberSaveable { mutableStateOf(initialIsAllDay) },
     dateAndTimeState = dateAndTimeState,
+    recurrence = rememberSaveable { mutableStateOf(initialRecurrence) },
     attendees = attendees,
     initialOrganizer = initialOrganizer,
     isKMeetUrlEnabled = rememberSaveable { mutableStateOf(initialIsKMeetUrlEnabled) },
