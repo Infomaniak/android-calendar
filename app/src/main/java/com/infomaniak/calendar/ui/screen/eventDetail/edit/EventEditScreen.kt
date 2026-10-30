@@ -30,11 +30,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -54,22 +52,18 @@ import com.infomaniak.calendar.components.foundation.state.rememberSaveableAtten
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
-import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
-import com.infomaniak.calendar.ui.screen.eventDetail.SaveEventResult
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchResultViewModel
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
-import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlin.time.Duration.Companion.hours
-import com.infomaniak.core.common.R as RCore
 
 @Composable
 fun EventEditScreen(
@@ -84,9 +78,6 @@ fun EventEditScreen(
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
     timeZoneSearchResultViewModel: TimeZoneSearchResultViewModel = viewModel(),
 ) {
-    val snackbarHostState = LocalSharedSnackbarHostState.current
-    val coroutineScope = rememberCoroutineScope()
-    val errorText = stringResource(RCore.string.anErrorHasOccurred)
     val eventDetailUiState = eventDetailSharedDataViewModel.eventDetailUi.collectAsStateWithLifecycle().value
 
     val uiState = when (eventDetailUiState) {
@@ -137,12 +128,7 @@ fun EventEditScreen(
         modifier = modifier,
         onSubmit = { scope ->
             val eventDraft = (uiState as? EventEditScreenState.Success)?.eventFormState?.toEventDraft() ?: return@EventEditScreen
-            coroutineScope.launch {
-                when (viewModel.submitEvent(occurrenceId, scope, eventDraft)) {
-                    SaveEventResult.Success -> goBack()
-                    SaveEventResult.Error -> snackbarHostState?.showSnackbar(message = errorText)
-                }
-            }
+            if (viewModel.submitEvent(occurrenceId, scope, eventDraft)) goBack()
         },
         sharedTransitionScope = LocalSharedTransitionScope.current,
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,

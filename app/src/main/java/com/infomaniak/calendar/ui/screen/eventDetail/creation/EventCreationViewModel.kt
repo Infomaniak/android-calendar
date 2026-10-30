@@ -25,9 +25,8 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.data.SettingsDataValues
-import com.infomaniak.calendar.ui.screen.eventDetail.EventComposerUseCase
+import com.infomaniak.calendar.manager.BackgroundEventComposer
 import com.infomaniak.calendar.ui.screen.eventDetail.EventCreationCalendarsUseCase
-import com.infomaniak.calendar.ui.screen.eventDetail.SaveEventResult
 import com.infomaniak.calendar.utils.saveableAttendeesSearchState
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
@@ -36,13 +35,11 @@ import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
 @AssistedInject
@@ -50,7 +47,7 @@ class EventCreationViewModel(
     @Assisted savedStateHandle: SavedStateHandle,
     eventCreationCalendarsUseCase: EventCreationCalendarsUseCase,
     settingsDataValues: SettingsDataValues,
-    private val eventComposerUseCase: EventComposerUseCase,
+    private val backgroundEventComposer: BackgroundEventComposer,
 ) : ViewModel() {
     val uiState: StateFlow<EventCreationUiState> = eventCreationCalendarsUseCase.creationCalendars
         .map { calendars -> calendars?.let(EventCreationUiState::Success) ?: EventCreationUiState.NoWritableCalendar }
@@ -60,14 +57,15 @@ class EventCreationViewModel(
 
     val defaultEventDuration = settingsDataValues.defaultEventDuration.flow
 
-    suspend fun submitEvent(eventDraft: EventDraft): SaveEventResult {
-        val result = CompletableDeferred<SaveEventResult>()
+    private var isSubmitted = false
 
-        viewModelScope.launch {
-            result.complete(eventComposerUseCase.createEvent(eventDraft))
-        }
+    fun submitEvent(eventDraft: EventDraft): Boolean {
+        if (isSubmitted) return false
+        isSubmitted = true
 
-        return result.await()
+        backgroundEventComposer.createEvent(eventDraft)
+
+        return true
     }
 
     @AssistedFactory

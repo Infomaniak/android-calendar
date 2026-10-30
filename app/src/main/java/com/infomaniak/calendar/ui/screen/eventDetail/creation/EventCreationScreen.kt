@@ -25,7 +25,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,8 +40,6 @@ import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeS
 import com.infomaniak.calendar.components.foundation.component.EmptyState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
-import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
-import com.infomaniak.calendar.ui.screen.eventDetail.SaveEventResult
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventCreationCalendars
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchResultViewModel
@@ -50,11 +47,9 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CalendarCross
-import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlin.time.Duration.Companion.hours
-import com.infomaniak.core.common.R as RCore
 
 @Composable
 fun EventCreationScreen(
@@ -67,9 +62,6 @@ fun EventCreationScreen(
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
     timeZoneSearchResultViewModel: TimeZoneSearchResultViewModel = viewModel(),
 ) {
-    val snackbarHostState = LocalSharedSnackbarHostState.current
-    val coroutineScope = rememberCoroutineScope()
-    val errorText = stringResource(RCore.string.anErrorHasOccurred)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val defaultEventDuration by viewModel.defaultEventDuration.collectAsStateWithLifecycle(null)
 
@@ -95,12 +87,7 @@ fun EventCreationScreen(
         formState = formState,
         onSubmit = {
             val eventDraft = formState?.toEventDraft() ?: return@EventCreationScreen
-            coroutineScope.launch {
-                when (viewModel.submitEvent(eventDraft)) {
-                    SaveEventResult.Success -> goBack()
-                    SaveEventResult.Error -> snackbarHostState?.showSnackbar(message = errorText)
-                }
-            }
+            if (viewModel.submitEvent(eventDraft)) goBack()
         },
         modifier = modifier,
         goBack = goBack,
