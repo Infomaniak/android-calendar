@@ -34,8 +34,6 @@ import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.core.common.utils.isEmailRfc5321Compliant
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 import com.infomaniak.core.common.R as RCore
 
 @Stable
@@ -54,14 +52,12 @@ class AttendeesSearchState(
         attendees.remove(attendee)
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     fun addCustomAttendee(email: String = searchQueryTextFieldState.text.toString().trim()): CustomAttendeeResult {
         if (email.lowercase() in attendeesEmailsLowercase) return CustomAttendeeResult.AlreadyPresent
         if (!email.isEmailRfc5321Compliant()) return CustomAttendeeResult.InvalidEmail
 
         addRawAttendee(
             AttendeeUi(
-                key = Uuid.generateV7().toString(),
                 email = email,
                 displayName = null,
                 status = ParticipationStatus.NeedsAction,

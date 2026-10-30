@@ -31,13 +31,19 @@ import kotlinx.parcelize.Parcelize
 @Immutable
 @Parcelize
 data class AttendeeUi(
-    val key: String,
     val email: String,
     val displayName: String?,
     val status: ParticipationStatus?,
     val isOrganizer: Boolean = false,
 ) : AttendeesSearchResult {
+    val key: String get() = keyOf(email, displayName)
+
     fun initials(): String = (displayName ?: email).computeInitials()
+
+    companion object {
+        /** Single source of attendee keys, matching the KMP `Attendee.key` format. */
+        fun keyOf(email: String, displayName: String?): String = "$email#$displayName"
+    }
 }
 
 enum class ParticipationStatus(
