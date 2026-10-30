@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.form.component.reminder
+package com.infomaniak.calendar.components.eventdetail.form.component
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
