@@ -89,7 +89,7 @@ fun EventDetail(
 
             if (recurrence is EventDetailRecurrence.Recurrence) Recurrence(recurrence.getText)
 
-            Section {
+            Section(EventSharedElement.Divider1) {
                 if (attendees.all.isNotEmpty()) {
                     AttendeesButton(
                         attendees = attendees.all,
@@ -115,7 +115,7 @@ fun EventDetail(
                 }
             }
 
-            Section {
+            Section(EventSharedElement.Divider2) {
                 if (description?.isNotBlank() == true) {
                     DescriptionCollapsibleButton(description = description)
                 }
@@ -123,14 +123,14 @@ fun EventDetail(
                 AttachmentFiles(files, onFileClick = { /*TODO[eventDetail]*/ })
             }
 
-            Section {
+            Section(EventSharedElement.Divider3) {
                 Notifications(
                     notifications = notifications,
                     onNotificationClick = { /*TODO[eventDetail]*/ },
                 )
             }
 
-            Section {
+            Section(EventSharedElement.Divider4) {
                 OccupiedStatus(isOccupied, modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus))
 
                 ClassificationStatus(
