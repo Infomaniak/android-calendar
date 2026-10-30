@@ -27,6 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 /**
@@ -40,6 +41,7 @@ class CachedCalendarManager @Inject constructor(calendarManager: CalendarManager
 
     val calendars = calendarManager
         .observeCalendars()
+        .map { sections -> sections.flatMap { it.calendars } }
         .stateIn(managerScope, SharingStarted.Eagerly, emptyList())
 
     val writableCalendars = calendars.mapState(managerScope, SharingStarted.Eagerly) { calendars ->
