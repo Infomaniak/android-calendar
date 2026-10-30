@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -36,8 +37,10 @@ import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Lock
 import com.infomaniak.designsystem.icons.symbols.Symbol
 
+private val MaxWidth = 300.dp
+
 @Composable
-fun EmptyState(text: String, modifier: Modifier = Modifier, icon: Symbol? = null) {
+fun EmptyState(text: String, modifier: Modifier = Modifier, description: String? = null, icon: Symbol? = null) {
     // TODO: improve empty state
     Column(
         modifier = modifier
@@ -47,7 +50,23 @@ fun EmptyState(text: String, modifier: Modifier = Modifier, icon: Symbol? = null
         verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xl, Alignment.CenterVertically),
     ) {
         icon?.let { Icon(icon.ExtraLarge, contentDescription = null) }
-        Text(text, style = MaterialTheme.typography.labelMedium, modifier = Modifier.widthIn(max = 300.dp))
+
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.widthIn(max = MaxWidth),
+        )
+
+        description?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.widthIn(max = MaxWidth),
+            )
+        }
     }
 }
 
@@ -63,6 +82,18 @@ private fun PreviewIcon() {
 @Composable
 private fun EmptyStatePreview() {
     Surface {
-        EmptyState(text = "Empty state")
+        EmptyState(icon = EsdsIcons.Lock, text = "Empty state", description = "This is a description")
+    }
+}
+
+@Preview
+@Composable
+private fun EmptyStateLongDescriptionPreview() {
+    Surface {
+        EmptyState(
+            icon = EsdsIcons.Lock,
+            text = "Empty state",
+            description = "This is a very long description with many words in order for the preview to wrap the next on multiple lines when reaching the end of the column",
+        )
     }
 }

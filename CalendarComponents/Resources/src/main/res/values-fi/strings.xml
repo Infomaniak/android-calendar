@@ -31,7 +31,8 @@
         <item quantity="one">%d hylätty</item>
         <item quantity="other">%d hylättyä</item>
     </plurals>
-    <string name="attendeesEmptyState">Osallistujia ei löytynyt</string>
+    <string name="attendeesEmptyStateDescription">Hae yhteystietoja lisätäksesi ne tapahtumaan</string>
+    <string name="attendeesEmptyStateTitle">Ei vieraita</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d odottaa</item>
         <item quantity="other">%d odottaa</item>

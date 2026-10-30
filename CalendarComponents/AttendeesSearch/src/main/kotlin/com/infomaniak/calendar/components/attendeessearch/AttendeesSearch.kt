@@ -42,7 +42,7 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
-import com.infomaniak.designsystem.icons.symbols.UserMagnifyingGlass
+import com.infomaniak.designsystem.icons.symbols.UsersStacked
 
 @Composable
 fun AttendeesSearch(
@@ -72,8 +72,9 @@ fun AttendeesSearch(
         )
         if (attendeesSearchState.searchQueryTextFieldState.text.isBlank() && attendeesList.isEmpty()) {
             EmptyState(
-                text = stringResource(R.string.attendeesEmptyState),
-                icon = EsdsIcons.UserMagnifyingGlass,
+                text = stringResource(R.string.attendeesEmptyStateTitle),
+                description = stringResource(R.string.attendeesEmptyStateDescription),
+                icon = EsdsIcons.UsersStacked,
                 modifier = Modifier.padding(bottom = contentPadding.calculateBottomPadding()),
             )
         } else {

@@ -37,7 +37,8 @@
         <item quantity="many">%d odrzucone</item>
         <item quantity="other">%d odrzucone</item>
     </plurals>
-    <string name="attendeesEmptyState">Nie znaleziono uczestników</string>
+    <string name="attendeesEmptyStateDescription">Wyszukaj kontakty, aby dodać je do wydarzenia</string>
+    <string name="attendeesEmptyStateTitle">Brak gości</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d oczekujący</item>
         <item quantity="few">%d oczekujących</item>
