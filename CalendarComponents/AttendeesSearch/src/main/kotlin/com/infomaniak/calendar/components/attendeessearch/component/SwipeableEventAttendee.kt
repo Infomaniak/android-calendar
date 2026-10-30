@@ -50,7 +50,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.foundation.component.ListItemClickable
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
@@ -123,9 +122,7 @@ private fun EventAttendee(
         leadingContent = {
             Avatar(
                 avatarType = AvatarType.fromAttendee(attendee),
-                modifier = Modifier
-                    .padding(start = EsdsTheme.spacing.lg)
-                    .size(40.dp),
+                modifier = Modifier.size(EsdsTheme.icon.sizeXl),
             )
         },
         overlineContent = attendee.status?.let {
