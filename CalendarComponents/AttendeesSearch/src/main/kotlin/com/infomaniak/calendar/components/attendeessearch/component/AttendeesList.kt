@@ -37,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.attendeessearch.component.ItemKey.Companion.itemKey
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
@@ -46,7 +47,7 @@ import kotlinx.parcelize.Parcelize
 
 @Composable
 internal fun AttendeesList(
-    attendees: () -> List<AttendeeUi>,
+    results: () -> List<AttendeesSearchResult>,
     query: () -> String,
     onAddCustomAttendee: () -> Unit,
     onRemove: (AttendeeUi) -> Unit,
@@ -60,24 +61,24 @@ internal fun AttendeesList(
         modifier = modifier.fillMaxSize(),
         contentPadding = contentPadding,
     ) {
-        val items = attendees()
         items(
-            items = items,
-            key = { attendee -> attendee.itemKey },
-        ) { attendee ->
-            SwipeableEventAttendee(
-                attendee = attendee,
-                onDismiss = { onRemove(attendee) },
-                onClick = onClick?.let { { it(attendee) } },
-                enabled = isEnabled(attendee),
-                enableDismissFromEndToStart = enableDeletion,
-                modifier = Modifier.animateItem(),
-            )
-        }
-
-        if (items.isNotEmpty() && query().isNotBlank()) {
-            item(key = ItemKey.AddCustomAttendee) {
-                AddCustomAttendee(query = query, onClick = onAddCustomAttendee, modifier = Modifier.animateItem())
+            items = results(),
+            key = { item -> item.itemKey },
+        ) { item ->
+            when (item) {
+                is AttendeeUi -> SwipeableEventAttendee(
+                    attendee = item,
+                    onDismiss = { onRemove(item) },
+                    onClick = onClick?.let { { it(item) } },
+                    enabled = isEnabled(item),
+                    enableDismissFromEndToStart = enableDeletion,
+                    modifier = Modifier.animateItem(),
+                )
+                AttendeesSearchResult.AddCustomAttendee -> AddCustomAttendee(
+                    query = query,
+                    onClick = onAddCustomAttendee,
+                    modifier = Modifier.animateItem(),
+                )
             }
         }
     }
@@ -115,7 +116,11 @@ private sealed interface ItemKey : Parcelable {
     object AddCustomAttendee : ItemKey
 
     companion object {
-        val AttendeeUi.itemKey get() = Attendee(key)
+        val AttendeesSearchResult.itemKey: ItemKey
+            get() = when (this) {
+                is AttendeeUi -> Attendee(key)
+                AttendeesSearchResult.AddCustomAttendee -> AddCustomAttendee
+            }
     }
 }
 
@@ -123,7 +128,7 @@ private sealed interface ItemKey : Parcelable {
 @Composable
 private fun AttendeesListPreview() {
     AttendeesList(
-        attendees = { previewAttendees },
+        results = { previewAttendees + AttendeesSearchResult.AddCustomAttendee },
         query = { "Bob" },
         onAddCustomAttendee = {},
         onRemove = {},

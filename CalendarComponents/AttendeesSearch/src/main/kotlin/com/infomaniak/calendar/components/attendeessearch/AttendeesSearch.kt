@@ -35,6 +35,7 @@ import com.infomaniak.calendar.components.attendeessearch.component.AttendeesLis
 import com.infomaniak.calendar.components.foundation.component.EmptyState
 import com.infomaniak.calendar.components.foundation.component.SearchBar
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
@@ -53,7 +54,7 @@ fun AttendeesSearch(
 ) {
     val isDisplayingSearchResults = attendeesSearchState.searchQueryTextFieldState.text.isNotBlank()
 
-    val attendeesList: List<AttendeeUi> = if (isDisplayingSearchResults) {
+    val attendeesList: List<AttendeesSearchResult> = if (isDisplayingSearchResults) {
         attendeesSearchState.results
     } else {
         attendeesSearchState.attendees.toList()
@@ -81,7 +82,7 @@ fun AttendeesSearch(
             val resources = LocalResources.current
 
             AttendeesList(
-                attendees = { attendeesList },
+                results = { attendeesList },
                 query = { attendeesSearchState.searchQueryTextFieldState.text.toString() },
                 onAddCustomAttendee = {
                     val result = attendeesSearchState.addCustomAttendee()
@@ -112,7 +113,7 @@ private fun Preview() {
             AttendeesSearch(
                 attendeesSearchState = rememberSaveableAttendeesSearchState(
                     attendees = remember { mutableStateSetOf<AttendeeUi>().apply { addAll(previewAttendees) } },
-                    results = remember { previewAttendees.toMutableStateList() },
+                    results = remember { previewAttendees.toMutableStateList<AttendeesSearchResult>() },
                 ),
                 onShowSnackbar = {},
             )

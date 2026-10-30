@@ -21,6 +21,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.navigation.SharedViewModelStoreNavEntryDecorator
 import com.infomaniak.calendar.utils.contactKey
@@ -51,10 +52,15 @@ class AttendeesSearchSharedDataViewModel(private val contactsManager: ContactsMa
     }
 
     suspend fun search(query: String) {
-        val results = contactsManager.search(query)
         val uiState = attendeesSearchState.value as? AttendeesSearchUiState.Success ?: return
-        uiState.state.results.clear()
-        uiState.state.results.addAll(results.toAttendeesUi(uiState.alreadyPresentAttendees))
+
+        if (query.isBlank()) {
+            uiState.state.results.clear()
+        } else {
+            val results = contactsManager.search(query)
+            uiState.state.results.clear()
+            uiState.state.results.addAll(results.toAttendeesUi(uiState.alreadyPresentAttendees) + AttendeesSearchResult.AddCustomAttendee)
+        }
     }
 }
 
