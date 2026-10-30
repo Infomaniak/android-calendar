@@ -30,6 +30,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.components.eventdetail.models.RecurrenceUi
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.eventdetail.state.computeDefaultValues
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
@@ -60,6 +61,7 @@ class EventFormState(
     endTimeZone: TimeZone,
     hasEndEverBeenTouched: Boolean,
     location: LocationUi?,
+    recurrence: RecurrenceUi,
     participants: Set<ParticipantUi>,
     organizerSource: OrganizerSource?,
     isKMeetUrlEnabled: Boolean,
@@ -86,6 +88,7 @@ class EventFormState(
         hasEndEverBeenTouched = mutableStateOf(hasEndEverBeenTouched),
     )
     var location by mutableStateOf(location)
+    val recurrence = mutableStateOf(recurrence)
     val participants = mutableStateSetOf<ParticipantUi>().apply { addAll(participants) }
     var organizerSource by mutableStateOf(organizerSource)
         private set
@@ -154,6 +157,7 @@ class EventFormState(
                 endTimeZone = timeZone,
                 hasEndEverBeenTouched = false,
                 location = null,
+                recurrence = RecurrenceUi.None,
                 participants = emptySet(),
                 organizerSource = calendar.organizerAttendeeUi?.let(OrganizerSource::Dynamic),
                 isKMeetUrlEnabled = false,

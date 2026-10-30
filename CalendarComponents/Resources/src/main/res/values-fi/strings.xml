@@ -91,6 +91,8 @@
     <string name="planningNothingPlanned">Ei suunnitelmia</string>
     <string name="privateLabel">Yksityinen</string>
     <string name="publicLabel">Julkinen</string>
+    <string name="recurrenceLabel">Toisto</string>
+    <string name="recurrenceNone">Ei mitään</string>
     <string name="reminderTitle">Muistutus</string>
     <string name="roomFloorLabel">%s kerros</string>
     <plurals name="roomSeatsLabel">

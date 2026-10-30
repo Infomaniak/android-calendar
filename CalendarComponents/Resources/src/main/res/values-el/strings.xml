@@ -91,6 +91,8 @@
     <string name="planningNothingPlanned">Τίποτα προγραμματισμένο</string>
     <string name="privateLabel">Ιδιωτικό</string>
     <string name="publicLabel">Δημόσιο</string>
+    <string name="recurrenceLabel">Επανάληψη</string>
+    <string name="recurrenceNone">Καμία</string>
     <string name="reminderTitle">Υπενθύμιση</string>
     <string name="roomFloorLabel">%s όροφος</string>
     <plurals name="roomSeatsLabel">

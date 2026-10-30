@@ -91,6 +91,8 @@
     <string name="planningNothingPlanned">Niets gepland</string>
     <string name="privateLabel">Privé</string>
     <string name="publicLabel">Openbaar</string>
+    <string name="recurrenceLabel">Herhaling</string>
+    <string name="recurrenceNone">Geen</string>
     <string name="reminderTitle">Herinnering</string>
     <string name="roomFloorLabel">%s verdieping</string>
     <plurals name="roomSeatsLabel">

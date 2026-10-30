@@ -91,6 +91,8 @@
     <string name="planningNothingPlanned">Niente di programmato</string>
     <string name="privateLabel">Privato</string>
     <string name="publicLabel">Pubblico</string>
+    <string name="recurrenceLabel">Ripetizione</string>
+    <string name="recurrenceNone">Nessuna</string>
     <string name="reminderTitle">Promemoria</string>
     <string name="roomFloorLabel">%s piano</string>
     <plurals name="roomSeatsLabel">

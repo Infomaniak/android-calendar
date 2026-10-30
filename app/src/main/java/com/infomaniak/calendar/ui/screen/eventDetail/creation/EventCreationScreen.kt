@@ -34,6 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
+import com.infomaniak.calendar.components.eventdetail.models.RecurrenceUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.foundation.component.EmptyState
@@ -43,6 +44,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.locationSearch.LocationSearchViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
+import com.infomaniak.calendar.utils.toLocalizedString
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CalendarCross
@@ -126,6 +128,7 @@ private fun EventCreationScreen(
                 onLocationClick = navigation.goToLocationSearch,
                 onTimeZoneClick = navigation.goToTimeZoneSearch,
                 onCustomReminderClick = navigation.goToCustomReminder,
+                getRecurrenceText = RecurrenceUi::toLocalizedString,
                 contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                 modifier = Modifier.verticalScroll(scrollState),
             )

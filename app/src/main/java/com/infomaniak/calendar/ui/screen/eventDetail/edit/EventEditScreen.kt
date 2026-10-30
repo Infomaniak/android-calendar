@@ -35,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
+import com.infomaniak.calendar.components.eventdetail.models.RecurrenceUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
@@ -48,6 +49,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.locationSearch.LocationSear
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
+import com.infomaniak.calendar.utils.toLocalizedString
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.coroutines.flow.filterIsInstance
@@ -143,6 +145,7 @@ private fun EventEditScreen(
                     onLocationClick = navigation.goToLocationSearch,
                     onTimeZoneClick = navigation.goToTimeZoneSearch,
                     onCustomReminderClick = navigation.goToCustomReminder,
+                    getRecurrenceText = RecurrenceUi::toLocalizedString,
                     modifier = Modifier.verticalScroll(scrollState),
                     contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                     sharedTransitionScope = sharedTransitionScope,

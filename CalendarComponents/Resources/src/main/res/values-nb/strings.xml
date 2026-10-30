@@ -91,6 +91,8 @@
     <string name="planningNothingPlanned">Ingenting planlagt</string>
     <string name="privateLabel">Privat</string>
     <string name="publicLabel">Offentlig</string>
+    <string name="recurrenceLabel">Gjentakelse</string>
+    <string name="recurrenceNone">Ingen</string>
     <string name="reminderTitle">Påminnelse</string>
     <string name="roomFloorLabel">%s etasjen</string>
     <plurals name="roomSeatsLabel">

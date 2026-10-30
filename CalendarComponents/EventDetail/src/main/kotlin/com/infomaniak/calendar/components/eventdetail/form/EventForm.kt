@@ -54,11 +54,14 @@ import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
 import com.infomaniak.calendar.components.eventdetail.detail.Locations
 import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
+import com.infomaniak.calendar.components.eventdetail.form.component.recurrence.RecurrenceItem
+import com.infomaniak.calendar.components.eventdetail.form.component.recurrence.recurrenceText
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.AddReminderButton
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderItem
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderOffsetDialog
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
+import com.infomaniak.calendar.components.eventdetail.models.RecurrenceUi
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
@@ -68,6 +71,7 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
 import com.infomaniak.core.common.utils.today
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
@@ -85,6 +89,7 @@ fun EventForm(
     onLocationClick: () -> Unit,
     onTimeZoneClick: (isStart: Boolean) -> Unit,
     onCustomReminderClick: () -> Unit,
+    getRecurrenceText: suspend (RecurrenceUi, start: LocalDateTime) -> String?,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -110,6 +115,11 @@ fun EventForm(
             isAllDay = state.isAllDay::value,
             onTimeZoneClick = onTimeZoneClick,
             modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
+        )
+
+        RecurrenceItem(
+            text = recurrenceText(recurrence = state.recurrence.value, start = state.start, getRecurrenceText = getRecurrenceText),
+            onClick = {}, // TODO: Open the recurrence dialog
         )
 
         Section(EventSharedElement.Divider1) {
@@ -265,6 +275,7 @@ private fun Preview() {
                     calendars = previewEventDetailCalendarGroups,
                 ).apply {
                     titleTextState.setTextAndPlaceCursorAtEnd("Event title")
+                    recurrence.value = RecurrenceUi.Rule.presets.first()
                     notifications.add(
                         EventDetailUi.Notification(EventDetailUi.Notification.Type.Push, NotificationTime.Offset((-15).minutes)),
                     )
@@ -276,6 +287,7 @@ private fun Preview() {
                 onLocationClick = {},
                 onTimeZoneClick = {},
                 onCustomReminderClick = {},
+                getRecurrenceText = { recurrence, _ -> (recurrence as? RecurrenceUi.Rule)?.frequency?.name },
                 contentPadding = PaddingValues(16.dp),
             )
         }
