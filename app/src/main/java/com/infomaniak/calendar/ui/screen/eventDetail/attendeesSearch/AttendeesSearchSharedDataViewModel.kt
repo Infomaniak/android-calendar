@@ -63,9 +63,9 @@ class AttendeesSearchSharedDataViewModel(private val contactsManager: ContactsMa
     }
 }
 
-private fun List<Contact>.toAttendeesUi(alreadyPresentAttendees: Map<String, AttendeeUi>): List<AttendeeUi> {
+private fun List<Contact>.toAttendeesUi(alreadyPresentAttendees: Map<AttendeeUi.Key, AttendeeUi>): List<AttendeeUi> {
     return map { contact ->
-        val alreadyPresentAttendee = alreadyPresentAttendees[AttendeeUi.keyOf(contact.email, contact.name)]
+        val alreadyPresentAttendee = alreadyPresentAttendees[AttendeeUi.Key(contact.email, contact.name)]
         if (alreadyPresentAttendee != null) return@map alreadyPresentAttendee
 
         return@map AttendeeUi(
@@ -82,6 +82,6 @@ sealed interface AttendeesSearchUiState {
     data object Loading : AttendeesSearchUiState
     data class Success(val state: AttendeesSearchState) : AttendeesSearchUiState {
         /** Cached by the snapshot system: recomputed only when [AttendeesSearchState.attendees] changes. */
-        val alreadyPresentAttendees: Map<String, AttendeeUi> by derivedStateOf { state.attendees.associateBy { it.key } }
+        val alreadyPresentAttendees: Map<AttendeeUi.Key, AttendeeUi> by derivedStateOf { state.attendees.associateBy { it.key } }
     }
 }

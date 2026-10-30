@@ -115,7 +115,7 @@ internal fun AddCustomAttendee(query: () -> String, onClick: () -> Unit, modifie
 
 private sealed interface ItemKey : Parcelable {
     @Parcelize
-    data class Attendee(val key: String) : ItemKey
+    data class Attendee(val key: AttendeeUi.Key) : ItemKey
     @Parcelize
     object AddCustomAttendee : ItemKey
 
