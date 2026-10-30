@@ -60,6 +60,7 @@
     <string name="contentDescriptionSearch">Søg</string>
     <string name="contentDescriptionToday">I dag</string>
     <string name="customAlarmLabel">Brugerdefineret</string>
+    <string name="customRecurrenceLabel">Brugerdefineret</string>
     <plurals name="dayAmount">
         <item quantity="one">%d dag</item>
         <item quantity="other">%d dage</item>

@@ -72,6 +72,7 @@
     <string name="contentDescriptionSearch">Szukaj</string>
     <string name="contentDescriptionToday">Dziś</string>
     <string name="customAlarmLabel">Niestandardowe</string>
+    <string name="customRecurrenceLabel">Niestandardowe</string>
     <plurals name="dayAmount">
         <item quantity="one">%d dzień</item>
         <item quantity="few">%d dni</item>

@@ -60,6 +60,7 @@
     <string name="contentDescriptionSearch">Buscar</string>
     <string name="contentDescriptionToday">Hoy</string>
     <string name="customAlarmLabel">Personalizado</string>
+    <string name="customRecurrenceLabel">Personalizada</string>
     <plurals name="dayAmount">
         <item quantity="one">%d día</item>
         <item quantity="other">%d días</item>

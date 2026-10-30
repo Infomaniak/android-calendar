@@ -60,6 +60,7 @@
     <string name="contentDescriptionSearch">Αναζήτηση</string>
     <string name="contentDescriptionToday">Σήμερα</string>
     <string name="customAlarmLabel">Προσαρμοσμένο</string>
+    <string name="customRecurrenceLabel">Προσαρμοσμένη</string>
     <plurals name="dayAmount">
         <item quantity="one">%d ημέρα</item>
         <item quantity="other">%d ημέρες</item>

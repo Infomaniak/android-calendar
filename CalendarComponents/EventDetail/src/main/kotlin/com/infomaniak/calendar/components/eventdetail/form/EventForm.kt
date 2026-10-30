@@ -54,6 +54,7 @@ import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
 import com.infomaniak.calendar.components.eventdetail.detail.Locations
 import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
+import com.infomaniak.calendar.components.eventdetail.form.component.recurrence.RecurrenceDialog
 import com.infomaniak.calendar.components.eventdetail.form.component.recurrence.RecurrenceItem
 import com.infomaniak.calendar.components.eventdetail.form.component.recurrence.recurrenceText
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.AddReminderButton
@@ -117,10 +118,26 @@ fun EventForm(
             modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
         )
 
+        var isRecurrenceDialogVisible by rememberSaveable { mutableStateOf(false) }
+
         RecurrenceItem(
-            text = recurrenceText(recurrence = state.recurrence.value, start = state.start, getRecurrenceText = getRecurrenceText),
-            onClick = {}, // TODO: Open the recurrence dialog
+            text = recurrenceText(state.recurrence.value, state.start, getRecurrenceText),
+            onClick = { isRecurrenceDialogVisible = true },
         )
+
+        if (isRecurrenceDialogVisible) {
+            RecurrenceDialog(
+                selectedRecurrence = state.recurrence.value,
+                start = state.start,
+                getRecurrenceText = getRecurrenceText,
+                onRecurrenceSelect = { recurrence ->
+                    state.recurrence.value = recurrence
+                    isRecurrenceDialogVisible = false
+                },
+                onCustomClick = { isRecurrenceDialogVisible = false }, // TODO: Open the custom recurrence screen
+                onDismissRequest = { isRecurrenceDialogVisible = false },
+            )
+        }
 
         Section(EventSharedElement.Divider1) {
             AttendeesButton(

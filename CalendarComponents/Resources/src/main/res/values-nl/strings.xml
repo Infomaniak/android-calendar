@@ -60,6 +60,7 @@
     <string name="contentDescriptionSearch">Zoeken</string>
     <string name="contentDescriptionToday">Vandaag</string>
     <string name="customAlarmLabel">Aangepast</string>
+    <string name="customRecurrenceLabel">Aangepast</string>
     <plurals name="dayAmount">
         <item quantity="one">%d dag</item>
         <item quantity="other">%d dagen</item>

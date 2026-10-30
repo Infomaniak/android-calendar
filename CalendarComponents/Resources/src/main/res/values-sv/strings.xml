@@ -60,6 +60,7 @@
     <string name="contentDescriptionSearch">Sök</string>
     <string name="contentDescriptionToday">Idag</string>
     <string name="customAlarmLabel">Anpassad</string>
+    <string name="customRecurrenceLabel">Anpassad</string>
     <plurals name="dayAmount">
         <item quantity="one">%d dag</item>
         <item quantity="other">%d dagar</item>
