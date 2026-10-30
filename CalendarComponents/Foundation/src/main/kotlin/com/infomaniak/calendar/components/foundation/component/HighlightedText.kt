@@ -34,7 +34,7 @@ import com.infomaniak.calendar.components.foundation.models.SearchableText
 @Composable
 fun HighlightedText(
     text: SearchableText,
-    query: String,
+    query: () -> String,
     modifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
     maxLines: Int = Int.MAX_VALUE,
@@ -43,7 +43,7 @@ fun HighlightedText(
     Text(
         buildAnnotatedString {
             append(text.text)
-            text.find(query)?.let {
+            text.find(query())?.let {
                 addStyle(
                     style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold),
                     start = it.first,
@@ -61,7 +61,7 @@ fun HighlightedText(
 @Composable
 fun HighlightedText(
     text: String,
-    query: String,
+    query: () -> String,
     modifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
     maxLines: Int = Int.MAX_VALUE,

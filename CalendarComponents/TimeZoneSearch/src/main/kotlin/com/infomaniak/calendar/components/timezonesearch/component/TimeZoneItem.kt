@@ -30,9 +30,9 @@ import kotlinx.datetime.TimeZone
 internal fun TimeZoneItem(timeZone: TimeZoneUi, query: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     ListItem(
         onClick = onClick,
-        overlineContent = { HighlightedText(timeZone.name, query) },
-        content = { HighlightedText(timeZone.location, query) },
-        supportingContent = { HighlightedText(timeZone.utcOffset, query) },
+        overlineContent = { HighlightedText(timeZone.name, { query }) },
+        content = { HighlightedText(timeZone.location, { query }) },
+        supportingContent = { HighlightedText(timeZone.utcOffset, { query }) },
         modifier = modifier,
     )
 }
