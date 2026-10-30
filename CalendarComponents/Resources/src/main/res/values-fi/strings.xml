@@ -37,6 +37,7 @@
         <item quantity="one">%d odottaa</item>
         <item quantity="other">%d odottaa</item>
     </plurals>
+    <string name="attendeesSearchPlaceholder">Lisää vieras</string>
     <plurals name="attendeesTentativeCount">
         <item quantity="one">%1$d ehkä</item>
         <item quantity="other">%1$d ehkä</item>
@@ -86,7 +87,6 @@
         <item quantity="one">%d paikkaa</item>
         <item quantity="other">%d paikkaa</item>
     </plurals>
-    <string name="searchForAttendees">Etsi osallistujia</string>
     <string name="sectionCalendarHeader">Kalenteri</string>
     <string name="sectionOrganizerHeader">Järjestäjä</string>
     <string name="statusAcceptedLabel">Hyväksytty</string>

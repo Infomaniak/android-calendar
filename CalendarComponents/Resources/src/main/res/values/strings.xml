@@ -37,6 +37,7 @@
         <item quantity="one">%d pending</item>
         <item quantity="other">%d pending</item>
     </plurals>
+    <string name="attendeesSearchPlaceholder">Add an attendee</string>
     <plurals name="attendeesTentativeCount">
         <item quantity="one">%1$d maybe</item>
         <item quantity="other">%1$d maybe</item>
@@ -86,7 +87,6 @@
         <item quantity="one">%d seat</item>
         <item quantity="other">%d seats</item>
     </plurals>
-    <string name="searchForAttendees">Search for attendees</string>
     <string name="sectionCalendarHeader">Calendar</string>
     <string name="sectionOrganizerHeader">Organizer</string>
     <string name="statusAcceptedLabel">Accepted</string>

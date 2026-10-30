@@ -37,6 +37,7 @@
         <item quantity="one">%d afventende</item>
         <item quantity="other">%d afventende</item>
     </plurals>
+    <string name="attendeesSearchPlaceholder">Tilføj en gæst</string>
     <plurals name="attendeesTentativeCount">
         <item quantity="one">%1$d måske</item>
         <item quantity="other">%1$d måske</item>
@@ -86,7 +87,6 @@
         <item quantity="one">%d plads</item>
         <item quantity="other">%d pladser</item>
     </plurals>
-    <string name="searchForAttendees">Søg efter deltagere</string>
     <string name="sectionCalendarHeader">Kalender</string>
     <string name="sectionOrganizerHeader">Arrangør</string>
     <string name="statusAcceptedLabel">Godkendt</string>

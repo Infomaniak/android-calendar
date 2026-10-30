@@ -37,6 +37,7 @@
         <item quantity="one">%d in afwachting</item>
         <item quantity="other">%d in afwachting</item>
     </plurals>
+    <string name="attendeesSearchPlaceholder">Gast toevoegen</string>
     <plurals name="attendeesTentativeCount">
         <item quantity="one">%1$d misschien</item>
         <item quantity="other">%1$d misschien</item>
@@ -86,7 +87,6 @@
         <item quantity="one">%d plaats</item>
         <item quantity="other">%d plaatsen</item>
     </plurals>
-    <string name="searchForAttendees">Zoeken naar deelnemers</string>
     <string name="sectionCalendarHeader">Kalender</string>
     <string name="sectionOrganizerHeader">Organisator</string>
     <string name="statusAcceptedLabel">Geaccepteerd</string>
