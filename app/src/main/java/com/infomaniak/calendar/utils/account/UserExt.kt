@@ -19,6 +19,7 @@ package com.infomaniak.calendar.utils.account
 
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarSection
 import com.infomaniak.multiplatform_core.account.domain.model.AccountId
 
 val User.accountId: AccountId get() = AccountId(id.toLong())
@@ -26,3 +27,7 @@ val User.accountId: AccountId get() = AccountId(id.toLong())
 /** Each user, in order, with the [calendars] of its account. */
 fun List<User>.withCalendars(calendars: List<Calendar>): Map<User, List<Calendar>> =
     associateWith { user -> calendars.filter { it.accountId == user.accountId } }
+
+/** Each user, in order, with the calendar [sections] of its account. */
+fun List<User>.withSections(sections: List<CalendarSection>): Map<User, List<CalendarSection>> =
+    associateWith { user -> sections.filter { it.accountId == user.accountId } }
