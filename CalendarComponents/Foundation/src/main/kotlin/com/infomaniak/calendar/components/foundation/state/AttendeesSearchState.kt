@@ -47,8 +47,7 @@ class AttendeesSearchState(
     val attendeesEmails by derivedStateOf { attendees.map { it.email } }
 
     fun addAttendee(attendee: AttendeeUi) {
-        attendees.add(attendee.copy(status = ParticipationStatus.NeedsAction))
-        searchQueryTextFieldState.clearText()
+        addRawAttendee(attendee.copy(status = ParticipationStatus.NeedsAction))
     }
 
     fun removeAttendee(attendee: AttendeeUi) {
@@ -60,7 +59,7 @@ class AttendeesSearchState(
         if (email in attendeesEmails) return CustomAttendeeResult.AlreadyPresent
         if (!email.isEmailRfc5321Compliant()) return CustomAttendeeResult.InvalidEmail
 
-        attendees.add(
+        addRawAttendee(
             AttendeeUi(
                 key = Uuid.generateV7().toString(),
                 email = email,
@@ -70,6 +69,11 @@ class AttendeesSearchState(
         )
 
         return CustomAttendeeResult.Added
+    }
+
+    private fun addRawAttendee(attendee: AttendeeUi) {
+        attendees.add(attendee)
+        searchQueryTextFieldState.clearText()
     }
 
     enum class CustomAttendeeResult(val messageRes: Int? = null) {
