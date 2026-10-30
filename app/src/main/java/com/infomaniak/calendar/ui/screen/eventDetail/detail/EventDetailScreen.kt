@@ -108,8 +108,8 @@ fun EventDetailScreen(
         for (request in eventDetailSharedDataViewModel.goBackRequests) goBack()
     }
 
-    LaunchedEffect(viewModel.attendeesState) {
-        attendeesSearchSharedDataViewModel.setAttendees(viewModel.attendeesState)
+    LaunchedEffect(viewModel.attendeesSearchState) {
+        attendeesSearchSharedDataViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
     }
 
     EventDetailScreen(

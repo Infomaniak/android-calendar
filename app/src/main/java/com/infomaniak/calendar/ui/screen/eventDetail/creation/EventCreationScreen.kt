@@ -81,7 +81,7 @@ fun EventCreationScreen(
             calendars = it.calendars,
             initialCalendar = it.initialCalendar,
             dateAndTimeState = defaultEventDuration?.let { rememberDateAndTimeState(it, TimeZone.currentSystemDefault(), date) },
-            attendees = viewModel.attendeesState,
+            attendees = viewModel.attendeesSearchState.attendees,
         )
     }
 
@@ -90,7 +90,7 @@ fun EventCreationScreen(
     }
 
     LaunchedEffect(Unit) {
-        attendeesSearchSharedDataViewModel.setAttendees(viewModel.attendeesState)
+        attendeesSearchSharedDataViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
     }
 
     EventCreationScreen(

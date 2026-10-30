@@ -17,24 +17,26 @@
  */
 package com.infomaniak.calendar.utils
 
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateSetOf
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 
 private const val ATTENDEES_SEARCH_STATE_KEY = "attendeesSearchState"
 
 @OptIn(SavedStateHandleSaveableApi::class)
-fun SavedStateHandle.saveableAttendeesState(): SnapshotStateSet<AttendeeUi> {
-    return saveable(key = ATTENDEES_SEARCH_STATE_KEY, saver = AttendeesSaver) { mutableStateSetOf() }
+fun SavedStateHandle.saveableAttendeesSearchState(): AttendeesSearchState {
+    return saveable(
+        key = ATTENDEES_SEARCH_STATE_KEY,
+        saver = AttendeesSearchState.Saver,
+    ) {
+        AttendeesSearchState(
+            searchQueryTextFieldState = TextFieldState(),
+            results = mutableStateListOf(),
+            attendees = mutableStateSetOf(),
+        )
+    }
 }
-
-// TODO: Use autoSaver once on Compose 1.13+, SnapshotStateSet only parcels its first element before (b/537461421)
-val AttendeesSaver = Saver<SnapshotStateSet<AttendeeUi>, ArrayList<AttendeeUi>>(
-    save = { ArrayList(it) },
-    restore = { mutableStateSetOf<AttendeeUi>().apply { addAll(it) } },
-)

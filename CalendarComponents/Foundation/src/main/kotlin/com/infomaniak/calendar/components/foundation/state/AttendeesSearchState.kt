@@ -52,19 +52,24 @@ class AttendeesSearchState(
 
     object Saver : androidx.compose.runtime.saveable.Saver<AttendeesSearchState, List<Any>> {
         private val resultsSaver = autoSaver<SnapshotStateList<AttendeeUi>>()
-        private val attendeesSaver = autoSaver<SnapshotStateSet<AttendeeUi>>()
+        // TODO: Use autoSaver once on Compose 1.13+, SnapshotStateSet only parcels its first element before (b/537461421)
+        private val attendeesSaver = androidx.compose.runtime.saveable.Saver<SnapshotStateSet<AttendeeUi>, ArrayList<AttendeeUi>>(
+            save = { ArrayList(it) },
+            restore = { mutableStateSetOf<AttendeeUi>().apply { addAll(it) } },
+        )
 
-        // TextFieldState.Saver.restore() never returns null, and both autoSaver also never return null
+        // TextFieldState.Saver.restore() never returns null, and neither do resultsSaver and attendeesSaver
         override fun SaverScope.save(value: AttendeesSearchState): List<Any> = listOf(
             with(TextFieldState.Saver) { save(value.searchQueryTextFieldState)!! },
             with(resultsSaver) { save(value.results)!! },
             with(attendeesSaver) { save(value.attendees)!! },
         )
 
+        @Suppress("UNCHECKED_CAST")
         override fun restore(value: List<Any>): AttendeesSearchState = AttendeesSearchState(
             searchQueryTextFieldState = TextFieldState.Saver.restore(value[0])!!,
             results = resultsSaver.restore(value[1])!!,
-            attendees = attendeesSaver.restore(value[2])!!,
+            attendees = attendeesSaver.restore(value[2] as ArrayList<AttendeeUi>)!!,
         )
     }
 }
