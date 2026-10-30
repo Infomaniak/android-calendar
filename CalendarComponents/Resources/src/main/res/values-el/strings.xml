@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Προσθήκη</string>
     <string name="allDayLabel">Όλη την ημέρα</string>
+    <string name="attendeeIncompleteEmailMessage">Συμπληρώστε τη διεύθυνση email για να την προσθέσετε</string>
     <string name="attendees">Συμμετέχοντες</string>
     <plurals name="attendeesAcceptedCount">
         <item quantity="one">%d αποδεκτός</item>
