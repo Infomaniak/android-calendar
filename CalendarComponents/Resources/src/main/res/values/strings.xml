@@ -84,6 +84,8 @@
     <string name="planningNothingPlanned">Nothing planned</string>
     <string name="privateLabel">Private</string>
     <string name="publicLabel">Public</string>
+    <!-- TODO: ink translate -->
+    <string name="recurrenceNone">Does not repeat</string>
     <string name="reminderTitle">Reminder</string>
     <string name="roomFloorLabel">%s floor</string>
     <plurals name="roomSeatsLabel">

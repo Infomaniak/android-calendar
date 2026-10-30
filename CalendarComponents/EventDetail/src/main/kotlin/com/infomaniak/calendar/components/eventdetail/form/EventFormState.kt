@@ -32,6 +32,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.components.eventdetail.models.RecurrenceUi
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import kotlinx.datetime.atTime
@@ -46,6 +47,7 @@ class EventFormState(
     selectedCalendarState: MutableState<EventDetailCalendar>,
     val isAllDay: MutableState<Boolean>,
     val dateAndTimeState: DateAndTimeState?,
+    val recurrence: MutableState<RecurrenceUi>,
     val attendees: SnapshotStateSet<AttendeeUi>,
     val isKMeetUrlEnabled: MutableState<Boolean>,
     val notifications: MutableState<List<EventDetailUi.Notification>>,
@@ -89,6 +91,7 @@ fun rememberDefaultEventForm(
     dateAndTimeState = dateAndTimeState,
     initialText = "",
     initialIsAllDay = false,
+    initialRecurrence = RecurrenceUi.None,
     initialIsKMeetUrlEnabled = false,
     initialNotifications = emptyList(),
     attendees = attendees,
@@ -104,6 +107,7 @@ fun rememberEventFormState(
     dateAndTimeState: DateAndTimeState?,
     initialText: String,
     initialIsAllDay: Boolean,
+    initialRecurrence: RecurrenceUi,
     initialIsKMeetUrlEnabled: Boolean,
     initialNotifications: List<EventDetailUi.Notification>,
     attendees: SnapshotStateSet<AttendeeUi>,
@@ -115,6 +119,7 @@ fun rememberEventFormState(
     selectedCalendarState = rememberSaveable { mutableStateOf(initialCalendar) },
     isAllDay = rememberSaveable { mutableStateOf(initialIsAllDay) },
     dateAndTimeState = dateAndTimeState,
+    recurrence = rememberSaveable { mutableStateOf(initialRecurrence) },
     attendees = attendees,
     isKMeetUrlEnabled = rememberSaveable { mutableStateOf(initialIsKMeetUrlEnabled) },
     notifications = rememberSaveable { mutableStateOf(initialNotifications) },

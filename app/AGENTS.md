@@ -45,7 +45,8 @@ app/src/main/java/com/infomaniak/calendar/
 │   ├── DayEventGroupingExt.kt      # Groups day-sliced events for calendar views
 │   ├── EventDaySliceExt.kt         # KMP EventDaySlice → OccurrenceEventUi mapping, shared by every calendar view
 │   ├── EventDraftExt.kt            # EventDraft → KMP EventEditData for creation and edition: a new form field is one line in `applyTo`; notifications get back the stored alarm they were read from (id kept)
-│   └── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
+│   ├── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
+│   └── RecurrenceExt.kt            # Event form `RecurrenceUi` → KMP `RecurrenceRule`, whose localized text the form shows
 └── ui/
     ├── model/                     # OccurrenceEventUi calendar item carrying KMP OccurrenceId and attendee summary; TimelineUiState
     ├── navigation/

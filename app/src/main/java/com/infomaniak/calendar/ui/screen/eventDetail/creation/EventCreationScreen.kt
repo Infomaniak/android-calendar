@@ -38,6 +38,7 @@ import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberDefaultEventForm
+import com.infomaniak.calendar.components.eventdetail.models.RecurrenceUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
@@ -52,6 +53,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.model.EventCreationCalendar
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchResultViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
+import com.infomaniak.calendar.utils.toLocalizedString
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CalendarCross
 import kotlinx.coroutines.launch
@@ -150,6 +152,7 @@ private fun EventCreationScreen(
                     onAttendeesClick = goToEventsAttendees,
                     onTimeZoneClick = goToTimeZoneSearch,
                     onCustomReminderClick = goToCustomReminder,
+                    getRecurrenceText = RecurrenceUi::toLocalizedString,
                     contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                     modifier = Modifier.verticalScroll(scrollState),
                 )

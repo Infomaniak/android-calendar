@@ -44,12 +44,15 @@ import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSw
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
 import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
+import com.infomaniak.calendar.components.eventdetail.form.component.recurrence.RecurrenceItem
+import com.infomaniak.calendar.components.eventdetail.form.component.recurrence.recurrenceText
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.AddReminderButton
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderItem
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderOffsetDialog
 import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
+import com.infomaniak.calendar.components.eventdetail.models.RecurrenceUi
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
@@ -57,7 +60,9 @@ import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElemen
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
@@ -72,6 +77,7 @@ fun EventForm(
     onAttendeesClick: () -> Unit,
     onTimeZoneClick: (isStart: Boolean) -> Unit,
     onCustomReminderClick: () -> Unit,
+    getRecurrenceText: suspend (RecurrenceUi, start: LocalDateTime) -> String?,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -95,6 +101,17 @@ fun EventForm(
             onTimeZoneClick = onTimeZoneClick,
             modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
         )
+
+        state.dateAndTimeState?.let { dateAndTimeState ->
+            RecurrenceItem(
+                text = recurrenceText(
+                    recurrence = state.recurrence.value,
+                    start = dateAndTimeState.start.date.atTime(dateAndTimeState.start.time),
+                    getRecurrenceText = getRecurrenceText,
+                ),
+                onClick = {}, // TODO: Open the recurrence dialog
+            )
+        }
 
         Section(EventSharedElement.Divider1) {
             AttendeesButton(
@@ -180,6 +197,7 @@ private fun Preview() {
                     initialText = "Event title",
                     attendees = remember { mutableStateSetOf() },
                     initialIsAllDay = false,
+                    initialRecurrence = RecurrenceUi.Rule.presets.first(),
                     initialIsKMeetUrlEnabled = false,
                     initialNotifications = listOf(
                         EventDetailUi.Notification(EventDetailUi.Notification.Type.Push, NotificationTime.Offset((-15).minutes)),
@@ -190,6 +208,7 @@ private fun Preview() {
                 onAttendeesClick = {},
                 onTimeZoneClick = {},
                 onCustomReminderClick = {},
+                getRecurrenceText = { recurrence, _ -> (recurrence as? RecurrenceUi.Rule)?.frequency?.name },
                 contentPadding = PaddingValues(16.dp),
             )
         }

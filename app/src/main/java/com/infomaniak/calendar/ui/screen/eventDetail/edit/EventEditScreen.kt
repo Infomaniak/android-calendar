@@ -45,6 +45,7 @@ import com.infomaniak.calendar.components.eventdetail.form.rememberEventFormStat
 import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.eventdetail.models.RecurrenceUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
@@ -64,6 +65,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchResultViewModel
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
+import com.infomaniak.calendar.utils.toLocalizedString
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
@@ -102,6 +104,7 @@ fun EventEditScreen(
                 dateAndTimeState = rememberEventDateState(eventDetailUiState.eventDetail),
                 initialText = eventDetailUiState.eventDetail.title,
                 initialIsAllDay = eventDetailUiState.eventDetail.isAllDay,
+                initialRecurrence = RecurrenceUi.None, // TODO: Read the event recurrence
                 initialIsKMeetUrlEnabled = eventDetailUiState.eventDetail.kMeetUrl != null,
                 initialNotifications = eventDetailUiState.eventDetail.notifications,
                 attendees = viewModel.attendeesState,
@@ -195,6 +198,7 @@ private fun EventEditScreen(
                     onAttendeesClick = goToEventAttendees,
                     onTimeZoneClick = goToTimeZoneSearch,
                     onCustomReminderClick = goToCustomReminder,
+                    getRecurrenceText = RecurrenceUi::toLocalizedString,
                     modifier = Modifier.verticalScroll(scrollState),
                     contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                     sharedTransitionScope = sharedTransitionScope,
@@ -249,6 +253,7 @@ private fun Preview() {
                         initialText = "Meeting on how to find funny preview titles",
                         attendees = remember { mutableStateSetOf(*previewAttendees.toTypedArray()) },
                         initialIsAllDay = false,
+                        initialRecurrence = RecurrenceUi.None,
                         initialIsKMeetUrlEnabled = false,
                         initialNotifications = emptyList(),
                         initialIsOccupied = true,
