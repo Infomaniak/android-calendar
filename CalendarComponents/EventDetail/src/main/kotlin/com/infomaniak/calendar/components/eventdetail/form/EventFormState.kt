@@ -69,6 +69,7 @@ class EventFormState(
             startTimeZone = dateAndTimeState.start.timeZone,
             end = dateAndTimeState.end.date.atTime(dateAndTimeState.end.time),
             endTimeZone = dateAndTimeState.end.timeZone,
+            recurrence = recurrence.value,
             attendees = attendees.toList(),
             isKMeetUrlEnabled = isKMeetUrlEnabled.value,
             notifications = notifications.value,

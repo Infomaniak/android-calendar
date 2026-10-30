@@ -20,6 +20,7 @@ package com.infomaniak.calendar.utils
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
+import com.infomaniak.calendar.components.eventdetail.models.RecurrenceUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.AlarmListEdit
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.AttendeeEdit
@@ -34,6 +35,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.Alarm
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.EventAlarm
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.TriggerRelation
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 
 val EventDraft.typedCalendarId: CalendarId get() = CalendarId(calendarId)
@@ -48,7 +50,7 @@ fun EventDraft.applyTo(
     defaultOrganizer: Organizer?,
 ): EventEditData = editData.copy(
     title = title,
-    timing = editData.timing.copy(bounds = bounds()),
+    timing = editData.timing.copy(bounds = bounds()).withRecurrence(recurrence, start.date),
     timeBlocking = if (isOccupied) TimeBlocking.Blocks else TimeBlocking.DoesNotBlock,
     calendarId = typedCalendarId,
     attendees = attendees.map { AttendeeEdit(email = it.email, displayName = it.displayName) },
@@ -79,6 +81,15 @@ private fun EventDraft.bounds(): EventBounds = if (isAllDay) {
     EventBounds.AllDay(start = start.date, end = end.date.plus(1, DateTimeUnit.DAY))
 } else {
     EventBounds.Zoned(start = ZonedWallClock(start, startTimeZone), end = ZonedWallClock(end, endTimeZone))
+}
+
+/** A rule the form reads the same as the stored one gives it back, so it keeps the parts the form doesn't show. */
+private fun EventTiming.withRecurrence(recurrence: RecurrenceUi, start: LocalDate): EventTiming = when (recurrence) {
+    RecurrenceUi.None -> copy(recurrenceRule = null, rDates = emptyList(), exDates = emptyList())
+    RecurrenceUi.Kept -> this
+    is RecurrenceUi.Rule -> copy(
+        recurrenceRule = recurrenceRule?.takeIf { it.toRecurrenceUi(start) == recurrence } ?: recurrence.toRecurrenceRule(start),
+    )
 }
 
 /**
