@@ -45,6 +45,7 @@
         <item quantity="many">%d oczekujących</item>
         <item quantity="other">%d oczekujących</item>
     </plurals>
+    <string name="attendeesSearchPlaceholder">Dodaj gościa</string>
     <plurals name="attendeesTentativeCount">
         <item quantity="one">%1$d może</item>
         <item quantity="few">%1$d może</item>
@@ -106,7 +107,6 @@
         <item quantity="many">%d miejsc</item>
         <item quantity="other">%d miejsc</item>
     </plurals>
-    <string name="searchForAttendees">Szukaj uczestników</string>
     <string name="sectionCalendarHeader">Kalendarz</string>
     <string name="sectionOrganizerHeader">Organizator</string>
     <string name="statusAcceptedLabel">Zaakceptowano</string>

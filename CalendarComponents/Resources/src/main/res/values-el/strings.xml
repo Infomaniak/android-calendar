@@ -37,6 +37,7 @@
         <item quantity="one">%d σε αναμονή</item>
         <item quantity="other">%d σε αναμονή</item>
     </plurals>
+    <string name="attendeesSearchPlaceholder">Προσθήκη καλεσμένου</string>
     <plurals name="attendeesTentativeCount">
         <item quantity="one">%1$d ίσως</item>
         <item quantity="other">%1$d ίσως</item>
@@ -86,7 +87,6 @@
         <item quantity="one">%d θέση</item>
         <item quantity="other">%d θέσεις</item>
     </plurals>
-    <string name="searchForAttendees">Αναζήτηση συμμετεχόντων</string>
     <string name="sectionCalendarHeader">Ημερολόγιο</string>
     <string name="sectionOrganizerHeader">Διοργανωτής</string>
     <string name="statusAcceptedLabel">Εγκρίθηκε</string>

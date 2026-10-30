@@ -37,6 +37,7 @@
         <item quantity="one">%d väntande</item>
         <item quantity="other">%d väntande</item>
     </plurals>
+    <string name="attendeesSearchPlaceholder">Lägg till en gäst</string>
     <plurals name="attendeesTentativeCount">
         <item quantity="one">%1$d kanske</item>
         <item quantity="other">%1$d kanske</item>
@@ -86,7 +87,6 @@
         <item quantity="one">%d plats</item>
         <item quantity="other">%d platser</item>
     </plurals>
-    <string name="searchForAttendees">Sök efter deltagare</string>
     <string name="sectionCalendarHeader">Kalender</string>
     <string name="sectionOrganizerHeader">Arrangör</string>
     <string name="statusAcceptedLabel">Godkänt</string>

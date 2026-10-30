@@ -68,7 +68,7 @@ fun AttendeesSearch(
     ) {
         SearchBar(
             searchState = attendeesSearchState.searchQueryTextFieldState,
-            placeholder = stringResource(R.string.searchForAttendees),
+            placeholder = stringResource(R.string.attendeesSearchPlaceholder),
         )
         if (attendeesSearchState.searchQueryTextFieldState.text.isBlank() && attendeesList.isEmpty()) {
             EmptyState(
