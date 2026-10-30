@@ -59,6 +59,7 @@ import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElemen
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
@@ -77,6 +78,7 @@ fun EventForm(
     onTimeZoneClick: (isStart: Boolean) -> Unit,
     onCustomReminderClick: () -> Unit,
     getRecurrenceText: suspend (RecurrenceUi, start: LocalDateTime) -> String?,
+    onCustomRecurrenceClick: (start: LocalDate, recurrence: RecurrenceUi) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -119,7 +121,10 @@ fun EventForm(
                         state.recurrence.value = recurrence
                         isRecurrenceDialogVisible = false
                     },
-                    onCustomClick = { isRecurrenceDialogVisible = false }, // TODO: Open the custom recurrence screen
+                    onCustomClick = {
+                        isRecurrenceDialogVisible = false
+                        onCustomRecurrenceClick(start.date, state.recurrence.value)
+                    },
                     onDismissRequest = { isRecurrenceDialogVisible = false },
                 )
             }
@@ -222,6 +227,7 @@ private fun Preview() {
                 onTimeZoneClick = {},
                 onCustomReminderClick = {},
                 getRecurrenceText = { recurrence, _ -> (recurrence as? RecurrenceUi.Rule)?.frequency?.name },
+                onCustomRecurrenceClick = { _, _ -> },
                 contentPadding = PaddingValues(16.dp),
             )
         }
