@@ -47,6 +47,8 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -117,7 +119,9 @@ private fun EventAttendee(
 ) {
     ListItemClickable(
         onClick = onClick.takeIf { enabled },
-        modifier = modifier.alpha(if (enabled) 1f else EsdsTheme.opacity.medium),
+        modifier = modifier
+            .alpha(if (enabled) 1f else EsdsTheme.opacity.medium)
+            .semantics { if (!enabled) disabled() },
         verticalAlignment = Alignment.CenterVertically,
         leadingContent = {
             Avatar(
