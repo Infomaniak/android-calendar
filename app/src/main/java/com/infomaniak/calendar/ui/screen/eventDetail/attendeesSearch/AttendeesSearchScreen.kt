@@ -42,6 +42,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.attendeessearch.AttendeesSearch
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
@@ -112,7 +113,7 @@ private fun EventAttendeesSearchScreenPreview() {
         AttendeesSearchScreen(
             attendeesSearchState = rememberSaveableAttendeesSearchState(
                 attendees = remember { mutableStateSetOf<AttendeeUi>().apply { addAll(previewAttendees) } },
-                results = remember { mutableStateListOf<AttendeeUi>().apply { addAll(previewAttendees) } },
+                results = remember { mutableStateListOf<AttendeesSearchResult>().apply { addAll(previewAttendees) } },
             ),
             goBack = {},
         )

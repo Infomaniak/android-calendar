@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.components.foundation.models
 
-import android.os.Parcelable
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.compose.material3.MaterialTheme
@@ -37,7 +36,7 @@ data class AttendeeUi(
     val displayName: String?,
     val status: ParticipationStatus?,
     val isOrganizer: Boolean = false,
-) : Parcelable {
+) : AttendeesSearchResult {
     fun initials(): String = (displayName ?: email).computeInitials()
 }
 
