@@ -36,6 +36,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.Alarm
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.EventAlarm
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.toLocalizedRecurrenceString
 import com.infomaniak.multiplatform_core.account.domain.model.AccountId
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 
@@ -55,7 +56,14 @@ fun Event.toEventDetailUi(
     start = timing.toDetailTiming(isStart = true),
     end = timing.toDetailTiming(isStart = false),
     isAllDay = timing.isAllDay,
-    recurrence = if (isOccurrence) EventDetailRecurrence.Recurrence(::toLocalizedRecurrenceString) else EventDetailRecurrence.Single,
+    recurrence = if (isOccurrence) {
+        EventDetailRecurrence.Recurrence(
+            getText = ::toLocalizedRecurrenceString,
+            rule = timing.recurrenceRule?.toRecurrenceUi(timing.bounds.startDate),
+        )
+    } else {
+        EventDetailRecurrence.Single
+    },
     attendees = attendees.toAttendees(accountId, emailsByUserId),
     kMeetUrl = meetRoomUrl,
     location = location,
@@ -84,6 +92,13 @@ private fun EventTiming.toDetailTiming(isStart: Boolean): EventDetailTiming = wh
         EventDetailTiming.Precise(it.instant, it.timeZone)
     }
 }
+
+private val EventBounds.startDate: LocalDate
+    get() = when (this) {
+        is EventBounds.AllDay -> start
+        is EventBounds.Floating -> start.date
+        is EventBounds.Zoned -> start.wallClock.date
+    }
 
 fun EventAlarm.toNotification(): EventDetailUi.Notification? {
 

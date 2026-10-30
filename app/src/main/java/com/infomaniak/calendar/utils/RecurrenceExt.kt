@@ -25,10 +25,13 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.recurrenceR
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.recurrenceRule.RecurrenceUntil
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.recurrenceRule.WeekDayNum
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.recurrenceRule.toLocalizedString
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
 import kotlinx.datetime.number
+import kotlinx.datetime.toLocalDateTime
 
 suspend fun RecurrenceUi.toLocalizedString(start: LocalDateTime): String? {
     val rule = this as? RecurrenceUi.Rule ?: return null
@@ -61,3 +64,54 @@ fun RecurrenceUi.Rule.toRecurrenceRule(start: LocalDate): RecurrenceRule = Recur
         emptyList()
     },
 )
+
+/** `null` when the form can't describe this rule, it then has to be kept as it is. */
+fun RecurrenceRule.toRecurrenceUi(start: LocalDate): RecurrenceUi.Rule? {
+    val unsupportedParts = listOf(byOccurrencePosition, byHour, byMinute, bySecond, byYearDay, byWeekNumber)
+    if (unsupportedParts.any { it.isNotEmpty() }) return null
+
+    val startMonth = listOf(start.month.number)
+    val isOnStartDay = byDay.isEmpty() && byMonthDay in listOf(emptyList(), listOf(start.day))
+    val weekday = byDay.singleOrNull()?.toMonthDayWeekday()?.takeIf { byMonthDay.isEmpty() }
+
+    val (frequency, monthDay) = when {
+        freq == Frequency.Daily && byDay.isEmpty() && byMonthDay.isEmpty() && byMonth.isEmpty() -> {
+            RecurrenceUi.Rule.Frequency.Daily to MonthDay.StartDay
+        }
+        freq == Frequency.Weekly && byDay.all { it.ordinal == null } && byMonth.isEmpty() -> {
+            RecurrenceUi.Rule.Frequency.Weekly to MonthDay.StartDay
+        }
+        freq == Frequency.Monthly && byMonth.isEmpty() && isOnStartDay -> RecurrenceUi.Rule.Frequency.Monthly to MonthDay.StartDay
+        freq == Frequency.Monthly && byMonth.isEmpty() && weekday != null -> RecurrenceUi.Rule.Frequency.Monthly to weekday
+        freq == Frequency.Yearly && byMonth in listOf(emptyList(), startMonth) && isOnStartDay -> {
+            RecurrenceUi.Rule.Frequency.Yearly to MonthDay.StartDay
+        }
+        freq == Frequency.Yearly && byMonth == startMonth && weekday != null -> RecurrenceUi.Rule.Frequency.Yearly to weekday
+        else -> return null
+    }
+
+    return RecurrenceUi.Rule(
+        frequency = frequency,
+        interval = interval,
+        daysOfWeek = if (frequency == RecurrenceUi.Rule.Frequency.Weekly) byDay.weeklyDays(start) else emptySet(),
+        monthDay = monthDay,
+        end = occurrenceCount?.let(End::AfterCount) ?: until?.let { End.Until(it.calendarDate) } ?: End.Never,
+    )
+}
+
+/** Only the start's day repeats as no day at all, which is what the weekly preset writes. */
+private fun List<WeekDayNum>.weeklyDays(start: LocalDate): Set<DayOfWeek> {
+    return map { it.dayOfWeek }.toSet().takeUnless { it == setOf(start.dayOfWeek) }.orEmpty()
+}
+
+private fun WeekDayNum.toMonthDayWeekday(): MonthDay.Weekday? {
+    val position = ordinal?.takeIf { it in 1..4 || it == -1 } ?: return null
+    return MonthDay.Weekday(position, dayOfWeek)
+}
+
+private val RecurrenceUntil.calendarDate: LocalDate
+    get() = when (this) {
+        is RecurrenceUntil.DateOnly -> date
+        is RecurrenceUntil.Floating -> dateTime.date
+        is RecurrenceUntil.DateTimeUtc -> instant.toLocalDateTime(TimeZone.UTC).date
+    }

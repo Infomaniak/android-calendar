@@ -43,6 +43,7 @@ import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberEventFormState
 import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.RecurrenceUi
@@ -104,14 +105,14 @@ fun EventEditScreen(
                 dateAndTimeState = rememberEventDateState(eventDetailUiState.eventDetail),
                 initialText = eventDetailUiState.eventDetail.title,
                 initialIsAllDay = eventDetailUiState.eventDetail.isAllDay,
-                initialRecurrence = RecurrenceUi.None, // TODO: Read the event recurrence
+                initialRecurrence = eventDetailUiState.eventDetail.recurrence.formRecurrence,
                 initialIsKMeetUrlEnabled = eventDetailUiState.eventDetail.kMeetUrl != null,
                 initialNotifications = eventDetailUiState.eventDetail.notifications,
                 attendees = viewModel.attendeesState,
                 initialIsOccupied = eventDetailUiState.eventDetail.isOccupied,
                 initialIsPublic = eventDetailUiState.eventDetail.classification == EventDetailUi.Classification.Public,
             ),
-            isRecurrent = eventDetailUiState.eventDetail.isRecurrent,
+            recurrence = eventDetailUiState.eventDetail.recurrence,
         )
     }
 
@@ -198,7 +199,10 @@ private fun EventEditScreen(
                     onAttendeesClick = goToEventAttendees,
                     onTimeZoneClick = goToTimeZoneSearch,
                     onCustomReminderClick = goToCustomReminder,
-                    getRecurrenceText = RecurrenceUi::toLocalizedString,
+                    getRecurrenceText = { recurrence, start ->
+                        val storedRecurrence = uiState.recurrence as? EventDetailRecurrence.Recurrence
+                        if (recurrence == RecurrenceUi.Kept) storedRecurrence?.getText() else recurrence.toLocalizedString(start)
+                    },
                     modifier = Modifier.verticalScroll(scrollState),
                     contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                     sharedTransitionScope = sharedTransitionScope,
@@ -235,7 +239,9 @@ private val EventDetailTiming.timeZone: TimeZone
 
 private sealed interface EventEditScreenState {
     object Loading : EventEditScreenState
-    data class Success(val eventFormState: EventFormState, val isRecurrent: Boolean) : EventEditScreenState
+    data class Success(val eventFormState: EventFormState, val recurrence: EventDetailRecurrence) : EventEditScreenState {
+        val isRecurrent get() = recurrence is EventDetailRecurrence.Recurrence
+    }
 }
 
 @Preview
@@ -259,7 +265,7 @@ private fun Preview() {
                         initialIsOccupied = true,
                         initialIsPublic = true,
                     ),
-                    isRecurrent = false,
+                    recurrence = EventDetailRecurrence.Single,
                 ),
                 goBack = {},
                 goToEventAttendees = {},

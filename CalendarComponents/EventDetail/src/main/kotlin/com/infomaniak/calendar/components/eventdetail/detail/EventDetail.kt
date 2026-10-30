@@ -152,7 +152,7 @@ private fun PreviewEventDetail() {
         calendar = previewEventDetailCalendar,
         calendars = previewEventDetailCalendarGroups,
         title = "Event Title",
-        recurrence = EventDetailRecurrence.Recurrence(getText = { "Every week on Monday" }),
+        recurrence = EventDetailRecurrence.Recurrence(getText = { "Every week on Monday" }, rule = null),
         start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
         end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
         isAllDay = false,
