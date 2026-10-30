@@ -81,12 +81,15 @@ private fun LazyListScope.calendarSection(
             )
             if (expanded) {
                 Column {
-                    userCalendars.calendars.forEach { calendar ->
-                        DrawerCalendarItem(
-                            calendar = calendar,
-                            onCalendarVisibilityChange = onCalendarVisibilityChange,
-                            onCalendarLongClick = onCalendarLongClick,
-                        )
+                    userCalendars.sections.forEach { section ->
+                        DrawerSectionHeader(organisationName = section.organisationName)
+                        section.calendars.forEach { calendar ->
+                            DrawerCalendarItem(
+                                calendar = calendar,
+                                onCalendarVisibilityChange = onCalendarVisibilityChange,
+                                onCalendarLongClick = onCalendarLongClick,
+                            )
+                        }
                     }
                 }
             }

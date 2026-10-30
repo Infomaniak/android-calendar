@@ -21,5 +21,5 @@ import com.infomaniak.core.auth.models.user.User
 
 data class UserCalendarsUi(
     val user: User,
-    val calendars: List<CalendarUi>,
+    val sections: List<CalendarSectionUi>,
 )

@@ -19,6 +19,7 @@ package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.infomaniak.calendar.ui.component.drawer.model.CalendarColorsUi
+import com.infomaniak.calendar.ui.component.drawer.model.CalendarSectionUi
 import com.infomaniak.calendar.ui.component.drawer.model.CalendarUi
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.utils.toCalendarColorsUi
@@ -46,20 +47,37 @@ class DrawerPreviewProvider : PreviewParameterProvider<List<UserCalendarsUi>> {
                     isStaff = false,
                     preferences = Preferences(organizationPreference = OrganizationPreference(currentOrganizationId = 1)),
                 ),
-                calendars = listOf(
-                    CalendarUi(
-                        id = CalendarId("1"),
-                        accountId = AccountId(1),
-                        displayName = "Private",
-                        colors = colorUi(0xFF2196F3),
-                        isVisible = true,
+                sections = listOf(
+                    CalendarSectionUi(
+                        organisationName = "John Doe",
+                        calendars = listOf(
+                            CalendarUi(
+                                id = CalendarId("1"),
+                                accountId = AccountId(1),
+                                displayName = "Private",
+                                colors = colorUi(0xFF2196F3),
+                                isVisible = true,
+                            ),
+                            CalendarUi(
+                                id = CalendarId("2"),
+                                accountId = AccountId(1),
+                                displayName = "Work",
+                                colors = colorUi(0xFFE91E63),
+                                isVisible = false,
+                            ),
+                        ),
                     ),
-                    CalendarUi(
-                        id = CalendarId("2"),
-                        accountId = AccountId(1),
-                        displayName = "Work",
-                        colors = colorUi(0xFFE91E63),
-                        isVisible = false,
+                    CalendarSectionUi(
+                        organisationName = null,
+                        calendars = listOf(
+                            CalendarUi(
+                                id = CalendarId("4"),
+                                accountId = AccountId(1),
+                                displayName = "Holidays",
+                                colors = colorUi(0xFF9C27B0),
+                                isVisible = true,
+                            ),
+                        ),
                     ),
                 ),
             ),
@@ -75,13 +93,18 @@ class DrawerPreviewProvider : PreviewParameterProvider<List<UserCalendarsUi>> {
                     isStaff = false,
                     preferences = Preferences(organizationPreference = OrganizationPreference(currentOrganizationId = 1)),
                 ),
-                calendars = listOf(
-                    CalendarUi(
-                        id = CalendarId("3"),
-                        accountId = AccountId(2),
-                        displayName = "Team",
-                        colors = colorUi(0xFF4CAF50),
-                        isVisible = true,
+                sections = listOf(
+                    CalendarSectionUi(
+                        organisationName = "Team Studio",
+                        calendars = listOf(
+                            CalendarUi(
+                                id = CalendarId("3"),
+                                accountId = AccountId(2),
+                                displayName = "Team",
+                                colors = colorUi(0xFF4CAF50),
+                                isVisible = true,
+                            ),
+                        ),
                     ),
                 ),
             ),

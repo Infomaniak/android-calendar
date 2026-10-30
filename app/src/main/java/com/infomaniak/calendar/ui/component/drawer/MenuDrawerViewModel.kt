@@ -22,14 +22,16 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.BuildConfig
 import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.CachedCalendarManager
+import com.infomaniak.calendar.ui.component.drawer.model.CalendarSectionUi
 import com.infomaniak.calendar.ui.component.drawer.model.CalendarUi
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.utils.account.AccountUtils
-import com.infomaniak.calendar.utils.account.withCalendars
+import com.infomaniak.calendar.utils.account.withSections
 import com.infomaniak.calendar.utils.toCalendarColorsUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarEditData
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarSection
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
@@ -53,10 +55,10 @@ class MenuDrawerViewModel(
 ) : ViewModel() {
     val calendarsUsers: StateFlow<List<UserCalendarsUi>> = combine(
         accountUtils.users,
-        cachedCalendarManager.calendars,
-    ) { users, calendars ->
-        return@combine users.withCalendars(calendars).map { (user, userCalendars) ->
-            UserCalendarsUi(user, userCalendars.map { it.toCalendarUi() })
+        cachedCalendarManager.calendarSections,
+    ) { users, sections ->
+        return@combine users.withSections(sections).map { (user, userSections) ->
+            UserCalendarsUi(user, userSections.map { it.toCalendarSectionUi() })
         }
     }.stateIn(
         scope = viewModelScope,
@@ -84,6 +86,11 @@ class MenuDrawerViewModel(
         }
     }
 }
+
+private fun CalendarSection.toCalendarSectionUi(): CalendarSectionUi = CalendarSectionUi(
+    organisationName = organisation?.name,
+    calendars = calendars.map { it.toCalendarUi() },
+)
 
 private fun Calendar.toCalendarUi(): CalendarUi = CalendarUi(
     id = id,
