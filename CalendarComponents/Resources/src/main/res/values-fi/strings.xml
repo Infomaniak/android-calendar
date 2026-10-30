@@ -79,10 +79,12 @@
     <string name="notificationTypeEmail">Sähköposti</string>
     <string name="notificationTypePush">Ilmoitus</string>
     <string name="occupiedLabel">Varattu</string>
+    <string name="otherReminderAlarmKindLabel">Muistutuksen tyyppi</string>
     <string name="participateKMeetTitle">Osallistu kMeet-tapahtumaan</string>
     <string name="planningNothingPlanned">Ei suunnitelmia</string>
     <string name="privateLabel">Yksityinen</string>
     <string name="publicLabel">Julkinen</string>
+    <string name="reminderTitle">Muistutus</string>
     <string name="roomFloorLabel">%s kerros</string>
     <plurals name="roomSeatsLabel">
         <item quantity="one">%d paikkaa</item>
@@ -95,6 +97,18 @@
     <string name="statusDeclinedLabel">Hylätty</string>
     <string name="statusNeedsActionLabel">Käsiteltävänä</string>
     <string name="statusTentativeLabel">Ehkä</string>
+    <plurals name="unitDays">
+        <item quantity="one">päivä</item>
+        <item quantity="other">päivää</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">tunti</item>
+        <item quantity="other">tuntia</item>
+    </plurals>
+    <plurals name="unitMinutes">
+        <item quantity="one">minuutti</item>
+        <item quantity="other">minuuttia</item>
+    </plurals>
     <plurals name="weekAmount">
         <item quantity="one">%d viikko</item>
         <item quantity="other">%d viikkoa</item>

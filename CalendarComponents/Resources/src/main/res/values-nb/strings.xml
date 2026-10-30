@@ -79,10 +79,12 @@
     <string name="notificationTypeEmail">E-post</string>
     <string name="notificationTypePush">Varsel</string>
     <string name="occupiedLabel">Opptatt</string>
+    <string name="otherReminderAlarmKindLabel">Påminnelsestype</string>
     <string name="participateKMeetTitle">Delta på kMeet</string>
     <string name="planningNothingPlanned">Ingenting planlagt</string>
     <string name="privateLabel">Privat</string>
     <string name="publicLabel">Offentlig</string>
+    <string name="reminderTitle">Påminnelse</string>
     <string name="roomFloorLabel">%s etasjen</string>
     <plurals name="roomSeatsLabel">
         <item quantity="one">%d sete</item>
@@ -95,6 +97,18 @@
     <string name="statusDeclinedLabel">Avvist</string>
     <string name="statusNeedsActionLabel">Under behandling</string>
     <string name="statusTentativeLabel">Kanskje</string>
+    <plurals name="unitDays">
+        <item quantity="one">dag</item>
+        <item quantity="other">dager</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">time</item>
+        <item quantity="other">timer</item>
+    </plurals>
+    <plurals name="unitMinutes">
+        <item quantity="one">minutt</item>
+        <item quantity="other">minutter</item>
+    </plurals>
     <plurals name="weekAmount">
         <item quantity="one">%d uke</item>
         <item quantity="other">%d uker</item>

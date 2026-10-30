@@ -79,10 +79,12 @@
     <string name="notificationTypeEmail">Email</string>
     <string name="notificationTypePush">Ειδοποίηση</string>
     <string name="occupiedLabel">Κατειλημμένο</string>
+    <string name="otherReminderAlarmKindLabel">Τύπος υπενθύμισης</string>
     <string name="participateKMeetTitle">Συμμετοχή στο kMeet</string>
     <string name="planningNothingPlanned">Τίποτα προγραμματισμένο</string>
     <string name="privateLabel">Ιδιωτικό</string>
     <string name="publicLabel">Δημόσιο</string>
+    <string name="reminderTitle">Υπενθύμιση</string>
     <string name="roomFloorLabel">%s όροφος</string>
     <plurals name="roomSeatsLabel">
         <item quantity="one">%d θέση</item>
@@ -95,6 +97,18 @@
     <string name="statusDeclinedLabel">Απορρίφθηκε</string>
     <string name="statusNeedsActionLabel">Σε εκκρεμότητα</string>
     <string name="statusTentativeLabel">Ίσως</string>
+    <plurals name="unitDays">
+        <item quantity="one">ημέρα</item>
+        <item quantity="other">ημέρες</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">ώρα</item>
+        <item quantity="other">ώρες</item>
+    </plurals>
+    <plurals name="unitMinutes">
+        <item quantity="one">λεπτό</item>
+        <item quantity="other">λεπτά</item>
+    </plurals>
     <plurals name="weekAmount">
         <item quantity="one">%d εβδομάδα</item>
         <item quantity="other">%d εβδομάδες</item>

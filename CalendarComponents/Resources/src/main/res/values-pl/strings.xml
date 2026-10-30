@@ -97,10 +97,12 @@
     <string name="notificationTypeEmail">E-mail</string>
     <string name="notificationTypePush">Powiadomienie</string>
     <string name="occupiedLabel">Zajęty</string>
+    <string name="otherReminderAlarmKindLabel">Typ przypomnienia</string>
     <string name="participateKMeetTitle">Weź udział w kMeet</string>
     <string name="planningNothingPlanned">Nic zaplanowanego</string>
     <string name="privateLabel">Prywatne</string>
     <string name="publicLabel">Publiczne</string>
+    <string name="reminderTitle">Przypomnienie</string>
     <string name="roomFloorLabel">%s piętro</string>
     <plurals name="roomSeatsLabel">
         <item quantity="one">%d miejsce</item>
@@ -115,6 +117,24 @@
     <string name="statusDeclinedLabel">Odrzucono</string>
     <string name="statusNeedsActionLabel">W toku</string>
     <string name="statusTentativeLabel">Może</string>
+    <plurals name="unitDays">
+        <item quantity="one">dzień</item>
+        <item quantity="few">dni</item>
+        <item quantity="many">dni</item>
+        <item quantity="other">dnia</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">godzina</item>
+        <item quantity="few">godziny</item>
+        <item quantity="many">godzin</item>
+        <item quantity="other">godziny</item>
+    </plurals>
+    <plurals name="unitMinutes">
+        <item quantity="one">minuta</item>
+        <item quantity="few">minuty</item>
+        <item quantity="many">minut</item>
+        <item quantity="other">minuty</item>
+    </plurals>
     <plurals name="weekAmount">
         <item quantity="one">%d tydzień</item>
         <item quantity="few">%d tygodnie</item>

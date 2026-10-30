@@ -79,10 +79,12 @@
     <string name="notificationTypeEmail">E-mail</string>
     <string name="notificationTypePush">Melding</string>
     <string name="occupiedLabel">Bezet</string>
+    <string name="otherReminderAlarmKindLabel">Type herinnering</string>
     <string name="participateKMeetTitle">Deelnemen aan de kMeet</string>
     <string name="planningNothingPlanned">Niets gepland</string>
     <string name="privateLabel">Privé</string>
     <string name="publicLabel">Openbaar</string>
+    <string name="reminderTitle">Herinnering</string>
     <string name="roomFloorLabel">%s verdieping</string>
     <plurals name="roomSeatsLabel">
         <item quantity="one">%d plaats</item>
@@ -95,6 +97,18 @@
     <string name="statusDeclinedLabel">Afgewezen</string>
     <string name="statusNeedsActionLabel">In behandeling</string>
     <string name="statusTentativeLabel">Misschien</string>
+    <plurals name="unitDays">
+        <item quantity="one">dag</item>
+        <item quantity="other">dagen</item>
+    </plurals>
+    <plurals name="unitHours">
+        <item quantity="one">uur</item>
+        <item quantity="other">uur</item>
+    </plurals>
+    <plurals name="unitMinutes">
+        <item quantity="one">minuut</item>
+        <item quantity="other">minuten</item>
+    </plurals>
     <plurals name="weekAmount">
         <item quantity="one">%d week</item>
         <item quantity="other">%d weken</item>
