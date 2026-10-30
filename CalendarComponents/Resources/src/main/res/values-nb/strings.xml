@@ -31,7 +31,8 @@
         <item quantity="one">%d avvist</item>
         <item quantity="other">%d avviste</item>
     </plurals>
-    <string name="attendeesEmptyState">Ingen deltakere funnet</string>
+    <string name="attendeesEmptyStateDescription">Søk etter kontakter for å legge dem til i arrangementet</string>
+    <string name="attendeesEmptyStateTitle">Ingen gjester</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d venter</item>
         <item quantity="other">%d venter</item>

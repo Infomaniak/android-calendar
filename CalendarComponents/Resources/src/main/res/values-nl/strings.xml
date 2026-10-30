@@ -31,7 +31,8 @@
         <item quantity="one">%d geweigerd</item>
         <item quantity="other">%d afgewezen</item>
     </plurals>
-    <string name="attendeesEmptyState">Geen deelnemers gevonden</string>
+    <string name="attendeesEmptyStateDescription">Zoek contacten om ze toe te voegen aan het evenement</string>
+    <string name="attendeesEmptyStateTitle">Geen gasten</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d in afwachting</item>
         <item quantity="other">%d in afwachting</item>

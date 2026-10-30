@@ -31,7 +31,8 @@
         <item quantity="one">%d abgelehnt</item>
         <item quantity="other">%d abgelehnt</item>
     </plurals>
-    <string name="attendeesEmptyState">Keine Teilnehmer gefunden</string>
+    <string name="attendeesEmptyStateDescription">Kontakte suchen, um sie zum Termin hinzuzufügen</string>
+    <string name="attendeesEmptyStateTitle">Keine Gäste</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d ausstehend</item>
         <item quantity="other">%d ausstehend</item>

@@ -31,7 +31,8 @@
         <item quantity="one">%d rechazado</item>
         <item quantity="other">%d rechazados</item>
     </plurals>
-    <string name="attendeesEmptyState">No se encontraron participantes</string>
+    <string name="attendeesEmptyStateDescription">Busca contactos para añadirlos al evento</string>
+    <string name="attendeesEmptyStateTitle">Sin invitados</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d pendiente</item>
         <item quantity="other">%d pendientes</item>

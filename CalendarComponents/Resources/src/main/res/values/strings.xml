@@ -31,7 +31,8 @@
         <item quantity="one">%d declined</item>
         <item quantity="other">%d declined</item>
     </plurals>
-    <string name="attendeesEmptyState">No attendees found</string>
+    <string name="attendeesEmptyStateDescription">Search for contacts to add them to the event</string>
+    <string name="attendeesEmptyStateTitle">No attendees</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d pending</item>
         <item quantity="other">%d pending</item>

@@ -31,7 +31,8 @@
         <item quantity="one">%d avvisad</item>
         <item quantity="other">%d avvisade</item>
     </plurals>
-    <string name="attendeesEmptyState">Inga deltagare hittades</string>
+    <string name="attendeesEmptyStateDescription">Sök efter kontakter för att lägga till dem i händelsen</string>
+    <string name="attendeesEmptyStateTitle">Inga gäster</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d väntande</item>
         <item quantity="other">%d väntande</item>
