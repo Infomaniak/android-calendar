@@ -44,7 +44,7 @@ class AttendeesSearchState(
     val results: SnapshotStateList<AttendeesSearchResult>,
     val attendees: SnapshotStateSet<AttendeeUi>,
 ) {
-    val attendeesEmails by derivedStateOf { attendees.map { it.email } }
+    val attendeesEmailsLowercase by derivedStateOf { attendees.map { it.email.lowercase() } }
 
     fun addAttendee(attendee: AttendeeUi) {
         addRawAttendee(attendee.copy(status = ParticipationStatus.NeedsAction))
@@ -56,7 +56,7 @@ class AttendeesSearchState(
 
     @OptIn(ExperimentalUuidApi::class)
     fun addCustomAttendee(email: String = searchQueryTextFieldState.text.toString().trim()): CustomAttendeeResult {
-        if (email in attendeesEmails) return CustomAttendeeResult.AlreadyPresent
+        if (email.lowercase() in attendeesEmailsLowercase) return CustomAttendeeResult.AlreadyPresent
         if (!email.isEmailRfc5321Compliant()) return CustomAttendeeResult.InvalidEmail
 
         addRawAttendee(
