@@ -24,7 +24,6 @@ import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.navigation.SharedViewModelStoreNavEntryDecorator
-import com.infomaniak.calendar.utils.contactKey
 import com.infomaniak.multiplatform_core.contacts.ContactsManager
 import com.infomaniak.multiplatform_core.contacts.domain.model.Contact
 import dev.zacsweers.metro.AppScope
@@ -66,11 +65,10 @@ class AttendeesSearchSharedDataViewModel(private val contactsManager: ContactsMa
 
 private fun List<Contact>.toAttendeesUi(alreadyPresentAttendees: Map<String, AttendeeUi>): List<AttendeeUi> {
     return map { contact ->
-        val alreadyPresentAttendee = alreadyPresentAttendees[contact.contactKey]
+        val alreadyPresentAttendee = alreadyPresentAttendees[AttendeeUi.keyOf(contact.email, contact.name)]
         if (alreadyPresentAttendee != null) return@map alreadyPresentAttendee
 
         return@map AttendeeUi(
-            key = contact.contactKey,
             displayName = contact.name,
             email = contact.email,
             status = null,
@@ -84,6 +82,6 @@ sealed interface AttendeesSearchUiState {
     data object Loading : AttendeesSearchUiState
     data class Success(val state: AttendeesSearchState) : AttendeesSearchUiState {
         /** Cached by the snapshot system: recomputed only when [AttendeesSearchState.attendees] changes. */
-        val alreadyPresentAttendees: Map<String, AttendeeUi> by derivedStateOf { state.attendees.associateBy { it.contactKey } }
+        val alreadyPresentAttendees: Map<String, AttendeeUi> by derivedStateOf { state.attendees.associateBy { it.key } }
     }
 }
