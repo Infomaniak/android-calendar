@@ -19,6 +19,7 @@ package com.infomaniak.calendar.components.eventdetail.form
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -44,8 +45,11 @@ import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
 import com.infomaniak.calendar.components.eventdetail.form.component.AddReminderButton
 import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
+import com.infomaniak.calendar.components.eventdetail.form.component.ReminderItem
 import com.infomaniak.calendar.components.eventdetail.form.component.ReminderOffsetDialog
 import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
@@ -55,6 +59,7 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import kotlinx.datetime.TimeZone
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 /**
  * Reusable component for both the creation and the edition of an event.
@@ -104,15 +109,30 @@ fun EventForm(
             )
         }
 
-        Section(EventSharedElement.Divider3) {
+        Section(EventSharedElement.Divider3, Modifier.animateContentSize()) {
             var isReminderOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
+
+            state.notifications.value.forEach { notification ->
+                ReminderItem(
+                    notification = notification,
+                    onRemoveClick = { state.notifications.value -= notification },
+                )
+            }
 
             AddReminderButton(onClick = { isReminderOffsetDialogVisible = true })
 
             if (isReminderOffsetDialogVisible) {
                 ReminderOffsetDialog(
                     selectedOffset = null,
-                    onOffsetSelect = { isReminderOffsetDialogVisible = false }, // TODO: Wire the selected offset to the event reminders
+                    onOffsetSelect = { offset ->
+                        if (offset != null) {
+                            state.notifications.value += EventDetailUi.Notification(
+                                type = EventDetailUi.Notification.Type.Push,
+                                time = NotificationTime.Offset(offset),
+                            )
+                        }
+                        isReminderOffsetDialogVisible = false
+                    },
                     onCustomClick = {}, // TODO: Open the custom reminder editor
                     onDismissRequest = { isReminderOffsetDialogVisible = false },
                 )
@@ -157,6 +177,9 @@ private fun Preview() {
                     attendees = remember { mutableStateSetOf() },
                     initialIsAllDay = false,
                     initialIsKMeetUrlEnabled = false,
+                    initialNotifications = listOf(
+                        EventDetailUi.Notification(EventDetailUi.Notification.Type.Push, NotificationTime.Offset((-15).minutes)),
+                    ),
                     initialIsOccupied = true,
                     initialIsPublic = true,
                 ),

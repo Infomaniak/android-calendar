@@ -27,6 +27,7 @@ import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Bell
 import com.infomaniak.designsystem.icons.symbols.BubbleTopRightCircle
 import com.infomaniak.designsystem.icons.symbols.Symbol
+import java.io.Serializable
 
 /**
  * @param calendars The calendars the event can be moved to: the writable ones, grouped by account.
@@ -64,7 +65,7 @@ data class EventDetailUi(
     }
 
     @Immutable
-    data class Notification(val type: Type, val time: NotificationTime) {
+    data class Notification(val type: Type, val time: NotificationTime) : Serializable {
         @Immutable
         enum class Type(val icon: Symbol, @StringRes val label: Int) {
             Email(EsdsIcons.Bell, R.string.notificationTypeEmail),

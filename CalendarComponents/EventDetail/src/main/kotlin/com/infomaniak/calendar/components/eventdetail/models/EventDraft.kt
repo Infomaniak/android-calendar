@@ -33,6 +33,7 @@ data class EventDraft(
     val endTimeZone: TimeZone,
     val attendees: List<AttendeeUi>,
     val isKMeetUrlEnabled: Boolean,
+    val notifications: List<EventDetailUi.Notification>,
     val isOccupied: Boolean,
     val isPublic: Boolean,
 )
