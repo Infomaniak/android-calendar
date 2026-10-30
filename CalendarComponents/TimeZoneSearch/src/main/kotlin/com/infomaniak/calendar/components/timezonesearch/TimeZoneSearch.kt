@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -43,6 +44,8 @@ import com.infomaniak.calendar.components.timezonesearch.models.TimeZoneUi
 import com.infomaniak.calendar.components.timezonesearch.models.availableTimeZones
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.MagnifyingGlass
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.withContext
@@ -64,6 +67,23 @@ fun TimeZoneSearch(
         }
     }
 
+    TimeZoneSearchContent(
+        searchQuery = searchQuery,
+        searchResults = searchResults,
+        onTimeZoneClick = onTimeZoneClick,
+        modifier = modifier,
+        contentPadding = contentPadding,
+    )
+}
+
+@Composable
+private fun TimeZoneSearchContent(
+    searchQuery: TextFieldState,
+    searchResults: List<TimeZoneUi>?,
+    onTimeZoneClick: (TimeZone) -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
     Column(
         modifier = modifier
             .padding(contentPadding.onlyHorizontal())
@@ -75,6 +95,7 @@ fun TimeZoneSearch(
             null -> Unit // Still loading
             emptyList<TimeZoneUi>() -> EmptyState(
                 text = stringResource(R.string.emptyStateNoTimeZone),
+                icon = EsdsIcons.MagnifyingGlass,
                 modifier = Modifier.padding(bottom = contentPadding.calculateBottomPadding()),
             )
             else -> TimeZoneResults(
@@ -110,6 +131,20 @@ private fun Preview() {
     MaterialTheme {
         Surface {
             TimeZoneSearch(onTimeZoneClick = {})
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewEmptyState() {
+    MaterialTheme {
+        Surface {
+            TimeZoneSearchContent(
+                searchQuery = rememberTextFieldState("abcdef"),
+                searchResults = emptyList(),
+                onTimeZoneClick = {},
+            )
         }
     }
 }

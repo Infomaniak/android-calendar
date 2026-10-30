@@ -48,9 +48,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.detail.EventDetail
 import com.infomaniak.calendar.components.eventdetail.detail.component.ParticipationStatusButtonsToolbar
+import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
@@ -212,9 +215,9 @@ private fun openLocationInMapApp(context: Context, location: String) {
 @Composable
 private fun Preview() {
     val previewEventDetail = EventDetailUi(
-        eventColor = Color.Red,
-        calendarColor = Color.Blue,
-        calendarName = "Vacation",
+        eventColorChoice = EventColorChoice.Default,
+        calendar = previewEventDetailCalendar,
+        calendars = previewEventDetailCalendarGroups,
         title = "Event title",
         start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
         end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),

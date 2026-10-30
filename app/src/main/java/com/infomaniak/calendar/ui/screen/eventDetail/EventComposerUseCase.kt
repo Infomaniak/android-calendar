@@ -18,13 +18,16 @@
 package com.infomaniak.calendar.ui.screen.eventDetail
 
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.account.accountId
 import com.infomaniak.calendar.utils.applyTo
 import com.infomaniak.calendar.utils.toNewEventEditData
+import com.infomaniak.calendar.utils.typedCalendarId
 import com.infomaniak.core.common.cancellable
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Organizer
@@ -32,6 +35,9 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.recurrence.
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.flow.first
+import java.io.IOException
+
+private const val TAG = "EventComposerUseCase"
 
 /**
  * Single entry point for the screens that create, edit or delete events
@@ -40,11 +46,15 @@ class EventComposerUseCase @Inject constructor(
     private val calendarManager: CalendarManager,
     private val cachedCalendarManager: CachedCalendarManager,
     private val accountUtils: AccountUtils,
+    private val calendarDataValues: CalendarDataValues,
 ) {
     suspend fun createEvent(eventDraft: EventDraft): SaveEventResult {
         return runCatching {
-            val defaultOrganizer = CalendarId(eventDraft.calendarId).toOrganizer()
+            val defaultOrganizer = eventDraft.typedCalendarId.toOrganizer()
             calendarManager.createEvent(eventDraft.toNewEventEditData(defaultOrganizer))
+
+            calendarDataValues.saveLastUsedCalendar(eventDraft)
+
             SaveEventResult.Success
         }.cancellable().getOrDefault(SaveEventResult.Error)
     }
@@ -55,8 +65,11 @@ class EventComposerUseCase @Inject constructor(
             val editData = calendarManager.getEditData(occurrenceId) ?: return SaveEventResult.Error
             calendarManager.updateEvent(
                 target = event.targetFor(scope.toRecurrenceScope()),
-                data = eventDraft.applyTo(editData, defaultOrganizer = editData.calendarId.toOrganizer()),
+                data = eventDraft.applyTo(editData, defaultOrganizer = eventDraft.typedCalendarId.toOrganizer()),
             )
+
+            calendarDataValues.saveLastUsedCalendar(eventDraft)
+
             SaveEventResult.Success
         }.cancellable().getOrDefault(SaveEventResult.Error)
     }
@@ -73,6 +86,18 @@ class EventComposerUseCase @Inject constructor(
         val accountId = cachedCalendarManager.calendars.value.find { it.id == this }?.accountId ?: return null
         val user = accountUtils.users.first().find { it.accountId == accountId } ?: return null
         return Organizer(email = user.email, displayName = user.displayName)
+    }
+}
+
+private suspend fun CalendarDataValues.saveLastUsedCalendar(eventDraft: EventDraft) {
+    runCatching {
+        lastUsedCalendarId.setValue(eventDraft.calendarId)
+    }.cancellable().onFailure {
+        if (it is IOException) {
+            SentryLog.w(TAG, "saveLastUsedCalendar() could not store last used calendar", it)
+        } else {
+            SentryLog.e(TAG, "saveLastUsedCalendar() could not store last used calendar", it)
+        }
     }
 }
 

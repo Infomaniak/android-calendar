@@ -34,6 +34,7 @@
     <string name="eventOccurrenceNotFound">Αυτή η εκδήλωση δεν είναι πλέον διαθέσιμη.</string>
     <string name="helpTitle">Βοήθεια</string>
     <string name="monthTitle">Μήνας</string>
+    <string name="noWritableCalendar">Δεν βρέθηκε επεξεργάσιμο ημερολόγιο</string>
     <string name="notificationAllDay">Όλη την ημέρα</string>
     <string name="notificationChannelEventRemindersDescription">Ειδοποιήσεις για επερχόμενες εκδηλώσεις και υπενθυμίσεις</string>
     <string name="notificationChannelEventRemindersTitle">Υπενθυμίσεις εκδηλώσεων</string>

@@ -42,9 +42,11 @@ import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.rememberEventFormState
+import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
@@ -86,15 +88,14 @@ fun EventEditScreen(
     val coroutineScope = rememberCoroutineScope()
     val errorText = stringResource(RCore.string.anErrorHasOccurred)
     val eventDetailUiState = eventDetailSharedDataViewModel.eventDetailUi.collectAsStateWithLifecycle().value
-    val eventFormCalendars = eventDetailSharedDataViewModel.eventFormCalendars.collectAsStateWithLifecycle().value
 
     val uiState = when (eventDetailUiState) {
         EventDetailUiState.Displayable.Loading -> EventEditScreenState.Loading
         is EventDetailUiState.Displayable.Success -> EventEditScreenState.Success(
             eventFormState = rememberEventFormState(
-                calendars = eventFormCalendars?.calendars ?: emptyList(),
-                initialEventColor = eventDetailUiState.eventDetail.eventColor,
-                initialCalendar = eventFormCalendars?.initialCalendar,
+                calendars = eventDetailUiState.eventDetail.calendars,
+                initialEventColor = eventDetailUiState.eventDetail.eventColorChoice,
+                initialCalendar = eventDetailUiState.eventDetail.calendar,
                 dateAndTimeState = rememberEventDateState(eventDetailUiState.eventDetail),
                 initialText = eventDetailUiState.eventDetail.title,
                 initialIsAllDay = eventDetailUiState.eventDetail.isAllDay,
@@ -230,8 +231,8 @@ private fun Preview() {
             EventEditScreen(
                 uiState = EventEditScreenState.Success(
                     eventFormState = rememberEventFormState(
-                        calendars = listOf(previewEventDetailCalendar),
-                        initialEventColor = previewEventDetailCalendar.color,
+                        calendars = previewEventDetailCalendarGroups,
+                        initialEventColor = EventColorChoice.Default,
                         initialCalendar = previewEventDetailCalendar,
                         dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
                         initialText = "Meeting on how to find funny preview titles",

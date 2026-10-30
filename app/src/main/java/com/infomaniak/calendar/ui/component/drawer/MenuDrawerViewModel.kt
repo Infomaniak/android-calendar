@@ -25,7 +25,7 @@ import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.ui.component.drawer.model.CalendarUi
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.utils.account.AccountUtils
-import com.infomaniak.calendar.utils.account.accountId
+import com.infomaniak.calendar.utils.account.withCalendars
 import com.infomaniak.calendar.utils.toCalendarColorsUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarEditData
@@ -55,9 +55,8 @@ class MenuDrawerViewModel(
         accountUtils.users,
         cachedCalendarManager.calendars,
     ) { users, calendars ->
-        return@combine users.map { user ->
-            val userCalendars = calendars.filter { it.accountId == user.accountId }.map { it.toCalendarUi() }
-            UserCalendarsUi(user, userCalendars)
+        return@combine users.withCalendars(calendars).map { (user, userCalendars) ->
+            UserCalendarsUi(user, userCalendars.map { it.toCalendarUi() })
         }
     }.stateIn(
         scope = viewModelScope,

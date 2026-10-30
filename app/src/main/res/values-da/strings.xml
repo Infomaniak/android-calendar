@@ -34,6 +34,7 @@
     <string name="eventOccurrenceNotFound">Denne begivenhed er ikke længere tilgængelig.</string>
     <string name="helpTitle">Hjælp</string>
     <string name="monthTitle">Måned</string>
+    <string name="noWritableCalendar">Ingen redigerbar kalender fundet</string>
     <string name="notificationAllDay">Hele dagen</string>
     <string name="notificationChannelEventRemindersDescription">Notifikationer om kommende arrangementer og påmindelser</string>
     <string name="notificationChannelEventRemindersTitle">Begivenhedspåmindelser</string>

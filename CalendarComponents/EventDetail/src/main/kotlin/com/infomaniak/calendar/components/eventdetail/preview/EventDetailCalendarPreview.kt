@@ -18,6 +18,21 @@
 package com.infomaniak.calendar.components.eventdetail.preview
 
 import androidx.compose.ui.graphics.Color
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailAccount
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 
 val previewEventDetailCalendar by lazy { EventDetailCalendar("Calendar 1", "Vacation", Color.Red) }
+
+val previewEventDetailCalendarGroups by lazy {
+    listOf(
+        EventDetailCalendarGroup(
+            account = EventDetailAccount(id = 1, name = "ellen.joe@ik.me"),
+            calendars = listOf(previewEventDetailCalendar, EventDetailCalendar("Calendar 2", "Work", Color.Blue)),
+        ),
+        EventDetailCalendarGroup(
+            account = EventDetailAccount(id = 2, name = "jane.doe@ik.me"),
+            calendars = listOf(EventDetailCalendar("Calendar 3", "Family", Color.Green)),
+        ),
+    )
+}

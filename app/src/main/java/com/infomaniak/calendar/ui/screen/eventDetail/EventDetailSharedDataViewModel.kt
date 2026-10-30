@@ -20,7 +20,6 @@ package com.infomaniak.calendar.ui.screen.eventDetail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.ui.navigation.SharedViewModelStoreNavEntryDecorator
-import com.infomaniak.calendar.ui.screen.eventDetail.model.EventFormCalendars
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
@@ -35,7 +34,6 @@ import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.flow.stateIn
 import kotlin.time.Duration.Companion.seconds
@@ -52,7 +50,6 @@ import kotlin.time.Duration.Companion.seconds
 @ViewModelKey
 class EventDetailSharedDataViewModel(
     eventLoader: EventLoader,
-    eventFormCalendarsUseCase: EventFormCalendarsUseCase,
 ) : ViewModel() {
     private val occurrenceIdFlow = MutableStateFlow<OccurrenceId?>(null)
 
@@ -74,12 +71,6 @@ class EventDetailSharedDataViewModel(
     val goBackRequests: ReceiveChannel<EventDetailUiState.Unavailable> = eventDetailUiState
         .filterIsInstance<EventDetailUiState.Unavailable>()
         .produceIn(viewModelScope)
-    //endregion
-
-    //region Calendars
-    val eventFormCalendars: StateFlow<EventFormCalendars?> = eventFormCalendarsUseCase
-        .editionCalendars(eventAndCalendar.filterIsInstance<EventAndCalendarState.Success>().map { it.calendar })
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), null)
     //endregion
 
     fun setOccurrenceId(occurrenceId: OccurrenceId) {

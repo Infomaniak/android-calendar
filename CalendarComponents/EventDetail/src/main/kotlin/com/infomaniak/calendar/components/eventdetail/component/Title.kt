@@ -57,9 +57,9 @@ internal fun Title(dotColor: Color, title: String, modifier: Modifier = Modifier
 }
 
 @Composable
-internal fun TitleEditable(dotColor: Color, textFieldState: TextFieldState, modifier: Modifier = Modifier) {
+internal fun TitleEditable(dotColor: () -> Color, textFieldState: TextFieldState, modifier: Modifier = Modifier) {
     ListItem(
-        leadingContent = { EventColorDot(dotColor) },
+        leadingContent = { EventColorDot(dotColor()) },
         content = {
             BasicTextField(
                 state = textFieldState,
@@ -113,7 +113,7 @@ private fun Preview() {
 private fun PreviewEditable() {
     MaterialPreviewTheme {
         Surface {
-            TitleEditable(dotColor = Color.Red, textFieldState = rememberTextFieldState(PREVIEW_TITLE))
+            TitleEditable(dotColor = { Color.Red }, textFieldState = rememberTextFieldState(PREVIEW_TITLE))
         }
     }
 }

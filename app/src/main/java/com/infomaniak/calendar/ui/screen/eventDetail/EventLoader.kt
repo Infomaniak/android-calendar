@@ -17,7 +17,9 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail
 
+import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.calendar.utils.toEventDetailCalendarGroups
 import com.infomaniak.calendar.utils.toEventDetailUi
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
@@ -35,11 +37,14 @@ import kotlinx.coroutines.flow.map
 class EventLoader @Inject constructor(
     private val accountUtils: AccountUtils,
     private val calendarManager: CalendarManager,
+    private val cachedCalendarManager: CachedCalendarManager,
 ) {
     fun eventDetailUi(eventAndCalendar: Flow<EventAndCalendarState>): Flow<EventDetailUiState> = combine(
         eventAndCalendar,
+        cachedCalendarManager.writableCalendars,
+        accountUtils.users,
         accountUtils.emailsByUserId,
-    ) { eventAndCalendarState, emailsByUserId ->
+    ) { eventAndCalendarState, writableCalendars, users, emailsByUserId ->
         val (event, calendar) = when (eventAndCalendarState) {
             EventAndCalendarState.EventNotFound -> return@combine EventDetailUiState.Unavailable
             EventAndCalendarState.Loading -> return@combine EventDetailUiState.Displayable.Loading
@@ -47,7 +52,7 @@ class EventLoader @Inject constructor(
         }
 
         event
-            .toEventDetailUi(calendar, emailsByUserId)
+            .toEventDetailUi(calendar, users.toEventDetailCalendarGroups(writableCalendars), emailsByUserId)
             .let(EventDetailUiState.Displayable::Success)
     }
 

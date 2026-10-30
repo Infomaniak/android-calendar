@@ -17,10 +17,18 @@
  */
 package com.infomaniak.calendar.components.eventdetail.models
 
+import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import com.infomaniak.calendar.components.eventdetail.utils.ColorParceler
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.TypeParceler
 
+@Immutable
+@Parcelize
+@TypeParceler<Color, ColorParceler>
 data class EventDetailCalendar(
     val id: String,
     val name: String,
     val color: Color,
-)
+) : Parcelable

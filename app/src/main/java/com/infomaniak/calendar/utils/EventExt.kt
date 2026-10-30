@@ -18,6 +18,8 @@
 package com.infomaniak.calendar.utils
 
 import androidx.compose.ui.graphics.Color
+import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
@@ -26,6 +28,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Classification
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventBounds
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.TimeBlocking
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.AlarmAction
@@ -40,10 +43,14 @@ import kotlinx.datetime.LocalTime
  * Translation of the KMP event model into the UI model consumed by the EventDetail component,
  * shared by every view that opens an event so they all display it identically.
  */
-fun Event.toEventDetailUi(calendar: Calendar, emailsByUserId: Map<AccountId, String>): EventDetailUi = EventDetailUi(
-    eventColor = Color(colors.sourceColor),
-    calendarColor = Color(colors.calendarSourceColor.argb),
-    calendarName = calendar.displayName,
+fun Event.toEventDetailUi(
+    calendar: Calendar,
+    calendarGroups: List<EventDetailCalendarGroup>,
+    emailsByUserId: Map<AccountId, String>,
+): EventDetailUi = EventDetailUi(
+    eventColorChoice = colors.toEventColorChoice(),
+    calendar = calendar.toEventDetailCalendar(),
+    calendars = calendarGroups,
     title = title,
     start = timing.toDetailTiming(isStart = true),
     end = timing.toDetailTiming(isStart = false),
@@ -61,6 +68,12 @@ fun Event.toEventDetailUi(calendar: Calendar, emailsByUserId: Map<AccountId, Str
     classification = classification.toClassification(),
     canEdit = canEdit,
 )
+
+private fun EventColors.toEventColorChoice(): EventColorChoice = if (sourceColor == calendarSourceColor.argb) {
+    EventColorChoice.Default
+} else {
+    EventColorChoice.Custom(Color(sourceColor))
+}
 
 private fun EventTiming.toDetailTiming(isStart: Boolean): EventDetailTiming = when (val bounds = bounds) {
     is EventBounds.AllDay -> EventDetailTiming.Floating(

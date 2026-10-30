@@ -28,11 +28,14 @@ import com.infomaniak.designsystem.icons.symbols.Bell
 import com.infomaniak.designsystem.icons.symbols.BubbleTopRightCircle
 import com.infomaniak.designsystem.icons.symbols.Symbol
 
+/**
+ * @param calendars The calendars the event can be moved to: the writable ones, grouped by account.
+ */
 @Immutable
 data class EventDetailUi(
-    val eventColor: Color,
-    val calendarColor: Color,
-    val calendarName: String,
+    val eventColorChoice: EventColorChoice,
+    val calendar: EventDetailCalendar,
+    val calendars: List<EventDetailCalendarGroup>,
     val title: String,
     val start: EventDetailTiming,
     val end: EventDetailTiming,
@@ -51,6 +54,7 @@ data class EventDetailUi(
     val canEdit: Boolean,
 ) {
     val isRecurrent get() = recurrence is EventDetailRecurrence.Recurrence
+    val eventColor get() = eventColorChoice.getColor(calendar)
 
     data class Room(val title: String, val seats: Int, val floor: Int)
 

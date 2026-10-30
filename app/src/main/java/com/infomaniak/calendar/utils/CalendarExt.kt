@@ -18,7 +18,11 @@
 package com.infomaniak.calendar.utils
 
 import androidx.compose.ui.graphics.Color
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailAccount
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
+import com.infomaniak.calendar.utils.account.withCalendars
+import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 
 fun Calendar.toEventDetailCalendar(): EventDetailCalendar = EventDetailCalendar(
@@ -26,3 +30,14 @@ fun Calendar.toEventDetailCalendar(): EventDetailCalendar = EventDetailCalendar(
     name = displayName,
     color = Color(colors.sourceColor),
 )
+
+/** Groups [calendars] under the email of their user's account, leaving out the accounts with none of them. */
+fun List<User>.toEventDetailCalendarGroups(calendars: List<Calendar>): List<EventDetailCalendarGroup> =
+    withCalendars(calendars).mapNotNull { (user, userCalendars) ->
+        if (userCalendars.isEmpty()) return@mapNotNull null
+
+        EventDetailCalendarGroup(
+            account = EventDetailAccount(id = user.id, name = user.email),
+            calendars = userCalendars.map(Calendar::toEventDetailCalendar),
+        )
+    }

@@ -34,6 +34,7 @@
     <string name="eventOccurrenceNotFound">Questo evento non è più disponibile.</string>
     <string name="helpTitle">Aiuto</string>
     <string name="monthTitle">Mese</string>
+    <string name="noWritableCalendar">Nessun calendario modificabile trovato</string>
     <string name="notificationAllDay">Tutto il giorno</string>
     <string name="notificationChannelEventRemindersDescription">Notifiche per eventi imminenti e promemoria</string>
     <string name="notificationChannelEventRemindersTitle">Promemoria eventi</string>

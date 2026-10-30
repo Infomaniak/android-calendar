@@ -18,6 +18,11 @@
 package com.infomaniak.calendar.utils.account
 
 import com.infomaniak.core.auth.models.user.User
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_core.account.domain.model.AccountId
 
 val User.accountId: AccountId get() = AccountId(id.toLong())
+
+/** Each user, in order, with the [calendars] of its account. */
+fun List<User>.withCalendars(calendars: List<Calendar>): Map<User, List<Calendar>> =
+    associateWith { user -> calendars.filter { it.accountId == user.accountId } }

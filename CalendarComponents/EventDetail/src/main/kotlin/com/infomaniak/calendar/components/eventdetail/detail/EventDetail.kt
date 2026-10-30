@@ -30,11 +30,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
+import com.infomaniak.calendar.components.eventdetail.component.Calendar
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatus
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
@@ -42,11 +42,11 @@ import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatus
 import com.infomaniak.calendar.components.eventdetail.component.Recurrence
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
-import com.infomaniak.calendar.components.eventdetail.detail.component.Calendar
 import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
 import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
+import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
@@ -55,6 +55,8 @@ import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElemen
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
+import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.core.ui.compose.margin.Margin
@@ -136,7 +138,7 @@ fun EventDetail(
                     modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
                 )
 
-                Calendar(calendarColor, calendarName)
+                Calendar(calendar.color, calendar.name, Modifier.eventSharedBounds(EventSharedElement.Calendar))
             }
         }
     }
@@ -146,9 +148,9 @@ fun EventDetail(
 @Composable
 private fun PreviewEventDetail() {
     val eventDetail = EventDetailUi(
-        eventColor = Color.Red,
-        calendarColor = Color.Blue,
-        calendarName = "Vacation",
+        eventColorChoice = EventColorChoice.Default,
+        calendar = previewEventDetailCalendar,
+        calendars = previewEventDetailCalendarGroups,
         title = "Event Title",
         recurrence = EventDetailRecurrence.Recurrence(getText = { "Every week on Monday" }),
         start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),

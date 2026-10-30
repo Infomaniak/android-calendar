@@ -29,11 +29,16 @@ fun SubmitTopAppBar(
     goBack: () -> Unit,
     onSubmit: () -> Unit,
     modifier: Modifier = Modifier,
+    isSubmitEnabled: () -> Boolean = { true },
     title: @Composable () -> Unit = {},
 ) {
     TopAppBar(
         navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
-        actions = { Row(Modifier.padding(end = EsdsTheme.spacing.lg)) { TopAppBarButtons.SaveButton(onClick = onSubmit) } },
+        actions = {
+            Row(Modifier.padding(end = EsdsTheme.spacing.lg)) {
+                TopAppBarButtons.SaveButton(enabled = isSubmitEnabled, onClick = onSubmit)
+            }
+        },
         title = title,
         modifier = modifier,
     )
