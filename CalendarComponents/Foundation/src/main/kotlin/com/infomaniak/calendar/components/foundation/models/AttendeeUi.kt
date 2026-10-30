@@ -44,7 +44,7 @@ data class AttendeeUi(
 
     companion object {
         /** Single source of attendee keys. */
-        fun keyOf(email: String, displayName: String?): String = "$email#$displayName"
+        fun keyOf(email: String, displayName: String?): String = "$email#${displayName.orEmpty()}"
     }
 }
 
