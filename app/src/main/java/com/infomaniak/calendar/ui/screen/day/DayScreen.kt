@@ -36,6 +36,7 @@ import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
+import com.infomaniak.calendar.components.foundation.utils.NAVIGABLE_DATES
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
@@ -47,10 +48,7 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
-import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.minus
-import kotlinx.datetime.plus
 
 @Composable
 fun DayScreen(
@@ -80,7 +78,6 @@ fun DayScreen(
         eventsDots = { eventDots },
         visibleDayState = visibleDayState,
         timelineState = timelineState,
-        dateRange = viewModel.dateRange,
         modifier = modifier,
     )
 }
@@ -93,7 +90,6 @@ private fun DayScreen(
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
     visibleDayState: VisibleDayState,
     timelineState: TimelineState,
-    dateRange: ClosedRange<LocalDate>,
     modifier: Modifier = Modifier,
 ) {
     val calendarExpansionState = rememberCalendarExpansionState()
@@ -119,7 +115,7 @@ private fun DayScreen(
         modifier = modifier,
     ) { contentPadding ->
         DayPager(
-            dateRange = dateRange,
+            dateRange = NAVIGABLE_DATES,
             selectedDate = { visibleDayState.visibleDate },
             eventsOf = { uiState().eventsOf(it) },
             state = timelineState,
@@ -143,7 +139,6 @@ private fun DayScreen(
 private fun Preview() {
     CalendarThemeForPreview {
         val visibleDayState = rememberVisibleDayState()
-        val date = visibleDayState.visibleDate
 
         CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
             DayScreen(
@@ -153,7 +148,6 @@ private fun Preview() {
                 eventsDots = { emptyMap() },
                 visibleDayState = visibleDayState,
                 timelineState = rememberDayTimelineState({}),
-                dateRange = date.minus(1, DateTimeUnit.DAY)..date.plus(1, DateTimeUnit.DAY),
             )
         }
     }

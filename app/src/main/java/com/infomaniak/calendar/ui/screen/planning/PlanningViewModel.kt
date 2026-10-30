@@ -20,9 +20,8 @@ package com.infomaniak.calendar.ui.screen.planning
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.manager.SyncEventsManager
+import com.infomaniak.calendar.manager.VisibleEventsManager
 import com.infomaniak.calendar.manager.VisibleMonthManager
-import com.infomaniak.core.common.utils.today
-import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
@@ -31,44 +30,34 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.minus
-import kotlinx.datetime.plus
-import kotlin.time.Clock
+import kotlin.time.Duration.Companion.seconds
 
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
 class PlanningViewModel(
-    calendarManager: CalendarManager,
     syncEventsManager: SyncEventsManager,
+    visibleEventsManager: VisibleEventsManager,
     visibleMonthManager: VisibleMonthManager,
 ) : ViewModel() {
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
 
-    private val timeZone = TimeZone.currentSystemDefault()
-    private val today = Clock.today(timeZone)
-
-    private val startDate = today.minus(PLANNING_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
-    private val endDate = today.plus(PLANNING_RANGE_DAYS, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
-
     @OptIn(ExperimentalCoroutinesApi::class)
-    val planningUiState: StateFlow<PlanningUiState> = calendarManager
-        .observeDaySlices(startDate, endDate, timeZone)
-        .mapLatest {
-            val events = it.groupByWeekAndDay()
-            PlanningUiState.Success({ events })
+    val planningUiState: StateFlow<PlanningUiState> = visibleEventsManager.loadedEvents
+        .filterNotNull()
+        .mapLatest { loadedEvents ->
+            PlanningUiState.Success(loadedEvents.slicesByDay.groupByDay(loadedEvents.days, loadedEvents.timeZone))
         }
-        .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = PlanningUiState.Loading)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5.seconds),
+            initialValue = PlanningUiState.Loading,
+        )
 
     val eventDots = visibleMonthManager.eventDots
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
-
-    companion object {
-        private const val PLANNING_RANGE_DAYS = 250
-    }
 }

@@ -69,4 +69,6 @@ dependencies {
     debugImplementation(core.compose.ui.tooling)
 
     implementation(kmpCalendar.kotlinx.datetime)
+
+    testImplementation(core.junit)
 }
