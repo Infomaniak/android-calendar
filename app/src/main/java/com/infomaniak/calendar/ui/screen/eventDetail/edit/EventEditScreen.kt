@@ -131,6 +131,7 @@ private fun EventEditScreen(
                 onSubmit = onSubmit,
                 isSubmitEnabled = { uiState is EventEditScreenState.Success },
                 isRecurring = (uiState as? EventEditScreenState.Success)?.isRecurring ?: false,
+                isRecurrenceEdited = { (uiState as? EventEditScreenState.Success)?.isRecurrenceEdited ?: false },
             )
         },
         modifier = modifier,
@@ -164,6 +165,7 @@ private sealed interface EventEditScreenState {
     object Loading : EventEditScreenState
     data class Success(val eventFormState: EventFormState, val recurrence: EventDetailRecurrence) : EventEditScreenState {
         val isRecurring get() = recurrence is EventDetailRecurrence.Recurrence
+        val isRecurrenceEdited get() = eventFormState.recurrence.value != recurrence.formRecurrence
     }
 }
 

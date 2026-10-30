@@ -126,6 +126,7 @@ class EventFormState(
             end = end,
             endTimeZone = dateAndTimeState.end.timeZone,
             location = location,
+            recurrence = recurrence.value,
             attendees = attendees,
             initialOrganizer = (organizerSource as? OrganizerSource.Static)?.organizer,
             isKMeetUrlEnabled = isKMeetUrlEnabled.value,

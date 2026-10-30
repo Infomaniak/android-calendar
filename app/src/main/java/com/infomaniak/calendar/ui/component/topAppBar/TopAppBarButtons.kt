@@ -158,6 +158,7 @@ object TopAppBarButtons {
         onSubmit: (RecurrentEventScope) -> Unit,
         modifier: Modifier = Modifier,
         enabled: () -> Boolean,
+        isRecurrenceEdited: () -> Boolean = { false },
     ) {
         var showEditRecurrentEventDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -170,7 +171,11 @@ object TopAppBarButtons {
         )
 
         if (showEditRecurrentEventDialog) {
-            EditRecurrentEventDialog(onEdit = onSubmit, onDismissRequest = { showEditRecurrentEventDialog = false })
+            EditRecurrentEventDialog(
+                isRecurrenceEdited = isRecurrenceEdited(),
+                onEdit = onSubmit,
+                onDismissRequest = { showEditRecurrentEventDialog = false },
+            )
         }
     }
 

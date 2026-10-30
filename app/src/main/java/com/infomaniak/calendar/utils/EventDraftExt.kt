@@ -20,6 +20,7 @@ package com.infomaniak.calendar.utils
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
+import com.infomaniak.calendar.components.eventdetail.models.RecurrenceUi
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import com.infomaniak.calendar.ui.screen.eventDetail.AttendeesUpdatePayload
@@ -37,6 +38,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.Alarm
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.EventAlarm
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.TriggerRelation
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
@@ -53,7 +55,7 @@ fun EventDraft.applyTo(
     defaultOrganizer: Organizer?,
 ): EventEditData = editData.copy(
     title = title,
-    timing = editData.timing.copy(bounds = bounds()),
+    timing = editData.timing.copy(bounds = bounds()).withRecurrence(recurrence, start.date),
     location = location.toLocation(editData.location),
     timeBlocking = if (isOccupied) TimeBlocking.Blocks else TimeBlocking.DoesNotBlock,
     calendarId = typedCalendarId,
@@ -115,6 +117,15 @@ fun eventBounds(
 }
 
 private fun OrganizerUi.toOrganizer(): Organizer = Organizer(email, displayName)
+
+/** A rule the form reads the same as the stored one gives it back, so it keeps the parts the form doesn't show. */
+private fun EventTiming.withRecurrence(recurrence: RecurrenceUi, start: LocalDate): EventTiming = when (recurrence) {
+    RecurrenceUi.None -> copy(recurrenceRule = null, rDates = emptyList(), exDates = emptyList())
+    RecurrenceUi.Kept -> this
+    is RecurrenceUi.Rule -> copy(
+        recurrenceRule = recurrenceRule?.takeIf { it.toRecurrenceUi(start) == recurrence } ?: recurrence.toRecurrenceRule(start),
+    )
+}
 
 /** Alarms stored without id get a new random [EventDetailUi.Notification.uiId] each time they're read. */
 private fun List<EventDetailUi.Notification>.withoutUiId() = map { it.copy(uiId = "") }

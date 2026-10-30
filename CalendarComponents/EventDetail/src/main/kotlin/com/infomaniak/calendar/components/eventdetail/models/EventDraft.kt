@@ -34,6 +34,7 @@ data class EventDraft(
     val end: LocalDateTime,
     val endTimeZone: TimeZone,
     val location: LocationUi?,
+    val recurrence: RecurrenceUi,
     val attendees: List<AttendeeUi>,
     val initialOrganizer: OrganizerUi?,
     val isKMeetUrlEnabled: Boolean,

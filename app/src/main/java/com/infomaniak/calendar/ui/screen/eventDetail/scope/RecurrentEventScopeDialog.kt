@@ -45,16 +45,17 @@ fun RecurrentEventScopeDialog(
     confirmLabel: String,
     onConfirm: (RecurrentEventScope) -> Unit,
     onDismissRequest: () -> Unit,
+    scopes: List<RecurrentEventScope> = RecurrentEventScope.entries,
     confirmTextButtonColors: ButtonColors = ButtonDefaults.textButtonColors(),
 ) {
-    var selectedScope by rememberSaveable { mutableStateOf(RecurrentEventScope.ThisEvent) }
+    var selectedScope by rememberSaveable { mutableStateOf(scopes.first()) }
 
     AlertDialog(
         onDismissRequest = onDismissRequest,
         title = { Text(title) },
         text = {
             Column(Modifier.selectableGroup()) {
-                RecurrentEventScope.entries.forEach { scope ->
+                scopes.forEach { scope ->
                     val isSelected = selectedScope == scope
 
                     ListItem(

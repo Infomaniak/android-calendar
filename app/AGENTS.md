@@ -49,10 +49,10 @@ app/src/main/java/com/infomaniak/calendar/
 │   ├── AttendeeExt.kt              # KMP Attendee → Attendees mapping for event detail
 │   ├── DayEventGroupingExt.kt      # Groups day-sliced events for calendar views
 │   ├── EventDaySliceExt.kt         # KMP EventDaySlice → OccurrenceEventUi mapping, shared by every calendar view
-│   ├── EventDraftExt.kt            # EventDraft → KMP EventEditData for creation and edition: a new form field is one line in `applyTo`; unchanged notifications leave the stored alarms alone (`AlarmListEdit.Preserve`, since `Event.alarms` lacks the ones KMP can't read), changed ones get back the stored alarm they were read from (matched by the `Notification.sourceId` holding its KMP `AlarmId`)
+│   ├── EventDraftExt.kt            # EventDraft → KMP EventEditData for creation and edition: a new form field is one line in `applyTo`; unchanged notifications leave the stored alarms alone (`AlarmListEdit.Preserve`, since `Event.alarms` lacks the ones KMP can't read), changed ones get back the stored alarm they were read from (matched by the `Notification.sourceId` holding its KMP `AlarmId`); a recurrence the form reads the same as the stored rule keeps it, `RecurrenceUi.Kept` (a rule the form can't describe) leaves it untouched
 │   ├── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
 │   ├── LocationExt.kt              # KMP Location ↔ Foundation's LocationUi: a place's name and address are read from and written to the `LOCATION` text until KMP stores them
-│   └── RecurrenceExt.kt            # Event form `RecurrenceUi` → KMP `RecurrenceRule`, whose localized text the form shows
+│   └── RecurrenceExt.kt            # Event form `RecurrenceUi` ↔ KMP `RecurrenceRule`, whose localized text the form shows
 └── ui/
     ├── model/                     # OccurrenceEventUi calendar item carrying KMP OccurrenceId and attendee summary; TimelineUiState;
     │                              # UserCalendarsUi / CalendarSectionUi / CalendarUi / CalendarColorsUi, the calendars as the drawer and other views draw them

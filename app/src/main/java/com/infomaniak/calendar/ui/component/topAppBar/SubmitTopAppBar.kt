@@ -32,13 +32,19 @@ fun SubmitTopAppBar(
     isRecurring: Boolean,
     modifier: Modifier = Modifier,
     isSubmitEnabled: () -> Boolean = { true },
+    isRecurrenceEdited: () -> Boolean = { false },
     title: @Composable () -> Unit = {},
 ) {
     TopAppBar(
         navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
         actions = {
             Row(Modifier.padding(end = EsdsTheme.spacing.lg)) {
-                TopAppBarButtons.SubmitButton(enabled = isSubmitEnabled, onSubmit = onSubmit, isRecurring = isRecurring)
+                TopAppBarButtons.SubmitButton(
+                    enabled = isSubmitEnabled,
+                    onSubmit = onSubmit,
+                    isRecurring = isRecurring,
+                    isRecurrenceEdited = isRecurrenceEdited,
+                )
             }
         },
         title = title,

@@ -27,12 +27,18 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.R as RCore
 
 @Composable
-fun EditRecurrentEventDialog(onEdit: (RecurrentEventScope) -> Unit, onDismissRequest: () -> Unit) {
+fun EditRecurrentEventDialog(isRecurrenceEdited: Boolean, onEdit: (RecurrentEventScope) -> Unit, onDismissRequest: () -> Unit) {
     RecurrentEventScopeDialog(
         title = stringResource(R.string.editRecurringEventAlertTitle),
         confirmLabel = stringResource(RCore.string.edit),
         onConfirm = onEdit,
         onDismissRequest = onDismissRequest,
+        // KMP ignores a recurrence change made to a single occurrence
+        scopes = if (isRecurrenceEdited) {
+            RecurrentEventScope.entries - RecurrentEventScope.ThisEvent
+        } else {
+            RecurrentEventScope.entries
+        },
     )
 }
 
@@ -40,6 +46,6 @@ fun EditRecurrentEventDialog(onEdit: (RecurrentEventScope) -> Unit, onDismissReq
 @Composable
 private fun EditRecurrentEventDialogPreview() {
     CalendarThemeForPreview {
-        EditRecurrentEventDialog(onEdit = {}, onDismissRequest = {})
+        EditRecurrentEventDialog(isRecurrenceEdited = false, onEdit = {}, onDismissRequest = {})
     }
 }
