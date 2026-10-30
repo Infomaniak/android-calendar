@@ -17,9 +17,12 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.union
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -62,6 +65,7 @@ private fun TimeZoneSearchScreen(
             )
         },
         modifier = modifier,
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.union(WindowInsets.ime),
     ) { contentPadding ->
         TimeZoneSearch(
             onTimeZoneClick = onTimeZoneSelected,

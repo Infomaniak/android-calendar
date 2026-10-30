@@ -55,6 +55,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.foundation.models.Attendees
+import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
@@ -107,8 +108,8 @@ fun EventDetailScreen(
         for (request in eventDetailSharedDataViewModel.goBackRequests) goBack()
     }
 
-    LaunchedEffect(viewModel.attendeesSearchState) {
-        attendeesSearchSharedDataViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
+    LaunchedEffect(viewModel.attendeesState) {
+        attendeesSearchSharedDataViewModel.setAttendees(viewModel.attendeesState)
     }
 
     EventDetailScreen(
@@ -165,7 +166,7 @@ private fun EventDetailScreen(
         bottomBar = {
             (state as? EventDetailUiState.Displayable.Success)?.eventDetail?.attendees?.me?.let { me ->
                 ParticipationStatusButtonsToolbar(
-                    participationStatus = { me.status },
+                    participationStatus = { me.status ?: ParticipationStatus.NeedsAction }, // me.status can never be null here
                     onParticipationStatusChange = { /*TODO[eventDetail]*/ },
                     scrollBehavior = floatingToolbarScrollBehavior,
                 )

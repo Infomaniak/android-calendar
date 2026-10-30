@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.attendeessearch.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -30,8 +31,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,9 +49,17 @@ import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
-internal fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) {
+internal fun EventAttendee(
+    attendee: AttendeeUi,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    enabled: Boolean = true,
+) {
     Row(
         modifier = modifier
+            .clip(ListItemDefaults.shapes().pressedShape)
+            .clickableNullable(enabled, onClick, Role.Button)
+            .alpha(if (enabled) 1f else EsdsTheme.opacity.medium)
             .background(ListItemDefaults.colors().containerColor)
             .padding(start = EsdsTheme.spacing.lg),
         verticalAlignment = Alignment.CenterVertically,
@@ -58,9 +70,10 @@ internal fun EventAttendee(attendee: AttendeeUi, modifier: Modifier = Modifier) 
                 .padding(start = EsdsTheme.spacing.lg)
                 .size(40.dp),
         )
+
         ListItem(
-            overlineContent = {
-                AttendeeParticipationStatus(attendee.status, attendee.isOrganizer)
+            overlineContent = attendee.status?.let {
+                { AttendeeParticipationStatus(it, attendee.isOrganizer) }
             },
             supportingContent = if (attendee.displayName.isNullOrEmpty()) {
                 null
@@ -118,6 +131,14 @@ private fun ParticipationStatusText(text: String, color: Color, isOrganizer: Boo
     }
 }
 
+private fun Modifier.clickableNullable(enabled: Boolean, onClick: (() -> Unit)?, role: Role): Modifier = then(
+    if (onClick == null) {
+        Modifier
+    } else {
+        Modifier.clickable(enabled = enabled, onClick = onClick, role = role)
+    },
+)
+
 @Preview
 @Composable
 private fun PreviewAttendeeAccepted() {
@@ -147,5 +168,13 @@ private fun PreviewAttendeeMaybe() {
 private fun PreviewAttendeePending() {
     Surface {
         EventAttendee(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.NeedsAction))
+    }
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    Surface {
+        EventAttendee(AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", null), enabled = false)
     }
 }

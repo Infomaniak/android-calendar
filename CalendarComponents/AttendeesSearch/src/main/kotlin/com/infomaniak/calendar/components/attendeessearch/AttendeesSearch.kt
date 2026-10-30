@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.attendeessearch
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -37,6 +38,7 @@ import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.UserMagnifyingGlass
@@ -45,25 +47,46 @@ import com.infomaniak.designsystem.icons.symbols.UserMagnifyingGlass
 fun AttendeesSearch(
     attendeesSearchState: AttendeesSearchState,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
-    val attendeesList: List<AttendeeUi> =
-        if (attendeesSearchState.searchQueryTextFieldState.text.isBlank()) {
-            attendeesSearchState.attendees.toList()
-        } else {
-            attendeesSearchState.results.toList()
-        }
+    val isDisplayingSearchResults = attendeesSearchState.searchQueryTextFieldState.text.isNotBlank()
 
-    Column(modifier = modifier) {
+    val attendeesList: List<AttendeeUi> = if (isDisplayingSearchResults) {
+        attendeesSearchState.results
+    } else {
+        attendeesSearchState.attendees.toList()
+    }
+
+    val horizontalContentPadding = contentPadding.onlyHorizontal()
+
+    Column(
+        modifier = modifier
+            .padding(horizontalContentPadding)
+            .padding(top = contentPadding.calculateTopPadding()),
+    ) {
         SearchBar(
             searchState = attendeesSearchState.searchQueryTextFieldState,
             placeholder = stringResource(R.string.searchForAttendees),
         )
         if (attendeesList.isEmpty()) {
-            EmptyState(text = stringResource(R.string.attendeesEmptyState), icon = EsdsIcons.UserMagnifyingGlass)
+            EmptyState(
+                text = stringResource(R.string.attendeesEmptyState),
+                icon = EsdsIcons.UserMagnifyingGlass,
+                modifier = Modifier.padding(bottom = contentPadding.calculateBottomPadding()),
+            )
         } else {
             AttendeesList(
                 attendees = { attendeesList },
                 modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md, vertical = EsdsTheme.spacing.sm),
+                onClick = if (isDisplayingSearchResults) {
+                    { attendee -> attendeesSearchState.addAttendee(attendee) }
+                } else {
+                    null
+                },
+                isEnabled = { attendee ->
+                    !isDisplayingSearchResults || attendee.email !in attendeesSearchState.attendeesEmails
+                },
+                contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
             )
         }
     }

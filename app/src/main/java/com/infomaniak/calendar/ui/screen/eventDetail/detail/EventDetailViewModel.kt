@@ -17,18 +17,19 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.detail
 
+import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.ui.screen.eventDetail.DeleteEventResult
 import com.infomaniak.calendar.ui.screen.eventDetail.EventComposerUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.screen.eventDetail.utils.synchronizeTo
-import com.infomaniak.calendar.utils.saveableAttendeesSearchState
+import com.infomaniak.calendar.utils.saveableAttendeesState
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
@@ -46,10 +47,10 @@ class EventDetailViewModel(
     @Assisted private val savedStateHandle: SavedStateHandle,
     private val eventComposerUseCase: EventComposerUseCase,
 ) : ViewModel() {
-    val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
+    val attendeesState: SnapshotStateSet<AttendeeUi> = savedStateHandle.saveableAttendeesState()
 
     suspend fun synchronizeAttendeesSearchState(eventDetailUi: StateFlow<EventDetailUiState>) {
-        eventDetailUi.synchronizeTo(attendeesSearchState)
+        eventDetailUi.synchronizeTo(attendeesState)
     }
 
     suspend fun deleteEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope): DeleteEventResult {

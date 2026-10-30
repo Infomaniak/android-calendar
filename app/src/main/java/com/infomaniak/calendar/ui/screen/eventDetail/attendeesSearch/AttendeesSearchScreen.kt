@@ -18,17 +18,22 @@
 package com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.union
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,21 +48,33 @@ import com.infomaniak.calendar.components.foundation.state.rememberSaveableAtten
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun AttendeesSearchScreen(
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
-    attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
+    viewModel: AttendeesSearchSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
-    val attendeesSearchUi by attendeesSearchSharedDataViewModel.attendeesSearchState.collectAsStateWithLifecycle()
+    val attendeesSearchUi by viewModel.attendeesState.collectAsStateWithLifecycle()
 
     Box(modifier = modifier.fillMaxSize()) {
-        when (val attendeesSearchState = attendeesSearchUi) {
+        when (val attendeesState = attendeesSearchUi) {
             AttendeesSearchUiState.Loading -> Unit // The parent provides it right away, so nothing to show
             is AttendeesSearchUiState.Success -> {
+                val attendeesSearchState = rememberSaveableAttendeesSearchState(
+                    attendees = attendeesState.attendees,
+                )
+
+                LaunchedEffect(attendeesSearchState) {
+                    snapshotFlow { attendeesSearchState.searchQueryTextFieldState.text }.collectLatest {
+                        viewModel.search(it.toString())
+                    }
+                }
+
+
                 AttendeesSearchScreen(
-                    attendeesSearchState = attendeesSearchState.state,
+                    attendeesSearchState = attendeesSearchState,
                     goBack = goBack,
                 )
             }
@@ -79,12 +96,12 @@ private fun AttendeesSearchScreen(
             )
         },
         modifier = modifier,
-    ) { paddingValues ->
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.union(WindowInsets.ime),
+    ) { contentPadding ->
         AttendeesSearch(
             attendeesSearchState = attendeesSearchState,
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = contentPadding,
         )
     }
 }

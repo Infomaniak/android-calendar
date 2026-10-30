@@ -17,14 +17,15 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.utils
 
-import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
+import androidx.compose.runtime.snapshots.SnapshotStateSet
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 
-suspend fun StateFlow<EventDetailUiState>.synchronizeTo(attendeesSearchState: AttendeesSearchState) {
+suspend fun StateFlow<EventDetailUiState>.synchronizeTo(attendeesState: SnapshotStateSet<AttendeeUi>) {
     filterIsInstance<EventDetailUiState.Displayable.Success>().collect { event ->
-        attendeesSearchState.attendees.clear()
-        attendeesSearchState.attendees.addAll(event.eventDetail.attendees.all)
+        attendeesState.clear()
+        attendeesState.addAll(event.eventDetail.attendees.all)
     }
 }

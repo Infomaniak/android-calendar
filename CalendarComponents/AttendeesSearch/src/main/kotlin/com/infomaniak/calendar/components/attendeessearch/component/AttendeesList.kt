@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.attendeessearch.component
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -30,15 +31,24 @@ import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 internal fun AttendeesList(
     attendees: () -> List<AttendeeUi>,
     modifier: Modifier = Modifier,
+    onClick: ((AttendeeUi) -> Unit)? = null,
+    isEnabled: (AttendeeUi) -> Boolean = { true },
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
+        contentPadding = contentPadding,
     ) {
         items(
             items = attendees(),
             key = { attendee -> attendee.key },
         ) { attendee ->
-            EventAttendee(attendee = attendee)
+            EventAttendee(
+                attendee = attendee,
+                onClick = onClick?.let { { it(attendee) } },
+                enabled = isEnabled(attendee),
+                modifier = Modifier.animateItem(),
+            )
         }
     }
 }
