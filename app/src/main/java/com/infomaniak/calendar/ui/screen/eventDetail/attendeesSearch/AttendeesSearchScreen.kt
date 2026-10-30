@@ -95,13 +95,13 @@ private fun AttendeesSearchScreen(
         modifier = modifier,
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.union(WindowInsets.ime),
     ) { contentPadding ->
-        val snackbarHostState = LocalSharedSnackbarHostState.current ?: return@Scaffold
+        val snackbarHostState = LocalSharedSnackbarHostState.current
 
         AttendeesSearch(
             attendeesSearchState = attendeesSearchState,
             modifier = Modifier.fillMaxWidth(),
             contentPadding = contentPadding,
-            onShowSnackbar = { message -> snackbarHostState.showSnackbar(message = message) },
+            onShowSnackbar = { message -> snackbarHostState?.showSnackbar(message = message) },
         )
     }
 }
