@@ -17,8 +17,10 @@
  */
 package com.infomaniak.calendar.components.foundation.component
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -28,6 +30,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.models.SearchableText
 
 /** [text] with its first match of [highlightedText] highlighted, ignoring case and accents. */
@@ -68,4 +71,18 @@ fun HighlightedText(
     overflow: TextOverflow = TextOverflow.Clip,
 ) {
     HighlightedText(remember(text) { SearchableText(text) }, highlightedText, modifier, style, maxLines, overflow)
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    MaterialTheme {
+        Surface {
+            Column {
+                HighlightedText(text = "Résumé review", highlightedText = { "RESUME" })
+                HighlightedText(text = "Team meeting", highlightedText = { "meet" })
+                HighlightedText(text = "No match here", highlightedText = { "xyz" })
+            }
+        }
+    }
 }
