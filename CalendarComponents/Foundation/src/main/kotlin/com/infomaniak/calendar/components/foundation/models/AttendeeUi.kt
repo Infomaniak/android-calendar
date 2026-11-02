@@ -63,8 +63,8 @@ enum class ParticipationStatus(
     Tentative(
         R.plurals.attendeesTentativeCount,
         R.string.statusTentativeLabel,
-        { MaterialTheme.colorScheme.onSurfaceVariant },
-        { MaterialTheme.colorScheme.surfaceVariant },
+        { MaterialTheme.extendedColorScheme.datavizGray },
+        { MaterialTheme.extendedColorScheme.onDatavizGray },
     ),
     Declined(
         R.plurals.attendeesDeclinedCount,
