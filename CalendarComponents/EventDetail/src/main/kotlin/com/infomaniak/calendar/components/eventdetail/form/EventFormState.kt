@@ -26,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateSet
 import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
@@ -46,7 +45,7 @@ class EventFormState(
     selectedCalendarState: MutableState<EventDetailCalendar>,
     val isAllDay: MutableState<Boolean>,
     val dateAndTimeState: DateAndTimeState?,
-    val attendees: SnapshotStateSet<AttendeeUi>,
+    val attendees: List<AttendeeUi>,
     /** The organizer of the edited event, never updated by the form. There either is one at the start or it will be added right before sending */
     val initialOrganizer: OrganizerUi?,
     val isKMeetUrlEnabled: MutableState<Boolean>,
@@ -68,7 +67,7 @@ class EventFormState(
             startTimeZone = dateAndTimeState.start.timeZone,
             end = dateAndTimeState.end.date.atTime(dateAndTimeState.end.time),
             endTimeZone = dateAndTimeState.end.timeZone,
-            attendees = attendees.toList(),
+            attendees = attendees,
             initialOrganizer = initialOrganizer,
             isKMeetUrlEnabled = isKMeetUrlEnabled.value,
             isOccupied = isOccupied.value,
@@ -82,7 +81,7 @@ fun rememberDefaultEventForm(
     calendars: List<EventDetailCalendarGroup>,
     initialCalendar: EventDetailCalendar,
     dateAndTimeState: DateAndTimeState?,
-    attendees: SnapshotStateSet<AttendeeUi>,
+    attendees: List<AttendeeUi>,
 ): EventFormState = rememberEventFormState(
     calendars = calendars,
     initialEventColor = EventColorChoice.Default,
@@ -106,7 +105,7 @@ fun rememberEventFormState(
     initialText: String,
     initialIsAllDay: Boolean,
     initialIsKMeetUrlEnabled: Boolean,
-    attendees: SnapshotStateSet<AttendeeUi>,
+    attendees: List<AttendeeUi>,
     initialOrganizer: OrganizerUi?,
     initialIsOccupied: Boolean,
     initialIsPublic: Boolean,

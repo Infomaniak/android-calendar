@@ -36,7 +36,7 @@ fun SavedStateHandle.saveableAttendeesSearchState(): AttendeesSearchState {
         AttendeesSearchState(
             searchQueryTextFieldState = TextFieldState(),
             results = mutableStateListOf(),
-            attendees = mutableStateSetOf(),
+            participants = mutableStateSetOf(),
         )
     }
 }

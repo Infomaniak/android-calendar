@@ -30,6 +30,17 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
+sealed interface ParticipantUi : Parcelable {
+    /** The owner of the currently selected calendar, resolved through [resolve]. */
+    @Parcelize
+    data object Me : ParticipantUi
+
+    fun resolve(me: AttendeeUi?): AttendeeUi? = when (this) {
+        Me -> me
+        is AttendeeUi -> this
+    }
+}
+
 @Immutable
 @Parcelize
 data class AttendeeUi(
@@ -37,7 +48,7 @@ data class AttendeeUi(
     val displayName: String?,
     val status: ParticipationStatus?,
     val isOrganizer: Boolean = false,
-) : AttendeesSearchResult {
+) : AttendeesSearchResult, ParticipantUi {
     @IgnoredOnParcel
     val key: Key = Key(email, displayName)
 

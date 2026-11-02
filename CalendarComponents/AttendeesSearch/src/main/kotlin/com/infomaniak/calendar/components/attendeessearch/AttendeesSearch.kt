@@ -34,7 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.attendeessearch.component.AttendeesList
 import com.infomaniak.calendar.components.foundation.component.EmptyState
 import com.infomaniak.calendar.components.foundation.component.SearchBar
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
@@ -57,7 +57,7 @@ fun AttendeesSearch(
     val attendeesList: List<AttendeesSearchResult> = if (isDisplayingSearchResults) {
         attendeesSearchState.results
     } else {
-        attendeesSearchState.attendees.toList()
+        attendeesSearchState.attendees
     }
 
     val horizontalContentPadding = contentPadding.onlyHorizontal()
@@ -112,7 +112,7 @@ private fun Preview() {
         Surface {
             AttendeesSearch(
                 attendeesSearchState = rememberSaveableAttendeesSearchState(
-                    attendees = remember { mutableStateSetOf<AttendeeUi>().apply { addAll(previewAttendees) } },
+                    participants = remember { mutableStateSetOf<ParticipantUi>().apply { addAll(previewAttendees) } },
                     results = remember { previewAttendees.toMutableStateList<AttendeesSearchResult>() },
                 ),
                 onShowSnackbar = {},
@@ -128,7 +128,7 @@ private fun PreviewEmptySearchState() {
         Surface {
             AttendeesSearch(
                 attendeesSearchState = rememberSaveableAttendeesSearchState(
-                    attendees = remember { mutableStateSetOf() },
+                    participants = remember { mutableStateSetOf() },
                     results = remember { mutableStateListOf() },
                 ),
                 onShowSnackbar = {},

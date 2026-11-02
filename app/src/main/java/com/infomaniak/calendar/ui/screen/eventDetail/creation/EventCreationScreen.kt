@@ -25,9 +25,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateSetOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -150,7 +147,7 @@ private fun EventCreationScreenPreview() {
             calendars = previewEventDetailCalendarGroups,
             initialCalendar = previewEventDetailCalendar,
             dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
-            attendees = rememberSaveable { mutableStateSetOf() },
+            attendees = emptyList(),
         )
 
         EventCreationScreen(
@@ -174,7 +171,7 @@ private fun PreviewEmptyWritableCalendar() {
             calendars = previewEventDetailCalendarGroups,
             initialCalendar = previewEventDetailCalendar,
             dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
-            attendees = remember { mutableStateSetOf(*previewAttendees.toTypedArray()) },
+            attendees = previewAttendees,
         )
 
         EventCreationScreen(

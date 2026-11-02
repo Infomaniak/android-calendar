@@ -26,8 +26,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateSetOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -211,7 +209,7 @@ private fun Preview() {
                         initialCalendar = previewEventDetailCalendar,
                         dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
                         initialText = "Meeting on how to find funny preview titles",
-                        attendees = remember { mutableStateSetOf(*previewAttendees.toTypedArray()) },
+                        attendees = previewAttendees,
                         initialOrganizer = null,
                         initialIsAllDay = false,
                         initialIsKMeetUrlEnabled = false,

@@ -57,7 +57,7 @@ class EventEditViewModel(
     suspend fun initAttendeesSearchState(eventDetailUi: Flow<EventDetailUiState>) {
         if (areAttendeesInitialized) return
         val event = eventDetailUi.filterIsInstance<EventDetailUiState.Displayable.Success>().first()
-        attendeesSearchState.attendees.addAll(event.eventDetail.attendees.all)
+        attendeesSearchState.participants.addAll(event.eventDetail.attendees.all)
         attendeesSearchState.initialOrganizer = event.eventDetail.organizer
         areAttendeesInitialized = true
     }
