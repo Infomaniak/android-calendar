@@ -24,6 +24,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurren
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
+import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Classification
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
@@ -46,10 +47,11 @@ import kotlinx.datetime.LocalTime
 fun Event.toEventDetailUi(
     calendar: Calendar,
     calendarGroups: List<EventDetailCalendarGroup>,
+    users: List<User>,
     emailsByUserId: Map<AccountId, String>,
 ): EventDetailUi = EventDetailUi(
     eventColorChoice = colors.toEventColorChoice(),
-    calendar = calendar.toEventDetailCalendar(),
+    calendar = calendar.toEventDetailCalendar(users),
     calendars = calendarGroups,
     title = title,
     start = timing.toDetailTiming(isStart = true),

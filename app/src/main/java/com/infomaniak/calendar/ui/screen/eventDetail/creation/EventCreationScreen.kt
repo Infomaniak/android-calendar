@@ -74,6 +74,10 @@ fun EventCreationScreen(
         )
     }
 
+    LaunchedEffect(formState?.calendar) {
+        viewModel.attendeesSearchState.me = formState?.calendar?.organizerAttendeeUi
+    }
+
     LaunchedEffect(formState?.dateAndTimeState) {
         timeZoneSearchResultViewModel.applyPickedTimeZonesTo(formState?.dateAndTimeState)
     }

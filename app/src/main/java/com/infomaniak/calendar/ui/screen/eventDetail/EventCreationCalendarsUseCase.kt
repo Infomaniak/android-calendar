@@ -48,6 +48,6 @@ class EventCreationCalendarsUseCase @Inject constructor(
         accountUtils.users,
     ) { calendars, lastUsedCalendarId, users ->
         val initialCalendar = calendars.firstOrNull { it.id.url == lastUsedCalendarId } ?: calendars.firstOrNull()
-        initialCalendar?.let { EventCreationCalendars(users.toEventDetailCalendarGroups(calendars), it.toEventDetailCalendar()) }
+        initialCalendar?.let { EventCreationCalendars(users.toEventDetailCalendarGroups(calendars), it.toEventDetailCalendar(users)) }
     }
 }

@@ -105,6 +105,11 @@ fun EventEditScreen(
         for (request in eventDetailSharedDataViewModel.goBackRequests) goBackToCalendarView()
     }
 
+    val selectedCalendar = (uiState as? EventEditScreenState.Success)?.eventFormState?.calendar
+    LaunchedEffect(selectedCalendar) {
+        viewModel.attendeesSearchState.me = selectedCalendar?.organizerAttendeeUi
+    }
+
     val dateAndTimeState = (uiState as? EventEditScreenState.Success)?.eventFormState?.dateAndTimeState
     LaunchedEffect(dateAndTimeState) {
         timeZoneSearchResultViewModel.applyPickedTimeZonesTo(dateAndTimeState)

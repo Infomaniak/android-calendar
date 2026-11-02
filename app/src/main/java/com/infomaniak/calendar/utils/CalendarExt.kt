@@ -21,14 +21,21 @@ import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailAccount
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
+import com.infomaniak.calendar.utils.account.accountId
 import com.infomaniak.calendar.utils.account.withCalendars
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 
-fun Calendar.toEventDetailCalendar(): EventDetailCalendar = EventDetailCalendar(
+/** [users] are searched for this calendar's organizer. */
+fun Calendar.toEventDetailCalendar(users: List<User>): EventDetailCalendar = EventDetailCalendar(
     id = id.url,
     name = displayName,
     color = Color(colors.sourceColor),
+    organizerAttendeeUi = users.find { it.accountId == accountId }?.let {
+        AttendeeUi(email = it.email, displayName = it.displayName, status = ParticipationStatus.Accepted, isOrganizer = true)
+    },
 )
 
 /** Groups [calendars] under the email of their user's account, leaving out the accounts with none of them. */
@@ -38,6 +45,6 @@ fun List<User>.toEventDetailCalendarGroups(calendars: List<Calendar>): List<Even
 
         EventDetailCalendarGroup(
             account = EventDetailAccount(id = user.id, userEmail = user.email),
-            calendars = userCalendars.map(Calendar::toEventDetailCalendar),
+            calendars = userCalendars.map { it.toEventDetailCalendar(this) },
         )
     }
