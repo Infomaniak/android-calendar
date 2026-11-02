@@ -100,7 +100,7 @@ private fun TimeZoneSearchContent(
             )
             else -> TimeZoneResults(
                 results = results,
-                query = searchQuery.text.toString().trim(),
+                query = { searchQuery.text.toString().trim() },
                 onTimeZoneClick = onTimeZoneClick,
                 contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
             )
@@ -111,7 +111,7 @@ private fun TimeZoneSearchContent(
 @Composable
 private fun TimeZoneResults(
     results: List<TimeZoneUi>,
-    query: String,
+    query: () -> String,
     onTimeZoneClick: (TimeZone) -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {

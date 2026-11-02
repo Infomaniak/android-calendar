@@ -27,12 +27,12 @@ import com.infomaniak.calendar.components.timezonesearch.models.TimeZoneUi
 import kotlinx.datetime.TimeZone
 
 @Composable
-internal fun TimeZoneItem(timeZone: TimeZoneUi, query: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+internal fun TimeZoneItem(timeZone: TimeZoneUi, query: () -> String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     ListItem(
         onClick = onClick,
-        overlineContent = { HighlightedText(timeZone.name, { query }) },
-        content = { HighlightedText(timeZone.location, { query }) },
-        supportingContent = { HighlightedText(timeZone.utcOffset, { query }) },
+        overlineContent = { HighlightedText(timeZone.name, query) },
+        content = { HighlightedText(timeZone.location, query) },
+        supportingContent = { HighlightedText(timeZone.utcOffset, query) },
         modifier = modifier,
     )
 }
@@ -43,7 +43,7 @@ private fun Preview() {
     Surface {
         TimeZoneItem(
             timeZone = TimeZoneUi(TimeZone.of("Europe/Zurich")),
-            query = "zur",
+            query = { "zur" },
             onClick = {},
         )
     }
