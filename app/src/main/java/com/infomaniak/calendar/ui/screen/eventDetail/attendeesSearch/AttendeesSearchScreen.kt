@@ -42,11 +42,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.attendeessearch.AttendeesSearch
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
+import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.coroutines.flow.collectLatest
 
@@ -93,10 +95,13 @@ private fun AttendeesSearchScreen(
         modifier = modifier,
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.union(WindowInsets.ime),
     ) { contentPadding ->
+        val snackbarHostState = LocalSharedSnackbarHostState.current
+
         AttendeesSearch(
             attendeesSearchState = attendeesSearchState,
             modifier = Modifier.fillMaxWidth(),
             contentPadding = contentPadding,
+            onShowSnackbar = { message -> snackbarHostState?.showSnackbar(message = message) },
         )
     }
 }
@@ -108,7 +113,7 @@ private fun EventAttendeesSearchScreenPreview() {
         AttendeesSearchScreen(
             attendeesSearchState = rememberSaveableAttendeesSearchState(
                 attendees = remember { mutableStateSetOf<AttendeeUi>().apply { addAll(previewAttendees) } },
-                results = remember { mutableStateListOf<AttendeeUi>().apply { addAll(previewAttendees) } },
+                results = remember { mutableStateListOf<AttendeesSearchResult>().apply { addAll(previewAttendees) } },
             ),
             goBack = {},
         )

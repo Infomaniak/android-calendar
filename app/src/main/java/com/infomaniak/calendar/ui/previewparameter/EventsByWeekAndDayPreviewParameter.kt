@@ -46,8 +46,8 @@ private fun eventUi(
     color: Color = Color(0xFF2196F3),
 ): OccurrenceEventSummaryUi {
     val attendees = listOf(
-        AttendeeUi("alice@example.com#Alice", "alice@example.com", "Alice", ParticipationStatus.Accepted),
-        AttendeeUi("bob@example.com#Bob", "bob@example.com", "Bob", ParticipationStatus.Tentative),
+        AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted),
+        AttendeeUi("bob@example.com", "Bob", ParticipationStatus.Tentative),
     )
 
     return OccurrenceEventSummaryUi(

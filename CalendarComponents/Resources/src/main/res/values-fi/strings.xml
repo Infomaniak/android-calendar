@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Lisää</string>
     <string name="allDayLabel">Koko päivän</string>
+    <string name="attendeeIncompleteEmailMessage">Täydennä sähköpostiosoite lisätäksesi sen</string>
     <string name="attendees">Osallistujat</string>
     <plurals name="attendeesAcceptedCount">
         <item quantity="one">%d hyväksytty</item>
@@ -31,11 +32,13 @@
         <item quantity="one">%d hylätty</item>
         <item quantity="other">%d hylättyä</item>
     </plurals>
-    <string name="attendeesEmptyState">Osallistujia ei löytynyt</string>
+    <string name="attendeesEmptyStateDescription">Hae yhteystietoja lisätäksesi ne tapahtumaan</string>
+    <string name="attendeesEmptyStateTitle">Ei vieraita</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d odottaa</item>
         <item quantity="other">%d odottaa</item>
     </plurals>
+    <string name="attendeesSearchPlaceholder">Lisää vieras</string>
     <plurals name="attendeesTentativeCount">
         <item quantity="one">%1$d ehkä</item>
         <item quantity="other">%1$d ehkä</item>
@@ -85,7 +88,6 @@
         <item quantity="one">%d paikkaa</item>
         <item quantity="other">%d paikkaa</item>
     </plurals>
-    <string name="searchForAttendees">Etsi osallistujia</string>
     <string name="sectionCalendarHeader">Kalenteri</string>
     <string name="sectionOrganizerHeader">Järjestäjä</string>
     <string name="statusAcceptedLabel">Hyväksytty</string>

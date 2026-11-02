@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Lägg till</string>
     <string name="allDayLabel">Hela dagen</string>
+    <string name="attendeeIncompleteEmailMessage">Fyll i hela e-postadressen för att lägga till den</string>
     <string name="attendees">Deltagare</string>
     <plurals name="attendeesAcceptedCount">
         <item quantity="one">%d accepterad</item>
@@ -31,11 +32,13 @@
         <item quantity="one">%d avvisad</item>
         <item quantity="other">%d avvisade</item>
     </plurals>
-    <string name="attendeesEmptyState">Inga deltagare hittades</string>
+    <string name="attendeesEmptyStateDescription">Sök efter kontakter för att lägga till dem i händelsen</string>
+    <string name="attendeesEmptyStateTitle">Inga gäster</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d väntande</item>
         <item quantity="other">%d väntande</item>
     </plurals>
+    <string name="attendeesSearchPlaceholder">Lägg till en gäst</string>
     <plurals name="attendeesTentativeCount">
         <item quantity="one">%1$d kanske</item>
         <item quantity="other">%1$d kanske</item>
@@ -85,7 +88,6 @@
         <item quantity="one">%d plats</item>
         <item quantity="other">%d platser</item>
     </plurals>
-    <string name="searchForAttendees">Sök efter deltagare</string>
     <string name="sectionCalendarHeader">Kalender</string>
     <string name="sectionOrganizerHeader">Arrangör</string>
     <string name="statusAcceptedLabel">Godkänt</string>

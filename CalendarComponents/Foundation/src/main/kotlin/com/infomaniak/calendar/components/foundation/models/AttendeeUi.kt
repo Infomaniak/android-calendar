@@ -27,18 +27,25 @@ import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.computeInitials
 import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Immutable
 @Parcelize
 data class AttendeeUi(
-    val key: String,
     val email: String,
     val displayName: String?,
     val status: ParticipationStatus?,
     val isOrganizer: Boolean = false,
-) : Parcelable {
+) : AttendeesSearchResult {
+    @IgnoredOnParcel
+    val key: Key = Key(email, displayName)
+
     fun initials(): String = (displayName ?: email).computeInitials()
+
+    /** Identifies an attendee across sources (event, contacts, custom input). */
+    @Parcelize
+    data class Key(val email: String, val displayName: String?) : Parcelable
 }
 
 enum class ParticipationStatus(

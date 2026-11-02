@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Προσθήκη</string>
     <string name="allDayLabel">Όλη την ημέρα</string>
+    <string name="attendeeIncompleteEmailMessage">Συμπληρώστε τη διεύθυνση email για να την προσθέσετε</string>
     <string name="attendees">Συμμετέχοντες</string>
     <plurals name="attendeesAcceptedCount">
         <item quantity="one">%d αποδεκτός</item>
@@ -31,11 +32,13 @@
         <item quantity="one">%d απορρίφθηκε</item>
         <item quantity="other">%d απορριφθέντα</item>
     </plurals>
-    <string name="attendeesEmptyState">Δεν βρέθηκαν συμμετέχοντες</string>
+    <string name="attendeesEmptyStateDescription">Αναζητήστε επαφές για να τις προσθέσετε στην εκδήλωση</string>
+    <string name="attendeesEmptyStateTitle">Δεν υπάρχουν καλεσμένοι</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d σε αναμονή</item>
         <item quantity="other">%d σε αναμονή</item>
     </plurals>
+    <string name="attendeesSearchPlaceholder">Προσθήκη καλεσμένου</string>
     <plurals name="attendeesTentativeCount">
         <item quantity="one">%1$d ίσως</item>
         <item quantity="other">%1$d ίσως</item>
@@ -85,7 +88,6 @@
         <item quantity="one">%d θέση</item>
         <item quantity="other">%d θέσεις</item>
     </plurals>
-    <string name="searchForAttendees">Αναζήτηση συμμετεχόντων</string>
     <string name="sectionCalendarHeader">Ημερολόγιο</string>
     <string name="sectionOrganizerHeader">Διοργανωτής</string>
     <string name="statusAcceptedLabel">Εγκρίθηκε</string>

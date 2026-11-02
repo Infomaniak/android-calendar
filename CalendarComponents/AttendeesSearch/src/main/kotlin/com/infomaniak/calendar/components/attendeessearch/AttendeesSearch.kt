@@ -28,12 +28,14 @@ import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.attendeessearch.component.AttendeesList
 import com.infomaniak.calendar.components.foundation.component.EmptyState
 import com.infomaniak.calendar.components.foundation.component.SearchBar
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
@@ -41,17 +43,18 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
-import com.infomaniak.designsystem.icons.symbols.UserMagnifyingGlass
+import com.infomaniak.designsystem.icons.symbols.UsersStacked
 
 @Composable
 fun AttendeesSearch(
     attendeesSearchState: AttendeesSearchState,
+    onShowSnackbar: (message: String) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val isDisplayingSearchResults = attendeesSearchState.searchQueryTextFieldState.text.isNotBlank()
 
-    val attendeesList: List<AttendeeUi> = if (isDisplayingSearchResults) {
+    val attendeesList: List<AttendeesSearchResult> = if (isDisplayingSearchResults) {
         attendeesSearchState.results
     } else {
         attendeesSearchState.attendees.toList()
@@ -66,17 +69,25 @@ fun AttendeesSearch(
     ) {
         SearchBar(
             searchState = attendeesSearchState.searchQueryTextFieldState,
-            placeholder = stringResource(R.string.searchForAttendees),
+            placeholder = stringResource(R.string.attendeesSearchPlaceholder),
         )
-        if (attendeesList.isEmpty()) {
+        if (attendeesSearchState.searchQueryTextFieldState.text.isBlank() && attendeesList.isEmpty()) {
             EmptyState(
-                text = stringResource(R.string.attendeesEmptyState),
-                icon = EsdsIcons.UserMagnifyingGlass,
+                text = stringResource(R.string.attendeesEmptyStateTitle),
+                description = stringResource(R.string.attendeesEmptyStateDescription),
+                icon = EsdsIcons.UsersStacked,
                 modifier = Modifier.padding(bottom = contentPadding.calculateBottomPadding()),
             )
         } else {
+            val resources = LocalResources.current
+
             AttendeesList(
-                attendees = { attendeesList },
+                results = { attendeesList },
+                query = { attendeesSearchState.searchQueryTextFieldState.text.toString() },
+                onAddCustomAttendee = {
+                    val result = attendeesSearchState.addCustomAttendee()
+                    result.messageRes?.let { onShowSnackbar(resources.getString(it)) }
+                },
                 onRemove = attendeesSearchState::removeAttendee,
                 modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md, vertical = EsdsTheme.spacing.sm),
                 onClick = if (isDisplayingSearchResults) {
@@ -85,7 +96,7 @@ fun AttendeesSearch(
                     null
                 },
                 isEnabled = { attendee ->
-                    !isDisplayingSearchResults || attendee.email !in attendeesSearchState.attendeesEmails
+                    !isDisplayingSearchResults || attendee.email.lowercase() !in attendeesSearchState.attendeesEmailsLowercase
                 },
                 enableDeletion = { isDisplayingSearchResults.not() },
                 contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
@@ -102,8 +113,9 @@ private fun Preview() {
             AttendeesSearch(
                 attendeesSearchState = rememberSaveableAttendeesSearchState(
                     attendees = remember { mutableStateSetOf<AttendeeUi>().apply { addAll(previewAttendees) } },
-                    results = remember { previewAttendees.toMutableStateList() },
+                    results = remember { previewAttendees.toMutableStateList<AttendeesSearchResult>() },
                 ),
+                onShowSnackbar = {},
             )
         }
     }
@@ -119,6 +131,7 @@ private fun PreviewEmptySearchState() {
                     attendees = remember { mutableStateSetOf() },
                     results = remember { mutableStateListOf() },
                 ),
+                onShowSnackbar = {},
             )
         }
     }

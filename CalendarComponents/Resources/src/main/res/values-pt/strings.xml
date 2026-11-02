@@ -18,6 +18,7 @@
 <resources>
     <string name="addEventLabel">Adicionar</string>
     <string name="allDayLabel">O dia todo</string>
+    <string name="attendeeIncompleteEmailMessage">Complete o endereço de email para o adicionar</string>
     <string name="attendees">Convidados</string>
     <plurals name="attendeesAcceptedCount">
         <item quantity="one">%d aceite</item>
@@ -31,11 +32,13 @@
         <item quantity="one">%d recusado</item>
         <item quantity="other">%d recusados</item>
     </plurals>
-    <string name="attendeesEmptyState">Nenhum participante encontrado</string>
+    <string name="attendeesEmptyStateDescription">Pesquisar contactos para os adicionar ao evento</string>
+    <string name="attendeesEmptyStateTitle">Sem convidados</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d pendente</item>
         <item quantity="other">%d pendentes</item>
     </plurals>
+    <string name="attendeesSearchPlaceholder">Adicionar um convidado</string>
     <plurals name="attendeesTentativeCount">
         <item quantity="one">%1$d talvez</item>
         <item quantity="other">%1$d talvez</item>
@@ -85,7 +88,6 @@
         <item quantity="one">%d lugar</item>
         <item quantity="other">%d lugares</item>
     </plurals>
-    <string name="searchForAttendees">Pesquisar participantes</string>
     <string name="sectionCalendarHeader">Calendário</string>
     <string name="sectionOrganizerHeader">Organizador</string>
     <string name="statusAcceptedLabel">Aceite</string>
