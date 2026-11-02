@@ -30,11 +30,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.infomaniak.calendar.components.foundation.models.SearchableText
 
-/** [text] with its first match of [query] highlighted, ignoring case and accents. */
+/** [text] with its first match of [highlightedText] highlighted, ignoring case and accents. */
 @Composable
 fun HighlightedText(
     text: SearchableText,
-    query: () -> String,
+    highlightedText: () -> String,
     modifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
     maxLines: Int = Int.MAX_VALUE,
@@ -43,7 +43,7 @@ fun HighlightedText(
     Text(
         buildAnnotatedString {
             append(text.text)
-            text.find(query())?.let {
+            text.find(highlightedText())?.let {
                 addStyle(
                     style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold),
                     start = it.first,
@@ -61,11 +61,11 @@ fun HighlightedText(
 @Composable
 fun HighlightedText(
     text: String,
-    query: () -> String,
+    highlightedText: () -> String,
     modifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip,
 ) {
-    HighlightedText(remember(text) { SearchableText(text) }, query, modifier, style, maxLines, overflow)
+    HighlightedText(remember(text) { SearchableText(text) }, highlightedText, modifier, style, maxLines, overflow)
 }
