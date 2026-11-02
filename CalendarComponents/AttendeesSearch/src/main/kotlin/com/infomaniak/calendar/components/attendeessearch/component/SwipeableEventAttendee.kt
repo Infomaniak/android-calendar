@@ -61,7 +61,7 @@ import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
-import com.infomaniak.designsystem.icons.symbols.Trash
+import com.infomaniak.designsystem.icons.symbols.Cross
 import kotlinx.coroutines.flow.drop
 import kotlin.math.abs
 import com.infomaniak.core.common.R as RCore
@@ -163,7 +163,7 @@ private fun DeleteBackground(state: SwipeToDismissBoxState) {
         val progress = abs(state.requireOffset() / maxWidthPx)
 
         Icon(
-            imageVector = EsdsIcons.Trash.Medium,
+            imageVector = EsdsIcons.Cross.Medium,
             contentDescription = stringResource(RCore.string.deleteButton),
             modifier = Modifier
                 .width(maxWidth * progress)
