@@ -31,7 +31,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.Calendar
@@ -46,24 +45,14 @@ import com.infomaniak.calendar.components.eventdetail.detail.component.Descripti
 import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
 import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
-import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
-import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
-import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
-import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
-import com.infomaniak.calendar.components.foundation.models.Attendees
-import com.infomaniak.calendar.components.foundation.preview.previewAttendees
+import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailUi
 import com.infomaniak.core.ui.compose.margin.Margin
-import kotlinx.datetime.TimeZone
-import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Instant
 
 /**
  * [sharedTransitionScope] and [animatedVisibilityScope] animate associated components between detail and editing.
@@ -147,51 +136,12 @@ fun EventDetail(
 @Preview(heightDp = 1200)
 @Composable
 private fun PreviewEventDetail() {
-    val eventDetail = EventDetailUi(
-        eventColorChoice = EventColorChoice.Default,
-        calendar = previewEventDetailCalendar,
-        calendars = previewEventDetailCalendarGroups,
-        title = "Event Title",
-        recurrence = EventDetailRecurrence.Recurrence(getText = { "Every week on Monday" }),
-        start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
-        end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
-        isAllDay = false,
-        attendees = Attendees(
-            all = previewAttendees,
-            me = previewAttendees.first(),
-        ),
-        organizer = null,
-        kMeetUrl = "test url",
-        location = "Location",
-        room = EventDetailUi.Room("Japan room", 5, 3),
-        urlLink = null,
-        description = LoremIpsum(30).values.first(),
-        files = listOf(
-            EventDetailUi.File("1", "How to not get fired.pdf"),
-            EventDetailUi.File("2", "Bob.txt"),
-            EventDetailUi.File("3", "Next loto results.png"),
-        ),
-        notifications = listOf(
-            EventDetailUi.Notification(
-                EventDetailUi.Notification.Type.Email,
-                NotificationTime.Absolute(Instant.parse("2026-05-20T07:00:00Z")),
-            ),
-            EventDetailUi.Notification(
-                EventDetailUi.Notification.Type.Push,
-                NotificationTime.Offset(90.days + 30.minutes),
-            ),
-        ),
-        isOccupied = true,
-        classification = EventDetailUi.Classification.Public,
-        canEdit = true,
-    )
-
     MaterialTheme {
         Surface {
             Scaffold {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     EventDetail(
-                        eventDetail = eventDetail,
+                        eventDetail = previewEventDetailUi,
                         onJoinKMeet = {},
                         onCopyKMeet = {},
                         onLocationClick = {},

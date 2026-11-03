@@ -37,7 +37,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,13 +46,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.detail.EventDetail
 import com.infomaniak.calendar.components.eventdetail.detail.component.ParticipationStatusButtonsToolbar
-import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
-import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
-import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
-import com.infomaniak.calendar.components.foundation.models.Attendees
+import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
@@ -70,8 +63,6 @@ import com.infomaniak.core.common.extensions.safeStartActivity
 import com.infomaniak.core.ui.compose.basics.rememberClipboardCopyManager
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
-import kotlinx.datetime.TimeZone
-import kotlin.time.Instant
 import com.infomaniak.core.common.R as RCommon
 
 @Composable
@@ -202,33 +193,10 @@ private fun openLocationInMapApp(context: Context, location: String) {
 @Preview
 @Composable
 private fun Preview() {
-    val previewEventDetail = EventDetailUi(
-        eventColorChoice = EventColorChoice.Default,
-        calendar = previewEventDetailCalendar,
-        calendars = previewEventDetailCalendarGroups,
-        title = "Event title",
-        start = EventDetailTiming.Precise(Instant.parse("2026-05-20T08:00:00Z"), TimeZone.of("Europe/Paris")),
-        end = EventDetailTiming.Precise(Instant.parse("2026-05-20T09:00:00Z"), TimeZone.of("Europe/Paris")),
-        isAllDay = false,
-        recurrence = EventDetailRecurrence.Recurrence(getText = { "Every week on Monday" }),
-        attendees = Attendees(all = emptyList(), me = null),
-        organizer = null,
-        kMeetUrl = null,
-        location = "Salle Tokyo",
-        room = null,
-        urlLink = null,
-        description = "Description",
-        files = emptyList(),
-        notifications = emptyList(),
-        isOccupied = true,
-        classification = EventDetailUi.Classification.Public,
-        canEdit = true,
-    )
-
     CalendarThemeForPreview {
         Surface {
             EventDetailScreen(
-                uiState = { EventDetailUiState.Displayable.Success(previewEventDetail) },
+                uiState = { EventDetailUiState.Displayable.Success(previewEventDetailUi) },
                 goBack = {},
                 goToEdit = {},
                 goToEventAttendees = {},
