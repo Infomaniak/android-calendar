@@ -75,6 +75,7 @@ private fun LazyListScope.calendarSection(
 
     item(key = userId) {
         val segmentCount = if (expanded) 1 + userCalendars.sections.size else 1
+        val showsSectionHeaders = userCalendars.sections.size > 1
 
         Column(
             modifier = Modifier
@@ -90,18 +91,20 @@ private fun LazyListScope.calendarSection(
             )
             if (expanded) {
                 userCalendars.sections.forEachIndexed { index, section ->
-                    val sectionExpanded = isSectionExpanded(section.key)
+                    val sectionExpanded = !showsSectionHeaders || isSectionExpanded(section.key)
 
                     Column(
                         modifier = Modifier
                             .clip(ListItemDefaults.segmentedShapes(index = index + 1, count = segmentCount).shape)
                             .background(CustomColors.menuDrawerContainerBackground),
                     ) {
-                        DrawerSectionHeader(
-                            organisationName = section.organisationName,
-                            isExpanded = { sectionExpanded },
-                            onExpandedChange = { onSectionExpandedChange(section.key, it) },
-                        )
+                        if (showsSectionHeaders) {
+                            DrawerSectionHeader(
+                                organisationName = section.organisationName,
+                                isExpanded = { sectionExpanded },
+                                onExpandedChange = { onSectionExpandedChange(section.key, it) },
+                            )
+                        }
                         if (sectionExpanded) {
                             section.calendars.forEach { calendar ->
                                 DrawerCalendarItem(
