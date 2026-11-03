@@ -61,7 +61,9 @@ class AttendeesSearchState<T : OrganizerSource>(
 
     fun removeAttendee(attendee: AttendeeUi) {
         // A concrete entry wins over Me: when editing, our own attendee is concrete and shares Me's key
-        participants.remove(attendee) || (attendee.key == me?.key && participants.remove(ParticipantUi.Me))
+        if (!participants.remove(attendee)) {
+            if (attendee.key == me?.key) participants.remove(ParticipantUi.Me)
+        }
     }
 
     fun addCustomAttendee(email: String = searchQueryTextFieldState.text.toString().trim()): CustomAttendeeResult {
