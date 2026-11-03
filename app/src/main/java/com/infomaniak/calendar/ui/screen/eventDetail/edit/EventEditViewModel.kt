@@ -20,13 +20,11 @@ package com.infomaniak.calendar.ui.screen.eventDetail.edit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
-import com.infomaniak.calendar.ui.screen.eventDetail.EventComposerUseCase
+import com.infomaniak.calendar.manager.BackgroundEventComposer
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
-import com.infomaniak.calendar.ui.screen.eventDetail.SaveEventResult
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.utils.saveableAttendeesSearchState
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
@@ -37,16 +35,14 @@ import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 @AssistedInject
 class EventEditViewModel(
     @Assisted private val savedStateHandle: SavedStateHandle,
-    private val eventComposerUseCase: EventComposerUseCase,
+    private val backgroundEventComposer: BackgroundEventComposer,
 ) : ViewModel() {
     val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
 
@@ -56,6 +52,8 @@ class EventEditViewModel(
             savedStateHandle[ARE_ATTENDEES_INITIALIZED_KEY] = value
         }
 
+    private var isSubmitted = false
+
     suspend fun initAttendeesSearchState(eventDetailUi: Flow<EventDetailUiState>) {
         if (areAttendeesInitialized) return
         val event = eventDetailUi.filterIsInstance<EventDetailUiState.Displayable.Success>().first()
@@ -63,14 +61,14 @@ class EventEditViewModel(
         areAttendeesInitialized = true
     }
 
-    suspend fun submitEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope, eventDraft: EventDraft): SaveEventResult {
-        val result = CompletableDeferred<SaveEventResult>()
+    /** `false` when the event was already submitted: the request is ignored. */
+    fun submitEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope, eventDraft: EventDraft): Boolean {
+        if (isSubmitted) return false
+        isSubmitted = true
 
-        viewModelScope.launch {
-            result.complete(eventComposerUseCase.updateEvent(occurrenceId, scope, eventDraft))
-        }
+        backgroundEventComposer.updateEvent(occurrenceId, scope, eventDraft)
 
-        return result.await()
+        return true
     }
 
     @AssistedFactory

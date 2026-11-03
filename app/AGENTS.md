@@ -37,6 +37,9 @@ app/src/main/java/com/infomaniak/calendar/
 │       └── worker/                 # MetroWorker key, MetroWorkerFactory, WorkerGraphProvider, WorkerInstanceFactory
 ├── manager/
 │   ├── SyncEventsManager.kt        # App-scoped: downloads + syncs the events of the months around the visible date
+│   ├── BackgroundEventComposer.kt  # App-scoped, temporary until KMP is offline first: runs EventComposerUseCase's changes in
+│   │                               # the background for the event ViewModels, so their screens close at once; MainActivity shows
+│   │                               # its errors
 │   ├── VisibleDateManager.kt       # App-scoped: single visible-date source, restored/saved by MainViewModel
 │   ├── VisibleMonthManager.kt      # App-scoped: event dots derived from the shared visible date's month
 │   └── DayEventsLoader.kt          # App-scoped: loads day-sliced events shared by calendar views
