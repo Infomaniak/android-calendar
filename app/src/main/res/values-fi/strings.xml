@@ -48,6 +48,7 @@
     <string name="onboardingThreeTitle">Kutsu osallistujasi</string>
     <string name="onboardingTwoSubtitle">Saat muistutuksen ennen jokaista tapahtumaa etkä missaa enää tärkeitä tapaamisia.</string>
     <string name="onboardingTwoTitle">Salli ilmoitukset</string>
+    <string name="otherCalendarsSectionTitle">Muut kalenterit</string>
     <string name="planningTitle">Suunnittelu</string>
     <string name="settingsTitle">Asetukset</string>
     <string name="signOutAccountAlertConfirm">Kirjaudu ulos tililtä</string>

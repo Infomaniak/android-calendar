@@ -48,6 +48,7 @@
     <string name="onboardingThreeTitle">Bjud in dina deltagare</string>
     <string name="onboardingTwoSubtitle">Bli påmind före varje händelse och missa aldrig ett viktigt möte.</string>
     <string name="onboardingTwoTitle">Tillåt aviseringar</string>
+    <string name="otherCalendarsSectionTitle">Andra kalendrar</string>
     <string name="planningTitle">Planering</string>
     <string name="settingsTitle">Inställningar</string>
     <string name="signOutAccountAlertConfirm">Logga ut från kontot</string>

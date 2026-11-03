@@ -18,15 +18,10 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,7 +40,6 @@ import com.infomaniak.calendar.ui.theme.CustomColors
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
-import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.core.ui.compose.preview.previewparameter.dummyUserOf
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ChevronDown
@@ -66,17 +60,12 @@ fun DrawerAccountItem(
         modifier = modifier.semantics { toggleableState = ToggleableState(isExpanded()) },
         leadingContent = { Avatar(avatarType = AvatarType.fromUser(user), Modifier.size(32.dp)) },
         trailingContent = {
-            Box(
-                modifier = Modifier.background(MaterialTheme.colorScheme.surface, CircleShape),
-            ) {
-                Icon(
-                    modifier = Modifier
-                        .padding(vertical = Margin.Mini, horizontal = Margin.Micro)
-                        .rotate(rotation),
-                    imageVector = EsdsIcons.ChevronDown.Small,
-                    contentDescription = null,
-                )
-            }
+            Icon(
+                modifier = Modifier
+                    .rotate(rotation),
+                imageVector = EsdsIcons.ChevronDown.Small,
+                contentDescription = null,
+            )
         },
         verticalAlignment = Alignment.CenterVertically,
         colors = ListItemDefaults.colors(containerColor = CustomColors.menuDrawerContainerBackground),

@@ -48,6 +48,7 @@
     <string name="onboardingThreeTitle">Invita i tuoi partecipanti</string>
     <string name="onboardingTwoSubtitle">Ricevi un avviso prima di ogni evento e non perdere più un appuntamento importante.</string>
     <string name="onboardingTwoTitle">Consenti le notifiche</string>
+    <string name="otherCalendarsSectionTitle">Altri calendari</string>
     <string name="planningTitle">Pianificazione</string>
     <string name="settingsTitle">Impostazioni</string>
     <string name="signOutAccountAlertConfirm">Esci dall’account</string>

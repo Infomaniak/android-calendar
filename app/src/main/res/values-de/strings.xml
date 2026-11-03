@@ -48,6 +48,7 @@
     <string name="onboardingThreeTitle">Lade deine Teilnehmer ein</string>
     <string name="onboardingTwoSubtitle">Werde vor jedem Anlass benachrichtigt und verpasse keinen wichtigen Termin mehr.</string>
     <string name="onboardingTwoTitle">Mitteilungen erlauben</string>
+    <string name="otherCalendarsSectionTitle">Andere Kalender</string>
     <string name="planningTitle">Planung</string>
     <string name="settingsTitle">Einstellungen</string>
     <string name="signOutAccountAlertConfirm">Sich aus dem Konto abmelden</string>

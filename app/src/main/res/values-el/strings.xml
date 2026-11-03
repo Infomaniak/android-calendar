@@ -48,6 +48,7 @@
     <string name="onboardingThreeTitle">Προσκαλέστε τους συμμετέχοντές σας</string>
     <string name="onboardingTwoSubtitle">Ειδοποιηθείτε πριν από κάθε εκδήλωση και μην χάνετε ποτέ ένα σημαντικό ραντεβού.</string>
     <string name="onboardingTwoTitle">Να επιτρέπονται οι ειδοποιήσεις</string>
+    <string name="otherCalendarsSectionTitle">Άλλα ημερολόγια</string>
     <string name="planningTitle">Προγραμματισμός</string>
     <string name="settingsTitle">Ρυθμίσεις</string>
     <string name="signOutAccountAlertConfirm">Αποσύνδεση από τον λογαριασμό</string>

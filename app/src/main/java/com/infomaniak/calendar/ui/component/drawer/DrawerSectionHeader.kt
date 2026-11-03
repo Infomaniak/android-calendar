@@ -62,7 +62,7 @@ fun DrawerSectionHeader(
     ) {
         Text(
             modifier = Modifier.weight(1f),
-            text = organisationName ?: stringResource(R.string.sectionOtherCalendarsHeader),
+            text = organisationName ?: stringResource(R.string.otherCalendarsSectionTitle),
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
@@ -72,12 +72,11 @@ fun DrawerSectionHeader(
             modifier = Modifier.rotate(rotation),
             imageVector = EsdsIcons.ChevronDown.Small,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun DrawerSectionHeaderPreview() {
     CalendarThemeForPreview {
@@ -85,7 +84,7 @@ private fun DrawerSectionHeaderPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun DrawerOtherCalendarsSectionHeaderPreview() {
     CalendarThemeForPreview {

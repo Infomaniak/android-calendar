@@ -48,6 +48,7 @@
     <string name="onboardingThreeTitle">Inviter dine deltagere</string>
     <string name="onboardingTwoSubtitle">Bliv advaret før hver begivenhed, og gå aldrig glip af en vigtig aftale.</string>
     <string name="onboardingTwoTitle">Tillad notifikationer</string>
+    <string name="otherCalendarsSectionTitle">Andre kalendere</string>
     <string name="planningTitle">Planlægning</string>
     <string name="settingsTitle">Indstillinger</string>
     <string name="signOutAccountAlertConfirm">Log ud af kontoen</string>
