@@ -52,7 +52,7 @@ class AttendeesSearchState(
     /** What [ParticipantUi.Me] resolves to, the owner of the currently selected calendar. */
     var me: AttendeeUi? by mutableStateOf(null)
 
-    val attendees: List<AttendeeUi> by derivedStateOf { participants.mapNotNull { it.resolve(me) } }
+    val attendees: List<AttendeeUi> by derivedStateOf { participants.mapNotNull { it.toAttendeeUi(me) } }
 
     val attendeesEmailsLowercase by derivedStateOf { attendees.map { it.email.lowercase() } }
 

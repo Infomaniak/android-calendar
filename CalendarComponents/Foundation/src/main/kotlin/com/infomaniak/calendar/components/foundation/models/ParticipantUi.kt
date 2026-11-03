@@ -21,11 +21,11 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 sealed interface ParticipantUi : Parcelable {
-    /** The owner of the currently selected calendar, resolved through [resolve]. */
+    /** The owner of the currently selected calendar, resolved through [toAttendeeUi]. */
     @Parcelize
     data object Me : ParticipantUi
 
-    fun resolve(me: AttendeeUi?): AttendeeUi? = when (this) {
+    fun toAttendeeUi(me: AttendeeUi?): AttendeeUi? = when (this) {
         Me -> me
         is AttendeeUi -> this
     }
