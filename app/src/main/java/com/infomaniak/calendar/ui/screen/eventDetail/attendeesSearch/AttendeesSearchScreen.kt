@@ -81,7 +81,7 @@ fun AttendeesSearchScreen(
 
 @Composable
 private fun AttendeesSearchScreen(
-    attendeesSearchState: AttendeesSearchState,
+    attendeesSearchState: AttendeesSearchState<*>,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {

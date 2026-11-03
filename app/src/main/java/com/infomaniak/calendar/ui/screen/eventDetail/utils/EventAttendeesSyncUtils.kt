@@ -22,7 +22,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 
-suspend fun StateFlow<EventDetailUiState>.synchronizeTo(attendeesSearchState: AttendeesSearchState) {
+suspend fun StateFlow<EventDetailUiState>.synchronizeTo(attendeesSearchState: AttendeesSearchState<*>) {
     filterIsInstance<EventDetailUiState.Displayable.Success>().collect { event ->
         attendeesSearchState.participants.clear()
         attendeesSearchState.participants.addAll(event.eventDetail.attendees.all)

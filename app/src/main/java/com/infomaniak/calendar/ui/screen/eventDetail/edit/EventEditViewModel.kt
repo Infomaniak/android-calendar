@@ -45,7 +45,7 @@ class EventEditViewModel(
     @Assisted private val savedStateHandle: SavedStateHandle,
     private val backgroundEventComposer: BackgroundEventComposer,
 ) : ViewModel() {
-    val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
+    val attendeesSearchState: AttendeesSearchState<OrganizerSource.Static> = savedStateHandle.saveableAttendeesSearchState()
 
     private var areAttendeesInitialized: Boolean
         get() = savedStateHandle[ARE_ATTENDEES_INITIALIZED_KEY] ?: false

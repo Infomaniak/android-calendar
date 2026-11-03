@@ -47,7 +47,7 @@ import com.infomaniak.designsystem.icons.symbols.UsersStacked
 
 @Composable
 fun AttendeesSearch(
-    attendeesSearchState: AttendeesSearchState,
+    attendeesSearchState: AttendeesSearchState<*>,
     onShowSnackbar: (message: String) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),

@@ -41,13 +41,13 @@ import com.infomaniak.core.common.utils.isEmailRfc5321Compliant
 import com.infomaniak.core.common.R as RCore
 
 @Stable
-class AttendeesSearchState(
+class AttendeesSearchState<T : OrganizerSource>(
     val searchQueryTextFieldState: TextFieldState,
     val results: SnapshotStateList<AttendeesSearchResult>,
     val participants: SnapshotStateSet<ParticipantUi>,
 ) {
     /** `null` until initialized by the screen. */
-    var organizerSource: OrganizerSource? by mutableStateOf(null)
+    var organizerSource: T? by mutableStateOf(null)
 
     private val me: AttendeeUi? by derivedStateOf { (organizerSource as? OrganizerSource.Dynamic)?.owner }
 
@@ -94,9 +94,9 @@ class AttendeesSearchState(
         InvalidEmail(RCore.string.emailInvalid),
     }
 
-    object Saver : androidx.compose.runtime.saveable.Saver<AttendeesSearchState, List<Any?>> {
+    class Saver<T : OrganizerSource> : androidx.compose.runtime.saveable.Saver<AttendeesSearchState<T>, List<Any?>> {
         private val resultsSaver = autoSaver<SnapshotStateList<AttendeesSearchResult>>()
-        private val organizerSourceSaver = autoSaver<OrganizerSource?>()
+        private val organizerSourceSaver = autoSaver<T?>()
         // TODO: Use autoSaver once on Compose 1.13+, SnapshotStateSet only parcels its first element before (b/537461421)
         private val participantsSaver =
             androidx.compose.runtime.saveable.Saver<SnapshotStateSet<ParticipantUi>, ArrayList<ParticipantUi>>(
@@ -105,7 +105,7 @@ class AttendeesSearchState(
             )
 
         // TextFieldState.Saver.restore() never returns null, and neither do resultsSaver and participantsSaver
-        override fun SaverScope.save(value: AttendeesSearchState): List<Any?> = listOf(
+        override fun SaverScope.save(value: AttendeesSearchState<T>): List<Any?> = listOf(
             with(TextFieldState.Saver) { save(value.searchQueryTextFieldState)!! },
             with(resultsSaver) { save(value.results)!! },
             with(participantsSaver) { save(value.participants)!! },
@@ -113,7 +113,7 @@ class AttendeesSearchState(
         )
 
         @Suppress("UNCHECKED_CAST")
-        override fun restore(value: List<Any?>): AttendeesSearchState = AttendeesSearchState(
+        override fun restore(value: List<Any?>): AttendeesSearchState<T> = AttendeesSearchState<T>(
             searchQueryTextFieldState = TextFieldState.Saver.restore(value[0]!!)!!,
             results = resultsSaver.restore(value[1]!!)!!,
             participants = participantsSaver.restore(value[2] as ArrayList<ParticipantUi>)!!,
@@ -133,7 +133,7 @@ fun rememberSaveableAttendeesSearchState(
     participants: SnapshotStateSet<ParticipantUi> = rememberSaveable { mutableStateSetOf() },
     results: SnapshotStateList<AttendeesSearchResult> = rememberSaveable { mutableStateListOf() },
     searchQuery: String = "",
-): AttendeesSearchState = rememberSaveable(saver = AttendeesSearchState.Saver) {
+): AttendeesSearchState<OrganizerSource> = rememberSaveable(saver = AttendeesSearchState.Saver()) {
     AttendeesSearchState(
         searchQueryTextFieldState = TextFieldState(initialText = searchQuery),
         results = results,

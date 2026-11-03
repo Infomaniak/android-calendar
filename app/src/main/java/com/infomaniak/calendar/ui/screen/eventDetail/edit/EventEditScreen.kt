@@ -86,7 +86,7 @@ fun EventEditScreen(
                 initialIsAllDay = eventDetailUiState.eventDetail.isAllDay,
                 initialIsKMeetUrlEnabled = eventDetailUiState.eventDetail.kMeetUrl != null,
                 attendees = { viewModel.attendeesSearchState.attendees },
-                initialOrganizer = (viewModel.attendeesSearchState.organizerSource as? OrganizerSource.Static)?.organizer, // TODO: Cast is always true here
+                initialOrganizer = viewModel.attendeesSearchState.organizerSource?.organizer,
                 initialIsOccupied = eventDetailUiState.eventDetail.isOccupied,
                 initialIsPublic = eventDetailUiState.eventDetail.classification == EventDetailUi.Classification.Public,
             ),
