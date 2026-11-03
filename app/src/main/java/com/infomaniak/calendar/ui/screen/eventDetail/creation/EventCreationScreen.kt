@@ -70,7 +70,7 @@ fun EventCreationScreen(
             calendars = it.calendars,
             initialCalendar = it.initialCalendar,
             dateAndTimeState = defaultEventDuration?.let { rememberDateAndTimeState(it, TimeZone.currentSystemDefault(), date) },
-            attendees = viewModel.attendeesSearchState.attendees,
+            attendees = { viewModel.attendeesSearchState.attendees },
         )
     }
 
@@ -151,7 +151,7 @@ private fun EventCreationScreenPreview() {
             calendars = previewEventDetailCalendarGroups,
             initialCalendar = previewEventDetailCalendar,
             dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
-            attendees = emptyList(),
+            attendees = { emptyList() },
         )
 
         EventCreationScreen(
@@ -175,7 +175,7 @@ private fun PreviewEmptyWritableCalendar() {
             calendars = previewEventDetailCalendarGroups,
             initialCalendar = previewEventDetailCalendar,
             dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
-            attendees = previewAttendees,
+            attendees = { previewAttendees },
         )
 
         EventCreationScreen(

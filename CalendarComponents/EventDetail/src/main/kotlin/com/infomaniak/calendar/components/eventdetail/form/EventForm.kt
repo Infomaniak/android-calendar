@@ -84,7 +84,7 @@ fun EventForm(
 
         Section(EventSharedElement.Divider1) {
             AttendeesButton(
-                attendees = state.attendees,
+                attendees = state.attendees(),
                 onClick = onAttendeesClick,
                 modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
             )
@@ -131,7 +131,7 @@ private fun Preview() {
                     initialCalendar = previewEventDetailCalendar,
                     dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
                     initialText = "Event title",
-                    attendees = emptyList(),
+                    attendees = { emptyList() },
                     initialOrganizer = null,
                     initialIsAllDay = false,
                     initialIsKMeetUrlEnabled = false,
