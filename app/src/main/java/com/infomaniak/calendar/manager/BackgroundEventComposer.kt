@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.manager
 
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.ui.screen.eventDetail.DeleteEventResult
 import com.infomaniak.calendar.ui.screen.eventDetail.EventComposerUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.SaveEventResult
@@ -55,6 +56,10 @@ class BackgroundEventComposer @Inject constructor(private val eventComposerUseCa
 
     fun createEvent(eventDraft: EventDraft) {
         enqueue { eventComposerUseCase.createEvent(eventDraft) == SaveEventResult.Success }
+    }
+
+    fun updateAttendees(occurrenceId: OccurrenceId, scope: RecurrentEventScope, attendees: List<AttendeeUi>) {
+        enqueue { eventComposerUseCase.updateAttendees(occurrenceId, scope, attendees) == SaveEventResult.Success }
     }
 
     fun updateEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope, eventDraft: EventDraft) {

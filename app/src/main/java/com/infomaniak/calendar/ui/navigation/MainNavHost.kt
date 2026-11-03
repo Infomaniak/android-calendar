@@ -146,8 +146,8 @@ private fun baseEntryProvider(
                 occurrenceId = destination.occurrenceId,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
                 goToEdit = { backStack.addOnce(NavDestination.EventEdit(destination.occurrenceId)) },
-                goToEventAttendees = { canEdit, isRecurring ->
-                    backStack.addOnce(NavDestination.EditableAttendeeSearch(parent = destination, canEdit = canEdit, isRecurring = isRecurring))
+                goToEventAttendees = { config ->
+                    backStack.addOnce(NavDestination.EditableAttendeeSearch(parent = destination, config = config))
                 },
             )
         }
@@ -183,8 +183,7 @@ private fun baseEntryProvider(
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
             EditableAttendeesSearchScreen(
-                hasWritePermissions = destination.canEdit,
-                isRecurring = destination.isRecurring,
+                config = destination.config,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
         }

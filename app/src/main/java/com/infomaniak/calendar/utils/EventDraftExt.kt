@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.utils
 
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.AlarmListEdit
@@ -42,7 +43,7 @@ fun EventDraft.applyTo(editData: EventEditData, defaultOrganizer: Organizer?): E
     timing = editData.timing.copy(bounds = bounds()),
     timeBlocking = if (isOccupied) TimeBlocking.Blocks else TimeBlocking.DoesNotBlock,
     calendarId = typedCalendarId,
-    attendees = attendees.map { AttendeeEdit(email = it.email, displayName = it.displayName) },
+    attendees = attendees.toAttendeeEdit(),
     organizer = (initialOrganizer?.toOrganizer() ?: defaultOrganizer).takeIf { attendees.isNotEmpty() },
 )
 
@@ -62,6 +63,8 @@ fun EventDraft.toNewEventEditData(defaultOrganizer: Organizer?): EventEditData =
         meetRoom = null,
     ),
 )
+
+fun List<AttendeeUi>.toAttendeeEdit(): List<AttendeeEdit> = map { AttendeeEdit(email = it.email, displayName = it.displayName) }
 
 /** The bounds the form describes, knowing it shows the last day of an all-day event where KMP expects the day after it. */
 private fun EventDraft.bounds(): EventBounds = if (isAllDay) {

@@ -54,6 +54,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailSharedDataViewMo
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventDialog
+import com.infomaniak.calendar.ui.screen.eventDetail.model.EditAttendeesConfig
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
@@ -70,7 +71,7 @@ fun EventDetailScreen(
     occurrenceId: OccurrenceId,
     goBack: () -> Unit,
     goToEdit: () -> Unit,
-    goToEventAttendees: (canEdit: Boolean, isRecurring: Boolean) -> Unit,
+    goToEventAttendees: (EditAttendeesConfig) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),
     eventDetailSharedDataViewModel: EventDetailSharedDataViewModel = viewModel(),
@@ -103,7 +104,9 @@ fun EventDetailScreen(
         goToEdit = goToEdit,
         onDelete = { scope -> if (viewModel.deleteEvent(occurrenceId, scope)) goBack() },
         onLocationClick = { location -> openLocationInMapApp(context, location) },
-        goToEventAttendees = goToEventAttendees,
+        goToEventAttendees = { canEdit, isRecurring ->
+            goToEventAttendees(EditAttendeesConfig(occurrenceId, canEdit, isRecurring))
+        },
         modifier = modifier,
     )
 }

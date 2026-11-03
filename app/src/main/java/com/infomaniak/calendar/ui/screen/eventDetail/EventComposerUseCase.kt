@@ -18,12 +18,14 @@
 package com.infomaniak.calendar.ui.screen.eventDetail
 
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.account.accountId
 import com.infomaniak.calendar.utils.applyTo
+import com.infomaniak.calendar.utils.toAttendeeEdit
 import com.infomaniak.calendar.utils.toNewEventEditData
 import com.infomaniak.calendar.utils.typedCalendarId
 import com.infomaniak.core.common.cancellable
@@ -69,6 +71,23 @@ class EventComposerUseCase @Inject constructor(
             )
 
             calendarDataValues.saveLastUsedCalendar(eventDraft)
+
+            SaveEventResult.Success
+        }.cancellable().getOrDefault(SaveEventResult.Error)
+    }
+
+    suspend fun updateAttendees(
+        occurrenceId: OccurrenceId,
+        scope: RecurrentEventScope,
+        attendees: List<AttendeeUi>,
+    ): SaveEventResult {
+        return runCatching {
+            val event = calendarManager.getOccurrence(occurrenceId) ?: return SaveEventResult.Error
+            val editData = calendarManager.getEditData(occurrenceId) ?: return SaveEventResult.Error
+            calendarManager.updateEvent(
+                target = event.targetFor(scope.toRecurrenceScope()),
+                data = editData.copy(attendees = attendees.toAttendeeEdit()),
+            )
 
             SaveEventResult.Success
         }.cancellable().getOrDefault(SaveEventResult.Error)

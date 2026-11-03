@@ -45,31 +45,40 @@ import com.infomaniak.calendar.components.foundation.state.rememberSaveableAtten
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.SubmitButton
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
+import com.infomaniak.calendar.ui.screen.eventDetail.model.EditAttendeesConfig
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 
 @Composable
 fun EditableAttendeesSearchScreen(
-    hasWritePermissions: Boolean,
-    isRecurring: Boolean,
+    config: EditAttendeesConfig,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: AttendeesSearchSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
+    viewModel: EditableAttendeesSearchViewModel = viewModel(),
+    sharedViewModel: AttendeesSearchSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
-    val attendeesSearchUi by viewModel.attendeesSearchState.collectAsStateWithLifecycle()
+    val attendeesSearchUi by sharedViewModel.attendeesSearchState.collectAsStateWithLifecycle()
 
     Box(modifier = modifier.fillMaxSize()) {
         when (val attendeesSearchState = attendeesSearchUi) {
             AttendeesSearchUiState.Loading -> Unit // The parent provides it right away, so nothing to show
             is AttendeesSearchUiState.Success -> {
-                if (hasWritePermissions) viewModel.EnableSearch()
+                if (config.canEdit) sharedViewModel.EnableSearch()
 
                 EditableAttendeesSearchScreen(
                     attendeesSearchState = attendeesSearchState.state,
-                    hasWritePermissions = hasWritePermissions,
-                    isRecurring = isRecurring,
-                    onSubmit = {},
+                    config = config,
+                    onSubmit = { scope ->
+                        val isSuccess = viewModel.updateAttendees(
+                            occurrenceId = config.occurrenceId,
+                            attendees = attendeesSearchState.state.attendees,
+                            scope = scope,
+                        )
+                        if (isSuccess) goBack()
+                    },
                     goBack = goBack,
                 )
             }
@@ -80,8 +89,7 @@ fun EditableAttendeesSearchScreen(
 @Composable
 private fun EditableAttendeesSearchScreen(
     attendeesSearchState: AttendeesSearchState<*>,
-    hasWritePermissions: Boolean,
-    isRecurring: Boolean,
+    config: EditAttendeesConfig,
     onSubmit: (RecurrentEventScope) -> Unit,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -94,10 +102,10 @@ private fun EditableAttendeesSearchScreen(
             TopAppBar(
                 navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
                 actions = {
-                    if (hasWritePermissions) {
+                    if (config.canEdit) {
                         Row(Modifier.padding(end = EsdsTheme.spacing.lg)) {
                             SubmitButton(
-                                isRecurring = isRecurring,
+                                isRecurring = config.isRecurring,
                                 onSubmit = onSubmit,
                                 modifier = Modifier,
                                 enabled = { isSubmitEnabled },
@@ -110,7 +118,7 @@ private fun EditableAttendeesSearchScreen(
         },
         attendeesSearchState = attendeesSearchState,
         modifier = modifier,
-        isSearchable = hasWritePermissions,
+        isSearchable = config.canEdit,
     )
 }
 
@@ -124,8 +132,11 @@ private val SetSaver = listSaver<Set<ParticipantUi>, ParticipantUi>(
 private fun Preview() {
     CalendarThemeForPreview {
         EditableAttendeesSearchScreen(
-            hasWritePermissions = true,
-            isRecurring = true,
+            config = EditAttendeesConfig(
+                occurrenceId = OccurrenceId.Master(EventId("preview")),
+                canEdit = true,
+                isRecurring = false,
+            ),
             attendeesSearchState = rememberSaveableAttendeesSearchState(
                 participants = remember { mutableStateSetOf<ParticipantUi>().apply { addAll(previewAttendees) } },
                 results = remember { mutableStateListOf<AttendeesSearchResult>().apply { addAll(previewAttendees) } },

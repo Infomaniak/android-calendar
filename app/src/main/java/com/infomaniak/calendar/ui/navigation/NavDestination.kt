@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.ui.navigation
 
 import androidx.navigation3.runtime.NavKey
+import com.infomaniak.calendar.ui.screen.eventDetail.model.EditAttendeesConfig
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
@@ -84,7 +85,7 @@ sealed interface NavDestination : NavKey {
     data class AttendeeSearch(val parent: NavDestination) : NavDestination
 
     @Serializable
-    data class EditableAttendeeSearch(val parent: NavDestination, val canEdit: Boolean, val isRecurring: Boolean) : NavDestination
+    data class EditableAttendeeSearch(val parent: NavDestination, val config: EditAttendeesConfig) : NavDestination
 
     @Serializable
     data class EventCreation(val date: LocalDate) : NavDestination
