@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.manager.BackgroundEventComposer
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
@@ -58,7 +59,7 @@ class EventEditViewModel(
         if (areAttendeesInitialized) return
         val event = eventDetailUi.filterIsInstance<EventDetailUiState.Displayable.Success>().first()
         attendeesSearchState.participants.addAll(event.eventDetail.attendees.all)
-        attendeesSearchState.initialOrganizer = event.eventDetail.organizer
+        attendeesSearchState.organizerSource = OrganizerSource.Static(event.eventDetail.organizer)
         areAttendeesInitialized = true
     }
 

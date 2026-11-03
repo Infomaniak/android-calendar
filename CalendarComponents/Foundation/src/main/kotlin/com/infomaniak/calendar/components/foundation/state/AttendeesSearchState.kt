@@ -34,7 +34,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateSet
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
-import com.infomaniak.calendar.components.foundation.models.OrganizerUi
+import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.core.common.utils.isEmailRfc5321Compliant
@@ -46,11 +46,10 @@ class AttendeesSearchState(
     val results: SnapshotStateList<AttendeesSearchResult>,
     val participants: SnapshotStateSet<ParticipantUi>,
 ) {
-    /** Snapshot of the edited event's organizer, taken once along with the [participants]. */
-    var initialOrganizer: OrganizerUi? by mutableStateOf(null)
+    /** `null` until initialized by the screen. */
+    var organizerSource: OrganizerSource? by mutableStateOf(null)
 
-    /** What [ParticipantUi.Me] resolves to, the owner of the currently selected calendar. */
-    var me: AttendeeUi? by mutableStateOf(null)
+    private val me: AttendeeUi? by derivedStateOf { (organizerSource as? OrganizerSource.Dynamic)?.owner }
 
     val attendees: List<AttendeeUi> by derivedStateOf { participants.mapNotNull { it.toAttendeeUi(me) } }
 
@@ -81,8 +80,10 @@ class AttendeesSearchState(
     }
 
     private fun innerAddAttendee(attendee: AttendeeUi) {
-        // If the event is already organized by someone, don't add Me. Only add Me when creating a new event by myself.
-        if (participants.isEmpty() && initialOrganizer == null) participants.add(ParticipantUi.Me)
+        // Only add Me when creating a new event, which we organize
+        if (participants.isEmpty() && organizerSource is OrganizerSource.Dynamic) {
+            participants.add(ParticipantUi.Me)
+        }
         participants.add(attendee)
         searchQueryTextFieldState.clearText()
     }
@@ -95,8 +96,7 @@ class AttendeesSearchState(
 
     object Saver : androidx.compose.runtime.saveable.Saver<AttendeesSearchState, List<Any?>> {
         private val resultsSaver = autoSaver<SnapshotStateList<AttendeesSearchResult>>()
-        private val initialOrganizerSaver = autoSaver<OrganizerUi?>()
-        private val meSaver = autoSaver<AttendeeUi?>()
+        private val organizerSourceSaver = autoSaver<OrganizerSource?>()
         // TODO: Use autoSaver once on Compose 1.13+, SnapshotStateSet only parcels its first element before (b/537461421)
         private val participantsSaver =
             androidx.compose.runtime.saveable.Saver<SnapshotStateSet<ParticipantUi>, ArrayList<ParticipantUi>>(
@@ -104,13 +104,12 @@ class AttendeesSearchState(
                 restore = { mutableStateSetOf<ParticipantUi>().apply { addAll(it) } },
             )
 
-        // TextFieldState.Saver.restore() never returns null, and neither do resultsSaver and attendeesSaver
+        // TextFieldState.Saver.restore() never returns null, and neither do resultsSaver and participantsSaver
         override fun SaverScope.save(value: AttendeesSearchState): List<Any?> = listOf(
             with(TextFieldState.Saver) { save(value.searchQueryTextFieldState)!! },
             with(resultsSaver) { save(value.results)!! },
             with(participantsSaver) { save(value.participants)!! },
-            with(initialOrganizerSaver) { save(value.initialOrganizer) },
-            with(meSaver) { save(value.me) },
+            with(organizerSourceSaver) { save(value.organizerSource) },
         )
 
         @Suppress("UNCHECKED_CAST")
@@ -119,8 +118,7 @@ class AttendeesSearchState(
             results = resultsSaver.restore(value[1]!!)!!,
             participants = participantsSaver.restore(value[2] as ArrayList<ParticipantUi>)!!,
         ).apply {
-            initialOrganizer = value[3]?.let(initialOrganizerSaver::restore)
-            me = value[4]?.let(meSaver::restore)
+            organizerSource = value[3]?.let(organizerSourceSaver::restore)
         }
     }
 }

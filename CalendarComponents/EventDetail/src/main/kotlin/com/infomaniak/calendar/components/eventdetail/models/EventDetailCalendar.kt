@@ -33,6 +33,6 @@ data class EventDetailCalendar(
     val id: String,
     val name: String,
     val color: Color,
-    /** The user this calendar belongs to, used to know what to display when resolving [ParticipantUi.Me] */
+    /** The user this calendar belongs to, used to know what to display when resolving [ParticipantUi.Me]. Should never be null */
     val organizerAttendeeUi: AttendeeUi?,
 ) : Parcelable

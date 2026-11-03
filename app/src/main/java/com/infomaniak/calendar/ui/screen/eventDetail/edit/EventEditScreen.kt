@@ -41,6 +41,7 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
+import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
@@ -85,7 +86,7 @@ fun EventEditScreen(
                 initialIsAllDay = eventDetailUiState.eventDetail.isAllDay,
                 initialIsKMeetUrlEnabled = eventDetailUiState.eventDetail.kMeetUrl != null,
                 attendees = { viewModel.attendeesSearchState.attendees },
-                initialOrganizer = viewModel.attendeesSearchState.initialOrganizer,
+                initialOrganizer = (viewModel.attendeesSearchState.organizerSource as? OrganizerSource.Static)?.organizer, // TODO: Cast is always true here
                 initialIsOccupied = eventDetailUiState.eventDetail.isOccupied,
                 initialIsPublic = eventDetailUiState.eventDetail.classification == EventDetailUi.Classification.Public,
             ),
@@ -103,11 +104,6 @@ fun EventEditScreen(
 
     LaunchedEffect(Unit) {
         for (request in eventDetailSharedDataViewModel.goBackRequests) goBackToCalendarView()
-    }
-
-    val selectedCalendar = (uiState as? EventEditScreenState.Success)?.eventFormState?.calendar
-    LaunchedEffect(selectedCalendar) {
-        viewModel.attendeesSearchState.me = selectedCalendar?.organizerAttendeeUi
     }
 
     val dateAndTimeState = (uiState as? EventEditScreenState.Success)?.eventFormState?.dateAndTimeState

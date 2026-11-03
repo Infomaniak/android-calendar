@@ -38,6 +38,7 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.component.EmptyState
+import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
@@ -75,7 +76,9 @@ fun EventCreationScreen(
     }
 
     LaunchedEffect(formState?.calendar) {
-        viewModel.attendeesSearchState.me = formState?.calendar?.organizerAttendeeUi
+        if (formState == null) return@LaunchedEffect
+
+        viewModel.attendeesSearchState.organizerSource = formState.calendar.organizerAttendeeUi?.let(OrganizerSource::Dynamic)
     }
 
     LaunchedEffect(formState?.dateAndTimeState) {
