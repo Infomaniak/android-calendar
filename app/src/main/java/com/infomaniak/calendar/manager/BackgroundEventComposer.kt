@@ -32,8 +32,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 
 /**
  * Runs [EventComposerUseCase]'s changes in the background, one at a time, so the event screens close right away.
@@ -42,10 +40,18 @@ import kotlinx.coroutines.sync.withLock
 @SingleIn(AppScope::class)
 class BackgroundEventComposer @Inject constructor(private val eventComposerUseCase: EventComposerUseCase) {
     private val managerScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private val changeMutex = Mutex()
+    private val pendingChanges = Channel<suspend () -> Boolean>(Channel.UNLIMITED)
 
     private val _savingError = Channel<Unit>(Channel.CONFLATED)
     val savingError: ReceiveChannel<Unit> = _savingError
+
+    init {
+        managerScope.launch {
+            for (change in pendingChanges) {
+                if (!change()) _savingError.trySend(Unit)
+            }
+        }
+    }
 
     fun createEvent(eventDraft: EventDraft) {
         enqueue { eventComposerUseCase.createEvent(eventDraft) == SaveEventResult.Success }
@@ -60,9 +66,6 @@ class BackgroundEventComposer @Inject constructor(private val eventComposerUseCa
     }
 
     private fun enqueue(change: suspend () -> Boolean) {
-        managerScope.launch {
-            val isSuccess = changeMutex.withLock { change() }
-            if (!isSuccess) _savingError.trySend(Unit)
-        }
+        pendingChanges.trySend(change)
     }
 }
