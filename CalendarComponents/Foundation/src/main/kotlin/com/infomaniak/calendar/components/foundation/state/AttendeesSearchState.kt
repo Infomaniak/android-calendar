@@ -81,7 +81,8 @@ class AttendeesSearchState(
     }
 
     private fun innerAddAttendee(attendee: AttendeeUi) {
-        if (participants.isEmpty()) participants.add(ParticipantUi.Me)
+        // If the event is already organized by someone, don't add Me. Only add Me when creating a new event by myself.
+        if (participants.isEmpty() && initialOrganizer == null) participants.add(ParticipantUi.Me)
         participants.add(attendee)
         searchQueryTextFieldState.clearText()
     }
