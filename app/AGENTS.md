@@ -111,7 +111,7 @@ app/
 - **Compose-only UI**: No XML layouts / ViewBinding; use Material 3 components.
 - **Navigation**: Uses Jetpack Navigation 3 (`NavDisplay`). Destinations are `NavDestination` keys, and
   `MainNavHost.baseEntryProvider` maps each key to a `NavEntry` with a manual `when` (not the `entryProvider { entry<…> }`
-  DSL): the DSL can't read the key while building `metadata`, which `EventAttendees` needs in order to declare its parent.
+  DSL): the DSL can't read the key while building `metadata`, which `AttendeeSearch` needs in order to declare its parent.
   Entries are decorated with `rememberSaveableStateHolderNavEntryDecorator()` followed by
   `rememberSharedViewModelStoreNavEntryDecorator()`, in that order.
 - **Sharing a ViewModel between a parent entry and a child entry**: the child's key carries its parent

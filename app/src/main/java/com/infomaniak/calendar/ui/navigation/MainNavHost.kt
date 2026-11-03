@@ -49,6 +49,7 @@ import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
 import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.EditableAttendeesSearchScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
@@ -131,7 +132,7 @@ private fun baseEntryProvider(
             EventCreationScreen(
                 date = destination.date,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
-                goToEventsAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
+                goToEventsAttendees = { backStack.addOnce(NavDestination.AttendeeSearch(parent = destination)) },
                 goToTimeZoneSearch = { isStart -> backStack.addOnce(NavDestination.EventTimeZone(destination, isStart)) },
             )
         }
@@ -145,7 +146,9 @@ private fun baseEntryProvider(
                 occurrenceId = destination.occurrenceId,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
                 goToEdit = { backStack.addOnce(NavDestination.EventEdit(destination.occurrenceId)) },
-                goToEventAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
+                goToEventAttendees = { canEdit ->
+                    backStack.addOnce(NavDestination.EditableAttendeeSearch(parent = destination, canEdit = canEdit))
+                },
             )
         }
 
@@ -161,16 +164,26 @@ private fun baseEntryProvider(
                 occurrenceId = destination.occurrenceId,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
                 goBackToCalendarView = { backStack.popUntilCalendarView(defaultCalendarView) },
-                goToEventAttendees = { backStack.addOnce(NavDestination.EventAttendees(parent = destination)) },
+                goToEventAttendees = { backStack.addOnce(NavDestination.AttendeeSearch(parent = destination)) },
                 goToTimeZoneSearch = { isStart -> backStack.addOnce(NavDestination.EventTimeZone(destination, isStart)) },
             )
         }
 
-        is NavDestination.EventAttendees -> NavEntry(
+        is NavDestination.AttendeeSearch -> NavEntry(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
             AttendeesSearchScreen(
+                goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
+            )
+        }
+
+        is NavDestination.EditableAttendeeSearch -> NavEntry(
+            key = destination,
+            metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
+        ) {
+            EditableAttendeesSearchScreen(
+                hasWritePermissions = destination.canEdit,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
         }

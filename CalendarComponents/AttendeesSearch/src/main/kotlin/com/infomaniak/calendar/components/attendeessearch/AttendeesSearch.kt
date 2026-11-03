@@ -34,8 +34,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.attendeessearch.component.AttendeesList
 import com.infomaniak.calendar.components.foundation.component.EmptyState
 import com.infomaniak.calendar.components.foundation.component.SearchBar
-import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
+import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
@@ -51,6 +51,7 @@ fun AttendeesSearch(
     onShowSnackbar: (message: String) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    isSearchable: Boolean = true,
 ) {
     val isDisplayingSearchResults = attendeesSearchState.searchQueryTextFieldState.text.isNotBlank()
 
@@ -67,10 +68,13 @@ fun AttendeesSearch(
             .padding(horizontalContentPadding)
             .padding(top = contentPadding.calculateTopPadding()),
     ) {
-        SearchBar(
-            searchState = attendeesSearchState.searchQueryTextFieldState,
-            placeholder = stringResource(R.string.attendeesSearchPlaceholder),
-        )
+        if (isSearchable) {
+            SearchBar(
+                searchState = attendeesSearchState.searchQueryTextFieldState,
+                placeholder = stringResource(R.string.attendeesSearchPlaceholder),
+            )
+        }
+
         if (attendeesSearchState.searchQueryTextFieldState.text.isBlank() && attendeesList.isEmpty()) {
             EmptyState(
                 text = stringResource(R.string.attendeesEmptyStateTitle),
@@ -98,7 +102,7 @@ fun AttendeesSearch(
                 isEnabled = { attendee ->
                     !isDisplayingSearchResults || attendee.email.lowercase() !in attendeesSearchState.attendeesEmailsLowercase
                 },
-                enableDeletion = { isDisplayingSearchResults.not() },
+                enableDeletion = { isSearchable && isDisplayingSearchResults.not() },
                 contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
             )
         }

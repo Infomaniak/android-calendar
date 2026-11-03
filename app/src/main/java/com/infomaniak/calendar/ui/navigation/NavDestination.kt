@@ -81,7 +81,10 @@ sealed interface NavDestination : NavKey {
     data class EventEdit(val occurrenceId: OccurrenceId) : NavDestination
 
     @Serializable
-    data class EventAttendees(val parent: NavDestination) : NavDestination
+    data class AttendeeSearch(val parent: NavDestination) : NavDestination
+
+    @Serializable
+    data class EditableAttendeeSearch(val parent: NavDestination, val canEdit: Boolean) : NavDestination
 
     @Serializable
     data class EventCreation(val date: LocalDate) : NavDestination

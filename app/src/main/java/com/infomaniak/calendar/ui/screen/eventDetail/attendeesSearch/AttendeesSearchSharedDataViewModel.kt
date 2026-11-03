@@ -17,9 +17,13 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
@@ -34,6 +38,7 @@ import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 
 /**
  * Shares the [AttendeesSearchState] instance between the parent screen and the attendees search screen.
@@ -51,7 +56,20 @@ class AttendeesSearchSharedDataViewModel(private val contactsManager: ContactsMa
         _attendeesSearchState.value = AttendeesSearchUiState.Success(attendeesSearchState)
     }
 
-    suspend fun search(query: String) {
+    @Composable
+    fun EnableSearch() {
+        val attendeesSearchState by attendeesSearchState.collectAsStateWithLifecycle()
+        val textFieldState = (attendeesSearchState as? AttendeesSearchUiState.Success)?.state?.searchQueryTextFieldState
+        LaunchedEffect(textFieldState) {
+            if (textFieldState == null) return@LaunchedEffect
+
+            snapshotFlow { textFieldState.text }.collectLatest {
+                search(it.toString())
+            }
+        }
+    }
+
+    private suspend fun search(query: String) {
         val uiState = attendeesSearchState.value as? AttendeesSearchUiState.Success ?: return
 
         if (query.isBlank()) {
