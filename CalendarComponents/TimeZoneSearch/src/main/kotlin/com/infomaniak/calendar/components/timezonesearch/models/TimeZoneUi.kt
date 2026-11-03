@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.timezonesearch.models
 
+import com.infomaniak.calendar.components.foundation.models.SearchableText
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatCityAndCountry
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatLongName
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatUtcOffset

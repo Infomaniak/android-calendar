@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.timezonesearch.models
+package com.infomaniak.calendar.components.foundation.models
 
 import java.text.Normalizer
 
@@ -25,7 +25,7 @@ import java.text.Normalizer
  * Normalizing char by char keeps track of where each searchable char comes from, so a match maps back onto [text]
  * even when stripping accents or lowercasing changed its length.
  */
-internal class SearchableText(val text: String) {
+class SearchableText(val text: String) {
     private val searchable = StringBuilder()
     private val sourceIndices = mutableListOf<Int>()
 
