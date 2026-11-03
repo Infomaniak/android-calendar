@@ -53,7 +53,7 @@ data class EventDetailUi(
     val classification: Classification,
     val canEdit: Boolean,
 ) {
-    val isRecurrent get() = recurrence is EventDetailRecurrence.Recurrence
+    val isRecurring get() = recurrence is EventDetailRecurrence.Recurrence
     val eventColor get() = eventColorChoice.getColor(calendar)
 
     data class Room(val title: String, val seats: Int, val floor: Int)

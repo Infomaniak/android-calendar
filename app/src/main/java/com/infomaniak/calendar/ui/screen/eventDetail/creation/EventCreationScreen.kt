@@ -112,7 +112,14 @@ private fun EventCreationScreen(
     val scrollState = rememberScrollState()
 
     Scaffold(
-        topBar = { SubmitTopAppBar(goBack = goBack, onSubmit = onSubmit, isSubmitEnabled = { formState != null }) },
+        topBar = {
+            SubmitTopAppBar(
+                goBack = goBack,
+                onSubmit = { onSubmit() },
+                isSubmitEnabled = { formState != null },
+                isRecurring = false,
+            )
+        },
         modifier = modifier,
     ) { contentPadding ->
         when (uiState) {

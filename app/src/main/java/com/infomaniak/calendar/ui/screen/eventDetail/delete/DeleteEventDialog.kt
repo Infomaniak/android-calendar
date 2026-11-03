@@ -23,8 +23,8 @@ import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
-fun DeleteEventDialog(isRecurrent: () -> Boolean, onDelete: (RecurrentEventScope) -> Unit, onDismissRequest: () -> Unit) {
-    if (isRecurrent()) {
+fun DeleteEventDialog(isRecurring: () -> Boolean, onDelete: (RecurrentEventScope) -> Unit, onDismissRequest: () -> Unit) {
+    if (isRecurring()) {
         DeleteRecurrentEventDialog(onDelete = onDelete, onDismissRequest = onDismissRequest)
     } else {
         DeleteSingleEventDialog(onDelete = { onDelete(RecurrentEventScope.ThisEvent) }, onDismissRequest = onDismissRequest)
@@ -35,7 +35,7 @@ fun DeleteEventDialog(isRecurrent: () -> Boolean, onDelete: (RecurrentEventScope
 @Composable
 private fun DeleteEventDialogSinglePreview() {
     CalendarThemeForPreview {
-        DeleteEventDialog(isRecurrent = { false }, onDelete = {}, onDismissRequest = {})
+        DeleteEventDialog(isRecurring = { false }, onDelete = {}, onDismissRequest = {})
     }
 }
 
@@ -43,6 +43,6 @@ private fun DeleteEventDialogSinglePreview() {
 @Composable
 private fun DeleteEventDialogRecurrentPreview() {
     CalendarThemeForPreview {
-        DeleteEventDialog(isRecurrent = { true }, onDelete = {}, onDismissRequest = {})
+        DeleteEventDialog(isRecurring = { true }, onDelete = {}, onDismissRequest = {})
     }
 }
