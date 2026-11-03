@@ -95,7 +95,7 @@ internal fun ReminderOffsetDialog(
     }
 }
 
-@Preview
+@Preview(showSystemUi = true)
 @Composable
 private fun Preview() {
     MaterialTheme {
