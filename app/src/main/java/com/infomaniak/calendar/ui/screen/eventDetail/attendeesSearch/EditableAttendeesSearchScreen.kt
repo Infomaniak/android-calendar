@@ -24,12 +24,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -80,7 +81,8 @@ private fun EditableAttendeesSearchScreen(
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isSubmitEnabled by remember { mutableStateOf(false) }
+    val initialParticipantsSnapshot = rememberSaveable(saver = SetSaver) { attendeesSearchState.participants.toSet() }
+    val isSubmitEnabled by remember { derivedStateOf { attendeesSearchState.participants.toSet() != initialParticipantsSnapshot } }
 
     AttendeesSearchScreenContent(
         topBar = {
@@ -101,6 +103,11 @@ private fun EditableAttendeesSearchScreen(
         isSearchable = hasWritePermissions,
     )
 }
+
+private val SetSaver = listSaver<Set<ParticipantUi>, ParticipantUi>(
+    save = { it.toList() },
+    restore = { it.toSet() },
+)
 
 @Preview
 @Composable
