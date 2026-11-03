@@ -38,6 +38,7 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.component.EmptyState
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
@@ -77,8 +78,15 @@ fun EventCreationScreen(
 
     LaunchedEffect(formState?.calendar) {
         if (formState == null) return@LaunchedEffect
+        val organizerAttendeeUi = formState.calendar.organizerAttendeeUi ?: return@LaunchedEffect
 
-        viewModel.attendeesSearchState.organizerSource = formState.calendar.organizerAttendeeUi?.let(OrganizerSource::Dynamic)
+        val newOrganizer = OrganizerSource.Dynamic(organizerAttendeeUi)
+
+        // It's possible that the new organizer is already in the attendees list. We need to make sure to remove it before adding
+        // to avoid having two attendees with the same email.
+        viewModel.attendeesSearchState.participants.removeAll { (it is AttendeeUi) && it.email == newOrganizer.owner.email }
+
+        viewModel.attendeesSearchState.organizerSource = newOrganizer
     }
 
     LaunchedEffect(formState?.dateAndTimeState) {
