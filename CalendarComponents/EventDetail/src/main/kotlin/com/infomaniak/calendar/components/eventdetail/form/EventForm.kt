@@ -84,7 +84,7 @@ fun EventForm(
 
         Section(EventSharedElement.Divider1) {
             AttendeesButton(
-                attendees = state.attendees(),
+                attendees = state.attendees,
                 onClick = onAttendeesClick,
                 modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
             )

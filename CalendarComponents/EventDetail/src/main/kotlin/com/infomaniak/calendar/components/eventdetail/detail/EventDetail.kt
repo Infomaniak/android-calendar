@@ -92,7 +92,7 @@ fun EventDetail(
             Section(EventSharedElement.Divider1) {
                 if (attendees.all.isNotEmpty()) {
                     AttendeesButton(
-                        attendees = attendees.all,
+                        attendees = { attendees.all },
                         onClick = goToEventAttendees,
                         modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
                     )
