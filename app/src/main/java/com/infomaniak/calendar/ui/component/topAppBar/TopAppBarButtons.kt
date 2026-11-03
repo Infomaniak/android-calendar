@@ -29,7 +29,11 @@ import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +46,8 @@ import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.InboxButt
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.SaveButton
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.SearchButton
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
+import com.infomaniak.calendar.ui.screen.eventDetail.edit.EditRecurrentEventDialog
+import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ArrowLeft
@@ -128,7 +134,7 @@ object TopAppBarButtons {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun SaveButton(modifier: Modifier = Modifier, enabled: () -> Boolean = { true }, onClick: () -> Unit) {
+    fun SaveButton(onClick: () -> Unit, modifier: Modifier = Modifier, enabled: () -> Boolean = { true }) {
         val contentDescription = stringResource(RCommon.string.buttonSave)
 
         TooltipBox(
@@ -140,6 +146,31 @@ object TopAppBarButtons {
             FilledIconButton(onClick = onClick, enabled = enabled()) {
                 Icon(EsdsIcons.Check.Medium, contentDescription)
             }
+        }
+    }
+
+    /**
+     * Wrapper around [SaveButton] with added logic that factorizes the recurrence scope choice
+     */
+    @Composable
+    fun SubmitButton(
+        isRecurring: Boolean,
+        onSubmit: (RecurrentEventScope) -> Unit,
+        modifier: Modifier = Modifier,
+        enabled: () -> Boolean,
+    ) {
+        var showEditRecurrentEventDialog by rememberSaveable { mutableStateOf(false) }
+
+        SaveButton(
+            onClick = {
+                if (isRecurring) showEditRecurrentEventDialog = true else onSubmit(RecurrentEventScope.ThisEvent)
+            },
+            modifier = modifier,
+            enabled = enabled,
+        )
+
+        if (showEditRecurrentEventDialog) {
+            EditRecurrentEventDialog(onEdit = onSubmit, onDismissRequest = { showEditRecurrentEventDialog = false })
         }
     }
 

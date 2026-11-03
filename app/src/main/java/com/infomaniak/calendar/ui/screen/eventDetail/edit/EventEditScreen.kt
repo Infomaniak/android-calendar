@@ -26,12 +26,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -94,7 +90,7 @@ fun EventEditScreen(
                 initialIsOccupied = eventDetailUiState.eventDetail.isOccupied,
                 initialIsPublic = eventDetailUiState.eventDetail.classification == EventDetailUi.Classification.Public,
             ),
-            isRecurrent = eventDetailUiState.eventDetail.isRecurrent,
+            isRecurring = eventDetailUiState.eventDetail.isRecurring,
         )
     }
 
@@ -146,16 +142,13 @@ private fun EventEditScreen(
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val scrollState = rememberScrollState()
-    var showEditRecurrentEventDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             SubmitTopAppBar(
                 goBack = goBack,
-                onSubmit = {
-                    val isRecurrent = (uiState as? EventEditScreenState.Success)?.isRecurrent == true
-                    if (isRecurrent) showEditRecurrentEventDialog = true else onSubmit(RecurrentEventScope.ThisEvent)
-                },
+                onSubmit = onSubmit,
+                isRecurring = (uiState as? EventEditScreenState.Success)?.isRecurring ?: false,
             )
         },
         modifier = modifier,
@@ -174,10 +167,6 @@ private fun EventEditScreen(
                     sharedTransitionScope = sharedTransitionScope,
                     animatedVisibilityScope = animatedVisibilityScope,
                 )
-
-                if (showEditRecurrentEventDialog) {
-                    EditRecurrentEventDialog(onEdit = onSubmit, onDismissRequest = { showEditRecurrentEventDialog = false })
-                }
             }
         }
     }
@@ -205,7 +194,7 @@ private val EventDetailTiming.timeZone: TimeZone
 
 private sealed interface EventEditScreenState {
     object Loading : EventEditScreenState
-    data class Success(val eventFormState: EventFormState, val isRecurrent: Boolean) : EventEditScreenState
+    data class Success(val eventFormState: EventFormState, val isRecurring: Boolean) : EventEditScreenState
 }
 
 @Preview
@@ -227,7 +216,7 @@ private fun Preview() {
                         initialIsOccupied = true,
                         initialIsPublic = true,
                     ),
-                    isRecurrent = false,
+                    isRecurring = false,
                 ),
                 goBack = {},
                 goToEventAttendees = {},

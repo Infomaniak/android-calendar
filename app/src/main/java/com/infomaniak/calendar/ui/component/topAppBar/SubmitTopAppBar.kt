@@ -22,12 +22,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
 fun SubmitTopAppBar(
     goBack: () -> Unit,
-    onSubmit: () -> Unit,
+    onSubmit: (RecurrentEventScope) -> Unit,
+    isRecurring: Boolean,
     modifier: Modifier = Modifier,
     isSubmitEnabled: () -> Boolean = { true },
     title: @Composable () -> Unit = {},
@@ -36,7 +38,7 @@ fun SubmitTopAppBar(
         navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
         actions = {
             Row(Modifier.padding(end = EsdsTheme.spacing.lg)) {
-                TopAppBarButtons.SaveButton(enabled = isSubmitEnabled, onClick = onSubmit)
+                TopAppBarButtons.SubmitButton(enabled = isSubmitEnabled, onSubmit = onSubmit, isRecurring = isRecurring)
             }
         },
         title = title,
