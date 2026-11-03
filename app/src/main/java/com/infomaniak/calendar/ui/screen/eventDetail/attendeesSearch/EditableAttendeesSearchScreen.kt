@@ -43,13 +43,16 @@ import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.SubmitButton
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
+import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
 fun EditableAttendeesSearchScreen(
     hasWritePermissions: Boolean,
+    isRecurring: Boolean,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AttendeesSearchSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
@@ -65,6 +68,7 @@ fun EditableAttendeesSearchScreen(
                 EditableAttendeesSearchScreen(
                     attendeesSearchState = attendeesSearchState.state,
                     hasWritePermissions = hasWritePermissions,
+                    isRecurring = isRecurring,
                     onSubmit = {},
                     goBack = goBack,
                 )
@@ -77,7 +81,8 @@ fun EditableAttendeesSearchScreen(
 private fun EditableAttendeesSearchScreen(
     attendeesSearchState: AttendeesSearchState<*>,
     hasWritePermissions: Boolean,
-    onSubmit: () -> Unit,
+    isRecurring: Boolean,
+    onSubmit: (RecurrentEventScope) -> Unit,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -91,7 +96,12 @@ private fun EditableAttendeesSearchScreen(
                 actions = {
                     if (hasWritePermissions) {
                         Row(Modifier.padding(end = EsdsTheme.spacing.lg)) {
-                            TopAppBarButtons.SaveButton(enabled = { isSubmitEnabled }, onClick = onSubmit)
+                            SubmitButton(
+                                isRecurring = isRecurring,
+                                onSubmit = onSubmit,
+                                modifier = Modifier,
+                                enabled = { isSubmitEnabled },
+                            )
                         }
                     }
                 },
@@ -115,6 +125,7 @@ private fun Preview() {
     CalendarThemeForPreview {
         EditableAttendeesSearchScreen(
             hasWritePermissions = true,
+            isRecurring = true,
             attendeesSearchState = rememberSaveableAttendeesSearchState(
                 participants = remember { mutableStateSetOf<ParticipantUi>().apply { addAll(previewAttendees) } },
                 results = remember { mutableStateListOf<AttendeesSearchResult>().apply { addAll(previewAttendees) } },
