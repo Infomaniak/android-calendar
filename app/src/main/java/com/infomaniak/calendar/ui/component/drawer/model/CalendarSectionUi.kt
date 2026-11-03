@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.ui.component.drawer.model
 
 data class CalendarSectionUi(
+    val key: String,
     val organisationName: String?,
     val calendars: List<CalendarUi>,
 )

@@ -68,6 +68,8 @@ class MenuDrawerViewModel(
 
     val expandedAccountIds: Flow<Set<Int>> = calendarDataValues.expandedDrawerAccountIds.flow
 
+    val collapsedSectionKeys: Flow<Set<String>> = calendarDataValues.collapsedDrawerSectionKeys.flow
+
     fun onCalendarVisibilityChanged(calendarId: CalendarId, isVisible: Boolean) {
         viewModelScope.launch {
             calendarManager.updateCalendar(calendarId, edit = CalendarEditData(isVisible = isVisible))
@@ -85,9 +87,18 @@ class MenuDrawerViewModel(
             }
         }
     }
+
+    fun onSectionExpandedChanged(sectionKey: String, isExpanded: Boolean) {
+        viewModelScope.launch {
+            calendarDataValues.collapsedDrawerSectionKeys.update { current ->
+                if (isExpanded) current - sectionKey else current + sectionKey
+            }
+        }
+    }
 }
 
 private fun CalendarSection.toCalendarSectionUi(): CalendarSectionUi = CalendarSectionUi(
+    key = "${accountId.value}/${organisation?.id?.value}",
     organisationName = organisation?.name,
     calendars = calendars.map { it.toCalendarUi() },
 )

@@ -17,36 +17,71 @@
  */
 package com.infomaniak.calendar.ui.component.drawer
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.ChevronDown
 
 @Composable
-fun DrawerSectionHeader(organisationName: String?, modifier: Modifier = Modifier) {
-    Text(
+fun DrawerSectionHeader(
+    organisationName: String?,
+    isExpanded: () -> Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val rotation by animateFloatAsState(targetValue = if (isExpanded()) 180f else 0f)
+
+    Row(
         modifier = modifier
-            .padding(start = Margin.Medium, top = Margin.Small, end = Margin.Medium, bottom = Margin.Micro)
+            .fillMaxWidth()
+            .toggleable(value = isExpanded(), onValueChange = onExpandedChange)
+            .padding(horizontal = Margin.Medium, vertical = Margin.Small)
             .semantics { heading() },
-        text = organisationName ?: stringResource(R.string.sectionOtherCalendarsHeader),
-        style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Margin.Medium),
+    ) {
+        Text(
+            modifier = Modifier.weight(1f),
+            text = organisationName ?: stringResource(R.string.sectionOtherCalendarsHeader),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Icon(
+            modifier = Modifier.rotate(rotation),
+            imageVector = EsdsIcons.ChevronDown.Small,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun DrawerSectionHeaderPreview() {
     CalendarThemeForPreview {
-        DrawerSectionHeader(organisationName = "Infomaniak")
+        DrawerSectionHeader(organisationName = "Infomaniak", isExpanded = { true }, onExpandedChange = {})
     }
 }
 
@@ -54,6 +89,6 @@ private fun DrawerSectionHeaderPreview() {
 @Composable
 private fun DrawerOtherCalendarsSectionHeaderPreview() {
     CalendarThemeForPreview {
-        DrawerSectionHeader(organisationName = null)
+        DrawerSectionHeader(organisationName = null, isExpanded = { false }, onExpandedChange = {})
     }
 }

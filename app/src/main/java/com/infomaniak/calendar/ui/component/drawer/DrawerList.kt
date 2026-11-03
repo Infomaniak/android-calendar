@@ -42,15 +42,19 @@ import kotlinx.parcelize.Parcelize
 fun LazyListScope.drawerListItems(
     usersCalendars: List<UserCalendarsUi>,
     onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
-    isSectionExpanded: (Int) -> Boolean,
+    isAccountExpanded: (Int) -> Boolean,
+    onSectionExpandedChange: (sectionKey: String, isExpanded: Boolean) -> Unit,
+    isSectionExpanded: (String) -> Boolean,
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
     onCalendarLongClick: (CalendarId) -> Unit,
 ) {
     usersCalendars.forEach { userCalendars ->
         calendarSection(
             userCalendars = userCalendars,
-            isExpanded = isSectionExpanded,
+            isExpanded = isAccountExpanded,
             onAccountExpandedChange = onAccountExpandedChange,
+            isSectionExpanded = isSectionExpanded,
+            onSectionExpandedChange = onSectionExpandedChange,
             onCalendarVisibilityChange = onCalendarVisibilityChange,
             onCalendarLongClick = onCalendarLongClick,
         )
@@ -61,6 +65,8 @@ private fun LazyListScope.calendarSection(
     userCalendars: UserCalendarsUi,
     isExpanded: (Int) -> Boolean,
     onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
+    isSectionExpanded: (String) -> Boolean,
+    onSectionExpandedChange: (sectionKey: String, isExpanded: Boolean) -> Unit,
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
     onCalendarLongClick: (CalendarId) -> Unit,
 ) {
@@ -84,18 +90,26 @@ private fun LazyListScope.calendarSection(
             )
             if (expanded) {
                 userCalendars.sections.forEachIndexed { index, section ->
+                    val sectionExpanded = isSectionExpanded(section.key)
+
                     Column(
                         modifier = Modifier
                             .clip(ListItemDefaults.segmentedShapes(index = index + 1, count = segmentCount).shape)
                             .background(CustomColors.menuDrawerContainerBackground),
                     ) {
-                        DrawerSectionHeader(organisationName = section.organisationName)
-                        section.calendars.forEach { calendar ->
-                            DrawerCalendarItem(
-                                calendar = calendar,
-                                onCalendarVisibilityChange = onCalendarVisibilityChange,
-                                onCalendarLongClick = onCalendarLongClick,
-                            )
+                        DrawerSectionHeader(
+                            organisationName = section.organisationName,
+                            isExpanded = { sectionExpanded },
+                            onExpandedChange = { onSectionExpandedChange(section.key, it) },
+                        )
+                        if (sectionExpanded) {
+                            section.calendars.forEach { calendar ->
+                                DrawerCalendarItem(
+                                    calendar = calendar,
+                                    onCalendarVisibilityChange = onCalendarVisibilityChange,
+                                    onCalendarLongClick = onCalendarLongClick,
+                                )
+                            }
                         }
                     }
                 }
@@ -112,7 +126,9 @@ private fun DrawerListPreviewContent(
         drawerListItems(
             usersCalendars = usersCalendars,
             onAccountExpandedChange = { _, _ -> {} },
-            isSectionExpanded = { false },
+            isAccountExpanded = { false },
+            onSectionExpandedChange = { _, _ -> },
+            isSectionExpanded = { true },
             onCalendarVisibilityChange = { _, _ -> },
             onCalendarLongClick = {},
         )

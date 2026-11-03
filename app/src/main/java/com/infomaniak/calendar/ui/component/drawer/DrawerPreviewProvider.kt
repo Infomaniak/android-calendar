@@ -49,6 +49,7 @@ class DrawerPreviewProvider : PreviewParameterProvider<List<UserCalendarsUi>> {
                 ),
                 sections = listOf(
                     CalendarSectionUi(
+                        key = "1/1",
                         organisationName = "John Doe",
                         calendars = listOf(
                             CalendarUi(
@@ -68,6 +69,7 @@ class DrawerPreviewProvider : PreviewParameterProvider<List<UserCalendarsUi>> {
                         ),
                     ),
                     CalendarSectionUi(
+                        key = "1/null",
                         organisationName = null,
                         calendars = listOf(
                             CalendarUi(
@@ -95,6 +97,7 @@ class DrawerPreviewProvider : PreviewParameterProvider<List<UserCalendarsUi>> {
                 ),
                 sections = listOf(
                     CalendarSectionUi(
+                        key = "2/2",
                         organisationName = "Team Studio",
                         calendars = listOf(
                             CalendarUi(

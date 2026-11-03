@@ -58,6 +58,7 @@ fun MenuDrawer(
     val calendarDrawerState = LocalDrawerState.current ?: return
     val calendarsUsers by menuDrawerViewModel.calendarsUsers.collectAsStateWithLifecycle()
     val expandedAccountIds by menuDrawerViewModel.expandedAccountIds.collectAsStateWithLifecycle(emptySet())
+    val collapsedSectionKeys by menuDrawerViewModel.collapsedSectionKeys.collectAsStateWithLifecycle(emptySet())
     val scope = rememberCoroutineScope()
 
     BackHandler(enabled = calendarDrawerState.isOpen) { scope.launch { calendarDrawerState.close() } }
@@ -69,7 +70,9 @@ fun MenuDrawer(
         onCalendarLongClick = menuDrawerViewModel::onCalendarLongClicked,
         content = content,
         onAccountExpandedChange = menuDrawerViewModel::onAccountExpandedChanged,
-        isSectionExpanded = { expandedAccountIds.contains(it) },
+        isAccountExpanded = { expandedAccountIds.contains(it) },
+        onSectionExpandedChange = menuDrawerViewModel::onSectionExpandedChanged,
+        isSectionExpanded = { !collapsedSectionKeys.contains(it) },
         onManageAccounts = {
             scope.launch {
                 calendarDrawerState.close()
@@ -87,7 +90,9 @@ private fun MenuDrawer(
     onCalendarVisibilityChanged: (CalendarId, Boolean) -> Unit,
     onCalendarLongClick: (CalendarId) -> Unit,
     onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
-    isSectionExpanded: (Int) -> Boolean,
+    isAccountExpanded: (Int) -> Boolean,
+    onSectionExpandedChange: (sectionKey: String, isExpanded: Boolean) -> Unit,
+    isSectionExpanded: (String) -> Boolean,
     onManageAccounts: () -> Unit,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -112,8 +117,10 @@ private fun MenuDrawer(
                         usersCalendars = calendarsUsers,
                         onCalendarVisibilityChange = onCalendarVisibilityChanged,
                         onCalendarLongClick = onCalendarLongClick,
-                        isSectionExpanded = isSectionExpanded,
+                        isAccountExpanded = isAccountExpanded,
                         onAccountExpandedChange = onAccountExpandedChange,
+                        isSectionExpanded = isSectionExpanded,
+                        onSectionExpandedChange = onSectionExpandedChange,
                     )
                     item {
                         MenuList(menuOptions = menuOptions)
@@ -164,7 +171,9 @@ private fun MenuDrawerPreview(
             onCalendarVisibilityChanged = { _, _ -> },
             onCalendarLongClick = {},
             onAccountExpandedChange = { _, _ -> },
-            isSectionExpanded = { false },
+            isAccountExpanded = { false },
+            onSectionExpandedChange = { _, _ -> },
+            isSectionExpanded = { true },
             onManageAccounts = {},
             content = {},
             modifier = Modifier,
