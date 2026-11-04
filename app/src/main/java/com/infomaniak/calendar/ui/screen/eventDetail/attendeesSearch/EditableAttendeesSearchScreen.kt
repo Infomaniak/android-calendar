@@ -38,6 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
+import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
@@ -45,10 +46,12 @@ import com.infomaniak.calendar.components.foundation.state.rememberSaveableAtten
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.SubmitButton
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
+import com.infomaniak.calendar.ui.screen.eventDetail.AttendeesUpdatePayload
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EditAttendeesConfig
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 
@@ -73,7 +76,11 @@ fun EditableAttendeesSearchScreen(
                 onSubmit = { scope ->
                     val isSuccess = viewModel.updateAttendees(
                         occurrenceId = config.occurrenceId,
-                        attendees = attendeesSearchState.state.attendees,
+                        attendeesUpdatePayload = AttendeesUpdatePayload(
+                            attendees = attendeesSearchState.state.attendees,
+                            organizer = (attendeesSearchState.state.organizerSource as? OrganizerSource.Static)?.organizer,
+                            calendarId = CalendarId(config.calendarId),
+                        ),
                         scope = scope,
                     )
                     if (isSuccess) goBack()
@@ -134,6 +141,7 @@ private fun Preview() {
                 occurrenceId = OccurrenceId.Master(EventId("preview")),
                 canEdit = true,
                 isRecurring = false,
+                calendarId = "preview",
             ),
             attendeesSearchState = rememberSaveableAttendeesSearchState(
                 participants = remember { mutableStateSetOf<ParticipantUi>().apply { addAll(previewAttendees) } },

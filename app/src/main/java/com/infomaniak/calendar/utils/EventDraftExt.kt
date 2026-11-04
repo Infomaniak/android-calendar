@@ -20,6 +20,7 @@ package com.infomaniak.calendar.utils
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerUi
+import com.infomaniak.calendar.ui.screen.eventDetail.AttendeesUpdatePayload
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.AlarmListEdit
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.AttendeeEdit
@@ -46,6 +47,17 @@ fun EventDraft.applyTo(editData: EventEditData, defaultOrganizer: Organizer?): E
     attendees = attendees.toAttendeeEdit(),
     organizer = (initialOrganizer?.toOrganizer() ?: defaultOrganizer).takeIf { attendees.isNotEmpty() },
 )
+
+fun EventEditData.updateWithAttendeesAndOrganizer(
+    attendeesUpdatePayload: AttendeesUpdatePayload,
+    defaultOrganizer: Organizer?,
+): EventEditData {
+    return copy(
+        attendees = attendeesUpdatePayload.attendees.toAttendeeEdit(),
+        organizer = (attendeesUpdatePayload.organizer?.toOrganizer() ?: defaultOrganizer)
+            .takeIf { attendeesUpdatePayload.attendees.isNotEmpty() },
+    )
+}
 
 fun EventDraft.toNewEventEditData(defaultOrganizer: Organizer?): EventEditData = applyTo(
     defaultOrganizer = defaultOrganizer,

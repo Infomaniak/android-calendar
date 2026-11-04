@@ -18,9 +18,15 @@
 package com.infomaniak.calendar.ui.screen.eventDetail.model
 
 import androidx.compose.runtime.Stable
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.serialization.Serializable
 
 @Serializable
 @Stable
-data class EditAttendeesConfig(val occurrenceId: OccurrenceId, val canEdit: Boolean, val isRecurring: Boolean)
+data class EditAttendeesConfig(
+    val occurrenceId: OccurrenceId,
+    val canEdit: Boolean,
+    val isRecurring: Boolean,
+    val calendarId: String,
+)

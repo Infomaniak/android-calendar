@@ -18,16 +18,14 @@
 package com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch
 
 import androidx.lifecycle.ViewModel
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.manager.BackgroundEventComposer
-import com.infomaniak.calendar.ui.screen.eventDetail.EventComposerUseCase
+import com.infomaniak.calendar.ui.screen.eventDetail.AttendeesUpdatePayload
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
-import kotlinx.coroutines.runBlocking
 
 @Inject
 @ContributesIntoMap(AppScope::class)
@@ -35,11 +33,15 @@ import kotlinx.coroutines.runBlocking
 class EditableAttendeesSearchViewModel(private val backgroundEventComposer: BackgroundEventComposer) : ViewModel() {
     private var hasEdited = false
 
-    fun updateAttendees(occurrenceId: OccurrenceId, attendees: List<AttendeeUi>, scope: RecurrentEventScope): Boolean {
+    fun updateAttendees(
+        occurrenceId: OccurrenceId,
+        attendeesUpdatePayload: AttendeesUpdatePayload,
+        scope: RecurrentEventScope,
+    ): Boolean {
         if (hasEdited) return false
         hasEdited = true
 
-        backgroundEventComposer.updateAttendees(occurrenceId, scope, attendees)
+        backgroundEventComposer.updateAttendees(occurrenceId, scope, attendeesUpdatePayload)
 
         return true
     }

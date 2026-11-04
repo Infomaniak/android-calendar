@@ -104,8 +104,8 @@ fun EventDetailScreen(
         goToEdit = goToEdit,
         onDelete = { scope -> if (viewModel.deleteEvent(occurrenceId, scope)) goBack() },
         onLocationClick = { location -> openLocationInMapApp(context, location) },
-        goToEventAttendees = { canEdit, isRecurring ->
-            goToEventAttendees(EditAttendeesConfig(occurrenceId, canEdit, isRecurring))
+        goToEventAttendees = { canEdit, isRecurring, calendarId ->
+            goToEventAttendees(EditAttendeesConfig(occurrenceId, canEdit, isRecurring, calendarId))
         },
         modifier = modifier,
     )
@@ -116,7 +116,7 @@ private fun EventDetailScreen(
     uiState: () -> EventDetailUiState.Displayable,
     goBack: () -> Unit,
     goToEdit: () -> Unit,
-    goToEventAttendees: (canEdit: Boolean, isRecurring: Boolean) -> Unit,
+    goToEventAttendees: (canEdit: Boolean, isRecurring: Boolean, calendarId: String) -> Unit,
     onDelete: (RecurrentEventScope) -> Unit,
     onLocationClick: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -167,7 +167,11 @@ private fun EventDetailScreen(
                     onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
                     onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
                     onRoomClick = { /*TODO[eventDetail]*/ },
-                    goToEventAttendees = { goToEventAttendees(state.eventDetail.canEdit, state.eventDetail.isRecurring) },
+                    goToEventAttendees = {
+                        with(state.eventDetail) {
+                            goToEventAttendees(canEdit, isRecurring, calendar.id)
+                        }
+                    },
                     modifier = Modifier.verticalScroll(scrollState),
                     contentPadding = scaffoldContentPadding + Dimens.EventDetailScreensHorizontalPadding,
                     sharedTransitionScope = sharedTransitionScope,
@@ -202,7 +206,7 @@ private fun Preview() {
                 uiState = { EventDetailUiState.Displayable.Success(previewEventDetailUi) },
                 goBack = {},
                 goToEdit = {},
-                goToEventAttendees = { _, _ -> },
+                goToEventAttendees = { _, _, _ -> },
                 onDelete = {},
                 onLocationClick = {},
             )
