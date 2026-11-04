@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,18 +56,23 @@ fun AttendeesSearchScreen(
     viewModel: AttendeesSearchSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
     val attendeesSearchUi by viewModel.attendeesSearchState.collectAsStateWithLifecycle()
+
     viewModel.EnableSearch()
 
-    AttendeesSearchScreenContent(
-        topBar = { TopBar(goBack) },
-        attendeesSearchState = (attendeesSearchUi as? AttendeesSearchUiState.Success)?.state, // The parent provides it right away, so nothing to show
-        modifier = modifier.fillMaxSize(),
-    )
+    Box(modifier = modifier.fillMaxSize()) {
+        when (val attendeesSearchState = attendeesSearchUi) {
+            AttendeesSearchUiState.Loading -> Unit // The parent provides it right away, so nothing to show
+            is AttendeesSearchUiState.Success -> AttendeesSearchScreenContent(
+                topBar = { TopBar(goBack) },
+                attendeesSearchState = attendeesSearchState.state,
+            )
+        }
+    }
 }
 
 @Composable
 fun AttendeesSearchScreenContent(
-    attendeesSearchState: AttendeesSearchState<*>?,
+    attendeesSearchState: AttendeesSearchState<*>,
     topBar: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     isSearchable: Boolean = true,
@@ -78,17 +84,13 @@ fun AttendeesSearchScreenContent(
     ) { contentPadding ->
         val snackbarHostState = LocalSharedSnackbarHostState.current
 
-        when (attendeesSearchState) {
-            null -> Unit // The parent provides it right away, so nothing to show
-            else -> AttendeesSearch(
-                attendeesSearchState = attendeesSearchState,
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = contentPadding,
-                onShowSnackbar = { message -> snackbarHostState?.showSnackbar(message = message) },
-                isSearchable = isSearchable,
-            )
-
-        }
+        AttendeesSearch(
+            attendeesSearchState = attendeesSearchState,
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = contentPadding,
+            onShowSnackbar = { message -> snackbarHostState?.showSnackbar(message = message) },
+            isSearchable = isSearchable,
+        )
     }
 }
 
