@@ -96,7 +96,13 @@ internal suspend fun CalendarPager.growRangeAround(page: LocalDate) {
 internal suspend fun CalendarPager.followSelection(page: LocalDate) {
     awaitScroll()
     snapshotFlow { page in pageRange }.first { it }
-    if (page != displayedPage) scrollToPage(page, animate = true)
+    if (page != displayedPage) slideToPage(page)
+}
+
+private suspend fun CalendarPager.slideToPage(page: LocalDate) {
+    val slideStart = pageAt(page, if (page < displayedPage) 1 else -1)
+    if (slideStart != displayedPage) scrollToPage(slideStart, animate = false)
+    scrollToPage(page, animate = true)
 }
 
 private suspend fun CalendarPager.awaitScroll() {
