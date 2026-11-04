@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.utils
 
+import com.infomaniak.calendar.components.foundation.models.AvatarData
 import com.infomaniak.multiplatform_core.contacts.domain.model.Contact
 
-val Contact.avatarUri: String? get() = avatar.avatarUri
+val Contact.avatarData: AvatarData? get() = avatar.avatarData

@@ -18,22 +18,47 @@
 package com.infomaniak.calendar.components.foundation.utils
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.produceState
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.AvatarData
+import com.infomaniak.calendar.components.foundation.models.AvatarStrategy
 import com.infomaniak.calendar.components.foundation.state.LocalAvatarFinder
 import com.infomaniak.core.avatar.LocalAvatarColors
 import com.infomaniak.core.avatar.getBackgroundColorResBasedOnId
 import com.infomaniak.core.avatar.models.AvatarColors
 import com.infomaniak.core.avatar.models.AvatarType
+import com.infomaniak.core.avatar.models.AvatarUrlData
 
 @Composable
-fun AvatarType.Companion.fromAttendee(attendee: AttendeeUi): AvatarType {
+fun AvatarType.Companion.fromAttendee(attendee: AttendeeUi): State<AvatarType> {
     val avatarColors = LocalAvatarColors.current
     val avatarFinder = LocalAvatarFinder.current
-    return AvatarType.WithInitials.Initials(
+    val avatar = attendee.avatar
+
+    fun getUrlOrInitials(avatarUrlData: AvatarUrlData?): AvatarType.WithInitials = AvatarType.getUrlOrInitials(
+        avatarUrlData = avatarUrlData,
         initials = attendee.initials(),
         colors = AvatarColors(
             containerColor = getBackgroundColorResBasedOnId(attendee.email.hashCode(), avatarColors.containerColors),
             contentColor = avatarColors.contentColor,
         ),
     )
+
+    val initialValue = if (avatar is AvatarStrategy.Precomputed) {
+        avatarUrlDataOf(avatar.avatarData)
+    } else {
+        null
+    }
+
+    return produceState(getUrlOrInitials(initialValue)) {
+        if (avatar is AvatarStrategy.ToCompute) {
+            val avatarUri = avatarFinder.avatarOf(attendee.displayName, attendee.email)
+            value = getUrlOrInitials(avatarUrlDataOf(avatarUri))
+        }
+    }
+}
+
+private fun avatarUrlDataOf(avatarUri: AvatarData?): AvatarUrlData? {
+    return avatarUri?.let { AvatarUrlData(url = it.url, imageLoader = imageLoader) }
 }

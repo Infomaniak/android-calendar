@@ -117,7 +117,7 @@ private fun StackedAvatars(attendees: List<AttendeeUi>) {
         val size = EsdsTheme.icon.sizeLg
 
         attendees.take(AVATAR_STACK_LIMIT).forEach { attendee ->
-            Avatar(AvatarType.fromAttendee(attendee), Modifier.size(size), border)
+            Avatar(AvatarType.fromAttendee(attendee).value, Modifier.size(size), border)
         }
         if (attendees.size > AVATAR_STACK_LIMIT) ExtraCountIndicator(attendees.size, border, Modifier.size(size))
     }

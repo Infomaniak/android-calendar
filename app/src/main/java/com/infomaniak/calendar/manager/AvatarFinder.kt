@@ -18,9 +18,9 @@
 package com.infomaniak.calendar.manager
 
 import com.infomaniak.calendar.components.foundation.manager.AvatarFinder
-import com.infomaniak.calendar.utils.avatarUri
+import com.infomaniak.calendar.utils.avatarData
 import com.infomaniak.multiplatform_core.contacts.ContactsManager
 
 fun AvatarFinder.Companion.of(contactsManager: ContactsManager): AvatarFinder = AvatarFinder { name, email ->
-    contactsManager.search(email).firstOrNull()?.avatarUri
+    contactsManager.search(email).firstOrNull()?.avatarData
 }

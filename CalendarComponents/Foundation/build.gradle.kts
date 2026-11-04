@@ -44,6 +44,8 @@ dependencies {
     implementation(libs.infomaniak.designsystem.foundation)
     implementation(libs.infomaniak.designsystem.icons)
 
+    implementation(core.coil.compose)
+
     implementation(kmpCalendar.kotlinx.datetime)
 
     implementation(platform(core.compose.bom))

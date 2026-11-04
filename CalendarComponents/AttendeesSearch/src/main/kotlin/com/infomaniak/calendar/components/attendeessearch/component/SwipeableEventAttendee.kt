@@ -129,7 +129,7 @@ private fun EventAttendee(
         verticalAlignment = Alignment.CenterVertically,
         leadingContent = {
             Avatar(
-                avatarType = AvatarType.fromAttendee(attendee),
+                avatarType = AvatarType.fromAttendee(attendee).value,
                 modifier = Modifier.size(EsdsTheme.icon.sizeXl),
             )
         },

@@ -17,8 +17,10 @@
  */
 package com.infomaniak.calendar.components.foundation.manager
 
+import com.infomaniak.calendar.components.foundation.models.AvatarData
+
 fun interface AvatarFinder {
-    suspend fun avatarOf(name: String?, email: String): String?
+    suspend fun avatarOf(name: String?, email: String): AvatarData?
 
     companion object {
         val Empty = AvatarFinder { _, _ -> null }

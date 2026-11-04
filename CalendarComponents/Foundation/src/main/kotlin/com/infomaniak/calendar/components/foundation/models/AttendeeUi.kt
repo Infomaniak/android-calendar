@@ -51,7 +51,7 @@ data class AttendeeUi(
 
 sealed interface AvatarStrategy : Parcelable {
     @Parcelize
-    data class Precomputed(val avatarUri: String?) : AvatarStrategy
+    data class Precomputed(val avatarData: AvatarData?) : AvatarStrategy
     @Parcelize
     data object ToCompute : AvatarStrategy
 }
