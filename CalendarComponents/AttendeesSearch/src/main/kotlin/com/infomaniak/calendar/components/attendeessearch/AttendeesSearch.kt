@@ -53,7 +53,7 @@ fun AttendeesSearch(
     contentPadding: PaddingValues = PaddingValues(),
     isSearchable: Boolean = true,
 ) {
-    val isDisplayingSearchResults = attendeesSearchState.searchQueryTextFieldState.text.isNotBlank()
+    val isDisplayingSearchResults = attendeesSearchState.searchQueryTextFieldState.text.isNotBlank() && isSearchable
 
     val attendeesList: List<AttendeesSearchResult> = if (isDisplayingSearchResults) {
         attendeesSearchState.results
