@@ -29,8 +29,10 @@ import com.infomaniak.calendar.notification.AlarmScheduler
 import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.login.InfomaniakLogin
+import com.infomaniak.core.network.ApiEnvironment
 import com.infomaniak.core.network.LOGIN_ENDPOINT_URL
 import com.infomaniak.multiplatform_calendar.core.managers.AccountManager
+import com.infomaniak.multiplatform_core.appenvironment.AppEnvironment
 import com.infomaniak.multiplatform_core.crashreport.AndroidCrashReport
 import com.infomaniak.multiplatform_core.crashreport.CrashReport
 import dev.zacsweers.metro.AppScope
@@ -85,6 +87,13 @@ interface AppGraph : AndroidComponentProvider, ViewModelGraph {
     @Provides
     @SingleIn(AppScope::class)
     fun provideCrashReportInterface(): CrashReport = AndroidCrashReport()
+
+    @Provides
+    fun provideAppEnvironment(): AppEnvironment = when (val apiEnvironment = ApiEnvironment.current) {
+        ApiEnvironment.Prod -> AppEnvironment.Prod
+        ApiEnvironment.PreProd -> AppEnvironment.Preprod
+        is ApiEnvironment.Custom -> AppEnvironment.Custom(apiEnvironment.host)
+    }
 
     @DependencyGraph.Factory
     fun interface Factory {
