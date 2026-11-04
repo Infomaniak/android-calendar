@@ -105,17 +105,15 @@ private fun EventDraft.bounds(): EventBounds = if (isAllDay) {
 private fun OrganizerUi.toOrganizer(): Organizer = Organizer(email, displayName)
 
 /**
- * A notification read from a stored alarm gives that alarm back, so it keeps its id and the properties the form doesn't show.
+ * A notification read from a stored alarm gives that alarm back, found by its id, so it keeps the properties the form doesn't show.
  * Stored alarms the form can't show are kept as well.
  */
 private fun List<EventDetailUi.Notification>.toAlarms(storedAlarms: List<EventAlarm>): List<EventAlarm> {
-    val unmatchedAlarms = storedAlarms.toMutableList()
     val alarms = map { notification ->
-        val index = unmatchedAlarms.indexOfFirst { it.toNotification() == notification }
-        if (index == -1) notification.toAlarm() else unmatchedAlarms.removeAt(index)
+        notification.sourceId?.let { sourceId -> storedAlarms.find { it.id?.value == sourceId } } ?: notification.toAlarm()
     }
 
-    return alarms + unmatchedAlarms.filter { it.toNotification() == null }
+    return alarms + storedAlarms.filter { it.toNotification() == null }
 }
 
 private fun EventDetailUi.Notification.toAlarm(): EventAlarm = EventAlarm(

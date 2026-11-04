@@ -100,6 +100,7 @@ fun EventAlarm.toNotification(): EventDetailUi.Notification? {
             is AlarmTrigger.Relative -> NotificationTime.Offset(trigger.offset)
             is AlarmTrigger.Absolute -> NotificationTime.Absolute(trigger.instant)
         },
+        sourceId = id?.value,
     )
 }
 

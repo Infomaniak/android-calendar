@@ -64,8 +64,9 @@ data class EventDetailUi(
         val fileType: FileType by lazy { FileType.guessFromFileName(name) }
     }
 
+    /** @param sourceId Opaque id of the stored alarm it was read from, `null` for one added in the form. */
     @Immutable
-    data class Notification(val type: Type, val time: NotificationTime) {
+    data class Notification(val type: Type, val time: NotificationTime, val sourceId: String? = null) {
         @Immutable
         enum class Type(val icon: Symbol, @StringRes val label: Int) {
             Email(EsdsIcons.Bell, R.string.notificationTypeEmail),
