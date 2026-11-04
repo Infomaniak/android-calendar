@@ -43,8 +43,8 @@ android {
         applicationId = "com.infomaniak.calendar"
         minSdk = appMinSdk
         targetSdk = appCompileSdk
-        versionCode = 2
-        versionName = "0.1-dev"
+        versionCode = 1_00_000_1
+        versionName = "1.0.0-alpha1"
 
         buildConfigField("String", "CLIENT_ID", "\"019ED5E7-47D9-7C02-A0C0-F5EF862DB5A1\"")
 
