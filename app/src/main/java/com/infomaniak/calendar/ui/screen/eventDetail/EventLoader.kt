@@ -52,7 +52,7 @@ class EventLoader @Inject constructor(
         }
 
         event
-            .toEventDetailUi(calendar, users.toEventDetailCalendarGroups(writableCalendars), emailsByUserId)
+            .toEventDetailUi(calendar, users.toEventDetailCalendarGroups(writableCalendars), users, emailsByUserId)
             .let(EventDetailUiState.Displayable::Success)
     }
 

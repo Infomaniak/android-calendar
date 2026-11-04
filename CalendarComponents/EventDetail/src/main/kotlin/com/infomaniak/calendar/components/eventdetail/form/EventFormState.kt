@@ -26,13 +26,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateSet
 import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import kotlinx.datetime.atTime
 
 /**
@@ -45,7 +45,9 @@ class EventFormState(
     selectedCalendarState: MutableState<EventDetailCalendar>,
     val isAllDay: MutableState<Boolean>,
     val dateAndTimeState: DateAndTimeState?,
-    val attendees: SnapshotStateSet<AttendeeUi>,
+    val attendees: () -> List<AttendeeUi>,
+    /** The organizer of the edited event, never updated by the form. There either is one at the start or it will be added right before sending */
+    val initialOrganizer: OrganizerUi?,
     val isKMeetUrlEnabled: MutableState<Boolean>,
     val isOccupied: MutableState<Boolean>,
     val isPublic: MutableState<Boolean>,
@@ -65,7 +67,8 @@ class EventFormState(
             startTimeZone = dateAndTimeState.start.timeZone,
             end = dateAndTimeState.end.date.atTime(dateAndTimeState.end.time),
             endTimeZone = dateAndTimeState.end.timeZone,
-            attendees = attendees.toList(),
+            attendees = attendees(),
+            initialOrganizer = initialOrganizer,
             isKMeetUrlEnabled = isKMeetUrlEnabled.value,
             isOccupied = isOccupied.value,
             isPublic = isPublic.value,
@@ -78,7 +81,7 @@ fun rememberDefaultEventForm(
     calendars: List<EventDetailCalendarGroup>,
     initialCalendar: EventDetailCalendar,
     dateAndTimeState: DateAndTimeState?,
-    attendees: SnapshotStateSet<AttendeeUi>,
+    attendees: () -> List<AttendeeUi>,
 ): EventFormState = rememberEventFormState(
     calendars = calendars,
     initialEventColor = EventColorChoice.Default,
@@ -88,6 +91,7 @@ fun rememberDefaultEventForm(
     initialIsAllDay = false,
     initialIsKMeetUrlEnabled = false,
     attendees = attendees,
+    initialOrganizer = null,
     initialIsOccupied = true,
     initialIsPublic = true,
 )
@@ -101,7 +105,8 @@ fun rememberEventFormState(
     initialText: String,
     initialIsAllDay: Boolean,
     initialIsKMeetUrlEnabled: Boolean,
-    attendees: SnapshotStateSet<AttendeeUi>,
+    attendees: () -> List<AttendeeUi>,
+    initialOrganizer: OrganizerUi?,
     initialIsOccupied: Boolean,
     initialIsPublic: Boolean,
 ): EventFormState = EventFormState(
@@ -111,6 +116,7 @@ fun rememberEventFormState(
     isAllDay = rememberSaveable { mutableStateOf(initialIsAllDay) },
     dateAndTimeState = dateAndTimeState,
     attendees = attendees,
+    initialOrganizer = initialOrganizer,
     isKMeetUrlEnabled = rememberSaveable { mutableStateOf(initialIsKMeetUrlEnabled) },
     isOccupied = rememberSaveable { mutableStateOf(initialIsOccupied) },
     isPublic = rememberSaveable { mutableStateOf(initialIsPublic) },

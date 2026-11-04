@@ -21,6 +21,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
+import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.manager.BackgroundEventComposer
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
@@ -42,7 +43,7 @@ class EventDetailViewModel(
     @Assisted private val savedStateHandle: SavedStateHandle,
     private val backgroundEventComposer: BackgroundEventComposer,
 ) : ViewModel() {
-    val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
+    val attendeesSearchState: AttendeesSearchState<OrganizerSource.Static> = savedStateHandle.saveableAttendeesSearchState()
 
     private var isDeleteRequested = false
 

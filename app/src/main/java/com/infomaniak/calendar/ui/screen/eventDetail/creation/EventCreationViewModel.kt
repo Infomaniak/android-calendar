@@ -23,6 +23,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.data.SettingsDataValues
 import com.infomaniak.calendar.manager.BackgroundEventComposer
@@ -53,7 +54,7 @@ class EventCreationViewModel(
         .map { calendars -> calendars?.let(EventCreationUiState::Success) ?: EventCreationUiState.NoWritableCalendar }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), EventCreationUiState.Loading)
 
-    val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
+    val attendeesSearchState: AttendeesSearchState<OrganizerSource.Dynamic> = savedStateHandle.saveableAttendeesSearchState()
 
     val defaultEventDuration = settingsDataValues.defaultEventDuration.flow
 

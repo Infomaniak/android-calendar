@@ -19,6 +19,7 @@ package com.infomaniak.calendar.components.eventdetail.models
 
 import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 
@@ -32,6 +33,7 @@ data class EventDraft(
     val end: LocalDateTime,
     val endTimeZone: TimeZone,
     val attendees: List<AttendeeUi>,
+    val initialOrganizer: OrganizerUi?,
     val isKMeetUrlEnabled: Boolean,
     val isOccupied: Boolean,
     val isPublic: Boolean,

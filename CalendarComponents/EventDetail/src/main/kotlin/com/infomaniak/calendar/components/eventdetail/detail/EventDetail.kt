@@ -92,7 +92,7 @@ fun EventDetail(
             Section(EventSharedElement.Divider1) {
                 if (attendees.all.isNotEmpty()) {
                     AttendeesButton(
-                        attendees = attendees.all,
+                        attendees = { attendees.all },
                         onClick = goToEventAttendees,
                         modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
                     )
@@ -160,6 +160,7 @@ private fun PreviewEventDetail() {
             all = previewAttendees,
             me = previewAttendees.first(),
         ),
+        organizer = null,
         kMeetUrl = "test url",
         location = "Location",
         room = EventDetailUi.Room("Japan room", 5, 3),

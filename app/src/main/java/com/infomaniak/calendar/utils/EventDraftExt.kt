@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.utils
 
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.AlarmListEdit
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.AttendeeEdit
@@ -42,7 +43,7 @@ fun EventDraft.applyTo(editData: EventEditData, defaultOrganizer: Organizer?): E
     timeBlocking = if (isOccupied) TimeBlocking.Blocks else TimeBlocking.DoesNotBlock,
     calendarId = typedCalendarId,
     attendees = attendees.map { AttendeeEdit(email = it.email, displayName = it.displayName) },
-    organizer = (editData.organizer ?: defaultOrganizer).takeIf { attendees.isNotEmpty() },
+    organizer = (initialOrganizer?.toOrganizer() ?: defaultOrganizer).takeIf { attendees.isNotEmpty() },
 )
 
 fun EventDraft.toNewEventEditData(defaultOrganizer: Organizer?): EventEditData = applyTo(
@@ -68,3 +69,5 @@ private fun EventDraft.bounds(): EventBounds = if (isAllDay) {
 } else {
     EventBounds.Zoned(start = ZonedWallClock(start, startTimeZone), end = ZonedWallClock(end, endTimeZone))
 }
+
+private fun OrganizerUi.toOrganizer(): Organizer = Organizer(email, displayName)

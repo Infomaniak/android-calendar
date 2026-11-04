@@ -212,6 +212,7 @@ private fun Preview() {
         isAllDay = false,
         recurrence = EventDetailRecurrence.Recurrence(getText = { "Every week on Monday" }),
         attendees = Attendees(all = emptyList(), me = null),
+        organizer = null,
         kMeetUrl = null,
         location = "Salle Tokyo",
         room = null,

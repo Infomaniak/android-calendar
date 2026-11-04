@@ -19,10 +19,12 @@ package com.infomaniak.calendar.utils
 
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
+import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationStatus as KmpParticipationStatus
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.Organizer
 import com.infomaniak.multiplatform_core.account.domain.model.AccountId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationStatus as KmpParticipationStatus
 
 /**
  * Attendees of an event owned by [accountId], with the current user singled out by matching their
@@ -39,6 +41,8 @@ fun Attendee.toAttendeeUi(): AttendeeUi = AttendeeUi(
     status = status.toParticipationStatus(),
     isOrganizer = isOrganizer,
 )
+
+fun Organizer.toOrganizerUi(): OrganizerUi = OrganizerUi(email = email, displayName = displayName)
 
 internal fun KmpParticipationStatus.toParticipationStatus(): ParticipationStatus = when (this) {
     KmpParticipationStatus.Accepted -> ParticipationStatus.Accepted

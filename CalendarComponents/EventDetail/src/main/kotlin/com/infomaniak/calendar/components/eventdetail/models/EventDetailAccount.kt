@@ -20,4 +20,4 @@ package com.infomaniak.calendar.components.eventdetail.models
 import androidx.compose.runtime.Immutable
 
 @Immutable
-data class EventDetailAccount(val id: Int, val name: String)
+data class EventDetailAccount(val id: Int, val userEmail: String)

@@ -69,7 +69,7 @@ internal fun CalendarChoiceDialog(
                 item(key = Key.Title(account.id)) {
                     val topPadding = if (index == 0) 0.dp else EsdsTheme.spacing.threeXl
                     Text(
-                        text = account.name,
+                        text = account.userEmail,
                         style = MaterialTheme.typography.titleSmall,
                         modifier = Modifier
                             .padding(top = topPadding, bottom = EsdsTheme.spacing.md)

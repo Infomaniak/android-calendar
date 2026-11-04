@@ -62,31 +62,33 @@ private const val AVATAR_STACK_LIMIT = 3
 
 @Composable
 internal fun AttendeesButton(
-    attendees: List<AttendeeUi>,
+    attendees: () -> List<AttendeeUi>,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
+    val attendeeList = attendees()
+
     ClickableItem(
         contentPadding = contentPadding,
         onClick = onClick,
         leadingIcon = EsdsIcons.UsersStacked,
-        text = if (attendees.isEmpty()) {
+        text = if (attendeeList.isEmpty()) {
             stringResource(R.string.attendees)
         } else {
-            pluralStringResource(R.plurals.attendeesCount, attendees.size, attendees.size)
+            pluralStringResource(R.plurals.attendeesCount, attendeeList.size, attendeeList.size)
         },
-        supportingContent = if (attendees.isEmpty()) {
+        supportingContent = if (attendeeList.isEmpty()) {
             null
         } else {
-            { Text(text = participationSummary(attendees)) }
+            { Text(text = participationSummary(attendeeList)) }
         },
         trailingContent = {
             Row(horizontalArrangement = Arrangement.spacedBy(Margin.Mini), verticalAlignment = Alignment.CenterVertically) {
-                if (attendees.isEmpty()) {
+                if (attendeeList.isEmpty()) {
                     Text(stringResource(R.string.noAttendeesLabel))
                 } else {
-                    StackedAvatars(attendees)
+                    StackedAvatars(attendeeList)
                 }
                 Icon(EsdsIcons.ChevronRight.Small, contentDescription = null)
             }
@@ -147,7 +149,7 @@ private fun ExtraCountIndicator(extraCount: Int, border: BorderStroke, modifier:
 private fun PreviewAttendeesButton() {
     MaterialTheme {
         Surface {
-            AttendeesButton(previewAttendees, onClick = {})
+            AttendeesButton({ previewAttendees }, onClick = {})
         }
     }
 }
@@ -157,7 +159,7 @@ private fun PreviewAttendeesButton() {
 private fun PreviewEmptyList() {
     MaterialTheme {
         Surface {
-            AttendeesButton(emptyList(), onClick = {})
+            AttendeesButton({ emptyList() }, onClick = {})
         }
     }
 }

@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.manager.BackgroundEventComposer
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
@@ -44,7 +45,7 @@ class EventEditViewModel(
     @Assisted private val savedStateHandle: SavedStateHandle,
     private val backgroundEventComposer: BackgroundEventComposer,
 ) : ViewModel() {
-    val attendeesSearchState: AttendeesSearchState = savedStateHandle.saveableAttendeesSearchState()
+    val attendeesSearchState: AttendeesSearchState<OrganizerSource.Static> = savedStateHandle.saveableAttendeesSearchState()
 
     private var areAttendeesInitialized: Boolean
         get() = savedStateHandle[ARE_ATTENDEES_INITIALIZED_KEY] ?: false
@@ -57,7 +58,8 @@ class EventEditViewModel(
     suspend fun initAttendeesSearchState(eventDetailUi: Flow<EventDetailUiState>) {
         if (areAttendeesInitialized) return
         val event = eventDetailUi.filterIsInstance<EventDetailUiState.Displayable.Success>().first()
-        attendeesSearchState.attendees.addAll(event.eventDetail.attendees.all)
+        attendeesSearchState.participants.addAll(event.eventDetail.attendees.all)
+        attendeesSearchState.organizerSource = OrganizerSource.Static(event.eventDetail.organizer)
         areAttendeesInitialized = true
     }
 

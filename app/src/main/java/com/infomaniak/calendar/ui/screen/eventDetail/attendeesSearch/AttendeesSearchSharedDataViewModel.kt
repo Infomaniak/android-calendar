@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
+import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.navigation.SharedViewModelStoreNavEntryDecorator
 import com.infomaniak.multiplatform_core.contacts.ContactsManager
@@ -46,7 +47,7 @@ class AttendeesSearchSharedDataViewModel(private val contactsManager: ContactsMa
     private val _attendeesSearchState: MutableStateFlow<AttendeesSearchUiState> = MutableStateFlow(AttendeesSearchUiState.Loading)
     val attendeesSearchState: StateFlow<AttendeesSearchUiState> = _attendeesSearchState.asStateFlow()
 
-    fun setAttendeesSearchState(attendeesSearchState: AttendeesSearchState) {
+    fun setAttendeesSearchState(attendeesSearchState: AttendeesSearchState<*>) {
         _attendeesSearchState.value = AttendeesSearchUiState.Success(attendeesSearchState)
     }
 
@@ -80,7 +81,7 @@ private fun List<Contact>.toAttendeesUi(alreadyPresentAttendees: Map<AttendeeUi.
 sealed interface AttendeesSearchUiState {
     /** The parent screen hasn't provided its [AttendeesSearchState] yet. */
     data object Loading : AttendeesSearchUiState
-    data class Success(val state: AttendeesSearchState) : AttendeesSearchUiState {
+    data class Success(val state: AttendeesSearchState<*>) : AttendeesSearchUiState {
         /** Cached by the snapshot system: recomputed only when [AttendeesSearchState.attendees] changes. */
         val alreadyPresentAttendees: Map<AttendeeUi.Key, AttendeeUi> by derivedStateOf { state.attendees.associateBy { it.key } }
     }

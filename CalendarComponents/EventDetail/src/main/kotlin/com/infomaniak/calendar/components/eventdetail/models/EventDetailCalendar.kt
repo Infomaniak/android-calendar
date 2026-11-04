@@ -21,6 +21,8 @@ import android.os.Parcelable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.eventdetail.utils.ColorParceler
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 
@@ -31,4 +33,6 @@ data class EventDetailCalendar(
     val id: String,
     val name: String,
     val color: Color,
+    /** The user this calendar belongs to, used to know what to display when resolving [ParticipantUi.Me]. Should never be null */
+    val organizerAttendeeUi: AttendeeUi?,
 ) : Parcelable

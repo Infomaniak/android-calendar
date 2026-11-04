@@ -37,7 +37,7 @@ data class AttendeeUi(
     val displayName: String?,
     val status: ParticipationStatus?,
     val isOrganizer: Boolean = false,
-) : AttendeesSearchResult {
+) : AttendeesSearchResult, ParticipantUi {
     @IgnoredOnParcel
     val key: Key = Key(email, displayName)
 

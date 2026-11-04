@@ -24,39 +24,53 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.runtime.saveable.autoSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateSet
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
+import com.infomaniak.calendar.components.foundation.models.OrganizerSource
+import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.core.common.utils.isEmailRfc5321Compliant
 import com.infomaniak.core.common.R as RCore
 
 @Stable
-class AttendeesSearchState(
+class AttendeesSearchState<T : OrganizerSource>(
     val searchQueryTextFieldState: TextFieldState,
     val results: SnapshotStateList<AttendeesSearchResult>,
-    val attendees: SnapshotStateSet<AttendeeUi>,
+    val participants: SnapshotStateSet<ParticipantUi>,
 ) {
+    /** `null` until initialized by the screen. */
+    var organizerSource: T? by mutableStateOf(null)
+
+    private val me: AttendeeUi? by derivedStateOf { (organizerSource as? OrganizerSource.Dynamic)?.owner }
+
+    val attendees: List<AttendeeUi> by derivedStateOf { participants.mapNotNull { it.toAttendeeUi(me) } }
+
     val attendeesEmailsLowercase by derivedStateOf { attendees.map { it.email.lowercase() } }
 
     fun addAttendee(attendee: AttendeeUi) {
-        addRawAttendee(attendee.copy(status = ParticipationStatus.NeedsAction))
+        innerAddAttendee(attendee.copy(status = ParticipationStatus.NeedsAction))
     }
 
     fun removeAttendee(attendee: AttendeeUi) {
-        attendees.remove(attendee)
+        // A concrete entry wins over Me: when editing, our own attendee is concrete and shares Me's key
+        if (!participants.remove(attendee)) {
+            if (attendee.key == me?.key) participants.remove(ParticipantUi.Me)
+        }
     }
 
     fun addCustomAttendee(email: String = searchQueryTextFieldState.text.toString().trim()): CustomAttendeeResult {
         if (email.lowercase() in attendeesEmailsLowercase) return CustomAttendeeResult.AlreadyPresent
         if (!email.isEmailRfc5321Compliant()) return CustomAttendeeResult.InvalidEmail
 
-        addRawAttendee(
+        innerAddAttendee(
             AttendeeUi(
                 email = email,
                 displayName = null,
@@ -67,8 +81,12 @@ class AttendeesSearchState(
         return CustomAttendeeResult.Added
     }
 
-    private fun addRawAttendee(attendee: AttendeeUi) {
-        attendees.add(attendee)
+    private fun innerAddAttendee(attendee: AttendeeUi) {
+        // Only add Me when creating a new event, which we organize
+        if (participants.isEmpty() && organizerSource is OrganizerSource.Dynamic) {
+            participants.add(ParticipantUi.Me)
+        }
+        participants.add(attendee)
         searchQueryTextFieldState.clearText()
     }
 
@@ -78,27 +96,32 @@ class AttendeesSearchState(
         InvalidEmail(RCore.string.emailInvalid),
     }
 
-    object Saver : androidx.compose.runtime.saveable.Saver<AttendeesSearchState, List<Any>> {
+    class Saver<T : OrganizerSource> : androidx.compose.runtime.saveable.Saver<AttendeesSearchState<T>, List<Any?>> {
         private val resultsSaver = autoSaver<SnapshotStateList<AttendeesSearchResult>>()
+        private val organizerSourceSaver = autoSaver<T?>()
         // TODO: Use autoSaver once on Compose 1.13+, SnapshotStateSet only parcels its first element before (b/537461421)
-        private val attendeesSaver = androidx.compose.runtime.saveable.Saver<SnapshotStateSet<AttendeeUi>, ArrayList<AttendeeUi>>(
-            save = { ArrayList(it) },
-            restore = { mutableStateSetOf<AttendeeUi>().apply { addAll(it) } },
-        )
+        private val participantsSaver =
+            androidx.compose.runtime.saveable.Saver<SnapshotStateSet<ParticipantUi>, ArrayList<ParticipantUi>>(
+                save = { ArrayList(it) },
+                restore = { mutableStateSetOf<ParticipantUi>().apply { addAll(it) } },
+            )
 
-        // TextFieldState.Saver.restore() never returns null, and neither do resultsSaver and attendeesSaver
-        override fun SaverScope.save(value: AttendeesSearchState): List<Any> = listOf(
+        // TextFieldState.Saver.restore() never returns null, and neither do resultsSaver and participantsSaver
+        override fun SaverScope.save(value: AttendeesSearchState<T>): List<Any?> = listOf(
             with(TextFieldState.Saver) { save(value.searchQueryTextFieldState)!! },
             with(resultsSaver) { save(value.results)!! },
-            with(attendeesSaver) { save(value.attendees)!! },
+            with(participantsSaver) { save(value.participants)!! },
+            with(organizerSourceSaver) { save(value.organizerSource) },
         )
 
         @Suppress("UNCHECKED_CAST")
-        override fun restore(value: List<Any>): AttendeesSearchState = AttendeesSearchState(
-            searchQueryTextFieldState = TextFieldState.Saver.restore(value[0])!!,
-            results = resultsSaver.restore(value[1])!!,
-            attendees = attendeesSaver.restore(value[2] as ArrayList<AttendeeUi>)!!,
-        )
+        override fun restore(value: List<Any?>): AttendeesSearchState<T> = AttendeesSearchState<T>(
+            searchQueryTextFieldState = TextFieldState.Saver.restore(value[0]!!)!!,
+            results = resultsSaver.restore(value[1]!!)!!,
+            participants = participantsSaver.restore(value[2] as ArrayList<ParticipantUi>)!!,
+        ).apply {
+            organizerSource = value[3]?.let(organizerSourceSaver::restore)
+        }
     }
 }
 
@@ -109,13 +132,13 @@ class AttendeesSearchState(
  */
 @Composable
 fun rememberSaveableAttendeesSearchState(
-    attendees: SnapshotStateSet<AttendeeUi> = rememberSaveable { mutableStateSetOf() },
+    participants: SnapshotStateSet<ParticipantUi> = rememberSaveable { mutableStateSetOf() },
     results: SnapshotStateList<AttendeesSearchResult> = rememberSaveable { mutableStateListOf() },
     searchQuery: String = "",
-): AttendeesSearchState = rememberSaveable(saver = AttendeesSearchState.Saver) {
+): AttendeesSearchState<OrganizerSource> = rememberSaveable(saver = AttendeesSearchState.Saver()) {
     AttendeesSearchState(
         searchQueryTextFieldState = TextFieldState(initialText = searchQuery),
         results = results,
-        attendees = attendees,
+        participants = participants,
     )
 }
