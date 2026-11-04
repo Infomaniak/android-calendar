@@ -17,6 +17,7 @@
   -->
 <resources>
     <string name="addEventLabel">Legg til</string>
+    <string name="alarmOffsetNone">Ingen</string>
     <string name="allDayLabel">Hele dagen</string>
     <string name="attendeeIncompleteEmailMessage">Fullfør e-postadressen for å legge den til</string>
     <string name="attendees">Deltakere</string>
@@ -56,6 +57,7 @@
     <string name="contentDescriptionHasLocation">Har en beliggenhet</string>
     <string name="contentDescriptionSearch">Søk</string>
     <string name="contentDescriptionToday">I dag</string>
+    <string name="customAlarmLabel">Egendefinert</string>
     <plurals name="dayAmount">
         <item quantity="one">%d dag</item>
         <item quantity="other">%d dager</item>
