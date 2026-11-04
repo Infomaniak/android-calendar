@@ -22,6 +22,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailAccount
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.AvatarStrategy
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.utils.account.accountId
 import com.infomaniak.calendar.utils.account.withCalendars
@@ -34,7 +35,13 @@ fun Calendar.toEventDetailCalendar(users: List<User>): EventDetailCalendar = Eve
     name = displayName,
     color = Color(colors.sourceColor),
     organizerAttendeeUi = users.find { it.accountId == accountId }?.let {
-        AttendeeUi(email = it.email, displayName = it.displayName, status = ParticipationStatus.Accepted, isOrganizer = true)
+        AttendeeUi(
+            email = it.email,
+            displayName = it.displayName,
+            status = ParticipationStatus.Accepted,
+            avatar = AvatarStrategy.ToCompute,
+            isOrganizer = true,
+        )
     },
 )
 

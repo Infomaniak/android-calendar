@@ -42,6 +42,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.serialization.NavBackStackSerializer
 import androidx.navigation3.runtime.serialization.NavKeySerializer
+import com.infomaniak.calendar.components.foundation.manager.AvatarFinder
+import com.infomaniak.calendar.components.foundation.state.LocalAvatarFinder
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
 import com.infomaniak.calendar.extensions.appGraph
@@ -94,6 +96,7 @@ class MainActivity : ComponentActivity() {
                         is MainUiState.Loaded -> MainContent(
                             uiState = uiState,
                             visibleDayState = rememberVisibleDayState(mainViewModel.visibleDate),
+                            avatarFinder = mainViewModel.avatarFinder,
                             loadingEventsError = mainViewModel.loadingEventsError,
                             savingEventError = mainViewModel.savingEventError,
                             pendingOccurrenceId = pendingOccurrenceId.value,
@@ -144,6 +147,7 @@ class MainActivity : ComponentActivity() {
 private fun MainContent(
     uiState: MainUiState.Loaded,
     visibleDayState: VisibleDayState,
+    avatarFinder: AvatarFinder,
     loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError>,
     savingEventError: ReceiveChannel<Unit>,
     pendingOccurrenceId: OccurrenceId?,
@@ -167,6 +171,7 @@ private fun MainContent(
         LocalSharedSnackbarHostState provides rememberCustomSnackbarHostState(),
         LocalToolbarScrollableState provides rememberToolbarScrollableState(),
         LocalDrawerState provides rememberDrawerState(initialValue = DrawerValue.Closed),
+        LocalAvatarFinder provides avatarFinder,
     ) {
         ObserveSyncError(loadingEventsError)
         ObserveSaveEventError(savingEventError)

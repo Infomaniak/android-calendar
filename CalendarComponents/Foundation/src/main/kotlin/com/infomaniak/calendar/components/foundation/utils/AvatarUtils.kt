@@ -19,6 +19,7 @@ package com.infomaniak.calendar.components.foundation.utils
 
 import androidx.compose.runtime.Composable
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.state.LocalAvatarFinder
 import com.infomaniak.core.avatar.LocalAvatarColors
 import com.infomaniak.core.avatar.getBackgroundColorResBasedOnId
 import com.infomaniak.core.avatar.models.AvatarColors
@@ -27,6 +28,7 @@ import com.infomaniak.core.avatar.models.AvatarType
 @Composable
 fun AvatarType.Companion.fromAttendee(attendee: AttendeeUi): AvatarType {
     val avatarColors = LocalAvatarColors.current
+    val avatarFinder = LocalAvatarFinder.current
     return AvatarType.WithInitials.Initials(
         initials = attendee.initials(),
         colors = AvatarColors(

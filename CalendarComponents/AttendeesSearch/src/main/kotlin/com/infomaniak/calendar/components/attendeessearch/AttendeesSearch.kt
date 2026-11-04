@@ -117,7 +117,7 @@ private fun Preview() {
             AttendeesSearch(
                 attendeesSearchState = rememberSaveableAttendeesSearchState(
                     participants = remember { mutableStateSetOf<ParticipantUi>().apply { addAll(previewAttendees) } },
-                    results = remember { previewAttendees.toMutableStateList<AttendeesSearchResult>() },
+                    results = remember { previewAttendees.toMutableStateList() },
                 ),
                 onShowSnackbar = {},
             )
