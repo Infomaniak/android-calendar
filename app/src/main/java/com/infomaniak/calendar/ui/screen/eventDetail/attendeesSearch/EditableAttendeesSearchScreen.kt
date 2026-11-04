@@ -62,26 +62,24 @@ fun EditableAttendeesSearchScreen(
 ) {
     val attendeesSearchUi by sharedViewModel.attendeesSearchState.collectAsStateWithLifecycle()
 
+    if (config.canEdit) sharedViewModel.EnableSearch()
+
     Box(modifier = modifier.fillMaxSize()) {
         when (val attendeesSearchState = attendeesSearchUi) {
             AttendeesSearchUiState.Loading -> Unit // The parent provides it right away, so nothing to show
-            is AttendeesSearchUiState.Success -> {
-                if (config.canEdit) sharedViewModel.EnableSearch()
-
-                EditableAttendeesSearchScreen(
-                    attendeesSearchState = attendeesSearchState.state,
-                    config = config,
-                    onSubmit = { scope ->
-                        val isSuccess = viewModel.updateAttendees(
-                            occurrenceId = config.occurrenceId,
-                            attendees = attendeesSearchState.state.attendees,
-                            scope = scope,
-                        )
-                        if (isSuccess) goBack()
-                    },
-                    goBack = goBack,
-                )
-            }
+            is AttendeesSearchUiState.Success -> EditableAttendeesSearchScreen(
+                attendeesSearchState = attendeesSearchState.state,
+                config = config,
+                onSubmit = { scope ->
+                    val isSuccess = viewModel.updateAttendees(
+                        occurrenceId = config.occurrenceId,
+                        attendees = attendeesSearchState.state.attendees,
+                        scope = scope,
+                    )
+                    if (isSuccess) goBack()
+                },
+                goBack = goBack,
+            )
         }
     }
 }
