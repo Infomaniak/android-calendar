@@ -18,12 +18,15 @@
 package com.infomaniak.calendar.ui.screen.eventDetail
 
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.account.accountId
 import com.infomaniak.calendar.utils.applyTo
+import com.infomaniak.calendar.utils.updateWithAttendeesAndOrganizer
 import com.infomaniak.calendar.utils.toNewEventEditData
 import com.infomaniak.calendar.utils.typedCalendarId
 import com.infomaniak.core.common.cancellable
@@ -74,6 +77,26 @@ class EventComposerUseCase @Inject constructor(
         }.cancellable().getOrDefault(SaveEventResult.Error)
     }
 
+    suspend fun updateAttendees(
+        occurrenceId: OccurrenceId,
+        scope: RecurrentEventScope,
+        attendeesUpdatePayload: AttendeesUpdatePayload,
+    ): SaveEventResult {
+        return runCatching {
+            val event = calendarManager.getOccurrence(occurrenceId) ?: return SaveEventResult.Error
+            val editData = calendarManager.getEditData(occurrenceId) ?: return SaveEventResult.Error
+            calendarManager.updateEvent(
+                target = event.targetFor(scope.toRecurrenceScope()),
+                data = editData.updateWithAttendeesAndOrganizer(
+                    attendeesUpdatePayload = attendeesUpdatePayload,
+                    defaultOrganizer = attendeesUpdatePayload.calendarId.toOrganizer(),
+                ),
+            )
+
+            SaveEventResult.Success
+        }.cancellable().getOrDefault(SaveEventResult.Error)
+    }
+
     suspend fun deleteEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope): DeleteEventResult {
         return runCatching {
             val event = calendarManager.getOccurrence(occurrenceId) ?: return DeleteEventResult.Error
@@ -101,6 +124,12 @@ private suspend fun CalendarDataValues.saveLastUsedCalendar(eventDraft: EventDra
     }
 }
 
+private fun RecurrentEventScope.toRecurrenceScope(): RecurrenceScope = when (this) {
+    RecurrentEventScope.ThisEvent -> RecurrenceScope.ThisOccurrence
+    RecurrentEventScope.ThisAndFollowingEvents -> RecurrenceScope.ThisAndFollowing
+    RecurrentEventScope.AllEvents -> RecurrenceScope.AllOccurrences
+}
+
 sealed interface SaveEventResult {
     object Success : SaveEventResult
     object Error : SaveEventResult
@@ -111,8 +140,8 @@ sealed interface DeleteEventResult {
     object Error : DeleteEventResult
 }
 
-private fun RecurrentEventScope.toRecurrenceScope(): RecurrenceScope = when (this) {
-    RecurrentEventScope.ThisEvent -> RecurrenceScope.ThisOccurrence
-    RecurrentEventScope.ThisAndFollowingEvents -> RecurrenceScope.ThisAndFollowing
-    RecurrentEventScope.AllEvents -> RecurrenceScope.AllOccurrences
-}
+data class AttendeesUpdatePayload(
+    val attendees: List<AttendeeUi>,
+    val organizer: OrganizerUi?,
+    val calendarId: CalendarId,
+)

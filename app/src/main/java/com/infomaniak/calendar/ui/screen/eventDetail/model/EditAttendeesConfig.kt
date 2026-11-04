@@ -15,16 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.eventDetail.utils
+package com.infomaniak.calendar.ui.screen.eventDetail.model
 
-import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
-import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filterIsInstance
+import androidx.compose.runtime.Stable
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import kotlinx.serialization.Serializable
 
-suspend fun StateFlow<EventDetailUiState>.synchronizeTo(attendeesSearchState: AttendeesSearchState<*>) {
-    filterIsInstance<EventDetailUiState.Displayable.Success>().collect { event ->
-        attendeesSearchState.participants.clear()
-        attendeesSearchState.participants.addAll(event.eventDetail.attendees.all)
-    }
-}
+@Serializable
+@Stable
+data class EditAttendeesConfig(
+    val occurrenceId: OccurrenceId,
+    val canEdit: Boolean,
+    val isRecurring: Boolean,
+    val calendarId: String,
+)

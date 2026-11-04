@@ -28,12 +28,10 @@ import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,8 +39,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.attendeessearch.AttendeesSearch
-import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
+import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
@@ -50,7 +48,6 @@ import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun AttendeesSearchScreen(
@@ -60,38 +57,28 @@ fun AttendeesSearchScreen(
 ) {
     val attendeesSearchUi by viewModel.attendeesSearchState.collectAsStateWithLifecycle()
 
+    viewModel.EnableSearch()
+
     Box(modifier = modifier.fillMaxSize()) {
         when (val attendeesSearchState = attendeesSearchUi) {
             AttendeesSearchUiState.Loading -> Unit // The parent provides it right away, so nothing to show
-            is AttendeesSearchUiState.Success -> {
-                LaunchedEffect(attendeesSearchState) {
-                    snapshotFlow { attendeesSearchState.state.searchQueryTextFieldState.text }.collectLatest {
-                        viewModel.search(it.toString())
-                    }
-                }
-
-                AttendeesSearchScreen(
-                    attendeesSearchState = attendeesSearchState.state,
-                    goBack = goBack,
-                )
-            }
+            is AttendeesSearchUiState.Success -> AttendeesSearchScreenContent(
+                topBar = { TopBar(goBack) },
+                attendeesSearchState = attendeesSearchState.state,
+            )
         }
     }
 }
 
 @Composable
-private fun AttendeesSearchScreen(
+fun AttendeesSearchScreenContent(
     attendeesSearchState: AttendeesSearchState<*>,
-    goBack: () -> Unit,
+    topBar: @Composable () -> Unit,
     modifier: Modifier = Modifier,
+    isSearchable: Boolean = true,
 ) {
     Scaffold(
-        topBar = {
-            TopAppBar(
-                navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
-                title = { Text(text = stringResource(R.string.attendeesSearchTitle)) },
-            )
-        },
+        topBar = topBar,
         modifier = modifier,
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.union(WindowInsets.ime),
     ) { contentPadding ->
@@ -102,20 +89,29 @@ private fun AttendeesSearchScreen(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = contentPadding,
             onShowSnackbar = { message -> snackbarHostState?.showSnackbar(message = message) },
+            isSearchable = isSearchable,
         )
     }
 }
 
+@Composable
+private fun TopBar(goBack: () -> Unit) {
+    TopAppBar(
+        navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
+        title = { Text(text = stringResource(R.string.attendeesSearchTitle)) },
+    )
+}
+
 @Preview
 @Composable
-private fun EventAttendeesSearchScreenPreview() {
+private fun Preview() {
     CalendarThemeForPreview {
-        AttendeesSearchScreen(
+        AttendeesSearchScreenContent(
+            topBar = { TopBar({}) },
             attendeesSearchState = rememberSaveableAttendeesSearchState(
                 participants = remember { mutableStateSetOf<ParticipantUi>().apply { addAll(previewAttendees) } },
                 results = remember { mutableStateListOf<AttendeesSearchResult>().apply { addAll(previewAttendees) } },
             ),
-            goBack = {},
         )
     }
 }

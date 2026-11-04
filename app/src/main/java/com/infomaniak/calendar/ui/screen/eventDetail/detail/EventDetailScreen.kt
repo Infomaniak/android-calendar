@@ -54,6 +54,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailSharedDataViewMo
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventDialog
+import com.infomaniak.calendar.ui.screen.eventDetail.model.EditAttendeesConfig
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
@@ -70,7 +71,7 @@ fun EventDetailScreen(
     occurrenceId: OccurrenceId,
     goBack: () -> Unit,
     goToEdit: () -> Unit,
-    goToEventAttendees: () -> Unit,
+    goToEventAttendees: (EditAttendeesConfig) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),
     eventDetailSharedDataViewModel: EventDetailSharedDataViewModel = viewModel(),
@@ -103,7 +104,9 @@ fun EventDetailScreen(
         goToEdit = goToEdit,
         onDelete = { scope -> if (viewModel.deleteEvent(occurrenceId, scope)) goBack() },
         onLocationClick = { location -> openLocationInMapApp(context, location) },
-        goToEventAttendees = goToEventAttendees,
+        goToEventAttendees = { canEdit, isRecurring, calendarId ->
+            goToEventAttendees(EditAttendeesConfig(occurrenceId, canEdit, isRecurring, calendarId))
+        },
         modifier = modifier,
     )
 }
@@ -113,7 +116,7 @@ private fun EventDetailScreen(
     uiState: () -> EventDetailUiState.Displayable,
     goBack: () -> Unit,
     goToEdit: () -> Unit,
-    goToEventAttendees: () -> Unit,
+    goToEventAttendees: (canEdit: Boolean, isRecurring: Boolean, calendarId: String) -> Unit,
     onDelete: (RecurrentEventScope) -> Unit,
     onLocationClick: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -164,7 +167,11 @@ private fun EventDetailScreen(
                     onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
                     onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
                     onRoomClick = { /*TODO[eventDetail]*/ },
-                    goToEventAttendees = goToEventAttendees,
+                    goToEventAttendees = {
+                        with(state.eventDetail) {
+                            goToEventAttendees(canEdit, isRecurring, calendar.id)
+                        }
+                    },
                     modifier = Modifier.verticalScroll(scrollState),
                     contentPadding = scaffoldContentPadding + Dimens.EventDetailScreensHorizontalPadding,
                     sharedTransitionScope = sharedTransitionScope,
@@ -199,7 +206,7 @@ private fun Preview() {
                 uiState = { EventDetailUiState.Displayable.Success(previewEventDetailUi) },
                 goBack = {},
                 goToEdit = {},
-                goToEventAttendees = {},
+                goToEventAttendees = { _, _, _ -> },
                 onDelete = {},
                 onLocationClick = {},
             )
