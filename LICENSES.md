@@ -46,6 +46,7 @@ This file lists the runtime dependencies added to this project along with their 
 | dev.zacsweers.metro:metrox-viewmodel-compose | 1.2.1 | Apache License 2.0 | https://github.com/ZacSweers/metro |
 | dev.zacsweers.metro:runtime | 1.2.1 | Apache License 2.0 | https://github.com/ZacSweers/metro |
 | io.coil-kt.coil3:coil | 3.3.0 | Apache License 2.0 | https://github.com/coil-kt/coil |
+| io.coil-kt.coil3:coil-network-okhttp | 3.3.0 | Apache License 2.0 | https://github.com/coil-kt/coil |
 | io.ktor:ktor-client-core | 3.5.0 | Apache License 2.0 | https://ktor.io/ |
 | io.sentry:sentry-android | 8.27.1 | MIT License | https://github.com/getsentry/sentry-java |
 | org.jetbrains.kotlin:kotlin-stdlib | 2.4.0 | Apache License 2.0 | https://kotlinlang.org/ |

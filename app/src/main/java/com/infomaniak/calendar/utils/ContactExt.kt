@@ -20,4 +20,4 @@ package com.infomaniak.calendar.utils
 import com.infomaniak.calendar.components.foundation.models.AvatarData
 import com.infomaniak.multiplatform_core.contacts.domain.model.Contact
 
-val Contact.avatarData: AvatarData? get() = avatar.avatarData
+val Contact.avatarData: AvatarData? get() = avatar?.avatarData

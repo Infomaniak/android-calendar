@@ -189,6 +189,8 @@ dependencies {
     implementation(core.androidx.core.splashscreen)
     implementation(core.androidx.lifecycle.runtime.ktx)
     implementation(core.appcompat)
+    implementation(core.coil)
+    implementation(core.coil.network.okhttp)
     implementation(core.compose.ui)
     implementation(core.compose.ui.graphics)
     implementation(core.compose.ui.tooling.preview)

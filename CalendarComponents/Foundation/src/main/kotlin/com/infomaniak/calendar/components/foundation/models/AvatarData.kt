@@ -21,4 +21,4 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class AvatarData(val url: String, val accountId: Long? = null) : Parcelable
+data class AvatarData(val url: String, val accountId: Long?) : Parcelable

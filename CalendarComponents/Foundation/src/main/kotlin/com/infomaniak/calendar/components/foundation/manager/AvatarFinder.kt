@@ -17,12 +17,19 @@
  */
 package com.infomaniak.calendar.components.foundation.manager
 
+import coil3.ImageLoader
 import com.infomaniak.calendar.components.foundation.models.AvatarData
 
-fun interface AvatarFinder {
+interface AvatarFinder {
     suspend fun avatarOf(name: String?, email: String): AvatarData?
 
+    /** The loader fetching avatars of [accountId] (`null` for device avatars); `null` shows initials instead. */
+    fun imageLoaderOf(accountId: Long?): ImageLoader?
+
     companion object {
-        val Empty = AvatarFinder { _, _ -> null }
+        val Empty = object : AvatarFinder {
+            override suspend fun avatarOf(name: String?, email: String): AvatarData? = null
+            override fun imageLoaderOf(accountId: Long?): ImageLoader? = null
+        }
     }
 }

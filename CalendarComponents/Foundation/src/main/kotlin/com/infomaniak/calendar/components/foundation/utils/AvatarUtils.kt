@@ -20,6 +20,7 @@ package com.infomaniak.calendar.components.foundation.utils
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.produceState
+import com.infomaniak.calendar.components.foundation.manager.AvatarFinder
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.AvatarData
 import com.infomaniak.calendar.components.foundation.models.AvatarStrategy
@@ -46,19 +47,20 @@ fun AvatarType.Companion.fromAttendee(attendee: AttendeeUi): State<AvatarType> {
     )
 
     val initialValue = if (avatar is AvatarStrategy.Precomputed) {
-        avatarUrlDataOf(avatar.avatarData)
+        avatarFinder.avatarUrlDataOf(avatar.avatarData)
     } else {
         null
     }
 
     return produceState(getUrlOrInitials(initialValue)) {
         if (avatar is AvatarStrategy.ToCompute) {
-            val avatarUri = avatarFinder.avatarOf(attendee.displayName, attendee.email)
-            value = getUrlOrInitials(avatarUrlDataOf(avatarUri))
+            val avatarData = avatarFinder.avatarOf(attendee.displayName, attendee.email)
+            value = getUrlOrInitials(avatarFinder.avatarUrlDataOf(avatarData))
         }
     }
 }
 
-private fun avatarUrlDataOf(avatarUri: AvatarData?): AvatarUrlData? {
-    return avatarUri?.let { AvatarUrlData(url = it.url, imageLoader = imageLoader) }
+fun AvatarFinder.avatarUrlDataOf(avatarData: AvatarData?): AvatarUrlData? {
+    val data = avatarData ?: return null
+    return imageLoaderOf(data.accountId)?.let { AvatarUrlData(url = data.url, imageLoader = it) }
 }

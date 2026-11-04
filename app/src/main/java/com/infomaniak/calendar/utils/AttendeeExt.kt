@@ -45,7 +45,7 @@ fun Attendee.toAttendeeUi(): AttendeeUi = AttendeeUi(
     avatar = AvatarStrategy.Precomputed(avatarData),
 )
 
-val Attendee.avatarData: AvatarData? get() = avatar.avatarData
+val Attendee.avatarData: AvatarData? get() = avatar?.avatarData
 
 fun Organizer.toOrganizerUi(): OrganizerUi = OrganizerUi(email = email, displayName = displayName)
 

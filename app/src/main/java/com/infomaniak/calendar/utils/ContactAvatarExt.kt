@@ -20,9 +20,8 @@ package com.infomaniak.calendar.utils
 import com.infomaniak.calendar.components.foundation.models.AvatarData
 import com.infomaniak.multiplatform_core.contacts.domain.model.ContactAvatar
 
-val ContactAvatar?.avatarData: AvatarData?
+val ContactAvatar.avatarData: AvatarData?
     get() = when (this) {
         is ContactAvatar.Device -> AvatarData(id, null)
         is ContactAvatar.Remote -> AvatarData(url, accountId.value)
-        else -> null
     }
