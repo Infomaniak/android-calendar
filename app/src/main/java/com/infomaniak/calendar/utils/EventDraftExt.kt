@@ -56,7 +56,12 @@ fun EventDraft.applyTo(
     calendarId = typedCalendarId,
     attendees = attendees.toAttendeeEdit(),
     organizer = (initialOrganizer?.toOrganizer() ?: defaultOrganizer).takeIf { attendees.isNotEmpty() },
-    alarms = AlarmListEdit.Replace(notifications.toAlarms(storedAlarms)),
+    // Stored alarms KMP can't read are missing from storedAlarms, replacing the list would delete them
+    alarms = if (notifications == storedAlarms.mapNotNull { it.toNotification() }) {
+        editData.alarms
+    } else {
+        AlarmListEdit.Replace(notifications.toAlarms(storedAlarms))
+    },
 )
 
 fun EventEditData.updateWithAttendeesAndOrganizer(
