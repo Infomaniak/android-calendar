@@ -26,7 +26,6 @@ import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.manager.BackgroundEventComposer
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
-import com.infomaniak.calendar.ui.screen.eventDetail.utils.synchronizeTo
 import com.infomaniak.calendar.utils.saveableAttendeesSearchState
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
@@ -37,6 +36,7 @@ import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterIsInstance
 
 @AssistedInject
 class EventDetailViewModel(
@@ -68,5 +68,13 @@ class EventDetailViewModel(
         override fun create(extras: CreationExtras): EventDetailViewModel = create(extras.createSavedStateHandle())
 
         fun create(@Assisted savedStateHandle: SavedStateHandle): EventDetailViewModel
+    }
+}
+
+private suspend fun StateFlow<EventDetailUiState>.synchronizeTo(attendeesSearchState: AttendeesSearchState<OrganizerSource.Static>) {
+    filterIsInstance<EventDetailUiState.Displayable.Success>().collect { event ->
+        attendeesSearchState.participants.clear()
+        attendeesSearchState.participants.addAll(event.eventDetail.attendees.all)
+        attendeesSearchState.organizerSource = OrganizerSource.Static(event.eventDetail.organizer)
     }
 }
