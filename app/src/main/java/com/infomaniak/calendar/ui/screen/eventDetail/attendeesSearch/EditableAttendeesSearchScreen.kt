@@ -32,17 +32,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
+import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.SubmitButton
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
@@ -118,7 +118,10 @@ private fun EditableAttendeesSearchScreen(
                         }
                     }
                 },
-                title = { Text(text = stringResource(R.string.attendeesSearchTitle)) },
+                title = {
+                    val count = attendeesSearchState.attendees.size
+                    Text(text = pluralStringResource(R.plurals.attendeesCount, count, count))
+                },
             )
         },
         attendeesSearchState = attendeesSearchState,
