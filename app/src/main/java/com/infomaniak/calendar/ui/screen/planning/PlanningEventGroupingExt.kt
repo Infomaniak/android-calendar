@@ -24,6 +24,8 @@ import com.infomaniak.calendar.utils.toThemedColorUi
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
@@ -37,7 +39,7 @@ import kotlin.time.Clock
 suspend fun Map<LocalDate, List<EventDaySlice>>.groupByDay(
     days: ClosedRange<LocalDate>,
     timeZone: TimeZone = TimeZone.currentSystemDefault(),
-): Map<LocalDate, List<EventSummaryUi>> = withContext(Dispatchers.Default) {
+): ImmutableMap<LocalDate, List<EventSummaryUi>> = withContext(Dispatchers.Default) {
     val eventsByDay = HashMap<LocalDate, List<EventSummaryUi>>()
 
     var date = days.start
@@ -48,7 +50,7 @@ suspend fun Map<LocalDate, List<EventDaySlice>>.groupByDay(
         date = date.plus(DatePeriod(days = 1))
     }
 
-    return@withContext eventsByDay
+    return@withContext eventsByDay.toImmutableMap()
 }
 
 private fun emptyStateFor(date: LocalDate, timeZone: TimeZone): EventSummaryUi {

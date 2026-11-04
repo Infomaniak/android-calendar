@@ -179,6 +179,7 @@ dependencies {
     implementation(libs.infomaniak.designsystem.icons)
     implementation(libs.infomaniak.designsystem.theme.calendar)
 
+    implementation(core.kotlinx.collections.immutable)
     implementation(core.kotlinx.serialization.json)
     implementation(kmpCalendar.androidx.room.runtime)
 

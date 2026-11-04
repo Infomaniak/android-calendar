@@ -54,6 +54,8 @@ import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.datetime.LocalDate
 
 @Composable
@@ -133,7 +135,7 @@ private fun PlanningScreen(
 
 @Composable
 private fun SuccessPlanning(
-    eventsByDate: Map<LocalDate, List<EventSummaryUi>>,
+    eventsByDate: ImmutableMap<LocalDate, List<EventSummaryUi>>,
     contentPadding: PaddingValues,
     goToEventCreation: (LocalDate) -> Unit,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
@@ -168,7 +170,7 @@ private fun Preview(@PreviewParameter(PlanningPreviewParameter::class) eventsByD
         val visibleDayState = rememberVisibleDayState(remember { mutableStateOf(eventsByDate.keys.min()) })
         CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
             PlanningScreen(
-                planningUiState = { PlanningUiState.Success(eventsByDate) },
+                planningUiState = { PlanningUiState.Success(eventsByDate.toImmutableMap()) },
                 goToEventCreation = {},
                 goToEventDetail = {},
                 isLoadingEvents = { false },

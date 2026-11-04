@@ -63,7 +63,13 @@ private fun generateEventsAround(targetDay: LocalDate): Map<LocalDate, List<Even
         return LocalDateTime(date.year, date.month.ordinal + 1, date.day, hour, minute).toInstant(timeZone)
     }
 
-    fun event(date: LocalDate, hour: Int, title: String, location: String? = null, color: Color = Color(0xFF4285F4)): EventSummaryUi {
+    fun event(
+        date: LocalDate,
+        hour: Int,
+        title: String,
+        location: String? = null,
+        color: Color = Color(0xFF4285F4),
+    ): EventSummaryUi {
         return SimpleEventSummaryUi(
             id = "$date-$hour",
             title = title,
@@ -92,7 +98,9 @@ private fun generateEventsAround(targetDay: LocalDate): Map<LocalDate, List<Even
     )
 
     val today = Clock.today()
-    return generateSequence(pastDay) { it.plus(1, DateTimeUnit.DAY) }.takeWhile { it <= futureDay }.associateWith { date ->
-        events[date] ?: listOf(if (date == today) EventSummaryUi.TodayEmptyState else EventSummaryUi.EmptyState(date))
-    }
+    return generateSequence(pastDay) { it.plus(1, DateTimeUnit.DAY) }
+        .takeWhile { it <= futureDay }
+        .associateWith { date ->
+            events[date] ?: listOf(if (date == today) EventSummaryUi.TodayEmptyState else EventSummaryUi.EmptyState(date))
+        }
 }

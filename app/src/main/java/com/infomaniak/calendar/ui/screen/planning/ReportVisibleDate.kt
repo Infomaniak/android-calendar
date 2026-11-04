@@ -27,6 +27,7 @@ import kotlinx.datetime.LocalDate
 @Composable
 fun ReportVisibleDate(lazyListState: LazyListState, timeline: PlanningTimeline, onVisibleDateChanged: (LocalDate) -> Unit) {
     LaunchedEffect(lazyListState) {
-        snapshotFlow { timeline.dateAt(lazyListState.firstVisibleItemIndex) }.collect { onVisibleDateChanged(it) }
+        snapshotFlow { timeline.dateAt(lazyListState.firstVisibleItemIndex) }
+            .collect { onVisibleDateChanged(it) }
     }
 }
