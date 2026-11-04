@@ -19,7 +19,6 @@ package com.infomaniak.calendar.components.eventdetail.models
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import com.infomaniak.calendar.components.resources.R
@@ -28,7 +27,6 @@ import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Bell
 import com.infomaniak.designsystem.icons.symbols.BubbleTopRightCircle
 import com.infomaniak.designsystem.icons.symbols.Symbol
-import java.io.Serializable
 
 /**
  * @param calendars The calendars the event can be moved to: the writable ones, grouped by account.
@@ -67,7 +65,7 @@ data class EventDetailUi(
     }
 
     @Immutable
-    data class Notification(val type: Type, val time: NotificationTime) : Serializable {
+    data class Notification(val type: Type, val time: NotificationTime) {
         @Immutable
         enum class Type(val icon: Symbol, @StringRes val label: Int) {
             Email(EsdsIcons.Bell, R.string.notificationTypeEmail),

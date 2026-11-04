@@ -17,11 +17,10 @@
  */
 package com.infomaniak.calendar.components.eventdetail.models
 
-import java.io.Serializable
 import kotlin.time.Duration
 import kotlin.time.Instant
 
-sealed interface NotificationTime : Serializable {
+sealed interface NotificationTime {
     data class Offset(val duration: Duration) : NotificationTime
     data class Absolute(val instant: Instant) : NotificationTime
 }
