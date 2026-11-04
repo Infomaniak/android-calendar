@@ -43,6 +43,7 @@ import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomReminderResultViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventCreationCalendars
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchResultViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -59,10 +60,12 @@ fun EventCreationScreen(
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
+    goToCustomReminder: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventCreationViewModel = viewModel(),
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
     timeZoneSearchResultViewModel: TimeZoneSearchResultViewModel = viewModel(),
+    customReminderResultViewModel: CustomReminderResultViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val defaultEventDuration by viewModel.defaultEventDuration.collectAsStateWithLifecycle(null)
@@ -93,6 +96,10 @@ fun EventCreationScreen(
         timeZoneSearchResultViewModel.applyPickedTimeZonesTo(formState?.dateAndTimeState)
     }
 
+    LaunchedEffect(formState) {
+        customReminderResultViewModel.applyAddedRemindersTo(formState)
+    }
+
     LaunchedEffect(Unit) {
         attendeesSearchSharedDataViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
     }
@@ -108,6 +115,7 @@ fun EventCreationScreen(
         goBack = goBack,
         goToEventsAttendees = goToEventsAttendees,
         goToTimeZoneSearch = goToTimeZoneSearch,
+        goToCustomReminder = goToCustomReminder,
     )
 }
 
@@ -119,6 +127,7 @@ private fun EventCreationScreen(
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
+    goToCustomReminder: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -146,6 +155,7 @@ private fun EventCreationScreen(
                     state = it,
                     onAttendeesClick = goToEventsAttendees,
                     onTimeZoneClick = goToTimeZoneSearch,
+                    onCustomReminderClick = goToCustomReminder,
                     contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                     modifier = Modifier.verticalScroll(scrollState),
                 )
@@ -174,6 +184,7 @@ private fun EventCreationScreenPreview() {
             goBack = {},
             goToEventsAttendees = {},
             goToTimeZoneSearch = {},
+            goToCustomReminder = {},
         )
     }
 }
@@ -196,6 +207,7 @@ private fun PreviewEmptyWritableCalendar() {
             goBack = {},
             goToEventsAttendees = {},
             goToTimeZoneSearch = {},
+            goToCustomReminder = {},
         )
     }
 }

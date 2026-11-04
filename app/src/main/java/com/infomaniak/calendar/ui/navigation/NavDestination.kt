@@ -92,4 +92,7 @@ sealed interface NavDestination : NavKey {
 
     @Serializable
     data class EventTimeZone(val parent: NavDestination, val isStart: Boolean) : NavDestination
+
+    @Serializable
+    data class EventCustomReminder(val parent: NavDestination) : NavDestination
 }
