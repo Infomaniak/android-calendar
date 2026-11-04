@@ -19,7 +19,6 @@ package com.infomaniak.calendar.components.eventdetail.models
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import com.infomaniak.calendar.components.resources.R
@@ -65,8 +64,9 @@ data class EventDetailUi(
         val fileType: FileType by lazy { FileType.guessFromFileName(name) }
     }
 
+    /** @param sourceId Opaque id of the stored alarm it was read from, `null` for one added in the form. */
     @Immutable
-    data class Notification(val type: Type, val time: NotificationTime) {
+    data class Notification(val type: Type, val time: NotificationTime, val sourceId: String? = null) {
         @Immutable
         enum class Type(val icon: Symbol, @StringRes val label: Int) {
             Email(EsdsIcons.Bell, R.string.notificationTypeEmail),

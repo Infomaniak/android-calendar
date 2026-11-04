@@ -88,7 +88,7 @@ private fun EventTiming.toDetailTiming(isStart: Boolean): EventDetailTiming = wh
     }
 }
 
-private fun EventAlarm.toNotification(): EventDetailUi.Notification? {
+fun EventAlarm.toNotification(): EventDetailUi.Notification? {
 
     return EventDetailUi.Notification(
         type = when (action) {
@@ -100,6 +100,7 @@ private fun EventAlarm.toNotification(): EventDetailUi.Notification? {
             is AlarmTrigger.Relative -> NotificationTime.Offset(trigger.offset)
             is AlarmTrigger.Absolute -> NotificationTime.Absolute(trigger.instant)
         },
+        sourceId = id?.value,
     )
 }
 
