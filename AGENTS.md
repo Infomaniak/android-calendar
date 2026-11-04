@@ -217,6 +217,9 @@ All CalendarComponents source lives **in this repository**. Changes to these mod
   `:CalendarCore` `commonMain`) defines the shared accessors (`accountManager`, `calendarManager`, `contactsManager`)
   and is automatically merged into `AppGraph` (Android). On Apple, `CalendarSDK` lives in `:CalendarCore` `appleMain`
   and explicitly inherits `CaldavClientModule` while also receiving the contributed bindings.
+- **App environment**: `AppGraph` provides the KMP `AppEnvironment`, mapped from Core's `ApiEnvironment.current` (set by
+  `NetworkConfiguration.init`) so the whole app targets the same servers. It selects the Infomaniak servers every
+  KMP module reaches.
 - **Apple artifact**: The public `MultiplatformCalendar.xcframework` is produced by `:CalendarCore`. `:CalendarKmpDav`
   is **not** exported: the public Apple API exposes only `:CalendarCore` types (e.g. credentials are passed as
   `DavCredentials`, mapped to `DavAccount` at the repository boundary). `CalendarSDKProvider.sdk(...)` is the Apple
