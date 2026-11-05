@@ -18,7 +18,9 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import android.os.Parcelable
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -27,7 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.ui.component.drawer.model.CalendarSectionUi
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -69,8 +71,7 @@ private fun LazyListScope.accountItems(
 ) {
     val userId = userCalendars.user.id
     val sections = userCalendars.sections
-    val showsSectionHeaders = sections.size > 1
-    val hasRowsBelow = isExpanded && (showsSectionHeaders || sections.any { it.calendars.isNotEmpty() })
+    val hasRowsBelow = isExpanded && (sections.size > 1 || sections.any { it.calendars.isNotEmpty() })
 
     item(key = "account/$userId", contentType = "account") {
         DrawerAccountItem(
@@ -87,12 +88,38 @@ private fun LazyListScope.accountItems(
         )
     }
 
-    if (!isExpanded) return
+    if (isExpanded) {
+        sectionItems(
+            userId = userId,
+            sections = sections,
+            isSectionExpanded = isSectionExpanded,
+            onSectionExpandedChange = onSectionExpandedChange,
+            onCalendarVisibilityChange = onCalendarVisibilityChange,
+            onCalendarLongClick = onCalendarLongClick,
+        )
+    }
+}
+
+private fun LazyListScope.sectionItems(
+    userId: Int,
+    sections: List<CalendarSectionUi>,
+    isSectionExpanded: (String) -> Boolean,
+    onSectionExpandedChange: (sectionKey: String, isExpanded: Boolean) -> Unit,
+    onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
+    onCalendarLongClick: (CalendarId) -> Unit,
+) {
+    val showsSectionHeaders = sections.size > 1
 
     sections.forEachIndexed { sectionIndex, section ->
         val lastCorner = if (sectionIndex == sections.lastIndex) SegmentCorner.Outer else SegmentCorner.Inner
         val sectionExpanded = !showsSectionHeaders || isSectionExpanded(section.key)
         val calendars = if (sectionExpanded) section.calendars else emptyList()
+
+        if (showsSectionHeaders || calendars.isNotEmpty()) {
+            item(key = "gap/${section.key}", contentType = "gap") {
+                Spacer(Modifier.animateItem().height(ListItemDefaults.SegmentedGap))
+            }
+        }
 
         if (showsSectionHeaders) {
             item(key = "section/${section.key}", contentType = "section") {
@@ -104,9 +131,7 @@ private fun LazyListScope.accountItems(
                         top = SegmentCorner.Inner,
                         bottom = if (calendars.isEmpty()) lastCorner else SegmentCorner.None,
                     ),
-                    modifier = Modifier
-                        .animateItem()
-                        .padding(top = ListItemDefaults.SegmentedGap),
+                    modifier = Modifier.animateItem(),
                 )
             }
         }
@@ -114,7 +139,7 @@ private fun LazyListScope.accountItems(
         calendars.forEachIndexed { calendarIndex, calendar ->
             val isFirstRow = !showsSectionHeaders && calendarIndex == 0
 
-            item(key = "calendar/$userId/${calendar.id.url}", contentType = "calendar") {
+            item(key = CalendarKey(userId, calendar.id.url), contentType = "calendar") {
                 DrawerCalendarItem(
                     calendar = calendar,
                     onCalendarVisibilityChange = onCalendarVisibilityChange,
@@ -123,14 +148,15 @@ private fun LazyListScope.accountItems(
                         top = if (isFirstRow) SegmentCorner.Inner else SegmentCorner.None,
                         bottom = if (calendarIndex == calendars.lastIndex) lastCorner else SegmentCorner.None,
                     ),
-                    modifier = Modifier
-                        .animateItem()
-                        .padding(top = if (isFirstRow) ListItemDefaults.SegmentedGap else 0.dp),
+                    modifier = Modifier.animateItem(),
                 )
             }
         }
     }
 }
+
+@Parcelize
+private data class CalendarKey(val userId: Int, val calendarUrl: String) : Parcelable
 
 @Composable
 private fun DrawerListPreviewContent(
@@ -148,9 +174,6 @@ private fun DrawerListPreviewContent(
         )
     }
 }
-
-@Parcelize
-private data class CalendarKey(val calendarUrl: String, val userId: Int) : Parcelable
 
 @Preview
 @Composable
