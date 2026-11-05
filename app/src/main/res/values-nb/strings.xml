@@ -32,7 +32,6 @@
     <string name="deleteRecurringEventAlertTitle">Hvilke hendelser vil du slette?</string>
     <string name="editRecurringEventAlertTitle">Hvilke hendelser vil du redigere?</string>
     <string name="eventOccurrenceNotFound">Denne hendelsen er ikke lenger tilgjengelig.</string>
-    <string name="helpTitle">Hjelp</string>
     <string name="monthTitle">Måned</string>
     <string name="noWritableCalendar">Ingen redigerbar kalender funnet</string>
     <string name="notificationAllDay">Hele dagen</string>
@@ -48,6 +47,7 @@
     <string name="onboardingThreeTitle">Inviter deltakerne dine</string>
     <string name="onboardingTwoSubtitle">Få beskjed før hver hendelse og gå aldri glipp av en viktig avtale.</string>
     <string name="onboardingTwoTitle">Tillat varsler</string>
+    <string name="otherCalendarsSectionTitle">Andre kalendere</string>
     <string name="planningTitle">Planlegging</string>
     <string name="settingsTitle">Innstillinger</string>
     <string name="signOutAccountAlertConfirm">Logg ut av kontoen</string>

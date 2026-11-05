@@ -18,7 +18,7 @@
 package com.infomaniak.calendar.utils
 
 import androidx.compose.ui.graphics.Color
-import com.infomaniak.calendar.ui.component.drawer.model.CalendarColorsUi
+import com.infomaniak.calendar.ui.model.CalendarColorsUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColors
 
 fun CalendarColors.toCalendarColorsUi(): CalendarColorsUi = CalendarColorsUi(

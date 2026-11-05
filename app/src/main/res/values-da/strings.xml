@@ -32,7 +32,6 @@
     <string name="deleteRecurringEventAlertTitle">Hvilke begivenheder vil du slette?</string>
     <string name="editRecurringEventAlertTitle">Hvilke begivenheder vil du redigere?</string>
     <string name="eventOccurrenceNotFound">Denne begivenhed er ikke længere tilgængelig.</string>
-    <string name="helpTitle">Hjælp</string>
     <string name="monthTitle">Måned</string>
     <string name="noWritableCalendar">Ingen redigerbar kalender fundet</string>
     <string name="notificationAllDay">Hele dagen</string>
@@ -48,6 +47,7 @@
     <string name="onboardingThreeTitle">Inviter dine deltagere</string>
     <string name="onboardingTwoSubtitle">Bliv advaret før hver begivenhed, og gå aldrig glip af en vigtig aftale.</string>
     <string name="onboardingTwoTitle">Tillad notifikationer</string>
+    <string name="otherCalendarsSectionTitle">Andre kalendere</string>
     <string name="planningTitle">Planlægning</string>
     <string name="settingsTitle">Indstillinger</string>
     <string name="signOutAccountAlertConfirm">Log ud af kontoen</string>

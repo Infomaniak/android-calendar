@@ -51,7 +51,8 @@ app/src/main/java/com/infomaniak/calendar/
 │   ├── EventDraftExt.kt            # EventDraft → KMP EventEditData for creation and edition: a new form field is one line in `applyTo`; unchanged notifications leave the stored alarms alone (`AlarmListEdit.Preserve`, since `Event.alarms` lacks the ones KMP can't read), changed ones get back the stored alarm they were read from (matched by the `Notification.sourceId` holding its KMP `AlarmId`)
 │   └── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
 └── ui/
-    ├── model/                     # OccurrenceEventUi calendar item carrying KMP OccurrenceId and attendee summary; TimelineUiState
+    ├── model/                     # OccurrenceEventUi calendar item carrying KMP OccurrenceId and attendee summary; TimelineUiState;
+    │                              # UserCalendarsUi / CalendarSectionUi / CalendarUi / CalendarColorsUi, the calendars as the drawer and other views draw them
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
     │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), EventTimeZone(parent, isStart), EventCustomReminder(parent), Accounts, Onboarding.Login(onlyLogin) / Onboarding.Permissions)

@@ -32,7 +32,6 @@
     <string name="deleteRecurringEventAlertTitle">Which events do you want to delete?</string>
     <string name="editRecurringEventAlertTitle">Which events do you want to edit?</string>
     <string name="eventOccurrenceNotFound">This event is no longer available.</string>
-    <string name="helpTitle">Help</string>
     <string name="monthTitle">Month</string>
     <string name="noWritableCalendar">No writable calendars found</string>
     <string name="notificationAllDay">All day</string>
@@ -48,6 +47,7 @@
     <string name="onboardingThreeTitle">Invite your attendees</string>
     <string name="onboardingTwoSubtitle">Get notified before every event and never miss an important appointment.</string>
     <string name="onboardingTwoTitle">Allow notifications</string>
+    <string name="otherCalendarsSectionTitle">Other calendars</string>
     <string name="planningTitle">Planning</string>
     <string name="settingsTitle">Settings</string>
     <string name="signOutAccountAlertConfirm">Sign out of the account</string>

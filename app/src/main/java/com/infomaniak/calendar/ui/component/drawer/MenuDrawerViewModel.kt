@@ -22,12 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.BuildConfig
 import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.CachedCalendarManager
-import com.infomaniak.calendar.ui.component.drawer.model.CalendarUi
-import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
-import com.infomaniak.calendar.utils.account.AccountUtils
-import com.infomaniak.calendar.utils.account.withCalendars
-import com.infomaniak.calendar.utils.toCalendarColorsUi
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
+import com.infomaniak.calendar.ui.model.UserCalendarsUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarEditData
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
@@ -36,35 +31,22 @@ import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
 class MenuDrawerViewModel(
-    accountUtils: AccountUtils,
     cachedCalendarManager: CachedCalendarManager,
     private val calendarManager: CalendarManager,
     private val calendarDataValues: CalendarDataValues,
 ) : ViewModel() {
-    val calendarsUsers: StateFlow<List<UserCalendarsUi>> = combine(
-        accountUtils.users,
-        cachedCalendarManager.calendars,
-    ) { users, calendars ->
-        return@combine users.withCalendars(calendars).map { (user, userCalendars) ->
-            UserCalendarsUi(user, userCalendars.map { it.toCalendarUi() })
-        }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Lazily,
-        initialValue = emptyList(),
-    )
+    val calendarsUsers: StateFlow<List<UserCalendarsUi>> = cachedCalendarManager.usersCalendars
 
     val expandedAccountIds: Flow<Set<Int>> = calendarDataValues.expandedDrawerAccountIds.flow
+
+    val collapsedSectionKeys: Flow<Set<String>> = calendarDataValues.collapsedDrawerSectionKeys.flow
 
     fun onCalendarVisibilityChanged(calendarId: CalendarId, isVisible: Boolean) {
         viewModelScope.launch {
@@ -83,12 +65,12 @@ class MenuDrawerViewModel(
             }
         }
     }
-}
 
-private fun Calendar.toCalendarUi(): CalendarUi = CalendarUi(
-    id = id,
-    accountId = accountId,
-    displayName = displayName,
-    colors = colors.toCalendarColorsUi(),
-    isVisible = isVisible,
-)
+    fun onSectionExpandedChanged(sectionKey: String, isExpanded: Boolean) {
+        viewModelScope.launch {
+            calendarDataValues.collapsedDrawerSectionKeys.update { current ->
+                if (isExpanded) current - sectionKey else current + sectionKey
+            }
+        }
+    }
+}
