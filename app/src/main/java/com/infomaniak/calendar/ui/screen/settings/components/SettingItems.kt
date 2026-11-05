@@ -45,7 +45,7 @@ import com.infomaniak.designsystem.icons.symbols.Symbol
 
 @Composable
 fun SettingItemClickable(
-    shapes: SettingShape,
+    shapes: ListItemShapes,
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -67,7 +67,7 @@ fun SettingItemClickable(
 
 @Composable
 fun SettingItemOpen(
-    shapes: SettingShape,
+    shapes: ListItemShapes,
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -89,7 +89,7 @@ fun SettingItemOpen(
 
 @Composable
 fun SettingItemSwitch(
-    shapes: SettingShape,
+    shapes: ListItemShapes,
     text: String,
     checked: () -> Boolean,
     onCheckedChange: (Boolean) -> Unit,
@@ -105,7 +105,7 @@ fun SettingItemSwitch(
     SegmentedListItem(
         checked = isChecked,
         onCheckedChange = onCheckedChange,
-        shapes = shapes.segmentedShape(),
+        shapes = shapes,
         modifier = modifier,
         enabled = enabled(),
         leadingContent = symbol?.let { { SettingIcon(it) } },
@@ -118,7 +118,7 @@ fun SettingItemSwitch(
 
 @Composable
 private fun SettingItem(
-    shapes: SettingShape,
+    shapes: ListItemShapes,
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -130,7 +130,7 @@ private fun SettingItem(
 ) {
     SegmentedListItem(
         onClick = onClick,
-        shapes = shapes.segmentedShape(),
+        shapes = shapes,
         modifier = modifier,
         enabled = enabled(),
         leadingContent = symbol?.let { { SettingIcon(it) } },
@@ -159,11 +159,11 @@ enum class SwitchType(val content: ((isChecked: Boolean) -> @Composable (() -> U
     Check(content = { checked -> if (checked) ({ SettingIcon(EsdsIcons.Check) }) else null }),
 }
 
-enum class SettingShape(val segmentedShape: @Composable () -> ListItemShapes) {
-    Single({ ListItemDefaults.segmentedShapes(index = 0, count = 1) }),
-    First({ ListItemDefaults.segmentedShapes(index = 0, count = 3) }),
-    Middle({ ListItemDefaults.segmentedShapes(index = 1, count = 3) }),
-    Last({ ListItemDefaults.segmentedShapes(index = 2, count = 3) }),
+object SettingShape {
+    val Single @Composable get() = ListItemDefaults.segmentedShapes(index = 0, count = 1)
+    val First @Composable get() = ListItemDefaults.segmentedShapes(index = 0, count = 3)
+    val Middle @Composable get() = ListItemDefaults.segmentedShapes(index = 1, count = 3)
+    val Last @Composable get() = ListItemDefaults.segmentedShapes(index = 2, count = 3)
 }
 
 @Composable
