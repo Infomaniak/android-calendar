@@ -26,11 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.toggleableState
-import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.ui.component.drawer.model.CalendarUi
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -47,14 +42,14 @@ fun DrawerCalendarItem(
     modifier: Modifier = Modifier,
     onCalendarLongClick: (CalendarId) -> Unit = {},
 ) {
+    val colors = ListItemDefaults.drawerColors
+
     SegmentedListItem(
-        onClick = { onCalendarVisibilityChange(calendar.id, !calendar.isVisible) },
+        checked = calendar.isVisible,
+        onCheckedChange = { onCalendarVisibilityChange(calendar.id, it) },
         onLongClick = { onCalendarLongClick(calendar.id) },
-        shapes = shapes,
-        modifier = modifier.semantics {
-            role = Role.Checkbox
-            toggleableState = ToggleableState(calendar.isVisible)
-        },
+        shapes = shapes.copy(selectedShape = shapes.shape, pressedShape = shapes.shape),
+        modifier = modifier,
         leadingContent = {
             Checkbox(
                 checked = calendar.isVisible,
@@ -67,7 +62,8 @@ fun DrawerCalendarItem(
             )
         },
         verticalAlignment = Alignment.CenterVertically,
-        colors = ListItemDefaults.drawerColors,
+        // A visible calendar is shown by its checkbox, not by the selected look a checked item gets
+        colors = colors.copy(selectedContainerColor = colors.containerColor, selectedContentColor = colors.contentColor),
     ) {
         Text(calendar.displayName)
     }
