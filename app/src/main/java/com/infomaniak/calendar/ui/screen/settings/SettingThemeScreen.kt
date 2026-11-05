@@ -28,7 +28,7 @@ import com.infomaniak.calendar.data.SettingThemeOption
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemSwitch
 import com.infomaniak.calendar.ui.screen.settings.components.SettingSection
 import com.infomaniak.calendar.ui.screen.settings.components.SettingShape
-import com.infomaniak.calendar.ui.screen.settings.components.SettingsScaffold
+import com.infomaniak.calendar.ui.screen.settings.components.SettingScaffold
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Moon
@@ -59,7 +59,7 @@ private fun SettingThemeContent(
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    SettingsScaffold(
+    SettingScaffold(
         title = stringResource(RCore.string.themeTitle),
         goBack = goBack,
         modifier = modifier,

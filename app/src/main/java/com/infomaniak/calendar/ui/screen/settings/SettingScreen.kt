@@ -29,7 +29,7 @@ import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemClickable
 import com.infomaniak.calendar.ui.screen.settings.components.SettingSection
 import com.infomaniak.calendar.ui.screen.settings.components.SettingShape
-import com.infomaniak.calendar.ui.screen.settings.components.SettingsScaffold
+import com.infomaniak.calendar.ui.screen.settings.components.SettingScaffold
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.R as RCore
 
@@ -41,7 +41,7 @@ fun SettingScreen(
 ) {
     val context = LocalContext.current
 
-    SettingsScaffold(stringResource(R.string.settingsTitle), goBack, modifier) {
+    SettingScaffold(stringResource(R.string.settingsTitle), goBack, modifier) {
         SettingSection(title = stringResource(R.string.generalSettingsDisplayLabel)) {
             SettingItemClickable(
                 shapes = SettingShape.Single,
