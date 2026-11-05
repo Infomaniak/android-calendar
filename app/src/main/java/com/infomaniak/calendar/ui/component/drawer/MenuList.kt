@@ -46,7 +46,7 @@ fun LazyListScope.menuListItems(menuOptions: List<MenuOption>) {
                     .animateItem()
                     .padding(horizontal = Margin.Medium)
                     .padding(
-                        top = if (index == 0) Margin.Mini else ListItemDefaults.SegmentedGap,
+                        top = if (index == 0) Margin.Huge else ListItemDefaults.SegmentedGap,
                         bottom = if (index == menuOptions.lastIndex) Margin.Large else 0.dp,
                     ),
             )
