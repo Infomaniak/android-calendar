@@ -38,7 +38,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.calendar.ui.theme.CustomColors
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ChevronDown
 
@@ -67,7 +66,7 @@ fun DrawerSectionHeader(
             )
         },
         verticalAlignment = Alignment.CenterVertically,
-        colors = ListItemDefaults.colors(containerColor = CustomColors.menuDrawerContainerBackground),
+        colors = ListItemDefaults.drawerColors,
     ) {
         Text(
             text = organisationName ?: stringResource(R.string.otherCalendarsSectionTitle),

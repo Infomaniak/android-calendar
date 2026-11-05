@@ -34,7 +34,6 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.ui.component.drawer.model.CalendarUi
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.calendar.ui.theme.CustomColors
 import com.infomaniak.calendar.utils.toCalendarColorsUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
@@ -68,7 +67,7 @@ fun DrawerCalendarItem(
             )
         },
         verticalAlignment = Alignment.CenterVertically,
-        colors = ListItemDefaults.colors(containerColor = CustomColors.menuDrawerContainerBackground),
+        colors = ListItemDefaults.drawerColors,
     ) {
         Text(calendar.displayName)
     }

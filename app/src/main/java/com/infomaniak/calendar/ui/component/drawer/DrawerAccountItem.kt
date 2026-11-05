@@ -35,7 +35,6 @@ import com.infomaniak.calendar.ui.screen.accounts.AccountAvatar
 import com.infomaniak.calendar.ui.screen.accounts.AccountEmail
 import com.infomaniak.calendar.ui.screen.accounts.AccountName
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.calendar.ui.theme.CustomColors
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.ui.compose.preview.previewparameter.dummyUserOf
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -66,7 +65,7 @@ fun DrawerAccountItem(
             )
         },
         verticalAlignment = Alignment.CenterVertically,
-        colors = ListItemDefaults.colors(containerColor = CustomColors.menuDrawerContainerBackground),
+        colors = ListItemDefaults.drawerColors,
     ) {
         AccountName(user)
     }
