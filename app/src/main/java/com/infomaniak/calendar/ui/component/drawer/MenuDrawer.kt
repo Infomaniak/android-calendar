@@ -18,9 +18,11 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -40,6 +42,7 @@ import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CircleUser
 import com.infomaniak.designsystem.icons.symbols.Cog
@@ -106,8 +109,12 @@ private fun MenuDrawer(
                 windowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
             ) {
                 LazyColumn(
-                    modifier = Modifier
-                        .fillMaxHeight(),
+                    modifier = Modifier.fillMaxHeight(),
+                    contentPadding = PaddingValues(
+                        start = EsdsTheme.spacing.xl,
+                        end = EsdsTheme.spacing.xl,
+                        bottom = EsdsTheme.spacing.threeXl,
+                    ),
                 ) {
                     drawerListItems(
                         usersCalendars = calendarsUsers,
@@ -118,7 +125,14 @@ private fun MenuDrawer(
                         isSectionExpanded = isSectionExpanded,
                         onSectionExpandedChange = onSectionExpandedChange,
                     )
-                    menuListItems(menuOptions)
+                    item(key = "menu", contentType = "menu") {
+                        MenuList(
+                            menuOptions = menuOptions,
+                            modifier = Modifier
+                                .animateItem()
+                                .padding(top = EsdsTheme.spacing.fourXl),
+                        )
+                    }
                 }
             }
         },

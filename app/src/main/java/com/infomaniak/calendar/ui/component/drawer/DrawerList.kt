@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import kotlinx.parcelize.Parcelize
 
@@ -83,8 +83,7 @@ private fun LazyListScope.accountItems(
             ),
             modifier = Modifier
                 .animateItem()
-                .padding(horizontal = Margin.Medium)
-                .padding(top = if (isFirstAccount) Margin.Mini else Margin.Medium),
+                .padding(top = if (isFirstAccount) EsdsTheme.spacing.md else EsdsTheme.spacing.xl),
         )
     }
 
@@ -107,7 +106,6 @@ private fun LazyListScope.accountItems(
                     ),
                     modifier = Modifier
                         .animateItem()
-                        .padding(horizontal = Margin.Medium)
                         .padding(top = ListItemDefaults.SegmentedGap),
                 )
             }
@@ -127,7 +125,6 @@ private fun LazyListScope.accountItems(
                     ),
                     modifier = Modifier
                         .animateItem()
-                        .padding(horizontal = Margin.Medium)
                         .padding(top = if (isFirstRow) ListItemDefaults.SegmentedGap else 0.dp),
                 )
             }

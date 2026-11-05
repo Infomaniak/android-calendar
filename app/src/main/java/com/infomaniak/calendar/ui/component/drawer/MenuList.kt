@@ -18,37 +18,24 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CircleUser
 import com.infomaniak.designsystem.icons.symbols.Cog
 import com.infomaniak.designsystem.icons.symbols.Symbol
 
-fun LazyListScope.menuListItems(menuOptions: List<MenuOption>) {
-    menuOptions.forEachIndexed { index, menuOption ->
-        item(key = menuOption.itemNameRes, contentType = "menuOption") {
-            MenuItem(
-                menuOption = menuOption,
-                index = index,
-                count = menuOptions.size,
-                modifier = Modifier
-                    .animateItem()
-                    .padding(horizontal = Margin.Medium)
-                    .padding(
-                        top = if (index == 0) Margin.Huge else ListItemDefaults.SegmentedGap,
-                        bottom = if (index == menuOptions.lastIndex) Margin.Large else 0.dp,
-                    ),
-            )
+@Composable
+fun MenuList(menuOptions: List<MenuOption>, modifier: Modifier = Modifier) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
+        menuOptions.forEachIndexed { index, menuOption ->
+            MenuItem(menuOption = menuOption, index = index, count = menuOptions.size)
         }
     }
 }
@@ -57,14 +44,12 @@ fun LazyListScope.menuListItems(menuOptions: List<MenuOption>) {
 @Preview(showBackground = true)
 private fun MenuListPreview() {
     CalendarThemeForPreview {
-        LazyColumn {
-            menuListItems(
-                menuOptions = listOf(
-                    MenuOption(R.string.accountsTitle, EsdsIcons.CircleUser, {}),
-                    MenuOption(R.string.settingsTitle, EsdsIcons.Cog, {}),
-                ),
-            )
-        }
+        MenuList(
+            menuOptions = listOf(
+                MenuOption(R.string.accountsTitle, EsdsIcons.CircleUser, {}),
+                MenuOption(R.string.settingsTitle, EsdsIcons.Cog, {}),
+            ),
+        )
     }
 }
 
