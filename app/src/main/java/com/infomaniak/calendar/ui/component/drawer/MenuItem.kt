@@ -53,7 +53,7 @@ fun MenuItem(
         leadingContent = { Icon(menuOption.itemIcon.Medium, contentDescription = null) },
         trailingContent = {
             Icon(
-                imageVector = EsdsIcons.ChevronRight.Medium,
+                imageVector = EsdsIcons.ChevronRight.Small,
                 contentDescription = null,
             )
         },

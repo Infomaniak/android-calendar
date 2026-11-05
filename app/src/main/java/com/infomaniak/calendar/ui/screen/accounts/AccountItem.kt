@@ -100,7 +100,7 @@ fun AccountItemContent(user: User, isClickable: Boolean, modifier: Modifier = Mo
         trailingContent = {
             if (isClickable) {
                 Icon(
-                    imageVector = EsdsIcons.ChevronRight.Medium,
+                    imageVector = EsdsIcons.ChevronRight.Small,
                     contentDescription = null,
                 )
             }
