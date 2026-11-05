@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
@@ -31,6 +32,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.ui.screen.accounts.AccountAvatar
 import com.infomaniak.calendar.ui.screen.accounts.AccountEmail
 import com.infomaniak.calendar.ui.screen.accounts.AccountName
@@ -55,7 +57,7 @@ fun DrawerAccountItem(
         onClick = onAccountExpanded,
         shapes = shapes,
         modifier = modifier.semantics { toggleableState = ToggleableState(isExpanded()) },
-        leadingContent = { AccountAvatar(user) },
+        leadingContent = { AccountAvatar(user, Modifier.size(40.dp)) },
         supportingContent = { AccountEmail(user) },
         trailingContent = {
             Icon(

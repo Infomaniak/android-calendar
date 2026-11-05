@@ -95,7 +95,7 @@ fun AccountItemContent(user: User, isClickable: Boolean, modifier: Modifier = Mo
     ListItem(
         modifier = modifier.fillMaxWidth(),
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-        leadingContent = { AccountAvatar(user) },
+        leadingContent = { AccountAvatar(user, Modifier.size(32.dp)) },
         content = { AccountName(user) },
         supportingContent = { AccountEmail(user) },
         trailingContent = {
@@ -110,8 +110,8 @@ fun AccountItemContent(user: User, isClickable: Boolean, modifier: Modifier = Mo
 }
 
 @Composable
-fun AccountAvatar(user: User) {
-    Avatar(avatarType = AvatarType.fromUser(user), modifier = Modifier.size(32.dp))
+fun AccountAvatar(user: User, modifier: Modifier = Modifier) {
+    Avatar(avatarType = AvatarType.fromUser(user), modifier = modifier)
 }
 
 @Composable
