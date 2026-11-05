@@ -29,8 +29,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import com.infomaniak.calendar.ui.component.drawer.model.CalendarSectionUi
-import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
+import com.infomaniak.calendar.ui.model.CalendarSectionUi
+import com.infomaniak.calendar.ui.model.UserCalendarsUi
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId

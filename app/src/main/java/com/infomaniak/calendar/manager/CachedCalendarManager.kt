@@ -18,7 +18,11 @@
 package com.infomaniak.calendar.manager
 
 import com.infomaniak.calendar.data.CalendarDataValues
+import com.infomaniak.calendar.ui.model.UserCalendarsUi
+import com.infomaniak.calendar.utils.account.AccountUtils
+import com.infomaniak.calendar.utils.account.accountId
 import com.infomaniak.calendar.utils.mapState
+import com.infomaniak.calendar.utils.toCalendarSectionUi
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
@@ -27,6 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 /**
@@ -35,10 +40,22 @@ import kotlinx.coroutines.flow.stateIn
  * Created in [com.infomaniak.calendar.MainApplication.onCreate] so the queries have long completed by the time a screen needs them.
  */
 @SingleIn(AppScope::class)
-class CachedCalendarManager @Inject constructor(calendarManager: CalendarManager, calendarDataValues: CalendarDataValues) {
+class CachedCalendarManager @Inject constructor(
+    calendarManager: CalendarManager,
+    calendarDataValues: CalendarDataValues,
+    accountUtils: AccountUtils,
+) {
     private val managerScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
-    val calendarSections = calendarManager.observeCalendars().stateIn(managerScope, SharingStarted.Eagerly, emptyList())
+    private val calendarSections = calendarManager.observeCalendars().stateIn(managerScope, SharingStarted.Eagerly, emptyList())
+
+    private val calendarSectionsUiByAccount = calendarSections.mapState(managerScope, SharingStarted.Eagerly) { sections ->
+        sections.groupBy(keySelector = { it.accountId }, valueTransform = { it.toCalendarSectionUi() })
+    }
+
+    val usersCalendars = combine(accountUtils.users, calendarSectionsUiByAccount) { users, sectionsByAccount ->
+        users.map { user -> UserCalendarsUi(user, sectionsByAccount[user.accountId].orEmpty()) }
+    }.stateIn(managerScope, SharingStarted.Eagerly, emptyList())
 
     val calendars = calendarSections.mapState(managerScope, SharingStarted.Eagerly) { sections ->
         sections.flatMap { it.calendars }
