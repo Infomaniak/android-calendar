@@ -102,6 +102,7 @@
     <string name="statusDeclinedLabel">Avvist</string>
     <string name="statusNeedsActionLabel">Under behandling</string>
     <string name="statusTentativeLabel">Kanskje</string>
+    <string name="unavailableLabel">Utilgjengelig</string>
     <plurals name="unitDays">
         <item quantity="one">dag</item>
         <item quantity="other">dager</item>

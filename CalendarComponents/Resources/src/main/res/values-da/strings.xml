@@ -102,6 +102,7 @@
     <string name="statusDeclinedLabel">Afvist</string>
     <string name="statusNeedsActionLabel">Afventer</string>
     <string name="statusTentativeLabel">Måske</string>
+    <string name="unavailableLabel">Ikke tilgængelig</string>
     <plurals name="unitDays">
         <item quantity="one">dag</item>
         <item quantity="other">dage</item>

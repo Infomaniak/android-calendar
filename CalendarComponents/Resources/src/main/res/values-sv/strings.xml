@@ -102,6 +102,7 @@
     <string name="statusDeclinedLabel">Avvisat</string>
     <string name="statusNeedsActionLabel">Väntar på beslut</string>
     <string name="statusTentativeLabel">Kanske</string>
+    <string name="unavailableLabel">Inte tillgänglig</string>
     <plurals name="unitDays">
         <item quantity="one">dag</item>
         <item quantity="other">dagar</item>

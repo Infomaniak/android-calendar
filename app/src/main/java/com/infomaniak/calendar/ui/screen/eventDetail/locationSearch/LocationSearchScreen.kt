@@ -33,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.locationsearch.LocationSearch
+import com.infomaniak.calendar.components.locationsearch.models.RoomAvailability
 import com.infomaniak.calendar.components.locationsearch.models.SearchRoomUi
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
@@ -106,7 +107,7 @@ private fun Preview() {
     CalendarThemeForPreview {
         LocationSearchScreen(
             initialLocation = null,
-            rooms = listOf(SearchRoomUi(id = "1", name = "Salle Jules Verne", seats = 100, floor = 3)),
+            rooms = listOf(SearchRoomUi(id = "1", name = "Salle Jules Verne", seats = 100, floor = 3, availability = RoomAvailability.Available)),
             onSubmit = {},
             onRoomClick = {},
             goBack = {},

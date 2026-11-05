@@ -102,6 +102,7 @@
     <string name="statusDeclinedLabel">Recusado</string>
     <string name="statusNeedsActionLabel">Em espera</string>
     <string name="statusTentativeLabel">Talvez</string>
+    <string name="unavailableLabel">Indisponível</string>
     <plurals name="unitDays">
         <item quantity="one">dia</item>
         <item quantity="other">dias</item>

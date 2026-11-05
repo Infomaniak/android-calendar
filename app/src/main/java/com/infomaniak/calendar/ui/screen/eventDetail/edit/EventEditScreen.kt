@@ -80,7 +80,7 @@ fun EventEditScreen(
     val formState = eventFormViewModel.formState
 
     LaunchedEffect(formState) {
-        formState?.let { locationSearchViewModel.followForm(it) }
+        formState?.let { locationSearchViewModel.followForm(it, editedOccurrenceId = occurrenceId) }
     }
 
     val uiState = if (eventDetailUiState is EventDetailUiState.Displayable.Success && formState != null) {

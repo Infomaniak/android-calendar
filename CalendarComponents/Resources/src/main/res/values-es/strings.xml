@@ -102,6 +102,7 @@
     <string name="statusDeclinedLabel">Rechazado</string>
     <string name="statusNeedsActionLabel">Pendiente</string>
     <string name="statusTentativeLabel">Quizás</string>
+    <string name="unavailableLabel">No disponible</string>
     <plurals name="unitDays">
         <item quantity="one">día</item>
         <item quantity="other">días</item>

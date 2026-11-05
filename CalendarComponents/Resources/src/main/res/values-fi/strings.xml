@@ -102,6 +102,7 @@
     <string name="statusDeclinedLabel">Hylätty</string>
     <string name="statusNeedsActionLabel">Käsiteltävänä</string>
     <string name="statusTentativeLabel">Ehkä</string>
+    <string name="unavailableLabel">Ei käytettävissä</string>
     <plurals name="unitDays">
         <item quantity="one">päivä</item>
         <item quantity="other">päivää</item>

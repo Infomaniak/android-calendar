@@ -102,6 +102,7 @@
     <string name="statusDeclinedLabel">Afgewezen</string>
     <string name="statusNeedsActionLabel">In behandeling</string>
     <string name="statusTentativeLabel">Misschien</string>
+    <string name="unavailableLabel">Niet beschikbaar</string>
     <plurals name="unitDays">
         <item quantity="one">dag</item>
         <item quantity="other">dagen</item>

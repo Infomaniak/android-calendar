@@ -102,6 +102,7 @@
     <string name="statusDeclinedLabel">Απορρίφθηκε</string>
     <string name="statusNeedsActionLabel">Σε εκκρεμότητα</string>
     <string name="statusTentativeLabel">Ίσως</string>
+    <string name="unavailableLabel">Μη διαθέσιμη</string>
     <plurals name="unitDays">
         <item quantity="one">ημέρα</item>
         <item quantity="other">ημέρες</item>
