@@ -34,7 +34,7 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
-fun SettingsScaffold(
+fun SettingScaffold(
     title: String,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -63,7 +63,7 @@ fun SettingsScaffold(
 @Composable
 private fun Preview() {
     CalendarThemeForPreview {
-        SettingsScaffold(title = "Settings", goBack = {}) {
+        SettingScaffold(title = "Settings", goBack = {}) {
             Text("Hello", style = MaterialTheme.typography.displayLargeEmphasized)
         }
     }
