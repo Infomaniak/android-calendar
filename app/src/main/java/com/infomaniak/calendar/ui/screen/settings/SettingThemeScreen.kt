@@ -26,6 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.data.SettingThemeOption
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemSwitch
+import com.infomaniak.calendar.ui.screen.settings.components.SettingSection
 import com.infomaniak.calendar.ui.screen.settings.components.SettingShape
 import com.infomaniak.calendar.ui.screen.settings.components.SettingsScaffold
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -59,25 +60,27 @@ private fun SettingThemeContent(
         goBack = goBack,
         modifier = modifier,
     ) {
-        val theme = theme()
-        SettingItemSwitch(
-            shapes = SettingShape.First,
-            text = "Système",
-            checked = { theme == SettingThemeOption.System },
-            onCheckedChange = { onThemeClick(SettingThemeOption.System) },
-        )
-        SettingItemSwitch(
-            shapes = SettingShape.Middle,
-            text = "Clair",
-            checked = { theme == SettingThemeOption.Light },
-            onCheckedChange = { onThemeClick(SettingThemeOption.Light) },
-        )
-        SettingItemSwitch(
-            shapes = SettingShape.Last,
-            text = "Sombre",
-            checked = { theme == SettingThemeOption.Dark },
-            onCheckedChange = { onThemeClick(SettingThemeOption.Dark) },
-        )
+        SettingSection {
+            val theme = theme()
+            SettingItemSwitch(
+                shapes = SettingShape.First,
+                text = "Système",
+                checked = { theme == SettingThemeOption.System },
+                onCheckedChange = { onThemeClick(SettingThemeOption.System) },
+            )
+            SettingItemSwitch(
+                shapes = SettingShape.Middle,
+                text = "Clair",
+                checked = { theme == SettingThemeOption.Light },
+                onCheckedChange = { onThemeClick(SettingThemeOption.Light) },
+            )
+            SettingItemSwitch(
+                shapes = SettingShape.Last,
+                text = "Sombre",
+                checked = { theme == SettingThemeOption.Dark },
+                onCheckedChange = { onThemeClick(SettingThemeOption.Dark) },
+            )
+        }
     }
 }
 
