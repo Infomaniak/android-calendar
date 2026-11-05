@@ -91,7 +91,9 @@ fun SettingItemSwitch(
     shapes: SettingShape,
     text: String,
     checked: () -> Boolean,
+    onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier.Companion,
+    trailingSwitch: SwitchType = SwitchType.None,
     supportingText: String? = null,
     enabled: () -> Boolean = { true },
     colors: ListItemColors = SettingItemsDefault.colors(),
@@ -100,11 +102,11 @@ fun SettingItemSwitch(
 
     SegmentedListItem(
         checked = isChecked,
-        onCheckedChange = { },
-        shapes = shapes.segementedShape(),
+        onCheckedChange = onCheckedChange,
+        shapes = shapes.segmentedShape(),
         modifier = modifier,
         enabled = enabled(),
-        trailingContent = { Switch(isChecked, null) },
+        trailingContent = { trailingSwitch.content?.invoke(isChecked) },
         supportingContent = supportingText?.let { { Text(it) } },
         colors = colors,
         content = { Text(text) },
@@ -125,7 +127,7 @@ private fun SettingItem(
 ) {
     SegmentedListItem(
         onClick = onClick,
-        shapes = shapes.segementedShape(),
+        shapes = shapes.segmentedShape(),
         modifier = modifier,
         enabled = enabled(),
         leadingContent = leadingContent,
@@ -146,9 +148,15 @@ object SettingItemsDefault {
     fun colors(): ListItemColors {
         return ListItemDefaults.segmentedColors(containerColor = CustomColors.SettingItemContainerColor)
     }
+
 }
 
-enum class SettingShape(val segementedShape: @Composable () -> ListItemShapes) {
+enum class SwitchType(val content: @Composable ((isChecked: Boolean) -> Unit)? = null) {
+    Switch(content = { checked -> Switch(checked, null) }),
+    None,
+}
+
+enum class SettingShape(val segmentedShape: @Composable () -> ListItemShapes) {
     Single({ ListItemDefaults.segmentedShapes(index = 0, count = 1) }),
     First({ ListItemDefaults.segmentedShapes(index = 0, count = 3) }),
     Middle({ ListItemDefaults.segmentedShapes(index = 1, count = 3) }),
@@ -180,7 +188,7 @@ private fun PreviewLeadingIcon() {
 private fun SettingSectionPreview() {
     SettingsPreviewGroup(title = "Section") {
         SettingItemClickable(shapes = SettingShape.First, text = "Clickable", onClick = {})
-        SettingItemSwitch(shapes = SettingShape.Middle, text = "Switch", checked = { true })
+        SettingItemSwitch(shapes = SettingShape.Middle, text = "Switch", checked = { true }, onCheckedChange = {})
         SettingItemOpen(shapes = SettingShape.Last, text = "Open", onClick = {})
     }
 }
@@ -205,14 +213,21 @@ private fun SettingItemClickablePreview() {
 @Composable
 private fun SettingItemSwitchPreview() {
     SettingsPreviewGroup(title = "Switch") {
-        SettingItemSwitch(shapes = SettingShape.First, text = "Checked", checked = { true })
+        SettingItemSwitch(shapes = SettingShape.First, text = "Checked", checked = { true }, onCheckedChange = {})
         SettingItemSwitch(
             shapes = SettingShape.Middle,
             text = "Unchecked",
             checked = { false },
+            onCheckedChange = {},
             supportingText = "Supporting text",
         )
-        SettingItemSwitch(shapes = SettingShape.Last, text = "Disabled", checked = { true }, enabled = { false })
+        SettingItemSwitch(
+            shapes = SettingShape.Last,
+            text = "Disabled",
+            checked = { true },
+            enabled = { false },
+            onCheckedChange = {},
+        )
     }
 }
 
