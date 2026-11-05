@@ -23,7 +23,7 @@ import com.infomaniak.calendar.components.foundation.models.AvatarData
 interface AvatarFinder {
     suspend fun avatarOf(name: String?, email: String): AvatarData?
 
-    /** The loader fetching avatars of [accountId] (`null` for device avatars); `null` shows initials instead. */
+    /** The loader fetching avatars of [accountId] (`null` for device avatars); `null` also falls back to initials instead. */
     fun imageLoaderOf(accountId: Long?): ImageLoader?
 
     companion object {
