@@ -32,7 +32,6 @@ import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CircleUser
 import com.infomaniak.designsystem.icons.symbols.Cog
-import com.infomaniak.designsystem.icons.symbols.Headset
 import com.infomaniak.designsystem.icons.symbols.Symbol
 
 fun LazyListScope.menuListItems(menuOptions: List<MenuOption>) {
@@ -63,7 +62,6 @@ private fun MenuListPreview() {
                 menuOptions = listOf(
                     MenuOption(R.string.accountsTitle, EsdsIcons.CircleUser, {}),
                     MenuOption(R.string.settingsTitle, EsdsIcons.Cog, {}),
-                    MenuOption(R.string.helpTitle, EsdsIcons.Headset, {}),
                 ),
             )
         }

@@ -100,7 +100,6 @@ private fun MenuDrawer(
     val menuOptions = drawerMenuOptions(
         onManageAccounts = onManageAccounts,
         onSettings = {}, // TODO: Add navigation to settings
-        onHelp = {}, // TODO: Add intent to help 
     )
 
     ModalNavigationDrawer(
@@ -136,7 +135,6 @@ private fun MenuDrawer(
 private fun drawerMenuOptions(
     onManageAccounts: () -> Unit,
     onSettings: () -> Unit,
-    onHelp: () -> Unit,
 ): List<MenuOption> {
     return listOf(
         MenuOption(
@@ -148,11 +146,6 @@ private fun drawerMenuOptions(
             itemNameRes = R.string.settingsTitle,
             itemIcon = EsdsIcons.Cog,
             itemAction = onSettings,
-        ),
-        MenuOption(
-            itemNameRes = R.string.helpTitle,
-            itemIcon = EsdsIcons.Headset,
-            itemAction = onHelp,
         ),
     )
 }
