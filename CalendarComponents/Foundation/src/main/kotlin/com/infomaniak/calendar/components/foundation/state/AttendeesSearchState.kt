@@ -34,6 +34,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateSet
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
+import com.infomaniak.calendar.components.foundation.models.AvatarStrategy
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
@@ -75,6 +76,7 @@ class AttendeesSearchState<T : OrganizerSource>(
                 email = email,
                 displayName = null,
                 status = ParticipationStatus.NeedsAction,
+                avatar = AvatarStrategy.ToCompute,
             ),
         )
 

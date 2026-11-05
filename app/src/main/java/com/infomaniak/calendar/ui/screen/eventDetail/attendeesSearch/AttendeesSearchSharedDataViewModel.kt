@@ -26,9 +26,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
-import com.infomaniak.calendar.components.foundation.models.OrganizerSource
+import com.infomaniak.calendar.components.foundation.models.AvatarStrategy
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.ui.navigation.SharedViewModelStoreNavEntryDecorator
+import com.infomaniak.calendar.utils.avatarData
 import com.infomaniak.multiplatform_core.contacts.ContactsManager
 import com.infomaniak.multiplatform_core.contacts.domain.model.Contact
 import dev.zacsweers.metro.AppScope
@@ -91,6 +92,7 @@ private fun List<Contact>.toAttendeesUi(alreadyPresentAttendees: Map<AttendeeUi.
             displayName = contact.name,
             email = contact.email,
             status = null,
+            avatar = AvatarStrategy.Precomputed(contact.avatarData),
             isOrganizer = false,
         )
     }

@@ -36,6 +36,7 @@ data class AttendeeUi(
     val email: String,
     val displayName: String?,
     val status: ParticipationStatus?,
+    val avatar: AvatarStrategy,
     val isOrganizer: Boolean = false,
 ) : AttendeesSearchResult, ParticipantUi {
     @IgnoredOnParcel
@@ -46,6 +47,13 @@ data class AttendeeUi(
     /** Identifies an attendee across sources (event, contacts, custom input). */
     @Parcelize
     data class Key(val email: String, val displayName: String?) : Parcelable
+}
+
+sealed interface AvatarStrategy : Parcelable {
+    @Parcelize
+    data class Precomputed(val avatarData: AvatarData?) : AvatarStrategy
+    @Parcelize
+    data object ToCompute : AvatarStrategy
 }
 
 enum class ParticipationStatus(

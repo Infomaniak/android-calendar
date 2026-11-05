@@ -55,6 +55,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.HighlightedText
 import com.infomaniak.calendar.components.foundation.component.ListItemClickable
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.AvatarStrategy
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.utils.fromAttendee
 import com.infomaniak.calendar.components.resources.R
@@ -128,7 +129,7 @@ private fun EventAttendee(
         verticalAlignment = Alignment.CenterVertically,
         leadingContent = {
             Avatar(
-                avatarType = AvatarType.fromAttendee(attendee),
+                avatarType = AvatarType.fromAttendee(attendee).value,
                 modifier = Modifier.size(EsdsTheme.icon.sizeXl),
             )
         },
@@ -215,7 +216,7 @@ private fun ParticipationStatusText(text: String, color: Color, isOrganizer: Boo
 @Composable
 private fun PreviewAttendeeAccepted() {
     Surface {
-        EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted, true))
+        EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted, AvatarStrategy.ToCompute, true))
     }
 }
 
@@ -223,7 +224,7 @@ private fun PreviewAttendeeAccepted() {
 @Composable
 private fun PreviewAttendeeDeclined() {
     Surface {
-        EventAttendee(AttendeeUi("alice@example.com", null, ParticipationStatus.Declined))
+        EventAttendee(AttendeeUi("alice@example.com", null, ParticipationStatus.Declined, AvatarStrategy.ToCompute))
     }
 }
 
@@ -231,7 +232,7 @@ private fun PreviewAttendeeDeclined() {
 @Composable
 private fun PreviewAttendeeMaybe() {
     Surface {
-        EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Tentative))
+        EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Tentative, AvatarStrategy.ToCompute))
     }
 }
 
@@ -239,7 +240,7 @@ private fun PreviewAttendeeMaybe() {
 @Composable
 private fun PreviewAttendeePending() {
     Surface {
-        EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.NeedsAction))
+        EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.NeedsAction, AvatarStrategy.ToCompute))
     }
 }
 
@@ -247,7 +248,7 @@ private fun PreviewAttendeePending() {
 @Composable
 private fun Preview() {
     Surface {
-        EventAttendee(AttendeeUi("alice@example.com", "Alice", null), enabled = false)
+        EventAttendee(AttendeeUi("alice@example.com", "Alice", null, AvatarStrategy.ToCompute), enabled = false)
     }
 }
 
@@ -256,7 +257,7 @@ private fun Preview() {
 private fun SwipeableAttendeePreview() {
     Surface {
         SwipeableEventAttendee(
-            AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted),
+            AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted, AvatarStrategy.ToCompute),
             onDismiss = {},
             state = rememberSwipeToDismissBoxState(initialValue = SwipeToDismissBoxValue.EndToStart),
         )

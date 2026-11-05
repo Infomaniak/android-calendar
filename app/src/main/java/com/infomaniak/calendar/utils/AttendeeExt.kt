@@ -19,8 +19,10 @@ package com.infomaniak.calendar.utils
 
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.Attendees
+import com.infomaniak.calendar.components.foundation.models.AvatarStrategy
 import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
+import com.infomaniak.calendar.components.foundation.models.AvatarData
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Attendee
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Organizer
 import com.infomaniak.multiplatform_core.account.domain.model.AccountId
@@ -40,7 +42,10 @@ fun Attendee.toAttendeeUi(): AttendeeUi = AttendeeUi(
     displayName = displayName,
     status = status.toParticipationStatus(),
     isOrganizer = isOrganizer,
+    avatar = AvatarStrategy.Precomputed(avatarData),
 )
+
+val Attendee.avatarData: AvatarData? get() = avatar?.avatarData
 
 fun Organizer.toOrganizerUi(): OrganizerUi = OrganizerUi(email = email, displayName = displayName)
 

@@ -22,7 +22,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import com.infomaniak.calendar.components.foundation.manager.AvatarFinder
 import com.infomaniak.calendar.data.CalendarDataValues
+import com.infomaniak.calendar.manager.AppAvatarFinder
 import com.infomaniak.calendar.manager.BackgroundEventComposer
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.manager.VisibleDateManager
@@ -54,6 +56,7 @@ class MainViewModel(
     backgroundEventComposer: BackgroundEventComposer,
     private val calendarDataValues: CalendarDataValues,
     visibleDateManager: VisibleDateManager,
+    appAvatarFinder: AppAvatarFinder,
 ) : ViewModel() {
     val loadingEventsError: ReceiveChannel<SyncEventsManager.SyncError> = syncEventsManager.loadingError
     val savingEventError: ReceiveChannel<Unit> = backgroundEventComposer.savingError
@@ -66,6 +69,8 @@ class MainViewModel(
     }.stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = MainUiState.Loading)
 
     val visibleDate = visibleDateManager.visibleDate
+
+    val avatarFinder: AvatarFinder = appAvatarFinder
 
     init {
         visibleDateManager.bindTo(savedStateHandle)
@@ -102,4 +107,3 @@ class MainViewModel(
         fun create(@Assisted savedStateHandle: SavedStateHandle): MainViewModel
     }
 }
-

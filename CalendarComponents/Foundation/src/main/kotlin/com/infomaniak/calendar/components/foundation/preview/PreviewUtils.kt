@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.foundation.preview
 
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.AvatarStrategy
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 
 val previewAttendees = listOf(
@@ -25,25 +26,30 @@ val previewAttendees = listOf(
         email = "alice@example.com",
         displayName = "Alice Johnson",
         status = ParticipationStatus.Accepted,
+        avatar = AvatarStrategy.ToCompute,
     ),
     AttendeeUi(
         email = "ellen@example.com",
         displayName = "Ellen Joe",
         status = ParticipationStatus.NeedsAction,
+        avatar = AvatarStrategy.ToCompute,
     ),
     AttendeeUi(
         email = "bob@example.com",
         displayName = "Bob Smith",
         status = ParticipationStatus.Tentative,
+        avatar = AvatarStrategy.ToCompute,
     ),
     AttendeeUi(
         email = "carla@example.com",
         displayName = "Carla Lopez",
         status = ParticipationStatus.Declined,
+        avatar = AvatarStrategy.ToCompute,
     ),
     AttendeeUi(
         email = "denis@example.com",
         displayName = "Denis Brown",
         status = ParticipationStatus.NeedsAction,
+        avatar = AvatarStrategy.ToCompute,
     ),
 )
