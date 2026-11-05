@@ -33,6 +33,9 @@ import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
+/**
+ * Default aspect of a setting screen scaffold for most simple cases.
+ */
 @Composable
 fun SettingScaffold(
     title: String,
