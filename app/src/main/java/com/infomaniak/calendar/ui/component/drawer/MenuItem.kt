@@ -59,7 +59,7 @@ fun MenuItem(
         },
         verticalAlignment = Alignment.CenterVertically,
         colors = ListItemDefaults.colors(
-            containerColor = CustomColors.menuDrawerContainerBackground,
+            containerColor = CustomColors.MenuDrawerContainerBackground,
             leadingIconColor = MaterialTheme.colorScheme.primary,
         ),
     ) {

@@ -32,6 +32,9 @@
     <string name="deleteRecurringEventAlertTitle">Quels évènements souhaitez-vous supprimer ?</string>
     <string name="editRecurringEventAlertTitle">Quels évènements souhaitez-vous modifier ?</string>
     <string name="eventOccurrenceNotFound">Cet évènement n’est plus disponible.</string>
+    <string name="generalSettingsAuthorizationsLabel">Autorizations</string>
+    <string name="generalSettingsDisplayLabel">Affichage</string>
+    <string name="generalSettingsNotificationsLabel">Notifications</string>
     <string name="helpTitle">Aide</string>
     <string name="monthTitle">Mois</string>
     <string name="noWritableCalendar">Aucun calendrier modifiable trouvé</string>

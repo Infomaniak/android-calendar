@@ -1,0 +1,96 @@
+/*
+ * Infomaniak Calendar - Android
+ * Copyright (C) 2026 Infomaniak Network SA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.infomaniak.calendar.ui.screen.settings
+
+import android.content.Context
+import android.content.Intent
+import android.provider.Settings
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.R
+import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.screen.settings.components.SettingItemClickable
+import com.infomaniak.calendar.ui.screen.settings.components.SettingShape
+import com.infomaniak.calendar.ui.screen.settings.components.SettingTitle
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.core.common.R as RCore
+
+@Composable
+fun SettingScreen(
+    goBack: () -> Unit,
+    goToTheme: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.settingsTitle)) },
+                navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
+            )
+        },
+        modifier = modifier,
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(paddingValues)
+                .padding(horizontal = EsdsTheme.spacing.xl),
+        ) {
+            SettingTitle(stringResource(R.string.generalSettingsDisplayLabel))
+            SettingItemClickable(
+                shapes = SettingShape.Single,
+                text = stringResource(RCore.string.themeTitle),
+                onClick = goToTheme,
+            )
+
+            SettingTitle(stringResource(R.string.generalSettingsAuthorizationsLabel))
+            SettingItemClickable(
+                shapes = SettingShape.Single,
+                text = stringResource(R.string.generalSettingsNotificationsLabel),
+                onClick = { goToSystemNotificationScreen(context) },
+            )
+        }
+    }
+}
+
+private fun goToSystemNotificationScreen(context: Context) {
+    Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+        .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+        .also(context::startActivity)
+}
+
+@Preview
+@Composable
+private fun SettingScreenPreview() {
+    CalendarThemeForPreview {
+        SettingScreen(goBack = {}, goToTheme = {})
+    }
+}

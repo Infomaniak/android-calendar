@@ -54,7 +54,7 @@ import com.infomaniak.core.common.R as RCore
 @Composable
 fun AccountActionsScreen(
     userId: Int,
-    onBack: () -> Unit,
+    goBack: () -> Unit,
     modifier: Modifier = Modifier,
     accountsViewModel: AccountsViewModel = viewModel(),
     menuDrawerViewModel: MenuDrawerViewModel = viewModel(),
@@ -64,13 +64,13 @@ fun AccountActionsScreen(
 
     LaunchedEffect(accountsViewModel) {
         for (event in accountsViewModel.navigateBack) {
-            onBack()
+            goBack()
         }
     }
 
     AccountsActionsScreen(
         user = user,
-        onBack = onBack,
+        onBack = goBack,
         removeUser = { accountsViewModel.removeUser(user.id) },
         modifier = modifier,
     )

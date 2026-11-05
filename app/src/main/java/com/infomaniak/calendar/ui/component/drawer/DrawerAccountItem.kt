@@ -60,7 +60,7 @@ fun DrawerAccountItem(user: User, isExpanded: () -> Boolean, onAccountExpanded: 
     Row(
         modifier = modifier
             .clip(shape = EsdsTheme.radius.twoXl)
-            .background(color = CustomColors.menuDrawerContainerBackground)
+            .background(color = CustomColors.MenuDrawerContainerBackground)
             .fillMaxWidth()
             .toggleable(
                 value = isExpanded(),

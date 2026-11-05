@@ -62,6 +62,8 @@ import com.infomaniak.calendar.ui.screen.onboarding.login.LoginOnboardingScreen
 import com.infomaniak.calendar.ui.screen.onboarding.permissions.PermissionsOnboardingPage
 import com.infomaniak.calendar.ui.screen.onboarding.permissions.PermissionsOnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
+import com.infomaniak.calendar.ui.screen.settings.SettingScreen
+import com.infomaniak.calendar.ui.screen.settings.SettingThemeScreen
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.utils.NavigationTransition
 import com.infomaniak.core.common.utils.today
@@ -210,17 +212,28 @@ private fun baseEntryProvider(
 
         is NavDestination.Accounts.List -> NavEntry(destination) {
             AccountsListScreen(
-                onBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
-                onAddAccount = { backStack.addOnce(NavDestination.Onboarding.Login(onlyLogin = true)) },
-                onAccountClick = { userId -> backStack.addOnce(NavDestination.Accounts.Actions(userId)) },
+                goBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
+                goToAddAccount = { backStack.addOnce(NavDestination.Onboarding.Login(onlyLogin = true)) },
+                goToAccountActions = { userId -> backStack.addOnce(NavDestination.Accounts.Actions(userId)) },
             )
         }
 
         is NavDestination.Accounts.Actions -> NavEntry(destination) {
             AccountActionsScreen(
                 userId = destination.userId,
-                onBack = { backStack.popOrReplaceRoot(NavDestination.Accounts.List) },
+                goBack = { backStack.popOrReplaceRoot(NavDestination.Accounts.List) },
             )
+        }
+
+        is NavDestination.Settings.Main -> NavEntry(destination) {
+            SettingScreen(
+                goBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
+                goToTheme = { backStack.addOnce(NavDestination.Settings.Theme) },
+            )
+        }
+
+        is NavDestination.Settings.Theme -> NavEntry(destination) {
+            SettingThemeScreen(goBack = { backStack.popOrReplaceRoot(NavDestination.Settings.Main) })
         }
 
         is NavDestination.Onboarding.Login -> NavEntry(destination) {
@@ -283,6 +296,7 @@ private fun sceneDecoratorStrategies(
                 onManageAccounts = {
                     backStack.addOnce(NavDestination.Accounts.List)
                 },
+                goToSettings = { backStack.addOnce(NavDestination.Settings.Main) },
             )
         },
     )
