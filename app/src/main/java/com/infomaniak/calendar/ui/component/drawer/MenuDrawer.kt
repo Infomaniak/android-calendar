@@ -54,6 +54,7 @@ fun MenuDrawer(
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     onManageAccounts: () -> Unit = {},
+    goToSettings: () -> Unit = {},
     menuDrawerViewModel: MenuDrawerViewModel = viewModel(),
 ) {
     val calendarDrawerState = LocalDrawerState.current ?: return
@@ -80,6 +81,12 @@ fun MenuDrawer(
                 onManageAccounts()
             }
         },
+        onSettingsClick = {
+            scope.launch {
+                calendarDrawerState.close()
+                goToSettings()
+            }
+        },
         modifier = modifier,
     )
 }
@@ -95,12 +102,13 @@ private fun MenuDrawer(
     onSectionExpandedChange: (sectionKey: String, isExpanded: Boolean) -> Unit,
     isSectionExpanded: (String) -> Boolean,
     onManageAccounts: () -> Unit,
+    onSettingsClick: () -> Unit,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val menuOptions = drawerMenuOptions(
         onManageAccounts = onManageAccounts,
-        onSettings = {}, // TODO: Add navigation to settings
+        onSettingsClick = onSettingsClick,
     )
 
     ModalNavigationDrawer(
@@ -145,7 +153,7 @@ private fun MenuDrawer(
 
 private fun drawerMenuOptions(
     onManageAccounts: () -> Unit,
-    onSettings: () -> Unit,
+    onSettingsClick: () -> Unit,
 ): List<MenuOption> {
     return listOf(
         MenuOption(
@@ -156,7 +164,7 @@ private fun drawerMenuOptions(
         MenuOption(
             itemNameRes = R.string.settingsTitle,
             itemIcon = EsdsIcons.Cog,
-            itemAction = onSettings,
+            itemAction = onSettingsClick,
         ),
     )
 }
@@ -177,6 +185,7 @@ private fun MenuDrawerPreview(
             onSectionExpandedChange = { _, _ -> },
             isSectionExpanded = { true },
             onManageAccounts = {},
+            onSettingsClick = {},
             content = {},
             modifier = Modifier,
         )

@@ -55,7 +55,7 @@ app/src/main/java/com/infomaniak/calendar/
     │                              # UserCalendarsUi / CalendarSectionUi / CalendarUi / CalendarColorsUi, the calendars as the drawer and other views draw them
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
-    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), EventTimeZone(parent, isStart), EventCustomReminder(parent), Accounts, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
+    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), EventTimeZone(parent, isStart), EventCustomReminder(parent), Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
     │   └── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
     ├── screen/
@@ -66,6 +66,7 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── planning/              # PlanningScreen + PlanningViewModel (events from VisibleEventsManager) + PlanningEventGroupingExt
     │   ├── accounts/              # AccountsListScreen + AccountActionsScreen + AccountsViewModel + AccountItem
     │                              # Drawer-backed account list, per-account detail/logout screen, and remove-account flow
+    │   ├── settings/              # SettingScreen (opened from the drawer) + nested SettingThemeScreen + SettingThemeViewModel
     │   ├── eventCreation/         # EventCreationScreen
     │   ├── eventDetail/           # EventDetailScreen + EventEditScreen + EventCreationScreen + their ViewModels, and
     │                              # attendeesSearch/ (EventAttendeesScreen + EventAttendeesViewModel shared with its parent)

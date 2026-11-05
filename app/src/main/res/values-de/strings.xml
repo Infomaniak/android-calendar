@@ -32,6 +32,9 @@
     <string name="deleteRecurringEventAlertTitle">Welche Anlässe möchten Sie löschen?</string>
     <string name="editRecurringEventAlertTitle">Welche Anlässe möchten Sie bearbeiten?</string>
     <string name="eventOccurrenceNotFound">Dieser Anlass ist nicht mehr verfügbar.</string>
+    <string name="generalSettingsAuthorizationsLabel">Berechtigungen</string>
+    <string name="generalSettingsDisplayLabel">Anzeige</string>
+    <string name="generalSettingsNotificationsLabel">Benachrichtigungen</string>
     <string name="monthTitle">Monat</string>
     <string name="noWritableCalendar">Kein bearbeitbarer Kalender gefunden</string>
     <string name="notificationAllDay">Ganztägig</string>

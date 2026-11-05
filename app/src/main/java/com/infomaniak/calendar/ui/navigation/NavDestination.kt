@@ -75,6 +75,14 @@ sealed interface NavDestination : NavKey {
         data class Actions(val userId: Int) : Accounts
     }
 
+    sealed interface Settings : NavDestination {
+        @Serializable
+        data object Main : Settings
+
+        @Serializable
+        data object Theme : Settings
+    }
+
     @Serializable
     data class EventDetail(val occurrenceId: OccurrenceId) : NavDestination
 

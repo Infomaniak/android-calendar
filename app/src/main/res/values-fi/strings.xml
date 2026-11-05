@@ -32,6 +32,9 @@
     <string name="deleteRecurringEventAlertTitle">Mitkä tapahtumat haluat poistaa?</string>
     <string name="editRecurringEventAlertTitle">Mitä tapahtumia haluat muokata?</string>
     <string name="eventOccurrenceNotFound">Tämä tapahtuma ei ole enää saatavilla.</string>
+    <string name="generalSettingsAuthorizationsLabel">Luvat</string>
+    <string name="generalSettingsDisplayLabel">Näyttö</string>
+    <string name="generalSettingsNotificationsLabel">Ilmoitukset</string>
     <string name="monthTitle">Kuukausi</string>
     <string name="noWritableCalendar">Muokattavaa kalenteria ei löytynyt</string>
     <string name="notificationAllDay">Koko päivä</string>
