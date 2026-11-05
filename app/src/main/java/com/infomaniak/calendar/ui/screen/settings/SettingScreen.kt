@@ -35,8 +35,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemClickable
+import com.infomaniak.calendar.ui.screen.settings.components.SettingSection
 import com.infomaniak.calendar.ui.screen.settings.components.SettingShape
-import com.infomaniak.calendar.ui.screen.settings.components.SettingTitle
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.core.common.R as RCore
@@ -64,19 +64,21 @@ fun SettingScreen(
                 .padding(paddingValues)
                 .padding(horizontal = EsdsTheme.spacing.xl),
         ) {
-            SettingTitle(stringResource(R.string.generalSettingsDisplayLabel))
-            SettingItemClickable(
-                shapes = SettingShape.Single,
-                text = stringResource(RCore.string.themeTitle),
-                onClick = goToTheme,
-            )
+            SettingSection(title = stringResource(R.string.generalSettingsDisplayLabel)) {
+                SettingItemClickable(
+                    shapes = SettingShape.Single,
+                    text = stringResource(RCore.string.themeTitle),
+                    onClick = goToTheme,
+                )
+            }
 
-            SettingTitle(stringResource(R.string.generalSettingsAuthorizationsLabel))
-            SettingItemClickable(
-                shapes = SettingShape.Single,
-                text = stringResource(R.string.generalSettingsNotificationsLabel),
-                onClick = { goToSystemNotificationScreen(context) },
-            )
+            SettingSection(title = stringResource(R.string.generalSettingsAuthorizationsLabel)) {
+                SettingItemClickable(
+                    shapes = SettingShape.Single,
+                    text = stringResource(R.string.generalSettingsNotificationsLabel),
+                    onClick = { goToSystemNotificationScreen(context) },
+                )
+            }
         }
     }
 }
