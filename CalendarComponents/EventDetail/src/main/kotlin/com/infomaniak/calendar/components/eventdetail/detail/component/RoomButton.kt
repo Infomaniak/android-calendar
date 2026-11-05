@@ -17,23 +17,17 @@
  */
 package com.infomaniak.calendar.components.eventdetail.detail.component
 
-import android.icu.text.MessageFormat
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLocale
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
-import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.calendar.components.foundation.component.RoomDetails
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.DoorOpen
-import java.util.Locale
 
 @Composable
 internal fun RoomButton(
@@ -45,23 +39,11 @@ internal fun RoomButton(
     ClickableItem(
         text = room.title,
         leadingIcon = EsdsIcons.DoorOpen,
-        supportingContent = {
-            val locale = LocalLocale.current.platformLocale
-
-            val roomSeats = pluralStringResource(R.plurals.roomSeatsLabel, room.seats, room.seats)
-            val roomFloor = stringResource(R.string.roomFloorLabel, room.floor.formatToOrdinal(locale))
-
-            Text(text = "$roomSeats, $roomFloor")
-        },
+        supportingContent = { RoomDetails(seats = room.seats, floor = room.floor) },
         onClick = onClick,
         contentPadding = contentPadding,
         modifier = modifier,
     )
-}
-
-private fun Int.formatToOrdinal(locale: Locale): String {
-    val formatter = MessageFormat("{0, ordinal}", locale)
-    return formatter.format(arrayOf(this))
 }
 
 @Preview
