@@ -20,25 +20,17 @@ package com.infomaniak.calendar.ui.screen.settings
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
-import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemClickable
 import com.infomaniak.calendar.ui.screen.settings.components.SettingSection
 import com.infomaniak.calendar.ui.screen.settings.components.SettingShape
+import com.infomaniak.calendar.ui.screen.settings.components.SettingsScaffold
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.core.common.R as RCore
 
 @Composable
@@ -49,36 +41,21 @@ fun SettingScreen(
 ) {
     val context = LocalContext.current
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.settingsTitle)) },
-                navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
+    SettingsScaffold(stringResource(R.string.settingsTitle), goBack, modifier) {
+        SettingSection(title = stringResource(R.string.generalSettingsDisplayLabel)) {
+            SettingItemClickable(
+                shapes = SettingShape.Single,
+                text = stringResource(RCore.string.themeTitle),
+                onClick = goToTheme,
             )
-        },
-        modifier = modifier,
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(paddingValues)
-                .padding(horizontal = EsdsTheme.spacing.xl),
-        ) {
-            SettingSection(title = stringResource(R.string.generalSettingsDisplayLabel)) {
-                SettingItemClickable(
-                    shapes = SettingShape.Single,
-                    text = stringResource(RCore.string.themeTitle),
-                    onClick = goToTheme,
-                )
-            }
+        }
 
-            SettingSection(title = stringResource(R.string.generalSettingsAuthorizationsLabel)) {
-                SettingItemClickable(
-                    shapes = SettingShape.Single,
-                    text = stringResource(R.string.generalSettingsNotificationsLabel),
-                    onClick = { goToSystemNotificationScreen(context) },
-                )
-            }
+        SettingSection(title = stringResource(R.string.generalSettingsAuthorizationsLabel)) {
+            SettingItemClickable(
+                shapes = SettingShape.Single,
+                text = stringResource(R.string.generalSettingsNotificationsLabel),
+                onClick = { goToSystemNotificationScreen(context) },
+            )
         }
     }
 }
