@@ -22,15 +22,15 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
-import com.infomaniak.calendar.ui.theme.CalendarTheme
+import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
@@ -62,9 +62,9 @@ fun SettingsScaffold(
 @Preview
 @Composable
 private fun Preview() {
-    CalendarTheme {
-        Surface {
-            // TODO
+    CalendarThemeForPreview {
+        SettingsScaffold(title = "Settings", goBack = {}) {
+            Text("Hello", style = MaterialTheme.typography.displayLargeEmphasized)
         }
     }
 }
