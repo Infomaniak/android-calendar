@@ -18,13 +18,14 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.margin.Margin
@@ -34,17 +35,21 @@ import com.infomaniak.designsystem.icons.symbols.Cog
 import com.infomaniak.designsystem.icons.symbols.Headset
 import com.infomaniak.designsystem.icons.symbols.Symbol
 
-@Composable
-fun MenuList(
-    menuOptions: List<MenuOption>,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
-        modifier = modifier.padding(start = Margin.Medium, end = Margin.Medium, top = Margin.Mini, bottom = Margin.Large),
-    ) {
-        menuOptions.forEachIndexed { index, menuOption ->
-            MenuItem(menuOption = menuOption, index = index, count = menuOptions.size)
+fun LazyListScope.menuListItems(menuOptions: List<MenuOption>) {
+    menuOptions.forEachIndexed { index, menuOption ->
+        item(key = menuOption.itemNameRes, contentType = "menuOption") {
+            MenuItem(
+                menuOption = menuOption,
+                index = index,
+                count = menuOptions.size,
+                modifier = Modifier
+                    .animateItem()
+                    .padding(horizontal = Margin.Medium)
+                    .padding(
+                        top = if (index == 0) Margin.Mini else ListItemDefaults.SegmentedGap,
+                        bottom = if (index == menuOptions.lastIndex) Margin.Large else 0.dp,
+                    ),
+            )
         }
     }
 }
@@ -53,13 +58,15 @@ fun MenuList(
 @Preview(showBackground = true)
 private fun MenuListPreview() {
     CalendarThemeForPreview {
-        MenuList(
-            menuOptions = listOf(
-                MenuOption(R.string.accountsTitle, EsdsIcons.CircleUser, {}),
-                MenuOption(R.string.settingsTitle, EsdsIcons.Cog, {}),
-                MenuOption(R.string.helpTitle, EsdsIcons.Headset, {}),
-            ),
-        )
+        LazyColumn {
+            menuListItems(
+                menuOptions = listOf(
+                    MenuOption(R.string.accountsTitle, EsdsIcons.CircleUser, {}),
+                    MenuOption(R.string.settingsTitle, EsdsIcons.Cog, {}),
+                    MenuOption(R.string.helpTitle, EsdsIcons.Headset, {}),
+                ),
+            )
+        }
     }
 }
 

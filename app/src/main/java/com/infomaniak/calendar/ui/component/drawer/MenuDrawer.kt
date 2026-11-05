@@ -122,9 +122,7 @@ private fun MenuDrawer(
                         isSectionExpanded = isSectionExpanded,
                         onSectionExpandedChange = onSectionExpandedChange,
                     )
-                    item {
-                        MenuList(menuOptions = menuOptions)
-                    }
+                    menuListItems(menuOptions)
                 }
             }
         },
