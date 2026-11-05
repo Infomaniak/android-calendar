@@ -19,12 +19,14 @@ package com.infomaniak.calendar
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberDrawerState
@@ -32,13 +34,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.saveable.rememberSerializable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSerializable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.serialization.NavBackStackSerializer
 import androidx.navigation3.runtime.serialization.NavKeySerializer
@@ -46,6 +50,7 @@ import com.infomaniak.calendar.components.foundation.manager.AvatarFinder
 import com.infomaniak.calendar.components.foundation.state.LocalAvatarFinder
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
+import com.infomaniak.calendar.data.SettingThemeOption
 import com.infomaniak.calendar.extensions.appGraph
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.notification.NotificationHelper
@@ -62,6 +67,8 @@ import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import com.infomaniak.core.common.R as RCore
 
@@ -86,25 +93,23 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         if (SDK_INT >= 29) window.isNavigationBarContrastEnforced = false
 
+        adaptStatusBarToTheme()
+
         setContent {
             val currentUiState by mainViewModel.uiState.collectAsStateWithLifecycle()
 
-            CalendarTheme {
-                Surface {
-                    when (val uiState = currentUiState) {
-                        MainUiState.Loading -> Unit // Covered by the splash screen
-                        is MainUiState.Loaded -> MainContent(
-                            uiState = uiState,
-                            visibleDayState = rememberVisibleDayState(mainViewModel.visibleDate),
-                            avatarFinder = mainViewModel.avatarFinder,
-                            loadingEventsError = mainViewModel.loadingEventsError,
-                            savingEventError = mainViewModel.savingEventError,
-                            pendingOccurrenceId = pendingOccurrenceId.value,
-                            onClearPendingOccurrenceId = { pendingOccurrenceId.value = null },
-                            onCalendarViewSelected = mainViewModel::saveCalendarView,
-                        )
-                    }
-                }
+            when (val uiState = currentUiState) {
+                MainUiState.Loading -> Unit // Covered by the splash screen
+                is MainUiState.Loaded -> MainContent(
+                    uiState = uiState,
+                    visibleDayState = rememberVisibleDayState(mainViewModel.visibleDate),
+                    avatarFinder = mainViewModel.avatarFinder,
+                    loadingEventsError = mainViewModel.loadingEventsError,
+                    savingEventError = mainViewModel.savingEventError,
+                    pendingOccurrenceId = pendingOccurrenceId.value,
+                    onClearPendingOccurrenceId = { pendingOccurrenceId.value = null },
+                    onCalendarViewSelected = mainViewModel::saveCalendarView,
+                )
             }
         }
     }
@@ -123,6 +128,27 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         handleEventIntent(intent)
+    }
+
+    private fun adaptStatusBarToTheme() {
+        lifecycleScope.launch {
+            mainViewModel.uiState.filterIsInstance<MainUiState.Loaded>().collect {
+                val isDarkTheme = when (it.theme) {
+                    SettingThemeOption.System -> isSystemDark()
+                    SettingThemeOption.Light -> false
+                    SettingThemeOption.Dark -> true
+                }
+
+                val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+                windowInsetsController.isAppearanceLightStatusBars = !isDarkTheme
+                windowInsetsController.isAppearanceLightNavigationBars = !isDarkTheme
+            }
+        }
+    }
+
+    private fun isSystemDark(): Boolean {
+        val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        return currentNightMode == Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun handleEventIntent(intent: Intent) {
@@ -166,21 +192,26 @@ private fun MainContent(
         }
     }
 
-    CompositionLocalProvider(
-        LocalVisibleDayState provides visibleDayState,
-        LocalSharedSnackbarHostState provides rememberCustomSnackbarHostState(),
-        LocalToolbarScrollableState provides rememberToolbarScrollableState(),
-        LocalDrawerState provides rememberDrawerState(initialValue = DrawerValue.Closed),
-        LocalAvatarFinder provides avatarFinder,
-    ) {
-        ObserveSyncError(loadingEventsError)
-        ObserveSaveEventError(savingEventError)
-        NavigateToOnboardingIfLastUserIsDisconnected(backStack, isUserLoaded = isUserConnected)
-        MainNavHost(
-            backStack = backStack,
-            defaultCalendarView = uiState.lastCalendarView,
-            onCalendarViewSelected = onCalendarViewSelected,
-        )
+    val isDarkTheme = isDarkTheme(uiState)
+    CalendarTheme(isDarkTheme = isDarkTheme) {
+        Surface {
+            CompositionLocalProvider(
+                LocalVisibleDayState provides visibleDayState,
+                LocalSharedSnackbarHostState provides rememberCustomSnackbarHostState(),
+                LocalToolbarScrollableState provides rememberToolbarScrollableState(),
+                LocalDrawerState provides rememberDrawerState(initialValue = DrawerValue.Closed),
+                LocalAvatarFinder provides avatarFinder,
+            ) {
+                ObserveSyncError(loadingEventsError)
+                ObserveSaveEventError(savingEventError)
+                NavigateToOnboardingIfLastUserIsDisconnected(backStack, isUserLoaded = isUserConnected)
+                MainNavHost(
+                    backStack = backStack,
+                    defaultCalendarView = uiState.lastCalendarView,
+                    onCalendarViewSelected = onCalendarViewSelected,
+                )
+            }
+        }
     }
 }
 
@@ -223,4 +254,11 @@ private fun NavigateToOnboardingIfLastUserIsDisconnected(backStack: NavBackStack
             backStack.replaceRoot(NavDestination.Onboarding.Login())
         }
     }
+}
+
+@Composable
+private fun isDarkTheme(uiState: MainUiState.Loaded): Boolean = when (uiState.theme) {
+    SettingThemeOption.System -> isSystemInDarkTheme()
+    SettingThemeOption.Light -> false
+    SettingThemeOption.Dark -> true
 }
