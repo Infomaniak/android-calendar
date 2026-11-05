@@ -18,13 +18,11 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,11 +32,13 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.calendar.ui.theme.CustomColors
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ChevronDown
 
@@ -47,31 +47,34 @@ fun DrawerSectionHeader(
     organisationName: String?,
     isExpanded: () -> Boolean,
     onExpandedChange: (Boolean) -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
 ) {
     val rotation by animateFloatAsState(targetValue = if (isExpanded()) 180f else 0f)
 
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .toggleable(value = isExpanded(), onValueChange = onExpandedChange)
-            .padding(horizontal = Margin.Medium, vertical = Margin.Small)
-            .semantics { heading() },
+    SegmentedListItem(
+        onClick = { onExpandedChange(!isExpanded()) },
+        shapes = shapes,
+        modifier = modifier.semantics {
+            heading()
+            toggleableState = ToggleableState(isExpanded())
+        },
+        trailingContent = {
+            Icon(
+                modifier = Modifier.rotate(rotation),
+                imageVector = EsdsIcons.ChevronDown.Small,
+                contentDescription = null,
+            )
+        },
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Margin.Medium),
+        colors = ListItemDefaults.colors(containerColor = CustomColors.menuDrawerContainerBackground),
     ) {
         Text(
-            modifier = Modifier.weight(1f),
             text = organisationName ?: stringResource(R.string.otherCalendarsSectionTitle),
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-        )
-        Icon(
-            modifier = Modifier.rotate(rotation),
-            imageVector = EsdsIcons.ChevronDown.Small,
-            contentDescription = null,
         )
     }
 }
@@ -80,7 +83,12 @@ fun DrawerSectionHeader(
 @Composable
 private fun DrawerSectionHeaderPreview() {
     CalendarThemeForPreview {
-        DrawerSectionHeader(organisationName = "Infomaniak", isExpanded = { true }, onExpandedChange = {})
+        DrawerSectionHeader(
+            organisationName = "Infomaniak",
+            isExpanded = { true },
+            onExpandedChange = {},
+            shapes = ListItemDefaults.segmentedShapes(index = 1, count = 3),
+        )
     }
 }
 
@@ -88,6 +96,11 @@ private fun DrawerSectionHeaderPreview() {
 @Composable
 private fun DrawerOtherCalendarsSectionHeaderPreview() {
     CalendarThemeForPreview {
-        DrawerSectionHeader(organisationName = null, isExpanded = { false }, onExpandedChange = {})
+        DrawerSectionHeader(
+            organisationName = null,
+            isExpanded = { false },
+            onExpandedChange = {},
+            shapes = ListItemDefaults.segmentedShapes(index = 2, count = 3),
+        )
     }
 }

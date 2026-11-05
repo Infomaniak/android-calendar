@@ -18,10 +18,6 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import android.os.Parcelable
-import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,12 +25,11 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.calendar.ui.theme.CustomColors
 import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import kotlinx.parcelize.Parcelize
@@ -48,10 +43,11 @@ fun LazyListScope.drawerListItems(
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
     onCalendarLongClick: (CalendarId) -> Unit,
 ) {
-    usersCalendars.forEach { userCalendars ->
-        calendarSection(
+    usersCalendars.forEachIndexed { index, userCalendars ->
+        accountItems(
             userCalendars = userCalendars,
-            isExpanded = isAccountExpanded,
+            isFirstAccount = index == 0,
+            isExpanded = isAccountExpanded(userCalendars.user.id),
             onAccountExpandedChange = onAccountExpandedChange,
             isSectionExpanded = isSectionExpanded,
             onSectionExpandedChange = onSectionExpandedChange,
@@ -61,9 +57,10 @@ fun LazyListScope.drawerListItems(
     }
 }
 
-private fun LazyListScope.calendarSection(
+private fun LazyListScope.accountItems(
     userCalendars: UserCalendarsUi,
-    isExpanded: (Int) -> Boolean,
+    isFirstAccount: Boolean,
+    isExpanded: Boolean,
     onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
     isSectionExpanded: (String) -> Boolean,
     onSectionExpandedChange: (sectionKey: String, isExpanded: Boolean) -> Unit,
@@ -71,51 +68,68 @@ private fun LazyListScope.calendarSection(
     onCalendarLongClick: (CalendarId) -> Unit,
 ) {
     val userId = userCalendars.user.id
-    val expanded = isExpanded(userId)
+    val sections = userCalendars.sections
+    val showsSectionHeaders = sections.size > 1
+    val hasRowsBelow = isExpanded && (showsSectionHeaders || sections.any { it.calendars.isNotEmpty() })
 
-    item(key = userId) {
-        val segmentCount = if (expanded) 1 + userCalendars.sections.size else 1
-        val showsSectionHeaders = userCalendars.sections.size > 1
-
-        Column(
+    item(key = "account/$userId", contentType = "account") {
+        DrawerAccountItem(
+            user = userCalendars.user,
+            isExpanded = { isExpanded },
+            onAccountExpanded = { onAccountExpandedChange(userId, !isExpanded) },
+            shapes = manuallyAnimatedSegmentedShapes(
+                top = SegmentCorner.Outer,
+                bottom = if (hasRowsBelow) SegmentCorner.Inner else SegmentCorner.Outer,
+            ),
             modifier = Modifier
-                .padding(horizontal = Margin.Medium, vertical = Margin.Mini)
-                .animateContentSize(),
-            verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
-        ) {
-            DrawerAccountItem(
-                user = userCalendars.user,
-                isExpanded = { expanded },
-                onAccountExpanded = { onAccountExpandedChange(userId, !expanded) },
-                shapes = ListItemDefaults.segmentedShapes(index = 0, count = segmentCount),
-            )
-            if (expanded) {
-                userCalendars.sections.forEachIndexed { index, section ->
-                    val sectionExpanded = !showsSectionHeaders || isSectionExpanded(section.key)
+                .animateItem()
+                .padding(horizontal = Margin.Medium)
+                .padding(top = if (isFirstAccount) Margin.Mini else Margin.Medium),
+        )
+    }
 
-                    Column(
-                        modifier = Modifier
-                            .clip(ListItemDefaults.segmentedShapes(index = index + 1, count = segmentCount).shape)
-                            .background(CustomColors.menuDrawerContainerBackground),
-                    ) {
-                        if (showsSectionHeaders) {
-                            DrawerSectionHeader(
-                                organisationName = section.organisationName,
-                                isExpanded = { sectionExpanded },
-                                onExpandedChange = { onSectionExpandedChange(section.key, it) },
-                            )
-                        }
-                        if (sectionExpanded) {
-                            section.calendars.forEach { calendar ->
-                                DrawerCalendarItem(
-                                    calendar = calendar,
-                                    onCalendarVisibilityChange = onCalendarVisibilityChange,
-                                    onCalendarLongClick = onCalendarLongClick,
-                                )
-                            }
-                        }
-                    }
-                }
+    if (!isExpanded) return
+
+    sections.forEachIndexed { sectionIndex, section ->
+        val lastCorner = if (sectionIndex == sections.lastIndex) SegmentCorner.Outer else SegmentCorner.Inner
+        val sectionExpanded = !showsSectionHeaders || isSectionExpanded(section.key)
+        val calendars = if (sectionExpanded) section.calendars else emptyList()
+
+        if (showsSectionHeaders) {
+            item(key = "section/${section.key}", contentType = "section") {
+                DrawerSectionHeader(
+                    organisationName = section.organisationName,
+                    isExpanded = { sectionExpanded },
+                    onExpandedChange = { onSectionExpandedChange(section.key, it) },
+                    shapes = manuallyAnimatedSegmentedShapes(
+                        top = SegmentCorner.Inner,
+                        bottom = if (calendars.isEmpty()) lastCorner else SegmentCorner.None,
+                    ),
+                    modifier = Modifier
+                        .animateItem()
+                        .padding(horizontal = Margin.Medium)
+                        .padding(top = ListItemDefaults.SegmentedGap),
+                )
+            }
+        }
+
+        calendars.forEachIndexed { calendarIndex, calendar ->
+            val isFirstRow = !showsSectionHeaders && calendarIndex == 0
+
+            item(key = "calendar/$userId/${calendar.id.url}", contentType = "calendar") {
+                DrawerCalendarItem(
+                    calendar = calendar,
+                    onCalendarVisibilityChange = onCalendarVisibilityChange,
+                    onCalendarLongClick = onCalendarLongClick,
+                    shapes = manuallyAnimatedSegmentedShapes(
+                        top = if (isFirstRow) SegmentCorner.Inner else SegmentCorner.None,
+                        bottom = if (calendarIndex == calendars.lastIndex) lastCorner else SegmentCorner.None,
+                    ),
+                    modifier = Modifier
+                        .animateItem()
+                        .padding(horizontal = Margin.Medium)
+                        .padding(top = if (isFirstRow) ListItemDefaults.SegmentedGap else 0.dp),
+                )
             }
         }
     }

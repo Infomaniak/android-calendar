@@ -17,22 +17,24 @@
  */
 package com.infomaniak.calendar.ui.component.drawer
 
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.ui.component.drawer.model.CalendarUi
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.calendar.ui.theme.CustomColors
 import com.infomaniak.calendar.utils.toCalendarColorsUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
@@ -42,20 +44,17 @@ import com.infomaniak.multiplatform_core.account.domain.model.AccountId
 fun DrawerCalendarItem(
     calendar: CalendarUi,
     onCalendarVisibilityChange: (CalendarId, Boolean) -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     onCalendarLongClick: (CalendarId) -> Unit = {},
 ) {
-    ListItem(
-        modifier = modifier
-            .combinedClickable(
-                role = Role.Checkbox,
-                onClick = { onCalendarVisibilityChange(calendar.id, !calendar.isVisible) },
-                onLongClick = { onCalendarLongClick(calendar.id) },
-            )
-            .semantics { toggleableState = ToggleableState(calendar.isVisible) },
-        colors = ListItemDefaults.colors(Color.Transparent),
-        content = {
-            Text(calendar.displayName)
+    SegmentedListItem(
+        onClick = { onCalendarVisibilityChange(calendar.id, !calendar.isVisible) },
+        onLongClick = { onCalendarLongClick(calendar.id) },
+        shapes = shapes,
+        modifier = modifier.semantics {
+            role = Role.Checkbox
+            toggleableState = ToggleableState(calendar.isVisible)
         },
         leadingContent = {
             Checkbox(
@@ -68,7 +67,11 @@ fun DrawerCalendarItem(
                 ),
             )
         },
-    )
+        verticalAlignment = Alignment.CenterVertically,
+        colors = ListItemDefaults.colors(containerColor = CustomColors.menuDrawerContainerBackground),
+    ) {
+        Text(calendar.displayName)
+    }
 }
 
 @Preview
@@ -83,6 +86,10 @@ private fun DrawerCalendarItemPreview() {
             isVisible = true,
         )
 
-        DrawerCalendarItem(calendar = calendarPreview, onCalendarVisibilityChange = { _, _ -> })
+        DrawerCalendarItem(
+            calendar = calendarPreview,
+            onCalendarVisibilityChange = { _, _ -> },
+            shapes = ListItemDefaults.segmentedShapes(index = 1, count = 2),
+        )
     }
 }
