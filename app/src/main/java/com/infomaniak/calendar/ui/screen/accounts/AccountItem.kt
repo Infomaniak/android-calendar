@@ -34,7 +34,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
@@ -95,7 +94,7 @@ fun AccountItemContent(user: User, isClickable: Boolean, modifier: Modifier = Mo
     ListItem(
         modifier = modifier.fillMaxWidth(),
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-        leadingContent = { AccountAvatar(user, Modifier.size(32.dp)) },
+        leadingContent = { AccountAvatar(user) },
         content = { AccountName(user) },
         supportingContent = { AccountEmail(user) },
         trailingContent = {
@@ -111,26 +110,28 @@ fun AccountItemContent(user: User, isClickable: Boolean, modifier: Modifier = Mo
 
 @Composable
 fun AccountAvatar(user: User, modifier: Modifier = Modifier) {
-    Avatar(avatarType = AvatarType.fromUser(user), modifier = modifier)
+    Avatar(avatarType = AvatarType.fromUser(user), modifier = modifier.size(EsdsTheme.icon.sizeXl))
 }
 
 @Composable
-fun AccountName(user: User) {
+fun AccountName(user: User, modifier: Modifier = Modifier) {
     Text(
         text = user.displayName.toString(),
         style = MaterialTheme.typography.bodyLarge,
         fontWeight = FontWeight.Medium,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
+        modifier = modifier,
     )
 }
 
 @Composable
-fun AccountEmail(user: User) {
+fun AccountEmail(user: User, modifier: Modifier = Modifier) {
     Text(
         text = user.email,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
+        modifier = modifier,
     )
 }
 
