@@ -24,6 +24,7 @@ import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.locationsearch.models.RoomAvailability
 import com.infomaniak.calendar.components.locationsearch.models.SearchRoomUi
+import com.infomaniak.calendar.manager.PlaceSearcher
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.bookable_resources.domain.model.BookableResource
 import com.infomaniak.multiplatform_calendar.bookable_resources.domain.model.BookableResourceUuid
@@ -42,6 +43,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -51,9 +53,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * The rooms of the event form's location search, shared through the form's ViewModelStore: the form loads them as soon as
@@ -65,7 +69,9 @@ import kotlinx.coroutines.launch
 class LocationSearchViewModel(
     private val calendarBookableResourcesManager: CalendarBookableResourcesManager,
     private val calendarManager: CalendarManager,
+    private val placeSearcher: PlaceSearcher,
 ) : ViewModel() {
+    private val placesQuery = MutableStateFlow("")
     private val availabilityRequest = MutableStateFlow<RoomAvailabilityRequest?>(null)
     private var resources = emptyMap<String, BookableResource>()
     private var editedTiming: Pair<OccurrenceId, EventTiming?>? = null
@@ -88,6 +94,15 @@ class LocationSearchViewModel(
             resources.map { it.toSearchRoomUi(availability?.get(it.uuid)) }.sortedBy { it.availability.rank }
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val places: StateFlow<List<String>> = placesQuery
+        .mapLatest { query -> if (query.isEmpty()) emptyList() else placeSearcher.search(query) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), emptyList())
+
+    fun searchPlaces(query: String) {
+        placesQuery.value = query
+    }
 
     /**
      * Loads the rooms bookable in [formState]'s calendar with their availability over its time, following it as long as it's

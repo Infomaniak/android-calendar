@@ -47,12 +47,14 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 /**
- * [searchState] holds the typed location, listed first so it can be picked like the rooms below it.
- * Picking the typed location reports its text through [onLocationClick], picking a room reports it through [onRoomClick].
+ * [searchState] holds the typed location, listed first so it can be picked like the places and rooms below it.
+ * Picking the typed location or a place reports its text through [onLocationClick], picking a room reports it through
+ * [onRoomClick].
  */
 @Composable
 fun LocationSearch(
     searchState: TextFieldState,
+    places: List<String>,
     rooms: List<SearchRoomUi>,
     onLocationClick: (String) -> Unit,
     onRoomClick: (SearchRoomUi) -> Unit,
@@ -76,7 +78,8 @@ fun LocationSearch(
             contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding() + EsdsTheme.spacing.sm),
         ) {
             val typedCount = if (typedLocation.isEmpty()) 0 else 1
-            val count = typedCount + visibleRooms.size
+            val roomsOffset = typedCount + places.size
+            val count = roomsOffset + visibleRooms.size
 
             if (typedCount > 0) item(key = "typed") {
                 PlaceItem(
@@ -86,10 +89,18 @@ fun LocationSearch(
                 )
             }
 
+            itemsIndexed(places, key = { _, place -> "place:$place" }) { index, place ->
+                PlaceItem(
+                    place = place,
+                    shapes = ListItemDefaults.segmentedShapes(index = typedCount + index, count = count),
+                    onClick = { onLocationClick(place) },
+                )
+            }
+
             itemsIndexed(visibleRooms, key = { _, room -> "room:${room.id}" }) { index, room ->
                 RoomItem(
                     room = room,
-                    shapes = ListItemDefaults.segmentedShapes(index = typedCount + index, count = count),
+                    shapes = ListItemDefaults.segmentedShapes(index = roomsOffset + index, count = count),
                     onClick = { onRoomClick(room) },
                 )
             }
@@ -104,6 +115,7 @@ private fun Preview() {
         Surface {
             LocationSearch(
                 searchState = rememberTextFieldState(),
+                places = listOf("Rue Eugène-Marziano 25, 1227 Genève, Suisse"),
                 rooms = listOf(
                     SearchRoomUi(id = "1", name = "Salle Jules Verne", seats = 100, floor = 3, availability = RoomAvailability.Available),
                     SearchRoomUi(id = "2", name = "Salle Blanche", seats = 8, floor = 1, availability = RoomAvailability.Available),

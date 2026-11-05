@@ -43,7 +43,8 @@ app/src/main/java/com/infomaniak/calendar/
 │   ├── VisibleDateManager.kt       # App-scoped: single visible-date source, restored/saved by MainViewModel
 │   ├── VisibleMonthManager.kt      # App-scoped: event dots derived from the shared visible date's month
 │   ├── VisibleEventsManager.kt     # App-scoped: one observation of the day-sliced events around the visible date, for every view
-│   └── DayEventsLoader.kt          # App-scoped: VisibleEventsManager's events split into all-day and timed, for the day views
+│   ├── DayEventsLoader.kt          # App-scoped: VisibleEventsManager's events split into all-day and timed, for the day views
+│   └── PlaceSearcher.kt            # Location search's places, from the platform Geocoder (none on devices without one)
 ├── utils/
 │   ├── AttendeeExt.kt              # KMP Attendee → Attendees mapping for event detail
 │   ├── DayEventGroupingExt.kt      # Groups day-sliced events for calendar views
@@ -77,7 +78,7 @@ app/src/main/java/com/infomaniak/calendar/
     │                              # form/ (EventFormViewModel: the event form state of EventCreation / EventEdit)
     │                              # timeZoneSearch/ (TimeZoneSearchScreen: writes the picked time zone to the form)
     │                              # customReminder/ (CustomReminderScreen: adds the made reminder to the form)
-    │                              # locationSearch/ (LocationSearchScreen: ✓ writes the search text to the form as its location,
+    │                              # locationSearch/ (LocationSearchScreen: ✓ writes the search text or the clicked place to the form as its location,
     │                              #   or the clicked room as its room (saved as a Location.BookableRoom);
     │                              #   LocationSearchViewModel, shared through the form's ViewModelStore, observes the bookable rooms of the form's calendar
     │                              #   as soon as EventCreation / EventEdit opens, then sorts them by availability over the form's time, and over the edited

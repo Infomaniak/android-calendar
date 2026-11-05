@@ -20,6 +20,7 @@ package com.infomaniak.calendar.ui.screen.eventDetail.locationSearch
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
@@ -27,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,14 +54,21 @@ fun LocationSearchScreen(
     eventFormViewModel: EventFormViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
     val formState = eventFormViewModel.formState ?: return
+    val searchState = rememberTextFieldState((formState.location as? EventDetailUi.LocationUi.Place)?.text.orEmpty())
+    val places by locationSearchViewModel.places.collectAsStateWithLifecycle()
     val rooms by locationSearchViewModel.rooms.collectAsStateWithLifecycle()
 
     LaunchedEffect(formState) {
         locationSearchViewModel.followForm(formState, editedOccurrenceId)
     }
 
+    LaunchedEffect(searchState) {
+        snapshotFlow { searchState.text.toString() }.collect(locationSearchViewModel::searchPlaces)
+    }
+
     LocationSearchScreen(
-        initialLocation = (formState.location as? EventDetailUi.LocationUi.Place)?.text,
+        searchState = searchState,
+        places = places,
         rooms = rooms,
         onSubmit = { location ->
             formState.location = location?.let(EventDetailUi.LocationUi::Place)
@@ -76,15 +85,14 @@ fun LocationSearchScreen(
 
 @Composable
 private fun LocationSearchScreen(
-    initialLocation: String?,
+    searchState: TextFieldState,
+    places: List<String>,
     rooms: List<SearchRoomUi>,
     onSubmit: (String?) -> Unit,
     onRoomClick: (SearchRoomUi) -> Unit,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val searchState = rememberTextFieldState(initialLocation.orEmpty())
-
     Scaffold(
         topBar = {
             SubmitTopAppBar(
@@ -100,6 +108,7 @@ private fun LocationSearchScreen(
     ) { contentPadding ->
         LocationSearch(
             searchState = searchState,
+            places = places,
             rooms = rooms,
             onLocationClick = onSubmit,
             onRoomClick = onRoomClick,
@@ -113,7 +122,8 @@ private fun LocationSearchScreen(
 private fun Preview() {
     CalendarThemeForPreview {
         LocationSearchScreen(
-            initialLocation = null,
+            searchState = rememberTextFieldState("Salle"),
+            places = listOf("Salle Communale, Rue de Lausanne 1, 1201 Genève, Suisse"),
             rooms = listOf(SearchRoomUi(id = "1", name = "Salle Jules Verne", seats = 100, floor = 3, availability = RoomAvailability.Available)),
             onSubmit = {},
             onRoomClick = {},
