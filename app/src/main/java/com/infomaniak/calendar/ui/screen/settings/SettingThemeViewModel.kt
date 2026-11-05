@@ -18,12 +18,28 @@
 package com.infomaniak.calendar.ui.screen.settings
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.infomaniak.calendar.data.SettingThemeOption
+import com.infomaniak.calendar.data.SettingsDataValues
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
-class SettingThemeViewModel : ViewModel()
+class SettingThemeViewModel(private val settingsDataValues: SettingsDataValues) : ViewModel() {
+    val theme = settingsDataValues.theme.flow.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), null)
+
+    fun onThemeClick(themeOption: SettingThemeOption) {
+        viewModelScope.launch {
+            settingsDataValues.theme.setValue(themeOption)
+        }
+    }
+}

@@ -17,15 +17,17 @@
  */
 package com.infomaniak.calendar.ui.screen.settings
 
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.data.SettingThemeOption
+import com.infomaniak.calendar.ui.screen.settings.components.SettingItemSwitch
+import com.infomaniak.calendar.ui.screen.settings.components.SettingShape
+import com.infomaniak.calendar.ui.screen.settings.components.SettingsScaffold
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.R as RCore
 
@@ -35,29 +37,54 @@ fun SettingThemeScreen(
     modifier: Modifier = Modifier,
     settingThemeViewModel: SettingThemeViewModel = viewModel(),
 ) {
-    SettingThemeContent(onBack = goBack, modifier = modifier)
+    val theme by settingThemeViewModel.theme.collectAsStateWithLifecycle()
+
+    SettingThemeContent(
+        goBack = goBack,
+        modifier = modifier,
+        theme = { theme },
+        onThemeClick = { settingThemeViewModel.onThemeClick(it) },
+    )
 }
 
 @Composable
 private fun SettingThemeContent(
-    onBack: () -> Unit,
+    theme: () -> SettingThemeOption?,
+    onThemeClick: (SettingThemeOption) -> Unit,
+    goBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(RCore.string.themeTitle)) },
-                navigationIcon = { TopAppBarButtons.BackButton(onClick = onBack) },
-            )
-        },
+    SettingsScaffold(
+        title = stringResource(RCore.string.themeTitle),
+        goBack = goBack,
         modifier = modifier,
-    ) { _ -> }
+    ) {
+        val theme = theme()
+        SettingItemSwitch(
+            shapes = SettingShape.First,
+            text = "Système",
+            checked = { theme == SettingThemeOption.System },
+            onCheckedChange = { onThemeClick(SettingThemeOption.System) },
+        )
+        SettingItemSwitch(
+            shapes = SettingShape.Middle,
+            text = "Clair",
+            checked = { theme == SettingThemeOption.Light },
+            onCheckedChange = { onThemeClick(SettingThemeOption.Light) },
+        )
+        SettingItemSwitch(
+            shapes = SettingShape.Last,
+            text = "Sombre",
+            checked = { theme == SettingThemeOption.Dark },
+            onCheckedChange = { onThemeClick(SettingThemeOption.Dark) },
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun SettingThemePreview() {
     CalendarThemeForPreview {
-        SettingThemeContent(onBack = {})
+        SettingThemeContent(goBack = {}, theme = { SettingThemeOption.System }, onThemeClick = {})
     }
 }
