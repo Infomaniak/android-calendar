@@ -95,23 +95,9 @@ fun AccountItemContent(user: User, isClickable: Boolean, modifier: Modifier = Mo
     ListItem(
         modifier = modifier.fillMaxWidth(),
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-        leadingContent = { Avatar(avatarType = AvatarType.fromUser(user), modifier = Modifier.size(32.dp)) },
-        content = {
-            Text(
-                text = user.displayName.toString(),
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        },
-        supportingContent = {
-            Text(
-                text = user.email,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        },
+        leadingContent = { AccountAvatar(user) },
+        content = { AccountName(user) },
+        supportingContent = { AccountEmail(user) },
         trailingContent = {
             if (isClickable) {
                 Icon(
@@ -120,6 +106,31 @@ fun AccountItemContent(user: User, isClickable: Boolean, modifier: Modifier = Mo
                 )
             }
         },
+    )
+}
+
+@Composable
+fun AccountAvatar(user: User) {
+    Avatar(avatarType = AvatarType.fromUser(user), modifier = Modifier.size(32.dp))
+}
+
+@Composable
+fun AccountName(user: User) {
+    Text(
+        text = user.displayName.toString(),
+        style = MaterialTheme.typography.bodyLarge,
+        fontWeight = FontWeight.Medium,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+    )
+}
+
+@Composable
+fun AccountEmail(user: User) {
+    Text(
+        text = user.email,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
     )
 }
 

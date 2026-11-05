@@ -18,12 +18,10 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.SegmentedListItem
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -32,14 +30,13 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.ui.screen.accounts.AccountAvatar
+import com.infomaniak.calendar.ui.screen.accounts.AccountEmail
+import com.infomaniak.calendar.ui.screen.accounts.AccountName
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.CustomColors
 import com.infomaniak.core.auth.models.user.User
-import com.infomaniak.core.avatar.components.Avatar
-import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.ui.compose.preview.previewparameter.dummyUserOf
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ChevronDown
@@ -58,7 +55,8 @@ fun DrawerAccountItem(
         onClick = onAccountExpanded,
         shapes = shapes,
         modifier = modifier.semantics { toggleableState = ToggleableState(isExpanded()) },
-        leadingContent = { Avatar(avatarType = AvatarType.fromUser(user), Modifier.size(32.dp)) },
+        leadingContent = { AccountAvatar(user) },
+        supportingContent = { AccountEmail(user) },
         trailingContent = {
             Icon(
                 modifier = Modifier
@@ -70,11 +68,7 @@ fun DrawerAccountItem(
         verticalAlignment = Alignment.CenterVertically,
         colors = ListItemDefaults.colors(containerColor = CustomColors.menuDrawerContainerBackground),
     ) {
-        Text(
-            text = user.email,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
+        AccountName(user)
     }
 }
 
