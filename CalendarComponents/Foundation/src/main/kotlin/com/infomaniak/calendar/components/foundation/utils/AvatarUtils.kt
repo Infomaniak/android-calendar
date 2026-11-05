@@ -52,7 +52,7 @@ fun AvatarType.Companion.fromAttendee(attendee: AttendeeUi): State<AvatarType> {
         null
     }
 
-    return produceState(getUrlOrInitials(initialValue)) {
+    return produceState(getUrlOrInitials(initialValue), avatar) {
         if (avatar is AvatarStrategy.ToCompute) {
             val avatarData = avatarFinder.avatarOf(attendee.displayName, attendee.email)
             value = getUrlOrInitials(avatarFinder.avatarUrlDataOf(avatarData))
