@@ -37,6 +37,7 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.CustomColors
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Check
 import com.infomaniak.designsystem.icons.symbols.ChevronRight
 import com.infomaniak.designsystem.icons.symbols.Cog
 import com.infomaniak.designsystem.icons.symbols.SquareArrowOutUpRight
@@ -47,19 +48,19 @@ fun SettingItemClickable(
     shapes: SettingShape,
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
+    symbol: Symbol? = null,
     supportingText: String? = null,
     enabled: () -> Boolean = { true },
-    leadingContent: @Composable (() -> Unit)? = null,
 ) {
     SettingItem(
         shapes = shapes,
         text = text,
         onClick = onClick,
         modifier = modifier,
+        symbol = symbol,
         supportingText = supportingText,
         enabled = enabled,
-        leadingContent = leadingContent,
         trailingContent = { SettingIcon(EsdsIcons.ChevronRight) },
     )
 }
@@ -69,19 +70,19 @@ fun SettingItemOpen(
     shapes: SettingShape,
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
+    symbol: Symbol? = null,
     supportingText: String? = null,
     enabled: () -> Boolean = { true },
-    leadingContent: @Composable (() -> Unit)? = null,
 ) {
     SettingItem(
         shapes = shapes,
         text = text,
         onClick = onClick,
         modifier = modifier,
+        symbol = symbol,
         supportingText = supportingText,
         enabled = enabled,
-        leadingContent = leadingContent,
         trailingContent = { SettingIcon(EsdsIcons.SquareArrowOutUpRight) },
     )
 }
@@ -92,8 +93,9 @@ fun SettingItemSwitch(
     text: String,
     checked: () -> Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier.Companion,
-    trailingSwitch: SwitchType = SwitchType.None,
+    modifier: Modifier = Modifier,
+    symbol: Symbol? = null,
+    trailingSwitch: SwitchType = SwitchType.Check,
     supportingText: String? = null,
     enabled: () -> Boolean = { true },
     colors: ListItemColors = SettingItemsDefault.colors(),
@@ -106,7 +108,8 @@ fun SettingItemSwitch(
         shapes = shapes.segmentedShape(),
         modifier = modifier,
         enabled = enabled(),
-        trailingContent = { trailingSwitch.content?.invoke(isChecked) },
+        leadingContent = symbol?.let { { SettingIcon(it) } },
+        trailingContent = { trailingSwitch.content(isChecked)?.invoke() },
         supportingContent = supportingText?.let { { Text(it) } },
         colors = colors,
         content = { Text(text) },
@@ -118,10 +121,10 @@ private fun SettingItem(
     shapes: SettingShape,
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
+    symbol: Symbol? = null,
     supportingText: String? = null,
     enabled: () -> Boolean = { true },
-    leadingContent: @Composable (() -> Unit)? = null,
     trailingContent: @Composable (() -> Unit)? = null,
     colors: ListItemColors = SettingItemsDefault.colors(),
 ) {
@@ -130,7 +133,7 @@ private fun SettingItem(
         shapes = shapes.segmentedShape(),
         modifier = modifier,
         enabled = enabled(),
-        leadingContent = leadingContent,
+        leadingContent = symbol?.let { { SettingIcon(it) } },
         trailingContent = trailingContent,
         supportingContent = supportingText?.let { { Text(it) } },
         colors = colors,
@@ -139,7 +142,7 @@ private fun SettingItem(
 }
 
 @Composable
-private fun SettingIcon(symbol: Symbol, modifier: Modifier = Modifier.Companion) {
+private fun SettingIcon(symbol: Symbol, modifier: Modifier = Modifier) {
     Icon(symbol.Small, null, modifier)
 }
 
@@ -151,9 +154,9 @@ object SettingItemsDefault {
 
 }
 
-enum class SwitchType(val content: @Composable ((isChecked: Boolean) -> Unit)? = null) {
-    Switch(content = { checked -> Switch(checked, null) }),
-    None,
+enum class SwitchType(val content: ((isChecked: Boolean) -> @Composable (() -> Unit)?)) {
+    Switch(content = { checked -> { Switch(checked, null) } }),
+    Check(content = { checked -> if (checked) ({ SettingIcon(EsdsIcons.Check) }) else null }),
 }
 
 enum class SettingShape(val segmentedShape: @Composable () -> ListItemShapes) {
@@ -178,17 +181,18 @@ private fun SettingsPreviewGroup(title: String, content: @Composable ColumnScope
     }
 }
 
-@Composable
-private fun PreviewLeadingIcon() {
-    Icon(EsdsIcons.Cog.Small, contentDescription = null)
-}
-
 @PreviewLightDark
 @Composable
 private fun SettingSectionPreview() {
     SettingsPreviewGroup(title = "Section") {
         SettingItemClickable(shapes = SettingShape.First, text = "Clickable", onClick = {})
-        SettingItemSwitch(shapes = SettingShape.Middle, text = "Switch", checked = { true }, onCheckedChange = {})
+        SettingItemSwitch(
+            shapes = SettingShape.Middle,
+            text = "Switch",
+            checked = { true },
+            onCheckedChange = {},
+            trailingSwitch = SwitchType.Switch,
+        )
         SettingItemOpen(shapes = SettingShape.Last, text = "Open", onClick = {})
     }
 }
@@ -203,7 +207,7 @@ private fun SettingItemClickablePreview() {
             text = "Leading and supporting",
             onClick = {},
             supportingText = "Supporting text",
-            leadingContent = { PreviewLeadingIcon() },
+            symbol = EsdsIcons.Cog,
         )
         SettingItemClickable(shapes = SettingShape.Last, text = "Disabled", onClick = {}, enabled = { false })
     }
@@ -220,6 +224,16 @@ private fun SettingItemSwitchPreview() {
             checked = { false },
             onCheckedChange = {},
             supportingText = "Supporting text",
+            symbol = EsdsIcons.Cog,
+        )
+        SettingItemSwitch(
+            shapes = SettingShape.Middle,
+            text = "Unchecked",
+            checked = { false },
+            onCheckedChange = {},
+            supportingText = "Supporting text",
+            symbol = EsdsIcons.Cog,
+            trailingSwitch = SwitchType.Switch,
         )
         SettingItemSwitch(
             shapes = SettingShape.Last,
@@ -241,7 +255,7 @@ private fun SettingItemOpenPreview() {
             text = "Leading and supporting",
             onClick = {},
             supportingText = "Supporting text",
-            leadingContent = { PreviewLeadingIcon() },
+            symbol = EsdsIcons.Cog,
         )
         SettingItemOpen(shapes = SettingShape.Last, text = "Disabled", onClick = {}, enabled = { false })
     }

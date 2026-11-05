@@ -30,6 +30,10 @@ import com.infomaniak.calendar.ui.screen.settings.components.SettingSection
 import com.infomaniak.calendar.ui.screen.settings.components.SettingShape
 import com.infomaniak.calendar.ui.screen.settings.components.SettingsScaffold
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Moon
+import com.infomaniak.designsystem.icons.symbols.Smartphone
+import com.infomaniak.designsystem.icons.symbols.Sun
 import com.infomaniak.core.common.R as RCore
 
 @Composable
@@ -64,19 +68,22 @@ private fun SettingThemeContent(
             val theme = theme()
             SettingItemSwitch(
                 shapes = SettingShape.First,
-                text = "Système",
+                text = stringResource(RCore.string.themeSystem),
+                symbol = EsdsIcons.Smartphone,
                 checked = { theme == SettingThemeOption.System },
                 onCheckedChange = { onThemeClick(SettingThemeOption.System) },
             )
             SettingItemSwitch(
                 shapes = SettingShape.Middle,
-                text = "Clair",
+                text = stringResource(RCore.string.themeLight),
+                symbol = EsdsIcons.Sun,
                 checked = { theme == SettingThemeOption.Light },
                 onCheckedChange = { onThemeClick(SettingThemeOption.Light) },
             )
             SettingItemSwitch(
                 shapes = SettingShape.Last,
-                text = "Sombre",
+                text = stringResource(RCore.string.themeDark),
+                symbol = EsdsIcons.Moon,
                 checked = { theme == SettingThemeOption.Dark },
                 onCheckedChange = { onThemeClick(SettingThemeOption.Dark) },
             )
