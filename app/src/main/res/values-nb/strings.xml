@@ -32,7 +32,6 @@
     <string name="deleteRecurringEventAlertTitle">Hvilke hendelser vil du slette?</string>
     <string name="editRecurringEventAlertTitle">Hvilke hendelser vil du redigere?</string>
     <string name="eventOccurrenceNotFound">Denne hendelsen er ikke lenger tilgjengelig.</string>
-    <string name="helpTitle">Hjelp</string>
     <string name="monthTitle">Måned</string>
     <string name="noWritableCalendar">Ingen redigerbar kalender funnet</string>
     <string name="notificationAllDay">Hele dagen</string>

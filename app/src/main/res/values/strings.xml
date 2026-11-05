@@ -32,7 +32,6 @@
     <string name="deleteRecurringEventAlertTitle">Which events do you want to delete?</string>
     <string name="editRecurringEventAlertTitle">Which events do you want to edit?</string>
     <string name="eventOccurrenceNotFound">This event is no longer available.</string>
-    <string name="helpTitle">Help</string>
     <string name="monthTitle">Month</string>
     <string name="noWritableCalendar">No writable calendars found</string>
     <string name="notificationAllDay">All day</string>

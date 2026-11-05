@@ -32,7 +32,6 @@
     <string name="deleteRecurringEventAlertTitle">Welke evenementen wilt u verwijderen?</string>
     <string name="editRecurringEventAlertTitle">Welke evenementen wil je bewerken?</string>
     <string name="eventOccurrenceNotFound">Dit evenement is niet meer beschikbaar.</string>
-    <string name="helpTitle">Hulp</string>
     <string name="monthTitle">Maand</string>
     <string name="noWritableCalendar">Geen bewerkbare kalender gevonden</string>
     <string name="notificationAllDay">De hele dag</string>
