@@ -60,7 +60,7 @@ fun AvatarType.Companion.fromAttendee(attendee: AttendeeUi): State<AvatarType> {
     }
 }
 
-fun AvatarFinder.avatarUrlDataOf(avatarData: AvatarData?): AvatarUrlData? {
+private fun AvatarFinder.avatarUrlDataOf(avatarData: AvatarData?): AvatarUrlData? {
     val data = avatarData ?: return null
     return imageLoaderOf(data.accountId)?.let { AvatarUrlData(url = data.url, imageLoader = it) }
 }
