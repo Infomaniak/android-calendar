@@ -23,6 +23,7 @@ import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import com.infomaniak.calendar.ui.screen.eventDetail.AttendeesUpdatePayload
+import com.infomaniak.multiplatform_calendar.bookable_resources.domain.model.BookableResourceUuid
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.AlarmListEdit
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.AttendeeEdit
@@ -53,12 +54,7 @@ fun EventDraft.applyTo(
 ): EventEditData = editData.copy(
     title = title,
     timing = editData.timing.copy(bounds = bounds()),
-    // The form only edits the place text, a room location stays as long as the text is left untouched
-    location = if (location == (editData.location as? Location.Place)?.text) {
-        editData.location
-    } else {
-        location?.let(Location::Place)
-    },
+    location = locationOver(editData.location),
     timeBlocking = if (isOccupied) TimeBlocking.Blocks else TimeBlocking.DoesNotBlock,
     calendarId = typedCalendarId,
     attendees = attendees.toAttendeeEdit(),
@@ -99,6 +95,21 @@ fun EventDraft.toNewEventEditData(defaultOrganizer: Organizer?): EventEditData =
         meetRoom = null,
     ),
 )
+
+/**
+ * Keeps [current] when the form leaves it as is: its resolved room or the `LOCATION` text a room keeps. A room unknown
+ * locally isn't shown in the form, so it's kept too while no other location is picked.
+ */
+private fun EventDraft.locationOver(current: Location?): Location? {
+    val (roomId, location) = roomId to location
+    val currentRoom = current as? Location.BookableRoom
+    return when {
+        roomId != null -> currentRoom?.takeIf { it.uuid.value == roomId } ?: Location.BookableRoom(BookableResourceUuid(roomId), resource = null)
+        location != null -> if (location == (current as? Location.Place)?.text) current else Location.Place(location)
+        currentRoom != null && currentRoom.resource == null -> current
+        else -> null
+    }
+}
 
 fun List<AttendeeUi>.toAttendeeEdit(): List<AttendeeEdit> = map { AttendeeEdit(email = it.email, displayName = it.displayName) }
 

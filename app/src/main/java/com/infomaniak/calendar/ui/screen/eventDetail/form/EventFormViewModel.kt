@@ -110,6 +110,7 @@ class EventFormViewModel(
             endTimeZone = event.end.timeZone,
             hasEndEverBeenTouched = false,
             location = event.location,
+            room = event.room,
             participants = event.attendees.all.toSet(),
             organizerSource = Static(event.organizer),
             isKMeetUrlEnabled = event.kMeetUrl != null,

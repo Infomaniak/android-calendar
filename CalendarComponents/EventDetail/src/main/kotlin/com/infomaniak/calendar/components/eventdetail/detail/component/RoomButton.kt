@@ -51,7 +51,7 @@ internal fun RoomButton(
 private fun PreviewRoomButton() {
     MaterialTheme {
         Surface {
-            RoomButton(room = EventDetailUi.Room("Japan room", seats = 5, floor = 3), onClick = {})
+            RoomButton(room = EventDetailUi.Room(id = "1", title = "Japan room", seats = 5, floor = 3, location = null), onClick = {})
         }
     }
 }

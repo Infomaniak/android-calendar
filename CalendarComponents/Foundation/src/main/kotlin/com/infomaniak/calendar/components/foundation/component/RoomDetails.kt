@@ -46,8 +46,8 @@ fun RoomDetails(seats: Int?, floor: Int?, modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
     ) {
-        if (seats != null) RoomDetail(EsdsIcons.UsersStacked, pluralStringResource(R.plurals.roomSeatsLabel, seats, seats))
-        if (floor != null) RoomDetail(EsdsIcons.ZigzagArrowUpRight, floorLabel(floor))
+        seats?.let { RoomDetail(EsdsIcons.UsersStacked, pluralStringResource(R.plurals.roomSeatsLabel, it, it)) }
+        floor?.let { RoomDetail(EsdsIcons.ZigzagArrowUpRight, floorLabel(it)) }
     }
 }
 
@@ -64,6 +64,7 @@ private fun floorLabel(floor: Int): String {
     return stringResource(R.string.roomFloorLabel, floor.formatToOrdinal(LocalLocale.current.platformLocale))
 }
 
+/** Formats this number as a localized ordinal, e.g. "2nd" in English, "2e" in French or "2." in German. */
 private fun Int.formatToOrdinal(locale: Locale): String = MessageFormat("{0, ordinal}", locale).format(arrayOf(this))
 
 @Preview

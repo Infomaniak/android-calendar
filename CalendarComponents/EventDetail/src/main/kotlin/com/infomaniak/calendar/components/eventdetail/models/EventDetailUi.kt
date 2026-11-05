@@ -60,7 +60,12 @@ data class EventDetailUi(
     val isRecurring get() = recurrence is EventDetailRecurrence.Recurrence
     val eventColor get() = eventColorChoice.getColor(calendar)
 
-    data class Room(val title: String, val seats: Int, val floor: Int)
+    /**
+     * @param id The bookable resource's id.
+     * @param location Where the room is, e.g. its building's address.
+     */
+    @Parcelize
+    data class Room(val id: String, val title: String, val seats: Int?, val floor: Int?, val location: String?) : Parcelable
 
     @Immutable
     data class File(val id: String, val name: String) {

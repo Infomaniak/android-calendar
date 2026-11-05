@@ -48,13 +48,14 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 /**
  * [searchState] holds the typed location, listed first so it can be picked like the rooms below it.
- * Picking either reports it through [onLocationClick].
+ * Picking the typed location reports its text through [onLocationClick], picking a room reports it through [onRoomClick].
  */
 @Composable
 fun LocationSearch(
     searchState: TextFieldState,
     rooms: List<RoomUi>,
     onLocationClick: (String) -> Unit,
+    onRoomClick: (RoomUi) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -96,7 +97,7 @@ fun LocationSearch(
                 RoomItem(
                     room = room,
                     shapes = ListItemDefaults.segmentedShapes(index = typedCount + index, count = count),
-                    onClick = { onLocationClick(room.name) },
+                    onClick = { onRoomClick(room) },
                 )
             }
         }
@@ -116,6 +117,7 @@ private fun Preview() {
                     RoomUi(id = "3", name = "Salle de sport", seats = 50, floor = 0),
                 ),
                 onLocationClick = {},
+                onRoomClick = {},
             )
         }
     }
