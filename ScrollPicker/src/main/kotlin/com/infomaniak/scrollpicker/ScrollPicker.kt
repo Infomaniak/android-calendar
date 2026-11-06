@@ -489,6 +489,7 @@ private fun TimePreview() {
                         itemLabel = ::twoDigits,
                         onInput = String::toIntOrNull,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+                        modifier = Modifier.width(100.dp),
                     )
                     Text(text = ":", style = ScrollPickerDefaults.textStyle)
                     ScrollPicker(
@@ -498,6 +499,7 @@ private fun TimePreview() {
                         itemLabel = ::twoDigits,
                         onInput = String::toIntOrNull,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+                        modifier = Modifier.width(100.dp),
                     )
                 }
             }
