@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 
 /** Colors of a [ScrollPicker] in its different states, see [ScrollPickerDefaults.colors]. */
 @Immutable
-class ScrollPickerColors(
+data class ScrollPickerColors(
     val selectedTextColor: Color,
     val unselectedTextColor: Color,
     val disabledSelectedTextColor: Color,
@@ -36,26 +36,5 @@ class ScrollPickerColors(
         enabled -> unselectedTextColor
         selected -> disabledSelectedTextColor
         else -> disabledUnselectedTextColor
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is ScrollPickerColors) return false
-        return selectedTextColor == other.selectedTextColor &&
-                unselectedTextColor == other.unselectedTextColor &&
-                disabledSelectedTextColor == other.disabledSelectedTextColor &&
-                disabledUnselectedTextColor == other.disabledUnselectedTextColor &&
-                dividerColor == other.dividerColor &&
-                cursorColor == other.cursorColor
-    }
-
-    override fun hashCode(): Int {
-        var result = selectedTextColor.hashCode()
-        result = 31 * result + unselectedTextColor.hashCode()
-        result = 31 * result + disabledSelectedTextColor.hashCode()
-        result = 31 * result + disabledUnselectedTextColor.hashCode()
-        result = 31 * result + dividerColor.hashCode()
-        result = 31 * result + cursorColor.hashCode()
-        return result
     }
 }
