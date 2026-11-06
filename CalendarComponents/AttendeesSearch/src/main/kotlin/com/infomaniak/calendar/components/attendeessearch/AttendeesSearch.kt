@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.attendeessearch
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -33,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.attendeessearch.component.AttendeesList
 import com.infomaniak.calendar.components.foundation.component.EmptyState
+import com.infomaniak.calendar.components.foundation.component.InformationBlock
 import com.infomaniak.calendar.components.foundation.component.SearchBar
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
@@ -69,6 +71,10 @@ fun AttendeesSearch(
             .padding(top = contentPadding.calculateTopPadding()),
     ) {
         if (isSearchable) {
+            AnimatedVisibility(attendeesSearchState.attendees.size >= 100) {
+                InformationBlock("No more than 100 TODO", modifier = Modifier.padding(bottom = EsdsTheme.spacing.xs))
+            }
+
             SearchBar(
                 searchState = attendeesSearchState.searchQueryTextFieldState,
                 placeholder = stringResource(R.string.attendeesSearchPlaceholder),
