@@ -33,11 +33,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.EmptyState
 import com.infomaniak.calendar.components.foundation.component.SearchBar
+import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.calendar.components.timezonesearch.component.TimeZoneItem
 import com.infomaniak.calendar.components.timezonesearch.models.TimeZoneUi
@@ -90,7 +92,7 @@ private fun TimeZoneSearchContent(
             .padding(top = contentPadding.calculateTopPadding() + EsdsTheme.spacing.xl)
             .padding(horizontal = EsdsTheme.spacing.xl),
     ) {
-        SearchBar(searchQuery)
+        SearchBar(searchQuery, modifier = Modifier.focusRequester(rememberInitialFocusRequester()))
 
         when (val results = searchResults) {
             null -> Unit // Still loading
