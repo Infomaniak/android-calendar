@@ -21,6 +21,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -148,17 +149,35 @@ fun <T> ScrollPicker(
 
     val density = LocalDensity.current
     val itemHeightPx = with(density) { itemHeight.roundToPx() }
-    val haptics = LocalHapticFeedback.current
     LaunchedEffect(state, itemCount, looping, itemHeightPx) {
         if (itemCount == 0) return@LaunchedEffect
         snapshotFlow {
             listState.firstVisibleItemIndex + if (listState.firstVisibleItemScrollOffset > itemHeightPx / 2) 1 else 0
         }.collect { listIndex ->
-            // Ticks for every item passing the center while scrolled, not for typed input nor the initial position.
-            if (listState.isScrollInProgress) haptics.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
             state.selectedListIndex = listIndex
             state.selectedIndex = itemIndexOf(listIndex).coerceIn(0, itemCount - 1)
         }
+    }
+
+    val haptics = LocalHapticFeedback.current
+    val dragged by listState.interactionSource.collectIsDraggedAsState()
+    LaunchedEffect(listState, itemHeightPx) {
+        // Ticks whenever an item reaches the center, except for the same item again once released, so a snap overshoot
+        // ticks once.
+        var previous = -1L
+        var ticked = -1L
+        snapshotFlow { listState.firstVisibleItemIndex.toLong() * itemHeightPx + listState.firstVisibleItemScrollOffset }
+            .collect { position ->
+                val forward = position > previous
+                val item = if (forward) position / itemHeightPx else (position + itemHeightPx - 1) / itemHeightPx
+                val reached = if (forward) item * itemHeightPx > previous else item * itemHeightPx < previous
+                // Typed input and the initial position jump without scrolling, so they don't tick.
+                if (reached && (dragged || item != ticked) && listState.isScrollInProgress) {
+                    haptics.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
+                    ticked = item
+                }
+                previous = position
+            }
     }
 
     var editing by remember { mutableStateOf(false) }
