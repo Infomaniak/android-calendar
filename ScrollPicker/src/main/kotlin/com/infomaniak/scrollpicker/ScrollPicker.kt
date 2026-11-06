@@ -18,7 +18,6 @@
 package com.infomaniak.scrollpicker
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
@@ -57,6 +56,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
@@ -90,11 +90,9 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlin.math.abs
 import kotlin.math.roundToInt
-import kotlin.math.roundToLong
-import kotlin.math.sign
 
 /**
  * A single wheel picker, scrolled vertically to select one of [items].
@@ -140,79 +138,15 @@ fun <T> ScrollPicker(
 ) {
     val labels = remember(items, itemLabel) { items.map(itemLabel) }
     val itemCount = labels.size
-    val looping = loop && itemCount > 0
     val listState = state.lazyListState
-
-    // Centers the selection, in the middle of the virtual items when looping, before the wheel is first measured.
-    val listItemCount = remember(state, itemCount, looping) {
-        val index = state.selectedIndex.coerceIn(0, (itemCount - 1).coerceAtLeast(0))
-        state.loopSize = if (looping) itemCount else 0
-        state.selectedListIndex = if (looping) LOOP_START + index else index
-        state.selectedIndex = index
-        listState.requestScrollToItem(state.selectedListIndex)
-        if (looping) LOOP_ITEM_COUNT else itemCount
-    }
-
-    fun itemIndexOf(listIndex: Int) = if (looping) (listIndex - LOOP_START).mod(itemCount) else listIndex
+    val listItemCount = remember(state, itemCount, loop) { state.setItems(itemCount, loop) }
 
     val density = LocalDensity.current
     val itemHeightPx = with(density) { itemHeight.roundToPx() }
-    LaunchedEffect(state, itemCount, looping, itemHeightPx) {
-        if (itemCount == 0) return@LaunchedEffect
-        snapshotFlow {
-            listState.firstVisibleItemIndex + if (listState.firstVisibleItemScrollOffset > itemHeightPx / 2) 1 else 0
-        }.collect { listIndex ->
-            state.selectedListIndex = listIndex
-            state.selectedIndex = itemIndexOf(listIndex).coerceIn(0, itemCount - 1)
-        }
-    }
+    LaunchedEffect(state, itemCount, loop, itemHeightPx) { state.followCenteredRow(itemHeightPx) }
 
-    // Snaps on the item nearest to where the fling decays, picked as the fling starts so haptics know where it settles.
-    val snapper = remember(listState, itemHeightPx) {
-        object : SnapLayoutInfoProvider {
-            var target = -1L
-            val position
-                get() = listState.firstVisibleItemIndex.toLong() * itemHeightPx + listState.firstVisibleItemScrollOffset
-
-            override fun calculateApproachOffset(velocity: Float, decayOffset: Float): Float {
-                val lastItem = (listState.layoutInfo.totalItemsCount - 1).coerceAtLeast(0).toLong()
-                val nearest = (position + decayOffset.roundToLong() + itemHeightPx / 2).floorDiv(itemHeightPx)
-                target = nearest.coerceIn(0, lastItem)
-                return (abs(decayOffset) - itemHeightPx).coerceAtLeast(0f) * sign(decayOffset)
-            }
-
-            override fun calculateSnapOffset(velocity: Float): Float = (target * itemHeightPx - position).toFloat()
-        }
-    }
-
-    val haptics = LocalHapticFeedback.current
-    val dragged by listState.interactionSource.collectIsDraggedAsState()
-    LaunchedEffect(snapper) {
-        // Ticks when another item reaches the center, but a fling keeps its last item's tick for when it settles, even if
-        // it passes it before.
-        var previous = -1L
-        var ticked = -1L
-        var scrolled = false
-        snapshotFlow { listState.isScrollInProgress to snapper.position }.collect { (scrolling, position) ->
-            if (scrolling) {
-                val forward = position > previous
-                val item = if (forward) position / itemHeightPx else (position + itemHeightPx - 1) / itemHeightPx
-                val reached = if (forward) item * itemHeightPx > previous else item * itemHeightPx < previous
-                if (reached && item != ticked && (dragged || item != snapper.target)) {
-                    haptics.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
-                    ticked = item
-                }
-            } else {
-                // Typed input and the initial position jump without scrolling, so they don't tick.
-                val item = (position + itemHeightPx / 2) / itemHeightPx
-                if (scrolled && item != ticked) haptics.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
-                ticked = item
-                snapper.target = -1
-            }
-            scrolled = scrolling
-            previous = position
-        }
-    }
+    val snapper = remember(listState, itemHeightPx) { ScrollPickerSnapper(listState, itemHeightPx) }
+    ItemTickHaptics(listState, snapper, itemHeightPx)
 
     var editing by remember { mutableStateOf(false) }
     val group = state.group
@@ -229,13 +163,7 @@ fun <T> ScrollPicker(
 
     val textMeasurer = rememberTextMeasurer()
     val width = remember(labels, textStyle, selectedTextStyle, textMeasurer, density) {
-        val widest = labels.maxOfOrNull { label ->
-            maxOf(
-                textMeasurer.measure(label, textStyle, skipCache = true).size.width,
-                textMeasurer.measure(label, selectedTextStyle, skipCache = true).size.width,
-            )
-        }
-        with(density) { (widest ?: 0).toDp() }
+        with(density) { textMeasurer.widestWidth(labels, textStyle, selectedTextStyle).toDp() }
     }
 
     val scope = rememberCoroutineScope()
@@ -252,19 +180,7 @@ fun <T> ScrollPicker(
     }
 
     Box(
-        modifier = modifier.clearAndSetSemantics {
-            val selectedIndex = state.selectedIndex
-            labels.getOrNull(selectedIndex)?.let { stateDescription = it }
-            progressBarRangeInfo = ProgressBarRangeInfo(
-                current = selectedIndex.toFloat(),
-                range = 0f..(itemCount - 1).coerceAtLeast(0).toFloat(),
-                steps = (itemCount - 2).coerceAtLeast(0),
-            )
-            if (enabled && itemCount > 0) setProgress { target ->
-                scope.launch { state.scrollToIndex(target.roundToInt().coerceIn(0, itemCount - 1)) }
-                true
-            }
-        },
+        modifier = modifier.pickerSemantics(labels, state, enabled, scope),
         contentAlignment = Alignment.Center,
     ) {
         // Lies under the wheel, which handles all touches, and only shows while focused.
@@ -299,7 +215,7 @@ fun <T> ScrollPicker(
         ) {
             items(listItemCount) { listIndex ->
                 ScrollPickerItem(
-                    label = labels[itemIndexOf(listIndex)],
+                    label = labels[state.itemIndexOf(listIndex)],
                     listIndex = listIndex,
                     listState = listState,
                     group = group,
@@ -319,6 +235,71 @@ fun <T> ScrollPicker(
 
         // Sizes the picker by default, in pixels so the selection lines up with whole items.
         Spacer(Modifier.size(width, with(density) { (itemHeightPx * VISIBLE_ITEM_COUNT).toDp() }))
+    }
+}
+
+/**
+ * Ticks when another item reaches the center, but a fling keeps its last item's tick for when it settles, even if it
+ * passes it before.
+ */
+@Composable
+private fun ItemTickHaptics(listState: LazyListState, snapper: ScrollPickerSnapper, itemHeightPx: Int) {
+    val haptics = LocalHapticFeedback.current
+    val dragged by listState.interactionSource.collectIsDraggedAsState()
+    LaunchedEffect(snapper) {
+        var previous = -1L
+        var ticked = -1L
+        var scrolled = false
+        snapshotFlow { listState.isScrollInProgress to snapper.position }.collect { (scrolling, position) ->
+            if (scrolling) {
+                val forward = position > previous
+                val item = if (forward) position / itemHeightPx else (position + itemHeightPx - 1) / itemHeightPx
+                val reached = if (forward) item * itemHeightPx > previous else item * itemHeightPx < previous
+                if (reached && item != ticked && (dragged || item != snapper.target)) {
+                    haptics.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
+                    ticked = item
+                }
+            } else {
+                // Typed input and the initial position jump without scrolling, so they don't tick.
+                val item = (position + itemHeightPx / 2) / itemHeightPx
+                if (scrolled && item != ticked) haptics.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
+                ticked = item
+                snapper.target = -1
+            }
+            scrolled = scrolling
+            previous = position
+        }
+    }
+}
+
+/** Width of the widest of [labels], in whichever style is wider. Measured once, so skips the measurer's cache. */
+private fun TextMeasurer.widestWidth(labels: List<String>, textStyle: TextStyle, selectedTextStyle: TextStyle): Int {
+    return labels.maxOfOrNull { label ->
+        maxOf(
+            measure(label, textStyle, skipCache = true).size.width,
+            measure(label, selectedTextStyle, skipCache = true).size.width,
+        )
+    } ?: 0
+}
+
+/** Exposes the picker as a single adjustable value, like a slider, rather than as its many rows. */
+private fun Modifier.pickerSemantics(
+    labels: List<String>,
+    state: ScrollPickerState,
+    enabled: Boolean,
+    scope: CoroutineScope,
+): Modifier = clearAndSetSemantics {
+    val itemCount = labels.size
+    val selectedIndex = state.selectedIndex
+    labels.getOrNull(selectedIndex)?.let { stateDescription = it }
+    progressBarRangeInfo = ProgressBarRangeInfo(
+        current = selectedIndex.toFloat(),
+        range = 0f..(itemCount - 1).coerceAtLeast(0).toFloat(),
+        steps = (itemCount - 2).coerceAtLeast(0),
+    )
+    if (enabled && itemCount > 0) setProgress { target ->
+        scope.launch { state.scrollToIndex(target.roundToInt().coerceIn(0, itemCount - 1)) }
+        true
     }
 }
 
@@ -389,21 +370,12 @@ private fun <T> ScrollPickerInputField(
     val focusManager = LocalFocusManager.current
     var value by remember { mutableStateOf(TextFieldValue()) }
 
-    fun performImeAction() {
-        when (keyboardOptions.imeAction) {
-            ImeAction.Next -> focusManager.moveFocus(FocusDirection.Next)
-            ImeAction.Previous -> focusManager.moveFocus(FocusDirection.Previous)
-            ImeAction.None -> Unit
-            else -> focusManager.clearFocus()
-        }
-    }
-
     // Moving the focus before the field recomposes with its new value would make it report its stale value on blur.
     var isInputComplete by remember { mutableStateOf(false) }
     LaunchedEffect(isInputComplete) {
         if (isInputComplete) {
             isInputComplete = false
-            performImeAction()
+            focusManager.performImeAction(keyboardOptions.imeAction)
         }
     }
 
@@ -416,7 +388,7 @@ private fun <T> ScrollPickerInputField(
                 return@BasicTextField
             }
             val index = onInput(text)?.let(items::indexOf)?.takeIf { it >= 0 }
-            val isPrefix = labels.any { it.length > text.length && it.startsWith(text, ignoreCase = true) }
+            val isPrefix = labels.anyLongerStartingWith(text)
             if (text.isNotEmpty() && index == null && !isPrefix) return@BasicTextField
 
             value = newValue
@@ -434,7 +406,7 @@ private fun <T> ScrollPickerInputField(
         enabled = enabled,
         textStyle = textStyle,
         keyboardOptions = keyboardOptions,
-        keyboardActions = KeyboardActions(onAny = { performImeAction() }),
+        keyboardActions = KeyboardActions(onAny = { focusManager.performImeAction(keyboardOptions.imeAction) }),
         singleLine = true,
         cursorBrush = SolidColor(cursorColor),
         decorationBox = { innerTextField ->
@@ -444,6 +416,21 @@ private fun <T> ScrollPickerInputField(
             }
         },
     )
+}
+
+/** Moves the focus for [ImeAction.Next] and [ImeAction.Previous], and ends the input for any action but [ImeAction.None]. */
+private fun FocusManager.performImeAction(imeAction: ImeAction) {
+    when (imeAction) {
+        ImeAction.Next -> moveFocus(FocusDirection.Next)
+        ImeAction.Previous -> moveFocus(FocusDirection.Previous)
+        ImeAction.None -> Unit
+        else -> clearFocus()
+    }
+}
+
+/** Whether [text] is the start of a longer label, so typing could still complete it. */
+private fun List<String>.anyLongerStartingWith(text: String): Boolean {
+    return any { it.length > text.length && it.startsWith(text, ignoreCase = true) }
 }
 
 private fun twoDigits(number: Int) = number.toString().padStart(2, '0')
@@ -519,5 +506,3 @@ private fun TimePreview() {
 }
 
 private const val VISIBLE_ITEM_COUNT = 3
-private const val LOOP_ITEM_COUNT = 100_000
-private const val LOOP_START = LOOP_ITEM_COUNT / 2
