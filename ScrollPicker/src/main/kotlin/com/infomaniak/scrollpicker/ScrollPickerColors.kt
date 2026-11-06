@@ -20,20 +20,21 @@ package com.infomaniak.scrollpicker
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
-/** Colors of a [ScrollPicker] in its different states, see [ScrollPickerDefaults.colors]. */
+/**
+ * Colors of a [ScrollPicker] in its different states, see [ScrollPickerDefaults.colors]. A picker draws all its items
+ * with the same color, [activeTextColor] while it's scrolled or edited and [textColor] otherwise.
+ */
 @Immutable
 data class ScrollPickerColors(
-    val selectedTextColor: Color,
-    val unselectedTextColor: Color,
-    val disabledSelectedTextColor: Color,
-    val disabledUnselectedTextColor: Color,
+    val textColor: Color,
+    val activeTextColor: Color,
+    val disabledTextColor: Color,
     val cursorColor: Color,
 ) {
 
-    internal fun textColor(enabled: Boolean, selected: Boolean): Color = when {
-        enabled && selected -> selectedTextColor
-        enabled -> unselectedTextColor
-        selected -> disabledSelectedTextColor
-        else -> disabledUnselectedTextColor
+    internal fun textColor(enabled: Boolean, active: Boolean): Color = when {
+        !enabled -> disabledTextColor
+        active -> activeTextColor
+        else -> textColor
     }
 }
