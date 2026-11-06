@@ -25,6 +25,10 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+
+private const val LOOP_ITEM_COUNT = 100_000
+private const val LOOP_START = LOOP_ITEM_COUNT / 2
 
 @Composable
 fun rememberScrollPickerState(initialIndex: Int = 0, group: ScrollPickerGroupState? = null): ScrollPickerState {
@@ -44,10 +48,41 @@ class ScrollPickerState(initialIndex: Int = 0, val group: ScrollPickerGroupState
     /** Index in [lazyListState] of the selected row, which differs from [selectedIndex] when the picker loops. */
     internal var selectedListIndex = initialIndex
 
+    private var itemCount = 0
+
     /** Number of items when the picker loops, 0 otherwise. */
-    internal var loopSize = 0
+    private var loopSize = 0
 
     val isScrollInProgress: Boolean get() = lazyListState.isScrollInProgress
+
+    /**
+     * Centers the selection among [itemCount] items, in the middle of the virtual rows when looping, before the wheel is
+     * first measured. Returns the wheel's number of rows.
+     */
+    internal fun setItems(itemCount: Int, loop: Boolean): Int {
+        val looping = loop && itemCount > 0
+        val index = selectedIndex.coerceIn(0, (itemCount - 1).coerceAtLeast(0))
+        this.itemCount = itemCount
+        loopSize = if (looping) itemCount else 0
+        selectedListIndex = if (looping) LOOP_START + index else index
+        selectedIndex = index
+        lazyListState.requestScrollToItem(selectedListIndex)
+        return if (looping) LOOP_ITEM_COUNT else itemCount
+    }
+
+    /** Index in the picker's items of the one shown by the row at [listIndex]. */
+    internal fun itemIndexOf(listIndex: Int) = if (loopSize > 0) (listIndex - LOOP_START).mod(loopSize) else listIndex
+
+    /** Keeps the selection on the row nearest to the wheel's center while it scrolls. */
+    internal suspend fun followCenteredRow(itemHeightPx: Int) {
+        if (itemCount == 0) return
+        snapshotFlow {
+            lazyListState.firstVisibleItemIndex + if (lazyListState.firstVisibleItemScrollOffset > itemHeightPx / 2) 1 else 0
+        }.collect { listIndex ->
+            selectedListIndex = listIndex
+            selectedIndex = itemIndexOf(listIndex).coerceIn(0, itemCount - 1)
+        }
+    }
 
     suspend fun scrollToIndex(index: Int) = lazyListState.scrollToItem(listIndexOf(index))
 
