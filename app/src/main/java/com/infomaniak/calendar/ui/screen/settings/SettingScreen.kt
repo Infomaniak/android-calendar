@@ -31,6 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.data.SettingThemeOption
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemClickable
+import com.infomaniak.calendar.ui.screen.settings.components.SettingItemOpen
 import com.infomaniak.calendar.ui.screen.settings.components.SettingScaffold
 import com.infomaniak.calendar.ui.screen.settings.components.SettingSection
 import com.infomaniak.calendar.ui.screen.settings.components.SettingShape
@@ -68,7 +69,7 @@ private fun SettingContent(
         }
 
         SettingSection(title = stringResource(R.string.generalSettingsAuthorizationsLabel)) {
-            SettingItemClickable(
+            SettingItemOpen(
                 shapes = SettingShape.Single,
                 text = stringResource(R.string.generalSettingsNotificationsLabel),
                 onClick = { goToSystemNotificationScreen(context) },
