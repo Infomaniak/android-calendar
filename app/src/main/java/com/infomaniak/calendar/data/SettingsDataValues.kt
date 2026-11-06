@@ -22,6 +22,11 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.infomaniak.core.datavalue.DataValues
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Moon
+import com.infomaniak.designsystem.icons.symbols.Smartphone
+import com.infomaniak.designsystem.icons.symbols.Sun
+import com.infomaniak.designsystem.icons.symbols.Symbol
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
@@ -34,10 +39,10 @@ class SettingsDataValues @Inject constructor(appContext: Context) : DataValues(a
     val defaultEventDuration = dataValue(key = "defaultEventDuration", defaultValue = 1.hours)
 }
 
-enum class SettingThemeOption(@StringRes private val titleRes: Int) {
-    System(RCore.string.themeSystem),
-    Light(RCore.string.themeLight),
-    Dark(RCore.string.themeDark);
+enum class SettingThemeOption(@StringRes private val titleRes: Int, val symbol: Symbol) {
+    System(RCore.string.themeSystem, EsdsIcons.Smartphone),
+    Light(RCore.string.themeLight, EsdsIcons.Sun),
+    Dark(RCore.string.themeDark, EsdsIcons.Moon);
 
     val title: String @Composable get() = stringResource(titleRes)
 }

@@ -17,6 +17,8 @@
  */
 package com.infomaniak.calendar.ui.screen.settings
 
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -28,12 +30,7 @@ import com.infomaniak.calendar.data.SettingThemeOption
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemSwitch
 import com.infomaniak.calendar.ui.screen.settings.components.SettingScaffold
 import com.infomaniak.calendar.ui.screen.settings.components.SettingSection
-import com.infomaniak.calendar.ui.screen.settings.components.SettingShape
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.designsystem.icons.EsdsIcons
-import com.infomaniak.designsystem.icons.symbols.Moon
-import com.infomaniak.designsystem.icons.symbols.Smartphone
-import com.infomaniak.designsystem.icons.symbols.Sun
 import com.infomaniak.core.common.R as RCore
 
 @Composable
@@ -65,30 +62,29 @@ private fun SettingThemeContent(
         modifier = modifier,
     ) {
         SettingSection {
-            val theme = theme()
-            SettingItemSwitch(
-                shapes = SettingShape.First,
-                text = SettingThemeOption.System.title,
-                symbol = EsdsIcons.Smartphone,
-                checked = { theme == SettingThemeOption.System },
-                onCheckedChange = { onThemeClick(SettingThemeOption.System) },
-            )
-            SettingItemSwitch(
-                shapes = SettingShape.Middle,
-                text = SettingThemeOption.Light.title,
-                symbol = EsdsIcons.Sun,
-                checked = { theme == SettingThemeOption.Light },
-                onCheckedChange = { onThemeClick(SettingThemeOption.Light) },
-            )
-            SettingItemSwitch(
-                shapes = SettingShape.Last,
-                text = SettingThemeOption.Dark.title,
-                symbol = EsdsIcons.Moon,
-                checked = { theme == SettingThemeOption.Dark },
-                onCheckedChange = { onThemeClick(SettingThemeOption.Dark) },
-            )
+            val currentTheme = theme()
+            SettingThemeOption.entries.forEachIndexed { index, option ->
+                val shapes = ListItemDefaults.segmentedShapes(index, SettingThemeOption.entries.size)
+                ThemeItem(shapes, option, currentTheme, onThemeClick)
+            }
         }
     }
+}
+
+@Composable
+private fun ThemeItem(
+    shapes: ListItemShapes,
+    option: SettingThemeOption,
+    currentTheme: SettingThemeOption?,
+    onThemeClick: (SettingThemeOption) -> Unit,
+) {
+    SettingItemSwitch(
+        shapes = shapes,
+        text = option.title,
+        symbol = option.symbol,
+        checked = { currentTheme == option },
+        onCheckedChange = { onThemeClick(option) },
+    )
 }
 
 @Preview
