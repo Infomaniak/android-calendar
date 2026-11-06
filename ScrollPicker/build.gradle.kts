@@ -51,6 +51,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.infomaniak.designsystem.foundation)
+
     implementation(platform(core.compose.bom))
     implementation(core.compose.foundation)
     implementation(core.compose.ui.android)

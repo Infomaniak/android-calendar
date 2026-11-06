@@ -24,33 +24,38 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 object ScrollPickerDefaults {
 
     val ItemHeight: Dp = 48.dp
 
     val textStyle: TextStyle
-        @Composable get() = MaterialTheme.typography.headlineMedium
+        @Composable get() = MaterialTheme.typography.headlineMediumEmphasized
 
-    val selectedTextStyle: TextStyle
-        @Composable get() = textStyle.copy(fontWeight = FontWeight.Medium)
+    val inactiveTextStyle: TextStyle
+        @Composable get() = textStyle.copy(fontWeight = FontWeight.Normal)
 
+    /**
+     * "inactive" refers to text that's outside the center row.
+     */
     @Composable
     fun colors(
         textColor: Color = MaterialTheme.colorScheme.onSurface,
-        selectedTextColor: Color = textColor,
-        activeTextColor: Color = MaterialTheme.colorScheme.primary,
-        activeSelectedTextColor: Color = activeTextColor,
+        inactiveTextColor: Color = textColor.copy(alpha = InactiveAlpha),
+        pressedTextColor: Color = MaterialTheme.colorScheme.primary,
+        inactivePressedTextColor: Color = pressedTextColor.copy(alpha = InactiveAlpha),
         disabledTextColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = DisabledAlpha),
         cursorColor: Color = MaterialTheme.colorScheme.primary,
     ): ScrollPickerColors = ScrollPickerColors(
-        textColor = textColor,
-        selectedTextColor = selectedTextColor,
-        activeTextColor = activeTextColor,
-        activeSelectedTextColor = activeSelectedTextColor,
+        textColor = inactiveTextColor,
+        selectedTextColor = textColor,
+        activeTextColor = inactivePressedTextColor,
+        activeSelectedTextColor = pressedTextColor,
         disabledTextColor = disabledTextColor,
         cursorColor = cursorColor,
     )
 
+    val InactiveAlpha @Composable get() = EsdsTheme.opacity.medium
     private const val DisabledAlpha = 0.38f
 }
