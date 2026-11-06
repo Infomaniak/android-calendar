@@ -35,6 +35,7 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Kontakte suchen, um sie zum Termin hinzuzufügen</string>
     <string name="attendeesEmptyStateTitle">Keine Gäste</string>
+    <string name="attendeesLimitReached">Sie haben die Limite von 100 Gästen erreicht</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d ausstehend</item>
         <item quantity="other">%d ausstehend</item>

@@ -35,6 +35,7 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Zoek contacten om ze toe te voegen aan het evenement</string>
     <string name="attendeesEmptyStateTitle">Geen gasten</string>
+    <string name="attendeesLimitReached">U heeft de limiet van 100 gasten bereikt</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d in afwachting</item>
         <item quantity="other">%d in afwachting</item>

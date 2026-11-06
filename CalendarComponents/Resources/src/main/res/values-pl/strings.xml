@@ -41,6 +41,7 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Wyszukaj kontakty, aby dodać je do wydarzenia</string>
     <string name="attendeesEmptyStateTitle">Brak gości</string>
+    <string name="attendeesLimitReached">Osiągnięto limit 100 gości</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d oczekujący</item>
         <item quantity="few">%d oczekujących</item>
