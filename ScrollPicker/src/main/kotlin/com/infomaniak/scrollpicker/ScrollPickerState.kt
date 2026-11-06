@@ -38,17 +38,33 @@ class ScrollPickerState(initialIndex: Int = 0) {
     var selectedIndex by mutableIntStateOf(initialIndex)
         internal set
 
-    // TODO: Map to/from selectedIndex, accounting for the offset of the loop's virtual items.
-    internal val lazyListState = LazyListState()
+    internal val lazyListState = LazyListState(initialIndex)
+
+    /** Index in [lazyListState] of the selected row, which differs from [selectedIndex] when the picker loops. */
+    internal var selectedListIndex = initialIndex
+
+    /** Number of items when the picker loops, 0 otherwise. */
+    internal var loopSize = 0
 
     val isScrollInProgress: Boolean get() = lazyListState.isScrollInProgress
 
-    suspend fun scrollToIndex(index: Int) {
-        // TODO
+    suspend fun scrollToIndex(index: Int) = lazyListState.scrollToItem(listIndexOf(index))
+
+    suspend fun animateScrollToIndex(index: Int) = lazyListState.animateScrollToItem(listIndexOf(index))
+
+    /** Selects [index] immediately, without waiting for the wheel to scroll there. */
+    internal fun select(index: Int) {
+        val listIndex = listIndexOf(index)
+        lazyListState.requestScrollToItem(listIndex)
+        selectedListIndex = listIndex
+        selectedIndex = index
     }
 
-    suspend fun animateScrollToIndex(index: Int) {
-        // TODO
+    /** The row showing the item at [index], taking the shortest way round when looping. */
+    private fun listIndexOf(index: Int): Int {
+        var delta = index - selectedIndex
+        if (loopSize > 0) delta = (delta + loopSize / 2).mod(loopSize) - loopSize / 2
+        return selectedListIndex + delta
     }
 
     companion object {
