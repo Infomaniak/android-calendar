@@ -21,11 +21,15 @@ import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
+import com.infomaniak.calendar.data.SettingThemeOption
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemClickable
 import com.infomaniak.calendar.ui.screen.settings.components.SettingScaffold
 import com.infomaniak.calendar.ui.screen.settings.components.SettingSection
@@ -38,6 +42,18 @@ fun SettingScreen(
     goBack: () -> Unit,
     goToTheme: () -> Unit,
     modifier: Modifier = Modifier,
+    settingThemeViewModel: SettingThemeViewModel = viewModel(),
+) {
+    val theme by settingThemeViewModel.theme.collectAsStateWithLifecycle()
+    SettingContent({ theme }, goBack, goToTheme, modifier)
+}
+
+@Composable
+private fun SettingContent(
+    theme: () -> SettingThemeOption?,
+    goBack: () -> Unit,
+    goToTheme: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
 
@@ -47,6 +63,7 @@ fun SettingScreen(
                 shapes = SettingShape.Single,
                 text = stringResource(RCore.string.themeTitle),
                 onClick = goToTheme,
+                supportingText = theme()?.title,
             )
         }
 
@@ -70,6 +87,6 @@ private fun goToSystemNotificationScreen(context: Context) {
 @Composable
 private fun SettingScreenPreview() {
     CalendarThemeForPreview {
-        SettingScreen(goBack = {}, goToTheme = {})
+        SettingContent(theme = { SettingThemeOption.System }, goBack = {}, goToTheme = {})
     }
 }
