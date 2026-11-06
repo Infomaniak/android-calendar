@@ -208,7 +208,8 @@ and snaps a `LazyColumn` of three rows; tapping the centre row opens a hidden te
 to an item updates `selectedIndex` immediately (so a form submitted mid-typing reads it). Once no longer input can match,
 the picker runs its `ImeAction`: `Next`/`Previous` move focus to the neighbouring focusable, which chains pickers (an
 hours "9" jumps to minutes); the last picker of a chain should use `Done`. A `FocusRequester` or `focusProperties` in its
-`modifier` reaches the input field, so focus can be moved from code.
+`modifier` reaches the input field, so focus can be moved from code. Pickers whose states share a `ScrollPickerGroupState`
+(`rememberScrollPickerState(group = …)`) react as one: while any is edited, all only show their selected value.
 
 ## Key Integration Points
 
