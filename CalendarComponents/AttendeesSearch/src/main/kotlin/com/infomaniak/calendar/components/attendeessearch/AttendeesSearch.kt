@@ -107,7 +107,13 @@ fun AttendeesSearch(
                 onRemove = attendeesSearchState::removeAttendee,
                 modifier = Modifier.padding(vertical = EsdsTheme.spacing.sm),
                 onClick = if (isDisplayingSearchResults) {
-                    { attendee -> attendeesSearchState.addAttendee(attendee) }
+                    { attendee ->
+                        if (attendeesSearchState.attendees.size >= MAX_ATTENDEE_COUNT) {
+                            onShowSnackbar("Too many attendee TODO")
+                        } else {
+                            attendeesSearchState.addAttendee(attendee)
+                        }
+                    }
                 } else {
                     null
                 },
