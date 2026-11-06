@@ -48,23 +48,25 @@ fun <T> ScrollPicker(
     visibleItemCount: Int = ScrollPickerDefaults.VisibleItemCount,
     itemHeight: Dp = ScrollPickerDefaults.ItemHeight,
     textStyle: TextStyle = ScrollPickerDefaults.textStyle,
+    selectedTextStyle: TextStyle = ScrollPickerDefaults.selectedTextStyle,
     colors: ScrollPickerColors = ScrollPickerDefaults.colors(),
 ) {
     // TODO: LazyColumn over state.lazyListState, snapping, loop index mapping.
-    // TODO: Interpolate items' color/style by their distance to the center, optionally clipped at the edges like Samsung's.
+    // TODO: Clip everything to the picker's bounds, the center item's height being the selection area.
     // TODO: Switch to ScrollPickerInputField when the selected item is clicked and onInput != null.
 }
 
 @Composable
 private fun ScrollPickerItem(
     label: String,
-    selected: Boolean,
     enabled: Boolean,
     textStyle: TextStyle,
+    selectedTextStyle: TextStyle,
     colors: ScrollPickerColors,
     modifier: Modifier = Modifier,
 ) {
-    // TODO
+    // TODO: Draw the label twice: with textStyle clipped to outside the selection area, then with selectedTextStyle
+    //  clipped to inside it (drawWithContent { clipRect(…) }), so an item crossing its border is split between both styles.
 }
 
 @Composable
