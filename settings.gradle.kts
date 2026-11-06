@@ -90,6 +90,7 @@ include(":CalendarComponents:Planning")
 include(":CalendarComponents:TimeZoneSearch")
 include(":CalendarComponents:LocationSearch")
 include(":CalendarComponents:Resources")
+include(":ScrollPicker")
 
 // Read local.properties first (git-ignored), then fall back to gradle.properties.
 // Set useCalendarCoreCompositeBuild=true in local.properties to use the local submodule source

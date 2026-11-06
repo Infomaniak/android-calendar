@@ -25,6 +25,7 @@ android-calendar/
 │   ├── Planning/                   # Planning Composable (week/day/event list)
 │   ├── Calendar/                   # Calendar Composable (expanded, unexpanded)
 │   └── Resources/                  # Centralised string resources (no code)
+├── ScrollPicker/                   # Standalone wheel picker component, to be moved to its own repo
 ├── Core/                           # Git submodule - Infomaniak shared Android library
 │   ├── build-logic/                # Composite build: provides com.infomaniak.core.composite plugin
 │   └── gradle/core.versions.toml  # Core version catalog consumed by the root build
@@ -34,7 +35,7 @@ android-calendar/
 │   ├── libs.versions.toml          # Android app version catalog
 │   └── wrapper/                    # Gradle wrapper
 ├── build.gradle.kts                # Root build script
-├── settings.gradle.kts             # Includes :app + :CalendarComponents:*; composite builds for Core and multiplatform-calendar
+├── settings.gradle.kts             # Includes :app + :CalendarComponents:* + :ScrollPicker; composite builds for Core and multiplatform-calendar
 └── AGENTS.md                       # This file (top-level overview)
 ```
 
@@ -194,6 +195,15 @@ in the stack it needs.
 
 All CalendarComponents source lives **in this repository**. Changes to these modules belong in PRs against
 `Infomaniak/android-calendar`. Do **not** edit them from a consuming app or the submodule repositories.
+
+## ScrollPicker
+
+`:ScrollPicker` (`ScrollPicker/`, package `com.infomaniak.scrollpicker`) is a wheel picker meant to move to its own
+repository later, so it depends on nothing from this repo (no `:app`, no CalendarComponents, no Infomaniak Design System):
+only Compose and Material 3, through the plain `core.plugins.android.library` plugin. Its API follows Material component
+conventions: `ScrollPicker(items, state, …)` is generic over its items (numbers, text, …), hoists its selection in a
+`ScrollPickerState` (`rememberScrollPickerState`), can loop infinitely, accepts typed input when `onInput` is given, and
+is themed through `ScrollPickerColors` / `ScrollPickerDefaults`, whose defaults read `MaterialTheme`. 🚧 Stubs only for now.
 
 ## Key Integration Points
 
