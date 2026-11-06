@@ -40,6 +40,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -99,6 +100,8 @@ import kotlin.math.roundToInt
  * Input can also be started from code with a [androidx.compose.ui.focus.FocusRequester] given in [modifier], while
  * [androidx.compose.ui.focus.focusProperties] in [modifier] changes where [ImeAction.Next] and [ImeAction.Previous] go.
  * As moving the focus wraps around, the last of chained pickers should end the input rather than use [ImeAction.Next].
+ * Chained pickers sharing a [ScrollPickerGroupState] in their [ScrollPickerState] also react as one: while any of them is
+ * edited, all of them only show their selected value, and dragging or tapping a hidden row of any of them ends the input.
  *
  * @param items the values to pick from, numbers, text or anything [itemLabel] can render.
  * @param state hoisted selection and scroll state, see [rememberScrollPickerState].
@@ -153,10 +156,15 @@ fun <T> ScrollPicker(
     }
 
     var editing by remember { mutableStateOf(false) }
+    val group = state.group
+    // Only the selected value shows while this picker, or another one of its group, is edited by hand.
+    fun showsOnlySelection() = editing || group?.isEditing == true
+    DisposableEffect(state) { onDispose { group?.setEditing(state, editing = false) } }
+
     val focusManager = LocalFocusManager.current
     LaunchedEffect(listState) {
         listState.interactionSource.interactions.collect {
-            if (it is DragInteraction.Start && editing) focusManager.clearFocus()
+            if (it is DragInteraction.Start && showsOnlySelection()) focusManager.clearFocus()
         }
     }
 
@@ -177,8 +185,9 @@ fun <T> ScrollPicker(
     val onItemClick: (Int) -> Unit = { listIndex ->
         if (listIndex == state.selectedListIndex && onInput != null) {
             if (editing) keyboardController?.show() else inputFocusRequester.requestFocus()
+        } else if (showsOnlySelection()) {
+            focusManager.clearFocus()
         } else {
-            if (editing) focusManager.clearFocus()
             scope.launch { listState.animateScrollToItem(listIndex) }
         }
     }
@@ -212,7 +221,10 @@ fun <T> ScrollPicker(
             modifier = Modifier
                 .matchParentSize()
                 .focusRequester(inputFocusRequester)
-                .onFocusChanged { editing = it.isFocused }
+                .onFocusChanged {
+                    editing = it.isFocused
+                    group?.setEditing(state, it.isFocused)
+                }
                 .graphicsLayer { alpha = if (editing) 1f else 0f },
         )
 
@@ -230,6 +242,7 @@ fun <T> ScrollPicker(
                     label = labels[itemIndexOf(listIndex)],
                     listIndex = listIndex,
                     listState = listState,
+                    group = group,
                     enabled = enabled,
                     textMeasurer = textMeasurer,
                     textStyle = textStyle,
@@ -250,13 +263,15 @@ fun <T> ScrollPicker(
 
 /**
  * Draws the label twice: with [textStyle] outside the selection area, the center row of the wheel, and with
- * [selectedTextStyle] inside it, so an item crossing its border is split between both styles.
+ * [selectedTextStyle] inside it, so an item crossing its border is split between both styles. Only the latter is drawn
+ * while another picker of the [group] is edited.
  */
 @Composable
 private fun ScrollPickerItem(
     label: String,
     listIndex: Int,
     listState: LazyListState,
+    group: ScrollPickerGroupState?,
     enabled: Boolean,
     textMeasurer: TextMeasurer,
     textStyle: TextStyle,
@@ -279,8 +294,10 @@ private fun ScrollPickerItem(
                     val selectionTop =
                         (listState.firstVisibleItemIndex - listIndex) * size.height + listState.firstVisibleItemScrollOffset
                     val selectionBottom = selectionTop + size.height
-                    clipRect(top = selectionTop, bottom = selectionBottom, clipOp = ClipOp.Difference) {
-                        drawCentered(text, color)
+                    if (group?.isEditing != true) {
+                        clipRect(top = selectionTop, bottom = selectionBottom, clipOp = ClipOp.Difference) {
+                            drawCentered(text, color)
+                        }
                     }
                     clipRect(top = selectionTop, bottom = selectionBottom) { drawCentered(selectedText, selectedColor) }
                 }
@@ -398,10 +415,11 @@ private fun TimePreview() {
     MaterialTheme {
         Surface {
             Column(Modifier.padding(16.dp)) {
+                val group = rememberScrollPickerGroupState()
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     ScrollPicker(
                         items = (0..23).toList(),
-                        state = rememberScrollPickerState(initialIndex = 10),
+                        state = rememberScrollPickerState(initialIndex = 10, group = group),
                         loop = true,
                         itemLabel = ::twoDigits,
                         onInput = String::toIntOrNull,
@@ -410,7 +428,7 @@ private fun TimePreview() {
                     Text(text = ":", style = ScrollPickerDefaults.selectedTextStyle)
                     ScrollPicker(
                         items = (0..59).toList(),
-                        state = rememberScrollPickerState(),
+                        state = rememberScrollPickerState(group = group),
                         loop = true,
                         itemLabel = ::twoDigits,
                         onInput = String::toIntOrNull,
