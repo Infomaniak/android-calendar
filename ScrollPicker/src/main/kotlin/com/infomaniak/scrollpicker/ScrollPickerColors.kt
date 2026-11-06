@@ -21,20 +21,23 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
 /**
- * Colors of a [ScrollPicker] in its different states, see [ScrollPickerDefaults.colors]. A picker draws all its items
- * with the same color, [activeTextColor] while it's scrolled or edited and [textColor] otherwise.
+ * Colors of a [ScrollPicker] in its different states, see [ScrollPickerDefaults.colors]. A picker draws its items with
+ * [activeTextColor] while it's scrolled or edited and [textColor] otherwise, and the part of them inside the selection
+ * with [activeSelectedTextColor] and [selectedTextColor] respectively.
  */
 @Immutable
 data class ScrollPickerColors(
     val textColor: Color,
+    val selectedTextColor: Color,
     val activeTextColor: Color,
+    val activeSelectedTextColor: Color,
     val disabledTextColor: Color,
     val cursorColor: Color,
 ) {
 
-    internal fun textColor(enabled: Boolean, active: Boolean): Color = when {
+    internal fun textColor(enabled: Boolean, active: Boolean, selected: Boolean): Color = when {
         !enabled -> disabledTextColor
-        active -> activeTextColor
-        else -> textColor
+        active -> if (selected) activeSelectedTextColor else activeTextColor
+        else -> if (selected) selectedTextColor else textColor
     }
 }

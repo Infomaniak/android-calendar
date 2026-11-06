@@ -270,7 +270,10 @@ fun <T> ScrollPicker(
             onInput = onInput,
             enabled = enabled,
             keyboardOptions = keyboardOptions,
-            textStyle = selectedTextStyle.copy(color = colors.textColor(enabled, active = true), textAlign = TextAlign.Center),
+            textStyle = selectedTextStyle.copy(
+                color = colors.textColor(enabled, active = true, selected = true),
+                textAlign = TextAlign.Center,
+            ),
             cursorColor = colors.cursorColor,
             modifier = Modifier
                 .matchParentSize()
@@ -342,17 +345,19 @@ private fun ScrollPickerItem(
                 val text = textMeasurer.measure(label, textStyle)
                 val selectedText = textMeasurer.measure(label, selectedTextStyle)
                 onDrawBehind {
-                    val color = colors.textColor(enabled, active = listState.isScrollInProgress)
+                    val active = listState.isScrollInProgress
                     // Read while drawing so that scrolling only redraws. The row at the wheel's content start is selected.
                     val selectionTop =
                         (listState.firstVisibleItemIndex - listIndex) * size.height + listState.firstVisibleItemScrollOffset
                     val selectionBottom = selectionTop + size.height
                     if (group?.isEditing != true) {
                         clipRect(top = selectionTop, bottom = selectionBottom, clipOp = ClipOp.Difference) {
-                            drawCentered(text, color)
+                            drawCentered(text, colors.textColor(enabled, active, selected = false))
                         }
                     }
-                    clipRect(top = selectionTop, bottom = selectionBottom) { drawCentered(selectedText, color) }
+                    clipRect(top = selectionTop, bottom = selectionBottom) {
+                        drawCentered(selectedText, colors.textColor(enabled, active, selected = true))
+                    }
                 }
             },
     )
