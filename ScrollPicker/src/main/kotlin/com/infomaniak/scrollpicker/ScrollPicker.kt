@@ -64,7 +64,9 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
@@ -146,11 +148,14 @@ fun <T> ScrollPicker(
 
     val density = LocalDensity.current
     val itemHeightPx = with(density) { itemHeight.roundToPx() }
+    val haptics = LocalHapticFeedback.current
     LaunchedEffect(state, itemCount, looping, itemHeightPx) {
         if (itemCount == 0) return@LaunchedEffect
         snapshotFlow {
             listState.firstVisibleItemIndex + if (listState.firstVisibleItemScrollOffset > itemHeightPx / 2) 1 else 0
         }.collect { listIndex ->
+            // Ticks for every item passing the center while scrolled, not for typed input nor the initial position.
+            if (listState.isScrollInProgress) haptics.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
             state.selectedListIndex = listIndex
             state.selectedIndex = itemIndexOf(listIndex).coerceIn(0, itemCount - 1)
         }
