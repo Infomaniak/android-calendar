@@ -27,12 +27,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 
 @Composable
-fun rememberScrollPickerState(initialIndex: Int = 0): ScrollPickerState {
-    return rememberSaveable(saver = ScrollPickerState.Saver) { ScrollPickerState(initialIndex) }
+fun rememberScrollPickerState(initialIndex: Int = 0, group: ScrollPickerGroupState? = null): ScrollPickerState {
+    return rememberSaveable(group, saver = ScrollPickerState.Saver(group)) { ScrollPickerState(initialIndex, group) }
 }
 
+/** @param group links this picker to others sharing it, see [ScrollPickerGroupState]. */
 @Stable
-class ScrollPickerState(initialIndex: Int = 0) {
+class ScrollPickerState(initialIndex: Int = 0, val group: ScrollPickerGroupState? = null) {
 
     /** Index in the picker's items of the value currently selected. */
     var selectedIndex by mutableIntStateOf(initialIndex)
@@ -68,6 +69,9 @@ class ScrollPickerState(initialIndex: Int = 0) {
     }
 
     companion object {
-        val Saver: Saver<ScrollPickerState, Int> = Saver(save = { it.selectedIndex }, restore = ::ScrollPickerState)
+        fun Saver(group: ScrollPickerGroupState?): Saver<ScrollPickerState, Int> = Saver<ScrollPickerState, Int>(
+            save = { it.selectedIndex },
+            restore = { ScrollPickerState(it, group) },
+        )
     }
 }
