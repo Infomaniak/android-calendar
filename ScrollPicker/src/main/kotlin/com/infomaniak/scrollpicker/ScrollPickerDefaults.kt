@@ -38,14 +38,12 @@ object ScrollPickerDefaults {
         unselectedTextColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
         disabledSelectedTextColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = DisabledAlpha),
         disabledUnselectedTextColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = DisabledAlpha),
-        dividerColor: Color = MaterialTheme.colorScheme.outlineVariant,
         cursorColor: Color = MaterialTheme.colorScheme.primary,
     ): ScrollPickerColors = ScrollPickerColors(
         selectedTextColor = selectedTextColor,
         unselectedTextColor = unselectedTextColor,
         disabledSelectedTextColor = disabledSelectedTextColor,
         disabledUnselectedTextColor = disabledUnselectedTextColor,
-        dividerColor = dividerColor,
         cursorColor = cursorColor,
     )
 

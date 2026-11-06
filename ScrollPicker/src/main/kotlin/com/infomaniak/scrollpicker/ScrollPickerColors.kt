@@ -27,7 +27,6 @@ data class ScrollPickerColors(
     val unselectedTextColor: Color,
     val disabledSelectedTextColor: Color,
     val disabledUnselectedTextColor: Color,
-    val dividerColor: Color,
     val cursorColor: Color,
 ) {
 
