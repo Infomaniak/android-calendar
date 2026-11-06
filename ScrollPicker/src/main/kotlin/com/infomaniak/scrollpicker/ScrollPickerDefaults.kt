@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -31,6 +32,9 @@ object ScrollPickerDefaults {
 
     val textStyle: TextStyle
         @Composable get() = MaterialTheme.typography.headlineMedium
+
+    val selectedTextStyle: TextStyle
+        @Composable get() = textStyle.copy(fontWeight = FontWeight.Medium)
 
     @Composable
     fun colors(
