@@ -35,6 +35,7 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Sök efter kontakter för att lägga till dem i händelsen</string>
     <string name="attendeesEmptyStateTitle">Inga gäster</string>
+    <string name="attendeesLimitReached">Du har nått gränsen på 100 gäster</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d väntande</item>
         <item quantity="other">%d väntande</item>

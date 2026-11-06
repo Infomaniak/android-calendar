@@ -35,6 +35,7 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Busca contactos para añadirlos al evento</string>
     <string name="attendeesEmptyStateTitle">Sin invitados</string>
+    <string name="attendeesLimitReached">Ha alcanzado el límite de 100 invitados</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d pendiente</item>
         <item quantity="other">%d pendientes</item>

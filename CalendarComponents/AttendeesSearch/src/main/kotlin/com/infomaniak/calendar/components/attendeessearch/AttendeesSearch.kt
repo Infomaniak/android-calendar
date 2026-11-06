@@ -77,7 +77,7 @@ fun AttendeesSearch(
     ) {
         if (isSearchable) {
             AnimatedVisibility(attendeesSearchState.attendees.size >= MAX_ATTENDEE_COUNT) {
-                InformationBlock("No more than 100 TODO")
+                InformationBlock(stringResource(R.string.attendeesLimitReached))
             }
 
             SearchBar(
@@ -109,7 +109,7 @@ fun AttendeesSearch(
                 onClick = if (isDisplayingSearchResults) {
                     { attendee ->
                         if (attendeesSearchState.attendees.size >= MAX_ATTENDEE_COUNT) {
-                            onShowSnackbar("Too many attendee TODO")
+                            onShowSnackbar(resources.getString(R.string.attendeesLimitReached))
                         } else {
                             attendeesSearchState.addAttendee(attendee)
                         }

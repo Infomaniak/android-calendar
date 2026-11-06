@@ -35,6 +35,7 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Hae yhteystietoja lisätäksesi ne tapahtumaan</string>
     <string name="attendeesEmptyStateTitle">Ei vieraita</string>
+    <string name="attendeesLimitReached">Olet saavuttanut 100 vieraan rajan</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d odottaa</item>
         <item quantity="other">%d odottaa</item>

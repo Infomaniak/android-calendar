@@ -35,6 +35,7 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Search for contacts to add them to the event</string>
     <string name="attendeesEmptyStateTitle">No attendees</string>
+    <string name="attendeesLimitReached">You have reached the limit of 100 attendees</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d pending</item>
         <item quantity="other">%d pending</item>
