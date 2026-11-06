@@ -22,7 +22,9 @@ import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -32,6 +34,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.text.BasicTextField
@@ -84,7 +87,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -117,6 +119,8 @@ import kotlin.math.sign
  * @param onInput parses the text typed after clicking the selected item, returning `null` to reject it.
  * When `null`, the selected item isn't clickable and values can only be picked by scrolling.
  * @param keyboardOptions keyboard used for manual input, e.g. [androidx.compose.ui.text.input.KeyboardType.Number].
+ * @param horizontalAlignment where the labels sit within the picker's width, e.g. to line up hours on their end and
+ * minutes on their start.
  */
 @Composable
 fun <T> ScrollPicker(
@@ -128,6 +132,7 @@ fun <T> ScrollPicker(
     itemLabel: (T) -> String = { it.toString() },
     onInput: ((String) -> T?)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     itemHeight: Dp = ScrollPickerDefaults.ItemHeight,
     textStyle: TextStyle = ScrollPickerDefaults.textStyle,
     selectedTextStyle: TextStyle = ScrollPickerDefaults.selectedTextStyle,
@@ -270,10 +275,8 @@ fun <T> ScrollPicker(
             onInput = onInput,
             enabled = enabled,
             keyboardOptions = keyboardOptions,
-            textStyle = selectedTextStyle.copy(
-                color = colors.textColor(enabled, active = true, selected = true),
-                textAlign = TextAlign.Center,
-            ),
+            textStyle = selectedTextStyle.copy(color = colors.textColor(enabled, active = true, selected = true)),
+            horizontalAlignment = horizontalAlignment,
             cursorColor = colors.cursorColor,
             modifier = Modifier
                 .matchParentSize()
@@ -304,6 +307,7 @@ fun <T> ScrollPicker(
                     textMeasurer = textMeasurer,
                     textStyle = textStyle,
                     selectedTextStyle = selectedTextStyle,
+                    horizontalAlignment = horizontalAlignment,
                     colors = colors,
                     onClick = { onItemClick(listIndex) },
                     modifier = Modifier
@@ -333,6 +337,7 @@ private fun ScrollPickerItem(
     textMeasurer: TextMeasurer,
     textStyle: TextStyle,
     selectedTextStyle: TextStyle,
+    horizontalAlignment: Alignment.Horizontal,
     colors: ScrollPickerColors,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -352,19 +357,20 @@ private fun ScrollPickerItem(
                     val selectionBottom = selectionTop + size.height
                     if (group?.isEditing != true) {
                         clipRect(top = selectionTop, bottom = selectionBottom, clipOp = ClipOp.Difference) {
-                            drawCentered(text, colors.textColor(enabled, active, selected = false))
+                            drawAligned(text, horizontalAlignment, colors.textColor(enabled, active, selected = false))
                         }
                     }
                     clipRect(top = selectionTop, bottom = selectionBottom) {
-                        drawCentered(selectedText, colors.textColor(enabled, active, selected = true))
+                        drawAligned(selectedText, horizontalAlignment, colors.textColor(enabled, active, selected = true))
                     }
                 }
             },
     )
 }
 
-private fun DrawScope.drawCentered(text: TextLayoutResult, color: Color) {
-    drawText(text, color, Offset((size.width - text.size.width) / 2f, (size.height - text.size.height) / 2f))
+private fun DrawScope.drawAligned(text: TextLayoutResult, alignment: Alignment.Horizontal, color: Color) {
+    val x = alignment.align(text.size.width, size.width.roundToInt(), layoutDirection)
+    drawText(text, color, Offset(x.toFloat(), (size.height - text.size.height) / 2f))
 }
 
 @Composable
@@ -376,6 +382,7 @@ private fun <T> ScrollPickerInputField(
     enabled: Boolean,
     keyboardOptions: KeyboardOptions,
     textStyle: TextStyle,
+    horizontalAlignment: Alignment.Horizontal,
     cursorColor: Color,
     modifier: Modifier = Modifier,
 ) {
@@ -430,7 +437,12 @@ private fun <T> ScrollPickerInputField(
         keyboardActions = KeyboardActions(onAny = { performImeAction() }),
         singleLine = true,
         cursorBrush = SolidColor(cursorColor),
-        decorationBox = { innerTextField -> Box(Modifier.fillMaxSize(), Alignment.Center) { innerTextField() } },
+        decorationBox = { innerTextField ->
+            Column(Modifier.fillMaxSize(), Arrangement.Center, horizontalAlignment) {
+                // The inner field fills the width it's given, so shrink it to its text for the alignment to apply.
+                Box(Modifier.width(IntrinsicSize.Max)) { innerTextField() }
+            }
+        },
     )
 }
 
