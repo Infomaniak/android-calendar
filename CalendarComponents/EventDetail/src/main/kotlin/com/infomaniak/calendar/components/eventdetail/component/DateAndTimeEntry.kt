@@ -22,6 +22,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
@@ -63,6 +64,7 @@ import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatS
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Globe
+import com.infomaniak.scrollpicker.ScrollPicker
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
@@ -113,19 +115,27 @@ private fun DateAndTimeEntryContent(
     val enter = fadeIn(effectSpec)
     val exit = fadeOut(effectSpec)
 
-    Row(horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.lg), modifier = modifier) {
-        OutlinedButton(onClick = { isDatePickerVisible = true }, shapes = shapes) {
-            Text(entry.date.formatShortDateWithYear())
-        }
+    Column {
+        Row(horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.lg), modifier = modifier) {
+            OutlinedButton(onClick = { isDatePickerVisible = true }, shapes = shapes) {
+                Text(entry.date.formatShortDateWithYear())
+            }
 
-        AnimatedVisibility(!isAllDay(), enter = enter, exit = exit) {
-            OutlinedButton(onClick = { isTimePickerVisible = true }, shapes = shapes) {
-                Text(entry.time.formatExplicitTimeLabel())
+            AnimatedVisibility(!isAllDay(), enter = enter, exit = exit) {
+                OutlinedButton(onClick = { isTimePickerVisible = true }, shapes = shapes) {
+                    Text(entry.time.formatExplicitTimeLabel())
+                }
+            }
+
+            AnimatedVisibility(!isAllDay(), enter = enter, exit = exit, modifier = Modifier.weight(1f)) {
+                TimeZoneButton(entry, shapes, onClick = onTimeZoneClick)
             }
         }
 
-        AnimatedVisibility(!isAllDay(), enter = enter, exit = exit, modifier = Modifier.weight(1f)) {
-            TimeZoneButton(entry, shapes, onClick = onTimeZoneClick)
+        if (isTimePickerVisible) {
+            Row {
+                ScrollPicker()
+            }
         }
     }
 
@@ -134,14 +144,6 @@ private fun DateAndTimeEntryContent(
             initialDate = entry.date,
             onDateSelected = onDatePicked,
             onDismissRequest = { isDatePickerVisible = false },
-        )
-    }
-
-    if (isTimePickerVisible) {
-        TimeSelectionDialog(
-            initialTime = entry.time,
-            onTimeSelected = onTimePicked,
-            onDismissRequest = { isTimePickerVisible = false },
         )
     }
 }

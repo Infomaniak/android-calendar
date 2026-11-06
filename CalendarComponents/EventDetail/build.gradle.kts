@@ -37,6 +37,7 @@ android {
 dependencies {
     api(project(":CalendarComponents:Foundation"))
     implementation(project(":CalendarComponents:Resources"))
+    implementation(project(":ScrollPicker"))
 
     api(core.infomaniak.core.filetypes)
     implementation(core.infomaniak.core.avatar)
