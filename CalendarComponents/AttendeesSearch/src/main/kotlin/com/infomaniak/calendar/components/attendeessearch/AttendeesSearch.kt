@@ -25,11 +25,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -80,9 +87,11 @@ fun AttendeesSearch(
                 InformationBlock(stringResource(R.string.attendeesLimitReached))
             }
 
+            val focusRequester = rememberInitialFocusRequester(shouldRequestFocus = { attendeesSearchState.attendees.isEmpty() })
             SearchBar(
                 searchState = attendeesSearchState.searchQueryTextFieldState,
                 placeholder = stringResource(R.string.attendeesSearchPlaceholder),
+                modifier = Modifier.focusRequester(focusRequester),
             )
         }
 
@@ -125,6 +134,20 @@ fun AttendeesSearch(
             )
         }
     }
+}
+
+/** Requests focus once on first entry if [shouldRequestFocus], but not again after a configuration change. */
+@Composable
+private fun rememberInitialFocusRequester(shouldRequestFocus: () -> Boolean): FocusRequester {
+    val focusRequester = remember { FocusRequester() }
+    var hasHandledInitialFocus by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (!hasHandledInitialFocus && shouldRequestFocus()) focusRequester.requestFocus()
+        hasHandledInitialFocus = true
+    }
+
+    return focusRequester
 }
 
 @Preview
