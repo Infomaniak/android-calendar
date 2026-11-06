@@ -148,16 +148,13 @@ fun <T> ScrollPicker(
     val snapper = remember(listState, itemHeightPx) { ScrollPickerSnapper(listState, itemHeightPx) }
     ItemTickHaptics(listState, snapper, itemHeightPx)
 
-    var editing by remember { mutableStateOf(false) }
     val group = state.group
-    // Only the selected value shows while this picker, or another one of its group, is edited by hand.
-    fun showsOnlySelection() = editing || group?.isEditing == true
-    DisposableEffect(state) { onDispose { group?.setEditing(state, editing = false) } }
+    DisposableEffect(state) { onDispose { group.setEditing(state, editing = false) } }
 
     val focusManager = LocalFocusManager.current
     LaunchedEffect(listState) {
         listState.interactionSource.interactions.collect {
-            if (it is DragInteraction.Start && showsOnlySelection()) focusManager.clearFocus()
+            if (it is DragInteraction.Start && group.isEditing) focusManager.clearFocus()
         }
     }
 
@@ -171,8 +168,8 @@ fun <T> ScrollPicker(
     val inputFocusRequester = remember { FocusRequester() }
     val onItemClick: (Int) -> Unit = { listIndex ->
         if (listIndex == state.selectedListIndex && onInput != null) {
-            if (editing) keyboardController?.show() else inputFocusRequester.requestFocus()
-        } else if (showsOnlySelection()) {
+            if (state.isEditing) keyboardController?.show() else inputFocusRequester.requestFocus()
+        } else if (group.isEditing) {
             focusManager.clearFocus()
         } else {
             scope.launch { listState.animateScrollToItem(listIndex) }
@@ -197,17 +194,14 @@ fun <T> ScrollPicker(
             modifier = Modifier
                 .matchParentSize()
                 .focusRequester(inputFocusRequester)
-                .onFocusChanged {
-                    editing = it.isFocused
-                    group?.setEditing(state, it.isFocused)
-                }
-                .graphicsLayer { alpha = if (editing) 1f else 0f },
+                .onFocusChanged { group.setEditing(state, it.isFocused) }
+                .graphicsLayer { alpha = if (state.isEditing) 1f else 0f },
         )
 
         LazyColumn(
             modifier = Modifier
                 .matchParentSize()
-                .graphicsLayer { alpha = if (editing) 0f else 1f },
+                .graphicsLayer { alpha = if (state.isEditing) 0f else 1f },
             state = listState,
             contentPadding = PaddingValues(vertical = itemHeight),
             flingBehavior = rememberSnapFlingBehavior(snapper),
@@ -306,14 +300,14 @@ private fun Modifier.pickerSemantics(
 /**
  * Draws the label twice: with [textStyle] outside the selection area, the center row of the wheel, and with
  * [selectedTextStyle] inside it, so an item crossing its border is split between both styles. Only the latter is drawn
- * while another picker of the [group] is edited.
+ * while a picker of the [group] is edited.
  */
 @Composable
 private fun ScrollPickerItem(
     label: String,
     listIndex: Int,
     listState: LazyListState,
-    group: ScrollPickerGroupState?,
+    group: ScrollPickerGroupState,
     enabled: Boolean,
     textMeasurer: TextMeasurer,
     textStyle: TextStyle,
@@ -336,7 +330,7 @@ private fun ScrollPickerItem(
                     val selectionTop =
                         (listState.firstVisibleItemIndex - listIndex) * size.height + listState.firstVisibleItemScrollOffset
                     val selectionBottom = selectionTop + size.height
-                    if (group?.isEditing != true) {
+                    if (!group.isEditing) {
                         clipRect(top = selectionTop, bottom = selectionBottom, clipOp = ClipOp.Difference) {
                             drawAligned(text, horizontalAlignment, colors.textColor(enabled, active, selected = false))
                         }

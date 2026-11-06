@@ -34,7 +34,8 @@ fun rememberScrollPickerGroupState(): ScrollPickerGroupState = remember { Scroll
 @Stable
 class ScrollPickerGroupState {
 
-    private var editingPicker by mutableStateOf<ScrollPickerState?>(null)
+    internal var editingPicker by mutableStateOf<ScrollPickerState?>(null)
+        private set
 
     /** Whether a picker of the group is being edited by hand. */
     val isEditing: Boolean get() = editingPicker != null
