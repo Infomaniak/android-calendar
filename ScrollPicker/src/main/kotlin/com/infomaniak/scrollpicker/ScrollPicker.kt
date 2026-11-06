@@ -18,7 +18,7 @@
 package com.infomaniak.scrollpicker
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.snapping.SnapPosition
+import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
@@ -89,7 +89,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
+import kotlin.math.sign
 
 /**
  * A single wheel picker, scrolled vertically to select one of [items].
@@ -159,25 +162,51 @@ fun <T> ScrollPicker(
         }
     }
 
+    // Snaps on the item nearest to where the fling decays, picked as the fling starts so haptics know where it settles.
+    val snapper = remember(listState, itemHeightPx) {
+        object : SnapLayoutInfoProvider {
+            var target = -1L
+            val position
+                get() = listState.firstVisibleItemIndex.toLong() * itemHeightPx + listState.firstVisibleItemScrollOffset
+
+            override fun calculateApproachOffset(velocity: Float, decayOffset: Float): Float {
+                val lastItem = (listState.layoutInfo.totalItemsCount - 1).coerceAtLeast(0).toLong()
+                val nearest = (position + decayOffset.roundToLong() + itemHeightPx / 2).floorDiv(itemHeightPx)
+                target = nearest.coerceIn(0, lastItem)
+                return (abs(decayOffset) - itemHeightPx).coerceAtLeast(0f) * sign(decayOffset)
+            }
+
+            override fun calculateSnapOffset(velocity: Float): Float = (target * itemHeightPx - position).toFloat()
+        }
+    }
+
     val haptics = LocalHapticFeedback.current
     val dragged by listState.interactionSource.collectIsDraggedAsState()
-    LaunchedEffect(listState, itemHeightPx) {
-        // Ticks whenever an item reaches the center, except for the same item again once released, so a snap overshoot
-        // ticks once.
+    LaunchedEffect(snapper) {
+        // Ticks when another item reaches the center, but a fling keeps its last item's tick for when it settles, even if
+        // it passes it before.
         var previous = -1L
         var ticked = -1L
-        snapshotFlow { listState.firstVisibleItemIndex.toLong() * itemHeightPx + listState.firstVisibleItemScrollOffset }
-            .collect { position ->
+        var scrolled = false
+        snapshotFlow { listState.isScrollInProgress to snapper.position }.collect { (scrolling, position) ->
+            if (scrolling) {
                 val forward = position > previous
                 val item = if (forward) position / itemHeightPx else (position + itemHeightPx - 1) / itemHeightPx
                 val reached = if (forward) item * itemHeightPx > previous else item * itemHeightPx < previous
-                // Typed input and the initial position jump without scrolling, so they don't tick.
-                if (reached && (dragged || item != ticked) && listState.isScrollInProgress) {
+                if (reached && item != ticked && (dragged || item != snapper.target)) {
                     haptics.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
                     ticked = item
                 }
-                previous = position
+            } else {
+                // Typed input and the initial position jump without scrolling, so they don't tick.
+                val item = (position + itemHeightPx / 2) / itemHeightPx
+                if (scrolled && item != ticked) haptics.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
+                ticked = item
+                snapper.target = -1
             }
+            scrolled = scrolling
+            previous = position
+        }
     }
 
     var editing by remember { mutableStateOf(false) }
@@ -259,7 +288,7 @@ fun <T> ScrollPicker(
                 .graphicsLayer { alpha = if (editing) 0f else 1f },
             state = listState,
             contentPadding = PaddingValues(vertical = itemHeight),
-            flingBehavior = rememberSnapFlingBehavior(listState, SnapPosition.Start),
+            flingBehavior = rememberSnapFlingBehavior(snapper),
             userScrollEnabled = enabled,
         ) {
             items(listItemCount) { listIndex ->
