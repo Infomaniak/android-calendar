@@ -26,9 +26,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.data.SettingThemeOption
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemSwitch
+import com.infomaniak.calendar.ui.screen.settings.components.SettingScaffold
 import com.infomaniak.calendar.ui.screen.settings.components.SettingSection
 import com.infomaniak.calendar.ui.screen.settings.components.SettingShape
-import com.infomaniak.calendar.ui.screen.settings.components.SettingScaffold
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Moon
@@ -68,21 +68,21 @@ private fun SettingThemeContent(
             val theme = theme()
             SettingItemSwitch(
                 shapes = SettingShape.First,
-                text = stringResource(RCore.string.themeSystem),
+                text = SettingThemeOption.System.title,
                 symbol = EsdsIcons.Smartphone,
                 checked = { theme == SettingThemeOption.System },
                 onCheckedChange = { onThemeClick(SettingThemeOption.System) },
             )
             SettingItemSwitch(
                 shapes = SettingShape.Middle,
-                text = stringResource(RCore.string.themeLight),
+                text = SettingThemeOption.Light.title,
                 symbol = EsdsIcons.Sun,
                 checked = { theme == SettingThemeOption.Light },
                 onCheckedChange = { onThemeClick(SettingThemeOption.Light) },
             )
             SettingItemSwitch(
                 shapes = SettingShape.Last,
-                text = stringResource(RCore.string.themeDark),
+                text = SettingThemeOption.Dark.title,
                 symbol = EsdsIcons.Moon,
                 checked = { theme == SettingThemeOption.Dark },
                 onCheckedChange = { onThemeClick(SettingThemeOption.Dark) },

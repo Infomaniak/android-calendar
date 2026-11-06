@@ -18,11 +18,15 @@
 package com.infomaniak.calendar.data
 
 import android.content.Context
+import androidx.annotation.StringRes
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import com.infomaniak.core.datavalue.DataValues
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
 import kotlin.time.Duration.Companion.hours
+import com.infomaniak.core.common.R as RCore
 
 @SingleIn(AppScope::class)
 class SettingsDataValues @Inject constructor(appContext: Context) : DataValues(appContext, name = "settingsData") {
@@ -30,6 +34,10 @@ class SettingsDataValues @Inject constructor(appContext: Context) : DataValues(a
     val defaultEventDuration = dataValue(key = "defaultEventDuration", defaultValue = 1.hours)
 }
 
-enum class SettingThemeOption {
-    System, Light, Dark,
+enum class SettingThemeOption(@StringRes private val titleRes: Int) {
+    System(RCore.string.themeSystem),
+    Light(RCore.string.themeLight),
+    Dark(RCore.string.themeDark);
+
+    val title: String @Composable get() = stringResource(titleRes)
 }
