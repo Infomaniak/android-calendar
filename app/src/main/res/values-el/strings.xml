@@ -32,6 +32,9 @@
     <string name="deleteRecurringEventAlertTitle">Ποιες εκδηλώσεις θέλετε να διαγράψετε;</string>
     <string name="editRecurringEventAlertTitle">Ποιες εκδηλώσεις θέλετε να επεξεργαστείτε;</string>
     <string name="eventOccurrenceNotFound">Αυτή η εκδήλωση δεν είναι πλέον διαθέσιμη.</string>
+    <string name="generalSettingsAuthorizationsLabel">Άδειες</string>
+    <string name="generalSettingsDisplayLabel">Οθόνη</string>
+    <string name="generalSettingsNotificationsLabel">Ειδοποιήσεις</string>
     <string name="helpTitle">Βοήθεια</string>
     <string name="monthTitle">Μήνας</string>
     <string name="noWritableCalendar">Δεν βρέθηκε επεξεργάσιμο ημερολόγιο</string>

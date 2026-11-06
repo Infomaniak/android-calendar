@@ -53,6 +53,7 @@ fun MenuDrawer(
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     onManageAccounts: () -> Unit = {},
+    goToSettings: () -> Unit = {},
     menuDrawerViewModel: MenuDrawerViewModel = viewModel(),
 ) {
     val calendarDrawerState = LocalDrawerState.current ?: return
@@ -76,6 +77,12 @@ fun MenuDrawer(
                 onManageAccounts()
             }
         },
+        onSettingsClick = {
+            scope.launch {
+                calendarDrawerState.close()
+                goToSettings()
+            }
+        },
         modifier = modifier,
     )
 }
@@ -89,12 +96,13 @@ private fun MenuDrawer(
     onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
     isSectionExpanded: (Int) -> Boolean,
     onManageAccounts: () -> Unit,
+    onSettingsClick: () -> Unit,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val menuOptions = drawerMenuOptions(
         onManageAccounts = onManageAccounts,
-        onSettings = {}, // TODO: Add navigation to settings
+        onSettingsClick = onSettingsClick,
         onHelp = {}, // TODO: Add intent to help 
     )
 
@@ -130,7 +138,7 @@ private fun MenuDrawer(
 
 private fun drawerMenuOptions(
     onManageAccounts: () -> Unit,
-    onSettings: () -> Unit,
+    onSettingsClick: () -> Unit,
     onHelp: () -> Unit,
 ): List<MenuOption> {
     return listOf(
@@ -142,7 +150,7 @@ private fun drawerMenuOptions(
         MenuOption(
             itemNameRes = R.string.settingsTitle,
             itemIcon = EsdsIcons.Cog,
-            itemAction = onSettings,
+            itemAction = onSettingsClick,
         ),
         MenuOption(
             itemNameRes = R.string.helpTitle,
@@ -166,6 +174,7 @@ private fun MenuDrawerPreview(
             onAccountExpandedChange = { _, _ -> },
             isSectionExpanded = { false },
             onManageAccounts = {},
+            onSettingsClick = {},
             content = {},
             modifier = Modifier,
         )

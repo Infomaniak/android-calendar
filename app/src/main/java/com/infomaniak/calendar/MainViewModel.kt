@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.foundation.manager.AvatarFinder
 import com.infomaniak.calendar.data.CalendarDataValues
+import com.infomaniak.calendar.data.SettingsDataValues
 import com.infomaniak.calendar.manager.AppAvatarFinder
 import com.infomaniak.calendar.manager.BackgroundEventComposer
 import com.infomaniak.calendar.manager.SyncEventsManager
@@ -41,12 +42,14 @@ import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 @AssistedInject
 class MainViewModel(
@@ -55,6 +58,7 @@ class MainViewModel(
     private val syncEventsManager: SyncEventsManager,
     backgroundEventComposer: BackgroundEventComposer,
     private val calendarDataValues: CalendarDataValues,
+    settingsDataValues: SettingsDataValues,
     visibleDateManager: VisibleDateManager,
     appAvatarFinder: AppAvatarFinder,
 ) : ViewModel() {
@@ -64,9 +68,12 @@ class MainViewModel(
     val uiState: StateFlow<MainUiState> = combine(
         accountUtils.users,
         calendarDataValues.lastCalendarView.flow,
-    ) { users, lastCalendarView ->
-        MainUiState.Loaded(isUserConnected = users.isNotEmpty(), lastCalendarView = lastCalendarView)
+        settingsDataValues.theme.flow,
+    ) { users, lastCalendarView, theme ->
+        MainUiState.Loaded(isUserConnected = users.isNotEmpty(), lastCalendarView = lastCalendarView, theme = theme)
     }.stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = MainUiState.Loading)
+
+    val theme = settingsDataValues.theme.flow.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), null)
 
     val visibleDate = visibleDateManager.visibleDate
 

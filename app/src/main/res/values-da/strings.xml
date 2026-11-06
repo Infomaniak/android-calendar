@@ -32,6 +32,9 @@
     <string name="deleteRecurringEventAlertTitle">Hvilke begivenheder vil du slette?</string>
     <string name="editRecurringEventAlertTitle">Hvilke begivenheder vil du redigere?</string>
     <string name="eventOccurrenceNotFound">Denne begivenhed er ikke længere tilgængelig.</string>
+    <string name="generalSettingsAuthorizationsLabel">Tilladelser</string>
+    <string name="generalSettingsDisplayLabel">Visning</string>
+    <string name="generalSettingsNotificationsLabel">Notifikationer</string>
     <string name="helpTitle">Hjælp</string>
     <string name="monthTitle">Måned</string>
     <string name="noWritableCalendar">Ingen redigerbar kalender fundet</string>
