@@ -132,8 +132,8 @@ fun <T> ScrollPicker(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     itemHeight: Dp = ScrollPickerDefaults.ItemHeight,
-    textStyle: TextStyle = ScrollPickerDefaults.textStyle,
-    selectedTextStyle: TextStyle = ScrollPickerDefaults.selectedTextStyle,
+    textStyle: TextStyle = ScrollPickerDefaults.inactiveTextStyle,
+    selectedTextStyle: TextStyle = ScrollPickerDefaults.textStyle,
     colors: ScrollPickerColors = ScrollPickerDefaults.colors(),
 ) {
     val labels = remember(items, itemLabel) { items.map(itemLabel) }
@@ -490,7 +490,7 @@ private fun TimePreview() {
                         onInput = String::toIntOrNull,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
                     )
-                    Text(text = ":", style = ScrollPickerDefaults.selectedTextStyle)
+                    Text(text = ":", style = ScrollPickerDefaults.textStyle)
                     ScrollPicker(
                         items = (0..59).toList(),
                         state = rememberScrollPickerState(group = group),
