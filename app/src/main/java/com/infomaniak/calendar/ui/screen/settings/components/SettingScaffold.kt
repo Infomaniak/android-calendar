@@ -27,10 +27,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.core.ui.compose.theme.LocalIsThemeDarkMode
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 /**
@@ -45,10 +47,14 @@ fun SettingScaffold(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(title) },
-                navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
-            )
+            // The TopAppBar background naturally animates its color when it changes. This triggers by error when changing between
+            // light and dark theme here. Restarts TopAppBar's container color animation so it skips animating.
+            key(LocalIsThemeDarkMode.current) {
+                TopAppBar(
+                    title = { Text(title) },
+                    navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
+                )
+            }
         },
         modifier = modifier,
     ) { contentPadding ->
