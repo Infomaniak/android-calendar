@@ -22,18 +22,22 @@ import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -78,6 +82,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -132,6 +137,7 @@ fun <T> ScrollPicker(
         listState.requestScrollToItem(state.selectedListIndex)
         if (looping) LOOP_ITEM_COUNT else itemCount
     }
+
     fun itemIndexOf(listIndex: Int) = if (looping) (listIndex - LOOP_START).mod(itemCount) else listIndex
 
     val density = LocalDensity.current
@@ -358,43 +364,61 @@ private fun twoDigits(number: Int) = number.toString().padStart(2, '0')
 @Preview
 @Composable
 private fun NumbersPreview() {
-    ScrollPicker(
-        items = (0..59).toList(),
-        state = rememberScrollPickerState(),
-        loop = true,
-        itemLabel = ::twoDigits,
-        onInput = String::toIntOrNull,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-    )
+    MaterialTheme {
+        Surface {
+            Column(Modifier.padding(16.dp)) {
+                ScrollPicker(
+                    items = (0..59).toList(),
+                    state = rememberScrollPickerState(),
+                    loop = true,
+                    itemLabel = ::twoDigits,
+                    onInput = String::toIntOrNull,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                )
+            }
+        }
+    }
 }
 
 @Preview
 @Composable
 private fun TextPreview() {
-    ScrollPicker(items = listOf("Minutes", "Hours", "Days", "Weeks"), state = rememberScrollPickerState())
+    MaterialTheme {
+        Surface {
+            Column(Modifier.padding(16.dp)) {
+                ScrollPicker(items = listOf("Minutes", "Hours", "Days", "Weeks"), state = rememberScrollPickerState())
+            }
+        }
+    }
 }
 
 @Preview
 @Composable
 private fun TimePreview() {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        ScrollPicker(
-            items = (0..23).toList(),
-            state = rememberScrollPickerState(initialIndex = 10),
-            loop = true,
-            itemLabel = ::twoDigits,
-            onInput = String::toIntOrNull,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-        )
-        Text(text = ":", style = ScrollPickerDefaults.selectedTextStyle)
-        ScrollPicker(
-            items = (0..59).toList(),
-            state = rememberScrollPickerState(),
-            loop = true,
-            itemLabel = ::twoDigits,
-            onInput = String::toIntOrNull,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-        )
+    MaterialTheme {
+        Surface {
+            Column(Modifier.padding(16.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    ScrollPicker(
+                        items = (0..23).toList(),
+                        state = rememberScrollPickerState(initialIndex = 10),
+                        loop = true,
+                        itemLabel = ::twoDigits,
+                        onInput = String::toIntOrNull,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+                    )
+                    Text(text = ":", style = ScrollPickerDefaults.selectedTextStyle)
+                    ScrollPicker(
+                        items = (0..59).toList(),
+                        state = rememberScrollPickerState(),
+                        loop = true,
+                        itemLabel = ::twoDigits,
+                        onInput = String::toIntOrNull,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+                    )
+                }
+            }
+        }
     }
 }
 
