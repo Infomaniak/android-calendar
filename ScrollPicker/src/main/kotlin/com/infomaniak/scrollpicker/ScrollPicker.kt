@@ -37,6 +37,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -413,8 +414,12 @@ private fun TextPreview() {
 @Composable
 private fun TimePreview() {
     MaterialTheme {
-        Surface {
-            Column(Modifier.padding(16.dp)) {
+        Scaffold {
+            Column(
+                Modifier
+                    .padding(16.dp)
+                    .padding(it),
+            ) {
                 val group = rememberScrollPickerGroupState()
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     ScrollPicker(
