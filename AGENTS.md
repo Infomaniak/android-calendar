@@ -201,7 +201,12 @@ repository later, so it depends on nothing from this repo (no `:app`, no Calenda
 only Compose and Material 3, through the plain `core.plugins.android.library` plugin. Its API follows Material component
 conventions: `ScrollPicker(items, state, …)` is generic over its items (numbers, text, …), hoists its selection in a
 `ScrollPickerState` (`rememberScrollPickerState`), can loop infinitely, accepts typed input when `onInput` is given, and
-is themed through `ScrollPickerColors` / `ScrollPickerDefaults`, whose defaults read `MaterialTheme`. 🚧 Stubs only for now.
+is themed through `ScrollPickerColors` / `ScrollPickerDefaults`, whose defaults read `MaterialTheme`. It scrolls, flings
+and snaps a `LazyColumn` of three rows; tapping the centre row opens a hidden text field where every keystroke that maps
+to an item updates `selectedIndex` immediately (so a form submitted mid-typing reads it). Once no longer input can match,
+the picker runs its `ImeAction`: `Next`/`Previous` move focus to the neighbouring focusable, which chains pickers (an
+hours "9" jumps to minutes); the last picker of a chain should use `Done`. A `FocusRequester` or `focusProperties` in its
+`modifier` reaches the input field, so focus can be moved from code.
 
 ## Key Integration Points
 
