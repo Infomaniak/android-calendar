@@ -50,7 +50,8 @@ fun <T> ScrollPicker(
     textStyle: TextStyle = ScrollPickerDefaults.textStyle,
     colors: ScrollPickerColors = ScrollPickerDefaults.colors(),
 ) {
-    // TODO: LazyColumn over state.lazyListState, snapping, loop index mapping, fading, dividers.
+    // TODO: LazyColumn over state.lazyListState, snapping, loop index mapping.
+    // TODO: Interpolate items' color/style by their distance to the center, optionally clipped at the edges like Samsung's.
     // TODO: Switch to ScrollPickerInputField when the selected item is clicked and onInput != null.
 }
 
