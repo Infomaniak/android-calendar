@@ -217,7 +217,7 @@ fun <T> ScrollPicker(
             onInput = onInput,
             enabled = enabled,
             keyboardOptions = keyboardOptions,
-            textStyle = selectedTextStyle.copy(color = colors.textColor(enabled, selected = true), textAlign = TextAlign.Center),
+            textStyle = selectedTextStyle.copy(color = colors.textColor(enabled, active = true), textAlign = TextAlign.Center),
             cursorColor = colors.cursorColor,
             modifier = Modifier
                 .matchParentSize()
@@ -288,9 +288,8 @@ private fun ScrollPickerItem(
             .drawWithCache {
                 val text = textMeasurer.measure(label, textStyle)
                 val selectedText = textMeasurer.measure(label, selectedTextStyle)
-                val color = colors.textColor(enabled, selected = false)
-                val selectedColor = colors.textColor(enabled, selected = true)
                 onDrawBehind {
+                    val color = colors.textColor(enabled, active = listState.isScrollInProgress)
                     // Read while drawing so that scrolling only redraws. The row at the wheel's content start is selected.
                     val selectionTop =
                         (listState.firstVisibleItemIndex - listIndex) * size.height + listState.firstVisibleItemScrollOffset
@@ -300,7 +299,7 @@ private fun ScrollPickerItem(
                             drawCentered(text, color)
                         }
                     }
-                    clipRect(top = selectionTop, bottom = selectionBottom) { drawCentered(selectedText, selectedColor) }
+                    clipRect(top = selectionTop, bottom = selectionBottom) { drawCentered(selectedText, color) }
                 }
             },
     )
