@@ -45,13 +45,12 @@ fun <T> ScrollPicker(
     itemLabel: (T) -> String = { it.toString() },
     onInput: ((String) -> T?)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    visibleItemCount: Int = ScrollPickerDefaults.VisibleItemCount,
     itemHeight: Dp = ScrollPickerDefaults.ItemHeight,
     textStyle: TextStyle = ScrollPickerDefaults.textStyle,
     selectedTextStyle: TextStyle = ScrollPickerDefaults.selectedTextStyle,
     colors: ScrollPickerColors = ScrollPickerDefaults.colors(),
 ) {
-    // TODO: LazyColumn over state.lazyListState, snapping, loop index mapping.
+    // TODO: LazyColumn over state.lazyListState, VISIBLE_ITEM_COUNT * itemHeight tall, snapping, loop index mapping.
     // TODO: Clip everything to the picker's bounds, the center item's height being the selection area.
     // TODO: Switch to ScrollPickerInputField when the selected item is clicked and onInput != null.
 }
@@ -93,3 +92,5 @@ private fun NumbersPreview() {
 private fun TextPreview() {
     ScrollPicker(items = listOf("Minutes", "Hours", "Days", "Weeks"), state = rememberScrollPickerState())
 }
+
+private const val VISIBLE_ITEM_COUNT = 3

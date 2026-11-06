@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.dp
 
 object ScrollPickerDefaults {
 
-    const val VisibleItemCount = 5
     val ItemHeight: Dp = 48.dp
 
     val textStyle: TextStyle
