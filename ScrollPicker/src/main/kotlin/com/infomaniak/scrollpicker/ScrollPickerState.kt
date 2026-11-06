@@ -31,13 +31,19 @@ private const val LOOP_ITEM_COUNT = 100_000
 private const val LOOP_START = LOOP_ITEM_COUNT / 2
 
 @Composable
-fun rememberScrollPickerState(initialIndex: Int = 0, group: ScrollPickerGroupState? = null): ScrollPickerState {
+fun rememberScrollPickerState(
+    initialIndex: Int = 0,
+    group: ScrollPickerGroupState = rememberScrollPickerGroupState(),
+): ScrollPickerState {
     return rememberSaveable(group, saver = ScrollPickerState.Saver(group)) { ScrollPickerState(initialIndex, group) }
 }
 
-/** @param group links this picker to others sharing it, see [ScrollPickerGroupState]. */
+/** @param group links this picker to others sharing it, see [ScrollPickerGroupState]. Defaults to a group of its own. */
 @Stable
-class ScrollPickerState(initialIndex: Int = 0, val group: ScrollPickerGroupState? = null) {
+class ScrollPickerState(initialIndex: Int = 0, val group: ScrollPickerGroupState = ScrollPickerGroupState()) {
+
+    /** Whether this picker is being edited by hand. */
+    internal val isEditing: Boolean get() = group.editingPicker == this
 
     /** Index in the picker's items of the value currently selected. */
     var selectedIndex by mutableIntStateOf(initialIndex)
@@ -104,7 +110,7 @@ class ScrollPickerState(initialIndex: Int = 0, val group: ScrollPickerGroupState
     }
 
     companion object {
-        fun Saver(group: ScrollPickerGroupState?): Saver<ScrollPickerState, Int> = Saver<ScrollPickerState, Int>(
+        fun Saver(group: ScrollPickerGroupState): Saver<ScrollPickerState, Int> = Saver<ScrollPickerState, Int>(
             save = { it.selectedIndex },
             restore = { ScrollPickerState(it, group) },
         )
