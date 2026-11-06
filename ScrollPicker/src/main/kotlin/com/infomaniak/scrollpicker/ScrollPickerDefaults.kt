@@ -38,12 +38,16 @@ object ScrollPickerDefaults {
     @Composable
     fun colors(
         textColor: Color = MaterialTheme.colorScheme.onSurface,
+        selectedTextColor: Color = textColor,
         activeTextColor: Color = MaterialTheme.colorScheme.primary,
+        activeSelectedTextColor: Color = activeTextColor,
         disabledTextColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = DisabledAlpha),
         cursorColor: Color = MaterialTheme.colorScheme.primary,
     ): ScrollPickerColors = ScrollPickerColors(
         textColor = textColor,
+        selectedTextColor = selectedTextColor,
         activeTextColor = activeTextColor,
+        activeSelectedTextColor = activeSelectedTextColor,
         disabledTextColor = disabledTextColor,
         cursorColor = cursorColor,
     )
