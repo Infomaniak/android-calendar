@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemColors
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
@@ -141,17 +140,11 @@ private fun SettingItem(
     )
 }
 
-@Composable
-private fun SettingIcon(symbol: Symbol, modifier: Modifier = Modifier) {
-    Icon(symbol.Small, null, modifier)
-}
-
 object SettingItemsDefault {
     @Composable
     fun colors(): ListItemColors {
         return ListItemDefaults.segmentedColors(containerColor = CustomColors.SettingItemContainerColor)
     }
-
 }
 
 enum class SwitchType(val content: ((isChecked: Boolean) -> @Composable (() -> Unit)?)) {
