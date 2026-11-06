@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.attendeessearch
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -47,6 +48,8 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.UsersStacked
 
+private const val MAX_ATTENDEE_COUNT = 100
+
 @Composable
 fun AttendeesSearch(
     attendeesSearchState: AttendeesSearchState<*>,
@@ -68,11 +71,13 @@ fun AttendeesSearch(
     Column(
         modifier = modifier
             .padding(horizontalContentPadding)
-            .padding(top = contentPadding.calculateTopPadding()),
+            .padding(top = contentPadding.calculateTopPadding() + EsdsTheme.spacing.xl)
+            .padding(horizontal = EsdsTheme.spacing.xl),
+        verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xl),
     ) {
         if (isSearchable) {
-            AnimatedVisibility(attendeesSearchState.attendees.size >= 100) {
-                InformationBlock("No more than 100 TODO", modifier = Modifier.padding(bottom = EsdsTheme.spacing.xs))
+            AnimatedVisibility(attendeesSearchState.attendees.size >= MAX_ATTENDEE_COUNT) {
+                InformationBlock("No more than 100 TODO")
             }
 
             SearchBar(
@@ -81,12 +86,13 @@ fun AttendeesSearch(
             )
         }
 
+        val bottomContentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding())
         if (attendeesSearchState.searchQueryTextFieldState.text.isBlank() && attendeesList.isEmpty()) {
             EmptyState(
                 text = stringResource(R.string.attendeesEmptyStateTitle),
                 description = stringResource(R.string.attendeesEmptyStateDescription),
                 icon = EsdsIcons.UsersStacked,
-                modifier = Modifier.padding(bottom = contentPadding.calculateBottomPadding()),
+                modifier = Modifier.padding(bottomContentPadding),
             )
         } else {
             val resources = LocalResources.current
@@ -99,7 +105,7 @@ fun AttendeesSearch(
                     result.messageRes?.let { onShowSnackbar(resources.getString(it)) }
                 },
                 onRemove = attendeesSearchState::removeAttendee,
-                modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md, vertical = EsdsTheme.spacing.sm),
+                modifier = Modifier.padding(vertical = EsdsTheme.spacing.sm),
                 onClick = if (isDisplayingSearchResults) {
                     { attendee -> attendeesSearchState.addAttendee(attendee) }
                 } else {
@@ -109,7 +115,7 @@ fun AttendeesSearch(
                     !isDisplayingSearchResults || attendee.email.lowercase() !in attendeesSearchState.attendeesEmailsLowercase
                 },
                 enableDeletion = { isSearchable && isDisplayingSearchResults.not() },
-                contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
+                contentPadding = bottomContentPadding,
             )
         }
     }
@@ -139,6 +145,31 @@ private fun PreviewEmptySearchState() {
             AttendeesSearch(
                 attendeesSearchState = rememberSaveableAttendeesSearchState(
                     participants = remember { mutableStateSetOf() },
+                    results = remember { mutableStateListOf() },
+                ),
+                onShowSnackbar = {},
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun MaxAttendeePreview() {
+    val participants = remember {
+        val attendee = previewAttendees.first()
+        mutableStateSetOf<ParticipantUi>().apply {
+            repeat(MAX_ATTENDEE_COUNT) { index ->
+                add(attendee.copy(email = "attendee$index@example.com")) // Unique emails so LazyColumn keys (and the set) stay distinct
+            }
+        }
+    }
+
+    MaterialTheme {
+        Surface {
+            AttendeesSearch(
+                attendeesSearchState = rememberSaveableAttendeesSearchState(
+                    participants = participants,
                     results = remember { mutableStateListOf() },
                 ),
                 onShowSnackbar = {},

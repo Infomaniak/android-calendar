@@ -19,7 +19,6 @@ package com.infomaniak.calendar.components.foundation.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
@@ -35,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.resources.R
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Cross
 import com.infomaniak.designsystem.icons.symbols.MagnifyingGlass
@@ -69,7 +67,6 @@ fun SearchBar(
             }
         },
         modifier = modifier
-            .padding(horizontal = EsdsTheme.spacing.lg, vertical = EsdsTheme.spacing.lg)
             .background(
                 color = MaterialTheme.colorScheme.surfaceContainerHigh,
                 shape = CircleShape,
