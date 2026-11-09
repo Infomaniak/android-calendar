@@ -20,9 +20,11 @@ package com.infomaniak.calendar
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -71,6 +73,10 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import com.infomaniak.core.common.R as RCore
+
+// Copied from internal value inside enableEdgeToEdge()
+private val DefaultLightScrim = Color.argb(0xe6, 0xFF, 0xFF, 0xFF)
+private val DefaultDarkScrim = Color.argb(0x80, 0x1b, 0x1b, 0x1b)
 
 class MainActivity : ComponentActivity() {
 
@@ -142,6 +148,9 @@ class MainActivity : ComponentActivity() {
                 val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
                 windowInsetsController.isAppearanceLightStatusBars = !isDarkTheme
                 windowInsetsController.isAppearanceLightNavigationBars = !isDarkTheme
+
+                // Only needed for API 27 and 28
+                enableEdgeToEdge(SystemBarStyle.auto(DefaultLightScrim, DefaultDarkScrim, { isDarkTheme }))
             }
         }
     }
