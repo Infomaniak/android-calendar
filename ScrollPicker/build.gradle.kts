@@ -53,6 +53,8 @@ android {
 dependencies {
     implementation(libs.infomaniak.designsystem.foundation)
 
+    api(kmpCalendar.kotlinx.datetime)
+
     implementation(platform(core.compose.bom))
     implementation(core.compose.foundation)
     implementation(core.compose.ui.android)
