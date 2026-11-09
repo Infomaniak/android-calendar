@@ -103,8 +103,8 @@ sealed interface NavDestination : NavKey {
     data class EventCreation(val date: LocalDate) : EventForm
 
     @Serializable
-    data class EventTimeZone(val parent: NavDestination, val isStart: Boolean) : NavDestination
+    data class EventTimeZone(val parent: EventForm, val isStart: Boolean) : NavDestination
 
     @Serializable
-    data class EventCustomReminder(val parent: NavDestination) : NavDestination
+    data class EventCustomReminder(val parent: EventForm) : NavDestination
 }

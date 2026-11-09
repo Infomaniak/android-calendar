@@ -46,11 +46,9 @@ import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
-import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomReminderResultViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.form.eventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
-import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchResultViewModel
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
 import kotlinx.datetime.TimeZone
@@ -72,8 +70,6 @@ fun EventEditScreen(
         loadedEvent = (eventDetailSharedDataViewModel.eventDetailUi.value as? EventDetailUiState.Displayable.Success)?.eventDetail,
     ),
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
-    timeZoneSearchResultViewModel: TimeZoneSearchResultViewModel = viewModel(),
-    customReminderResultViewModel: CustomReminderResultViewModel = viewModel(),
 ) {
     val eventDetailUiState = eventDetailSharedDataViewModel.eventDetailUi.collectAsStateWithLifecycle().value
     val eventFormState = eventFormViewModel.state
@@ -90,14 +86,6 @@ fun EventEditScreen(
 
     LaunchedEffect(Unit) {
         for (request in eventDetailSharedDataViewModel.goBackRequests) goBackToCalendarView()
-    }
-
-    LaunchedEffect(eventFormState?.dateAndTimeState) {
-        timeZoneSearchResultViewModel.applyPickedTimeZonesTo(eventFormState?.dateAndTimeState)
-    }
-
-    LaunchedEffect(eventFormState) {
-        customReminderResultViewModel.applyAddedRemindersTo(eventFormState)
     }
 
     LaunchedEffect(eventFormViewModel.attendeesSearchState) {

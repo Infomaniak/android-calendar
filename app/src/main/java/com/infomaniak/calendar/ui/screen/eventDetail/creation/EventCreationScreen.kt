@@ -42,11 +42,9 @@ import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
-import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomReminderResultViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.form.eventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventCreationCalendars
-import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchResultViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -65,19 +63,9 @@ fun EventCreationScreen(
     viewModel: EventCreationViewModel = viewModel(),
     eventFormViewModel: EventFormViewModel = eventFormViewModel(destination),
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
-    timeZoneSearchResultViewModel: TimeZoneSearchResultViewModel = viewModel(),
-    customReminderResultViewModel: CustomReminderResultViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val formState = eventFormViewModel.state
-
-    LaunchedEffect(formState?.dateAndTimeState) {
-        timeZoneSearchResultViewModel.applyPickedTimeZonesTo(formState?.dateAndTimeState)
-    }
-
-    LaunchedEffect(formState) {
-        customReminderResultViewModel.applyAddedRemindersTo(formState)
-    }
 
     LaunchedEffect(eventFormViewModel.attendeesSearchState) {
         eventFormViewModel.attendeesSearchState?.let(attendeesSearchSharedDataViewModel::setAttendeesSearchState)

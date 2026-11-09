@@ -24,34 +24,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.eventdetail.form.CustomReminder
 import com.infomaniak.calendar.components.eventdetail.form.rememberCustomReminderState
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
-import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.calendar.components.resources.R as RComponents
 
 @Composable
 fun CustomReminderScreen(
-    goBack: () -> Unit,
-    modifier: Modifier = Modifier,
-    customReminderResultViewModel: CustomReminderResultViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
-) {
-    CustomReminderScreen(
-        onSubmit = { notification ->
-            customReminderResultViewModel.addReminder(notification)
-            goBack()
-        },
-        goBack = goBack,
-        modifier = modifier,
-    )
-}
-
-@Composable
-private fun CustomReminderScreen(
     onSubmit: (EventDetailUi.Notification) -> Unit,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -62,7 +44,11 @@ private fun CustomReminderScreen(
         topBar = {
             SubmitTopAppBar(
                 goBack = goBack,
-                onSubmit = { state.toNotification()?.let(onSubmit) },
+                onSubmit = {
+                    val notification = state.toNotification() ?: return@SubmitTopAppBar
+                    onSubmit(notification)
+                    goBack()
+                },
                 isSubmitEnabled = { state.amount != null },
                 isRecurring = false,
                 title = { Text(stringResource(RComponents.string.reminderTitle)) },
