@@ -49,6 +49,7 @@ import java.text.DateFormatSymbols
 import java.time.LocalTime
 
 private val PickerWidth = 100.dp
+private val Hours12 = listOf(12) + (1..11)
 
 @Composable
 fun TimePicker(state: TimePickerState, modifier: Modifier = Modifier) {
@@ -95,6 +96,8 @@ private fun MinutePicker(state: TimePickerState, imeAction: ImeAction) {
 /** Shows 12 first so that an item's index is the hour modulo 12. */
 @Composable
 private fun HourPicker12(state: TimePickerState) {
+    LaunchedEffect(state) { state.flipAmPmWhenScrollingPastNoonOrMidnight() }
+
     ScrollPicker(
         items = Hours12,
         state = state.hour12State,
@@ -115,7 +118,9 @@ private fun AmPmPicker(state: TimePickerState) {
         items = listOf(0, 1),
         state = state.amPmState,
         itemLabel = labels::get,
-        onInput = { text -> labels.indexOfFirst { text.isNotEmpty() && it.startsWith(text, ignoreCase = true) }.takeIf { it >= 0 } },
+        onInput = { text ->
+            labels.indexOfFirst { text.isNotEmpty() && it.startsWith(text, ignoreCase = true) }.takeIf { it >= 0 }
+        },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         modifier = Modifier.width(PickerWidth),
     )
@@ -158,19 +163,31 @@ class TimePickerState(
         }
 
     val minute: Int get() = minuteState.selectedIndex
+}
 
-    /** Mirrors [hour] into the pickers of the clock not shown, so switching clocks keeps the selected hour. */
-    internal fun syncHiddenHourPickers(hour: Int) {
-        if (is24Hour) {
-            hour12State.select(hour % 12)
-            amPmState.select(hour / 12)
-        } else {
-            hourState.select(hour)
-        }
+/**
+ * Flips AM/PM whenever scrolling the 12-hour wheel moves it between 11 and 12, as a clock does. Typed hours don't,
+ * so typing "12" keeps the half of the day the user chose.
+ */
+private suspend fun TimePickerState.flipAmPmWhenScrollingPastNoonOrMidnight() {
+    var previous = hour12State.selectedIndex
+    snapshotFlow { hour12State.selectedIndex }.collect { index ->
+        // Takes the shortest way round, as the wheel moves far less than half a turn between two frames.
+        val unwrapped = previous + (index - previous + 6).mod(12) - 6
+        if (!hour12State.isEditing && unwrapped !in 0..11) amPmState.animateScrollToIndex(1 - amPmState.selectedIndex)
+        previous = index
     }
 }
 
-private val Hours12 = listOf(12) + (1..11)
+/** Mirrors [hour] into the pickers of the clock not shown, so switching clocks keeps the selected hour. */
+private fun TimePickerState.syncHiddenHourPickers(hour: Int) {
+    if (is24Hour) {
+        hour12State.select(hour % 12)
+        amPmState.select(hour / 12)
+    } else {
+        hourState.select(hour)
+    }
+}
 
 private fun twoDigits(number: Int) = number.toString().padStart(2, '0')
 
