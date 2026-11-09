@@ -109,7 +109,10 @@ app/
 - **Single Activity**: `MainActivity` hosts all Compose content via `setContent { CalendarTheme { Surface { MainNavHost() } } }`.
 - **Theme preference**: `MainApplication` mirrors `SettingsDataValues.theme` into `AppCompatDelegate.setDefaultNightMode`,
   so `-night` resources (e.g. onboarding illustrations) and the AppCompat login activities follow the same mode as
-  `CalendarTheme`. `MainActivity` must stay an `AppCompatActivity` for this override to reach its configuration.
+  `CalendarTheme`. `MainActivity` must stay an `AppCompatActivity` for this override to reach its configuration. It
+  declares `configChanges="uiMode"`: a mode change updates its configuration without recreating it, so Compose
+  (`isSystemInDarkTheme()`) and the system bars follow the configuration, never the setting directly. The splash stays
+  up until the stored theme has been applied, to avoid drawing a first frame in the wrong mode.
 - **Splash screen**: `androidx.core:core-splashscreen`. `MainActivity` launches with `AppThemeLauncher`, which hands over to
   `Theme.Calendar` (`postSplashScreenTheme`). The splash and the content read the same state: `MainViewModel.uiState`
   stays `MainUiState.Loading` until both the users and the last calendar view are read, and the splash stays up meanwhile. Android 12+ draws it from `values-v31/themes.xml` (launcher foreground, `splashscreenBackground`,
