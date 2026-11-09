@@ -38,59 +38,38 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.component.EmptyState
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
-import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
+import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomReminderResultViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.form.eventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventCreationCalendars
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchResultViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CalendarCross
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlin.time.Duration.Companion.hours
 
 @Composable
 fun EventCreationScreen(
-    date: LocalDate,
+    destination: NavDestination.EventCreation,
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     goToCustomReminder: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventCreationViewModel = viewModel(),
+    eventFormViewModel: EventFormViewModel = eventFormViewModel(destination),
     attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
     timeZoneSearchResultViewModel: TimeZoneSearchResultViewModel = viewModel(),
     customReminderResultViewModel: CustomReminderResultViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val defaultEventDuration by viewModel.defaultEventDuration.collectAsStateWithLifecycle(null)
-
-    val formState = (uiState as? EventCreationUiState.Success)?.calendars?.let {
-        rememberDefaultEventForm(
-            calendars = it.calendars,
-            initialCalendar = it.initialCalendar,
-            dateAndTimeState = defaultEventDuration?.let { rememberDateAndTimeState(it, TimeZone.currentSystemDefault(), date) },
-            attendees = { viewModel.attendeesSearchState.attendees },
-        )
-    }
-
-    LaunchedEffect(formState?.calendar) {
-        if (formState == null) return@LaunchedEffect
-        val organizerAttendeeUi = formState.calendar.organizerAttendeeUi ?: return@LaunchedEffect
-
-        val newOrganizer = OrganizerSource.Dynamic(organizerAttendeeUi)
-
-        // It's possible that the new organizer is already in the attendees list. We need to make sure to remove it before adding
-        // to avoid having two attendees with the same email.
-        viewModel.attendeesSearchState.participants.removeAll { (it is AttendeeUi) && it.email == newOrganizer.owner.email }
-
-        viewModel.attendeesSearchState.organizerSource = newOrganizer
-    }
+    val formState = eventFormViewModel.state
 
     LaunchedEffect(formState?.dateAndTimeState) {
         timeZoneSearchResultViewModel.applyPickedTimeZonesTo(formState?.dateAndTimeState)
@@ -100,8 +79,8 @@ fun EventCreationScreen(
         customReminderResultViewModel.applyAddedRemindersTo(formState)
     }
 
-    LaunchedEffect(Unit) {
-        attendeesSearchSharedDataViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
+    LaunchedEffect(eventFormViewModel.attendeesSearchState) {
+        eventFormViewModel.attendeesSearchState?.let(attendeesSearchSharedDataViewModel::setAttendeesSearchState)
     }
 
     EventCreationScreen(

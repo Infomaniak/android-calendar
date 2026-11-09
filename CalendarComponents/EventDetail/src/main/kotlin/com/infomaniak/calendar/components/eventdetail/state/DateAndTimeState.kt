@@ -168,7 +168,7 @@ fun rememberDateAndTimeState(
     timeZone: TimeZone,
     date: LocalDate = Clock.today(timeZone),
 ): DateAndTimeState {
-    val (start, end) = computeDefaultValues(date, timeZone, defaultEventDuration)
+    val (start, end) = defaultEventStartAndEnd(date, timeZone, defaultEventDuration)
 
     return rememberDateAndTimeState(
         startDate = start.date,
@@ -186,7 +186,7 @@ fun rememberDateAndTimeState(
  * The start is the next full hour if the date is today, and the end is [eventDuration] after the start.
  * Otherwise, the start is 8:00 AM on the given date, and the end is [eventDuration] after the start.
  */
-private fun computeDefaultValues(
+fun defaultEventStartAndEnd(
     date: LocalDate,
     timeZone: TimeZone,
     eventDuration: Duration,
@@ -219,7 +219,7 @@ private fun LocalDate.atHeightInTheMorning(timeZone: TimeZone, eventDuration: Du
     return start to end
 }
 
-private val TimeZoneSaver = Saver<TimeZone, String>(
+val TimeZoneSaver = Saver<TimeZone, String>(
     save = { it.id },
     restore = { TimeZone.of(it) },
 )

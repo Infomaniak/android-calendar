@@ -139,7 +139,7 @@ private fun baseEntryProvider(
             metadata = metaDataOf(ResponsiveDialog),
         ) {
             EventCreationScreen(
-                date = destination.date,
+                destination = destination,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
                 goToEventsAttendees = { backStack.addOnce(NavDestination.AttendeeSearch(parent = destination)) },
                 goToTimeZoneSearch = { isStart -> backStack.addOnce(NavDestination.EventTimeZone(destination, isStart)) },
@@ -171,7 +171,7 @@ private fun baseEntryProvider(
             ),
         ) {
             EventEditScreen(
-                occurrenceId = destination.occurrenceId,
+                destination = destination,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
                 goBackToCalendarView = { backStack.popUntilCalendarView(defaultCalendarView) },
                 goToEventAttendees = { backStack.addOnce(NavDestination.AttendeeSearch(parent = destination)) },
