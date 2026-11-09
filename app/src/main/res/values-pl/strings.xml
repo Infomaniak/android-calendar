@@ -32,7 +32,6 @@
     <string name="deleteRecurringEventAlertTitle">Które wydarzenia chcesz usunąć?</string>
     <string name="editRecurringEventAlertTitle">Które wydarzenia chcesz edytować?</string>
     <string name="eventOccurrenceNotFound">To wydarzenie nie jest już dostępne.</string>
-    <string name="helpTitle">Pomoc</string>
     <string name="monthTitle">Miesiąc</string>
     <string name="noWritableCalendar">Nie znaleziono edytowalnego kalendarza</string>
     <string name="notificationAllDay">Cały dzień</string>
@@ -48,6 +47,7 @@
     <string name="onboardingThreeTitle">Zaproś uczestników</string>
     <string name="onboardingTwoSubtitle">Otrzymuj przypomnienie przed każdym wydarzeniem i nie przegap już żadnego ważnego spotkania.</string>
     <string name="onboardingTwoTitle">Zezwól na powiadomienia</string>
+    <string name="otherCalendarsSectionTitle">Inne kalendarze</string>
     <string name="planningTitle">Planowanie</string>
     <string name="settingsTitle">Ustawienia</string>
     <string name="signOutAccountAlertConfirm">Wyloguj się z konta</string>

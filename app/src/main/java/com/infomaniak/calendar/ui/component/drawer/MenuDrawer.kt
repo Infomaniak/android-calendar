@@ -18,13 +18,14 @@
 package com.infomaniak.calendar.ui.component.drawer
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.ScaffoldDefaults
@@ -38,13 +39,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
-import com.infomaniak.calendar.ui.component.drawer.model.UserCalendarsUi
+import com.infomaniak.calendar.ui.model.UserCalendarsUi
 import com.infomaniak.calendar.ui.navigation.state.LocalDrawerState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CircleUser
 import com.infomaniak.designsystem.icons.symbols.Cog
-import com.infomaniak.designsystem.icons.symbols.Headset
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import kotlinx.coroutines.launch
 
@@ -58,6 +59,7 @@ fun MenuDrawer(
     val calendarDrawerState = LocalDrawerState.current ?: return
     val calendarsUsers by menuDrawerViewModel.calendarsUsers.collectAsStateWithLifecycle()
     val expandedAccountIds by menuDrawerViewModel.expandedAccountIds.collectAsStateWithLifecycle(emptySet())
+    val collapsedSectionKeys by menuDrawerViewModel.collapsedSectionKeys.collectAsStateWithLifecycle(emptySet())
     val scope = rememberCoroutineScope()
 
     BackHandler(enabled = calendarDrawerState.isOpen) { scope.launch { calendarDrawerState.close() } }
@@ -69,7 +71,9 @@ fun MenuDrawer(
         onCalendarLongClick = menuDrawerViewModel::onCalendarLongClicked,
         content = content,
         onAccountExpandedChange = menuDrawerViewModel::onAccountExpandedChanged,
-        isSectionExpanded = { expandedAccountIds.contains(it) },
+        isAccountExpanded = { expandedAccountIds.contains(it) },
+        onSectionExpandedChange = menuDrawerViewModel::onSectionExpandedChanged,
+        isSectionExpanded = { !collapsedSectionKeys.contains(it) },
         onManageAccounts = {
             scope.launch {
                 calendarDrawerState.close()
@@ -87,7 +91,9 @@ private fun MenuDrawer(
     onCalendarVisibilityChanged: (CalendarId, Boolean) -> Unit,
     onCalendarLongClick: (CalendarId) -> Unit,
     onAccountExpandedChange: (userId: Int, isExpanded: Boolean) -> Unit,
-    isSectionExpanded: (Int) -> Boolean,
+    isAccountExpanded: (Int) -> Boolean,
+    onSectionExpandedChange: (sectionKey: String, isExpanded: Boolean) -> Unit,
+    isSectionExpanded: (String) -> Boolean,
     onManageAccounts: () -> Unit,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -95,28 +101,37 @@ private fun MenuDrawer(
     val menuOptions = drawerMenuOptions(
         onManageAccounts = onManageAccounts,
         onSettings = {}, // TODO: Add navigation to settings
-        onHelp = {}, // TODO: Add intent to help 
     )
 
     ModalNavigationDrawer(
         drawerContent = {
             ModalDrawerSheet(
-                drawerContainerColor = MaterialTheme.colorScheme.surface,
                 windowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
             ) {
                 LazyColumn(
-                    modifier = Modifier
-                        .fillMaxHeight(),
+                    modifier = Modifier.fillMaxHeight(),
+                    contentPadding = PaddingValues(
+                        start = EsdsTheme.spacing.xl,
+                        end = EsdsTheme.spacing.xl,
+                        bottom = EsdsTheme.spacing.threeXl,
+                    ),
                 ) {
                     drawerListItems(
                         usersCalendars = calendarsUsers,
                         onCalendarVisibilityChange = onCalendarVisibilityChanged,
                         onCalendarLongClick = onCalendarLongClick,
-                        isSectionExpanded = isSectionExpanded,
+                        isAccountExpanded = isAccountExpanded,
                         onAccountExpandedChange = onAccountExpandedChange,
+                        isSectionExpanded = isSectionExpanded,
+                        onSectionExpandedChange = onSectionExpandedChange,
                     )
-                    item {
-                        MenuList(menuOptions = menuOptions)
+                    item(key = "menu", contentType = "menu") {
+                        MenuList(
+                            menuOptions = menuOptions,
+                            modifier = Modifier
+                                .animateItem()
+                                .padding(top = EsdsTheme.spacing.fourXl),
+                        )
                     }
                 }
             }
@@ -131,7 +146,6 @@ private fun MenuDrawer(
 private fun drawerMenuOptions(
     onManageAccounts: () -> Unit,
     onSettings: () -> Unit,
-    onHelp: () -> Unit,
 ): List<MenuOption> {
     return listOf(
         MenuOption(
@@ -143,11 +157,6 @@ private fun drawerMenuOptions(
             itemNameRes = R.string.settingsTitle,
             itemIcon = EsdsIcons.Cog,
             itemAction = onSettings,
-        ),
-        MenuOption(
-            itemNameRes = R.string.helpTitle,
-            itemIcon = EsdsIcons.Headset,
-            itemAction = onHelp,
         ),
     )
 }
@@ -164,7 +173,9 @@ private fun MenuDrawerPreview(
             onCalendarVisibilityChanged = { _, _ -> },
             onCalendarLongClick = {},
             onAccountExpandedChange = { _, _ -> },
-            isSectionExpanded = { false },
+            isAccountExpanded = { false },
+            onSectionExpandedChange = { _, _ -> },
+            isSectionExpanded = { true },
             onManageAccounts = {},
             content = {},
             modifier = Modifier,

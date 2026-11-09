@@ -15,17 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.component.drawer.model
+package com.infomaniak.calendar.ui.model
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.ui.graphics.Color
-import com.infomaniak.calendar.components.foundation.models.ThemedColorUi
+import com.infomaniak.core.auth.models.user.User
 
-@Immutable
-data class CalendarColorsUi(
-    val sourceColor: Color,
-    private val _onSourceColor: ThemedColorUi,
-) {
-    val onSourceColor: Color @Composable get() = _onSourceColor.toColor()
-}
+data class UserCalendarsUi(
+    val user: User,
+    val sections: List<CalendarSectionUi>,
+)

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.component.drawer.model
+package com.infomaniak.calendar.ui.model
 
 import androidx.compose.runtime.Immutable
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId

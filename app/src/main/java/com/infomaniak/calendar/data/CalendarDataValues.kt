@@ -45,6 +45,11 @@ class CalendarDataValues @Inject constructor(
         defaultValue = emptySet<Int>(),
     )
 
+    val collapsedDrawerSectionKeys = dataValue(
+        key = "collapsedDrawerSectionKeys",
+        defaultValue = emptySet<String>(),
+    )
+
     /** Height of one hour on the day timeline, in dp, as last zoomed to by the user. */
     val dayViewHourHeight = dataValue(
         key = "dayViewHourHeight",

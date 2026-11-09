@@ -32,7 +32,6 @@
     <string name="deleteRecurringEventAlertTitle">Vilka evenemang vill du ta bort?</string>
     <string name="editRecurringEventAlertTitle">Vilka evenemang vill du redigera?</string>
     <string name="eventOccurrenceNotFound">Det här evenemanget är inte längre tillgängligt.</string>
-    <string name="helpTitle">Hjälp</string>
     <string name="monthTitle">Månad</string>
     <string name="noWritableCalendar">Ingen redigerbar kalender hittades</string>
     <string name="notificationAllDay">Hela dagen</string>
@@ -48,6 +47,7 @@
     <string name="onboardingThreeTitle">Bjud in dina deltagare</string>
     <string name="onboardingTwoSubtitle">Bli påmind före varje händelse och missa aldrig ett viktigt möte.</string>
     <string name="onboardingTwoTitle">Tillåt aviseringar</string>
+    <string name="otherCalendarsSectionTitle">Andra kalendrar</string>
     <string name="planningTitle">Planering</string>
     <string name="settingsTitle">Inställningar</string>
     <string name="signOutAccountAlertConfirm">Logga ut från kontot</string>
