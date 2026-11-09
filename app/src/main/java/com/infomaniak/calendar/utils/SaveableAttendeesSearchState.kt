@@ -24,20 +24,24 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
+import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 
 private const val ATTENDEES_SEARCH_STATE_KEY = "attendeesSearchState"
 
 @OptIn(SavedStateHandleSaveableApi::class)
-fun <T: OrganizerSource> SavedStateHandle.saveableAttendeesSearchState(): AttendeesSearchState<T> {
+fun <T : OrganizerSource> SavedStateHandle.saveableAttendeesSearchState(
+    initialParticipants: Collection<ParticipantUi> = emptyList(),
+    initialOrganizerSource: T? = null,
+): AttendeesSearchState<T> {
     return saveable(
         key = ATTENDEES_SEARCH_STATE_KEY,
         saver = AttendeesSearchState.Saver(),
     ) {
-        AttendeesSearchState(
+        AttendeesSearchState<T>(
             searchQueryTextFieldState = TextFieldState(),
             results = mutableStateListOf(),
-            participants = mutableStateSetOf(),
-        )
+            participants = mutableStateSetOf<ParticipantUi>().apply { addAll(initialParticipants) },
+        ).apply { organizerSource = initialOrganizerSource }
     }
 }

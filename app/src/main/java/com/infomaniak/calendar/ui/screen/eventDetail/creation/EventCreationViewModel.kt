@@ -17,25 +17,15 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.creation
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
-import com.infomaniak.calendar.components.foundation.models.OrganizerSource
-import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
-import com.infomaniak.calendar.data.SettingsDataValues
 import com.infomaniak.calendar.manager.BackgroundEventComposer
 import com.infomaniak.calendar.ui.screen.eventDetail.EventCreationCalendarsUseCase
-import com.infomaniak.calendar.utils.saveableAttendeesSearchState
 import dev.zacsweers.metro.AppScope
-import dev.zacsweers.metro.Assisted
-import dev.zacsweers.metro.AssistedFactory
-import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
-import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
-import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
@@ -43,20 +33,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlin.time.Duration.Companion.seconds
 
-@AssistedInject
+@Inject
+@ContributesIntoMap(AppScope::class)
+@ViewModelKey
 class EventCreationViewModel(
-    @Assisted savedStateHandle: SavedStateHandle,
     eventCreationCalendarsUseCase: EventCreationCalendarsUseCase,
-    settingsDataValues: SettingsDataValues,
     private val backgroundEventComposer: BackgroundEventComposer,
 ) : ViewModel() {
     val uiState: StateFlow<EventCreationUiState> = eventCreationCalendarsUseCase.creationCalendars
         .map { calendars -> calendars?.let(EventCreationUiState::Success) ?: EventCreationUiState.NoWritableCalendar }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), EventCreationUiState.Loading)
-
-    val attendeesSearchState: AttendeesSearchState<OrganizerSource.Dynamic> = savedStateHandle.saveableAttendeesSearchState()
-
-    val defaultEventDuration = settingsDataValues.defaultEventDuration.flow
 
     private var isSubmitted = false
 
@@ -67,14 +53,5 @@ class EventCreationViewModel(
         backgroundEventComposer.createEvent(eventDraft)
 
         return true
-    }
-
-    @AssistedFactory
-    @ViewModelAssistedFactoryKey(EventCreationViewModel::class)
-    @ContributesIntoMap(AppScope::class)
-    fun interface Factory : ViewModelAssistedFactory {
-        override fun create(extras: CreationExtras): EventCreationViewModel = create(extras.createSavedStateHandle())
-
-        fun create(@Assisted savedStateHandle: SavedStateHandle): EventCreationViewModel
     }
 }

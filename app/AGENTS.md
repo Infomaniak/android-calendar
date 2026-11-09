@@ -71,6 +71,7 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── eventCreation/         # EventCreationScreen
     │   ├── eventDetail/           # EventDetailScreen + EventEditScreen + EventCreationScreen + their ViewModels, and
     │                              # attendeesSearch/ (EventAttendeesScreen + EventAttendeesViewModel shared with its parent)
+    │                              # form/ (EventFormViewModel: the event form state of EventCreation / EventEdit)
     │                              # timeZoneSearch/ (TimeZoneSearchScreen + TimeZoneSearchResultViewModel channel back to its parent)
     │                              # customReminder/ (CustomReminderScreen + CustomReminderResultViewModel channel back to its parent)
     │   └── onboarding/            # Two onboardings, each with its own page enum, sharing OnboardingPage + OnboardingButtonDefaults:
@@ -142,6 +143,14 @@ app/
   `EventAttendeesViewModel`: each of EventCreation / EventDetail / EventEdit owns its own instance, and the parent
   provides its `AttendeesSearchState` to it. The child shows nothing until that state is provided
   (`AttendeesSearchUiState.Loading`).
+- **Event form state**: `EventFormViewModel` holds the `EventFormState` and the form's `AttendeesSearchState` of a
+  `NavDestination.EventForm` (`EventCreation` / `EventEdit`), in that destination's own store. Get it with
+  `eventFormViewModel(destination, viewModelStoreOwner)`, which hands the destination to its factory through
+  `CreationExtras`: whichever entry composes first creates it, and it loads its initial values itself, so a child entry
+  restored alone after a process death still gets the form. Every field is created with `savedStateHandle.saveable`, so
+  restored values win over the loaded ones and no "initialized" flag is needed. The edit screen passes the event already
+  loaded by `EventDetailSharedDataViewModel`, so the form is there on its first frame for the shared-element transition.
+  `EventCreationViewModel` / `EventEditViewModel` only keep the screen state and the submission.
 - **DI**: Metro `@DependencyGraph` (`AppGraph`) scoped to `AppScope`. ViewModels are auto-registered
   via multibinding (`@ContributesIntoMap` + `@ViewModelKey`) and resolved through the `metrox-viewmodel`
   `MetroViewModelFactory` (exposed as `metroViewModelFactory` by the `ViewModelGraph` the graph implements,
