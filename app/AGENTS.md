@@ -55,7 +55,7 @@ app/src/main/java/com/infomaniak/calendar/
     │                              # UserCalendarsUi / CalendarSectionUi / CalendarUi / CalendarColorsUi, the calendars as the drawer and other views draw them
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
-    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), EventTimeZone(parent: EventForm, isStart), EventCustomReminder(parent: EventForm), Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
+    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, AttendeeSearch(parent: EventForm), EditableAttendeeSearch(parent: EventDetail, config), EventTimeZone(parent: EventForm, isStart), EventCustomReminder(parent: EventForm), Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
     │   ├── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
     │   └── ViewModelStoreSavedStates.kt # Saved state of each entry's ViewModelStore, kept until the entry is popped rather than
@@ -70,7 +70,8 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── settings/              # SettingScreen (opened from the drawer) + nested SettingThemeScreen + SettingThemeViewModel
     │   ├── eventCreation/         # EventCreationScreen
     │   ├── eventDetail/           # EventDetailScreen + EventEditScreen + EventCreationScreen + their ViewModels, and
-    │                              # attendeesSearch/ (EventAttendeesScreen + EventAttendeesViewModel shared with its parent)
+    │                              # attendeesSearch/ (AttendeesSearchScreen / EditableAttendeesSearchScreen, given their parent's
+    │                              # AttendeesSearchState, + AttendeesSearchViewModel searching the contacts as the query is typed)
     │                              # form/ (EventFormViewModel: the event form state of EventCreation / EventEdit)
     │                              # timeZoneSearch/ (TimeZoneSearchScreen: reports the picked time zone through `onTimeZoneSelected`)
     │                              # customReminder/ (CustomReminderScreen: reports the made reminder through `onSubmit`)
@@ -136,13 +137,12 @@ app/
   pane while the list pane is beside it (read from the pane, not the back stack, to avoid a flicker). On compact windows
   the strategy steps aside and entries display one at a time as before.
 - **Sharing a ViewModel between a parent entry and a child entry**: the child's key carries its parent
-  (`EventAttendees(parent)`), and its metadata uses `SharedViewModelStoreNavEntryDecorator.parent(parent.toContentKey())`.
+  (`AttendeeSearch(parent)`), and its metadata uses `SharedViewModelStoreNavEntryDecorator.parent(parent.toContentKey())`.
   The parent entry must set `contentKey = destination.toContentKey()`, so both resolve the same store. The child reads the
   parent's store through `LocalSharedViewModelStoreOwner.current`, passed as a default parameter
   (`viewModel(LocalSharedViewModelStoreOwner.current)`); the parent calls plain `viewModel()`. Currently used for
-  `EventAttendeesViewModel`: each of EventCreation / EventDetail / EventEdit owns its own instance, and the parent
-  provides its `AttendeesSearchState` to it. The child shows nothing until that state is provided
-  (`AttendeesSearchUiState.Loading`).
+  `EventDetailSharedDataViewModel` (the event loaded by EventDetail, reused by EventEdit), `EventFormViewModel` (below),
+  and `EventDetailViewModel`, whose `AttendeesSearchState` the `EditableAttendeeSearch` entry hands to its screen.
 - **Event form state**: `EventFormViewModel` holds the `EventFormState` and the form's `AttendeesSearchState` of a
   `NavDestination.EventForm` (`EventCreation` / `EventEdit`), in that destination's own store. Get it with
   `eventFormViewModel(destination, viewModelStoreOwner)`, which hands the destination to its factory through

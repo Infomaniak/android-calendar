@@ -17,9 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.union
@@ -28,14 +26,13 @@ import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.attendeessearch.AttendeesSearch
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
@@ -45,29 +42,25 @@ import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
-import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
 fun AttendeesSearchScreen(
+    attendeesSearchState: AttendeesSearchState<*>,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: AttendeesSearchSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
+    viewModel: AttendeesSearchViewModel = viewModel(),
 ) {
-    val attendeesSearchUi by viewModel.attendeesSearchState.collectAsStateWithLifecycle()
-
-    viewModel.EnableSearch()
-
-    Box(modifier = modifier.fillMaxSize()) {
-        when (val attendeesSearchState = attendeesSearchUi) {
-            AttendeesSearchUiState.Loading -> Unit // The parent provides it right away, so nothing to show
-            is AttendeesSearchUiState.Success -> AttendeesSearchScreenContent(
-                topBar = { TopBar(goBack, { attendeesSearchState.state.attendees.size }) },
-                attendeesSearchState = attendeesSearchState.state,
-            )
-        }
+    LaunchedEffect(attendeesSearchState) {
+        viewModel.searchContacts(attendeesSearchState)
     }
+
+    AttendeesSearchScreenContent(
+        topBar = { TopBar(goBack, { attendeesSearchState.attendees.size }) },
+        attendeesSearchState = attendeesSearchState,
+        modifier = modifier,
+    )
 }
 
 @Composable
