@@ -25,6 +25,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
@@ -43,11 +45,14 @@ import androidx.compose.material3.TimePickerDialog
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -60,7 +65,9 @@ import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatS
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Globe
-import com.infomaniak.scrollpicker.ScrollPicker
+import com.infomaniak.scrollpicker.timepicker.TimeScrollPicker
+import com.infomaniak.scrollpicker.timepicker.rememberTimeScrollPickerState
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
@@ -77,6 +84,8 @@ internal fun DateAndTimeEntry(
     onTimeZoneClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val timeScrollPickerState = rememberTimeScrollPickerState(entry.time)
+
     var isDatePickerVisible by rememberSaveable { mutableStateOf(false) }
     var isTimePickerVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -85,6 +94,12 @@ internal fun DateAndTimeEntry(
     val enter = fadeIn(effectSpec)
     val exit = fadeOut(effectSpec)
 
+    val currentOnTimePicked by rememberUpdatedState(onTimePicked)
+    LaunchedEffect(timeScrollPickerState, entry) {
+        launch { snapshotFlow { timeScrollPickerState.time }.collect { if (it != entry.time) currentOnTimePicked(it) } }
+        launch { snapshotFlow { entry.time }.collect { if (it != timeScrollPickerState.time) timeScrollPickerState.select(it) } }
+    }
+
     Column {
         Row(horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.lg), modifier = modifier) {
             OutlinedButton(onClick = { isDatePickerVisible = true }, shapes = shapes) {
@@ -92,7 +107,7 @@ internal fun DateAndTimeEntry(
             }
 
             AnimatedVisibility(!isAllDay(), enter = enter, exit = exit) {
-                OutlinedButton(onClick = { isTimePickerVisible = true }, shapes = shapes) {
+                OutlinedButton(onClick = { isTimePickerVisible = !isTimePickerVisible }, shapes = shapes) {
                     Text(entry.time.formatExplicitTimeLabel())
                 }
             }
@@ -102,9 +117,14 @@ internal fun DateAndTimeEntry(
             }
         }
 
-        if (isTimePickerVisible) {
-            Row {
-                ScrollPicker()
+        AnimatedVisibility(isTimePickerVisible) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = EsdsTheme.spacing.xl),
+                contentAlignment = Alignment.Center,
+            ) {
+                TimeScrollPicker(timeScrollPickerState)
             }
         }
     }
