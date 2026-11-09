@@ -37,10 +37,8 @@ import androidx.lifecycle.viewmodel.compose.rememberViewModelStoreProvider
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavEntryDecorator
 import androidx.navigation3.runtime.NavMetadataKey
-import androidx.navigation3.runtime.SaveableStateHolderNavEntryDecorator
 import androidx.navigation3.runtime.get
 import androidx.navigation3.runtime.metadata
-import androidx.savedstate.compose.LocalSavedStateRegistryOwner
 
 /**
  * Returns a [SharedViewModelStoreNavEntryDecorator] that is remembered across recompositions.
@@ -56,10 +54,9 @@ fun <T : Any> rememberSharedViewModelStoreNavEntryDecorator(
         },
 ): SharedViewModelStoreNavEntryDecorator<T> {
     val viewModelStoreProvider = rememberViewModelStoreProvider(viewModelStoreOwner)
+    val savedStates = rememberViewModelStoreSavedStates()
     return remember(viewModelStoreOwner) {
-        SharedViewModelStoreNavEntryDecorator(
-            viewModelStoreProvider,
-        )
+        SharedViewModelStoreNavEntryDecorator(viewModelStoreProvider, savedStates)
     }
 }
 
@@ -71,8 +68,8 @@ fun <T : Any> rememberSharedViewModelStoreNavEntryDecorator(
  * [ViewModelStoreOwner] will also be supplied along with the new one. This allows the
  * entry to access both its own [ViewModel] and its parent's [ViewModel]s.
  *
- * This requires the usage of [SaveableStateHolderNavEntryDecorator] to ensure that the [NavEntry]
- * scoped [ViewModel]s can properly provide access to [androidx.lifecycle.SavedStateHandle]s.
+ * The [androidx.lifecycle.SavedStateHandle]s of those [ViewModel]s are saved by [ViewModelStoreSavedStates] until the
+ * [NavEntry] is popped, whichever entry composes them.
  *
  * @see [SharedViewModelStoreNavEntryDecorator.parent]
  *
@@ -81,14 +78,18 @@ fun <T : Any> rememberSharedViewModelStoreNavEntryDecorator(
  */
 class SharedViewModelStoreNavEntryDecorator<T : Any>(
     viewModelStoreProvider: ViewModelStoreProvider,
+    savedStates: ViewModelStoreSavedStates,
 ) : NavEntryDecorator<T>(
-    onPop = { key -> viewModelStoreProvider.clearKey(key) },
+    onPop = { key ->
+        viewModelStoreProvider.clearKey(key)
+        savedStates.remove(key)
+    },
     decorate = { entry ->
         val localContentKey = entry.contentKey
         val localOwner = rememberViewModelStoreOwner(
             key = localContentKey,
             provider = viewModelStoreProvider,
-            savedStateRegistryOwner = LocalSavedStateRegistryOwner.current,
+            savedStateRegistryOwner = savedStates.ownerOf(localContentKey),
         )
 
         val localValues: MutableList<ProvidedValue<*>> = mutableListOf(LocalViewModelStoreOwner provides localOwner)
@@ -99,7 +100,7 @@ class SharedViewModelStoreNavEntryDecorator<T : Any>(
             val parentOwner = rememberViewModelStoreOwner(
                 key = parentContentKey,
                 provider = viewModelStoreProvider,
-                savedStateRegistryOwner = LocalSavedStateRegistryOwner.current,
+                savedStateRegistryOwner = savedStates.ownerOf(parentContentKey),
             )
 
             localValues.add(LocalSharedViewModelStoreOwner provides parentOwner)

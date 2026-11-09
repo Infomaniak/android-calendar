@@ -56,8 +56,10 @@ app/src/main/java/com/infomaniak/calendar/
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
     │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), EventTimeZone(parent, isStart), EventCustomReminder(parent), Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
-    │   └── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
+    │   ├── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
+    │   └── ViewModelStoreSavedStates.kt # Saved state of each entry's ViewModelStore, kept until the entry is popped rather than
+    │                                    # while it is composed, so a child entry can write to its parent's ViewModels
     ├── screen/
     │   ├── day/                   # DayScreen + DayViewModel
     │   ├── multiDays/             # MultiDaysScreen(dayCount) + MultiDaysViewModel — 3-day and week views share one entry (same contentKey)
