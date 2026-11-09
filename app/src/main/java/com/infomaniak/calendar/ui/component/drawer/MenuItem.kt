@@ -57,7 +57,7 @@ fun MenuItem(
             )
         },
         verticalAlignment = Alignment.CenterVertically,
-        colors = ListItemDefaults.drawerColors.copy(leadingContentColor = MaterialTheme.colorScheme.primary),
+        colors = ListItemDefaults.drawerColors,
     ) {
         Text(
             text = stringResource(menuOption.itemNameRes),
