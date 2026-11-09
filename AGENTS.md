@@ -210,6 +210,9 @@ the picker runs its `ImeAction`: `Next`/`Previous` move focus to the neighbourin
 hours "9" jumps to minutes); the last picker of a chain should use `Done`. A `FocusRequester` or `focusProperties` in its
 `modifier` reaches the input field, so focus can be moved from code. Pickers whose states share a `ScrollPickerGroupState`
 (`rememberScrollPickerState(group = …)`) react as one: while any is edited, all only show their selected value.
+`selectedIndex` is the source of truth: setting it takes effect at once and the wheel animates there on its own, unless
+a drag interrupts it. `TimeScrollPicker`'s 12-hour wheel holds all 24 hours (labelled 12 to 11 twice), so one
+`hourState` serves both clocks and its index is the hour of the day; the AM/PM wheel only mirrors its half.
 
 ## Key Integration Points
 

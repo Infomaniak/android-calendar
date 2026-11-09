@@ -26,6 +26,10 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.collectLatest
 
 private const val LOOP_ITEM_COUNT = 100_000
 private const val LOOP_START = LOOP_ITEM_COUNT / 2
@@ -86,7 +90,27 @@ class ScrollPickerState(initialIndex: Int = 0, val group: ScrollPickerGroupState
             lazyListState.firstVisibleItemIndex + if (lazyListState.firstVisibleItemScrollOffset > itemHeightPx / 2) 1 else 0
         }.collect { listIndex ->
             selectedListIndex = listIndex
-            selectedIndex = itemIndexOf(listIndex).coerceIn(0, itemCount - 1)
+            if (!isFollowingSelection) selectedIndex = itemIndexOf(listIndex).coerceIn(0, itemCount - 1)
+        }
+    }
+
+    /** Whether the wheel is animating towards [selectedIndex], so the rows it passes aren't selected. */
+    private var isFollowingSelection = false
+
+    /** Animates the wheel to [selectedIndex] whenever it's set while the wheel shows another row. A user scroll wins. */
+    internal suspend fun animateToSelection() {
+        snapshotFlow { selectedIndex }.collectLatest { index ->
+            if (itemCount > 0 && itemIndexOf(selectedListIndex) != index) {
+                isFollowingSelection = true
+                try {
+                    lazyListState.animateScrollToItem(listIndexOf(index))
+                } catch (e: CancellationException) {
+                    currentCoroutineContext().ensureActive()
+                    // Interrupted by a drag, so keeps what the wheel shows.
+                    selectedIndex = itemIndexOf(selectedListIndex).coerceIn(0, itemCount - 1)
+                }
+            }
+            isFollowingSelection = false
         }
     }
 
@@ -104,7 +128,7 @@ class ScrollPickerState(initialIndex: Int = 0, val group: ScrollPickerGroupState
 
     /** The row showing the item at [index], taking the shortest way round when looping. */
     private fun listIndexOf(index: Int): Int {
-        var delta = index - selectedIndex
+        var delta = index - itemIndexOf(selectedListIndex)
         if (loopSize > 0) delta = (delta + loopSize / 2).mod(loopSize) - loopSize / 2
         return selectedListIndex + delta
     }

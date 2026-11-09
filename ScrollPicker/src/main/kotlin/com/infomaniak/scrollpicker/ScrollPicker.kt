@@ -144,6 +144,7 @@ fun <T> ScrollPicker(
     val density = LocalDensity.current
     val itemHeightPx = with(density) { itemHeight.roundToPx() }
     LaunchedEffect(state, itemCount, loop, itemHeightPx) { state.followCenteredRow(itemHeightPx) }
+    LaunchedEffect(state, itemCount, loop) { state.animateToSelection() }
 
     val snapper = remember(listState, itemHeightPx) { ScrollPickerSnapper(listState, itemHeightPx) }
     ItemTickHaptics(listState, snapper, itemHeightPx)
