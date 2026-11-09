@@ -19,6 +19,7 @@ package com.infomaniak.calendar
 
 import android.app.Application
 import android.os.StrictMode
+import androidx.appcompat.app.AppCompatDelegate
 import com.infomaniak.calendar.crossAppLogin.DeviceInfoUpdateWorker
 import com.infomaniak.calendar.di.AppGraph
 import com.infomaniak.calendar.di.metroAndroidExtensions.MetroApplication
@@ -68,6 +69,14 @@ class MainApplication : Application(), MetroApplication {
 
         initStoredAccounts()
         appGraph.cachedCalendarManager // Start loading calendars now so they're ready before any screen needs them
+        applyThemeToNightMode()
+    }
+
+    // Resources (drawables, View-based activities like login) follow the configuration's night mode, not Compose's theme
+    private fun applyThemeToNightMode() {
+        applicationScope.launch(Dispatchers.Main.immediate) {
+            appGraph.settingsDataValues.theme.flow.collect { AppCompatDelegate.setDefaultNightMode(it.nightMode) }
+        }
     }
 
     private fun initStoredAccounts() {

@@ -18,19 +18,24 @@
 package com.infomaniak.calendar.model.settings
 
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import com.infomaniak.core.common.R
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Moon
 import com.infomaniak.designsystem.icons.symbols.Smartphone
 import com.infomaniak.designsystem.icons.symbols.Sun
 import com.infomaniak.designsystem.icons.symbols.Symbol
+import com.infomaniak.core.common.R as RCore
 
-enum class SettingThemeOption(@StringRes private val titleRes: Int, val symbol: Symbol) {
-    System(R.string.themeSystem, EsdsIcons.Smartphone),
-    Light(R.string.themeLight, EsdsIcons.Sun),
-    Dark(R.string.themeDark, EsdsIcons.Moon);
+enum class SettingThemeOption(
+    @StringRes private val titleRes: Int,
+    val symbol: Symbol,
+    @AppCompatDelegate.NightMode val nightMode: Int,
+) {
+    System(RCore.string.themeSystem, EsdsIcons.Smartphone, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM),
+    Light(RCore.string.themeLight, EsdsIcons.Sun, AppCompatDelegate.MODE_NIGHT_NO),
+    Dark(RCore.string.themeDark, EsdsIcons.Moon, AppCompatDelegate.MODE_NIGHT_YES);
 
     val title: String @Composable get() = stringResource(titleRes)
 }
