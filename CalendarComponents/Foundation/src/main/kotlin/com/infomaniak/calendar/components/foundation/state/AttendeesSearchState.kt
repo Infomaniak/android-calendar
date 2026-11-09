@@ -87,10 +87,8 @@ class AttendeesSearchState<T : OrganizerSource>(
         // Only add Me when creating a new event, which we organize
         if (participants.isEmpty() && organizerSource is OrganizerSource.Dynamic) {
             participants.add(ParticipantUi.Me)
-            if (attendee.email != me?.email) participants.add(attendee)
-        } else {
-            participants.add(attendee)
         }
+        participants.add(if (attendee.email == me?.email) ParticipantUi.Me else attendee)
         searchQueryTextFieldState.clearText()
     }
 
