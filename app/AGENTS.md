@@ -55,7 +55,7 @@ app/src/main/java/com/infomaniak/calendar/
     │                              # UserCalendarsUi / CalendarSectionUi / CalendarUi / CalendarColorsUi, the calendars as the drawer and other views draw them
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
-    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), EventTimeZone(parent, isStart), EventCustomReminder(parent), Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
+    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), EventTimeZone(parent: EventForm, isStart), EventCustomReminder(parent: EventForm), Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
     │   ├── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
     │   └── ViewModelStoreSavedStates.kt # Saved state of each entry's ViewModelStore, kept until the entry is popped rather than
@@ -72,8 +72,8 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── eventDetail/           # EventDetailScreen + EventEditScreen + EventCreationScreen + their ViewModels, and
     │                              # attendeesSearch/ (EventAttendeesScreen + EventAttendeesViewModel shared with its parent)
     │                              # form/ (EventFormViewModel: the event form state of EventCreation / EventEdit)
-    │                              # timeZoneSearch/ (TimeZoneSearchScreen + TimeZoneSearchResultViewModel channel back to its parent)
-    │                              # customReminder/ (CustomReminderScreen + CustomReminderResultViewModel channel back to its parent)
+    │                              # timeZoneSearch/ (TimeZoneSearchScreen: reports the picked time zone through `onTimeZoneSelected`)
+    │                              # customReminder/ (CustomReminderScreen: reports the made reminder through `onSubmit`)
     │   └── onboarding/            # Two onboardings, each with its own page enum, sharing OnboardingPage + OnboardingButtonDefaults:
     │                              # login/ (LoginOnboardingScreen + LoginOnboardingPage + CrossAppLoginViewModel): welcome + login;
     │                              # permissions/ (PermissionsOnboardingScreen + PermissionsOnboardingPage + NextStepButton): a pager
@@ -151,6 +151,11 @@ app/
   restored values win over the loaded ones and no "initialized" flag is needed. The edit screen passes the event already
   loaded by `EventDetailSharedDataViewModel`, so the form is there on its first frame for the shared-element transition.
   `EventCreationViewModel` / `EventEditViewModel` only keep the screen state and the submission.
+- **Screens opened by the event form** know nothing of it: they take their initial values or context as parameters, keep
+  their own draft until submitted, and report it through `onSubmit`-like callbacks before calling `goBack`. Their key only
+  carries `parent: NavDestination.EventForm` (plus navigation-only arguments such as `isStart`). Their `NavEntry` in
+  `MainNavHost`, the only place knowing both sides, reads the form through `sharedEventFormState(destination.parent)`
+  (`null` while the form loads: the entry shows nothing), passes the values in, and writes the result back to the form.
 - **DI**: Metro `@DependencyGraph` (`AppGraph`) scoped to `AppScope`. ViewModels are auto-registered
   via multibinding (`@ContributesIntoMap` + `@ViewModelKey`) and resolved through the `metrox-viewmodel`
   `MetroViewModelFactory` (exposed as `metroViewModelFactory` by the `ViewModelGraph` the graph implements,

@@ -36,6 +36,7 @@ import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.scene.SceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import androidx.window.core.layout.WindowSizeClass
+import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.component.drawer.MenuDrawer
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
@@ -60,6 +61,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationScree
 import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomReminderScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.form.eventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.multiDays.MultiDaysScreen
@@ -206,8 +208,11 @@ private fun baseEntryProvider(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
+            val dateAndTimeState = sharedEventFormState(destination.parent)?.dateAndTimeState ?: return@NavEntry
             TimeZoneSearchScreen(
-                isStart = destination.isStart,
+                onTimeZoneSelected = { timeZone ->
+                    with(dateAndTimeState) { (if (destination.isStart) start else end).pickTimeZone(timeZone) }
+                },
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
         }
@@ -216,7 +221,11 @@ private fun baseEntryProvider(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
-            CustomReminderScreen(goBack = { backStack.popOrReplaceRoot(defaultCalendarView) })
+            val formState = sharedEventFormState(destination.parent) ?: return@NavEntry
+            CustomReminderScreen(
+                onSubmit = { notification -> formState.notifications.value += notification },
+                goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
+            )
         }
 
         is NavDestination.Accounts.List -> NavEntry(destination) {
@@ -336,6 +345,12 @@ private fun sceneDecoratorStrategies(
 private const val MULTI_DAYS_CONTENT_KEY = "multiDays"
 
 private fun NavKey.toContentKey() = this.toString()
+
+/** The state of the event form opened by [destination], read by a screen it opens. `null` while the form loads. */
+@Composable
+private fun sharedEventFormState(destination: NavDestination.EventForm): EventFormState? {
+    return eventFormViewModel(destination, LocalSharedViewModelStoreOwner.current).state
+}
 
 /**
  * Shares [destination]'s ViewModelStore with this entry. Its ViewModels are cleared when [destination] is popped.
