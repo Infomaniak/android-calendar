@@ -52,7 +52,6 @@ import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
-import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.delete.DeleteEventDialog
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EditAttendeesConfig
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
@@ -75,7 +74,6 @@ fun EventDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: EventDetailViewModel = viewModel(),
     eventDetailSharedDataViewModel: EventDetailSharedDataViewModel = viewModel(),
-    attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
 ) {
     val context = LocalContext.current
     val uiState by eventDetailSharedDataViewModel.eventDetailUi.collectAsStateWithLifecycle()
@@ -90,10 +88,6 @@ fun EventDetailScreen(
 
     LaunchedEffect(Unit) {
         for (request in eventDetailSharedDataViewModel.goBackRequests) goBack()
-    }
-
-    LaunchedEffect(viewModel.attendeesSearchState) {
-        attendeesSearchSharedDataViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
     }
 
     EventDetailScreen(

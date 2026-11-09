@@ -45,7 +45,6 @@ import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
-import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.form.eventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
@@ -69,7 +68,6 @@ fun EventEditScreen(
         destination = destination,
         loadedEvent = (eventDetailSharedDataViewModel.eventDetailUi.value as? EventDetailUiState.Displayable.Success)?.eventDetail,
     ),
-    attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
 ) {
     val eventDetailUiState = eventDetailSharedDataViewModel.eventDetailUi.collectAsStateWithLifecycle().value
     val eventFormState = eventFormViewModel.state
@@ -86,10 +84,6 @@ fun EventEditScreen(
 
     LaunchedEffect(Unit) {
         for (request in eventDetailSharedDataViewModel.goBackRequests) goBackToCalendarView()
-    }
-
-    LaunchedEffect(eventFormViewModel.attendeesSearchState) {
-        eventFormViewModel.attendeesSearchState?.let(attendeesSearchSharedDataViewModel::setAttendeesSearchState)
     }
 
     EventEditScreen(

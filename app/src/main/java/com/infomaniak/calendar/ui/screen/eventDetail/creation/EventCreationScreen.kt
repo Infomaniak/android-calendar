@@ -41,7 +41,6 @@ import com.infomaniak.calendar.components.foundation.component.EmptyState
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.navigation.NavDestination
-import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.form.eventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventCreationCalendars
@@ -62,14 +61,9 @@ fun EventCreationScreen(
     modifier: Modifier = Modifier,
     viewModel: EventCreationViewModel = viewModel(),
     eventFormViewModel: EventFormViewModel = eventFormViewModel(destination),
-    attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val formState = eventFormViewModel.state
-
-    LaunchedEffect(eventFormViewModel.attendeesSearchState) {
-        eventFormViewModel.attendeesSearchState?.let(attendeesSearchSharedDataViewModel::setAttendeesSearchState)
-    }
 
     EventCreationScreen(
         uiState = uiState,

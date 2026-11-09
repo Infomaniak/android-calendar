@@ -17,13 +17,12 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -34,7 +33,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
@@ -45,7 +43,6 @@ import com.infomaniak.calendar.components.foundation.state.rememberSaveableAtten
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.SubmitButton
-import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.screen.eventDetail.AttendeesUpdatePayload
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EditAttendeesConfig
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
@@ -57,38 +54,37 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceI
 
 @Composable
 fun EditableAttendeesSearchScreen(
+    attendeesSearchState: AttendeesSearchState<*>,
     config: EditAttendeesConfig,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EditableAttendeesSearchViewModel = viewModel(),
-    sharedViewModel: AttendeesSearchSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
+    searchViewModel: AttendeesSearchViewModel = viewModel(),
 ) {
-    val attendeesSearchUi by sharedViewModel.attendeesSearchState.collectAsStateWithLifecycle()
-
-    if (config.canEdit) sharedViewModel.EnableSearch()
-
-    Box(modifier = modifier.fillMaxSize()) {
-        when (val attendeesSearchState = attendeesSearchUi) {
-            AttendeesSearchUiState.Loading -> Unit // The parent provides it right away, so nothing to show
-            is AttendeesSearchUiState.Success -> EditableAttendeesSearchScreen(
-                attendeesSearchState = attendeesSearchState.state,
-                config = config,
-                onSubmit = { scope ->
-                    val isSuccess = viewModel.updateAttendees(
-                        occurrenceId = config.occurrenceId,
-                        attendeesUpdatePayload = AttendeesUpdatePayload(
-                            attendees = attendeesSearchState.state.attendees,
-                            organizer = (attendeesSearchState.state.organizerSource as? OrganizerSource.Static)?.organizer,
-                            calendarId = CalendarId(config.calendarId),
-                        ),
-                        scope = scope,
-                    )
-                    if (isSuccess) goBack()
-                },
-                goBack = goBack,
-            )
+    if (config.canEdit) {
+        LaunchedEffect(attendeesSearchState) {
+            searchViewModel.searchContacts(attendeesSearchState)
         }
     }
+
+    EditableAttendeesSearchScreen(
+        attendeesSearchState = attendeesSearchState,
+        config = config,
+        onSubmit = { scope ->
+            val isSuccess = viewModel.updateAttendees(
+                occurrenceId = config.occurrenceId,
+                attendeesUpdatePayload = AttendeesUpdatePayload(
+                    attendees = attendeesSearchState.attendees,
+                    organizer = (attendeesSearchState.organizerSource as? OrganizerSource.Static)?.organizer,
+                    calendarId = CalendarId(config.calendarId),
+                ),
+                scope = scope,
+            )
+            if (isSuccess) goBack()
+        },
+        goBack = goBack,
+        modifier = modifier,
+    )
 }
 
 @Composable

@@ -28,6 +28,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -60,7 +61,9 @@ import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.EditableAtt
 import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomReminderScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.form.eventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
@@ -186,7 +189,9 @@ private fun baseEntryProvider(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
+            val attendeesSearchState = sharedEventFormViewModel(destination.parent).attendeesSearchState ?: return@NavEntry
             AttendeesSearchScreen(
+                attendeesSearchState = attendeesSearchState,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
         }
@@ -196,6 +201,7 @@ private fun baseEntryProvider(
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
             EditableAttendeesSearchScreen(
+                attendeesSearchState = viewModel<EventDetailViewModel>(LocalSharedViewModelStoreOwner.current).attendeesSearchState,
                 config = destination.config,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
@@ -341,10 +347,16 @@ private fun sceneDecoratorStrategies(
 
 private fun NavKey.toContentKey() = this.toString()
 
-/** The state of the event form opened by [destination], read by a screen it opens. `null` while the form loads. */
+/** The form of [destination], read by a screen it opens. */
+@Composable
+private fun sharedEventFormViewModel(destination: NavDestination.EventForm): EventFormViewModel {
+    return eventFormViewModel(destination, LocalSharedViewModelStoreOwner.current)
+}
+
+/** The state of the form of [destination], read by a screen it opens. `null` while the form loads. */
 @Composable
 private fun sharedEventFormState(destination: NavDestination.EventForm): EventFormState? {
-    return eventFormViewModel(destination, LocalSharedViewModelStoreOwner.current).state
+    return sharedEventFormViewModel(destination).state
 }
 
 /**
