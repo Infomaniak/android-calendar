@@ -29,9 +29,12 @@ import com.infomaniak.core.avatar.computeInitials
 import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Immutable
 @Parcelize
+@Serializable
 data class AttendeeUi(
     val email: String,
     val displayName: String?,
@@ -40,6 +43,7 @@ data class AttendeeUi(
     val isOrganizer: Boolean = false,
 ) : AttendeesSearchResult, ParticipantUi {
     @IgnoredOnParcel
+    @Transient
     val key: Key = Key(email, displayName)
 
     fun initials(): String = (displayName ?: email).computeInitials()
@@ -49,13 +53,17 @@ data class AttendeeUi(
     data class Key(val email: String, val displayName: String?) : Parcelable
 }
 
+@Serializable
 sealed interface AvatarStrategy : Parcelable {
     @Parcelize
+    @Serializable
     data class Precomputed(val avatarData: AvatarData?) : AvatarStrategy
     @Parcelize
+    @Serializable
     data object ToCompute : AvatarStrategy
 }
 
+@Serializable
 enum class ParticipationStatus(
     @PluralsRes val countPluralRes: Int,
     @StringRes val labelRes: Int,

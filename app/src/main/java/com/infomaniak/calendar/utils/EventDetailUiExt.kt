@@ -19,20 +19,21 @@ package com.infomaniak.calendar.utils
 
 import com.infomaniak.calendar.components.eventdetail.form.EventDateTime
 import com.infomaniak.calendar.components.eventdetail.form.EventDates
-import com.infomaniak.calendar.components.eventdetail.form.EventFormValues
+import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 
-fun EventDetailUi.toEventFormValues(): EventFormValues {
+fun EventDetailUi.toEventForm(): EventForm {
     val start = start.atTimeZone
     val end = end.atTimeZone
     // KMP ends an all-day event on the day after it, the form shows its last day
     val endDate = if (isAllDay) end.date.minus(1, DateTimeUnit.DAY) else end.date
 
-    return EventFormValues(
+    return EventForm(
         title = title,
         calendarId = calendar.id,
         eventColor = eventColorChoice,
@@ -41,6 +42,8 @@ fun EventDetailUi.toEventFormValues(): EventFormValues {
             start = EventDateTime(start.date, start.time, this.start.timeZone),
             end = EventDateTime(endDate, end.time, this.end.timeZone),
         ),
+        participants = attendees.all.toSet(),
+        organizerSource = OrganizerSource.Static(organizer),
         isKMeetUrlEnabled = kMeetUrl != null,
         notifications = notifications,
         isOccupied = isOccupied,

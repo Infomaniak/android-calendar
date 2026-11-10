@@ -20,12 +20,15 @@ package com.infomaniak.calendar.components.foundation.models
 import android.os.Parcelable
 import androidx.compose.runtime.Immutable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 /** Who organizes the event whose attendees are being edited. */
 @Immutable
+@Serializable
 sealed interface OrganizerSource : Parcelable {
     /** The organizer of an already existing event, snapshotted once with its attendees. `null` when it has none. */
     @Parcelize
+    @Serializable
     data class Static(val organizer: OrganizerUi?) : OrganizerSource
 
     /**
@@ -34,5 +37,6 @@ sealed interface OrganizerSource : Parcelable {
      * [ParticipantUi.Me] resolves to [owner], which follows the selected calendar.
      */
     @Parcelize
+    @Serializable
     data class Dynamic(val owner: AttendeeUi) : OrganizerSource
 }

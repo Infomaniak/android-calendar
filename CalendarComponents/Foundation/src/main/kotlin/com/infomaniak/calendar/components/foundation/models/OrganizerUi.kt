@@ -20,7 +20,9 @@ package com.infomaniak.calendar.components.foundation.models
 import android.os.Parcelable
 import androidx.compose.runtime.Immutable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 @Immutable
 @Parcelize
+@Serializable
 data class OrganizerUi(val email: String, val displayName: String?) : Parcelable

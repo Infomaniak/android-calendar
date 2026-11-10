@@ -48,7 +48,7 @@ app/src/main/java/com/infomaniak/calendar/
 │   ├── AttendeeExt.kt              # KMP Attendee → Attendees mapping for event detail
 │   ├── DayEventGroupingExt.kt      # Groups day-sliced events for calendar views
 │   ├── EventDaySliceExt.kt         # KMP EventDaySlice → OccurrenceEventUi mapping, shared by every calendar view
-│   ├── EventDetailUiExt.kt         # EventDetailUi → EventFormValues, the values an edition form starts from
+│   ├── EventDetailUiExt.kt         # EventDetailUi → EventForm, the form an edition starts from
 │   ├── EventDraftExt.kt            # EventDraft → KMP EventEditData for creation and edition: a new form field is one line in `applyTo`; unchanged notifications leave the stored alarms alone (`AlarmListEdit.Preserve`, since `Event.alarms` lacks the ones KMP can't read), changed ones get back the stored alarm they were read from (matched by the `Notification.sourceId` holding its KMP `AlarmId`)
 │   └── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
 └── ui/
@@ -74,8 +74,9 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── settings/              # SettingScreen (opened from the drawer) + nested SettingThemeScreen + SettingThemeViewModel
     │   ├── eventCreation/         # EventCreationScreen
     │   ├── eventDetail/           # EventDetailScreen + EventEditScreen + EventCreationScreen + their ViewModels, and
-    │                              # attendeesSearch/ (AttendeesSearchScreen / EditableAttendeesSearchScreen, given their parent's
-    │                              # AttendeesSearchState, + AttendeesSearchViewModel searching the contacts as the query is typed)
+    │                              # attendeesSearch/ (AttendeesSearchScreen, given the form's participants and reporting them back;
+    │                              # EditableAttendeesSearchScreen, given EventDetailViewModel's AttendeesSearchState;
+    │                              # AttendeesSearchViewModel searching the contacts as the query is typed)
     │                              # form/ (EventFormViewModel: the event form state of EventCreation / EventEdit)
     │                              # timeZoneSearch/ (TimeZoneSearchScreen: reports the picked time zone through `onTimeZoneSelected`)
     │                              # customReminder/ (CustomReminderScreen: reports the made reminder through `onSubmit`)
@@ -147,19 +148,21 @@ app/
   (`viewModel(LocalSharedViewModelStoreOwner.current)`); the parent calls plain `viewModel()`. Currently used for
   `EventDetailSharedDataViewModel` (the event loaded by EventDetail, reused by EventEdit), `EventFormViewModel` (below),
   and `EventDetailViewModel`, whose `AttendeesSearchState` the `EditableAttendeeSearch` entry hands to its screen.
-- **Event form state**: `EventFormViewModel` holds the `EventFormValues` (what the user filled in: an immutable,
-  `@Serializable` value, changed only through `update { it.copy(…) }`), the calendars it can be put in, and the form's
-  `AttendeesSearchState`, for a `NavDestination.EventForm` (`EventCreation` / `EventEdit`), in that destination's own store.
-  Get it with `eventFormViewModel(destination, viewModelStoreOwner)`, which hands the destination to its factory through
+- **Event form state**: `EventFormViewModel` holds the `EventForm` (what the user filled in, participants and organizer
+  included: an immutable, `@Serializable` value, changed only through `update { it.copy(…) }`) and the calendars it can be
+  put in, for a `NavDestination.EventForm` (`EventCreation` / `EventEdit`), in that destination's own store. Get it with
+  `eventFormViewModel(destination, viewModelStoreOwner)`, which hands the destination to its factory through
   `CreationExtras`: whichever entry composes first creates it, and it loads what it needs itself, so a child entry restored
-  alone after a process death still gets the form. The values are saved as a whole under one `SavedStateHandle` key
-  (`encodeToSavedState`); restored values win over the loaded ones (`EventFormValues.default` for a creation,
-  `EventDetailUi.toEventFormValues()` for an edition), so no "initialized" flag is needed. The calendars are reloaded
-  every time and never saved: the values only keep the selected `calendarId`. A new form field goes in `EventFormValues`
-  (and its `default` / `toEventDraft`), `toEventFormValues`, and the `EventForm` composable; the ViewModel doesn't change.
-  The `EventForm` composable owns the title's `TextFieldState` and reports its text through `update`. The edit screen passes
-  the event already loaded by `EventDetailSharedDataViewModel`, so the form is there on its first frame for the
-  shared-element transition. `EventCreationViewModel` / `EventEditViewModel` only keep the screen state and the submission.
+  alone after a process death still gets the form. The form is saved as a whole under one `SavedStateHandle` key
+  (`encodeToSavedState`); a restored form wins over the loaded one (`EventForm.default` for a creation,
+  `EventDetailUi.toEventForm()` for an edition), so no "initialized" flag is needed. The calendars are reloaded every time
+  and never saved: the form only keeps the selected `calendarId`, and `EventForm.withCalendar` makes a new event's owner
+  follow it. A new form field goes in `EventForm` (and its `default` / `toEventDraft`), `toEventForm`, and the
+  `EventFormContent` composable; the ViewModel doesn't change. `EventFormContent` owns the title's `TextFieldState` and
+  reports its text through `update`. The screens read the form through a lambda (`form: () -> EventForm?`) inside their
+  content, so a change doesn't run their `Scaffold` again. The edit screen passes the event already loaded by
+  `EventDetailSharedDataViewModel`, so the form is there on its first frame for the shared-element transition.
+  `EventCreationViewModel` / `EventEditViewModel` only keep the screen state and the submission.
 - **Screens opened by the event form** know nothing of it: they take their initial values or context as parameters, keep
   their own draft until submitted, and report it through `onSubmit`-like callbacks before calling `goBack`. Their key only
   carries `parent: NavDestination.EventForm` (plus navigation-only arguments such as `isStart`). Their `NavEntry` in

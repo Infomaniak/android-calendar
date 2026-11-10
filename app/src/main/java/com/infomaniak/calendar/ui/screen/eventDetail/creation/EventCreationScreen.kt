@@ -34,13 +34,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
-import com.infomaniak.calendar.components.eventdetail.form.EventFormValues
+import com.infomaniak.calendar.components.eventdetail.form.EventFormContent
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.foundation.component.EmptyState
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
-import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
@@ -70,9 +68,8 @@ fun EventCreationScreen(
 
     EventCreationScreen(
         uiState = uiState,
-        values = eventFormViewModel.values,
-        calendars = eventFormViewModel.calendars,
-        attendees = { eventFormViewModel.attendeesSearchState?.attendees.orEmpty() },
+        form = { eventFormViewModel.form },
+        calendars = { eventFormViewModel.calendars },
         update = eventFormViewModel::update,
         onSubmit = {
             val eventDraft = eventFormViewModel.toEventDraft() ?: return@EventCreationScreen
@@ -89,10 +86,9 @@ fun EventCreationScreen(
 @Composable
 private fun EventCreationScreen(
     uiState: EventCreationUiState,
-    values: EventFormValues?,
-    calendars: List<EventDetailCalendarGroup>?,
-    attendees: () -> List<AttendeeUi>,
-    update: ((EventFormValues) -> EventFormValues) -> Unit,
+    form: () -> EventForm?,
+    calendars: () -> List<EventDetailCalendarGroup>?,
+    update: ((EventForm) -> EventForm) -> Unit,
     onSubmit: () -> Unit,
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
@@ -101,13 +97,15 @@ private fun EventCreationScreen(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
+    val form = form()
+    val calendars = calendars()
 
     Scaffold(
         topBar = {
             SubmitTopAppBar(
                 goBack = goBack,
                 onSubmit = { onSubmit() },
-                isSubmitEnabled = { values != null && calendars != null },
+                isSubmitEnabled = { form != null && calendars != null },
                 isRecurring = false,
             )
         },
@@ -120,18 +118,20 @@ private fun EventCreationScreen(
                 icon = EsdsIcons.CalendarCross,
                 modifier = Modifier.padding(contentPadding),
             )
-            is EventCreationUiState.Success -> if (values != null && calendars != null) {
-                EventForm(
-                    values = values,
-                    update = update,
-                    calendars = calendars,
-                    attendees = attendees,
-                    onAttendeesClick = goToEventsAttendees,
-                    onTimeZoneClick = goToTimeZoneSearch,
-                    onCustomReminderClick = goToCustomReminder,
-                    contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
-                    modifier = Modifier.verticalScroll(scrollState),
-                )
+            is EventCreationUiState.Success -> {
+
+                if (form != null && calendars != null) {
+                    EventFormContent(
+                        form = form,
+                        update = update,
+                        calendars = calendars,
+                        onAttendeesClick = goToEventsAttendees,
+                        onTimeZoneClick = goToTimeZoneSearch,
+                        onCustomReminderClick = goToCustomReminder,
+                        contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
+                        modifier = Modifier.verticalScroll(scrollState),
+                    )
+                }
             }
         }
     }
@@ -141,16 +141,15 @@ private fun EventCreationScreen(
 @Composable
 private fun EventCreationScreenPreview() {
     CalendarThemeForPreview {
-        var values by remember { mutableStateOf(previewEventFormValues) }
+        var form by remember { mutableStateOf(previewEventForm) }
 
         EventCreationScreen(
             uiState = EventCreationUiState.Success(
                 EventCreationCalendars(previewEventDetailCalendarGroups, previewEventDetailCalendar),
             ),
-            values = values,
-            calendars = previewEventDetailCalendarGroups,
-            attendees = { emptyList() },
-            update = { transform -> values = transform(values) },
+            form = { form },
+            calendars = { previewEventDetailCalendarGroups },
+            update = { transform -> form = transform(form) },
             onSubmit = {},
             goBack = {},
             goToEventsAttendees = {},
@@ -166,9 +165,8 @@ private fun PreviewEmptyWritableCalendar() {
     CalendarThemeForPreview {
         EventCreationScreen(
             uiState = EventCreationUiState.NoWritableCalendar,
-            values = previewEventFormValues,
-            calendars = previewEventDetailCalendarGroups,
-            attendees = { previewAttendees },
+            form = { previewEventForm },
+            calendars = { previewEventDetailCalendarGroups },
             update = {},
             onSubmit = {},
             goBack = {},
@@ -179,8 +177,8 @@ private fun PreviewEmptyWritableCalendar() {
     }
 }
 
-private val previewEventFormValues = EventFormValues.default(
-    calendarId = previewEventDetailCalendar.id,
+private val previewEventForm = EventForm.default(
+    calendar = previewEventDetailCalendar,
     date = Clock.today(),
     timeZone = TimeZone.currentSystemDefault(),
     eventDuration = 1.hours,

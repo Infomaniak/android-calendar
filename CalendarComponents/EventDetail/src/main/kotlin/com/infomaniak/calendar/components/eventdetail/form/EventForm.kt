@@ -17,208 +17,90 @@
  */
 package com.infomaniak.calendar.components.eventdetail.form
 
-import androidx.compose.animation.AnimatedVisibilityScope
-import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
-import com.infomaniak.calendar.components.eventdetail.component.CalendarEditable
-import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatusSwitch
-import com.infomaniak.calendar.components.eventdetail.component.DateAndTimeEditable
-import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitch
-import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSwitch
-import com.infomaniak.calendar.components.eventdetail.component.Section
-import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
-import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
-import com.infomaniak.calendar.components.eventdetail.form.component.reminder.AddReminderButton
-import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderItem
-import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderOffsetDialog
+import androidx.compose.runtime.Immutable
+import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
-import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
-import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
-import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
-import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
-import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
-import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
-import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
+import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
-import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
-import com.infomaniak.core.common.utils.today
+import com.infomaniak.calendar.components.foundation.models.OrganizerSource
+import com.infomaniak.calendar.components.foundation.models.ParticipantUi
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlin.time.Clock
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
+import kotlinx.serialization.Serializable
+import kotlin.time.Duration
 
-/**
- * Reusable component for both the creation and the edition of an event.
- *
- * [sharedTransitionScope] and [animatedVisibilityScope] animate associated components between detail and editing.
- */
-@Composable
-fun EventForm(
-    values: EventFormValues,
-    update: ((EventFormValues) -> EventFormValues) -> Unit,
-    calendars: List<EventDetailCalendarGroup>,
-    attendees: () -> List<AttendeeUi>,
-    onAttendeesClick: () -> Unit,
-    onTimeZoneClick: (isStart: Boolean) -> Unit,
-    onCustomReminderClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(),
-    sharedTransitionScope: SharedTransitionScope? = null,
-    animatedVisibilityScope: AnimatedVisibilityScope? = null,
-) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
-    val calendar = calendars.calendarOf(values.calendarId) ?: return@ProvideEventSharedTransition
+/** What the user filled in an event form. */
+@Immutable
+@Serializable
+data class EventForm(
+    val title: String,
+    val calendarId: String,
+    val eventColor: EventColorChoice,
+    val isAllDay: Boolean,
+    val dates: EventDates,
+    val participants: Set<ParticipantUi>,
+    /** [OrganizerSource.Dynamic] for a new event, which follows the selected calendar. */
+    val organizerSource: OrganizerSource?,
+    val isKMeetUrlEnabled: Boolean,
+    val notifications: List<EventDetailUi.Notification>,
+    val isOccupied: Boolean,
+    val isPublic: Boolean,
+) {
+    val attendees: List<AttendeeUi>
+        get() {
+            val me = (organizerSource as? OrganizerSource.Dynamic)?.owner
+            return participants.mapNotNull { it.toAttendeeUi(me) }
+        }
 
-    val titleState = rememberTextFieldState(values.title)
-    val currentUpdate by rememberUpdatedState(update)
-    LaunchedEffect(titleState) {
-        snapshotFlow { titleState.text.toString() }.collect { title -> currentUpdate { it.copy(title = title) } }
+    /** Organizing a new event as the owner of [calendar], who must then not also be one of its attendees. */
+    fun withCalendar(calendar: EventDetailCalendar): EventForm {
+        val owner = calendar.organizerAttendeeUi
+        if (organizerSource is OrganizerSource.Static || owner == null) return copy(calendarId = calendar.id)
+
+        return copy(
+            calendarId = calendar.id,
+            participants = participants.filterNot { it is AttendeeUi && it.email == owner.email }.toSet(),
+            organizerSource = OrganizerSource.Dynamic(owner),
+        )
     }
 
-    Column(modifier.padding(contentPadding)) {
-        val focusRequester = rememberInitialFocusRequester(shouldRequestFocus = { titleState.text.isEmpty() })
-        TitleEditable(
-            dotColor = { values.eventColor.getColor(calendar) },
-            textFieldState = titleState,
-            modifier = Modifier
-                .focusRequester(focusRequester)
-                .eventSharedElement(EventSharedElement.Title),
+    fun toEventDraft(calendar: EventDetailCalendar) = EventDraft(
+        title = title,
+        color = eventColor.getColor(calendar),
+        calendarId = calendarId,
+        isAllDay = isAllDay,
+        start = dates.start.dateTime,
+        startTimeZone = dates.start.timeZone,
+        end = dates.end.dateTime,
+        endTimeZone = dates.end.timeZone,
+        attendees = attendees,
+        initialOrganizer = (organizerSource as? OrganizerSource.Static)?.organizer,
+        isKMeetUrlEnabled = isKMeetUrlEnabled,
+        notifications = notifications,
+        isOccupied = isOccupied,
+        isPublic = isPublic,
+    )
+
+    companion object {
+        /** A new event on [date] in [calendar], lasting [eventDuration]. */
+        fun default(calendar: EventDetailCalendar, date: LocalDate, timeZone: TimeZone, eventDuration: Duration) = EventForm(
+            title = "",
+            calendarId = calendar.id,
+            eventColor = EventColorChoice.Default,
+            isAllDay = false,
+            dates = EventDates.default(date, timeZone, eventDuration),
+            participants = emptySet(),
+            organizerSource = calendar.organizerAttendeeUi?.let(OrganizerSource::Dynamic),
+            isKMeetUrlEnabled = false,
+            notifications = emptyList(),
+            isOccupied = true,
+            isPublic = true,
         )
-
-        AllDaySwitch(
-            checked = { values.isAllDay },
-            onCheckedChange = { isChecked -> update { it.copy(isAllDay = isChecked) } },
-        )
-
-        DateAndTimeEditable(
-            dates = values.dates,
-            isAllDay = { values.isAllDay },
-            onDatesChange = { transform -> update { it.copy(dates = transform(it.dates)) } },
-            onTimeZoneClick = onTimeZoneClick,
-            modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
-        )
-
-        Section(EventSharedElement.Divider1) {
-            AttendeesButton(
-                attendees = attendees,
-                onClick = onAttendeesClick,
-                modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
-            )
-
-            KMeetButtonSwitch(
-                checked = { values.isKMeetUrlEnabled },
-                onCheckedChange = { isChecked -> update { it.copy(isKMeetUrlEnabled = isChecked) } },
-                modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
-            )
-        }
-
-        Section(EventSharedElement.Divider3, Modifier.animateContentSize()) {
-            var isReminderOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
-
-            values.notifications.forEach { notification ->
-                ReminderItem(
-                    notification = notification,
-                    onRemoveClick = { update { it.copy(notifications = it.notifications - notification) } },
-                )
-            }
-
-            AddReminderButton(onClick = { isReminderOffsetDialogVisible = true })
-
-            if (isReminderOffsetDialogVisible) {
-                ReminderOffsetDialog(
-                    selectedOffset = null,
-                    onOffsetSelect = { offset ->
-                        if (offset != null) {
-                            val notification = EventDetailUi.Notification(
-                                type = EventDetailUi.Notification.Type.Push,
-                                time = NotificationTime.Offset(offset),
-                            )
-                            update { it.copy(notifications = it.notifications + notification) }
-                        }
-                        isReminderOffsetDialogVisible = false
-                    },
-                    onCustomClick = {
-                        isReminderOffsetDialogVisible = false
-                        onCustomReminderClick()
-                    },
-                    onDismissRequest = { isReminderOffsetDialogVisible = false },
-                )
-            }
-        }
-
-        Section(EventSharedElement.Divider4) {
-            OccupiedStatusSwitch(
-                checked = { values.isOccupied },
-                onCheckedChange = { isChecked -> update { it.copy(isOccupied = isChecked) } },
-                modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus),
-            )
-
-            ClassificationStatusSwitch(
-                checked = { values.isPublic },
-                onCheckedChange = { isChecked -> update { it.copy(isPublic = isChecked) } },
-                modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
-            )
-
-            CalendarEditable(
-                selectedCalendar = calendar,
-                calendars = calendars,
-                onSelect = { selected -> update { it.copy(calendarId = selected.id) } },
-                modifier = Modifier.eventSharedBounds(EventSharedElement.Calendar),
-            )
-        }
     }
 }
 
-@Preview
-@Composable
-private fun Preview() {
-    MaterialTheme {
-        Surface {
-            var values by remember {
-                mutableStateOf(
-                    EventFormValues.default(
-                        calendarId = previewEventDetailCalendar.id,
-                        date = Clock.today(),
-                        timeZone = TimeZone.currentSystemDefault(),
-                        eventDuration = 1.hours,
-                    ).copy(
-                        title = "Event title",
-                        notifications = listOf(
-                            EventDetailUi.Notification(EventDetailUi.Notification.Type.Push, NotificationTime.Offset((-15).minutes)),
-                        ),
-                    ),
-                )
-            }
-            EventForm(
-                values = values,
-                update = { transform -> values = transform(values) },
-                calendars = previewEventDetailCalendarGroups,
-                attendees = { emptyList() },
-                onAttendeesClick = {},
-                onTimeZoneClick = {},
-                onCustomReminderClick = {},
-                contentPadding = PaddingValues(16.dp),
-            )
-        }
-    }
+fun List<EventDetailCalendarGroup>.calendarOf(id: String): EventDetailCalendar? {
+    return firstNotNullOfOrNull { group -> group.calendars.find { it.id == id } }
 }

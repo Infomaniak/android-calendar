@@ -185,9 +185,12 @@ private fun baseEntryProvider(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
-            val attendeesSearchState = sharedEventFormViewModel(destination.parent).attendeesSearchState ?: return@NavEntry
+            val eventFormViewModel = sharedEventFormViewModel(destination.parent)
+            val form = eventFormViewModel.form ?: return@NavEntry
             AttendeesSearchScreen(
-                attendeesSearchState = attendeesSearchState,
+                initialParticipants = form.participants,
+                organizerSource = form.organizerSource,
+                onParticipantsChange = { participants -> eventFormViewModel.update { it.copy(participants = participants) } },
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
         }
