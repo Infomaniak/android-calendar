@@ -48,7 +48,7 @@ app/src/main/java/com/infomaniak/calendar/
 │   ├── AttendeeExt.kt              # KMP Attendee → Attendees mapping for event detail
 │   ├── DayEventGroupingExt.kt      # Groups day-sliced events for calendar views
 │   ├── EventDaySliceExt.kt         # KMP EventDaySlice → OccurrenceEventUi mapping, shared by every calendar view
-│   ├── EventDetailUiExt.kt         # EventDetailUi → EventForm, the form an edition starts from
+│   ├── EventDetailUiExt.kt         # EventDetailUi → EventFormValues, what an edition form starts from
 │   ├── EventDraftExt.kt            # EventDraft → KMP EventEditData for creation and edition: a new form field is one line in `applyTo`; unchanged notifications leave the stored alarms alone (`AlarmListEdit.Preserve`, since `Event.alarms` lacks the ones KMP can't read), changed ones get back the stored alarm they were read from (matched by the `Notification.sourceId` holding its KMP `AlarmId`)
 │   └── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
 └── ui/
@@ -147,23 +147,23 @@ app/
   (`viewModel(LocalSharedViewModelStoreOwner.current)`); the parent calls plain `viewModel()`. Currently used for
   `EventDetailSharedDataViewModel` (the event loaded by EventDetail, reused by EventEdit), `EventFormViewModel` (below),
   and `EventDetailViewModel`, whose `AttendeesSearchState` `EditableAttendeesSearchScreen` edits.
-- **Event form state**: `EventFormViewModel` holds an `EventFormState` around the `EventForm` (what the user filled in,
+- **Event form state**: `EventFormViewModel` holds an `EventFormState` around the `EventFormValues` (what the user filled in,
   participants and organizer included: an immutable, `@Serializable` value, only changed through
   `EventFormState.edit { it.copy(…) }`) and the calendars it can be
   put in, for a `NavDestination.EventForm` (`EventCreation` / `EventEdit`), in that destination's own store. Get it with
   `eventFormViewModel(destination, viewModelStoreOwner)`, which hands the destination to its factory through
   `CreationExtras`: whichever entry composes first creates it, and it loads what it needs itself, so a child entry restored
   alone after a process death still gets the form. The form is saved as a whole under one `SavedStateHandle` key
-  (`encodeToSavedState`); a restored form wins over the loaded one (`EventForm.default` for a creation,
-  `EventDetailUi.toEventForm()` for an edition), so no "initialized" flag is needed. The calendars are observed as long as the
-  form lives and never saved: the form only keeps the selected `calendarId`, and `EventForm.withCalendar` makes a new
+  (`encodeToSavedState`); a restored form wins over the loaded one (`EventFormValues.default` for a creation,
+  `EventDetailUi.toEventFormValues()` for an edition), so no "initialized" flag is needed. The calendars are observed as long as the
+  form lives and never saved: the form only keeps the selected `calendarId`, and `EventFormValues.withCalendar` makes a new
   event's owner follow it. When the selected calendar can't be written to anymore, the form moves to a fallback one
   (the preselected calendar for a creation), keeping the rest of what was filled in, and `canSubmit` turns the Save
-  button off while no writable calendar holds the form. A new form field goes in `EventForm` (and its `default` / `toEventDraft`), `toEventForm`, and the
-  `EventFormContent` composable; the ViewModel doesn't change. `EventFormContent` takes the
+  button off while no writable calendar holds the form. A new form field goes in `EventFormValues` (and its `default` / `toEventDraft`), `toEventFormValues`, and the
+  `EventForm` composable; the ViewModel doesn't change. `EventForm` takes the
   `EventFormState`, like Material components take their state holder, and owns the title's `TextFieldState`, reporting its
   text through `edit`. The `EventFormState` instance only changes once, when the form is loaded, and its `form` is only
-  read inside `EventFormContent`, so a change doesn't run the screens' `Scaffold` again. The edit screen passes the event already loaded by
+  read inside `EventForm`, so a change doesn't run the screens' `Scaffold` again. The edit screen passes the event already loaded by
   `EventDetailSharedDataViewModel`, so the form is there on its first frame for the shared-element transition.
   `EventCreationViewModel` / `EventEditViewModel` only keep the screen state and the submission.
 - **Screens opened by the event form** (time zone, custom reminder, attendees) follow the screens' usual split: a public
