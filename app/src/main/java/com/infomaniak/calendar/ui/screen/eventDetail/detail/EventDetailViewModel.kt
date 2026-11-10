@@ -43,13 +43,7 @@ class EventDetailViewModel(
     @Assisted private val savedStateHandle: SavedStateHandle,
     private val backgroundEventComposer: BackgroundEventComposer,
 ) : ViewModel() {
-    val attendeesSearchState: AttendeesSearchState<OrganizerSource.Static> = savedStateHandle.saveableAttendeesSearchState()
-
     private var isDeleteRequested = false
-
-    suspend fun synchronizeAttendeesSearchState(eventDetailUi: StateFlow<EventDetailUiState>) {
-        eventDetailUi.synchronizeTo(attendeesSearchState)
-    }
 
     /** `false` when the deletion was already requested: the request is ignored. */
     fun deleteEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope): Boolean {

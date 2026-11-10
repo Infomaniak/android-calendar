@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -44,7 +45,8 @@ import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.SubmitButton
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.screen.eventDetail.AttendeesUpdatePayload
-import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailSharedDataViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EditAttendeesConfig
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -60,30 +62,39 @@ fun EditableAttendeesSearchScreen(
     modifier: Modifier = Modifier,
     viewModel: EditableAttendeesSearchViewModel = viewModel(),
     searchViewModel: AttendeesSearchViewModel = viewModel(),
-    eventDetailViewModel: EventDetailViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
+    eventDetailSharedDataViewModel: EventDetailSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current),
 ) {
-    val attendeesSearchState = eventDetailViewModel.attendeesSearchState
+    val eventDetailUi by eventDetailSharedDataViewModel.eventDetailUi.collectAsState()
 
-    if (config.canEdit) searchViewModel.EnableSearch(attendeesSearchState)
-
-    EditableAttendeesSearchScreen(
-        attendeesSearchState = attendeesSearchState,
-        config = config,
-        onSubmit = { scope ->
-            val isSuccess = viewModel.updateAttendees(
-                occurrenceId = config.occurrenceId,
-                attendeesUpdatePayload = AttendeesUpdatePayload(
-                    attendees = attendeesSearchState.attendees,
-                    organizer = (attendeesSearchState.organizerSource as? OrganizerSource.Static)?.organizer,
-                    calendarId = CalendarId(config.calendarId),
-                ),
-                scope = scope,
+    when (eventDetailUi) {
+        EventDetailUiState.Displayable.Loading -> Unit // The parent provides it right away, so nothing to show
+        is EventDetailUiState.Displayable.Success -> {
+            val attendeesSearchState = rememberSaveableAttendeesSearchState(
+                rememberSaveable { mutableStateSetOf<ParticipantUi>(eventDetailUi.eventDetail.attendees.toAttendeesUi()) },
             )
-            if (isSuccess) goBack()
-        },
-        goBack = goBack,
-        modifier = modifier,
-    )
+
+            if (config.canEdit) searchViewModel.EnableSearch(attendeesSearchState)
+
+            EditableAttendeesSearchScreen(
+                attendeesSearchState = attendeesSearchState,
+                config = config,
+                onSubmit = { scope ->
+                    val isSuccess = viewModel.updateAttendees(
+                        occurrenceId = config.occurrenceId,
+                        attendeesUpdatePayload = AttendeesUpdatePayload(
+                            attendees = attendeesSearchState.attendees,
+                            organizer = (attendeesSearchState.organizerSource as? OrganizerSource.Static)?.organizer,
+                            calendarId = CalendarId(config.calendarId),
+                        ),
+                        scope = scope,
+                    )
+                    if (isSuccess) goBack()
+                },
+                goBack = goBack,
+                modifier = modifier,
+            )
+        }
+    }
 }
 
 @Composable

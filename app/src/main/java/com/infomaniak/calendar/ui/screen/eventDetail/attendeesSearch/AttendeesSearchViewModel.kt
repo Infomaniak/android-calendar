@@ -60,7 +60,7 @@ class AttendeesSearchViewModel(private val contactsManager: ContactsManager) : V
     }
 }
 
-private fun List<Contact>.toAttendeesUi(alreadyPresentAttendees: Map<AttendeeUi.Key, AttendeeUi>): List<AttendeeUi> {
+fun List<Contact>.toAttendeesUi(alreadyPresentAttendees: Map<AttendeeUi.Key, AttendeeUi>): List<AttendeeUi> {
     return map { contact ->
         val alreadyPresentAttendee = alreadyPresentAttendees[AttendeeUi.Key(contact.email, contact.name)]
         if (alreadyPresentAttendee != null) return@map alreadyPresentAttendee
