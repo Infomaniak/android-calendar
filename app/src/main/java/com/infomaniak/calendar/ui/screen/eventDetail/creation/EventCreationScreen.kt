@@ -47,10 +47,10 @@ import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CalendarCross
-import kotlin.time.Clock
-import kotlin.time.Duration.Companion.hours
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.hours
 
 @Composable
 fun EventCreationScreen(
@@ -65,7 +65,7 @@ fun EventCreationScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(date) {
+    LaunchedEffect(Unit) {
         eventFormViewModel.initCreation(date)
     }
 
