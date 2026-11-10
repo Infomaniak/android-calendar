@@ -264,6 +264,7 @@ class AlarmSchedulerTest {
             ),
             hasAttendees = false,
             hasMeetRoom = false,
+            hasPlace = false,
             isBookable = false,
             isRecurring = false,
             myStatus = null,
