@@ -29,11 +29,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.timezonesearch.TimeZoneSearch
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.navigation.NavDestination
+import com.infomaniak.calendar.ui.navigation.sharedEventFormViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.datetime.TimeZone
 
 @Composable
 fun TimeZoneSearchScreen(
+    parent: NavDestination.EventForm,
+    isStart: Boolean,
+    goBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    eventFormViewModel: EventFormViewModel = sharedEventFormViewModel(parent),
+) {
+    TimeZoneSearchScreen(
+        onTimeZoneSelected = { timeZone ->
+            eventFormViewModel.formState?.edit { it.copy(dates = it.dates.pickTimeZone(isStart, timeZone)) }
+        },
+        goBack = goBack,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun TimeZoneSearchScreen(
     onTimeZoneSelected: (TimeZone) -> Unit,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,

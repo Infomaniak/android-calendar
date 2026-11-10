@@ -99,7 +99,8 @@ internal fun DateAndTime(
 internal fun DateAndTimeEditable(
     dates: EventDates,
     isAllDay: () -> Boolean,
-    onDatesChange: ((EventDates) -> EventDates) -> Unit,
+    onDatePicked: (isStart: Boolean, LocalDate) -> Unit,
+    onTimePicked: (isStart: Boolean, LocalTime) -> Unit,
     onTimeZoneClick: (isStart: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -110,15 +111,15 @@ internal fun DateAndTimeEditable(
         DateAndTimeEntry(
             entry = dates.start,
             isAllDay = isAllDay,
-            onDatePicked = { date -> onDatesChange { it.pickDate(isStart = true, date) } },
-            onTimePicked = { time -> onDatesChange { it.pickTime(isStart = true, time) } },
+            onDatePicked = { date -> onDatePicked(true, date) },
+            onTimePicked = { time -> onTimePicked(true, time) },
             onTimeZoneClick = { onTimeZoneClick(true) },
         )
         DateAndTimeEntry(
             entry = dates.end,
             isAllDay = isAllDay,
-            onDatePicked = { date -> onDatesChange { it.pickDate(isStart = false, date) } },
-            onTimePicked = { time -> onDatesChange { it.pickTime(isStart = false, time) } },
+            onDatePicked = { date -> onDatePicked(false, date) },
+            onTimePicked = { time -> onTimePicked(false, time) },
             onTimeZoneClick = { onTimeZoneClick(false) },
         )
     }
@@ -215,7 +216,8 @@ private fun PreviewEditable() {
             DateAndTimeEditable(
                 dates = dates,
                 isAllDay = { false },
-                onDatesChange = { transform -> dates = transform(dates) },
+                onDatePicked = { isStart, date -> dates = dates.pickDate(isStart, date) },
+                onTimePicked = { isStart, time -> dates = dates.pickTime(isStart, time) },
                 onTimeZoneClick = {},
             )
         }

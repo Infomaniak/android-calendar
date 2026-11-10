@@ -26,18 +26,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
-import com.infomaniak.calendar.components.eventdetail.form.EventFormContent
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
+import com.infomaniak.calendar.components.eventdetail.form.EventFormContent
+import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
@@ -74,11 +71,11 @@ fun EventEditScreen(
     ),
 ) {
     val eventDetailUiState = eventDetailSharedDataViewModel.eventDetailUi.collectAsStateWithLifecycle().value
-    val isFormLoaded by remember(eventFormViewModel) { derivedStateOf { eventFormViewModel.form != null } }
+    val formState = eventFormViewModel.formState
     val calendars = eventFormViewModel.calendars
 
-    val uiState = if (eventDetailUiState is EventDetailUiState.Displayable.Success && isFormLoaded && calendars != null) {
-        EventEditScreenState.Success(calendars, isRecurring = eventDetailUiState.eventDetail.isRecurring)
+    val uiState = if (eventDetailUiState is EventDetailUiState.Displayable.Success && formState != null && calendars != null) {
+        EventEditScreenState.Success(formState, calendars, isRecurring = eventDetailUiState.eventDetail.isRecurring)
     } else {
         EventEditScreenState.Loading
     }
@@ -93,9 +90,7 @@ fun EventEditScreen(
 
     EventEditScreen(
         uiState = uiState,
-        form = { eventFormViewModel.form },
         canSubmit = { eventFormViewModel.canSubmit },
-        update = eventFormViewModel::update,
         goBack = goBack,
         goToEventAttendees = goToEventAttendees,
         goToTimeZoneSearch = goToTimeZoneSearch,
@@ -113,9 +108,7 @@ fun EventEditScreen(
 @Composable
 private fun EventEditScreen(
     uiState: EventEditScreenState,
-    form: () -> EventForm?,
     canSubmit: () -> Boolean,
-    update: ((EventForm) -> EventForm) -> Unit,
     goBack: () -> Unit,
     goToEventAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
@@ -143,10 +136,8 @@ private fun EventEditScreen(
             // recreating the activity, but it still will be loaded from disk which is fast enough.
             EventEditScreenState.Loading -> Unit
             is EventEditScreenState.Success -> {
-                val form = form() ?: return@Scaffold
                 EventFormContent(
-                    form = form,
-                    update = update,
+                    state = uiState.formState,
                     calendars = uiState.calendars,
                     onAttendeesClick = goToEventAttendees,
                     onTimeZoneClick = goToTimeZoneSearch,
@@ -164,6 +155,7 @@ private fun EventEditScreen(
 private sealed interface EventEditScreenState {
     object Loading : EventEditScreenState
     data class Success(
+        val formState: EventFormState,
         val calendars: List<EventDetailCalendarGroup>,
         val isRecurring: Boolean,
     ) : EventEditScreenState
@@ -174,8 +166,8 @@ private sealed interface EventEditScreenState {
 private fun Preview() {
     CalendarTheme {
         Surface {
-            var form by remember {
-                mutableStateOf(
+            val formState = remember {
+                EventFormState(
                     EventForm.default(
                         calendar = previewEventDetailCalendar,
                         date = Clock.today(),
@@ -186,10 +178,8 @@ private fun Preview() {
             }
 
             EventEditScreen(
-                uiState = EventEditScreenState.Success(previewEventDetailCalendarGroups, isRecurring = false),
-                form = { form },
+                uiState = EventEditScreenState.Success(formState, previewEventDetailCalendarGroups, isRecurring = false),
                 canSubmit = { true },
-                update = { transform -> form = transform(form) },
                 goBack = {},
                 goToEventAttendees = {},
                 goToTimeZoneSearch = {},

@@ -24,9 +24,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,6 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormContent
+import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
@@ -68,10 +67,9 @@ fun EventCreationScreen(
 
     EventCreationScreen(
         uiState = uiState,
-        form = { eventFormViewModel.form },
+        formState = eventFormViewModel.formState,
         calendars = { eventFormViewModel.calendars },
         canSubmit = { eventFormViewModel.canSubmit },
-        update = eventFormViewModel::update,
         onSubmit = {
             val eventDraft = eventFormViewModel.toEventDraft() ?: return@EventCreationScreen
             if (viewModel.submitEvent(eventDraft)) goBack()
@@ -87,10 +85,9 @@ fun EventCreationScreen(
 @Composable
 private fun EventCreationScreen(
     uiState: EventCreationUiState,
-    form: () -> EventForm?,
+    formState: EventFormState?,
     calendars: () -> List<EventDetailCalendarGroup>?,
     canSubmit: () -> Boolean,
-    update: ((EventForm) -> EventForm) -> Unit,
     onSubmit: () -> Unit,
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
@@ -99,7 +96,6 @@ private fun EventCreationScreen(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
-    val form = form()
     val calendars = calendars()
 
     Scaffold(
@@ -122,10 +118,9 @@ private fun EventCreationScreen(
             )
             is EventCreationUiState.Success -> {
 
-                if (form != null && calendars != null) {
+                if (formState != null && calendars != null) {
                     EventFormContent(
-                        form = form,
-                        update = update,
+                        state = formState,
                         calendars = calendars,
                         onAttendeesClick = goToEventsAttendees,
                         onTimeZoneClick = goToTimeZoneSearch,
@@ -143,16 +138,15 @@ private fun EventCreationScreen(
 @Composable
 private fun EventCreationScreenPreview() {
     CalendarThemeForPreview {
-        var form by remember { mutableStateOf(previewEventForm) }
+        val formState = remember { EventFormState(previewEventForm) }
 
         EventCreationScreen(
             uiState = EventCreationUiState.Success(
                 EventCreationCalendars(previewEventDetailCalendarGroups, previewEventDetailCalendar),
             ),
-            form = { form },
+            formState = formState,
             calendars = { previewEventDetailCalendarGroups },
             canSubmit = { true },
-            update = { transform -> form = transform(form) },
             onSubmit = {},
             goBack = {},
             goToEventsAttendees = {},
@@ -168,10 +162,9 @@ private fun PreviewEmptyWritableCalendar() {
     CalendarThemeForPreview {
         EventCreationScreen(
             uiState = EventCreationUiState.NoWritableCalendar,
-            form = { previewEventForm },
+            formState = remember { EventFormState(previewEventForm) },
             calendars = { previewEventDetailCalendarGroups },
             canSubmit = { false },
-            update = {},
             onSubmit = {},
             goBack = {},
             goToEventsAttendees = {},

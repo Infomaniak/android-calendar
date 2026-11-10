@@ -46,12 +46,33 @@ import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.navigation.NavDestination
+import com.infomaniak.calendar.ui.navigation.sharedEventFormViewModel
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
+import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.coroutines.launch
 
 @Composable
 fun AttendeesSearchScreen(
+    parent: NavDestination.EventForm,
+    goBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    eventFormViewModel: EventFormViewModel = sharedEventFormViewModel(parent),
+) {
+    val formState = eventFormViewModel.formState ?: return
+
+    AttendeesSearchScreen(
+        initialParticipants = formState.form.participants,
+        organizerSource = formState.form.organizerSource,
+        onParticipantsChange = { participants -> formState.edit { it.copy(participants = participants) } },
+        goBack = goBack,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun AttendeesSearchScreen(
     initialParticipants: Set<ParticipantUi>,
     organizerSource: OrganizerSource?,
     onParticipantsChange: (Set<ParticipantUi>) -> Unit,

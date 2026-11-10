@@ -188,12 +188,8 @@ private fun baseEntryProvider(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
-            val eventFormViewModel = sharedEventFormViewModel(destination.parent)
-            val form = eventFormViewModel.form ?: return@NavEntry
             AttendeesSearchScreen(
-                initialParticipants = form.participants,
-                organizerSource = form.organizerSource,
-                onParticipantsChange = { participants -> eventFormViewModel.update { it.copy(participants = participants) } },
+                parent = destination.parent,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
         }
@@ -213,11 +209,9 @@ private fun baseEntryProvider(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
-            val eventFormViewModel = sharedEventFormViewModel(destination.parent)
             TimeZoneSearchScreen(
-                onTimeZoneSelected = { timeZone ->
-                    eventFormViewModel.update { it.copy(dates = it.dates.pickTimeZone(destination.isStart, timeZone)) }
-                },
+                parent = destination.parent,
+                isStart = destination.isStart,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
         }
@@ -226,11 +220,8 @@ private fun baseEntryProvider(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
-            val eventFormViewModel = sharedEventFormViewModel(destination.parent)
             CustomReminderScreen(
-                onSubmit = { notification ->
-                    eventFormViewModel.update { it.copy(notifications = it.notifications + notification) }
-                },
+                parent = destination.parent,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
         }

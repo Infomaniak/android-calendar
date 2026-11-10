@@ -58,7 +58,7 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
     │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, AttendeeSearch(parent: EventForm), EditableAttendeeSearch(parent: EventDetail, config), EventTimeZone(parent: EventForm, isStart), EventCustomReminder(parent: EventForm), Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
     │   ├── SharedViewModelStores.kt # `toContentKey`, `shareViewModelStoreWith(parent)` metadata, and
-    │   │                            # `sharedEventFormViewModel` read by the form's child entries
+    │   │                            # `sharedEventFormViewModel` read by the form's child screens
     │   ├── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
     │   └── ViewModelStoreSavedStates.kt # Saved state of each entry's ViewModelStore, kept until the entry is popped rather than
@@ -73,12 +73,12 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── settings/              # SettingScreen (opened from the drawer) + nested SettingThemeScreen + SettingThemeViewModel
     │   ├── eventCreation/         # EventCreationScreen
     │   ├── eventDetail/           # EventDetailScreen + EventEditScreen + EventCreationScreen + their ViewModels, and
-    │                              # attendeesSearch/ (AttendeesSearchScreen, given the form's participants and reporting them back;
+    │                              # attendeesSearch/ (AttendeesSearchScreen, reading and writing the form's participants;
     │                              # EditableAttendeesSearchScreen, given EventDetailViewModel's AttendeesSearchState;
     │                              # AttendeesSearchViewModel searching the contacts as the query is typed)
     │                              # form/ (EventFormViewModel: the event form state of EventCreation / EventEdit)
-    │                              # timeZoneSearch/ (TimeZoneSearchScreen: reports the picked time zone through `onTimeZoneSelected`)
-    │                              # customReminder/ (CustomReminderScreen: reports the made reminder through `onSubmit`)
+    │                              # timeZoneSearch/ (TimeZoneSearchScreen: writes the picked time zone to the form)
+    │                              # customReminder/ (CustomReminderScreen: adds the made reminder to the form)
     │   └── onboarding/            # Two onboardings, each with its own page enum, sharing OnboardingPage + OnboardingButtonDefaults:
     │                              # login/ (LoginOnboardingScreen + LoginOnboardingPage + CrossAppLoginViewModel): welcome + login;
     │                              # permissions/ (PermissionsOnboardingScreen + PermissionsOnboardingPage + NextStepButton): a pager
@@ -147,8 +147,9 @@ app/
   (`viewModel(LocalSharedViewModelStoreOwner.current)`); the parent calls plain `viewModel()`. Currently used for
   `EventDetailSharedDataViewModel` (the event loaded by EventDetail, reused by EventEdit), `EventFormViewModel` (below),
   and `EventDetailViewModel`, whose `AttendeesSearchState` the `EditableAttendeeSearch` entry hands to its screen.
-- **Event form state**: `EventFormViewModel` holds the `EventForm` (what the user filled in, participants and organizer
-  included: an immutable, `@Serializable` value, changed only through `update { it.copy(…) }`) and the calendars it can be
+- **Event form state**: `EventFormViewModel` holds an `EventFormState` around the `EventForm` (what the user filled in,
+  participants and organizer included: an immutable, `@Serializable` value, only changed through
+  `EventFormState.edit { it.copy(…) }`) and the calendars it can be
   put in, for a `NavDestination.EventForm` (`EventCreation` / `EventEdit`), in that destination's own store. Get it with
   `eventFormViewModel(destination, viewModelStoreOwner)`, which hands the destination to its factory through
   `CreationExtras`: whichever entry composes first creates it, and it loads what it needs itself, so a child entry restored
@@ -159,16 +160,17 @@ app/
   event's owner follow it. When the selected calendar can't be written to anymore, the form moves to a fallback one
   (the preselected calendar for a creation), keeping the rest of what was filled in, and `canSubmit` turns the Save
   button off while no writable calendar holds the form. A new form field goes in `EventForm` (and its `default` / `toEventDraft`), `toEventForm`, and the
-  `EventFormContent` composable; the ViewModel doesn't change. `EventFormContent` owns the title's `TextFieldState` and
-  reports its text through `update`. The screens read the form through a lambda (`form: () -> EventForm?`) inside their
-  content, so a change doesn't run their `Scaffold` again. The edit screen passes the event already loaded by
+  `EventFormContent` composable; the ViewModel doesn't change. `EventFormContent` takes the
+  `EventFormState`, like Material components take their state holder, and owns the title's `TextFieldState`, reporting its
+  text through `edit`. The `EventFormState` instance only changes once, when the form is loaded, and its `form` is only
+  read inside `EventFormContent`, so a change doesn't run the screens' `Scaffold` again. The edit screen passes the event already loaded by
   `EventDetailSharedDataViewModel`, so the form is there on its first frame for the shared-element transition.
   `EventCreationViewModel` / `EventEditViewModel` only keep the screen state and the submission.
-- **Screens opened by the event form** know nothing of it: they take their initial values or context as parameters, keep
-  their own draft until submitted, and report it through `onSubmit`-like callbacks before calling `goBack`. Their key only
-  carries `parent: NavDestination.EventForm` (plus navigation-only arguments such as `isStart`). Their `NavEntry` in
-  `MainNavHost`, the only place knowing both sides, reads the form through `sharedEventFormViewModel(destination.parent)`
-  (its `values` are `null` while the form loads), passes the values in, and writes the result back with `update`.
+- **Screens opened by the event form** (time zone, custom reminder, attendees) follow the screens' usual split: a public
+  composable taking `parent: NavDestination.EventForm` (plus navigation-only arguments such as `isStart`), which reads the
+  form through `sharedEventFormViewModel(parent)` as a default parameter (its `formState` is `null` while the form loads),
+  and a private stateless one taking initial values, keeping its own draft until submitted, and reporting it through
+  `onSubmit`-like callbacks before calling `goBack`. The public one writes the result back through `EventFormState.edit`. Their key only carries the parent, and their `NavEntry` in `MainNavHost` only passes it along.
 - **DI**: Metro `@DependencyGraph` (`AppGraph`) scoped to `AppScope`. ViewModels are auto-registered
   via multibinding (`@ContributesIntoMap` + `@ViewModelKey`) and resolved through the `metrox-viewmodel`
   `MetroViewModelFactory` (exposed as `metroViewModelFactory` by the `ViewModelGraph` the graph implements,
