@@ -27,14 +27,11 @@ enum class MetadataSceneStrategy(override val metadata: Map<String, Any>) : Navi
     Drawer(metadata = mapOf(SHOULD_SHOW_DRAWER to true)),
     ResponsiveDialog(metadata = mapOf(SHOULD_SHOW_RESPONSIVE_DIALOG to true)),
 
-    /** Settings list, shown side by side with the trailing [DetailPane] entries when the window is wide enough. */
+    /** Settings list, shown side by side with the trailing [DetailPane] entry when the window is wide enough. */
     SettingsListPane(metadata = ListDetailSceneStrategy.listPane(detailPlaceholder = { SettingDetailPlaceholder() })),
 
-    /** Second level of a list/detail layout, shown after its list. */
+    /** Detail shown after the last list pane. */
     DetailPane(metadata = ListDetailSceneStrategy.detailPane()),
-
-    /** Third level of a list/detail layout: when opened, its [DetailPane] moves to the start in place of the list. */
-    ExtraPane(metadata = ListDetailSceneStrategy.extraPane()),
 }
 
 fun metaDataOf(vararg items: NavigationMetadata): Map<String, Any> = buildMap {

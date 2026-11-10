@@ -20,22 +20,13 @@ package com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
-import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation3.LocalListDetailSceneScope
 import androidx.compose.runtime.Composable
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
-private val panesFromStartToEnd = listOf(
-    ListDetailPaneScaffoldRole.List,
-    ListDetailPaneScaffoldRole.Detail,
-    ListDetailPaneScaffoldRole.Extra,
-)
-
-/** Whether no other list/detail pane is shown before the [role] one, so it should display the back button. */
+/** Whether a list/detail layout currently shows its list pane, e.g. beside the detail pane. */
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun isFirstVisiblePane(role: ThreePaneScaffoldRole): Boolean {
+fun isListPaneExpanded(): Boolean {
     val scaffoldValue = LocalListDetailSceneScope.current?.scaffoldTransitionScope?.scaffoldStateTransition?.targetState
-        ?: return true
-    return panesFromStartToEnd.takeWhile { it != role }.none { scaffoldValue[it] == PaneAdaptedValue.Expanded }
+    return scaffoldValue?.get(ListDetailPaneScaffoldRole.List) == PaneAdaptedValue.Expanded
 }

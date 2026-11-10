@@ -21,7 +21,7 @@ import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
-import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -49,7 +49,7 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Metada
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationMetadata
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.ResponsiveDialogSceneStrategy
-import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.isFirstVisiblePane
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.isListPaneExpanded
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
 import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
 import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
@@ -238,9 +238,8 @@ private fun baseEntryProvider(
             )
         }
 
-        is NavDestination.Settings.Theme -> NavEntry(destination, metadata = metaDataOf(DetailPane)) {
-            val goBack = { backStack.popOrReplaceRoot(NavDestination.Settings.Main) }
-            SettingThemeScreen(goBack = goBack.takeIf { isFirstVisiblePane(ListDetailPaneScaffoldRole.Detail) })
+        is NavDestination.Settings.Theme -> backStack.settingsSubPageEntry(destination) { goBack ->
+            SettingThemeScreen(goBack = goBack)
         }
 
         is NavDestination.Onboarding.Login -> NavEntry(destination) {
@@ -262,10 +261,26 @@ private fun baseEntryProvider(
     }
 }
 
+/**
+ * Settings sub-pages pair up as list | detail at any depth: the last entry is the detail and the one before it the list, so
+ * opening a deeper page shifts the panes. The back button is only shown on the leftmost visible pane.
+ */
+private fun NavBackStack<NavDestination>.settingsSubPageEntry(
+    destination: NavDestination,
+    content: @Composable (goBack: (() -> Unit)?) -> Unit,
+): NavEntry<NavDestination> {
+    val isDetail = lastOrNull() == destination
+    return NavEntry(destination, metadata = metaDataOf(if (isDetail) DetailPane else SettingsListPane)) {
+        val goBack = { popOrReplaceRoot(NavDestination.Settings.Main) }
+        content(goBack.takeUnless { isDetail && isListPaneExpanded() })
+    }
+}
+
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 private fun <T : NavKey> sceneStrategies(windowSizeClass: WindowSizeClass): List<SceneStrategy<T>> {
-    val listDetailStrategy = rememberListDetailSceneStrategy<T>()
+    // Roles shift with the depth, so each back must only pop the last entry.
+    val listDetailStrategy = rememberListDetailSceneStrategy<T>(backNavigationBehavior = BackNavigationBehavior.PopLatest)
     // ResponsiveDialogSceneStrategy holds the scene of the ongoing dialog, it must survive recompositions.
     return remember(windowSizeClass, listDetailStrategy) {
         listOf(ResponsiveDialogSceneStrategy(windowSizeClass), listDetailStrategy)

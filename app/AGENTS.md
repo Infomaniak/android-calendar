@@ -119,12 +119,13 @@ app/
   Entries are decorated with `rememberSaveableStateHolderNavEntryDecorator()` followed by
   `rememberSharedViewModelStoreNavEntryDecorator()`, in that order.
 - **List/detail (Settings)**: Material 3's `ListDetailSceneStrategy` (`adaptive-navigation3`) lays settings out side by
-  side on wide windows. Tag the root settings entry with `metaDataOf(SettingsListPane)` (it brings the
-  `SettingDetailPlaceholder` shown while nothing is opened), its sub-pages with `metaDataOf(DetailPane)` and a sub-page's
-  own sub-pages with `metaDataOf(ExtraPane)`: opening one (A > B > C) shows B | C, back shows A | B again. Open a pane
-  with `backStack.replaceAbove(currentDestination, next)` so it replaces the pane already shown instead of stacking on
-  it. Pass `goBack.takeIf { isFirstVisiblePane(role) }` so only the leftmost visible pane shows a back button. On
-  compact windows the strategy steps aside and entries display one at a time as before.
+  side on wide windows. The root settings entry is always `metaDataOf(SettingsListPane)` (it brings the
+  `SettingDetailPlaceholder` shown while nothing is opened). Build every sub-page with `backStack.settingsSubPageEntry`
+  in `MainNavHost`: the last entry gets `DetailPane` and earlier ones `SettingsListPane`, so at any depth the last two
+  settings screens show as list | detail (A > B > C shows B | C, back shows A | B). This is why the strategy uses
+  `BackNavigationBehavior.PopLatest`. Open a page with `backStack.replaceAbove(currentDestination, next)` so it replaces
+  the detail already shown instead of stacking on it. The helper hides the detail's back button while the list pane is
+  visible. On compact windows the strategy steps aside and entries display one at a time as before.
 - **Sharing a ViewModel between a parent entry and a child entry**: the child's key carries its parent
   (`EventAttendees(parent)`), and its metadata uses `SharedViewModelStoreNavEntryDecorator.parent(parent.toContentKey())`.
   The parent entry must set `contentKey = destination.toContentKey()`, so both resolve the same store. The child reads the
