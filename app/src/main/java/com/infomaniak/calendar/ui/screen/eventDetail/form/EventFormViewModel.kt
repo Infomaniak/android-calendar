@@ -36,8 +36,8 @@ import androidx.savedstate.read
 import androidx.savedstate.savedState
 import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
-import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
+import com.infomaniak.calendar.components.eventdetail.form.EventFormValues
 import com.infomaniak.calendar.components.eventdetail.form.calendarOf
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
@@ -48,7 +48,7 @@ import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.screen.eventDetail.EventCreationCalendarsUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.EventLoader
-import com.infomaniak.calendar.utils.toEventForm
+import com.infomaniak.calendar.utils.toEventFormValues
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -90,7 +90,7 @@ private object DestinationKey : CreationExtras.Key<NavDestination.EventForm>
 private object LoadedEventKey : CreationExtras.Key<EventDetailUi>
 
 /**
- * Holds an [EventForm], shared with the screens it opens through its ViewModelStore.
+ * Holds the [EventFormValues] of an event form, shared with the screens it opens through its ViewModelStore.
  *
  * The form is saved as a whole in the [SavedStateHandle]. A restored one wins over the loaded one, which is only read for a new
  * form. The calendars it can be put in are reloaded every time, never saved.
@@ -115,7 +115,7 @@ class EventFormViewModel(
 
     init {
         savedStateHandle.setSavedStateProvider(FORM_KEY) {
-            formState?.form?.let { encodeToSavedState(EventForm.serializer(), it) } ?: savedState()
+            formState?.form?.let { encodeToSavedState(EventFormValues.serializer(), it) } ?: savedState()
         }
 
         when (destination) {
@@ -153,7 +153,7 @@ class EventFormViewModel(
         val defaultEventDuration = settingsDataValues.defaultEventDuration.flow.first()
 
         formState = EventFormState(
-            EventForm.default(
+            EventFormValues.default(
                 calendar = creationCalendars.initialCalendar,
                 date = destination.date,
                 timeZone = TimeZone.currentSystemDefault(),
@@ -163,7 +163,7 @@ class EventFormViewModel(
     }
 
     private fun initForm(event: EventDetailUi) {
-        if (formState == null) formState = EventFormState(event.toEventForm())
+        if (formState == null) formState = EventFormState(event.toEventFormValues())
         updateCalendars(event.calendars, fallback = event.calendar)
     }
 
@@ -196,9 +196,9 @@ class EventFormViewModel(
     companion object {
         private const val FORM_KEY = "form"
 
-        private fun SavedStateHandle.restoredForm(): EventForm? {
+        private fun SavedStateHandle.restoredForm(): EventFormValues? {
             val savedValues = get<SavedState>(FORM_KEY)?.takeUnless { it.read { isEmpty() } } ?: return null
-            return decodeFromSavedState(EventForm.serializer(), savedValues)
+            return decodeFromSavedState(EventFormValues.serializer(), savedValues)
         }
     }
 }

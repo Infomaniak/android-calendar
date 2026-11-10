@@ -33,8 +33,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
-import com.infomaniak.calendar.components.eventdetail.form.EventFormContent
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
+import com.infomaniak.calendar.components.eventdetail.form.EventFormValues
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
@@ -50,9 +50,9 @@ import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.core.common.utils.today
-import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
+import kotlinx.datetime.TimeZone
 
 @Composable
 fun EventEditScreen(
@@ -136,7 +136,7 @@ private fun EventEditScreen(
             // recreating the activity, but it still will be loaded from disk which is fast enough.
             EventEditScreenState.Loading -> Unit
             is EventEditScreenState.Success -> {
-                EventFormContent(
+                EventForm(
                     state = uiState.eventFormState,
                     calendars = uiState.calendars,
                     onAttendeesClick = goToEventAttendees,
@@ -168,7 +168,7 @@ private fun Preview() {
         Surface {
             val formState = remember {
                 EventFormState(
-                    EventForm.default(
+                    EventFormValues.default(
                         calendar = previewEventDetailCalendar,
                         date = Clock.today(),
                         timeZone = TimeZone.currentSystemDefault(),

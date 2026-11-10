@@ -22,13 +22,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
-/** Holds the [EventForm] drawn by [EventFormContent], which only changes through [edit]. */
+/** Holds the [EventFormValues] drawn by [EventForm], which only change through [edit]. */
 @Stable
-class EventFormState(initialForm: EventForm) {
-    var form: EventForm by mutableStateOf(initialForm)
+class EventFormState(initialForm: EventFormValues) {
+    var form: EventFormValues by mutableStateOf(initialForm)
         private set
 
-    fun edit(change: (EventForm) -> EventForm) {
+    fun edit(change: (EventFormValues) -> EventFormValues) {
         form = change(form)
     }
 }
