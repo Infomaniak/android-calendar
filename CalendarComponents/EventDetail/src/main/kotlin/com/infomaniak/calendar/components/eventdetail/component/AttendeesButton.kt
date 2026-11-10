@@ -52,7 +52,6 @@ import com.infomaniak.calendar.components.foundation.utils.fromAttendee
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
-import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ChevronRight
@@ -84,7 +83,7 @@ internal fun AttendeesButton(
             { Text(text = participationSummary(attendeeList)) }
         },
         trailingContent = {
-            Row(horizontalArrangement = Arrangement.spacedBy(Margin.Mini), verticalAlignment = Alignment.CenterVertically) {
+            Row(horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md), verticalAlignment = Alignment.CenterVertically) {
                 if (attendeeList.isEmpty()) {
                     Text(stringResource(R.string.noAttendeesLabel))
                 } else {

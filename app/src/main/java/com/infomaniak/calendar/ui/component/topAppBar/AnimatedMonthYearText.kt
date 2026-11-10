@@ -41,7 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentYear
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatMonthAndOptionalYear
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ChevronDown
 import kotlinx.datetime.LocalDate
@@ -69,7 +69,7 @@ fun AnimatedMonthYearText(
     ) { targetDate ->
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
+            horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(text = targetDate.yearMonth.formatMonthAndOptionalYear(currentYear))

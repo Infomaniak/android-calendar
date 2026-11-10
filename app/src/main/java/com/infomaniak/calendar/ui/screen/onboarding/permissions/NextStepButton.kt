@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.ui.screen.onboarding.OnboardingButtonDefaults
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.ui.compose.basics.Typography
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
 internal fun NextStepButton(
@@ -44,7 +44,7 @@ internal fun NextStepButton(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = Margin.Medium),
+            .padding(horizontal = EsdsTheme.spacing.xl),
         contentAlignment = Alignment.Center,
     ) {
         Button(

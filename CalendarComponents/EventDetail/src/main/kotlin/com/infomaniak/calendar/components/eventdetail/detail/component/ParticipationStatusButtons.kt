@@ -52,7 +52,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.theme.Dimens
-import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CircleCheck
@@ -130,7 +129,7 @@ private fun ParticipationStatusButton.colors(): ToggleButtonColors {
 private fun ParticipationStatusButtonsToolbarPreview() {
     MaterialTheme {
         Surface {
-            Column(verticalArrangement = Arrangement.spacedBy(Margin.Medium)) {
+            Column(verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xl)) {
                 ParticipationStatus.entries.forEach { participationStatus ->
                     ParticipationStatusButtonsToolbar(
                         participationStatus = { participationStatus },

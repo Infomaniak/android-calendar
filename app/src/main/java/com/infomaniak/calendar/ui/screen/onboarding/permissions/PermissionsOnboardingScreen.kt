@@ -42,7 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.onboarding.OnboardingPage
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.coroutines.launch
 
 @Composable
@@ -93,7 +93,7 @@ private fun PermissionsOnboardingScreen(
             NextStepButton(
                 page = pages[pagerState.currentPage],
                 onClick = onNextClicked,
-                modifier = Modifier.padding(vertical = Margin.Large),
+                modifier = Modifier.padding(vertical = EsdsTheme.spacing.threeXl),
             )
         }
     }

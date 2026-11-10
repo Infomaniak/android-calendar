@@ -33,10 +33,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.component.cardStripes
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
 fun EventItemCard(
@@ -75,10 +76,13 @@ fun EventItemCard(
 }
 
 object EventItemCardDefaults {
-    val HorizontalPaddingValue = Margin.Small
-    val VerticalPaddingValue = Margin.Mini
+    val HorizontalPaddingValue: Dp
+        @Composable get() = EsdsTheme.spacing.lg
+    val VerticalPaddingValue: Dp
+        @Composable get() = EsdsTheme.spacing.md
 
-    val ContentPadding = PaddingValues(horizontal = HorizontalPaddingValue, vertical = VerticalPaddingValue)
+    val ContentPadding: PaddingValues
+        @Composable get() = PaddingValues(horizontal = HorizontalPaddingValue, vertical = VerticalPaddingValue)
 }
 
 

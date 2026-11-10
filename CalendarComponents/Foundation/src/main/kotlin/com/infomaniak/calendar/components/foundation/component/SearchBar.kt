@@ -35,7 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.resources.R
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Cross
 import com.infomaniak.designsystem.icons.symbols.MagnifyingGlass
@@ -69,7 +69,7 @@ fun SearchBar(
             }
         },
         modifier = modifier
-            .padding(horizontal = Margin.Small, vertical = Margin.Small)
+            .padding(horizontal = EsdsTheme.spacing.lg, vertical = EsdsTheme.spacing.lg)
             .background(
                 color = MaterialTheme.colorScheme.surfaceContainerHigh,
                 shape = CircleShape,

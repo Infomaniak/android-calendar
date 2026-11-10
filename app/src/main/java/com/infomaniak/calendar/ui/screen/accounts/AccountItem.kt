@@ -37,7 +37,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
-import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.core.ui.compose.preview.previewparameter.dummyUserOf
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -66,7 +65,7 @@ fun AccountClickableItem(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = Margin.Medium)
+            .padding(horizontal = EsdsTheme.spacing.xl)
             .clip(EsdsTheme.radius.twoXl),
         color = Color.Transparent,
     ) {
@@ -82,7 +81,7 @@ fun AccountInformationItem(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = Margin.Medium)
+            .padding(horizontal = EsdsTheme.spacing.xl)
             .clip(EsdsTheme.radius.twoXl),
     ) {
         AccountItemContent(user = user, isClickable = false)

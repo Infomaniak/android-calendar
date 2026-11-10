@@ -65,7 +65,7 @@ android-calendar/
     - `multiplatform-calendar/gradle/kmpCalendar.versions.toml` — KMP-side dependencies, exposed in `settings.gradle.kts`
       as the `kmpCalendar` catalog (e.g. `kotlinx-datetime` used by Foundation and Planning).
     - `Core/gradle/core.versions.toml` — Core library dependencies and plugin aliases, exposed as the `core` catalog
-      (e.g. `core.plugins.android.library`, `core.compose.bom`, `core.infomaniak.core.ui.compose.margin`).
+      (e.g. `core.plugins.android.library`, `core.compose.bom`, `core.infomaniak.core.avatar`).
 - **Project inclusion**: `settings.gradle.kts` includes `:app` plus the `:CalendarComponents:*` subprojects. The
   `multiplatform-calendar` library comes either from its published artifact (default) or, with
   `useCalendarCoreCompositeBuild=true` (in `local.properties` or as a Gradle property), from the submodule sources:
@@ -183,10 +183,10 @@ in the stack it needs.
   `Foundation` (and every module depending on it) require the `core.plugins.infomaniak.android.library.flavor.aware`
   plugin instead of `core.plugins.android.library` (see the "Flavors" section above).
 - `core.infomaniak.common` — `KotlinDateUtils` date helpers (`Clock.today()`, `LocalDate.isToday()`, …) (from `core` catalog).
-- `core.infomaniak.core.ui.compose.margin` — `Margin` spacing constants (from `core` catalog, Planning only).
 - `kmpCalendar.kotlinx.datetime` — `kotlinx-datetime` types (`LocalDate`, `TimeZone`, …) (Foundation + Planning).
 - `libs.compose.material3` — Material 3 Compose (from `libs` catalog).
-- `libs.infomaniak.designsystem.theme.calendar` — Infomaniak Design System.
+- `libs.infomaniak.designsystem.theme.calendar` — Infomaniak Design System; spacing comes from `EsdsTheme.spacing`, not
+  Core's `Margin`.
 
 ### Ownership
 

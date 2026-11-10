@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.ui.navigation.NavDestination
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ColumnsFour
 import com.infomaniak.designsystem.icons.symbols.ColumnsThree
@@ -62,7 +62,7 @@ fun FloatingToolbarDropdownMenu(
         popupPositionProvider = MenuDefaults.rememberDropdownMenuPopupPositionProvider(
             dropdownMenuAnchorPosition = MenuAnchorPosition.Above,
         ),
-        modifier = modifier.padding(bottom = Margin.Medium),
+        modifier = modifier.padding(bottom = EsdsTheme.spacing.xl),
         properties = PopupProperties(clippingEnabled = false, focusable = true),
     ) {
         val currentDestination = currentDestination()

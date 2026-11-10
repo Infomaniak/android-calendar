@@ -35,7 +35,7 @@ import com.infomaniak.calendar.components.eventdetail.detail.component.notificat
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.core.common.R as RCommon
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Cross
 import kotlin.time.Duration.Companion.minutes
@@ -46,7 +46,7 @@ internal fun ReminderItem(notification: EventDetailUi.Notification, onRemoveClic
         modifier = modifier,
         leadingContent = { ItemIcon(notification.type.icon) },
         trailingContent = {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md)) {
                 Text(notificationTimeText(notification.time), style = MaterialTheme.typography.labelLarge)
                 IconButton(onClick = onRemoveClick) {
                     Icon(EsdsIcons.Cross.Small, contentDescription = stringResource(RCommon.string.deleteButton))

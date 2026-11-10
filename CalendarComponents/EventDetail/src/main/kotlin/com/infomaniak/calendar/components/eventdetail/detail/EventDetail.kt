@@ -52,7 +52,7 @@ import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventShare
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailUi
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 /**
  * [sharedTransitionScope] and [animatedVisibilityScope] animate associated components between detail and editing.
@@ -147,7 +147,7 @@ private fun PreviewEventDetail() {
                         onLocationClick = {},
                         onRoomClick = {},
                         goToEventAttendees = {},
-                        contentPadding = PaddingValues(horizontal = Margin.Small) + it,
+                        contentPadding = PaddingValues(horizontal = EsdsTheme.spacing.lg) + it,
                     )
                 }
             }

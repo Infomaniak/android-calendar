@@ -173,7 +173,6 @@ dependencies {
     implementation(core.infomaniak.core.datavalue)
     implementation(core.infomaniak.core.sentry)
     implementation(core.infomaniak.core.ui.compose.basics)
-    implementation(core.infomaniak.core.ui.compose.margin)
     implementation(core.infomaniak.core.ui.compose.preview)
     implementation(core.infomaniak.core.ui.compose.theme)
     implementation(libs.infomaniak.designsystem.icons)

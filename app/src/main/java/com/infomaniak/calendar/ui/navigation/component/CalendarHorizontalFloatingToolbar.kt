@@ -43,7 +43,7 @@ import com.infomaniak.calendar.ui.modifier.sharedElement
 import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CalendarNumberOne
 import com.infomaniak.calendar.components.resources.R as RComponents
@@ -84,7 +84,7 @@ private fun CalendarHorizontalFloatingToolbar(
             .fillMaxWidth()
             .windowInsetsPadding(NavigationBarDefaults.windowInsets)
             .sharedElement(key = FLOATING_TOOLBARBAR_KEY)
-            .padding(end = Margin.Large),
+            .padding(end = EsdsTheme.spacing.threeXl),
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.Bottom,
     ) {

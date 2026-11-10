@@ -65,7 +65,7 @@ import com.infomaniak.calendar.components.foundation.state.DateState
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatFullDateWithYear
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Plus
 import kotlinx.datetime.LocalDate
@@ -112,7 +112,7 @@ internal fun Day(
                 selected = dateState == DateState.Selected
                 stateDescriptionToday?.let { stateDescription = it }
             }
-            .padding(Margin.Micro),
+            .padding(EsdsTheme.spacing.xs),
         contentAlignment = Alignment.Center,
     ) {
         AnimatedContent(
@@ -173,7 +173,7 @@ private fun DayCircleContent(
                     dots = dotsFor(),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = Margin.Micro),
+                        .padding(bottom = EsdsTheme.spacing.xs),
                 )
             } else {
                 Spacer(modifier = Modifier.height(DOT_SIZE))
