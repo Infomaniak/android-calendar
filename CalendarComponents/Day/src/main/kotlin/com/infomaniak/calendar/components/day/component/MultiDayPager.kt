@@ -74,11 +74,12 @@ import kotlinx.datetime.plus
 import kotlin.time.Clock
 
 /**
- * Several days side by side, one column each. All columns have an overlay header.
+ * [dayCount] days side by side starting on [firstDay], one column each. All columns have an overlay header.
  */
 @Composable
-internal fun MultiDayPager(
-    dates: List<LocalDate>,
+fun MultiDayPager(
+    firstDay: LocalDate,
+    dayCount: Int,
     eventsOf: (LocalDate) -> DayEvents,
     state: TimelineState,
     weekNumbering: WeekNumbering,
@@ -89,6 +90,7 @@ internal fun MultiDayPager(
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val density = LocalDensity.current
+    val dates = remember(firstDay, dayCount) { List(dayCount) { firstDay.plus(it, DateTimeUnit.DAY) } }
     var headerHeight by remember { mutableStateOf(0.dp) }
     val contentPadding = contentPadding + PaddingValues(horizontal = EsdsTheme.spacing.md)
 
@@ -266,14 +268,14 @@ private fun Modifier.verticalEndDivider(color: Color = ComponentColors.GridDivid
 @Composable
 private fun PaddingValues.onlyHorizontalAndTop(): PaddingValues = onlyHorizontal() + PaddingValues(top = calculateTopPadding())
 
-private val previewDates = Clock.today().let { today -> List(3) { today.plus(it, DateTimeUnit.DAY) } }
 
 @Preview
 @Composable
 private fun MultiDayPagerPreview() {
     Surface {
         MultiDayPager(
-            dates = previewDates,
+            firstDay = Clock.today(),
+            dayCount = 3,
             eventsOf = { previewDayEvents },
             state = rememberDayTimelineState({}, scrollState = rememberScrollState(initial = 430)),
             weekNumbering = WeekNumbering.ISO_8601,

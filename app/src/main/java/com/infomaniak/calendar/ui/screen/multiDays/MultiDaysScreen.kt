@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.multiDays.threeDays
+package com.infomaniak.calendar.ui.screen.multiDays
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.TopAppBarDefaults
@@ -30,7 +30,7 @@ import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendarDefaults
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
-import com.infomaniak.calendar.components.day.ThreeDayPager
+import com.infomaniak.calendar.components.day.component.MultiDayPager
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
@@ -43,7 +43,6 @@ import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
 import com.infomaniak.calendar.ui.model.TimelineUiState
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
-import com.infomaniak.calendar.ui.screen.multiDays.MultiDaysViewModel
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
@@ -51,8 +50,12 @@ import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.datetime.LocalDate
 
+private const val DAYS_PER_WEEK = 7
+
+/** A week when [dayCount] is a full week, else [dayCount] days starting on the visible date. */
 @Composable
-fun ThreeDayScreen(
+fun MultiDaysScreen(
+    dayCount: Int,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MultiDaysViewModel = viewModel(),
@@ -72,7 +75,8 @@ fun ThreeDayScreen(
 
     ApplyJumpRequests(visibleDayState)
 
-    ThreeDayScreen(
+    MultiDaysScreen(
+        dayCount = dayCount,
         goToEventDetail = goToEventDetail,
         uiState = { uiState },
         isLoadingEvents = { isLoadingEvents },
@@ -84,7 +88,8 @@ fun ThreeDayScreen(
 }
 
 @Composable
-private fun ThreeDayScreen(
+private fun MultiDaysScreen(
+    dayCount: Int,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     uiState: () -> TimelineUiState,
     isLoadingEvents: () -> Boolean,
@@ -116,11 +121,14 @@ private fun ThreeDayScreen(
         },
         modifier = modifier,
     ) { contentPadding ->
-        ThreeDayPager(
-            selectedDate = { visibleDayState.visibleDate },
+        val weekNumbering = WeekNumbering.ISO_8601 //TODO[weekNumbering]: Use week numbering from LocalSettings
+        val visibleDate = visibleDayState.visibleDate
+        MultiDayPager(
+            firstDay = if (dayCount == DAYS_PER_WEEK) weekNumbering.weekOf(visibleDate).firstDay else visibleDate,
+            dayCount = dayCount,
             eventsOf = { uiState().eventsOf(it) },
             state = timelineState,
-            weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
+            weekNumbering = weekNumbering,
             onEventClick = { goToEventDetail(it.occurrenceId) },
             headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
             timelineModifier = Modifier.hazeSource(hazeState),
@@ -138,7 +146,8 @@ private fun Preview() {
     CalendarThemeForPreview {
         val visibleDayState = rememberVisibleDayState()
         CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
-            ThreeDayScreen(
+            MultiDaysScreen(
+                dayCount = 3,
                 goToEventDetail = {},
                 uiState = { TimelineUiState.Success(emptyMap()) },
                 isLoadingEvents = { false },

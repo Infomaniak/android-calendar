@@ -60,8 +60,7 @@ app/src/main/java/com/infomaniak/calendar/
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
     ├── screen/
     │   ├── day/                   # DayScreen + DayViewModel
-    │   ├── threeDays/             # ThreeDayScreen + ThreeDayViewModel — 3-day view (events via DayEventsLoader)
-    │   ├── week/                  # WeekScreen + WeekViewModel — week view (events via DayEventsLoader)
+    │   ├── multiDays/             # MultiDaysScreen(dayCount) + MultiDaysViewModel — 3-day and week views share one entry (same contentKey)
     │   ├── month/                 # MonthScreen + MonthViewModel
     │   ├── planning/              # PlanningScreen + PlanningViewModel (events from VisibleEventsManager) + PlanningEventGroupingExt
     │   ├── accounts/              # AccountsListScreen + AccountActionsScreen + AccountsViewModel + AccountItem
