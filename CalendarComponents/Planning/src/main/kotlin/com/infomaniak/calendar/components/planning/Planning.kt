@@ -44,7 +44,7 @@ import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.foundation.state.DateState
-import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
+import com.infomaniak.calendar.components.foundation.state.rememberCurrentInstant
 import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortDayNameUppercase
 import com.infomaniak.calendar.components.planning.component.DayCurrentTimeLine
@@ -56,9 +56,7 @@ import com.infomaniak.calendar.components.planning.preview.PlanningPreviewParame
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 @Composable
 fun Planning(
@@ -71,7 +69,7 @@ fun Planning(
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val today by rememberToday()
-    val currentDateTime = rememberCurrentDateTime()
+    val currentInstant = rememberCurrentInstant()
 
     LazyColumn(
         state = lazyListState,
@@ -91,7 +89,7 @@ fun Planning(
                     date = date,
                     events = eventsOf(date),
                     today = today,
-                    currentDateTime = currentDateTime::value,
+                    currentInstant = currentInstant::value,
                     lazyListState = lazyListState,
                     index = index,
                     goToEventCreation = goToEventCreation,
@@ -107,7 +105,7 @@ private fun Day(
     date: LocalDate,
     events: List<EventSummaryUi>?,
     today: LocalDate,
-    currentDateTime: () -> LocalDateTime,
+    currentInstant: () -> Instant,
     lazyListState: LazyListState,
     index: Int,
     goToEventCreation: (LocalDate) -> Unit,
@@ -126,11 +124,7 @@ private fun Day(
 
         events?.let {
             Column {
-                val currentTimeIndex = if (date == today) {
-                    events.currentTimeIndex(now = currentDateTime().toInstant(TimeZone.currentSystemDefault()))
-                } else {
-                    null
-                }
+                val currentTimeIndex = if (date == today) events.currentTimeIndex(now = currentInstant()) else null
 
                 events.forEachIndexed { index, event ->
                     when {
