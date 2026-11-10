@@ -35,7 +35,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,10 +73,10 @@ import kotlinx.datetime.plus
 import kotlin.time.Clock
 
 /**
- * Several days side by side, one column each. All columns have an overlay header.
+ * The given [dates] side by side, one column each (they need not be contiguous). All columns have an overlay header.
  */
 @Composable
-internal fun MultiDayPager(
+fun MultiDayPager(
     dates: List<LocalDate>,
     eventsOf: (LocalDate) -> DayEvents,
     state: TimelineState,

@@ -62,8 +62,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
-import com.infomaniak.calendar.ui.screen.multiDays.threeDays.ThreeDayScreen
-import com.infomaniak.calendar.ui.screen.multiDays.week.WeekScreen
+import com.infomaniak.calendar.ui.screen.multiDays.MultiDaysScreen
 import com.infomaniak.calendar.ui.screen.onboarding.login.LoginOnboardingScreen
 import com.infomaniak.calendar.ui.screen.onboarding.permissions.PermissionsOnboardingPage
 import com.infomaniak.calendar.ui.screen.onboarding.permissions.PermissionsOnboardingScreen
@@ -121,12 +120,16 @@ private fun baseEntryProvider(
             DayScreen(goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) })
         }
 
-        is NavDestination.CalendarView.ThreeDays -> NavEntry(destination, metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-            ThreeDayScreen(goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) })
-        }
-
-        is NavDestination.CalendarView.Week -> NavEntry(destination, metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-            WeekScreen(goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) })
+        // One branch (and content key) so the screen's composition is kept when switching between both.
+        is NavDestination.CalendarView.ThreeDays, is NavDestination.CalendarView.Week -> NavEntry(
+            key = destination,
+            contentKey = MULTI_DAYS_CONTENT_KEY,
+            metadata = metaDataOf(FloatingToolbarWithFab, Drawer),
+        ) {
+            MultiDaysScreen(
+                dayCount = if (destination is NavDestination.CalendarView.Week) 7 else 3,
+                goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) },
+            )
         }
 
         is NavDestination.CalendarView.Month -> NavEntry(destination, metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
@@ -329,6 +332,8 @@ private fun sceneDecoratorStrategies(
 
     return listOf(navigationStrategy, drawerStrategy)
 }
+
+private const val MULTI_DAYS_CONTENT_KEY = "multiDays"
 
 private fun NavKey.toContentKey() = this.toString()
 
