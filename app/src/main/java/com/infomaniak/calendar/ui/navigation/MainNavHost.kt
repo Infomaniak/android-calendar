@@ -44,8 +44,8 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Drawer
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.DetailPane
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.Drawer
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
-import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.SettingsListPane
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.ResponsiveDialog
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.SettingsListPane
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationMetadata
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.ResponsiveDialogSceneStrategy
@@ -269,7 +269,7 @@ private fun NavBackStack<NavDestination>.settingsSubPageEntry(
     destination: NavDestination,
     content: @Composable (goBack: (() -> Unit)?) -> Unit,
 ): NavEntry<NavDestination> {
-    val isDetail = lastOrNull() == destination
+    val isDetail = lastOrNull { it is NavDestination.Settings } == destination
     return NavEntry(destination, metadata = metaDataOf(if (isDetail) DetailPane else SettingsListPane)) {
         val goBack = { popOrReplaceRoot(NavDestination.Settings.Main) }
         content(goBack.takeUnless { isDetailBesideList() })
