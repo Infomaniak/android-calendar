@@ -41,6 +41,7 @@ import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatus
 import com.infomaniak.calendar.components.eventdetail.component.Recurrence
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
+import com.infomaniak.calendar.components.eventdetail.component.item
 import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
@@ -80,19 +81,24 @@ fun EventDetail(
 
             Section(EventSharedElement.Divider1) {
                 if (attendees.all.isNotEmpty()) {
-                    AttendeesButton(
-                        attendees = { attendees.all },
-                        onClick = goToEventAttendees,
-                        modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
-                    )
+                    item {
+                        AttendeesButton(
+                            shapes = it,
+                            attendees = { attendees.all },
+                            onClick = goToEventAttendees,
+                            modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
+                        )
+                    }
                 }
 
                 if (kMeetUrl?.isNotBlank() == true) {
-                    KMeetButton(
-                        onJoin = onJoinKMeet,
-                        onCopy = onCopyKMeet,
-                        modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
-                    )
+                    item {
+                        KMeetButton(
+                            onJoin = onJoinKMeet,
+                            onCopy = onCopyKMeet,
+                            modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
+                        )
+                    }
                 }
 
                 if (location?.isNotBlank() == true) {
