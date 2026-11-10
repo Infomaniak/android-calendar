@@ -52,7 +52,7 @@ class AttendeesSearchState<T : OrganizerSource>(
 
     private val me: AttendeeUi? by derivedStateOf { (organizerSource as? OrganizerSource.Dynamic)?.owner }
 
-    val attendees: List<AttendeeUi> by derivedStateOf { participants.mapNotNull { it.toAttendeeUi(me) } }
+    val attendees: List<AttendeeUi> by derivedStateOf { participants.mapNotNull { it.toAttendeeUi(me) }.distinctBy { it.key } }
 
     val attendeesEmailsLowercase by derivedStateOf { attendees.map { it.email.lowercase() } }
 
@@ -88,7 +88,7 @@ class AttendeesSearchState<T : OrganizerSource>(
         if (participants.isEmpty() && organizerSource is OrganizerSource.Dynamic) {
             participants.add(ParticipantUi.Me)
         }
-        participants.add(attendee)
+        participants.add(if (attendee.email.equals(me?.email, ignoreCase = true)) ParticipantUi.Me else attendee)
         searchQueryTextFieldState.clearText()
     }
 
