@@ -22,6 +22,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,7 +49,9 @@ import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.plus
 
 private const val DAYS_PER_WEEK = 7
 
@@ -123,9 +126,10 @@ private fun MultiDaysScreen(
     ) { contentPadding ->
         val weekNumbering = WeekNumbering.ISO_8601 //TODO[weekNumbering]: Use week numbering from LocalSettings
         val visibleDate = visibleDayState.visibleDate
+        val firstDay = if (dayCount == DAYS_PER_WEEK) weekNumbering.weekOf(visibleDate).firstDay else visibleDate
+        val dates = remember(firstDay, dayCount) { List(dayCount) { firstDay.plus(it, DateTimeUnit.DAY) } }
         MultiDayPager(
-            firstDay = if (dayCount == DAYS_PER_WEEK) weekNumbering.weekOf(visibleDate).firstDay else visibleDate,
-            dayCount = dayCount,
+            dates = dates,
             eventsOf = { uiState().eventsOf(it) },
             state = timelineState,
             weekNumbering = weekNumbering,

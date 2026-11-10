@@ -35,7 +35,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,12 +73,11 @@ import kotlinx.datetime.plus
 import kotlin.time.Clock
 
 /**
- * [dayCount] days side by side starting on [firstDay], one column each. All columns have an overlay header.
+ * The given [dates] side by side, one column each (they need not be contiguous). All columns have an overlay header.
  */
 @Composable
 fun MultiDayPager(
-    firstDay: LocalDate,
-    dayCount: Int,
+    dates: List<LocalDate>,
     eventsOf: (LocalDate) -> DayEvents,
     state: TimelineState,
     weekNumbering: WeekNumbering,
@@ -90,7 +88,6 @@ fun MultiDayPager(
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val density = LocalDensity.current
-    val dates = remember(firstDay, dayCount) { List(dayCount) { firstDay.plus(it, DateTimeUnit.DAY) } }
     var headerHeight by remember { mutableStateOf(0.dp) }
     val contentPadding = contentPadding + PaddingValues(horizontal = EsdsTheme.spacing.md)
 
@@ -268,14 +265,14 @@ private fun Modifier.verticalEndDivider(color: Color = ComponentColors.GridDivid
 @Composable
 private fun PaddingValues.onlyHorizontalAndTop(): PaddingValues = onlyHorizontal() + PaddingValues(top = calculateTopPadding())
 
+private val previewDates = Clock.today().let { today -> List(3) { today.plus(it, DateTimeUnit.DAY) } }
 
 @Preview
 @Composable
 private fun MultiDayPagerPreview() {
     Surface {
         MultiDayPager(
-            firstDay = Clock.today(),
-            dayCount = 3,
+            dates = previewDates,
             eventsOf = { previewDayEvents },
             state = rememberDayTimelineState({}, scrollState = rememberScrollState(initial = 430)),
             weekNumbering = WeekNumbering.ISO_8601,
