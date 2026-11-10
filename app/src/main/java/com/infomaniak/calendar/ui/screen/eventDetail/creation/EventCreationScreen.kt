@@ -40,6 +40,7 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.foundation.component.EmptyState
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
+import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventCreationCalendars
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -71,7 +72,7 @@ fun EventCreationScreen(
 
     EventCreationScreen(
         uiState = uiState,
-        formState = eventFormViewModel.formState,
+        formUiState = eventFormViewModel.uiState,
         calendars = { eventFormViewModel.calendars },
         canSubmit = { eventFormViewModel.canSubmit },
         onSubmit = {
@@ -89,7 +90,7 @@ fun EventCreationScreen(
 @Composable
 private fun EventCreationScreen(
     uiState: EventCreationUiState,
-    formState: EventFormState?,
+    formUiState: EventFormUiState,
     calendars: () -> List<EventDetailCalendarGroup>?,
     canSubmit: () -> Boolean,
     onSubmit: () -> Unit,
@@ -120,10 +121,11 @@ private fun EventCreationScreen(
                 icon = EsdsIcons.CalendarCross,
                 modifier = Modifier.padding(contentPadding),
             )
-            is EventCreationUiState.Success -> formState?.let {
-                EventForm(
-                    state = it,
-                    calendars = calendars ?: return@let,
+            is EventCreationUiState.Success -> when (formUiState) {
+                EventFormUiState.Loading -> Unit
+                is EventFormUiState.Loaded -> EventForm(
+                    state = formUiState.formState,
+                    calendars = calendars ?: return@Scaffold,
                     onAttendeesClick = goToEventsAttendees,
                     onTimeZoneClick = goToTimeZoneSearch,
                     onCustomReminderClick = goToCustomReminder,
@@ -145,7 +147,7 @@ private fun EventCreationScreenPreview() {
             uiState = EventCreationUiState.Success(
                 EventCreationCalendars(previewEventDetailCalendarGroups, previewEventDetailCalendar),
             ),
-            formState = state,
+            formUiState = EventFormUiState.Loaded(state),
             calendars = { previewEventDetailCalendarGroups },
             canSubmit = { true },
             onSubmit = {},
@@ -163,7 +165,7 @@ private fun PreviewEmptyWritableCalendar() {
     CalendarThemeForPreview {
         EventCreationScreen(
             uiState = EventCreationUiState.NoWritableCalendar,
-            formState = remember { EventFormState(previewEventForm) },
+            formUiState = EventFormUiState.Loaded(remember { EventFormState(previewEventForm) }),
             calendars = { previewEventDetailCalendarGroups },
             canSubmit = { false },
             onSubmit = {},

@@ -71,8 +71,12 @@ class EventFormViewModel(
     private val eventCreationCalendarsUseCase: EventCreationCalendarsUseCase,
     private val settingsDataValues: SettingsDataValues,
 ) : ViewModel() {
-    var formState: EventFormState? by mutableStateOf(savedStateHandle.restoredForm()?.let(::EventFormState))
+    var uiState: EventFormUiState by mutableStateOf(
+        savedStateHandle.restoredForm()?.let { EventFormUiState.Loaded(EventFormState(it)) } ?: EventFormUiState.Loading,
+    )
         private set
+
+    private val formState: EventFormState? get() = (uiState as? EventFormUiState.Loaded)?.formState
 
     var calendars: List<EventDetailCalendarGroup>? by mutableStateOf(null)
         private set
@@ -97,12 +101,14 @@ class EventFormViewModel(
             val creationCalendars = eventCreationCalendarsUseCase.creationCalendars.filterNotNull().first()
             val defaultEventDuration = settingsDataValues.defaultEventDuration.flow.first()
 
-            formState = EventFormState(
-                EventFormValues.default(
-                    calendar = creationCalendars.initialCalendar,
-                    date = date,
-                    timeZone = TimeZone.currentSystemDefault(),
-                    eventDuration = defaultEventDuration,
+            uiState = EventFormUiState.Loaded(
+                EventFormState(
+                    EventFormValues.default(
+                        calendar = creationCalendars.initialCalendar,
+                        date = date,
+                        timeZone = TimeZone.currentSystemDefault(),
+                        eventDuration = defaultEventDuration,
+                    ),
                 ),
             )
         }
@@ -127,6 +133,11 @@ class EventFormViewModel(
         }
     }
 
+    /** Edits the form once it's loaded, for the screens it opens. */
+    fun edit(change: (EventFormValues) -> EventFormValues) {
+        formState?.edit(change)
+    }
+
     fun toEventDraft(): EventDraft? {
         val form = formState?.form ?: return null
         val calendar = calendars?.calendarOf(form.calendarId) ?: return null
@@ -135,7 +146,7 @@ class EventFormViewModel(
     }
 
     private fun initForm(event: EventDetailUi) {
-        if (formState == null) formState = EventFormState(event.toEventFormValues())
+        if (formState == null) uiState = EventFormUiState.Loaded(EventFormState(event.toEventFormValues()))
         updateCalendars(event.calendars, fallback = event.calendar)
     }
 
