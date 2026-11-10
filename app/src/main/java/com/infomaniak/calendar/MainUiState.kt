@@ -17,7 +17,7 @@
  */
 package com.infomaniak.calendar
 
-import com.infomaniak.calendar.data.SettingThemeOption
+import com.infomaniak.calendar.model.settings.SettingThemeOption
 import com.infomaniak.calendar.ui.navigation.NavDestination
 
 sealed interface MainUiState {

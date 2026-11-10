@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
-import com.infomaniak.calendar.data.SettingThemeOption
+import com.infomaniak.calendar.model.settings.SettingThemeOption
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemClickable
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemOpen
 import com.infomaniak.calendar.ui.screen.settings.components.SettingScaffold

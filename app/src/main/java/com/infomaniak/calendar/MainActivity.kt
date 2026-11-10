@@ -52,7 +52,7 @@ import com.infomaniak.calendar.components.foundation.manager.AvatarFinder
 import com.infomaniak.calendar.components.foundation.state.LocalAvatarFinder
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
-import com.infomaniak.calendar.data.SettingThemeOption
+import com.infomaniak.calendar.model.settings.SettingThemeOption
 import com.infomaniak.calendar.extensions.appGraph
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.notification.NotificationHelper

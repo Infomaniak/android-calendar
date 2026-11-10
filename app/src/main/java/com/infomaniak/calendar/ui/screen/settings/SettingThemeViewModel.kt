@@ -19,7 +19,7 @@ package com.infomaniak.calendar.ui.screen.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.calendar.data.SettingThemeOption
+import com.infomaniak.calendar.model.settings.SettingThemeOption
 import com.infomaniak.calendar.data.SettingsDataValues
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
