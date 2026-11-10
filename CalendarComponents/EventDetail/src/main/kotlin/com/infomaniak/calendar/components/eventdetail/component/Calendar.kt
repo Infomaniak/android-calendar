@@ -77,7 +77,7 @@ internal fun CalendarEditable(
     DropDownItem(
         onClick = { isDialogVisible = true },
         content = {
-            Row {
+            Row (verticalAlignment = Alignment.CenterVertically) {
                 Icon(EsdsIcons.Calendar.Small, contentDescription = null)
                 Text(stringResource(id = R.string.sectionCalendarHeader), modifier = Modifier.padding(start = EsdsTheme.spacing.lg))
             }
