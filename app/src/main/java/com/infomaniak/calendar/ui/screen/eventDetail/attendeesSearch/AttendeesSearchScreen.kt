@@ -45,6 +45,7 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
+import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
@@ -55,7 +56,7 @@ fun AttendeesSearchScreen(
     viewModel: AttendeesSearchViewModel = viewModel(),
     eventFormViewModel: EventFormViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
-    val formState = eventFormViewModel.formState ?: return
+    val formState = (eventFormViewModel.uiState as? EventFormUiState.Loaded)?.formState ?: return
     val attendeesSearchState = rememberSaveableAttendeesSearchState(
         participants = remember { mutableStateSetOf<ParticipantUi>().apply { addAll(formState.form.participants) } },
         organizerSource = formState.form.organizerSource,

@@ -147,9 +147,9 @@ app/
   (`viewModel(LocalSharedViewModelStoreOwner.current)`); the parent calls plain `viewModel()`. Currently used for
   `EventDetailSharedDataViewModel` (the event loaded by EventDetail, reused by EventEdit), `EventFormViewModel` (below),
   and `EventDetailViewModel`, whose `AttendeesSearchState` `EditableAttendeesSearchScreen` edits.
-- **Event form state**: `EventFormViewModel` holds an `EventFormState` around the `EventFormValues` (what the user filled in,
-  participants and organizer included: an immutable, `@Serializable` value, only changed through
-  `EventFormState.edit { it.copy(…) }`) and the calendars it can be
+- **Event form state**: `EventFormViewModel` exposes an `EventFormUiState`, `Loading` then `Loaded` with an
+  `EventFormState` around the `EventFormValues` (what the user filled in, participants and organizer included: an
+  immutable, `@Serializable` value, only changed through `EventFormState.edit { it.copy(…) }`), and the calendars it can be
   put in, for a `NavDestination.EventForm` (`EventCreation` / `EventEdit`), in that destination's own store. The form is
   saved as a whole under one `SavedStateHandle` key (`encodeToSavedState`) and read back when the ViewModel is created, so a
   child screen restored alone after a process death still gets it. The form's screen initializes it with `initCreation(date)`
@@ -168,7 +168,7 @@ app/
   `EventCreationViewModel` / `EventEditViewModel` only keep the screen state and the submission.
 - **Screens opened by the event form** (time zone, custom reminder, attendees) follow the screens' usual split: a public
   composable reading `EventFormViewModel` from its parent's store (`viewModel(LocalSharedViewModelStoreOwner.current)` as a
-  default parameter; its `formState` is `null` while the form loads),
+  default parameter; its `uiState` is `EventFormUiState.Loading` until the form is `Loaded`, and `edit` does nothing meanwhile),
   and a private stateless one taking initial values, keeping its own draft until submitted, and reporting it through
   `onSubmit`-like callbacks before calling `goBack`. The public one writes the result back through `EventFormState.edit`. Their key carries `parent: NavDestination.EventForm` (plus navigation-only arguments such as `isStart`), which only
   selects the store they share.

@@ -43,7 +43,7 @@ fun CustomReminderScreen(
 ) {
     CustomReminderScreen(
         onSubmit = { notification ->
-            eventFormViewModel.formState?.edit { it.copy(notifications = it.notifications + notification) }
+            eventFormViewModel.edit { it.copy(notifications = it.notifications + notification) }
             goBack()
         },
         goBack = goBack,
