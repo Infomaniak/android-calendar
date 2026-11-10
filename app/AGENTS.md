@@ -55,7 +55,7 @@ app/src/main/java/com/infomaniak/calendar/
     │                              # UserCalendarsUi / CalendarSectionUi / CalendarUi / CalendarColorsUi, the calendars as the drawer and other views draw them
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
-    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventDetail, AttendeeSearch(parent: EventForm), EventForm.{EventCreation, EventEdit, EditableAttendeeSearch(parent, config), EventTimeZone(parent, isStart), EventCustomReminder(parent)}, Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
+    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventDetail, AttendeeSearch(parent: EventForm), EventForm.{EventCreation, EventEdit, EditableAttendeeSearch(parent, config), EventTimeZone(parent, isStart), EventCustomReminder(parent), EventLocationSearch(parent)}, Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
     │   ├── SharedViewModelStores.kt # `toContentKey` and the `shareViewModelStoreWith(parent)` metadata
     │   ├── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
@@ -77,6 +77,7 @@ app/src/main/java/com/infomaniak/calendar/
     │                              # form/ (EventFormViewModel: the event form state of EventCreation / EventEdit)
     │                              # timeZoneSearch/ (TimeZoneSearchScreen: writes the picked time zone to the form)
     │                              # customReminder/ (CustomReminderScreen: adds the made reminder to the form)
+    │                              # locationSearch/ (LocationSearchScreen: ✓ writes the search text to the form as its location)
     │   └── onboarding/            # Two onboardings, each with its own page enum, sharing OnboardingPage + OnboardingButtonDefaults:
     │                              # login/ (LoginOnboardingScreen + LoginOnboardingPage + CrossAppLoginViewModel): welcome + login;
     │                              # permissions/ (PermissionsOnboardingScreen + PermissionsOnboardingPage + NextStepButton): a pager
@@ -163,7 +164,7 @@ app/
   single private screen state (`EventCreationScreenState`, `EventEditScreenState`) that its stateless content draws:
   `Success` only once `formState` is there. `EventCreationViewModel` / `EventEditViewModel` only keep the calendars'
   availability (creation) and the submission.
-- **Screens opened by the event form** (time zone, custom reminder, attendees) follow the screens' usual split: a public
+- **Screens opened by the event form** (time zone, custom reminder, attendees, location) follow the screens' usual split: a public
   composable reading `EventFormViewModel` from its parent's store (`viewModel(LocalSharedViewModelStoreOwner.current)` as a
   default parameter; its `formState` is `null` until the form is loaded), and a private stateless one taking initial values,
   keeping its own draft until submitted, and reporting it through `onSubmit`-like callbacks before calling `goBack`. The

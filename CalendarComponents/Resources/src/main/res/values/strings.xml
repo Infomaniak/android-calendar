@@ -71,6 +71,8 @@
         <item quantity="other">%d hours</item>
     </plurals>
     <string name="kMeetMeeting">Meeting on kMeet</string>
+    <string name="locationOrRoomLabel">Location or room</string>
+    <string name="locationSearchPlaceholder">Add a location</string>
     <plurals name="minuteAmount">
         <item quantity="one">%d minute</item>
         <item quantity="other">%d minutes</item>

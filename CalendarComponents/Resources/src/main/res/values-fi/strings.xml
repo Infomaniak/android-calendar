@@ -71,6 +71,8 @@
         <item quantity="other">%d tuntia</item>
     </plurals>
     <string name="kMeetMeeting">kMeet-kokous</string>
+    <string name="locationOrRoomLabel">Paikka tai huone</string>
+    <string name="locationSearchPlaceholder">Lisää sijainti</string>
     <plurals name="minuteAmount">
         <item quantity="one">%d minuutti</item>
         <item quantity="other">%d minuuttia</item>

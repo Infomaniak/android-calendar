@@ -96,7 +96,11 @@ fun EventDetail(
                 }
 
                 if (location?.isNotBlank() == true) {
-                    LocationButton(location = location, onClick = onLocationClick)
+                    LocationButton(
+                        location = location,
+                        onClick = onLocationClick,
+                        modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
+                    )
                 }
 
                 if (room != null) {

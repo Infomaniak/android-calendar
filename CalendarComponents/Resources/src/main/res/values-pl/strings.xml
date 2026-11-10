@@ -87,6 +87,8 @@
         <item quantity="other">%d godzina</item>
     </plurals>
     <string name="kMeetMeeting">Spotkanie kMeet</string>
+    <string name="locationOrRoomLabel">Lokalizacja lub pomieszczenie</string>
+    <string name="locationSearchPlaceholder">Dodaj lokalizację</string>
     <plurals name="minuteAmount">
         <item quantity="one">%d minuta</item>
         <item quantity="few">%d minuty</item>
