@@ -118,6 +118,11 @@ app/
   DSL): the DSL can't read the key while building `metadata`, which `AttendeeSearch` needs in order to declare its parent.
   Entries are decorated with `rememberSaveableStateHolderNavEntryDecorator()` followed by
   `rememberSharedViewModelStoreNavEntryDecorator()`, in that order.
+- **List/detail (Settings)**: Material 3's `ListDetailSceneStrategy` (`adaptive-navigation3`) lays settings out side by
+  side on wide windows. Tag the root settings entry with `metaDataOf(ListPane)` and every sub-page with
+  `metaDataOf(DetailPane)` (`MetadataSceneStrategy`); nested sub-pages just stack as further `DetailPane` entries, the last
+  one fills the detail pane and back reveals the previous one. On compact windows the strategy steps aside and entries
+  display one at a time as before.
 - **Sharing a ViewModel between a parent entry and a child entry**: the child's key carries its parent
   (`EventAttendees(parent)`), and its metadata uses `SharedViewModelStoreNavEntryDecorator.parent(parent.toContentKey())`.
   The parent entry must set `contentKey = destination.toContentKey()`, so both resolve the same store. The child reads the

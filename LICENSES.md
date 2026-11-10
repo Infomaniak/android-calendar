@@ -11,6 +11,7 @@ This file lists the runtime dependencies added to this project along with their 
 | androidx.compose.foundation:foundation | 1.11.3 | Apache License 2.0 | https://developer.android.com/jetpack/androidx/releases/compose-foundation |
 | androidx.compose.material3:material3 | 1.5.0-alpha18 | Apache License 2.0 | https://developer.android.com/jetpack/androidx/releases/compose-material3 |
 | androidx.compose.material3.adaptive:adaptive | 1.2.0 | Apache License 2.0 | https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive |
+| androidx.compose.material3.adaptive:adaptive-navigation3 | 1.3.0 | Apache License 2.0 | https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive |
 | androidx.compose.runtime:runtime | 1.11.3 | Apache License 2.0 | https://developer.android.com/jetpack/androidx/releases/compose-runtime |
 | androidx.compose.ui:ui | 1.11.3 | Apache License 2.0 | https://developer.android.com/jetpack/androidx/releases/compose-ui |
 | androidx.compose.ui:ui-graphics | 1.11.3 | Apache License 2.0 | https://developer.android.com/jetpack/androidx/releases/compose-ui |

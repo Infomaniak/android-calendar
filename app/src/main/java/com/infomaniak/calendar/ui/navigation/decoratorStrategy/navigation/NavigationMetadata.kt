@@ -17,10 +17,20 @@
  */
 package com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation
 
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 enum class MetadataSceneStrategy(override val metadata: Map<String, Any>) : NavigationMetadata {
     FloatingToolbarWithFab(metadata = mapOf(SHOULD_SHOW_FLOATING_TOOLBAR_WITH_FAB to true)),
     Drawer(metadata = mapOf(SHOULD_SHOW_DRAWER to true)),
     ResponsiveDialog(metadata = mapOf(SHOULD_SHOW_RESPONSIVE_DIALOG to true)),
+
+    /** Shown side by side with the trailing [DetailPane] entries when the window is wide enough. */
+    ListPane(metadata = ListDetailSceneStrategy.listPane()),
+
+    /** Nested details can be stacked: the last one replaces the previous in the detail pane, back reveals it again. */
+    DetailPane(metadata = ListDetailSceneStrategy.detailPane()),
 }
 
 fun metaDataOf(vararg items: NavigationMetadata): Map<String, Any> = buildMap {

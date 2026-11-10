@@ -19,7 +19,9 @@ package com.infomaniak.calendar.ui.navigation
 
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
+import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -38,8 +40,10 @@ import com.infomaniak.calendar.ui.component.drawer.MenuDrawer
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.component.CalendarHorizontalFloatingToolbar
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.DrawerDecoratorStrategy
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.DetailPane
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.Drawer
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.ListPane
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.ResponsiveDialog
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationMetadata
@@ -225,14 +229,14 @@ private fun baseEntryProvider(
             )
         }
 
-        is NavDestination.Settings.Main -> NavEntry(destination) {
+        is NavDestination.Settings.Main -> NavEntry(destination, metadata = metaDataOf(ListPane)) {
             SettingScreen(
                 goBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
                 goToTheme = { backStack.addOnce(NavDestination.Settings.Theme) },
             )
         }
 
-        is NavDestination.Settings.Theme -> NavEntry(destination) {
+        is NavDestination.Settings.Theme -> NavEntry(destination, metadata = metaDataOf(DetailPane)) {
             SettingThemeScreen(goBack = { backStack.popOrReplaceRoot(NavDestination.Settings.Main) })
         }
 
@@ -255,10 +259,14 @@ private fun baseEntryProvider(
     }
 }
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 private fun <T : NavKey> sceneStrategies(windowSizeClass: WindowSizeClass): List<SceneStrategy<T>> {
+    val listDetailStrategy = rememberListDetailSceneStrategy<T>()
     // ResponsiveDialogSceneStrategy holds the scene of the ongoing dialog, it must survive recompositions.
-    return remember(windowSizeClass) { listOf(ResponsiveDialogSceneStrategy(windowSizeClass)) }
+    return remember(windowSizeClass, listDetailStrategy) {
+        listOf(ResponsiveDialogSceneStrategy(windowSizeClass), listDetailStrategy)
+    }
 }
 
 private fun sceneDecoratorStrategies(
