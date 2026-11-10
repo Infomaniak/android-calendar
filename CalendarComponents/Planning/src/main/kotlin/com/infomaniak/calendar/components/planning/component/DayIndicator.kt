@@ -34,7 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.foundation.component.DayCircle
 import com.infomaniak.calendar.components.foundation.state.DateState
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
 internal fun DayIndicator(dayName: String, dayNumber: Int, state: DateState, modifier: Modifier = Modifier) {
@@ -48,7 +48,7 @@ internal fun DayIndicator(dayName: String, dayNumber: Int, state: DateState, mod
             state = state,
             modifier = Modifier
                 .size(48.dp)
-                .padding(Margin.Micro),
+                .padding(EsdsTheme.spacing.xs),
         ) {
             Text(
                 text = dayNumber.toString(),

@@ -49,7 +49,7 @@ import com.infomaniak.calendar.components.planning.component.emptyState.OtherDay
 import com.infomaniak.calendar.components.planning.component.emptyState.TodayEmptyState
 import com.infomaniak.calendar.components.planning.preview.PlanningPreviewParameter
 import com.infomaniak.calendar.components.resources.R
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.LocalDate
 
 @Composable
@@ -68,14 +68,14 @@ fun Planning(
         state = lazyListState,
         modifier = modifier,
         contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(Margin.Mini),
+        verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),
     ) {
         items(
             count = timeline.itemCount,
             contentType = { index -> if (timeline.isWeekHeader(index)) ContentType.WeekHeader else ContentType.Day },
         ) { index ->
             if (timeline.isWeekHeader(index)) {
-                Text(timeline.weekAt(index).label, modifier = Modifier.padding(bottom = Margin.Medium))
+                Text(timeline.weekAt(index).label, modifier = Modifier.padding(bottom = EsdsTheme.spacing.xl))
             } else {
                 val date = timeline.dateAt(index)
                 Day(
@@ -103,8 +103,8 @@ private fun Day(
     onEventClick: (EventSummaryUi.Normal) -> Unit,
 ) {
     Row(
-        modifier = Modifier.padding(bottom = Margin.Medium),
-        horizontalArrangement = Arrangement.spacedBy(Margin.Small),
+        modifier = Modifier.padding(bottom = EsdsTheme.spacing.xl),
+        horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.lg),
     ) {
         DayIndicator(
             dayName = date.formatShortDayNameUppercase(),
@@ -113,7 +113,7 @@ private fun Day(
             modifier = Modifier.stickyDayIndicator(lazyListState, index),
         )
 
-        Column(verticalArrangement = Arrangement.spacedBy(Margin.Mini)) {
+        Column(verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md)) {
             events?.forEach { event ->
                 key(event.id) { DayEvent(event, date, goToEventCreation, onEventClick) }
             }

@@ -32,7 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.resources.R
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
 internal fun EmptyStateContainer(
@@ -42,11 +42,11 @@ internal fun EmptyStateContainer(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
+        horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),
         modifier = modifier
             .clip(MaterialTheme.shapes.medium)
             .then(if (onClick == null) Modifier else Modifier.clickable(onClick = onClick))
-            .padding(all = Margin.Medium),
+            .padding(all = EsdsTheme.spacing.xl),
     ) {
         Text(
             text = stringResource(R.string.planningNothingPlanned),

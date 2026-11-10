@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatMonthAndOptionalYear
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortMonth
 import com.infomaniak.core.common.utils.today
-import com.infomaniak.core.ui.compose.margin.Margin
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -109,7 +108,7 @@ fun HorizontalMonthSelector(
 
     LazyRow(
         state = listState,
-        contentPadding = PaddingValues(horizontal = Margin.Large),
+        contentPadding = PaddingValues(horizontal = EsdsTheme.spacing.threeXl),
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
     ) {
@@ -121,15 +120,15 @@ fun HorizontalMonthSelector(
             when (val item = selectorItemAt(anchorYear, index)) {
                 is SelectorItem.Year -> YearSeparator(
                     year = item.year,
-                    modifier = Modifier.padding(horizontal = Margin.Small, vertical = Margin.Micro),
+                    modifier = Modifier.padding(horizontal = EsdsTheme.spacing.lg, vertical = EsdsTheme.spacing.xs),
                 )
                 is SelectorItem.Month -> MonthButton(
                     month = item.yearMonth,
                     isSelected = item.yearMonth == selectedMonth(),
                     onMonthClick = { onMonthSelected(item.yearMonth) },
                     modifier = Modifier
-                        .padding(horizontal = Margin.Mini)
-                        .padding(top = Margin.Mini, bottom = Margin.Micro),
+                        .padding(horizontal = EsdsTheme.spacing.md)
+                        .padding(top = EsdsTheme.spacing.md, bottom = EsdsTheme.spacing.xs),
                 )
             }
         }

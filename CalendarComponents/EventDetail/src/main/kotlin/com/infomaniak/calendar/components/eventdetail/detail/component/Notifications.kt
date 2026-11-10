@@ -36,7 +36,7 @@ import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTime
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDurationOffset
 import com.infomaniak.core.common.utils.today
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
@@ -58,7 +58,7 @@ internal fun Notifications(
             onClick = { onNotificationClick() },
             contentPadding = contentPadding,
             trailingContent = {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md)) {
                     Text(
                         text = notificationTimeText(notification.time),
                         style = MaterialTheme.typography.labelLarge,

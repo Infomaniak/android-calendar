@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatNarrowDayName
 import com.infomaniak.core.common.utils.today
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.kizitonwose.calendar.core.daysOfWeek
 import kotlinx.datetime.DayOfWeek
 import kotlin.time.Clock
@@ -41,7 +41,7 @@ internal fun DaysOfWeekTitle(firstDayOfWeek: DayOfWeek, modifier: Modifier = Mod
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(Margin.Micro),
+                    .padding(EsdsTheme.spacing.xs),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(text = dayOfWeek.formatNarrowDayName())

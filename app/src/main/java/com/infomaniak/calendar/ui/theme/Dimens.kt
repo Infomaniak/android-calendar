@@ -18,8 +18,10 @@
 package com.infomaniak.calendar.ui.theme
 
 import androidx.compose.foundation.layout.PaddingValues
-import com.infomaniak.core.ui.compose.margin.Margin
+import androidx.compose.runtime.Composable
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 object Dimens {
-    val EventDetailScreensHorizontalPadding = PaddingValues(horizontal = Margin.Small)
+    val EventDetailScreensHorizontalPadding: PaddingValues
+        @Composable get() = PaddingValues(horizontal = EsdsTheme.spacing.lg)
 }

@@ -50,7 +50,7 @@ import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.ui.compose.margin.Margin
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
@@ -117,7 +117,7 @@ private fun PlanningScreen(
             is PlanningUiState.Success -> {
                 SuccessPlanning(
                     eventsByDate = planningUi.eventsByDate,
-                    contentPadding = contentPadding + PaddingValues(Margin.Medium),
+                    contentPadding = contentPadding + PaddingValues(EsdsTheme.spacing.xl),
                     goToEventCreation = goToEventCreation,
                     goToEventDetail = goToEventDetail,
                     visibleDayState = visibleDayState,
