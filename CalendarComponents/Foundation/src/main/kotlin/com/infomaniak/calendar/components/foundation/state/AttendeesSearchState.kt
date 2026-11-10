@@ -88,7 +88,7 @@ class AttendeesSearchState<T : OrganizerSource>(
         if (participants.isEmpty() && organizerSource is OrganizerSource.Dynamic) {
             participants.add(ParticipantUi.Me)
         }
-        participants.add(if (attendee.email == me?.email) ParticipantUi.Me else attendee)
+        participants.add(if (attendee.email.equals(me?.email, ignoreCase = true)) ParticipantUi.Me else attendee)
         searchQueryTextFieldState.clearText()
     }
 
