@@ -18,11 +18,8 @@
 
 package com.infomaniak.calendar.ui.navigation
 
-import androidx.compose.runtime.Composable
 import androidx.navigation3.runtime.NavKey
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationMetadata
-import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
-import com.infomaniak.calendar.ui.screen.eventDetail.form.eventFormViewModel
 
 /** The content key of an entry, which a child entry uses to reach its ViewModelStore. */
 fun NavKey.toContentKey() = this.toString()
@@ -32,10 +29,4 @@ fun NavKey.toContentKey() = this.toString()
  */
 fun shareViewModelStoreWith(destination: NavDestination): NavigationMetadata = object : NavigationMetadata {
     override val metadata: Map<String, Any> = SharedViewModelStoreNavEntryDecorator.parent(destination.toContentKey())
-}
-
-/** The form of [destination], read by a screen it opens. */
-@Composable
-fun sharedEventFormViewModel(destination: NavDestination.EventForm): EventFormViewModel {
-    return eventFormViewModel(destination, LocalSharedViewModelStoreOwner.current)
 }

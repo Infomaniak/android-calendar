@@ -17,20 +17,14 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.form
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.HasDefaultViewModelProviderFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import androidx.lifecycle.viewmodel.MutableCreationExtras
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.savedstate.SavedState
 import androidx.savedstate.read
 import androidx.savedstate.savedState
@@ -44,11 +38,11 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.data.SettingsDataValues
-import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.screen.eventDetail.EventCreationCalendarsUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.EventLoader
 import com.infomaniak.calendar.utils.toEventFormValues
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -56,50 +50,23 @@ import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-
-/**
- * The [EventFormViewModel] of [destination], from the store of [viewModelStoreOwner]: the form's own store for its screen,
- * [com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner] for the screens it opens.
- *
- * @param loadedEvent The edited event when already loaded, so the form is built right away instead of loading it again.
- */
-@Composable
-fun eventFormViewModel(
-    destination: NavDestination.EventForm,
-    viewModelStoreOwner: ViewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current),
-    loadedEvent: EventDetailUi? = null,
-): EventFormViewModel {
-    val defaultExtras = (viewModelStoreOwner as? HasDefaultViewModelProviderFactory)?.defaultViewModelCreationExtras
-    return viewModel(
-        viewModelStoreOwner = viewModelStoreOwner,
-        extras = MutableCreationExtras(defaultExtras ?: CreationExtras.Empty).apply {
-            set(DestinationKey, destination)
-            loadedEvent?.let { set(LoadedEventKey, it) }
-        },
-    )
-}
-
-private object DestinationKey : CreationExtras.Key<NavDestination.EventForm>
-private object LoadedEventKey : CreationExtras.Key<EventDetailUi>
 
 /**
  * Holds the [EventFormValues] of an event form, shared with the screens it opens through its ViewModelStore.
  *
- * The form is saved as a whole in the [SavedStateHandle]. A restored one wins over the loaded one, which is only read for a new
- * form. The calendars it can be put in are reloaded every time, never saved.
+ * The form is saved as a whole in the [SavedStateHandle], so the screens it opens find it even when restored alone. The form's
+ * screen initializes it: a restored form wins over the loaded one, and the calendars it can be put in are observed, never saved.
  */
 @AssistedInject
 class EventFormViewModel(
     @Assisted private val savedStateHandle: SavedStateHandle,
-    @Assisted destination: NavDestination.EventForm,
-    @Assisted loadedEvent: EventDetailUi?,
     private val eventLoader: EventLoader,
     private val eventCreationCalendarsUseCase: EventCreationCalendarsUseCase,
     private val settingsDataValues: SettingsDataValues,
@@ -113,24 +80,50 @@ class EventFormViewModel(
     /** `false` while the form loads, and once its calendar can't be written to anymore. */
     val canSubmit: Boolean get() = formState?.form?.let { calendars?.calendarOf(it.calendarId) } != null
 
+    private var isInitialized = false
+
     init {
         savedStateHandle.setSavedStateProvider(FORM_KEY) {
             formState?.form?.let { encodeToSavedState(EventFormValues.serializer(), it) } ?: savedState()
         }
+    }
 
-        when (destination) {
-            is NavDestination.EventCreation -> {
-                viewModelScope.launch { initForm(destination) }
-                viewModelScope.launch {
-                    eventCreationCalendarsUseCase.creationCalendars.collect { creationCalendars ->
-                        updateCalendars(creationCalendars?.calendars, fallback = creationCalendars?.initialCalendar)
-                    }
-                }
+    fun initCreation(date: LocalDate) {
+        if (isInitialized) return
+        isInitialized = true
+
+        viewModelScope.launch {
+            if (formState != null) return@launch
+            val creationCalendars = eventCreationCalendarsUseCase.creationCalendars.filterNotNull().first()
+            val defaultEventDuration = settingsDataValues.defaultEventDuration.flow.first()
+
+            formState = EventFormState(
+                EventFormValues.default(
+                    calendar = creationCalendars.initialCalendar,
+                    date = date,
+                    timeZone = TimeZone.currentSystemDefault(),
+                    eventDuration = defaultEventDuration,
+                ),
+            )
+        }
+        viewModelScope.launch {
+            eventCreationCalendarsUseCase.creationCalendars.collect { creationCalendars ->
+                updateCalendars(creationCalendars?.calendars, fallback = creationCalendars?.initialCalendar)
             }
-            is NavDestination.EventEdit -> {
-                loadedEvent?.let(::initForm)
-                viewModelScope.launch { eventDetails(destination).collect(::initForm) }
-            }
+        }
+    }
+
+    /** @param loadedEvent The edited event when already loaded, so the form is built right away instead of loading it again. */
+    fun initEdition(occurrenceId: OccurrenceId, loadedEvent: EventDetailUi?) {
+        if (isInitialized) return
+        isInitialized = true
+
+        loadedEvent?.let(::initForm)
+        viewModelScope.launch {
+            eventLoader.eventDetailUi(eventLoader.eventAndCalendar(occurrenceId))
+                .filterIsInstance<EventDetailUiState.Displayable.Success>()
+                .map { it.eventDetail }
+                .collect(::initForm)
         }
     }
 
@@ -139,27 +132,6 @@ class EventFormViewModel(
         val calendar = calendars?.calendarOf(form.calendarId) ?: return null
 
         return form.toEventDraft(calendar)
-    }
-
-    private fun eventDetails(destination: NavDestination.EventEdit): Flow<EventDetailUi> {
-        return eventLoader.eventDetailUi(eventLoader.eventAndCalendar(destination.occurrenceId))
-            .filterIsInstance<EventDetailUiState.Displayable.Success>()
-            .map { it.eventDetail }
-    }
-
-    private suspend fun initForm(destination: NavDestination.EventCreation) {
-        if (formState != null) return
-        val creationCalendars = eventCreationCalendarsUseCase.creationCalendars.filterNotNull().first()
-        val defaultEventDuration = settingsDataValues.defaultEventDuration.flow.first()
-
-        formState = EventFormState(
-            EventFormValues.default(
-                calendar = creationCalendars.initialCalendar,
-                date = destination.date,
-                timeZone = TimeZone.currentSystemDefault(),
-                eventDuration = defaultEventDuration,
-            ),
-        )
     }
 
     private fun initForm(event: EventDetailUi) {
@@ -180,17 +152,9 @@ class EventFormViewModel(
     @ViewModelAssistedFactoryKey(EventFormViewModel::class)
     @ContributesIntoMap(AppScope::class)
     fun interface Factory : ViewModelAssistedFactory {
-        override fun create(extras: CreationExtras): EventFormViewModel = create(
-            savedStateHandle = extras.createSavedStateHandle(),
-            destination = checkNotNull(extras[DestinationKey]) { "Use eventFormViewModel() to get an EventFormViewModel" },
-            loadedEvent = extras[LoadedEventKey],
-        )
+        override fun create(extras: CreationExtras): EventFormViewModel = create(extras.createSavedStateHandle())
 
-        fun create(
-            @Assisted savedStateHandle: SavedStateHandle,
-            @Assisted destination: NavDestination.EventForm,
-            @Assisted loadedEvent: EventDetailUi?,
-        ): EventFormViewModel
+        fun create(@Assisted savedStateHandle: SavedStateHandle): EventFormViewModel
     }
 
     companion object {
