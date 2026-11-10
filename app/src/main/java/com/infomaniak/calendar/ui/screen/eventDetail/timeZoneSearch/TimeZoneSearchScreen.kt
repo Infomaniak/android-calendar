@@ -46,6 +46,7 @@ fun TimeZoneSearchScreen(
     TimeZoneSearchScreen(
         onTimeZoneSelected = { timeZone ->
             eventFormViewModel.formState?.edit { it.copy(dates = it.dates.pickTimeZone(isStart, timeZone)) }
+            goBack()
         },
         goBack = goBack,
         modifier = modifier,
@@ -69,10 +70,7 @@ private fun TimeZoneSearchScreen(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.union(WindowInsets.ime),
     ) { contentPadding ->
         TimeZoneSearch(
-            onTimeZoneClick = { timeZone ->
-                onTimeZoneSelected(timeZone)
-                goBack()
-            },
+            onTimeZoneClick = onTimeZoneSelected,
             modifier = Modifier.fillMaxWidth(),
             contentPadding = contentPadding,
         )

@@ -56,7 +56,7 @@ app/src/main/java/com/infomaniak/calendar/
     │                              # UserCalendarsUi / CalendarSectionUi / CalendarUi / CalendarColorsUi, the calendars as the drawer and other views draw them
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
-    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, AttendeeSearch(parent: EventForm), EditableAttendeeSearch(parent: EventDetail, config), EventTimeZone(parent: EventForm, isStart), EventCustomReminder(parent: EventForm), Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
+    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, AttendeeSearch(parent: EventForm), EditableAttendeeSearch(parent, config), EventTimeZone(parent: EventForm, isStart), EventCustomReminder(parent: EventForm), Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
     │   ├── SharedViewModelStores.kt # `toContentKey`, `shareViewModelStoreWith(parent)` metadata, and
     │   │                            # `sharedEventFormViewModel` read by the form's child screens
     │   ├── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
@@ -75,8 +75,8 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── eventCreation/         # EventCreationScreen
     │   ├── eventDetail/           # EventDetailScreen + EventEditScreen + EventCreationScreen + their ViewModels, and
     │                              # attendeesSearch/ (AttendeesSearchScreen, reading and writing the form's participants;
-    │                              # EditableAttendeesSearchScreen, given EventDetailViewModel's AttendeesSearchState;
-    │                              # AttendeesSearchViewModel searching the contacts as the query is typed)
+    │                              # EditableAttendeesSearchScreen, reading EventDetailViewModel's AttendeesSearchState;
+    │                              # AttendeesSearchViewModel.EnableSearch searching the contacts as the query is typed)
     │                              # form/ (EventFormViewModel: the event form state of EventCreation / EventEdit)
     │                              # timeZoneSearch/ (TimeZoneSearchScreen: writes the picked time zone to the form)
     │                              # customReminder/ (CustomReminderScreen: adds the made reminder to the form)
@@ -147,7 +147,7 @@ app/
   parent's store through `LocalSharedViewModelStoreOwner.current`, passed as a default parameter
   (`viewModel(LocalSharedViewModelStoreOwner.current)`); the parent calls plain `viewModel()`. Currently used for
   `EventDetailSharedDataViewModel` (the event loaded by EventDetail, reused by EventEdit), `EventFormViewModel` (below),
-  and `EventDetailViewModel`, whose `AttendeesSearchState` the `EditableAttendeeSearch` entry hands to its screen.
+  and `EventDetailViewModel`, whose `AttendeesSearchState` `EditableAttendeesSearchScreen` edits.
 - **Event form state**: `EventFormViewModel` holds an `EventFormState` around the `EventForm` (what the user filled in,
   participants and organizer included: an immutable, `@Serializable` value, only changed through
   `EventFormState.edit { it.copy(…) }`) and the calendars it can be

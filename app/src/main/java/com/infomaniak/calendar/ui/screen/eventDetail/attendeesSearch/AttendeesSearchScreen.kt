@@ -27,11 +27,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
@@ -39,7 +37,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.attendeessearch.AttendeesSearch
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
-import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
@@ -51,44 +48,27 @@ import com.infomaniak.calendar.ui.navigation.sharedEventFormViewModel
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import kotlinx.coroutines.launch
 
 @Composable
 fun AttendeesSearchScreen(
     parent: NavDestination.EventForm,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: AttendeesSearchViewModel = viewModel(),
     eventFormViewModel: EventFormViewModel = sharedEventFormViewModel(parent),
 ) {
     val formState = eventFormViewModel.formState ?: return
-
-    AttendeesSearchScreen(
-        initialParticipants = formState.form.participants,
-        organizerSource = formState.form.organizerSource,
-        onParticipantsChange = { participants -> formState.edit { it.copy(participants = participants) } },
-        goBack = goBack,
-        modifier = modifier,
-    )
-}
-
-@Composable
-private fun AttendeesSearchScreen(
-    initialParticipants: Set<ParticipantUi>,
-    organizerSource: OrganizerSource?,
-    onParticipantsChange: (Set<ParticipantUi>) -> Unit,
-    goBack: () -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: AttendeesSearchViewModel = viewModel(),
-) {
     val attendeesSearchState = rememberSaveableAttendeesSearchState(
-        participants = remember { mutableStateSetOf<ParticipantUi>().apply { addAll(initialParticipants) } },
-        organizerSource = organizerSource,
+        participants = remember { mutableStateSetOf<ParticipantUi>().apply { addAll(formState.form.participants) } },
+        organizerSource = formState.form.organizerSource,
     )
-    val currentOnParticipantsChange by rememberUpdatedState(onParticipantsChange)
+
+    viewModel.EnableSearch(attendeesSearchState)
 
     LaunchedEffect(attendeesSearchState) {
-        launch { viewModel.searchContacts(attendeesSearchState) }
-        snapshotFlow { attendeesSearchState.participants.toSet() }.collect { currentOnParticipantsChange(it) }
+        snapshotFlow { attendeesSearchState.participants.toSet() }.collect { participants ->
+            formState.edit { it.copy(participants = participants) }
+        }
     }
 
     AttendeesSearchScreenContent(

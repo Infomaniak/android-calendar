@@ -17,8 +17,8 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch
 
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
@@ -38,20 +38,24 @@ import kotlinx.coroutines.flow.collectLatest
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
 class AttendeesSearchViewModel(private val contactsManager: ContactsManager) : ViewModel() {
-    /** Fills the results of [attendeesSearchState] with the contacts matching its query, as it is typed. */
-    suspend fun searchContacts(attendeesSearchState: AttendeesSearchState<*>) {
-        val alreadyPresentAttendees by derivedStateOf { attendeesSearchState.attendees.associateBy { it.key } }
-
-        snapshotFlow { attendeesSearchState.searchQueryTextFieldState.text.toString() }.collectLatest { query ->
-            if (query.isBlank()) {
-                attendeesSearchState.results.clear()
-            } else {
-                val results = contactsManager.search(query)
-                attendeesSearchState.results.clear()
-                attendeesSearchState.results.addAll(
-                    results.toAttendeesUi(alreadyPresentAttendees) + AttendeesSearchResult.AddCustomAttendee,
-                )
+    @Composable
+    fun EnableSearch(attendeesSearchState: AttendeesSearchState<*>) {
+        val textFieldState = attendeesSearchState.searchQueryTextFieldState
+        LaunchedEffect(textFieldState) {
+            snapshotFlow { textFieldState.text }.collectLatest {
+                search(attendeesSearchState, it.toString())
             }
+        }
+    }
+
+    private suspend fun search(attendeesSearchState: AttendeesSearchState<*>, query: String) {
+        if (query.isBlank()) {
+            attendeesSearchState.results.clear()
+        } else {
+            val results = contactsManager.search(query)
+            val alreadyPresentAttendees = attendeesSearchState.attendees.associateBy { it.key }
+            attendeesSearchState.results.clear()
+            attendeesSearchState.results.addAll(results.toAttendeesUi(alreadyPresentAttendees) + AttendeesSearchResult.AddCustomAttendee)
         }
     }
 }
