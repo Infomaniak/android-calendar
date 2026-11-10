@@ -162,9 +162,8 @@ app/
   `EventForm` composable; the ViewModel doesn't change. `EventForm` takes the
   `EventFormState`, like Material components take their state holder, and owns the title's `TextFieldState`, reporting its
   text through `edit`. The `EventFormState` instance only changes once, when the form is loaded, and its `form` is only
-  read inside `EventForm`, so a change doesn't run the screens' `Scaffold` again. The edit screen calls `initEdition` during composition
-  with the event already loaded by `EventDetailSharedDataViewModel`, so the form is there on its first frame for the
-  shared-element transition.
+  read inside `EventForm`, so a change doesn't run the screens' `Scaffold` again. The edit screen calls `initEdition` from a `LaunchedEffect`
+  once `EventDetailSharedDataViewModel` has loaded the event.
   `EventCreationViewModel` / `EventEditViewModel` only keep the screen state and the submission.
 - **Screens opened by the event form** (time zone, custom reminder, attendees) follow the screens' usual split: a public
   composable reading `EventFormViewModel` from its parent's store (`viewModel(LocalSharedViewModelStoreOwner.current)` as a

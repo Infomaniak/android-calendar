@@ -49,9 +49,11 @@ import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
+import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
-import kotlinx.datetime.TimeZone
 
 @Composable
 fun EventEditScreen(
@@ -68,7 +70,11 @@ fun EventEditScreen(
 ) {
     val eventDetailUiState = eventDetailSharedDataViewModel.eventDetailUi.collectAsStateWithLifecycle().value
 
-    eventFormViewModel.initEdition(occurrenceId, (eventDetailUiState as? EventDetailUiState.Displayable.Success)?.eventDetail)
+    LaunchedEffect(Unit) {
+        val event = eventDetailSharedDataViewModel.eventDetailUi.filterIsInstance<EventDetailUiState.Displayable.Success>().first()
+        eventFormViewModel.initEdition(occurrenceId, event.eventDetail)
+    }
+
     val formState = eventFormViewModel.formState
     val calendars = eventFormViewModel.calendars
 

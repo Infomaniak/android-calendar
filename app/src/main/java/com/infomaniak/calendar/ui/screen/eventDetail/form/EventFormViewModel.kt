@@ -113,12 +113,12 @@ class EventFormViewModel(
         }
     }
 
-    /** @param loadedEvent The edited event when already loaded, so the form is built right away instead of loading it again. */
-    fun initEdition(occurrenceId: OccurrenceId, loadedEvent: EventDetailUi?) {
+    /** @param event The edited event, already loaded by the event detail, kept up to date here afterwards. */
+    fun initEdition(occurrenceId: OccurrenceId, event: EventDetailUi) {
         if (isInitialized) return
         isInitialized = true
 
-        loadedEvent?.let(::initForm)
+        initForm(event)
         viewModelScope.launch {
             eventLoader.eventDetailUi(eventLoader.eventAndCalendar(occurrenceId))
                 .filterIsInstance<EventDetailUiState.Displayable.Success>()
