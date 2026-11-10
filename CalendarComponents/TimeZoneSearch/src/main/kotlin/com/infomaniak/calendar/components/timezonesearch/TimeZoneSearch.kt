@@ -87,7 +87,8 @@ private fun TimeZoneSearchContent(
     Column(
         modifier = modifier
             .padding(contentPadding.onlyHorizontal())
-            .padding(top = contentPadding.calculateTopPadding()),
+            .padding(top = contentPadding.calculateTopPadding() + EsdsTheme.spacing.xl)
+            .padding(horizontal = EsdsTheme.spacing.xl),
     ) {
         SearchBar(searchQuery)
 
@@ -117,7 +118,7 @@ private fun TimeZoneResults(
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = contentPadding + PaddingValues(horizontal = EsdsTheme.spacing.md, vertical = EsdsTheme.spacing.sm),
+        contentPadding = contentPadding + PaddingValues(vertical = EsdsTheme.spacing.sm),
     ) {
         items(results, key = { it.timeZone.id }) { timeZone ->
             TimeZoneItem(timeZone, query, onClick = { onTimeZoneClick(timeZone.timeZone) })

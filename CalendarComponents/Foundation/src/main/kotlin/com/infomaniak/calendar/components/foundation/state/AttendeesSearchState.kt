@@ -39,6 +39,7 @@ import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.core.common.utils.isEmailRfc5321Compliant
+import com.infomaniak.calendar.components.resources.R as RComponents
 import com.infomaniak.core.common.R as RCore
 
 @Stable
@@ -56,8 +57,10 @@ class AttendeesSearchState<T : OrganizerSource>(
 
     val attendeesEmailsLowercase by derivedStateOf { attendees.map { it.email.lowercase() } }
 
-    fun addAttendee(attendee: AttendeeUi) {
+    fun addAttendee(attendee: AttendeeUi): AttendeeResult {
+        if (attendees.size >= MAX_ATTENDEE_COUNT) return AttendeeResult.LimitReached
         innerAddAttendee(attendee.copy(status = ParticipationStatus.NeedsAction))
+        return AttendeeResult.Added
     }
 
     fun removeAttendee(attendee: AttendeeUi) {
@@ -68,6 +71,7 @@ class AttendeesSearchState<T : OrganizerSource>(
     }
 
     fun addCustomAttendee(email: String = searchQueryTextFieldState.text.toString().trim()): CustomAttendeeResult {
+        if (attendees.size >= MAX_ATTENDEE_COUNT) return CustomAttendeeResult.LimitReached
         if (email.lowercase() in attendeesEmailsLowercase) return CustomAttendeeResult.AlreadyPresent
         if (!email.isEmailRfc5321Compliant()) return CustomAttendeeResult.InvalidEmail
 
@@ -96,6 +100,12 @@ class AttendeesSearchState<T : OrganizerSource>(
         Added,
         AlreadyPresent(RCore.string.emailAlreadyUsed),
         InvalidEmail(RCore.string.emailInvalid),
+        LimitReached(RComponents.string.attendeesLimitReached),
+    }
+
+    enum class AttendeeResult(val messageRes: Int? = null) {
+        Added,
+        LimitReached(RComponents.string.attendeesLimitReached),
     }
 
     class Saver<T : OrganizerSource> : androidx.compose.runtime.saveable.Saver<AttendeesSearchState<T>, List<Any?>> {
@@ -124,6 +134,10 @@ class AttendeesSearchState<T : OrganizerSource>(
         ).apply {
             organizerSource = value[3]?.let(organizerSourceSaver::restore)
         }
+    }
+
+    companion object {
+        const val MAX_ATTENDEE_COUNT = 100
     }
 }
 

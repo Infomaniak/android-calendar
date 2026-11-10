@@ -17,6 +17,8 @@
  */
 package com.infomaniak.calendar.components.attendeessearch
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -33,11 +35,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.attendeessearch.component.AttendeesList
 import com.infomaniak.calendar.components.foundation.component.EmptyState
+import com.infomaniak.calendar.components.foundation.component.InformationBlock
 import com.infomaniak.calendar.components.foundation.component.SearchBar
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
+import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState.Companion.MAX_ATTENDEE_COUNT
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
@@ -66,21 +70,28 @@ fun AttendeesSearch(
     Column(
         modifier = modifier
             .padding(horizontalContentPadding)
-            .padding(top = contentPadding.calculateTopPadding()),
+            .padding(top = contentPadding.calculateTopPadding() + EsdsTheme.spacing.xl)
+            .padding(horizontal = EsdsTheme.spacing.xl),
+        verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xl),
     ) {
         if (isSearchable) {
+            AnimatedVisibility(attendeesSearchState.attendees.size >= MAX_ATTENDEE_COUNT) {
+                InformationBlock(stringResource(R.string.attendeesLimitReached))
+            }
+
             SearchBar(
                 searchState = attendeesSearchState.searchQueryTextFieldState,
                 placeholder = stringResource(R.string.attendeesSearchPlaceholder),
             )
         }
 
+        val bottomContentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding())
         if (attendeesSearchState.searchQueryTextFieldState.text.isBlank() && attendeesList.isEmpty()) {
             EmptyState(
                 text = stringResource(R.string.attendeesEmptyStateTitle),
                 description = stringResource(R.string.attendeesEmptyStateDescription),
                 icon = EsdsIcons.UsersStacked,
-                modifier = Modifier.padding(bottom = contentPadding.calculateBottomPadding()),
+                modifier = Modifier.padding(bottomContentPadding),
             )
         } else {
             val resources = LocalResources.current
@@ -93,9 +104,12 @@ fun AttendeesSearch(
                     result.messageRes?.let { onShowSnackbar(resources.getString(it)) }
                 },
                 onRemove = attendeesSearchState::removeAttendee,
-                modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md, vertical = EsdsTheme.spacing.sm),
+                modifier = Modifier.padding(vertical = EsdsTheme.spacing.sm),
                 onClick = if (isDisplayingSearchResults) {
-                    { attendee -> attendeesSearchState.addAttendee(attendee) }
+                    { attendee ->
+                        val result = attendeesSearchState.addAttendee(attendee)
+                        result.messageRes?.let { onShowSnackbar(resources.getString(it)) }
+                    }
                 } else {
                     null
                 },
@@ -103,7 +117,7 @@ fun AttendeesSearch(
                     !isDisplayingSearchResults || attendee.email.lowercase() !in attendeesSearchState.attendeesEmailsLowercase
                 },
                 enableDeletion = { isSearchable && isDisplayingSearchResults.not() },
-                contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
+                contentPadding = bottomContentPadding,
             )
         }
     }
@@ -133,6 +147,31 @@ private fun PreviewEmptySearchState() {
             AttendeesSearch(
                 attendeesSearchState = rememberSaveableAttendeesSearchState(
                     participants = remember { mutableStateSetOf() },
+                    results = remember { mutableStateListOf() },
+                ),
+                onShowSnackbar = {},
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun MaxAttendeePreview() {
+    val participants = remember {
+        val attendee = previewAttendees.first()
+        mutableStateSetOf<ParticipantUi>().apply {
+            repeat(MAX_ATTENDEE_COUNT) { index ->
+                add(attendee.copy(email = "attendee$index@example.com")) // Unique emails so LazyColumn keys (and the set) stay distinct
+            }
+        }
+    }
+
+    MaterialTheme {
+        Surface {
+            AttendeesSearch(
+                attendeesSearchState = rememberSaveableAttendeesSearchState(
+                    participants = participants,
                     results = remember { mutableStateListOf() },
                 ),
                 onShowSnackbar = {},
