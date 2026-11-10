@@ -31,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
@@ -55,6 +56,7 @@ import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElemen
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
+import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
 import kotlinx.datetime.TimeZone
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -76,10 +78,13 @@ fun EventForm(
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
     Column(modifier.padding(contentPadding)) {
+        val focusRequester = rememberInitialFocusRequester(shouldRequestFocus = { state.titleTextState.text.isEmpty() })
         TitleEditable(
             dotColor = { state.eventColorState.value.getColor(state.calendar) },
             textFieldState = state.titleTextState,
-            modifier = Modifier.eventSharedElement(EventSharedElement.Title),
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .eventSharedElement(EventSharedElement.Title),
         )
 
         AllDaySwitch(

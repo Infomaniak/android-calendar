@@ -30,6 +30,7 @@ import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,6 +44,7 @@ import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState.Companion.MAX_ATTENDEE_COUNT
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
+import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -79,9 +81,11 @@ fun AttendeesSearch(
                 InformationBlock(stringResource(R.string.attendeesLimitReached))
             }
 
+            val focusRequester = rememberInitialFocusRequester(shouldRequestFocus = { attendeesSearchState.attendees.isEmpty() })
             SearchBar(
                 searchState = attendeesSearchState.searchQueryTextFieldState,
                 placeholder = stringResource(R.string.attendeesSearchPlaceholder),
+                modifier = Modifier.focusRequester(focusRequester),
             )
         }
 
