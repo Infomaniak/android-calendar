@@ -22,55 +22,61 @@ import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
-import com.infomaniak.calendar.components.eventdetail.state.defaultEventStartAndEnd
+import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 
-/** The values an [EventFormState] starts from. */
+/** What the user filled in an event form. */
 @Immutable
+@Serializable
 data class EventFormValues(
-    val calendars: List<EventDetailCalendarGroup>,
-    val calendar: EventDetailCalendar,
-    val eventColor: EventColorChoice,
     val title: String,
+    val calendarId: String,
+    val eventColor: EventColorChoice,
     val isAllDay: Boolean,
-    val start: LocalDateTime,
-    val startTimeZone: TimeZone,
-    val end: LocalDateTime,
-    val endTimeZone: TimeZone,
+    val dates: EventDates,
     val isKMeetUrlEnabled: Boolean,
     val notifications: List<EventDetailUi.Notification>,
     val isOccupied: Boolean,
     val isPublic: Boolean,
 ) {
-    companion object {
-        /** A new event on [date], lasting [eventDuration]. */
-        fun default(
-            calendars: List<EventDetailCalendarGroup>,
-            calendar: EventDetailCalendar,
-            date: LocalDate,
-            timeZone: TimeZone,
-            eventDuration: Duration,
-        ): EventFormValues {
-            val (start, end) = defaultEventStartAndEnd(date, timeZone, eventDuration)
+    fun toEventDraft(calendar: EventDetailCalendar, attendees: List<AttendeeUi>, initialOrganizer: OrganizerUi?) = EventDraft(
+        title = title,
+        color = eventColor.getColor(calendar),
+        calendarId = calendarId,
+        isAllDay = isAllDay,
+        start = dates.start.dateTime,
+        startTimeZone = dates.start.timeZone,
+        end = dates.end.dateTime,
+        endTimeZone = dates.end.timeZone,
+        attendees = attendees,
+        initialOrganizer = initialOrganizer,
+        isKMeetUrlEnabled = isKMeetUrlEnabled,
+        notifications = notifications,
+        isOccupied = isOccupied,
+        isPublic = isPublic,
+    )
 
-            return EventFormValues(
-                calendars = calendars,
-                calendar = calendar,
-                eventColor = EventColorChoice.Default,
-                title = "",
-                isAllDay = false,
-                start = start,
-                startTimeZone = timeZone,
-                end = end,
-                endTimeZone = timeZone,
-                isKMeetUrlEnabled = false,
-                notifications = emptyList(),
-                isOccupied = true,
-                isPublic = true,
-            )
-        }
+    companion object {
+        /** A new event on [date] in [calendarId], lasting [eventDuration]. */
+        fun default(calendarId: String, date: LocalDate, timeZone: TimeZone, eventDuration: Duration) = EventFormValues(
+            title = "",
+            calendarId = calendarId,
+            eventColor = EventColorChoice.Default,
+            isAllDay = false,
+            dates = EventDates.default(date, timeZone, eventDuration),
+            isKMeetUrlEnabled = false,
+            notifications = emptyList(),
+            isOccupied = true,
+            isPublic = true,
+        )
     }
+}
+
+fun List<EventDetailCalendarGroup>.calendarOf(id: String): EventDetailCalendar? {
+    return firstNotNullOfOrNull { group -> group.calendars.find { it.id == id } }
 }

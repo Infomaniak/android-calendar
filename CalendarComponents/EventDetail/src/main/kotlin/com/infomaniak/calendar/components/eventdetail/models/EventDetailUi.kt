@@ -27,6 +27,7 @@ import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Bell
 import com.infomaniak.designsystem.icons.symbols.BubbleTopRightCircle
 import com.infomaniak.designsystem.icons.symbols.Symbol
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
 /**
@@ -70,6 +71,7 @@ data class EventDetailUi(
      * @param uiId Tells apart reminders that are otherwise identical, which the user may add twice. Used for UI animtions.
      */
     @Immutable
+    @Serializable
     data class Notification(
         val type: Type,
         val time: NotificationTime,

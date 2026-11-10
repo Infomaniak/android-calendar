@@ -44,7 +44,6 @@ import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -52,7 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
+import com.infomaniak.calendar.components.eventdetail.form.EventDateTime
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatCityName
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatExplicitTimeLabel
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortDateWithYear
@@ -68,7 +67,7 @@ import kotlin.time.Instant
 
 @Composable
 internal fun DateAndTimeEntry(
-    entry: DateAndTimeState.Entry,
+    entry: EventDateTime,
     isAllDay: () -> Boolean,
     onDatePicked: (LocalDate) -> Unit,
     onTimePicked: (LocalTime) -> Unit,
@@ -118,7 +117,7 @@ internal fun DateAndTimeEntry(
 
 @Composable
 private fun TimeZoneButton(
-    entry: DateAndTimeState.Entry,
+    entry: EventDateTime,
     shapes: ButtonShapes,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -192,11 +191,7 @@ private fun Preview() {
     MaterialTheme {
         Surface {
             DateAndTimeEntry(
-                entry = DateAndTimeState.Entry(
-                    date = remember { mutableStateOf(LocalDate(2026, 10, 20)) },
-                    time = remember { mutableStateOf(LocalTime(14, 41)) },
-                    timeZone = remember { mutableStateOf(TimeZone.UTC) },
-                ),
+                entry = EventDateTime(LocalDate(2026, 10, 20), LocalTime(14, 41), TimeZone.UTC),
                 isAllDay = { false },
                 onDatePicked = {},
                 onTimePicked = {},
