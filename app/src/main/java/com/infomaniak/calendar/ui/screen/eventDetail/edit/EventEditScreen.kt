@@ -26,17 +26,21 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
-import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.EventFormValues
-import com.infomaniak.calendar.components.eventdetail.form.rememberEventFormState
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
@@ -71,10 +75,11 @@ fun EventEditScreen(
     ),
 ) {
     val eventDetailUiState = eventDetailSharedDataViewModel.eventDetailUi.collectAsStateWithLifecycle().value
-    val eventFormState = eventFormViewModel.state
+    val values = eventFormViewModel.values
+    val calendars = eventFormViewModel.calendars
 
-    val uiState = if (eventDetailUiState is EventDetailUiState.Displayable.Success && eventFormState != null) {
-        EventEditScreenState.Success(eventFormState, isRecurring = eventDetailUiState.eventDetail.isRecurring)
+    val uiState = if (eventDetailUiState is EventDetailUiState.Displayable.Success && values != null && calendars != null) {
+        EventEditScreenState.Success(values, calendars, isRecurring = eventDetailUiState.eventDetail.isRecurring)
     } else {
         EventEditScreenState.Loading
     }
@@ -89,13 +94,15 @@ fun EventEditScreen(
 
     EventEditScreen(
         uiState = uiState,
+        attendees = { eventFormViewModel.attendeesSearchState?.attendees.orEmpty() },
+        update = eventFormViewModel::update,
         goBack = goBack,
         goToEventAttendees = goToEventAttendees,
         goToTimeZoneSearch = goToTimeZoneSearch,
         goToCustomReminder = goToCustomReminder,
         modifier = modifier,
         onSubmit = { scope ->
-            val eventDraft = (uiState as? EventEditScreenState.Success)?.eventFormState?.toEventDraft() ?: return@EventEditScreen
+            val eventDraft = eventFormViewModel.toEventDraft() ?: return@EventEditScreen
             if (viewModel.submitEvent(destination.occurrenceId, scope, eventDraft)) goBack()
         },
         sharedTransitionScope = LocalSharedTransitionScope.current,
@@ -106,6 +113,8 @@ fun EventEditScreen(
 @Composable
 private fun EventEditScreen(
     uiState: EventEditScreenState,
+    attendees: () -> List<AttendeeUi>,
+    update: ((EventFormValues) -> EventFormValues) -> Unit,
     goBack: () -> Unit,
     goToEventAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
@@ -133,7 +142,10 @@ private fun EventEditScreen(
             EventEditScreenState.Loading -> Unit
             is EventEditScreenState.Success -> {
                 EventForm(
-                    state = uiState.eventFormState,
+                    values = uiState.values,
+                    update = update,
+                    calendars = uiState.calendars,
+                    attendees = attendees,
                     onAttendeesClick = goToEventAttendees,
                     onTimeZoneClick = goToTimeZoneSearch,
                     onCustomReminderClick = goToCustomReminder,
@@ -149,7 +161,11 @@ private fun EventEditScreen(
 
 private sealed interface EventEditScreenState {
     object Loading : EventEditScreenState
-    data class Success(val eventFormState: EventFormState, val isRecurring: Boolean) : EventEditScreenState
+    data class Success(
+        val values: EventFormValues,
+        val calendars: List<EventDetailCalendarGroup>,
+        val isRecurring: Boolean,
+    ) : EventEditScreenState
 }
 
 @Preview
@@ -157,21 +173,21 @@ private sealed interface EventEditScreenState {
 private fun Preview() {
     CalendarTheme {
         Surface {
+            var values by remember {
+                mutableStateOf(
+                    EventFormValues.default(
+                        calendarId = previewEventDetailCalendar.id,
+                        date = Clock.today(),
+                        timeZone = TimeZone.currentSystemDefault(),
+                        eventDuration = 1.hours,
+                    ).copy(title = "Meeting on how to find funny preview titles"),
+                )
+            }
+
             EventEditScreen(
-                uiState = EventEditScreenState.Success(
-                    eventFormState = rememberEventFormState(
-                        values = EventFormValues.default(
-                            calendars = previewEventDetailCalendarGroups,
-                            calendar = previewEventDetailCalendar,
-                            date = Clock.today(),
-                            timeZone = TimeZone.currentSystemDefault(),
-                            eventDuration = 1.hours,
-                        ).copy(title = "Meeting on how to find funny preview titles"),
-                        attendees = { previewAttendees },
-                        initialOrganizer = null,
-                    ),
-                    isRecurring = false,
-                ),
+                uiState = EventEditScreenState.Success(values, previewEventDetailCalendarGroups, isRecurring = false),
+                attendees = { previewAttendees },
+                update = { transform -> values = transform(values) },
                 goBack = {},
                 goToEventAttendees = {},
                 goToTimeZoneSearch = {},

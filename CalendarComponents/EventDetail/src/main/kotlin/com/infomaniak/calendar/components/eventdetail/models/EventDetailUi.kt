@@ -27,6 +27,7 @@ import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Bell
 import com.infomaniak.designsystem.icons.symbols.BubbleTopRightCircle
 import com.infomaniak.designsystem.icons.symbols.Symbol
+import kotlinx.serialization.Serializable
 
 /**
  * @param calendars The calendars the event can be moved to: the writable ones, grouped by account.
@@ -66,6 +67,7 @@ data class EventDetailUi(
 
     /** @param sourceId Opaque id of the stored alarm it was read from, `null` for one added in the form. */
     @Immutable
+    @Serializable
     data class Notification(val type: Type, val time: NotificationTime, val sourceId: String? = null) {
         @Immutable
         enum class Type(val icon: Symbol, @StringRes val label: Int) {

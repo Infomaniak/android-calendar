@@ -20,7 +20,6 @@ package com.infomaniak.calendar.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation3.runtime.NavKey
-import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationMetadata
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.form.eventFormViewModel
@@ -39,10 +38,4 @@ fun shareViewModelStoreWith(destination: NavDestination): NavigationMetadata = o
 @Composable
 fun sharedEventFormViewModel(destination: NavDestination.EventForm): EventFormViewModel {
     return eventFormViewModel(destination, LocalSharedViewModelStoreOwner.current)
-}
-
-/** The state of the form of [destination], read by a screen it opens. `null` while the form loads. */
-@Composable
-fun sharedEventFormState(destination: NavDestination.EventForm): EventFormState? {
-    return sharedEventFormViewModel(destination).state
 }

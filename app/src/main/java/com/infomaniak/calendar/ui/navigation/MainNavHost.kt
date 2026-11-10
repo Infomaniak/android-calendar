@@ -207,10 +207,10 @@ private fun baseEntryProvider(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
-            val dateAndTimeState = sharedEventFormState(destination.parent)?.dateAndTimeState ?: return@NavEntry
+            val eventFormViewModel = sharedEventFormViewModel(destination.parent)
             TimeZoneSearchScreen(
                 onTimeZoneSelected = { timeZone ->
-                    with(dateAndTimeState) { (if (destination.isStart) start else end).pickTimeZone(timeZone) }
+                    eventFormViewModel.update { it.copy(dates = it.dates.pickTimeZone(destination.isStart, timeZone)) }
                 },
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
@@ -220,9 +220,11 @@ private fun baseEntryProvider(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
-            val formState = sharedEventFormState(destination.parent) ?: return@NavEntry
+            val eventFormViewModel = sharedEventFormViewModel(destination.parent)
             CustomReminderScreen(
-                onSubmit = { notification -> formState.notifications.value += notification },
+                onSubmit = { notification ->
+                    eventFormViewModel.update { it.copy(notifications = it.notifications + notification) }
+                },
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
         }

@@ -32,10 +32,17 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.MutableCreationExtras
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.infomaniak.calendar.components.eventdetail.form.EventFormState
+import androidx.savedstate.SavedState
+import androidx.savedstate.read
+import androidx.savedstate.savedState
+import androidx.savedstate.serialization.decodeFromSavedState
+import androidx.savedstate.serialization.encodeToSavedState
 import com.infomaniak.calendar.components.eventdetail.form.EventFormValues
+import com.infomaniak.calendar.components.eventdetail.form.calendarOf
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
@@ -45,7 +52,6 @@ import com.infomaniak.calendar.ui.screen.eventDetail.EventCreationCalendarsUseCa
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.EventLoader
 import com.infomaniak.calendar.utils.saveableAttendeesSearchState
-import com.infomaniak.calendar.utils.saveableEventFormState
 import com.infomaniak.calendar.utils.toEventFormValues
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
@@ -87,9 +93,10 @@ private object DestinationKey : CreationExtras.Key<NavDestination.EventForm>
 private object LoadedEventKey : CreationExtras.Key<EventDetailUi>
 
 /**
- * Holds the state of an event form, shared with the screens it opens through its ViewModelStore.
+ * Holds the values of an event form, shared with the screens it opens through its ViewModelStore.
  *
- * The state is built once its initial values are loaded, its fields restored from the [SavedStateHandle] when it holds them.
+ * The values are saved as a whole in the [SavedStateHandle]. Restored ones win over the loaded ones, which are only read for a
+ * new form. The calendars it can be put in are reloaded every time, never saved.
  */
 @AssistedInject
 class EventFormViewModel(
@@ -100,39 +107,61 @@ class EventFormViewModel(
     private val eventCreationCalendarsUseCase: EventCreationCalendarsUseCase,
     private val settingsDataValues: SettingsDataValues,
 ) : ViewModel() {
-    var state: EventFormState? by mutableStateOf(null)
+    var values: EventFormValues? by mutableStateOf(savedStateHandle.restoredValues())
+        private set
+
+    var calendars: List<EventDetailCalendarGroup>? by mutableStateOf(null)
         private set
 
     var attendeesSearchState: AttendeesSearchState<OrganizerSource>? by mutableStateOf(null)
         private set
 
     init {
+        savedStateHandle.setSavedStateProvider(VALUES_KEY) {
+            values?.let { encodeToSavedState(EventFormValues.serializer(), it) } ?: savedState()
+        }
+
         when (destination) {
             is NavDestination.EventCreation -> viewModelScope.launch {
                 val attendeesSearchState = savedStateHandle.saveableAttendeesSearchState<OrganizerSource>()
-                val formState = build(creationValues(destination), attendeesSearchState)
-                snapshotFlow { formState.calendar }.collect(attendeesSearchState::followOrganizerOf)
+                val (creationCalendars, defaultEventDuration) = combine(
+                    eventCreationCalendarsUseCase.creationCalendars.filterNotNull(),
+                    settingsDataValues.defaultEventDuration.flow,
+                    ::Pair,
+                ).first()
+                show(creationCalendars.calendars, attendeesSearchState) {
+                    EventFormValues.default(
+                        calendarId = creationCalendars.initialCalendar.id,
+                        date = destination.date,
+                        timeZone = TimeZone.currentSystemDefault(),
+                        eventDuration = defaultEventDuration,
+                    )
+                }
+
+                snapshotFlow { values?.calendarId?.let(creationCalendars.calendars::calendarOf) }
+                    .filterNotNull()
+                    .collect(attendeesSearchState::followOrganizerOf)
             }
             is NavDestination.EventEdit -> if (loadedEvent != null) {
-                buildEdit(loadedEvent)
+                showEdit(loadedEvent)
             } else {
-                viewModelScope.launch { buildEdit(loadEvent(destination)) }
+                viewModelScope.launch { showEdit(loadEvent(destination)) }
             }
         }
     }
 
-    private suspend fun creationValues(destination: NavDestination.EventCreation): EventFormValues = combine(
-        eventCreationCalendarsUseCase.creationCalendars.filterNotNull(),
-        settingsDataValues.defaultEventDuration.flow,
-    ) { creationCalendars, defaultEventDuration ->
-        EventFormValues.default(
-            calendars = creationCalendars.calendars,
-            calendar = creationCalendars.initialCalendar,
-            date = destination.date,
-            timeZone = TimeZone.currentSystemDefault(),
-            eventDuration = defaultEventDuration,
-        )
-    }.first()
+    fun update(transform: (EventFormValues) -> EventFormValues) {
+        values = values?.let(transform)
+    }
+
+    fun toEventDraft(): EventDraft? {
+        val values = values ?: return null
+        val calendar = calendars?.calendarOf(values.calendarId) ?: return null
+        val attendeesSearchState = attendeesSearchState ?: return null
+        val initialOrganizer = (attendeesSearchState.organizerSource as? OrganizerSource.Static)?.organizer
+
+        return values.toEventDraft(calendar, attendeesSearchState.attendees, initialOrganizer)
+    }
 
     private suspend fun loadEvent(destination: NavDestination.EventEdit): EventDetailUi {
         return eventLoader.eventDetailUi(eventLoader.eventAndCalendar(destination.occurrenceId))
@@ -141,17 +170,22 @@ class EventFormViewModel(
             .eventDetail
     }
 
-    private fun buildEdit(event: EventDetailUi) {
+    private fun showEdit(event: EventDetailUi) {
         val attendeesSearchState = savedStateHandle.saveableAttendeesSearchState<OrganizerSource>(
             initialParticipants = event.attendees.all,
             initialOrganizerSource = OrganizerSource.Static(event.organizer),
         )
-        build(event.toEventFormValues(), attendeesSearchState)
+        show(event.calendars, attendeesSearchState, event::toEventFormValues)
     }
 
-    private fun build(values: EventFormValues, attendeesSearchState: AttendeesSearchState<OrganizerSource>): EventFormState {
+    private fun show(
+        calendars: List<EventDetailCalendarGroup>,
+        attendeesSearchState: AttendeesSearchState<OrganizerSource>,
+        initialValues: () -> EventFormValues,
+    ) {
+        this.calendars = calendars
         this.attendeesSearchState = attendeesSearchState
-        return savedStateHandle.saveableEventFormState(values, attendeesSearchState).also { state = it }
+        if (values == null) values = initialValues()
     }
 
     @AssistedFactory
@@ -169,6 +203,15 @@ class EventFormViewModel(
             @Assisted destination: NavDestination.EventForm,
             @Assisted loadedEvent: EventDetailUi?,
         ): EventFormViewModel
+    }
+
+    companion object {
+        private const val VALUES_KEY = "values"
+
+        private fun SavedStateHandle.restoredValues(): EventFormValues? {
+            val savedValues = get<SavedState>(VALUES_KEY)?.takeUnless { it.read { isEmpty() } } ?: return null
+            return decodeFromSavedState(EventFormValues.serializer(), savedValues)
+        }
     }
 }
 

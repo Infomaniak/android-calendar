@@ -58,7 +58,7 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
     │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, AttendeeSearch(parent: EventForm), EditableAttendeeSearch(parent: EventDetail, config), EventTimeZone(parent: EventForm, isStart), EventCustomReminder(parent: EventForm), Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
     │   ├── SharedViewModelStores.kt # `toContentKey`, `shareViewModelStoreWith(parent)` metadata, and
-    │   │                            # `sharedEventFormViewModel` / `sharedEventFormState` read by the form's child entries
+    │   │                            # `sharedEventFormViewModel` read by the form's child entries
     │   ├── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
     │   └── ViewModelStoreSavedStates.kt # Saved state of each entry's ViewModelStore, kept until the entry is popped rather than
@@ -147,22 +147,24 @@ app/
   (`viewModel(LocalSharedViewModelStoreOwner.current)`); the parent calls plain `viewModel()`. Currently used for
   `EventDetailSharedDataViewModel` (the event loaded by EventDetail, reused by EventEdit), `EventFormViewModel` (below),
   and `EventDetailViewModel`, whose `AttendeesSearchState` the `EditableAttendeeSearch` entry hands to its screen.
-- **Event form state**: `EventFormViewModel` holds the `EventFormState` and the form's `AttendeesSearchState` of a
-  `NavDestination.EventForm` (`EventCreation` / `EventEdit`), in that destination's own store. Get it with
-  `eventFormViewModel(destination, viewModelStoreOwner)`, which hands the destination to its factory through
-  `CreationExtras`: whichever entry composes first creates it, and it loads its initial values itself, so a child entry
-  restored alone after a process death still gets the form. It loads an `EventFormValues` (`EventFormValues.default` for a
-  creation, `EventDetailUi.toEventFormValues()` for an edition) and builds the state with
-  `SavedStateHandle.saveableEventFormState`, one `saveable` per field: restored values win over the loaded ones and no
-  "initialized" flag is needed. A new form field goes in `EventFormState`, `EventFormValues` (and its `default`),
-  `toEventFormValues` and `saveableEventFormState`; the ViewModel doesn't change. The edit screen passes the event already
-  loaded by `EventDetailSharedDataViewModel`, so the form is there on its first frame for the shared-element transition.
-  `EventCreationViewModel` / `EventEditViewModel` only keep the screen state and the submission.
+- **Event form state**: `EventFormViewModel` holds the `EventFormValues` (what the user filled in: an immutable,
+  `@Serializable` value, changed only through `update { it.copy(…) }`), the calendars it can be put in, and the form's
+  `AttendeesSearchState`, for a `NavDestination.EventForm` (`EventCreation` / `EventEdit`), in that destination's own store.
+  Get it with `eventFormViewModel(destination, viewModelStoreOwner)`, which hands the destination to its factory through
+  `CreationExtras`: whichever entry composes first creates it, and it loads what it needs itself, so a child entry restored
+  alone after a process death still gets the form. The values are saved as a whole under one `SavedStateHandle` key
+  (`encodeToSavedState`); restored values win over the loaded ones (`EventFormValues.default` for a creation,
+  `EventDetailUi.toEventFormValues()` for an edition), so no "initialized" flag is needed. The calendars are reloaded
+  every time and never saved: the values only keep the selected `calendarId`. A new form field goes in `EventFormValues`
+  (and its `default` / `toEventDraft`), `toEventFormValues`, and the `EventForm` composable; the ViewModel doesn't change.
+  The `EventForm` composable owns the title's `TextFieldState` and reports its text through `update`. The edit screen passes
+  the event already loaded by `EventDetailSharedDataViewModel`, so the form is there on its first frame for the
+  shared-element transition. `EventCreationViewModel` / `EventEditViewModel` only keep the screen state and the submission.
 - **Screens opened by the event form** know nothing of it: they take their initial values or context as parameters, keep
   their own draft until submitted, and report it through `onSubmit`-like callbacks before calling `goBack`. Their key only
   carries `parent: NavDestination.EventForm` (plus navigation-only arguments such as `isStart`). Their `NavEntry` in
-  `MainNavHost`, the only place knowing both sides, reads the form through `sharedEventFormState(destination.parent)`
-  (`null` while the form loads: the entry shows nothing), passes the values in, and writes the result back to the form.
+  `MainNavHost`, the only place knowing both sides, reads the form through `sharedEventFormViewModel(destination.parent)`
+  (its `values` are `null` while the form loads), passes the values in, and writes the result back with `update`.
 - **DI**: Metro `@DependencyGraph` (`AppGraph`) scoped to `AppScope`. ViewModels are auto-registered
   via multibinding (`@ContributesIntoMap` + `@ViewModelKey`) and resolved through the `metrox-viewmodel`
   `MetroViewModelFactory` (exposed as `metroViewModelFactory` by the `ViewModelGraph` the graph implements,
