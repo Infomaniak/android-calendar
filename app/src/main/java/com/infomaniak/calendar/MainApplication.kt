@@ -69,11 +69,11 @@ class MainApplication : Application(), MetroApplication {
 
         initStoredAccounts()
         appGraph.cachedCalendarManager // Start loading calendars now so they're ready before any screen needs them
-        applyThemeToNightMode()
+        applySettingThemeToSystem()
     }
 
     // Resources (drawables, View-based activities like login) follow the configuration's night mode, not Compose's theme
-    private fun applyThemeToNightMode() {
+    private fun applySettingThemeToSystem() {
         applicationScope.launch(Dispatchers.Main.immediate) {
             appGraph.settingsDataValues.theme.flow.collect { AppCompatDelegate.setDefaultNightMode(it.nightMode) }
         }
