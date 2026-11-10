@@ -20,13 +20,16 @@ package com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
+import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldPaneScope
 import androidx.compose.material3.adaptive.navigation3.LocalListDetailSceneScope
 import androidx.compose.runtime.Composable
 
-/** Whether a list/detail layout currently shows its list pane, e.g. beside the detail pane. */
+/** Whether this content is drawn in the detail pane while the list pane is shown beside it. */
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun isListPaneExpanded(): Boolean {
-    val scaffoldValue = LocalListDetailSceneScope.current?.scaffoldTransitionScope?.scaffoldStateTransition?.targetState
-    return scaffoldValue?.get(ListDetailPaneScaffoldRole.List) == PaneAdaptedValue.Expanded
+fun isDetailBesideList(): Boolean {
+    val transitionScope = LocalListDetailSceneScope.current?.scaffoldTransitionScope
+    val isInDetailPane = (transitionScope as? ThreePaneScaffoldPaneScope)?.paneRole == ListDetailPaneScaffoldRole.Detail
+    val scaffoldValue = transitionScope?.scaffoldStateTransition?.targetState
+    return isInDetailPane && scaffoldValue?.get(ListDetailPaneScaffoldRole.List) == PaneAdaptedValue.Expanded
 }

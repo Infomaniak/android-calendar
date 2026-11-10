@@ -49,7 +49,7 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Metada
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationMetadata
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.ResponsiveDialogSceneStrategy
-import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.isListPaneExpanded
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.isDetailBesideList
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
 import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
 import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
@@ -263,7 +263,7 @@ private fun baseEntryProvider(
 
 /**
  * Settings sub-pages pair up as list | detail at any depth: the last entry is the detail and the one before it the list, so
- * opening a deeper page shifts the panes. The back button is only shown on the leftmost visible pane.
+ * opening a deeper page shifts the panes. The back button is hidden on the detail pane while the list pane is beside it.
  */
 private fun NavBackStack<NavDestination>.settingsSubPageEntry(
     destination: NavDestination,
@@ -272,7 +272,7 @@ private fun NavBackStack<NavDestination>.settingsSubPageEntry(
     val isDetail = lastOrNull() == destination
     return NavEntry(destination, metadata = metaDataOf(if (isDetail) DetailPane else SettingsListPane)) {
         val goBack = { popOrReplaceRoot(NavDestination.Settings.Main) }
-        content(goBack.takeUnless { isDetail && isListPaneExpanded() })
+        content(goBack.takeUnless { isDetailBesideList() })
     }
 }
 
