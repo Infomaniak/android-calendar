@@ -43,3 +43,10 @@ fun NavBackStack<NavDestination>.popUntilCalendarView(fallback: NavDestination.C
 fun <T : NavKey> NavBackStack<T>.addOnce(destination: T) {
     if (lastOrNull() != destination) add(destination)
 }
+
+/** Opens [destination] in place of whatever is above [anchor], e.g. to replace the shown detail of a list/detail layout. */
+fun <T : NavKey> NavBackStack<T>.replaceAbove(anchor: T, destination: T) {
+    val anchorIndex = lastIndexOf(anchor)
+    if (anchorIndex != -1) subList(anchorIndex + 1, size).clear()
+    addOnce(destination)
+}

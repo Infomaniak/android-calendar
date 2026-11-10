@@ -21,6 +21,7 @@ import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -43,11 +44,12 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Drawer
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.DetailPane
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.Drawer
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
-import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.ListPane
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.SettingsListPane
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.ResponsiveDialog
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationMetadata
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.ResponsiveDialogSceneStrategy
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.isFirstVisiblePane
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
 import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
 import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
@@ -229,15 +231,16 @@ private fun baseEntryProvider(
             )
         }
 
-        is NavDestination.Settings.Main -> NavEntry(destination, metadata = metaDataOf(ListPane)) {
+        is NavDestination.Settings.Main -> NavEntry(destination, metadata = metaDataOf(SettingsListPane)) {
             SettingScreen(
                 goBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
-                goToTheme = { backStack.addOnce(NavDestination.Settings.Theme) },
+                goToTheme = { backStack.replaceAbove(destination, NavDestination.Settings.Theme) },
             )
         }
 
         is NavDestination.Settings.Theme -> NavEntry(destination, metadata = metaDataOf(DetailPane)) {
-            SettingThemeScreen(goBack = { backStack.popOrReplaceRoot(NavDestination.Settings.Main) })
+            val goBack = { backStack.popOrReplaceRoot(NavDestination.Settings.Main) }
+            SettingThemeScreen(goBack = goBack.takeIf { isFirstVisiblePane(ListDetailPaneScaffoldRole.Detail) })
         }
 
         is NavDestination.Onboarding.Login -> NavEntry(destination) {

@@ -35,7 +35,7 @@ import com.infomaniak.core.common.R as RCore
 
 @Composable
 fun SettingThemeScreen(
-    goBack: () -> Unit,
+    goBack: (() -> Unit)?,
     modifier: Modifier = Modifier,
     settingThemeViewModel: SettingThemeViewModel = viewModel(),
 ) {
@@ -53,7 +53,7 @@ fun SettingThemeScreen(
 private fun SettingThemeContent(
     theme: () -> SettingThemeOption?,
     onThemeClick: (SettingThemeOption) -> Unit,
-    goBack: () -> Unit,
+    goBack: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     SettingScaffold(

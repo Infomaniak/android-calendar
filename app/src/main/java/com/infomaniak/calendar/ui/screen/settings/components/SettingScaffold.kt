@@ -41,7 +41,7 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 @Composable
 fun SettingScaffold(
     title: String,
-    goBack: () -> Unit,
+    goBack: (() -> Unit)?,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -52,7 +52,7 @@ fun SettingScaffold(
             key(LocalIsThemeDarkMode.current) {
                 TopAppBar(
                     title = { Text(title) },
-                    navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
+                    navigationIcon = { goBack?.let { TopAppBarButtons.BackButton(onClick = it) } },
                 )
             }
         },
