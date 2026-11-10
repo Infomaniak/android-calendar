@@ -37,6 +37,7 @@ import androidx.savedstate.savedState
 import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
+import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.calendarOf
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
@@ -103,18 +104,18 @@ class EventFormViewModel(
     private val eventCreationCalendarsUseCase: EventCreationCalendarsUseCase,
     private val settingsDataValues: SettingsDataValues,
 ) : ViewModel() {
-    var form: EventForm? by mutableStateOf(savedStateHandle.restoredForm())
+    var formState: EventFormState? by mutableStateOf(savedStateHandle.restoredForm()?.let(::EventFormState))
         private set
 
     var calendars: List<EventDetailCalendarGroup>? by mutableStateOf(null)
         private set
 
     /** `false` while the form loads, and once its calendar can't be written to anymore. */
-    val canSubmit: Boolean get() = form?.let { calendars?.calendarOf(it.calendarId) } != null
+    val canSubmit: Boolean get() = formState?.form?.let { calendars?.calendarOf(it.calendarId) } != null
 
     init {
         savedStateHandle.setSavedStateProvider(FORM_KEY) {
-            form?.let { encodeToSavedState(EventForm.serializer(), it) } ?: savedState()
+            formState?.form?.let { encodeToSavedState(EventForm.serializer(), it) } ?: savedState()
         }
 
         when (destination) {
@@ -133,12 +134,8 @@ class EventFormViewModel(
         }
     }
 
-    fun update(transform: (EventForm) -> EventForm) {
-        form = form?.let(transform)
-    }
-
     fun toEventDraft(): EventDraft? {
-        val form = form ?: return null
+        val form = formState?.form ?: return null
         val calendar = calendars?.calendarOf(form.calendarId) ?: return null
 
         return form.toEventDraft(calendar)
@@ -151,29 +148,32 @@ class EventFormViewModel(
     }
 
     private suspend fun initForm(destination: NavDestination.EventCreation) {
-        if (form != null) return
+        if (formState != null) return
         val creationCalendars = eventCreationCalendarsUseCase.creationCalendars.filterNotNull().first()
         val defaultEventDuration = settingsDataValues.defaultEventDuration.flow.first()
 
-        form = EventForm.default(
-            calendar = creationCalendars.initialCalendar,
-            date = destination.date,
-            timeZone = TimeZone.currentSystemDefault(),
-            eventDuration = defaultEventDuration,
+        formState = EventFormState(
+            EventForm.default(
+                calendar = creationCalendars.initialCalendar,
+                date = destination.date,
+                timeZone = TimeZone.currentSystemDefault(),
+                eventDuration = defaultEventDuration,
+            ),
         )
     }
 
     private fun initForm(event: EventDetailUi) {
-        if (form == null) form = event.toEventForm()
+        if (formState == null) formState = EventFormState(event.toEventForm())
         updateCalendars(event.calendars, fallback = event.calendar)
     }
 
     /** Keeps the calendars up to date, moving the form to [fallback] when its calendar can't be written to anymore. */
     private fun updateCalendars(calendars: List<EventDetailCalendarGroup>?, fallback: EventDetailCalendar?) {
         this.calendars = calendars
+        val formState = formState ?: return
         if (calendars == null || fallback == null) return
 
-        update { form -> if (calendars.calendarOf(form.calendarId) == null) form.withCalendar(fallback) else form }
+        if (calendars.calendarOf(formState.form.calendarId) == null) formState.edit { it.withCalendar(fallback) }
     }
 
     @AssistedFactory

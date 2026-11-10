@@ -31,7 +31,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -74,8 +73,7 @@ import kotlin.time.Duration.Companion.minutes
  */
 @Composable
 fun EventFormContent(
-    form: EventForm,
-    update: ((EventForm) -> EventForm) -> Unit,
+    state: EventFormState,
     calendars: List<EventDetailCalendarGroup>,
     onAttendeesClick: () -> Unit,
     onTimeZoneClick: (isStart: Boolean) -> Unit,
@@ -85,12 +83,12 @@ fun EventFormContent(
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
+    val form = state.form
     val calendar = calendars.calendarOf(form.calendarId) ?: return@ProvideEventSharedTransition
 
     val titleState = rememberTextFieldState(form.title)
-    val currentUpdate by rememberUpdatedState(update)
-    LaunchedEffect(titleState) {
-        snapshotFlow { titleState.text.toString() }.collect { title -> currentUpdate { it.copy(title = title) } }
+    LaunchedEffect(state, titleState) {
+        snapshotFlow { titleState.text.toString() }.collect { title -> state.edit { it.copy(title = title) } }
     }
 
     Column(modifier.padding(contentPadding)) {
@@ -105,13 +103,14 @@ fun EventFormContent(
 
         AllDaySwitch(
             checked = { form.isAllDay },
-            onCheckedChange = { isChecked -> update { it.copy(isAllDay = isChecked) } },
+            onCheckedChange = { isAllDay -> state.edit { it.copy(isAllDay = isAllDay) } },
         )
 
         DateAndTimeEditable(
             dates = form.dates,
             isAllDay = { form.isAllDay },
-            onDatesChange = { transform -> update { it.copy(dates = transform(it.dates)) } },
+            onDatePicked = { isStart, date -> state.edit { it.copy(dates = it.dates.pickDate(isStart, date)) } },
+            onTimePicked = { isStart, time -> state.edit { it.copy(dates = it.dates.pickTime(isStart, time)) } },
             onTimeZoneClick = onTimeZoneClick,
             modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
         )
@@ -125,7 +124,7 @@ fun EventFormContent(
 
             KMeetButtonSwitch(
                 checked = { form.isKMeetUrlEnabled },
-                onCheckedChange = { isChecked -> update { it.copy(isKMeetUrlEnabled = isChecked) } },
+                onCheckedChange = { isEnabled -> state.edit { it.copy(isKMeetUrlEnabled = isEnabled) } },
                 modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
             )
         }
@@ -136,7 +135,7 @@ fun EventFormContent(
             form.notifications.forEach { notification ->
                 ReminderItem(
                     notification = notification,
-                    onRemoveClick = { update { it.copy(notifications = it.notifications - notification) } },
+                    onRemoveClick = { state.edit { it.copy(notifications = it.notifications - notification) } },
                 )
             }
 
@@ -151,7 +150,7 @@ fun EventFormContent(
                                 type = EventDetailUi.Notification.Type.Push,
                                 time = NotificationTime.Offset(offset),
                             )
-                            update { it.copy(notifications = it.notifications + notification) }
+                            state.edit { it.copy(notifications = it.notifications + notification) }
                         }
                         isReminderOffsetDialogVisible = false
                     },
@@ -167,20 +166,20 @@ fun EventFormContent(
         Section(EventSharedElement.Divider4) {
             OccupiedStatusSwitch(
                 checked = { form.isOccupied },
-                onCheckedChange = { isChecked -> update { it.copy(isOccupied = isChecked) } },
+                onCheckedChange = { isOccupied -> state.edit { it.copy(isOccupied = isOccupied) } },
                 modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus),
             )
 
             ClassificationStatusSwitch(
                 checked = { form.isPublic },
-                onCheckedChange = { isChecked -> update { it.copy(isPublic = isChecked) } },
+                onCheckedChange = { isPublic -> state.edit { it.copy(isPublic = isPublic) } },
                 modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
             )
 
             CalendarEditable(
                 selectedCalendar = calendar,
                 calendars = calendars,
-                onSelect = { selected -> update { it.withCalendar(selected) } },
+                onSelect = { calendar -> state.edit { it.withCalendar(calendar) } },
                 modifier = Modifier.eventSharedBounds(EventSharedElement.Calendar),
             )
         }
@@ -192,8 +191,8 @@ fun EventFormContent(
 private fun Preview() {
     MaterialTheme {
         Surface {
-            var form by remember {
-                mutableStateOf(
+            val state = remember {
+                EventFormState(
                     EventForm.default(
                         calendar = previewEventDetailCalendar,
                         date = Clock.today(),
@@ -208,8 +207,7 @@ private fun Preview() {
                 )
             }
             EventFormContent(
-                form = form,
-                update = { transform -> form = transform(form) },
+                state = state,
                 calendars = previewEventDetailCalendarGroups,
                 onAttendeesClick = {},
                 onTimeZoneClick = {},

@@ -28,12 +28,31 @@ import com.infomaniak.calendar.components.eventdetail.form.CustomReminder
 import com.infomaniak.calendar.components.eventdetail.form.rememberCustomReminderState
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
+import com.infomaniak.calendar.ui.navigation.NavDestination
+import com.infomaniak.calendar.ui.navigation.sharedEventFormViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.calendar.components.resources.R as RComponents
 
 @Composable
 fun CustomReminderScreen(
+    parent: NavDestination.EventForm,
+    goBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    eventFormViewModel: EventFormViewModel = sharedEventFormViewModel(parent),
+) {
+    CustomReminderScreen(
+        onSubmit = { notification ->
+            eventFormViewModel.formState?.edit { it.copy(notifications = it.notifications + notification) }
+        },
+        goBack = goBack,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun CustomReminderScreen(
     onSubmit: (EventDetailUi.Notification) -> Unit,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
