@@ -29,5 +29,6 @@ val White = Color(0xFFFFFFFF)
 data class CustomColorScheme(val avatarInitialsColor: Color = Color.Unspecified)
 
 object CustomColors {
-    val menuDrawerContainerBackground @Composable get() = MaterialTheme.colorScheme.surfaceBright
+    val MenuDrawerContainerBackground @Composable get() = MaterialTheme.colorScheme.surfaceBright
+    val SettingItemContainerColor @Composable get() = MenuDrawerContainerBackground
 }

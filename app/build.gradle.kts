@@ -194,6 +194,7 @@ dependencies {
     implementation(core.compose.ui.graphics)
     implementation(core.compose.ui.tooling.preview)
     implementation(core.androidx.adaptive)
+    implementation(libs.androidx.adaptive.navigation3)
     implementation(core.material)
     implementation(core.okhttp)
     implementation(libs.compose.material3)

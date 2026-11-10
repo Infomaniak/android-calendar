@@ -57,7 +57,7 @@ fun MenuItem(
             )
         },
         verticalAlignment = Alignment.CenterVertically,
-        colors = ListItemDefaults.drawerColors,
+        colors = ListItemDefaults.DrawerColors,
     ) {
         Text(
             text = stringResource(menuOption.itemNameRes),

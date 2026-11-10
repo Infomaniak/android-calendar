@@ -17,9 +17,14 @@
  */
 package com.infomaniak.calendar
 
+import com.infomaniak.calendar.model.settings.SettingThemeOption
 import com.infomaniak.calendar.ui.navigation.NavDestination
 
 sealed interface MainUiState {
     data object Loading : MainUiState
-    data class Loaded(val isUserConnected: Boolean, val lastCalendarView: NavDestination.CalendarView) : MainUiState
+    data class Loaded(
+        val isUserConnected: Boolean,
+        val lastCalendarView: NavDestination.CalendarView,
+        val theme: SettingThemeOption,
+    ) : MainUiState
 }

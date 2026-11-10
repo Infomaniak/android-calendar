@@ -17,10 +17,21 @@
  */
 package com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation
 
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
+import com.infomaniak.calendar.ui.screen.settings.SettingDetailPlaceholder
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 enum class MetadataSceneStrategy(override val metadata: Map<String, Any>) : NavigationMetadata {
     FloatingToolbarWithFab(metadata = mapOf(SHOULD_SHOW_FLOATING_TOOLBAR_WITH_FAB to true)),
     Drawer(metadata = mapOf(SHOULD_SHOW_DRAWER to true)),
     ResponsiveDialog(metadata = mapOf(SHOULD_SHOW_RESPONSIVE_DIALOG to true)),
+
+    /** Settings list, shown side by side with the trailing [DetailPane] entry when the window is wide enough. */
+    SettingsListPane(metadata = ListDetailSceneStrategy.listPane(detailPlaceholder = { SettingDetailPlaceholder() })),
+
+    /** Detail shown after the last list pane. */
+    DetailPane(metadata = ListDetailSceneStrategy.detailPane()),
 }
 
 fun metaDataOf(vararg items: NavigationMetadata): Map<String, Any> = buildMap {

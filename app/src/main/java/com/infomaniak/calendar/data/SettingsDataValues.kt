@@ -18,14 +18,15 @@
 package com.infomaniak.calendar.data
 
 import android.content.Context
+import com.infomaniak.calendar.model.settings.SettingThemeOption
 import com.infomaniak.core.datavalue.DataValues
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 
 @SingleIn(AppScope::class)
 class SettingsDataValues @Inject constructor(appContext: Context) : DataValues(appContext, name = "settingsData") {
+    val theme = dataValue(key = "theme", defaultValue = SettingThemeOption.System)
     val defaultEventDuration = dataValue(key = "defaultEventDuration", defaultValue = 1.hours)
 }

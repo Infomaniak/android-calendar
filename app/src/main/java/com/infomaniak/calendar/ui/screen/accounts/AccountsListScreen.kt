@@ -43,9 +43,9 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
 fun AccountsListScreen(
-    onAddAccount: () -> Unit,
-    onBack: () -> Unit,
-    onAccountClick: (Int) -> Unit,
+    goToAddAccount: () -> Unit,
+    goBack: () -> Unit,
+    goToAccountActions: (Int) -> Unit,
     modifier: Modifier = Modifier,
     menuDrawerViewModel: MenuDrawerViewModel = viewModel(),
 ) {
@@ -54,9 +54,9 @@ fun AccountsListScreen(
     AccountsListContent(
         calendarsUsers = { calendarsUsers },
         modifier = modifier,
-        onAddAccount = onAddAccount,
-        onBack = onBack,
-        onAccountClick = onAccountClick,
+        onAddAccount = goToAddAccount,
+        onBack = goBack,
+        onAccountClick = goToAccountActions,
     )
 }
 

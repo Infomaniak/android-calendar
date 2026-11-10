@@ -55,7 +55,7 @@ app/src/main/java/com/infomaniak/calendar/
     │                              # UserCalendarsUi / CalendarSectionUi / CalendarUi / CalendarColorsUi, the calendars as the drawer and other views draw them
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
-    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), EventTimeZone(parent, isStart), EventCustomReminder(parent), Accounts, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
+    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), EventTimeZone(parent, isStart), EventCustomReminder(parent), Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
     │   └── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
     ├── screen/
@@ -66,6 +66,7 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── planning/              # PlanningScreen + PlanningViewModel (events from VisibleEventsManager) + PlanningEventGroupingExt
     │   ├── accounts/              # AccountsListScreen + AccountActionsScreen + AccountsViewModel + AccountItem
     │                              # Drawer-backed account list, per-account detail/logout screen, and remove-account flow
+    │   ├── settings/              # SettingScreen (opened from the drawer) + nested SettingThemeScreen + SettingThemeViewModel
     │   ├── eventCreation/         # EventCreationScreen
     │   ├── eventDetail/           # EventDetailScreen + EventEditScreen + EventCreationScreen + their ViewModels, and
     │                              # attendeesSearch/ (EventAttendeesScreen + EventAttendeesViewModel shared with its parent)
@@ -106,6 +107,12 @@ app/
 ### Architecture & Design
 
 - **Single Activity**: `MainActivity` hosts all Compose content via `setContent { CalendarTheme { Surface { MainNavHost() } } }`.
+- **Theme preference**: `MainApplication` mirrors `SettingsDataValues.theme` into `AppCompatDelegate.setDefaultNightMode`,
+  so `-night` resources (e.g. onboarding illustrations) and the AppCompat login activities follow the same mode as
+  `CalendarTheme`. `MainActivity` must stay an `AppCompatActivity` for this override to reach its configuration. It
+  declares `configChanges="uiMode"`: a mode change updates its configuration without recreating it, so Compose
+  (`isSystemInDarkTheme()`) and the system bars follow the configuration, never the setting directly. The splash stays
+  up until the stored theme has been applied, to avoid drawing a first frame in the wrong mode.
 - **Splash screen**: `androidx.core:core-splashscreen`. `MainActivity` launches with `AppThemeLauncher`, which hands over to
   `Theme.Calendar` (`postSplashScreenTheme`). The splash and the content read the same state: `MainViewModel.uiState`
   stays `MainUiState.Loading` until both the users and the last calendar view are read, and the splash stays up meanwhile. Android 12+ draws it from `values-v31/themes.xml` (launcher foreground, `splashscreenBackground`,
@@ -117,6 +124,15 @@ app/
   DSL): the DSL can't read the key while building `metadata`, which `AttendeeSearch` needs in order to declare its parent.
   Entries are decorated with `rememberSaveableStateHolderNavEntryDecorator()` followed by
   `rememberSharedViewModelStoreNavEntryDecorator()`, in that order.
+- **List/detail (Settings)**: Material 3's `ListDetailSceneStrategy` (`adaptive-navigation3`) lays settings out side by
+  side on wide windows. The root settings entry is always `metaDataOf(SettingsListPane)` (it brings the
+  `SettingDetailPlaceholder` shown while nothing is opened). Build every sub-page with `backStack.settingsSubPageEntry`
+  in `MainNavHost`: the last entry gets `DetailPane` and earlier ones `SettingsListPane`, so at any depth the last two
+  settings screens show as list | detail (A > B > C shows B | C, back shows A | B). This is why the strategy uses
+  `BackNavigationBehavior.PopLatest`. Open a page with `backStack.replaceAbove(currentDestination, next)` so it replaces
+  the detail already shown instead of stacking on it. The helper hides the back button of whatever is drawn in the detail
+  pane while the list pane is beside it (read from the pane, not the back stack, to avoid a flicker). On compact windows
+  the strategy steps aside and entries display one at a time as before.
 - **Sharing a ViewModel between a parent entry and a child entry**: the child's key carries its parent
   (`EventAttendees(parent)`), and its metadata uses `SharedViewModelStoreNavEntryDecorator.parent(parent.toContentKey())`.
   The parent entry must set `contentKey = destination.toContentKey()`, so both resolve the same store. The child reads the

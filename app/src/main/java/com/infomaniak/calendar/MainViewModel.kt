@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.foundation.manager.AvatarFinder
 import com.infomaniak.calendar.data.CalendarDataValues
+import com.infomaniak.calendar.data.SettingsDataValues
 import com.infomaniak.calendar.manager.AppAvatarFinder
 import com.infomaniak.calendar.manager.BackgroundEventComposer
 import com.infomaniak.calendar.manager.SyncEventsManager
@@ -55,6 +56,7 @@ class MainViewModel(
     private val syncEventsManager: SyncEventsManager,
     backgroundEventComposer: BackgroundEventComposer,
     private val calendarDataValues: CalendarDataValues,
+    settingsDataValues: SettingsDataValues,
     visibleDateManager: VisibleDateManager,
     appAvatarFinder: AppAvatarFinder,
 ) : ViewModel() {
@@ -64,8 +66,9 @@ class MainViewModel(
     val uiState: StateFlow<MainUiState> = combine(
         accountUtils.users,
         calendarDataValues.lastCalendarView.flow,
-    ) { users, lastCalendarView ->
-        MainUiState.Loaded(isUserConnected = users.isNotEmpty(), lastCalendarView = lastCalendarView)
+        settingsDataValues.theme.flow,
+    ) { users, lastCalendarView, theme ->
+        MainUiState.Loaded(isUserConnected = users.isNotEmpty(), lastCalendarView = lastCalendarView, theme = theme)
     }.stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = MainUiState.Loading)
 
     val visibleDate = visibleDateManager.visibleDate

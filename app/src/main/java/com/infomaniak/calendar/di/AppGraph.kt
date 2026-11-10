@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.infomaniak.calendar.BuildConfig
 import com.infomaniak.calendar.MainApplication
 import com.infomaniak.calendar.data.CalendarDataValues
+import com.infomaniak.calendar.data.SettingsDataValues
 import com.infomaniak.calendar.di.metroAndroidExtensions.AndroidComponentProvider
 import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.notification.AlarmScheduler
@@ -70,6 +71,8 @@ interface AppGraph : AndroidComponentProvider, ViewModelGraph {
     val cachedCalendarManager: CachedCalendarManager
 
     val calendarDataValues: CalendarDataValues
+
+    val settingsDataValues: SettingsDataValues
 
     val alarmScheduler: AlarmScheduler
 

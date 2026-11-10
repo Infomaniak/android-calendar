@@ -19,12 +19,16 @@ package com.infomaniak.calendar
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberDrawerState
@@ -32,11 +36,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.saveable.rememberSerializable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSerializable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavBackStack
@@ -65,7 +70,11 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.serialization.json.Json
 import com.infomaniak.core.common.R as RCore
 
-class MainActivity : ComponentActivity() {
+// Copied from internal value inside enableEdgeToEdge()
+private val DefaultLightScrim = Color.argb(0xe6, 0xFF, 0xFF, 0xFF)
+private val DefaultDarkScrim = Color.argb(0x80, 0x1b, 0x1b, 0x1b)
+
+class MainActivity : AppCompatActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
     private val contactViewModel: ContactViewModel by viewModels()
@@ -75,7 +84,7 @@ class MainActivity : ComponentActivity() {
         get() = appGraph.metroViewModelFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen().setKeepOnScreenCondition { mainViewModel.uiState.value == MainUiState.Loading }
+        installSplashScreen().setKeepOnScreenCondition { !isReadyToShow() }
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) {
             handleEventIntent(intent)
@@ -87,24 +96,23 @@ class MainActivity : ComponentActivity() {
         if (SDK_INT >= 29) window.isNavigationBarContrastEnforced = false
 
         setContent {
+            val isDarkTheme = isSystemInDarkTheme()
+            LaunchedEffect(isDarkTheme) { adaptSystemBarsToTheme(isDarkTheme) }
+
             val currentUiState by mainViewModel.uiState.collectAsStateWithLifecycle()
 
-            CalendarTheme {
-                Surface {
-                    when (val uiState = currentUiState) {
-                        MainUiState.Loading -> Unit // Covered by the splash screen
-                        is MainUiState.Loaded -> MainContent(
-                            uiState = uiState,
-                            visibleDayState = rememberVisibleDayState(mainViewModel.visibleDate),
-                            avatarFinder = mainViewModel.avatarFinder,
-                            loadingEventsError = mainViewModel.loadingEventsError,
-                            savingEventError = mainViewModel.savingEventError,
-                            pendingOccurrenceId = pendingOccurrenceId.value,
-                            onClearPendingOccurrenceId = { pendingOccurrenceId.value = null },
-                            onCalendarViewSelected = mainViewModel::saveCalendarView,
-                        )
-                    }
-                }
+            when (val uiState = currentUiState) {
+                MainUiState.Loading -> Unit // Covered by the splash screen
+                is MainUiState.Loaded -> MainContent(
+                    uiState = uiState,
+                    visibleDayState = rememberVisibleDayState(mainViewModel.visibleDate),
+                    avatarFinder = mainViewModel.avatarFinder,
+                    loadingEventsError = mainViewModel.loadingEventsError,
+                    savingEventError = mainViewModel.savingEventError,
+                    pendingOccurrenceId = pendingOccurrenceId.value,
+                    onClearPendingOccurrenceId = { pendingOccurrenceId.value = null },
+                    onCalendarViewSelected = mainViewModel::saveCalendarView,
+                )
             }
         }
     }
@@ -123,6 +131,24 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         handleEventIntent(intent)
+    }
+
+    // The theme is applied asynchronously by MainApplication: wait for it, so the first frame isn't drawn in the wrong mode
+    private fun isReadyToShow(): Boolean {
+        val uiState = mainViewModel.uiState.value as? MainUiState.Loaded ?: return false
+        return AppCompatDelegate.getDefaultNightMode() == uiState.theme.nightMode
+    }
+
+    // The activity handles uiMode changes itself, so the system bars must follow the configuration's night mode
+    private fun adaptSystemBarsToTheme(isDarkTheme: Boolean) {
+        val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+        windowInsetsController.isAppearanceLightStatusBars = !isDarkTheme
+        windowInsetsController.isAppearanceLightNavigationBars = !isDarkTheme
+
+        // 29+ has isNavigationBarContrastEnforced set to false
+        if (SDK_INT < 29) {
+            enableEdgeToEdge(SystemBarStyle.auto(DefaultLightScrim, DefaultDarkScrim, { isDarkTheme }))
+        }
     }
 
     private fun handleEventIntent(intent: Intent) {
@@ -166,21 +192,25 @@ private fun MainContent(
         }
     }
 
-    CompositionLocalProvider(
-        LocalVisibleDayState provides visibleDayState,
-        LocalSharedSnackbarHostState provides rememberCustomSnackbarHostState(),
-        LocalToolbarScrollableState provides rememberToolbarScrollableState(),
-        LocalDrawerState provides rememberDrawerState(initialValue = DrawerValue.Closed),
-        LocalAvatarFinder provides avatarFinder,
-    ) {
-        ObserveSyncError(loadingEventsError)
-        ObserveSaveEventError(savingEventError)
-        NavigateToOnboardingIfLastUserIsDisconnected(backStack, isUserLoaded = isUserConnected)
-        MainNavHost(
-            backStack = backStack,
-            defaultCalendarView = uiState.lastCalendarView,
-            onCalendarViewSelected = onCalendarViewSelected,
-        )
+    CalendarTheme {
+        Surface {
+            CompositionLocalProvider(
+                LocalVisibleDayState provides visibleDayState,
+                LocalSharedSnackbarHostState provides rememberCustomSnackbarHostState(),
+                LocalToolbarScrollableState provides rememberToolbarScrollableState(),
+                LocalDrawerState provides rememberDrawerState(initialValue = DrawerValue.Closed),
+                LocalAvatarFinder provides avatarFinder,
+            ) {
+                ObserveSyncError(loadingEventsError)
+                ObserveSaveEventError(savingEventError)
+                NavigateToOnboardingIfLastUserIsDisconnected(backStack, isUserLoaded = isUserConnected)
+                MainNavHost(
+                    backStack = backStack,
+                    defaultCalendarView = uiState.lastCalendarView,
+                    onCalendarViewSelected = onCalendarViewSelected,
+                )
+            }
+        }
     }
 }
 

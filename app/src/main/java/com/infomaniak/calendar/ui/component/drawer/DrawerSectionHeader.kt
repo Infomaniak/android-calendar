@@ -66,7 +66,7 @@ fun DrawerSectionHeader(
             )
         },
         verticalAlignment = Alignment.CenterVertically,
-        colors = ListItemDefaults.drawerColors,
+        colors = ListItemDefaults.DrawerColors,
     ) {
         Text(
             text = organisationName ?: stringResource(R.string.otherCalendarsSectionTitle),

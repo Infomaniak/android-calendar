@@ -42,7 +42,7 @@ fun DrawerCalendarItem(
     modifier: Modifier = Modifier,
     onCalendarLongClick: (CalendarId) -> Unit = {},
 ) {
-    val colors = ListItemDefaults.drawerColors
+    val colors = ListItemDefaults.DrawerColors
 
     SegmentedListItem(
         checked = calendar.isVisible,

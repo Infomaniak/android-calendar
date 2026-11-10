@@ -19,7 +19,10 @@ package com.infomaniak.calendar.ui.navigation
 
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
+import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
+import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -38,12 +41,15 @@ import com.infomaniak.calendar.ui.component.drawer.MenuDrawer
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.component.CalendarHorizontalFloatingToolbar
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.DrawerDecoratorStrategy
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.DetailPane
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.Drawer
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.FloatingToolbarWithFab
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.ResponsiveDialog
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.SettingsListPane
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationMetadata
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.ResponsiveDialogSceneStrategy
+import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.isDetailBesideList
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
 import com.infomaniak.calendar.ui.screen.accounts.AccountActionsScreen
 import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
@@ -62,6 +68,8 @@ import com.infomaniak.calendar.ui.screen.onboarding.login.LoginOnboardingScreen
 import com.infomaniak.calendar.ui.screen.onboarding.permissions.PermissionsOnboardingPage
 import com.infomaniak.calendar.ui.screen.onboarding.permissions.PermissionsOnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
+import com.infomaniak.calendar.ui.screen.settings.SettingScreen
+import com.infomaniak.calendar.ui.screen.settings.SettingThemeScreen
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.utils.NavigationTransition
 import com.infomaniak.core.common.utils.today
@@ -210,17 +218,28 @@ private fun baseEntryProvider(
 
         is NavDestination.Accounts.List -> NavEntry(destination) {
             AccountsListScreen(
-                onBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
-                onAddAccount = { backStack.addOnce(NavDestination.Onboarding.Login(onlyLogin = true)) },
-                onAccountClick = { userId -> backStack.addOnce(NavDestination.Accounts.Actions(userId)) },
+                goBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
+                goToAddAccount = { backStack.addOnce(NavDestination.Onboarding.Login(onlyLogin = true)) },
+                goToAccountActions = { userId -> backStack.addOnce(NavDestination.Accounts.Actions(userId)) },
             )
         }
 
         is NavDestination.Accounts.Actions -> NavEntry(destination) {
             AccountActionsScreen(
                 userId = destination.userId,
-                onBack = { backStack.popOrReplaceRoot(NavDestination.Accounts.List) },
+                goBack = { backStack.popOrReplaceRoot(NavDestination.Accounts.List) },
             )
+        }
+
+        is NavDestination.Settings.Main -> NavEntry(destination, metadata = metaDataOf(SettingsListPane)) {
+            SettingScreen(
+                goBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
+                goToTheme = { backStack.replaceAbove(destination, NavDestination.Settings.Theme) },
+            )
+        }
+
+        is NavDestination.Settings.Theme -> backStack.settingsSubPageEntry(destination) { goBack ->
+            SettingThemeScreen(goBack = goBack)
         }
 
         is NavDestination.Onboarding.Login -> NavEntry(destination) {
@@ -242,10 +261,30 @@ private fun baseEntryProvider(
     }
 }
 
+/**
+ * Settings sub-pages pair up as list | detail at any depth: the last entry is the detail and the one before it the list, so
+ * opening a deeper page shifts the panes. The back button is hidden on the detail pane while the list pane is beside it.
+ */
+private fun NavBackStack<NavDestination>.settingsSubPageEntry(
+    destination: NavDestination,
+    content: @Composable (goBack: (() -> Unit)?) -> Unit,
+): NavEntry<NavDestination> {
+    val isDetail = lastOrNull { it is NavDestination.Settings } == destination
+    return NavEntry(destination, metadata = metaDataOf(if (isDetail) DetailPane else SettingsListPane)) {
+        val goBack = { popOrReplaceRoot(NavDestination.Settings.Main) }
+        content(goBack.takeUnless { isDetailBesideList() })
+    }
+}
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 private fun <T : NavKey> sceneStrategies(windowSizeClass: WindowSizeClass): List<SceneStrategy<T>> {
+    // Roles shift with the depth, so each back must only pop the last entry.
+    val listDetailStrategy = rememberListDetailSceneStrategy<T>(backNavigationBehavior = BackNavigationBehavior.PopLatest)
     // ResponsiveDialogSceneStrategy holds the scene of the ongoing dialog, it must survive recompositions.
-    return remember(windowSizeClass) { listOf(ResponsiveDialogSceneStrategy(windowSizeClass)) }
+    return remember(windowSizeClass, listDetailStrategy) {
+        listOf(ResponsiveDialogSceneStrategy(windowSizeClass), listDetailStrategy)
+    }
 }
 
 private fun sceneDecoratorStrategies(
@@ -283,6 +322,7 @@ private fun sceneDecoratorStrategies(
                 onManageAccounts = {
                     backStack.addOnce(NavDestination.Accounts.List)
                 },
+                goToSettings = { backStack.addOnce(NavDestination.Settings.Main) },
             )
         },
     )

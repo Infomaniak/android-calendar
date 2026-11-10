@@ -65,7 +65,7 @@ fun DrawerAccountItem(
             )
         },
         verticalAlignment = Alignment.CenterVertically,
-        colors = ListItemDefaults.drawerColors,
+        colors = ListItemDefaults.DrawerColors,
     ) {
         AccountName(user)
     }

@@ -22,5 +22,5 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.runtime.Composable
 import com.infomaniak.calendar.ui.theme.CustomColors
 
-val ListItemDefaults.drawerColors: ListItemColors
-    @Composable get() = colors(containerColor = CustomColors.menuDrawerContainerBackground)
+val ListItemDefaults.DrawerColors: ListItemColors
+    @Composable get() = colors(containerColor = CustomColors.MenuDrawerContainerBackground)
