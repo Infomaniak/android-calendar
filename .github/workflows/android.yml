@@ -13,7 +13,7 @@ concurrency:
 jobs:
   instrumentation-tests:
     if: github.event.pull_request.draft == false
-    runs-on: [ self-hosted, Android ]
+    runs-on: [ self-hosted, test ]
 
     steps:
       - name: Checkout the code

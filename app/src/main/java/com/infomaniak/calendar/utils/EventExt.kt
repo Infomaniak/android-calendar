@@ -61,7 +61,7 @@ fun Event.toEventDetailUi(
     attendees = attendees.toAttendees(accountId, emailsByUserId),
     organizer = organizer?.toOrganizerUi(),
     kMeetUrl = meetRoomUrl,
-    location = location,
+    location = location?.toString(),
     room = null, // TODO[eventDetail]: Not carried by the KMP model yet
     urlLink = null, // TODO[eventDetail]: Not carried by the KMP model yet
     description = description,
