@@ -137,7 +137,7 @@ private fun EventEditScreen(
             EventEditScreenState.Loading -> Unit
             is EventEditScreenState.Success -> {
                 EventFormContent(
-                    state = uiState.formState,
+                    state = uiState.eventFormState,
                     calendars = uiState.calendars,
                     onAttendeesClick = goToEventAttendees,
                     onTimeZoneClick = goToTimeZoneSearch,
@@ -155,7 +155,7 @@ private fun EventEditScreen(
 private sealed interface EventEditScreenState {
     object Loading : EventEditScreenState
     data class Success(
-        val formState: EventFormState,
+        val eventFormState: EventFormState,
         val calendars: List<EventDetailCalendarGroup>,
         val isRecurring: Boolean,
     ) : EventEditScreenState

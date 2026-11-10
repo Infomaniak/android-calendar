@@ -86,10 +86,6 @@ sealed interface NavDestination : NavKey {
     @Serializable
     data class EventDetail(val occurrenceId: OccurrenceId) : NavDestination
 
-    /** A destination holding an event form, whose state is shared with its child destinations through its ViewModelStore. */
-    @Serializable
-    sealed interface EventForm : NavDestination
-
     @Serializable
     data class EventEdit(val occurrenceId: OccurrenceId) : EventForm
 
@@ -97,7 +93,7 @@ sealed interface NavDestination : NavKey {
     data class AttendeeSearch(val parent: EventForm) : NavDestination
 
     @Serializable
-    data class EditableAttendeeSearch(val parent: EventDetail, val config: EditAttendeesConfig) : NavDestination
+    data class EditableAttendeeSearch(val parent: NavDestination, val config: EditAttendeesConfig) : NavDestination
 
     @Serializable
     data class EventCreation(val date: LocalDate) : EventForm
@@ -107,4 +103,8 @@ sealed interface NavDestination : NavKey {
 
     @Serializable
     data class EventCustomReminder(val parent: EventForm) : NavDestination
+
+    /** A destination holding an event form, whose state is shared with its child destinations through its ViewModelStore. */
+    @Serializable
+    sealed interface EventForm : NavDestination
 }

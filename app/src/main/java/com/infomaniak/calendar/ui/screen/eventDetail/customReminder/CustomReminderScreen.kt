@@ -45,6 +45,7 @@ fun CustomReminderScreen(
     CustomReminderScreen(
         onSubmit = { notification ->
             eventFormViewModel.formState?.edit { it.copy(notifications = it.notifications + notification) }
+            goBack()
         },
         goBack = goBack,
         modifier = modifier,
@@ -63,11 +64,7 @@ private fun CustomReminderScreen(
         topBar = {
             SubmitTopAppBar(
                 goBack = goBack,
-                onSubmit = {
-                    val notification = state.toNotification() ?: return@SubmitTopAppBar
-                    onSubmit(notification)
-                    goBack()
-                },
+                onSubmit = { state.toNotification()?.let(onSubmit) },
                 isSubmitEnabled = { state.amount != null },
                 isRecurring = false,
                 title = { Text(stringResource(RComponents.string.reminderTitle)) },

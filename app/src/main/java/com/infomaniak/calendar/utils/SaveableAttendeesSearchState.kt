@@ -29,12 +29,12 @@ import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 private const val ATTENDEES_SEARCH_STATE_KEY = "attendeesSearchState"
 
 @OptIn(SavedStateHandleSaveableApi::class)
-fun <T : OrganizerSource> SavedStateHandle.saveableAttendeesSearchState(): AttendeesSearchState<T> {
+fun <T: OrganizerSource> SavedStateHandle.saveableAttendeesSearchState(): AttendeesSearchState<T> {
     return saveable(
         key = ATTENDEES_SEARCH_STATE_KEY,
         saver = AttendeesSearchState.Saver(),
     ) {
-        AttendeesSearchState<T>(
+        AttendeesSearchState(
             searchQueryTextFieldState = TextFieldState(),
             results = mutableStateListOf(),
             participants = mutableStateSetOf(),

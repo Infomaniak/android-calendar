@@ -28,7 +28,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -59,7 +58,6 @@ import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.EditableAtt
 import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomReminderScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
-import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
@@ -199,7 +197,6 @@ private fun baseEntryProvider(
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
             EditableAttendeesSearchScreen(
-                attendeesSearchState = viewModel<EventDetailViewModel>(LocalSharedViewModelStoreOwner.current).attendeesSearchState,
                 config = destination.config,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
@@ -220,10 +217,7 @@ private fun baseEntryProvider(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
-            CustomReminderScreen(
-                parent = destination.parent,
-                goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
-            )
+            CustomReminderScreen(parent = destination.parent, goBack = { backStack.popOrReplaceRoot(defaultCalendarView) })
         }
 
         is NavDestination.Accounts.List -> NavEntry(destination) {

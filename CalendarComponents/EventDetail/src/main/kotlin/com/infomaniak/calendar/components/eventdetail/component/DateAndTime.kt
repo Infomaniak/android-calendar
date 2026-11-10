@@ -108,20 +108,22 @@ internal fun DateAndTimeEditable(
         modifier = modifier.padding(horizontal = EsdsTheme.spacing.xs),
         verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
     ) {
-        DateAndTimeEntry(
-            entry = dates.start,
-            isAllDay = isAllDay,
-            onDatePicked = { date -> onDatePicked(true, date) },
-            onTimePicked = { time -> onTimePicked(true, time) },
-            onTimeZoneClick = { onTimeZoneClick(true) },
-        )
-        DateAndTimeEntry(
-            entry = dates.end,
-            isAllDay = isAllDay,
-            onDatePicked = { date -> onDatePicked(false, date) },
-            onTimePicked = { time -> onTimePicked(false, time) },
-            onTimeZoneClick = { onTimeZoneClick(false) },
-        )
+        with(dates) {
+            DateAndTimeEntry(
+                entry = start,
+                isAllDay = isAllDay,
+                onDatePicked = { onDatePicked(true, it) },
+                onTimePicked = { onTimePicked(true, it) },
+                onTimeZoneClick = { onTimeZoneClick(true) },
+            )
+            DateAndTimeEntry(
+                entry = end,
+                isAllDay = isAllDay,
+                onDatePicked = { onDatePicked(false, it) },
+                onTimePicked = { onTimePicked(false, it) },
+                onTimeZoneClick = { onTimeZoneClick(false) },
+            )
+        }
     }
 }
 

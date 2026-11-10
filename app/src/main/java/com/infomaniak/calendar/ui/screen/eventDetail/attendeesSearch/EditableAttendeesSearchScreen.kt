@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -43,7 +42,9 @@ import com.infomaniak.calendar.components.foundation.state.rememberSaveableAtten
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons.SubmitButton
+import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.screen.eventDetail.AttendeesUpdatePayload
+import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EditAttendeesConfig
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -54,18 +55,16 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceI
 
 @Composable
 fun EditableAttendeesSearchScreen(
-    attendeesSearchState: AttendeesSearchState<*>,
     config: EditAttendeesConfig,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EditableAttendeesSearchViewModel = viewModel(),
     searchViewModel: AttendeesSearchViewModel = viewModel(),
+    eventDetailViewModel: EventDetailViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
-    if (config.canEdit) {
-        LaunchedEffect(attendeesSearchState) {
-            searchViewModel.searchContacts(attendeesSearchState)
-        }
-    }
+    val attendeesSearchState = eventDetailViewModel.attendeesSearchState
+
+    if (config.canEdit) searchViewModel.EnableSearch(attendeesSearchState)
 
     EditableAttendeesSearchScreen(
         attendeesSearchState = attendeesSearchState,

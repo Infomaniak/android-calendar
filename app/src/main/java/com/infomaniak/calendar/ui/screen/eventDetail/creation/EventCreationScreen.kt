@@ -116,19 +116,16 @@ private fun EventCreationScreen(
                 icon = EsdsIcons.CalendarCross,
                 modifier = Modifier.padding(contentPadding),
             )
-            is EventCreationUiState.Success -> {
-
-                if (formState != null && calendars != null) {
-                    EventFormContent(
-                        state = formState,
-                        calendars = calendars,
-                        onAttendeesClick = goToEventsAttendees,
-                        onTimeZoneClick = goToTimeZoneSearch,
-                        onCustomReminderClick = goToCustomReminder,
-                        contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
-                        modifier = Modifier.verticalScroll(scrollState),
-                    )
-                }
+            is EventCreationUiState.Success -> formState?.let {
+                EventFormContent(
+                    state = it,
+                    calendars = calendars ?: return@let,
+                    onAttendeesClick = goToEventsAttendees,
+                    onTimeZoneClick = goToTimeZoneSearch,
+                    onCustomReminderClick = goToCustomReminder,
+                    contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
+                    modifier = Modifier.verticalScroll(scrollState),
+                )
             }
         }
     }
@@ -138,13 +135,13 @@ private fun EventCreationScreen(
 @Composable
 private fun EventCreationScreenPreview() {
     CalendarThemeForPreview {
-        val formState = remember { EventFormState(previewEventForm) }
+        val state = remember { EventFormState(previewEventForm) }
 
         EventCreationScreen(
             uiState = EventCreationUiState.Success(
                 EventCreationCalendars(previewEventDetailCalendarGroups, previewEventDetailCalendar),
             ),
-            formState = formState,
+            formState = state,
             calendars = { previewEventDetailCalendarGroups },
             canSubmit = { true },
             onSubmit = {},
