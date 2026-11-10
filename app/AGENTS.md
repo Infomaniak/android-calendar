@@ -48,6 +48,7 @@ app/src/main/java/com/infomaniak/calendar/
 │   ├── AttendeeExt.kt              # KMP Attendee → Attendees mapping for event detail
 │   ├── DayEventGroupingExt.kt      # Groups day-sliced events for calendar views
 │   ├── EventDaySliceExt.kt         # KMP EventDaySlice → OccurrenceEventUi mapping, shared by every calendar view
+│   ├── EventDetailUiExt.kt         # EventDetailUi → EventFormValues, the values an edition form starts from
 │   ├── EventDraftExt.kt            # EventDraft → KMP EventEditData for creation and edition: a new form field is one line in `applyTo`; unchanged notifications leave the stored alarms alone (`AlarmListEdit.Preserve`, since `Event.alarms` lacks the ones KMP can't read), changed ones get back the stored alarm they were read from (matched by the `Notification.sourceId` holding its KMP `AlarmId`)
 │   └── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
 └── ui/
@@ -147,8 +148,11 @@ app/
   `NavDestination.EventForm` (`EventCreation` / `EventEdit`), in that destination's own store. Get it with
   `eventFormViewModel(destination, viewModelStoreOwner)`, which hands the destination to its factory through
   `CreationExtras`: whichever entry composes first creates it, and it loads its initial values itself, so a child entry
-  restored alone after a process death still gets the form. Every field is created with `savedStateHandle.saveable`, so
-  restored values win over the loaded ones and no "initialized" flag is needed. The edit screen passes the event already
+  restored alone after a process death still gets the form. It loads an `EventFormValues` (`EventFormValues.default` for a
+  creation, `EventDetailUi.toEventFormValues()` for an edition) and builds the state with
+  `SavedStateHandle.saveableEventFormState`, one `saveable` per field: restored values win over the loaded ones and no
+  "initialized" flag is needed. A new form field goes in `EventFormState`, `EventFormValues` (and its `default`),
+  `toEventFormValues` and `saveableEventFormState`; the ViewModel doesn't change. The edit screen passes the event already
   loaded by `EventDetailSharedDataViewModel`, so the form is there on its first frame for the shared-element transition.
   `EventCreationViewModel` / `EventEditViewModel` only keep the screen state and the submission.
 - **Screens opened by the event form** know nothing of it: they take their initial values or context as parameters, keep

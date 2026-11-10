@@ -55,7 +55,6 @@ import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitc
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.AddReminderButton
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderItem
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderOffsetDialog
-import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
@@ -65,9 +64,10 @@ import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElemen
 import com.infomaniak.calendar.components.eventdetail.modifier.reminderSharedBounds
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
-import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
+import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.TimeZone
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
@@ -245,20 +245,20 @@ private fun Preview() {
         Surface {
             EventForm(
                 state = rememberEventFormState(
-                    calendars = previewEventDetailCalendarGroups,
-                    initialEventColor = EventColorChoice.Default,
-                    initialCalendar = previewEventDetailCalendar,
-                    dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
-                    initialText = "Event title",
+                    values = EventFormValues.default(
+                        calendars = previewEventDetailCalendarGroups,
+                        calendar = previewEventDetailCalendar,
+                        date = Clock.today(),
+                        timeZone = TimeZone.currentSystemDefault(),
+                        eventDuration = 1.hours,
+                    ).copy(
+                        title = "Event title",
+                        notifications = listOf(
+                            EventDetailUi.Notification(EventDetailUi.Notification.Type.Push, NotificationTime.Offset((-15).minutes)),
+                        ),
+                    ),
                     attendees = { emptyList() },
                     initialOrganizer = null,
-                    initialIsAllDay = false,
-                    initialIsKMeetUrlEnabled = false,
-                    initialNotifications = listOf(
-                        EventDetailUi.Notification(EventDetailUi.Notification.Type.Push, NotificationTime.Offset((-15).minutes)),
-                    ),
-                    initialIsOccupied = true,
-                    initialIsPublic = true,
                 ),
                 onAttendeesClick = {},
                 onTimeZoneClick = {},

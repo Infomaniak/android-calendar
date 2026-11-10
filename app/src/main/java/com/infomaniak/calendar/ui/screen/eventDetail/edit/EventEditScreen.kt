@@ -33,11 +33,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
+import com.infomaniak.calendar.components.eventdetail.form.EventFormValues
 import com.infomaniak.calendar.components.eventdetail.form.rememberEventFormState
-import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
-import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
@@ -50,7 +49,9 @@ import com.infomaniak.calendar.ui.screen.eventDetail.form.eventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
+import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.TimeZone
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 
 @Composable
@@ -159,18 +160,15 @@ private fun Preview() {
             EventEditScreen(
                 uiState = EventEditScreenState.Success(
                     eventFormState = rememberEventFormState(
-                        calendars = previewEventDetailCalendarGroups,
-                        initialEventColor = EventColorChoice.Default,
-                        initialCalendar = previewEventDetailCalendar,
-                        dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
-                        initialText = "Meeting on how to find funny preview titles",
+                        values = EventFormValues.default(
+                            calendars = previewEventDetailCalendarGroups,
+                            calendar = previewEventDetailCalendar,
+                            date = Clock.today(),
+                            timeZone = TimeZone.currentSystemDefault(),
+                            eventDuration = 1.hours,
+                        ).copy(title = "Meeting on how to find funny preview titles"),
                         attendees = { previewAttendees },
                         initialOrganizer = null,
-                        initialIsAllDay = false,
-                        initialIsKMeetUrlEnabled = false,
-                        initialNotifications = emptyList(),
-                        initialIsOccupied = true,
-                        initialIsPublic = true,
                     ),
                     isRecurring = false,
                 ),

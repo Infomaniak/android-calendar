@@ -160,33 +160,12 @@ fun rememberDateAndTimeState(
 }
 
 /**
- * Used when creating a new event. It will dynamically compute the right dates to use based on the inputs.
- */
-@Composable
-fun rememberDateAndTimeState(
-    defaultEventDuration: Duration,
-    timeZone: TimeZone,
-    date: LocalDate = Clock.today(timeZone),
-): DateAndTimeState {
-    val (start, end) = defaultEventStartAndEnd(date, timeZone, defaultEventDuration)
-
-    return rememberDateAndTimeState(
-        startDate = start.date,
-        startTime = start.time,
-        startTimeZone = timeZone,
-        endDate = end.date,
-        endTime = end.time,
-        endTimeZone = timeZone,
-    )
-}
-
-/**
  * Computes default start and end values for a new event.
  *
  * The start is the next full hour if the date is today, and the end is [eventDuration] after the start.
  * Otherwise, the start is 8:00 AM on the given date, and the end is [eventDuration] after the start.
  */
-fun defaultEventStartAndEnd(
+internal fun defaultEventStartAndEnd(
     date: LocalDate,
     timeZone: TimeZone,
     eventDuration: Duration,
