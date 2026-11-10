@@ -38,6 +38,7 @@ import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.calendarOf
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
@@ -54,10 +55,11 @@ import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 
@@ -107,31 +109,26 @@ class EventFormViewModel(
     var calendars: List<EventDetailCalendarGroup>? by mutableStateOf(null)
         private set
 
+    /** `false` while the form loads, and once its calendar can't be written to anymore. */
+    val canSubmit: Boolean get() = form?.let { calendars?.calendarOf(it.calendarId) } != null
+
     init {
         savedStateHandle.setSavedStateProvider(FORM_KEY) {
             form?.let { encodeToSavedState(EventForm.serializer(), it) } ?: savedState()
         }
 
         when (destination) {
-            is NavDestination.EventCreation -> viewModelScope.launch {
-                val (creationCalendars, defaultEventDuration) = combine(
-                    eventCreationCalendarsUseCase.creationCalendars.filterNotNull(),
-                    settingsDataValues.defaultEventDuration.flow,
-                    ::Pair,
-                ).first()
-                initForm(creationCalendars.calendars) {
-                    EventForm.default(
-                        calendar = creationCalendars.initialCalendar,
-                        date = destination.date,
-                        timeZone = TimeZone.currentSystemDefault(),
-                        eventDuration = defaultEventDuration,
-                    )
+            is NavDestination.EventCreation -> {
+                viewModelScope.launch { initForm(destination) }
+                viewModelScope.launch {
+                    eventCreationCalendarsUseCase.creationCalendars.collect { creationCalendars ->
+                        updateCalendars(creationCalendars?.calendars, fallback = creationCalendars?.initialCalendar)
+                    }
                 }
             }
-            is NavDestination.EventEdit -> if (loadedEvent != null) {
-                initForm(loadedEvent)
-            } else {
-                viewModelScope.launch { initForm(loadEvent(destination)) }
+            is NavDestination.EventEdit -> {
+                loadedEvent?.let(::initForm)
+                viewModelScope.launch { eventDetails(destination).collect(::initForm) }
             }
         }
     }
@@ -147,18 +144,36 @@ class EventFormViewModel(
         return form.toEventDraft(calendar)
     }
 
-    private suspend fun loadEvent(destination: NavDestination.EventEdit): EventDetailUi {
+    private fun eventDetails(destination: NavDestination.EventEdit): Flow<EventDetailUi> {
         return eventLoader.eventDetailUi(eventLoader.eventAndCalendar(destination.occurrenceId))
             .filterIsInstance<EventDetailUiState.Displayable.Success>()
-            .first()
-            .eventDetail
+            .map { it.eventDetail }
     }
 
-    private fun initForm(event: EventDetailUi) = initForm(event.calendars, event::toEventForm)
+    private suspend fun initForm(destination: NavDestination.EventCreation) {
+        if (form != null) return
+        val creationCalendars = eventCreationCalendarsUseCase.creationCalendars.filterNotNull().first()
+        val defaultEventDuration = settingsDataValues.defaultEventDuration.flow.first()
 
-    private fun initForm(calendars: List<EventDetailCalendarGroup>, newForm: () -> EventForm) {
+        form = EventForm.default(
+            calendar = creationCalendars.initialCalendar,
+            date = destination.date,
+            timeZone = TimeZone.currentSystemDefault(),
+            eventDuration = defaultEventDuration,
+        )
+    }
+
+    private fun initForm(event: EventDetailUi) {
+        if (form == null) form = event.toEventForm()
+        updateCalendars(event.calendars, fallback = event.calendar)
+    }
+
+    /** Keeps the calendars up to date, moving the form to [fallback] when its calendar can't be written to anymore. */
+    private fun updateCalendars(calendars: List<EventDetailCalendarGroup>?, fallback: EventDetailCalendar?) {
         this.calendars = calendars
-        if (form == null) form = newForm()
+        if (calendars == null || fallback == null) return
+
+        update { form -> if (calendars.calendarOf(form.calendarId) == null) form.withCalendar(fallback) else form }
     }
 
     @AssistedFactory

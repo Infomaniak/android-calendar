@@ -94,6 +94,7 @@ fun EventEditScreen(
     EventEditScreen(
         uiState = uiState,
         form = { eventFormViewModel.form },
+        canSubmit = { eventFormViewModel.canSubmit },
         update = eventFormViewModel::update,
         goBack = goBack,
         goToEventAttendees = goToEventAttendees,
@@ -113,6 +114,7 @@ fun EventEditScreen(
 private fun EventEditScreen(
     uiState: EventEditScreenState,
     form: () -> EventForm?,
+    canSubmit: () -> Boolean,
     update: ((EventForm) -> EventForm) -> Unit,
     goBack: () -> Unit,
     goToEventAttendees: () -> Unit,
@@ -130,6 +132,7 @@ private fun EventEditScreen(
             SubmitTopAppBar(
                 goBack = goBack,
                 onSubmit = onSubmit,
+                isSubmitEnabled = canSubmit,
                 isRecurring = (uiState as? EventEditScreenState.Success)?.isRecurring ?: false,
             )
         },
@@ -185,6 +188,7 @@ private fun Preview() {
             EventEditScreen(
                 uiState = EventEditScreenState.Success(previewEventDetailCalendarGroups, isRecurring = false),
                 form = { form },
+                canSubmit = { true },
                 update = { transform -> form = transform(form) },
                 goBack = {},
                 goToEventAttendees = {},

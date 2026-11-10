@@ -70,6 +70,7 @@ fun EventCreationScreen(
         uiState = uiState,
         form = { eventFormViewModel.form },
         calendars = { eventFormViewModel.calendars },
+        canSubmit = { eventFormViewModel.canSubmit },
         update = eventFormViewModel::update,
         onSubmit = {
             val eventDraft = eventFormViewModel.toEventDraft() ?: return@EventCreationScreen
@@ -88,6 +89,7 @@ private fun EventCreationScreen(
     uiState: EventCreationUiState,
     form: () -> EventForm?,
     calendars: () -> List<EventDetailCalendarGroup>?,
+    canSubmit: () -> Boolean,
     update: ((EventForm) -> EventForm) -> Unit,
     onSubmit: () -> Unit,
     goBack: () -> Unit,
@@ -105,7 +107,7 @@ private fun EventCreationScreen(
             SubmitTopAppBar(
                 goBack = goBack,
                 onSubmit = { onSubmit() },
-                isSubmitEnabled = { form != null && calendars != null },
+                isSubmitEnabled = canSubmit,
                 isRecurring = false,
             )
         },
@@ -149,6 +151,7 @@ private fun EventCreationScreenPreview() {
             ),
             form = { form },
             calendars = { previewEventDetailCalendarGroups },
+            canSubmit = { true },
             update = { transform -> form = transform(form) },
             onSubmit = {},
             goBack = {},
@@ -167,6 +170,7 @@ private fun PreviewEmptyWritableCalendar() {
             uiState = EventCreationUiState.NoWritableCalendar,
             form = { previewEventForm },
             calendars = { previewEventDetailCalendarGroups },
+            canSubmit = { false },
             update = {},
             onSubmit = {},
             goBack = {},
