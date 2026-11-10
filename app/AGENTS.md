@@ -154,9 +154,11 @@ app/
   `CreationExtras`: whichever entry composes first creates it, and it loads what it needs itself, so a child entry restored
   alone after a process death still gets the form. The form is saved as a whole under one `SavedStateHandle` key
   (`encodeToSavedState`); a restored form wins over the loaded one (`EventForm.default` for a creation,
-  `EventDetailUi.toEventForm()` for an edition), so no "initialized" flag is needed. The calendars are reloaded every time
-  and never saved: the form only keeps the selected `calendarId`, and `EventForm.withCalendar` makes a new event's owner
-  follow it. A new form field goes in `EventForm` (and its `default` / `toEventDraft`), `toEventForm`, and the
+  `EventDetailUi.toEventForm()` for an edition), so no "initialized" flag is needed. The calendars are observed as long as the
+  form lives and never saved: the form only keeps the selected `calendarId`, and `EventForm.withCalendar` makes a new
+  event's owner follow it. When the selected calendar can't be written to anymore, the form moves to a fallback one
+  (the preselected calendar for a creation), keeping the rest of what was filled in, and `canSubmit` turns the Save
+  button off while no writable calendar holds the form. A new form field goes in `EventForm` (and its `default` / `toEventDraft`), `toEventForm`, and the
   `EventFormContent` composable; the ViewModel doesn't change. `EventFormContent` owns the title's `TextFieldState` and
   reports its text through `update`. The screens read the form through a lambda (`form: () -> EventForm?`) inside their
   content, so a change doesn't run their `Scaffold` again. The edit screen passes the event already loaded by
