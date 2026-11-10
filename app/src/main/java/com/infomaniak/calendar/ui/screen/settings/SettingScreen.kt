@@ -36,6 +36,8 @@ import com.infomaniak.calendar.ui.screen.settings.components.SettingScaffold
 import com.infomaniak.calendar.ui.screen.settings.components.SettingSection
 import com.infomaniak.calendar.ui.screen.settings.components.SettingShape
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Bell
 import com.infomaniak.core.common.R as RCore
 
 @Composable
@@ -64,6 +66,7 @@ private fun SettingContent(
                 shapes = SettingShape.Single,
                 text = stringResource(RCore.string.themeTitle),
                 onClick = goToTheme,
+                symbol = theme()?.symbol,
                 supportingText = theme()?.title,
             )
         }
@@ -73,6 +76,7 @@ private fun SettingContent(
                 shapes = SettingShape.Single,
                 text = stringResource(R.string.generalSettingsNotificationsLabel),
                 onClick = { goToSystemNotificationScreen(context) },
+                symbol = EsdsIcons.Bell,
             )
         }
     }
