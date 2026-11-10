@@ -145,8 +145,10 @@ class MainActivity : AppCompatActivity() {
         windowInsetsController.isAppearanceLightStatusBars = !isDarkTheme
         windowInsetsController.isAppearanceLightNavigationBars = !isDarkTheme
 
-        // Only needed for API 27 and 28
-        enableEdgeToEdge(SystemBarStyle.auto(DefaultLightScrim, DefaultDarkScrim, { isDarkTheme }))
+        // 29+ has isNavigationBarContrastEnforced set to false
+        if (SDK_INT < 29) {
+            enableEdgeToEdge(SystemBarStyle.auto(DefaultLightScrim, DefaultDarkScrim, { isDarkTheme }))
+        }
     }
 
     private fun handleEventIntent(intent: Intent) {
