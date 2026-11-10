@@ -57,6 +57,8 @@ app/src/main/java/com/infomaniak/calendar/
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
     │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, AttendeeSearch(parent: EventForm), EditableAttendeeSearch(parent: EventDetail, config), EventTimeZone(parent: EventForm, isStart), EventCustomReminder(parent: EventForm), Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
+    │   ├── SharedViewModelStores.kt # `toContentKey`, `shareViewModelStoreWith(parent)` metadata, and
+    │   │                            # `sharedEventFormViewModel` / `sharedEventFormState` read by the form's child entries
     │   ├── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
     │   └── ViewModelStoreSavedStates.kt # Saved state of each entry's ViewModelStore, kept until the entry is popped rather than

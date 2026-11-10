@@ -37,7 +37,6 @@ import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.scene.SceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import androidx.window.core.layout.WindowSizeClass
-import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.component.drawer.MenuDrawer
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
@@ -49,7 +48,6 @@ import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.Metada
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.ResponsiveDialog
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.MetadataSceneStrategy.SettingsListPane
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationDecoratorStrategy
-import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.NavigationMetadata
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.ResponsiveDialogSceneStrategy
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.isDetailBesideList
 import com.infomaniak.calendar.ui.navigation.decoratorStrategy.navigation.metaDataOf
@@ -63,8 +61,6 @@ import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomRemind
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
-import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
-import com.infomaniak.calendar.ui.screen.eventDetail.form.eventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.multiDays.MultiDaysScreen
@@ -349,27 +345,6 @@ private fun sceneDecoratorStrategies(
 }
 
 private const val MULTI_DAYS_CONTENT_KEY = "multiDays"
-
-private fun NavKey.toContentKey() = this.toString()
-
-/** The form of [destination], read by a screen it opens. */
-@Composable
-private fun sharedEventFormViewModel(destination: NavDestination.EventForm): EventFormViewModel {
-    return eventFormViewModel(destination, LocalSharedViewModelStoreOwner.current)
-}
-
-/** The state of the form of [destination], read by a screen it opens. `null` while the form loads. */
-@Composable
-private fun sharedEventFormState(destination: NavDestination.EventForm): EventFormState? {
-    return sharedEventFormViewModel(destination).state
-}
-
-/**
- * Shares [destination]'s ViewModelStore with this entry. Its ViewModels are cleared when [destination] is popped.
- */
-private fun shareViewModelStoreWith(destination: NavDestination): NavigationMetadata = object : NavigationMetadata {
-    override val metadata: Map<String, Any> = SharedViewModelStoreNavEntryDecorator.parent(destination.toContentKey())
-}
 
 private fun NavBackStack<NavDestination>.getLastCalendarView(): NavDestination.CalendarView? {
     return this.filterIsInstance<NavDestination.CalendarView>().lastOrNull()

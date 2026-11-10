@@ -60,12 +60,13 @@ class ViewModelStoreSavedStates private constructor(private val restoredStates: 
     }
 
     private class StoreSavedStateRegistryOwner(restoredState: SavedState?) : SavedStateRegistryOwner {
-        @Suppress("VisibleForTests")
-        private val lifecycleRegistry = LifecycleRegistry.createUnsafe(this)
         private val controller = SavedStateRegistryController.create(this)
 
-        override val lifecycle: Lifecycle get() = lifecycleRegistry
-        override val savedStateRegistry: SavedStateRegistry get() = controller.savedStateRegistry
+        override val lifecycle: Lifecycle
+            field = LifecycleRegistry.createUnsafe(this)
+
+        override val savedStateRegistry: SavedStateRegistry
+            get() = controller.savedStateRegistry
 
         init {
             controller.performRestore(restoredState)
