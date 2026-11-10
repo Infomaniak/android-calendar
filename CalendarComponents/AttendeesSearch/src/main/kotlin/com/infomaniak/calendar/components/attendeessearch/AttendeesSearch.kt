@@ -41,14 +41,13 @@ import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResul
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
+import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState.Companion.MAX_ATTENDEE_COUNT
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.UsersStacked
-
-private const val MAX_ATTENDEE_COUNT = 100
 
 @Composable
 fun AttendeesSearch(
@@ -108,11 +107,8 @@ fun AttendeesSearch(
                 modifier = Modifier.padding(vertical = EsdsTheme.spacing.sm),
                 onClick = if (isDisplayingSearchResults) {
                     { attendee ->
-                        if (attendeesSearchState.attendees.size >= MAX_ATTENDEE_COUNT) {
-                            onShowSnackbar(resources.getString(R.string.attendeesLimitReached))
-                        } else {
-                            attendeesSearchState.addAttendee(attendee)
-                        }
+                        val result = attendeesSearchState.addAttendee(attendee)
+                        result.messageRes?.let { onShowSnackbar(resources.getString(it)) }
                     }
                 } else {
                     null
