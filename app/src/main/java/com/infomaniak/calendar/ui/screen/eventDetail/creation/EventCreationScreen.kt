@@ -33,10 +33,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
-import com.infomaniak.calendar.components.eventdetail.form.rememberDefaultEventForm
+import com.infomaniak.calendar.components.eventdetail.form.EventFormValues
+import com.infomaniak.calendar.components.eventdetail.form.rememberEventFormState
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
-import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.component.EmptyState
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
@@ -46,9 +46,11 @@ import com.infomaniak.calendar.ui.screen.eventDetail.form.eventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventCreationCalendars
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
+import com.infomaniak.core.common.utils.today
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CalendarCross
 import kotlinx.datetime.TimeZone
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 
 @Composable
@@ -129,11 +131,16 @@ private fun EventCreationScreen(
 @Composable
 private fun EventCreationScreenPreview() {
     CalendarThemeForPreview {
-        val state = rememberDefaultEventForm(
-            calendars = previewEventDetailCalendarGroups,
-            initialCalendar = previewEventDetailCalendar,
-            dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
+        val state = rememberEventFormState(
+            values = EventFormValues.default(
+                calendars = previewEventDetailCalendarGroups,
+                calendar = previewEventDetailCalendar,
+                date = Clock.today(),
+                timeZone = TimeZone.currentSystemDefault(),
+                eventDuration = 1.hours,
+            ),
             attendees = { emptyList() },
+            initialOrganizer = null,
         )
 
         EventCreationScreen(
@@ -154,11 +161,16 @@ private fun EventCreationScreenPreview() {
 @Composable
 private fun PreviewEmptyWritableCalendar() {
     CalendarThemeForPreview {
-        val state = rememberDefaultEventForm(
-            calendars = previewEventDetailCalendarGroups,
-            initialCalendar = previewEventDetailCalendar,
-            dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
+        val state = rememberEventFormState(
+            values = EventFormValues.default(
+                calendars = previewEventDetailCalendarGroups,
+                calendar = previewEventDetailCalendar,
+                date = Clock.today(),
+                timeZone = TimeZone.currentSystemDefault(),
+                eventDuration = 1.hours,
+            ),
             attendees = { previewAttendees },
+            initialOrganizer = null,
         )
 
         EventCreationScreen(

@@ -32,6 +32,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
+import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import kotlinx.datetime.atTime
@@ -80,51 +81,28 @@ class EventFormState(
 }
 
 @Composable
-fun rememberDefaultEventForm(
-    calendars: List<EventDetailCalendarGroup>,
-    initialCalendar: EventDetailCalendar,
-    dateAndTimeState: DateAndTimeState?,
-    attendees: () -> List<AttendeeUi>,
-): EventFormState = rememberEventFormState(
-    calendars = calendars,
-    initialEventColor = EventColorChoice.Default,
-    initialCalendar = initialCalendar,
-    dateAndTimeState = dateAndTimeState,
-    initialText = "",
-    initialIsAllDay = false,
-    initialIsKMeetUrlEnabled = false,
-    initialNotifications = emptyList(),
-    attendees = attendees,
-    initialOrganizer = null,
-    initialIsOccupied = true,
-    initialIsPublic = true,
-)
-
-@Composable
 fun rememberEventFormState(
-    calendars: List<EventDetailCalendarGroup>,
-    initialEventColor: EventColorChoice,
-    initialCalendar: EventDetailCalendar,
-    dateAndTimeState: DateAndTimeState?,
-    initialText: String,
-    initialIsAllDay: Boolean,
-    initialIsKMeetUrlEnabled: Boolean,
-    initialNotifications: List<EventDetailUi.Notification>,
+    values: EventFormValues,
     attendees: () -> List<AttendeeUi>,
     initialOrganizer: OrganizerUi?,
-    initialIsOccupied: Boolean,
-    initialIsPublic: Boolean,
 ): EventFormState = EventFormState(
-    titleTextState = rememberTextFieldState(initialText),
-    eventColorState = rememberSaveable { mutableStateOf(initialEventColor) },
-    selectedCalendarState = rememberSaveable { mutableStateOf(initialCalendar) },
-    isAllDay = rememberSaveable { mutableStateOf(initialIsAllDay) },
-    dateAndTimeState = dateAndTimeState,
+    titleTextState = rememberTextFieldState(values.title),
+    eventColorState = rememberSaveable { mutableStateOf(values.eventColor) },
+    selectedCalendarState = rememberSaveable { mutableStateOf(values.calendar) },
+    isAllDay = rememberSaveable { mutableStateOf(values.isAllDay) },
+    dateAndTimeState = rememberDateAndTimeState(
+        startDate = values.start.date,
+        startTime = values.start.time,
+        startTimeZone = values.startTimeZone,
+        endDate = values.end.date,
+        endTime = values.end.time,
+        endTimeZone = values.endTimeZone,
+    ),
     attendees = attendees,
     initialOrganizer = initialOrganizer,
-    isKMeetUrlEnabled = rememberSaveable { mutableStateOf(initialIsKMeetUrlEnabled) },
-    notifications = rememberSaveable { mutableStateOf(initialNotifications) },
-    isOccupied = rememberSaveable { mutableStateOf(initialIsOccupied) },
-    isPublic = rememberSaveable { mutableStateOf(initialIsPublic) },
-    calendars = calendars,
+    isKMeetUrlEnabled = rememberSaveable { mutableStateOf(values.isKMeetUrlEnabled) },
+    notifications = rememberSaveable { mutableStateOf(values.notifications) },
+    isOccupied = rememberSaveable { mutableStateOf(values.isOccupied) },
+    isPublic = rememberSaveable { mutableStateOf(values.isPublic) },
+    calendars = values.calendars,
 )
