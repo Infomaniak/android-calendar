@@ -43,19 +43,17 @@ import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
-import com.infomaniak.calendar.ui.navigation.NavDestination
-import com.infomaniak.calendar.ui.navigation.sharedEventFormViewModel
+import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
 @Composable
 fun AttendeesSearchScreen(
-    parent: NavDestination.EventForm,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AttendeesSearchViewModel = viewModel(),
-    eventFormViewModel: EventFormViewModel = sharedEventFormViewModel(parent),
+    eventFormViewModel: EventFormViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
     val formState = eventFormViewModel.formState ?: return
     val attendeesSearchState = rememberSaveableAttendeesSearchState(

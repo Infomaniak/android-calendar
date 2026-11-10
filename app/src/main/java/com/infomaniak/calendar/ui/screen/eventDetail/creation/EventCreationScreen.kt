@@ -23,6 +23,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -39,9 +40,7 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.foundation.component.EmptyState
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
-import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
-import com.infomaniak.calendar.ui.screen.eventDetail.form.eventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.model.EventCreationCalendars
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
@@ -50,20 +49,25 @@ import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CalendarCross
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 
 @Composable
 fun EventCreationScreen(
-    destination: NavDestination.EventCreation,
+    date: LocalDate,
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     goToCustomReminder: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventCreationViewModel = viewModel(),
-    eventFormViewModel: EventFormViewModel = eventFormViewModel(destination),
+    eventFormViewModel: EventFormViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(date) {
+        eventFormViewModel.initCreation(date)
+    }
 
     EventCreationScreen(
         uiState = uiState,

@@ -41,22 +41,21 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
-import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
-import com.infomaniak.calendar.ui.screen.eventDetail.form.eventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.core.common.utils.today
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 import kotlinx.datetime.TimeZone
 
 @Composable
 fun EventEditScreen(
-    destination: NavDestination.EventEdit,
+    occurrenceId: OccurrenceId,
     goBack: () -> Unit,
     goBackToCalendarView: () -> Unit,
     goToEventAttendees: () -> Unit,
@@ -65,12 +64,11 @@ fun EventEditScreen(
     modifier: Modifier = Modifier,
     viewModel: EventEditViewModel = viewModel(),
     eventDetailSharedDataViewModel: EventDetailSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current),
-    eventFormViewModel: EventFormViewModel = eventFormViewModel(
-        destination = destination,
-        loadedEvent = (eventDetailSharedDataViewModel.eventDetailUi.value as? EventDetailUiState.Displayable.Success)?.eventDetail,
-    ),
+    eventFormViewModel: EventFormViewModel = viewModel(),
 ) {
     val eventDetailUiState = eventDetailSharedDataViewModel.eventDetailUi.collectAsStateWithLifecycle().value
+
+    eventFormViewModel.initEdition(occurrenceId, (eventDetailUiState as? EventDetailUiState.Displayable.Success)?.eventDetail)
     val formState = eventFormViewModel.formState
     val calendars = eventFormViewModel.calendars
 
@@ -80,8 +78,8 @@ fun EventEditScreen(
         EventEditScreenState.Loading
     }
 
-    LaunchedEffect(destination.occurrenceId) {
-        eventDetailSharedDataViewModel.setOccurrenceId(destination.occurrenceId)
+    LaunchedEffect(occurrenceId) {
+        eventDetailSharedDataViewModel.setOccurrenceId(occurrenceId)
     }
 
     LaunchedEffect(Unit) {
@@ -98,7 +96,7 @@ fun EventEditScreen(
         modifier = modifier,
         onSubmit = { scope ->
             val eventDraft = eventFormViewModel.toEventDraft() ?: return@EventEditScreen
-            if (viewModel.submitEvent(destination.occurrenceId, scope, eventDraft)) goBack()
+            if (viewModel.submitEvent(occurrenceId, scope, eventDraft)) goBack()
         },
         sharedTransitionScope = LocalSharedTransitionScope.current,
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
