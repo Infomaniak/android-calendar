@@ -46,7 +46,7 @@ class AppAvatarFinder(
     private val imageLoaders = ConcurrentHashMap<Long, ImageLoader>()
 
     override suspend fun avatarOf(name: String?, email: String): AvatarData? {
-        return contactsManager.search(email).firstOrNull()?.avatarData // TODO: Replace with logic from KMP once ready
+        return contactsManager.findContact(email, name)?.avatarData
     }
 
     @OptIn(ExperimentalCoilApi::class)
