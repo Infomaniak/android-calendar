@@ -125,7 +125,7 @@ fun EventForm(
             )
 
             LocationEditable(
-                location = { state.location?.label },
+                location = { state.location },
                 onClick = onLocationClick,
                 modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
             )

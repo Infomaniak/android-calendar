@@ -17,41 +17,35 @@
  */
 package com.infomaniak.calendar.components.eventdetail.detail.component
 
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
+import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.foundation.component.RoomDetails
 import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.DoorOpen
 
 @Composable
-internal fun RoomButton(
-    room: LocationUi.Room,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(),
-) {
-    ClickableItem(
-        text = room.name,
-        leadingIcon = EsdsIcons.DoorOpen,
+internal fun RoomItem(room: LocationUi.Room, modifier: Modifier = Modifier) {
+    ListItem(
+        content = { Text(room.name) },
+        leadingContent = { ItemIcon(EsdsIcons.DoorOpen) },
         supportingContent = { RoomDetails(seats = room.seats, floor = room.floor) },
-        onClick = onClick,
-        contentPadding = contentPadding,
         modifier = modifier,
     )
 }
 
 @Preview
 @Composable
-private fun PreviewRoomButton() {
+private fun PreviewRoomItem() {
     MaterialTheme {
         Surface {
-            RoomButton(room = LocationUi.Room(id = "1", name = "Japan room", seats = 5, floor = 3, address = null, availability = null), onClick = {})
+            RoomItem(room = LocationUi.Room(id = "1", name = "Japan room", seats = 5, floor = 3, address = null, availability = null))
         }
     }
 }

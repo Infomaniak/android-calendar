@@ -161,7 +161,6 @@ private fun EventDetailScreen(
                     onJoinKMeet = { /*TODO[eventDetail]*/ },
                     onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
                     onLocationClick = { state.eventDetail.location?.mapsQuery?.let(onLocationClick) },
-                    onRoomClick = { /*TODO[eventDetail]*/ },
                     goToEventAttendees = {
                         with(state.eventDetail) {
                             goToEventAttendees(canEdit, isRecurring, calendar.id)
@@ -186,7 +185,8 @@ private fun EventDetailScreen(
 }
 
 private fun openLocationInMapApp(context: Context, location: String) {
-    val geoUri = "geo:0,0?q=${Uri.encode(location)}".toUri()
+    // A place's name and address are on separate lines, a single line query finds it more reliably
+    val geoUri = "geo:0,0?q=${Uri.encode(location.lines().joinToString(", ") { it.trim() })}".toUri()
     val mapIntent = Intent(Intent.ACTION_VIEW, geoUri)
 
     context.safeStartActivity(mapIntent)

@@ -17,6 +17,12 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -26,6 +32,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
+import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
+import com.infomaniak.calendar.components.eventdetail.detail.component.RoomItem
+import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.MapPin
@@ -37,6 +46,7 @@ internal fun LocationButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
 ) {
     ClickableItem(
         text = name,
@@ -45,17 +55,44 @@ internal fun LocationButton(
         contentPadding = contentPadding,
         supportingContent = address?.let { { Text(it) } },
         modifier = modifier,
+        trailingContent = trailingContent,
     )
 }
 
+/**
+ * Shows the picked [location]: a place, or a room under the place it's in. Only the place opens the location search, the
+ * room isn't clickable. Switching between them, e.g. when a calendar switch drops the room, is animated.
+ */
 @Composable
-internal fun LocationEditable(location: () -> String?, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    ClickableItem(
-        text = location() ?: stringResource(R.string.locationOrRoomLabel),
-        leadingIcon = EsdsIcons.MapPin,
-        onClick = onClick,
+internal fun LocationEditable(
+    location: () -> LocationUi?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    AnimatedContent(
+        targetState = location(),
         modifier = modifier,
-    )
+        contentKey = { (it is LocationUi.Place) to (it as? LocationUi.Room)?.id },
+        transitionSpec = { fadeIn() togetherWith fadeOut() using SizeTransform(clip = false) },
+        label = "LocationEditable",
+    ) { location ->
+        when (location) {
+            is LocationUi.Place -> {
+                LocationButton(name = location.name, address = location.address, onClick = onClick)
+            }
+            is LocationUi.Room -> Column {
+                location.address?.takeIf { it.isNotBlank() }?.let { address ->
+                    LocationButton(name = address, address = null, onClick = onClick)
+                }
+                RoomItem(room = location)
+            }
+            null -> ClickableItem(
+                text = stringResource(R.string.locationOrRoomLabel),
+                leadingIcon = EsdsIcons.MapPin,
+                onClick = onClick,
+            )
+        }
+    }
 }
 
 @Preview
@@ -83,7 +120,34 @@ private fun PreviewEditable() {
 private fun PreviewEditableWithLocation() {
     MaterialTheme {
         Surface {
-            LocationEditable(location = { "Rue Eugène-Marziano 25, Geneva" }, onClick = {})
+            LocationEditable(
+                location = {
+                    LocationUi.Place(name = "Infomaniak", address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland")
+                },
+                onClick = {},
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewEditableWithRoom() {
+    MaterialTheme {
+        Surface {
+            LocationEditable(
+                location = {
+                    LocationUi.Room(
+                        id = "1",
+                        name = "Jules Verne room",
+                        seats = 100,
+                        floor = 3,
+                        address = "Infomaniak\nRue Eugène-Marziano 25, 1227 Les Acacias",
+                        availability = null,
+                    )
+                },
+                onClick = {},
+            )
         }
     }
 }

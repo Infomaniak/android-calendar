@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -44,7 +45,7 @@ import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
 import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
-import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
+import com.infomaniak.calendar.components.eventdetail.detail.component.RoomItem
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
@@ -54,6 +55,8 @@ import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElemen
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailUi
 import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.SquareArrowOutUpRight
 
 /**
  * [sharedTransitionScope] and [animatedVisibilityScope] animate associated components between detail and editing.
@@ -65,7 +68,6 @@ fun EventDetail(
     onCopyKMeet: () -> Unit,
     onLocationClick: () -> Unit,
     goToEventAttendees: () -> Unit,
-    onRoomClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -102,6 +104,7 @@ fun EventDetail(
                         address = location.address,
                         onClick = onLocationClick,
                         modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
+                        trailingContent = { Icon(EsdsIcons.SquareArrowOutUpRight.Small, contentDescription = null) },
                     )
                     is LocationUi.Room -> location.address?.let { address ->
                         LocationButton(
@@ -109,13 +112,14 @@ fun EventDetail(
                             address = null,
                             onClick = onLocationClick,
                             modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
+                            trailingContent = { Icon(EsdsIcons.SquareArrowOutUpRight.Small, contentDescription = null) },
                         )
                     }
                     null -> Unit
                 }
 
                 if (location is LocationUi.Room) {
-                    RoomButton(room = location, onClick = onRoomClick)
+                    RoomItem(room = location)
                 }
             }
 
@@ -160,7 +164,6 @@ private fun PreviewEventDetail() {
                         onJoinKMeet = {},
                         onCopyKMeet = {},
                         onLocationClick = {},
-                        onRoomClick = {},
                         goToEventAttendees = {},
                         contentPadding = PaddingValues(horizontal = EsdsTheme.spacing.lg) + it,
                     )
