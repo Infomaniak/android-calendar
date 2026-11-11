@@ -68,6 +68,7 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.TimeZone
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -90,25 +91,41 @@ fun EventForm(
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
     Column(modifier.padding(contentPadding)) {
         val focusRequester = rememberInitialFocusRequester(shouldRequestFocus = { state.titleTextState.text.isEmpty() })
-        TitleEditable(
-            dotColor = { state.eventColorState.value.getColor(state.calendar) },
-            textFieldState = state.titleTextState,
-            modifier = Modifier
-                .focusRequester(focusRequester)
-                .eventSharedElement(EventSharedElement.Title),
-        )
+        Section {
+            item {
+                TitleEditable(
+                    dotColor = { state.eventColorState.value.getColor(state.calendar) },
+                    shapes = it,
+                    textFieldState = state.titleTextState,
+                    modifier = Modifier
+                        .focusRequester(focusRequester)
+                        .eventSharedElement(EventSharedElement.Title),
+                )
+            }
+        }
 
-        AllDaySwitch(
-            checked = state.isAllDay::value,
-            onCheckedChange = { isChecked -> state.isAllDay.value = isChecked },
-        )
+        Section {
+            item {
+                AllDaySwitch(
+                    checked = state.isAllDay::value,
+                    onCheckedChange = { isChecked -> state.isAllDay.value = isChecked },
+                    shapes = it,
+                    backgroundColor = MaterialTheme.colorScheme.surfaceBright,
+                )
+            }
+        }
 
-        DateAndTimeEditable(
-            dateAndTimeState = state.dateAndTimeState,
-            isAllDay = state.isAllDay::value,
-            onTimeZoneClick = onTimeZoneClick,
-            modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
-        )
+        Section {
+            item {
+                DateAndTimeEditable(
+                    dateAndTimeState = state.dateAndTimeState,
+                    isAllDay = state.isAllDay::value,
+                    onTimeZoneClick = onTimeZoneClick,
+                    shapes = it,
+                    modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
+                )
+            }
+        }
 
         Section {
             item {
@@ -124,6 +141,7 @@ fun EventForm(
                 KMeetButtonSwitch(
                     shapes = it,
                     checked = state.isKMeetUrlEnabled::value,
+                    backgroundColor = MaterialTheme.colorScheme.surfaceBright,
                     onCheckedChange = { isChecked -> state.isKMeetUrlEnabled.value = isChecked },
                     modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
                 )
@@ -137,12 +155,13 @@ fun EventForm(
                     ReminderItem(
                         notification = notification,
                         onRemoveClick = { state.notifications.value -= notification },
+                        shapes = it,
                     )
                 }
             }
 
             item {
-                AddReminderButton(onClick = { isReminderOffsetDialogVisible = true })
+                AddReminderButton(onClick = { isReminderOffsetDialogVisible = true }, shapes = it)
             }
 
             if (isReminderOffsetDialogVisible) {
@@ -163,6 +182,7 @@ fun EventForm(
                             onCustomReminderClick()
                         },
                         onDismissRequest = { isReminderOffsetDialogVisible = false },
+                        shapes = it,
                     )
                 }
             }
@@ -174,6 +194,8 @@ fun EventForm(
                     checked = state.isOccupied::value,
                     onCheckedChange = { isChecked -> state.isOccupied.value = isChecked },
                     modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus),
+                    shapes = it,
+                    backgroundColor = MaterialTheme.colorScheme.surfaceBright,
                 )
             }
 
@@ -182,6 +204,8 @@ fun EventForm(
                     checked = state.isPublic::value,
                     onCheckedChange = { isChecked -> state.isPublic.value = isChecked },
                     modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
+                    shapes = it,
+                    backgroundColor = MaterialTheme.colorScheme.surfaceBright,
                 )
             }
 
@@ -191,6 +215,7 @@ fun EventForm(
                     calendars = state.calendars,
                     onSelect = { calendar -> state.calendar = calendar },
                     modifier = Modifier.eventSharedBounds(EventSharedElement.Calendar),
+                    shapes = it,
                 )
             }
         }

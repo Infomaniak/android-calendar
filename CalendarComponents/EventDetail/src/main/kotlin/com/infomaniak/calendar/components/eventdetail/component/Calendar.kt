@@ -76,6 +76,7 @@ internal fun CalendarEditable(
     selectedCalendar: EventDetailCalendar,
     calendars: List<EventDetailCalendarGroup>,
     onSelect: (EventDetailCalendar) -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
 ) {
     var isDialogVisible by rememberSaveable { mutableStateOf(false) }
@@ -83,9 +84,12 @@ internal fun CalendarEditable(
     DropDownItem(
         onClick = { isDialogVisible = true },
         content = {
-            Row (verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(EsdsIcons.Calendar.Small, contentDescription = null)
-                Text(stringResource(id = R.string.sectionCalendarHeader), modifier = Modifier.padding(start = EsdsTheme.spacing.lg))
+                Text(
+                    stringResource(id = R.string.sectionCalendarHeader),
+                    modifier = Modifier.padding(start = EsdsTheme.spacing.lg),
+                )
             }
         },
         trailingContent = {
@@ -93,6 +97,8 @@ internal fun CalendarEditable(
             Text(text = selectedCalendar.name, style = MaterialTheme.typography.labelLarge)
         },
         itemCount = calendars.sumOf { it.calendars.size },
+        shapes = shapes,
+        backgroundColor = MaterialTheme.colorScheme.surfaceBright,
         modifier = modifier,
     )
 
@@ -128,7 +134,12 @@ private fun Preview() {
 private fun PreviewEditable() {
     MaterialTheme {
         Surface {
-            CalendarEditable(selectedCalendar = previewEventDetailCalendar, calendars = previewEventDetailCalendarGroups, {})
+            CalendarEditable(
+                selectedCalendar = previewEventDetailCalendar,
+                calendars = previewEventDetailCalendarGroups,
+                {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            )
         }
     }
 }

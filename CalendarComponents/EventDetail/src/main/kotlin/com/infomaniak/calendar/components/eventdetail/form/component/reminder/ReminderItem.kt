@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -34,19 +36,28 @@ import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.detail.component.notificationTimeText
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
-import com.infomaniak.core.common.R as RCommon
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Cross
 import kotlin.time.Duration.Companion.minutes
+import com.infomaniak.core.common.R as RCommon
 
 @Composable
-internal fun ReminderItem(notification: EventDetailUi.Notification, onRemoveClick: () -> Unit, modifier: Modifier = Modifier) {
+internal fun ReminderItem(
+    notification: EventDetailUi.Notification,
+    onRemoveClick: () -> Unit,
+    shapes: ListItemShapes,
+    modifier: Modifier = Modifier,
+) {
     ListItem(
         modifier = modifier,
+        shapes = shapes,
         leadingContent = { ItemIcon(notification.type.icon) },
         trailingContent = {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),
+            ) {
                 Text(notificationTimeText(notification.time), style = MaterialTheme.typography.labelLarge)
                 IconButton(onClick = onRemoveClick) {
                     Icon(EsdsIcons.Cross.Small, contentDescription = stringResource(RCommon.string.deleteButton))
@@ -68,6 +79,7 @@ private fun Preview() {
                     time = NotificationTime.Offset((-15).minutes),
                 ),
                 onRemoveClick = {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             )
         }
     }

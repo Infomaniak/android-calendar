@@ -26,6 +26,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
@@ -58,8 +59,16 @@ internal fun ClassificationStatusSwitch(
     onCheckedChange: (isChecked: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
+    backgroundColor: Color? = null,
 ) {
-    ListItemSwitch(checked, onCheckedChange, modifier, shapes, leadingContent = { ClassificationIcon() }) {
+    ListItemSwitch(
+        checked,
+        onCheckedChange,
+        modifier,
+        shapes = shapes,
+        backgroundColor = backgroundColor,
+        leadingContent = { ClassificationIcon() },
+    ) {
         Text(text = stringResource(EventDetailUi.Classification.Public.label))
     }
 }

@@ -25,12 +25,14 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.foundation.component.ListItemClickable
@@ -44,13 +46,19 @@ internal fun DropDownItem(
     trailingContent: @Composable RowScope.() -> Unit,
     onClick: () -> Unit,
     itemCount: Int,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
+    backgroundColor: Color? = null,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     ListItemClickable(
         onClick = onClick,
         contentPadding = contentPadding + ListItemDefaults.ContentPadding,
         content = content,
+        shapes = shapes,
+        colors = ListItemDefaults.colors(
+            containerColor = backgroundColor ?: MaterialTheme.colorScheme.surfaceBright,
+        ),
         trailingContent = {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),
@@ -74,6 +82,7 @@ private fun Preview() {
                     content = { Text("Dropdown item") },
                     trailingContent = { Text("Value") },
                     onClick = {},
+                    shapes = ListItemDefaults.segmentedShapes(index = 0, count = 2),
                     itemCount = 2,
                 )
 
@@ -81,6 +90,7 @@ private fun Preview() {
                     content = { Text("Disabled item") },
                     trailingContent = { Text("Value") },
                     onClick = {},
+                    shapes = ListItemDefaults.segmentedShapes(index = 1, count = 2),
                     itemCount = 1,
                 )
             }

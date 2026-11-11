@@ -26,6 +26,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.resources.R
@@ -35,6 +36,7 @@ internal fun ListItemSwitch(
     checked: () -> Boolean,
     onCheckedChange: (isChecked: Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    backgroundColor: Color? = null,
     shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
     leadingContent: @Composable (() -> Unit)? = null,
     content: @Composable () -> Unit,
@@ -49,14 +51,18 @@ internal fun ListItemSwitch(
         trailingContent = { Switch(checked = checked(), onCheckedChange = null) },
         modifier = modifier,
         colors = ListItemDefaults.colors(
-            selectedContainerColor = defaultColors.containerColor,
+            containerColor = backgroundColor ?: defaultColors.containerColor,
+            selectedContainerColor = backgroundColor ?: defaultColors.containerColor,
             selectedContentColor = defaultColors.contentColor,
             selectedLeadingContentColor = defaultColors.leadingContentColor,
             selectedTrailingContentColor = defaultColors.trailingContentColor,
             selectedSupportingContentColor = defaultColors.supportingContentColor,
             selectedOverlineContentColor = defaultColors.overlineContentColor,
         ),
-        shapes = shapes,
+        shapes = shapes.copy(
+            selectedShape = shapes.shape,
+            pressedShape = shapes.shape,
+        ),
     )
 }
 @Preview

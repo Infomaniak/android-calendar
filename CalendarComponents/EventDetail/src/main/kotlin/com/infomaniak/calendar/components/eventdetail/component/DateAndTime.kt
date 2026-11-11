@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -29,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
@@ -108,6 +110,7 @@ internal fun DateAndTimeEditable(
     dateAndTimeState: DateAndTimeState?,
     isAllDay: () -> Boolean,
     onTimeZoneClick: (isStart: Boolean) -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
 ) {
     val shouldDisplay = dateAndTimeState != null
@@ -116,7 +119,9 @@ internal fun DateAndTimeEditable(
     Column(
         modifier = modifier
             .alpha(if (shouldDisplay) 1f else 0f)
-            .padding(horizontal = EsdsTheme.spacing.xs),
+            .clip(shapes.shape)
+            .background(MaterialTheme.colorScheme.surfaceBright)
+            .padding(EsdsTheme.spacing.md),
         verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
     ) {
         with(dateAndTimeState) {
@@ -228,6 +233,7 @@ private fun PreviewEditable() {
                     endTime = LocalTime(9, 0),
                     endTimeZone = TimeZone.currentSystemDefault(),
                 ),
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
                 isAllDay = { false },
                 onTimeZoneClick = {},
             )

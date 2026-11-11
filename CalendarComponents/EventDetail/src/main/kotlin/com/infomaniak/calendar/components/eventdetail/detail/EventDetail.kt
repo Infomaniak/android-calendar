@@ -75,13 +75,24 @@ fun EventDetail(
         with(eventDetail) {
             Section {
                 item {
-                    Title(dotColor = eventColor, title = title, shapes = it)
+                    Title(
+                        dotColor = eventColor,
+                        title = title,
+                        shapes = it,
+                        modifier = Modifier.eventSharedElement(EventSharedElement.Title),
+                    )
                 }
             }
 
             Section {
                 item {
-                    DateAndTime(start, end, isAllDay, shapes = it)
+                    DateAndTime(
+                        start,
+                        end,
+                        isAllDay,
+                        shapes = it,
+                        modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
+                    )
                 }
 
                 if (recurrence is EventDetailRecurrence.Recurrence) {

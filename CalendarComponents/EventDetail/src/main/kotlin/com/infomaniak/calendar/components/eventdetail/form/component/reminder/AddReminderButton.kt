@@ -17,6 +17,8 @@
  */
 package com.infomaniak.calendar.components.eventdetail.form.component.reminder
 
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -29,13 +31,14 @@ import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Plus
 
 @Composable
-internal fun AddReminderButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+internal fun AddReminderButton(onClick: () -> Unit, shapes: ListItemShapes, modifier: Modifier = Modifier) {
     ClickableItem(
         text = stringResource(R.string.buttonAddReminder),
         leadingIcon = EsdsIcons.Plus,
         onClick = onClick,
         modifier = modifier,
         trailingContent = {},
+        shapes = shapes,
     )
 }
 
@@ -44,7 +47,7 @@ internal fun AddReminderButton(onClick: () -> Unit, modifier: Modifier = Modifie
 private fun Preview() {
     MaterialTheme {
         Surface {
-            AddReminderButton(onClick = {})
+            AddReminderButton(onClick = {}, shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1))
         }
     }
 }
