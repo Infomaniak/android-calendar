@@ -35,7 +35,6 @@ import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.EventFormValues
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
@@ -77,10 +76,9 @@ fun EventEditScreen(
     }
 
     val formUiState = eventFormViewModel.uiState
-    val calendars = eventFormViewModel.calendars
 
-    val uiState = if (eventDetailUiState is EventDetailUiState.Displayable.Success && formUiState is EventFormUiState.Loaded && calendars != null) {
-        EventEditScreenState.Success(formUiState.formState, calendars, isRecurring = eventDetailUiState.eventDetail.isRecurring)
+    val uiState = if (eventDetailUiState is EventDetailUiState.Displayable.Success && formUiState is EventFormUiState.Loaded) {
+        EventEditScreenState.Success(formUiState.formState, isRecurring = eventDetailUiState.eventDetail.isRecurring)
     } else {
         EventEditScreenState.Loading
     }
@@ -95,14 +93,13 @@ fun EventEditScreen(
 
     EventEditScreen(
         uiState = uiState,
-        canSubmit = { eventFormViewModel.canSubmit },
         goBack = goBack,
         goToEventAttendees = goToEventAttendees,
         goToTimeZoneSearch = goToTimeZoneSearch,
         goToCustomReminder = goToCustomReminder,
         modifier = modifier,
         onSubmit = { scope ->
-            val eventDraft = eventFormViewModel.toEventDraft() ?: return@EventEditScreen
+            val eventDraft = eventFormViewModel.formState?.toEventDraft() ?: return@EventEditScreen
             if (viewModel.submitEvent(occurrenceId, scope, eventDraft)) goBack()
         },
         sharedTransitionScope = LocalSharedTransitionScope.current,
@@ -113,7 +110,6 @@ fun EventEditScreen(
 @Composable
 private fun EventEditScreen(
     uiState: EventEditScreenState,
-    canSubmit: () -> Boolean,
     goBack: () -> Unit,
     goToEventAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
@@ -130,7 +126,7 @@ private fun EventEditScreen(
             SubmitTopAppBar(
                 goBack = goBack,
                 onSubmit = onSubmit,
-                isSubmitEnabled = canSubmit,
+                isSubmitEnabled = { (uiState as? EventEditScreenState.Success)?.eventFormState?.canSubmit == true },
                 isRecurring = (uiState as? EventEditScreenState.Success)?.isRecurring ?: false,
             )
         },
@@ -143,7 +139,6 @@ private fun EventEditScreen(
             is EventEditScreenState.Success -> {
                 EventForm(
                     state = uiState.eventFormState,
-                    calendars = uiState.calendars,
                     onAttendeesClick = goToEventAttendees,
                     onTimeZoneClick = goToTimeZoneSearch,
                     onCustomReminderClick = goToCustomReminder,
@@ -159,11 +154,7 @@ private fun EventEditScreen(
 
 private sealed interface EventEditScreenState {
     object Loading : EventEditScreenState
-    data class Success(
-        val eventFormState: EventFormState,
-        val calendars: List<EventDetailCalendarGroup>,
-        val isRecurring: Boolean,
-    ) : EventEditScreenState
+    data class Success(val eventFormState: EventFormState, val isRecurring: Boolean) : EventEditScreenState
 }
 
 @Preview
@@ -179,12 +170,12 @@ private fun Preview() {
                         timeZone = TimeZone.currentSystemDefault(),
                         eventDuration = 1.hours,
                     ).copy(title = "Meeting on how to find funny preview titles"),
+                    previewEventDetailCalendarGroups,
                 )
             }
 
             EventEditScreen(
-                uiState = EventEditScreenState.Success(formState, previewEventDetailCalendarGroups, isRecurring = false),
-                canSubmit = { true },
+                uiState = EventEditScreenState.Success(formState, isRecurring = false),
                 goBack = {},
                 goToEventAttendees = {},
                 goToTimeZoneSearch = {},

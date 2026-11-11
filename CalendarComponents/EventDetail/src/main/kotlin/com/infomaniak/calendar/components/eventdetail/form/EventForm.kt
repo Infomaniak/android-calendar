@@ -55,7 +55,6 @@ import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitc
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.AddReminderButton
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderItem
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderOffsetDialog
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
@@ -80,7 +79,6 @@ import kotlin.time.Duration.Companion.minutes
 @Composable
 fun EventForm(
     state: EventFormState,
-    calendars: List<EventDetailCalendarGroup>,
     onAttendeesClick: () -> Unit,
     onTimeZoneClick: (isStart: Boolean) -> Unit,
     onCustomReminderClick: () -> Unit,
@@ -89,7 +87,7 @@ fun EventForm(
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
-    val calendar = calendars.calendarOf(state.calendarId) ?: return@ProvideEventSharedTransition
+    val calendar = state.calendar ?: return@ProvideEventSharedTransition
 
     Column(modifier.padding(contentPadding)) {
         val focusRequester = rememberInitialFocusRequester(shouldRequestFocus = { state.titleTextState.text.isEmpty() })
@@ -175,7 +173,7 @@ fun EventForm(
 
             CalendarEditable(
                 selectedCalendar = calendar,
-                calendars = calendars,
+                calendars = state.calendars,
                 onSelect = state::selectCalendar,
                 modifier = Modifier.eventSharedBounds(EventSharedElement.Calendar),
             )
@@ -264,11 +262,11 @@ private fun Preview() {
                             EventDetailUi.Notification(EventDetailUi.Notification.Type.Push, NotificationTime.Offset((-15).minutes)),
                         ),
                     ),
+                    previewEventDetailCalendarGroups,
                 )
             }
             EventForm(
                 state = state,
-                calendars = previewEventDetailCalendarGroups,
                 onAttendeesClick = {},
                 onTimeZoneClick = {},
                 onCustomReminderClick = {},

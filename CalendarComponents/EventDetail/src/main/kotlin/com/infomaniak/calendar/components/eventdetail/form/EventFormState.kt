@@ -25,13 +25,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.setValue
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
+import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 
-/** The editable state of an event form, one state per field, starting from [values] and read back with [toValues]. */
+/**
+ * The editable state of an event form, one state per field, starting from [values] and read back with [toValues].
+ *
+ * @param calendars The calendars the event can be put in, kept up to date by its owner.
+ */
 @Stable
-class EventFormState(values: EventFormValues) {
+class EventFormState(values: EventFormValues, calendars: List<EventDetailCalendarGroup>) {
     val titleTextState = TextFieldState(values.title)
     val eventColorState = mutableStateOf(values.eventColor)
     var calendarId by mutableStateOf(values.calendarId)
@@ -46,6 +52,12 @@ class EventFormState(values: EventFormValues) {
     val notifications = mutableStateOf(values.notifications)
     val isOccupied = mutableStateOf(values.isOccupied)
     val isPublic = mutableStateOf(values.isPublic)
+    var calendars by mutableStateOf(calendars)
+
+    val calendar: EventDetailCalendar? get() = calendars.calendarOf(calendarId)
+
+    /** `false` while the calendars aren't known, and once the selected one can't be written to anymore. */
+    val canSubmit: Boolean get() = calendar != null
 
     val attendees: List<AttendeeUi> by derivedStateOf {
         val me = (organizerSource as? OrganizerSource.Dynamic)?.owner
@@ -61,6 +73,8 @@ class EventFormState(values: EventFormValues) {
         participants.removeAll { it is AttendeeUi && it.email == owner.email }
         organizerSource = OrganizerSource.Dynamic(owner)
     }
+
+    fun toEventDraft(): EventDraft? = calendar?.let(toValues()::toEventDraft)
 
     fun toValues() = EventFormValues(
         title = titleTextState.text.toString(),

@@ -147,18 +147,18 @@ app/
   `EventDetailSharedDataViewModel` (the event loaded by EventDetail, reused by EventEdit), `EventFormViewModel` (below),
   and `EventDetailViewModel`, whose `AttendeesSearchState` `EditableAttendeesSearchScreen` edits.
 - **Event form state**: `EventFormViewModel` exposes an `EventFormUiState`, `Loading` then `Loaded` with an
-  `EventFormState` (also readable as `formState`, `null` until loaded), and the calendars the form can be put in, for a
+  `EventFormState` (also readable as `formState`, `null` until loaded), for a
   `NavDestination.EventForm.EventCreation` / `EventEdit`, in that destination's own store. `EventFormState` holds one state
   per field, like Material state holders: the title's `TextFieldState`, the participants' `SnapshotStateSet`, and a
   `MutableState` for each other field (`dates` holds the pure `EventDates`). It is built from an `EventFormValues` (what the
-  user filled in: an immutable, `@Serializable` value) and read back with `toValues()`, which gives the saved form and the
-  `EventDraft`. The ViewModel saves `toValues()` as a whole under one `SavedStateHandle` key (`encodeToSavedState`), read
+  user filled in: an immutable, `@Serializable` value) and read back with `toValues()`, which gives the saved form. It also
+  holds the calendars the form can be put in, from which it derives the selected `calendar`, `canSubmit` and `toEventDraft()`. The ViewModel saves `toValues()` as a whole under one `SavedStateHandle` key (`encodeToSavedState`), read
   live from the states when Android saves, and rebuilds the state from it when the ViewModel is created, so a child screen
   restored alone after a process death still gets it. The form's screen initializes it with `initCreation(date)` /
   `initEdition(occurrenceId, event)`, which only run once per ViewModel instance; a restored form wins over the loaded one
   (`EventFormValues.default` for a creation, `EventDetailUi.toEventFormValues()` for an edition), so no saved "initialized"
-  flag is needed. The calendars are observed as long as the form lives and never saved: the form only keeps the selected
-  `calendarId`, and `EventFormState.selectCalendar` makes a new event's owner follow it. When the selected calendar can't be
+  flag is needed. The ViewModel keeps the state's calendars up to date as long as the form lives; they are never saved (empty after a
+  restoration until the form's screen initializes the ViewModel again): the form only keeps the selected `calendarId`, and `EventFormState.selectCalendar` makes a new event's owner follow it. When the selected calendar can't be
   written to anymore, the form moves to a fallback one (the preselected calendar for a creation), keeping the rest of what
   was filled in, and `canSubmit` turns the Save button off while no writable calendar holds the form. A new form field goes
   in `EventFormValues` (and its `default` / `toEventDraft`), `EventFormState` (its state and `toValues`),

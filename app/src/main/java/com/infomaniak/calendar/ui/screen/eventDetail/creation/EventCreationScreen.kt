@@ -35,7 +35,6 @@ import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.EventFormValues
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.foundation.component.EmptyState
@@ -73,10 +72,8 @@ fun EventCreationScreen(
     EventCreationScreen(
         uiState = uiState,
         formUiState = eventFormViewModel.uiState,
-        calendars = { eventFormViewModel.calendars },
-        canSubmit = { eventFormViewModel.canSubmit },
         onSubmit = {
-            val eventDraft = eventFormViewModel.toEventDraft() ?: return@EventCreationScreen
+            val eventDraft = eventFormViewModel.formState?.toEventDraft() ?: return@EventCreationScreen
             if (viewModel.submitEvent(eventDraft)) goBack()
         },
         modifier = modifier,
@@ -91,8 +88,6 @@ fun EventCreationScreen(
 private fun EventCreationScreen(
     uiState: EventCreationUiState,
     formUiState: EventFormUiState,
-    calendars: () -> List<EventDetailCalendarGroup>?,
-    canSubmit: () -> Boolean,
     onSubmit: () -> Unit,
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
@@ -101,14 +96,13 @@ private fun EventCreationScreen(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
-    val calendars = calendars()
 
     Scaffold(
         topBar = {
             SubmitTopAppBar(
                 goBack = goBack,
                 onSubmit = { onSubmit() },
-                isSubmitEnabled = canSubmit,
+                isSubmitEnabled = { (formUiState as? EventFormUiState.Loaded)?.formState?.canSubmit == true },
                 isRecurring = false,
             )
         },
@@ -125,7 +119,6 @@ private fun EventCreationScreen(
                 EventFormUiState.Loading -> Unit
                 is EventFormUiState.Loaded -> EventForm(
                     state = formUiState.formState,
-                    calendars = calendars ?: return@Scaffold,
                     onAttendeesClick = goToEventsAttendees,
                     onTimeZoneClick = goToTimeZoneSearch,
                     onCustomReminderClick = goToCustomReminder,
@@ -141,15 +134,13 @@ private fun EventCreationScreen(
 @Composable
 private fun EventCreationScreenPreview() {
     CalendarThemeForPreview {
-        val state = remember { EventFormState(previewEventForm) }
+        val state = remember { EventFormState(previewEventForm, previewEventDetailCalendarGroups) }
 
         EventCreationScreen(
             uiState = EventCreationUiState.Success(
                 EventCreationCalendars(previewEventDetailCalendarGroups, previewEventDetailCalendar),
             ),
             formUiState = EventFormUiState.Loaded(state),
-            calendars = { previewEventDetailCalendarGroups },
-            canSubmit = { true },
             onSubmit = {},
             goBack = {},
             goToEventsAttendees = {},
@@ -165,9 +156,7 @@ private fun PreviewEmptyWritableCalendar() {
     CalendarThemeForPreview {
         EventCreationScreen(
             uiState = EventCreationUiState.NoWritableCalendar,
-            formUiState = EventFormUiState.Loaded(remember { EventFormState(previewEventForm) }),
-            calendars = { previewEventDetailCalendarGroups },
-            canSubmit = { false },
+            formUiState = EventFormUiState.Loading,
             onSubmit = {},
             goBack = {},
             goToEventsAttendees = {},
