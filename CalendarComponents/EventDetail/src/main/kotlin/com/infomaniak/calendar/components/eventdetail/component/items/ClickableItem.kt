@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemColors
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.LocalTextStyle
@@ -43,6 +44,7 @@ internal fun ClickableItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    backgroundColor: ListItemColors? = null,
     shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
     trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
     supportingContent: @Composable (() -> Unit)? = null,
@@ -52,6 +54,7 @@ internal fun ClickableItem(
         leadingContent = { ItemIcon(leadingIcon) },
         onClick = onClick,
         modifier = modifier,
+        backgroundColor = backgroundColor,
         contentPadding = contentPadding,
         trailingContent = trailingContent,
         supportingContent = supportingContent,
@@ -65,6 +68,7 @@ internal fun ClickableItem(
     leadingContent: @Composable () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    backgroundColor: ListItemColors? = null,
     contentPadding: PaddingValues = PaddingValues(),
     shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
     trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
@@ -73,6 +77,9 @@ internal fun ClickableItem(
     ListItem(
         modifier = modifier,
         content = { Text(text) },
+        colors = backgroundColor ?: ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceBright,
+        ),
         supportingContent = supportingContent,
         leadingContent = leadingContent,
         trailingContent = {

@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -48,8 +50,12 @@ import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Calendar
 
 @Composable
-internal fun Calendar(calendarColor: Color, calendarName: String, modifier: Modifier = Modifier) {
+internal fun Calendar(calendarColor: Color, calendarName: String, shapes: ListItemShapes, modifier: Modifier = Modifier) {
     ListItem(
+        shapes = shapes,
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceBright,
+        ),
         content = { Text(stringResource(id = R.string.sectionCalendarHeader)) },
         leadingContent = { Icon(EsdsIcons.Calendar.Small, contentDescription = null) },
         trailingContent = {
@@ -108,7 +114,11 @@ internal fun CalendarEditable(
 private fun Preview() {
     MaterialTheme {
         Surface {
-            Calendar(calendarColor = previewEventDetailCalendar.color, calendarName = previewEventDetailCalendar.name)
+            Calendar(
+                calendarColor = previewEventDetailCalendar.color,
+                calendarName = previewEventDetailCalendar.name,
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            )
         }
     }
 }

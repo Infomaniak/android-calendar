@@ -28,6 +28,8 @@ import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -48,11 +50,14 @@ import com.infomaniak.core.ui.compose.theme.MaterialPreviewTheme
 private const val MAX_LINES = Int.MAX_VALUE
 
 @Composable
-internal fun Title(dotColor: Color, title: String, modifier: Modifier = Modifier) {
+internal fun Title(dotColor: Color, title: String, shapes: ListItemShapes, modifier: Modifier = Modifier) {
     ListItem(
         leadingContent = { EventColorDot(dotColor) },
+        shapes = shapes,
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceBright,
+        ),
         content = { Text(text = title, style = MaterialTheme.typography.titleLargeEmphasized, maxLines = MAX_LINES) },
-        modifier = modifier,
     )
 }
 
@@ -103,7 +108,7 @@ private const val PREVIEW_TITLE = "End of the year vacations with Santa Claus"
 private fun Preview() {
     MaterialPreviewTheme {
         Surface {
-            Title(dotColor = Color.Red, title = PREVIEW_TITLE)
+            Title(dotColor = Color.Red, title = PREVIEW_TITLE, shapes = ListItemDefaults.shapes())
         }
     }
 }

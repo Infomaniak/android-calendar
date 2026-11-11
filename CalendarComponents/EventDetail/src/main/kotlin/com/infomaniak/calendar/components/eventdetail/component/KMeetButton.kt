@@ -24,6 +24,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
@@ -52,11 +53,16 @@ import com.infomaniak.core.common.R as RCommon
 internal fun KMeetButton(
     onJoin: () -> Unit,
     onCopy: () -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
 ) {
     ListItem(
         content = { Text(stringResource(id = R.string.participateKMeetTitle)) },
         leadingContent = { KMeetIcon() },
+        shapes = shapes,
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceBright,
+        ),
         trailingContent = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -111,7 +117,7 @@ private fun CopyButton(onClick: () -> Unit) {
 private fun PreviewKMeetButton() {
     MaterialTheme {
         Surface {
-            KMeetButton(onJoin = {}, onCopy = {})
+            KMeetButton(onJoin = {}, onCopy = {}, shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1))
         }
     }
 }
@@ -121,7 +127,11 @@ private fun PreviewKMeetButton() {
 private fun PreviewKMeetButtonSwitch() {
     MaterialTheme {
         Surface {
-            KMeetButtonSwitch(checked = { true }, onCheckedChange = {})
+            KMeetButtonSwitch(
+                checked = { true },
+                onCheckedChange = {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            )
         }
     }
 }

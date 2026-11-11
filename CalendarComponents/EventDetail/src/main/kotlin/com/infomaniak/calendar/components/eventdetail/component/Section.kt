@@ -17,17 +17,14 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
-import androidx.compose.material3.Shapes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.Layout
-import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
-import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 class SectionScope {
@@ -43,20 +40,21 @@ fun SectionScope.item(content: @Composable (ListItemShapes) -> Unit) {
  */
 @Composable
 internal fun Section(
-    sharedElementId: EventSharedElement,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     content: SectionScope.() -> Unit,
 ) {
-    val scope = SectionScope().apply(content)
-    if (scope.itemList.isNotEmpty()) {
-        scope.itemList.forEachIndexed { index, function ->
-            function(ListItemDefaults.segmentedShapes(index, scope.itemList.size))
+    val items = SectionScope().apply(content).itemList
+    if (items.isEmpty()) return
+
+    Column(
+        modifier = modifier
+            .padding(contentPadding)
+            .padding(top = EsdsTheme.spacing.md),
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+    ) {
+        items.forEachIndexed { index, item ->
+            item(ListItemDefaults.segmentedShapes(index = index, count = items.size))
         }
     }
-}
-
-@Composable
-private fun Divider(modifier: Modifier = Modifier) {
-    HorizontalDivider(modifier = modifier.padding(vertical = EsdsTheme.spacing.md))
 }

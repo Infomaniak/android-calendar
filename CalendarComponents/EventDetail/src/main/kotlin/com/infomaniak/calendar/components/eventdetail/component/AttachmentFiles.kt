@@ -18,6 +18,8 @@
 package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -32,16 +34,21 @@ import com.infomaniak.core.ui.compose.theme.LocalIsThemeDarkMode
 internal fun AttachmentFiles(
     files: List<EventDetailUi.File>,
     onFileClick: (String) -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     files.forEach { file ->
         ClickableItem(
+            shapes = shapes,
             text = file.name,
             leadingContent = {
                 val fileType = file.fileType
                 ItemIcon(fileType.icon, tint = fileType.color(LocalIsThemeDarkMode.current))
             },
+            backgroundColor = ListItemDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceBright,
+            ),
             onClick = { onFileClick(file.id) },
             modifier = modifier,
             contentPadding = contentPadding,
@@ -62,6 +69,7 @@ private fun PreviewAttachmentFiles() {
                     EventDetailUi.File("3", "Next loto results.png"),
                 ),
                 onFileClick = {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             )
         }
     }

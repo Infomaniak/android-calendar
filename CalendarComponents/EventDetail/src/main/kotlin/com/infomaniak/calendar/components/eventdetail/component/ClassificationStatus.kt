@@ -19,6 +19,7 @@ package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -35,10 +36,18 @@ import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Lock
 
 @Composable
-internal fun ClassificationStatus(classification: EventDetailUi.Classification, modifier: Modifier = Modifier) {
+internal fun ClassificationStatus(
+    classification: EventDetailUi.Classification,
+    shapes: ListItemShapes,
+    modifier: Modifier = Modifier,
+) {
     ListItem(
         content = { Text(text = stringResource(classification.label)) },
         leadingContent = { ClassificationIcon() },
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceBright,
+        ),
+        shapes = shapes,
         modifier = modifier,
     )
 }
@@ -66,7 +75,12 @@ private fun PreviewClassificationStatus() {
     MaterialTheme {
         Surface {
             Column {
-                EventDetailUi.Classification.entries.forEach { ClassificationStatus(classification = it) }
+                EventDetailUi.Classification.entries.forEach {
+                    ClassificationStatus(
+                        classification = it,
+                        shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+                    )
+                }
             }
         }
     }

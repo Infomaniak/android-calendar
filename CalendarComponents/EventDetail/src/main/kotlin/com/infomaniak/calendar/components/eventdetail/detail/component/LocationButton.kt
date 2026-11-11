@@ -18,6 +18,8 @@
 package com.infomaniak.calendar.components.eventdetail.detail.component
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -30,6 +32,7 @@ import com.infomaniak.designsystem.icons.symbols.MapPin
 @Composable
 internal fun LocationButton(
     location: String,
+    shapes: ListItemShapes,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
@@ -38,6 +41,10 @@ internal fun LocationButton(
         text = location,
         leadingIcon = EsdsIcons.MapPin,
         onClick = onClick,
+        shapes = shapes,
+        backgroundColor = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceBright,
+        ),
         contentPadding = contentPadding,
         modifier = modifier,
     )
@@ -48,7 +55,11 @@ internal fun LocationButton(
 private fun PreviewLocationButton() {
     MaterialTheme {
         Surface {
-            LocationButton(location = "742 Evergreen Terrace, Springfield", onClick = {})
+            LocationButton(
+                location = "742 Evergreen Terrace, Springfield",
+                onClick = {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            )
         }
     }
 }

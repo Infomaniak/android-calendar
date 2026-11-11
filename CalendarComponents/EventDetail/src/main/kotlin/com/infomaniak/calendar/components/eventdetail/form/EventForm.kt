@@ -51,6 +51,7 @@ import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitc
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
+import com.infomaniak.calendar.components.eventdetail.component.item
 import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.AddReminderButton
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderItem
@@ -109,66 +110,89 @@ fun EventForm(
             modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
         )
 
-        Section(EventSharedElement.Divider1) {
-            AttendeesButton(
-                attendees = state.attendees,
-                onClick = onAttendeesClick,
-                modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
-            )
+        Section {
+            item {
+                AttendeesButton(
+                    attendees = state.attendees,
+                    onClick = onAttendeesClick,
+                    shapes = it,
+                    modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
+                )
+            }
 
-            KMeetButtonSwitch(
-                checked = state.isKMeetUrlEnabled::value,
-                onCheckedChange = { isChecked -> state.isKMeetUrlEnabled.value = isChecked },
-                modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
-            )
-        }
-
-        Section(EventSharedElement.Divider3) {
-            var isReminderOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
-            ReminderItems(state)
-
-            AddReminderButton(onClick = { isReminderOffsetDialogVisible = true })
-
-            if (isReminderOffsetDialogVisible) {
-                ReminderOffsetDialog(
-                    selectedOffset = null,
-                    onOffsetSelect = { offset ->
-                        if (offset != null) {
-                            state.notifications.value += EventDetailUi.Notification(
-                                type = EventDetailUi.Notification.Type.Push,
-                                time = NotificationTime.Offset(offset),
-                            )
-                        }
-                        isReminderOffsetDialogVisible = false
-                    },
-                    onCustomClick = {
-                        isReminderOffsetDialogVisible = false
-                        onCustomReminderClick()
-                    },
-                    onDismissRequest = { isReminderOffsetDialogVisible = false },
+            item {
+                KMeetButtonSwitch(
+                    shapes = it,
+                    checked = state.isKMeetUrlEnabled::value,
+                    onCheckedChange = { isChecked -> state.isKMeetUrlEnabled.value = isChecked },
+                    modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
                 )
             }
         }
 
-        Section(EventSharedElement.Divider4) {
-            OccupiedStatusSwitch(
-                checked = state.isOccupied::value,
-                onCheckedChange = { isChecked -> state.isOccupied.value = isChecked },
-                modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus),
-            )
+        var isReminderOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
+        Section(Modifier.animateContentSize()) {
+            state.notifications.value.forEach { notification ->
+                item {
+                    ReminderItem(
+                        notification = notification,
+                        onRemoveClick = { state.notifications.value -= notification },
+                    )
+                }
+            }
 
-            ClassificationStatusSwitch(
-                checked = state.isPublic::value,
-                onCheckedChange = { isChecked -> state.isPublic.value = isChecked },
-                modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
-            )
+            item {
+                AddReminderButton(onClick = { isReminderOffsetDialogVisible = true })
+            }
 
-            CalendarEditable(
-                selectedCalendar = state.calendar,
-                calendars = state.calendars,
-                onSelect = { calendar -> state.calendar = calendar },
-                modifier = Modifier.eventSharedBounds(EventSharedElement.Calendar),
-            )
+            if (isReminderOffsetDialogVisible) {
+                item {
+                    ReminderOffsetDialog(
+                        selectedOffset = null,
+                        onOffsetSelect = { offset ->
+                            if (offset != null) {
+                                state.notifications.value += EventDetailUi.Notification(
+                                    type = EventDetailUi.Notification.Type.Push,
+                                    time = NotificationTime.Offset(offset),
+                                )
+                            }
+                            isReminderOffsetDialogVisible = false
+                        },
+                        onCustomClick = {
+                            isReminderOffsetDialogVisible = false
+                            onCustomReminderClick()
+                        },
+                        onDismissRequest = { isReminderOffsetDialogVisible = false },
+                    )
+                }
+            }
+        }
+
+        Section {
+            item {
+                OccupiedStatusSwitch(
+                    checked = state.isOccupied::value,
+                    onCheckedChange = { isChecked -> state.isOccupied.value = isChecked },
+                    modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus),
+                )
+            }
+
+            item {
+                ClassificationStatusSwitch(
+                    checked = state.isPublic::value,
+                    onCheckedChange = { isChecked -> state.isPublic.value = isChecked },
+                    modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
+                )
+            }
+
+            item {
+                CalendarEditable(
+                    selectedCalendar = state.calendar,
+                    calendars = state.calendars,
+                    onSelect = { calendar -> state.calendar = calendar },
+                    modifier = Modifier.eventSharedBounds(EventSharedElement.Calendar),
+                )
+            }
         }
     }
 }

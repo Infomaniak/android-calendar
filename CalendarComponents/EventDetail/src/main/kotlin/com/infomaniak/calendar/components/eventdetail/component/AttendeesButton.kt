@@ -29,6 +29,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -42,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus.Accepted
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus.Declined
@@ -63,6 +66,7 @@ private const val AVATAR_STACK_LIMIT = 3
 internal fun AttendeesButton(
     attendees: () -> List<AttendeeUi>,
     onClick: () -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -71,6 +75,10 @@ internal fun AttendeesButton(
     ClickableItem(
         contentPadding = contentPadding,
         onClick = onClick,
+        shapes = shapes,
+        backgroundColor = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceBright,
+        ),
         leadingIcon = EsdsIcons.UsersStacked,
         text = if (attendeeList.isEmpty()) {
             stringResource(R.string.attendees)
@@ -148,7 +156,7 @@ private fun ExtraCountIndicator(extraCount: Int, border: BorderStroke, modifier:
 private fun PreviewAttendeesButton() {
     MaterialTheme {
         Surface {
-            AttendeesButton({ previewAttendees }, onClick = {})
+            AttendeesButton({ previewAttendees }, onClick = {}, shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1))
         }
     }
 }
@@ -158,7 +166,7 @@ private fun PreviewAttendeesButton() {
 private fun PreviewEmptyList() {
     MaterialTheme {
         Surface {
-            AttendeesButton({ emptyList() }, onClick = {})
+            AttendeesButton({ emptyList() }, onClick = {}, shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1))
         }
     }
 }

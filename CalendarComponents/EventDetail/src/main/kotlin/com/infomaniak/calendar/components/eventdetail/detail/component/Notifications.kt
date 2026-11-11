@@ -17,10 +17,13 @@
  */
 package com.infomaniak.calendar.components.eventdetail.detail.component
 
+import android.R.attr.text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -49,11 +52,13 @@ import kotlin.time.Instant
 internal fun Notifications(
     notifications: List<EventDetailUi.Notification>,
     onNotificationClick: () -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     notifications.forEach { notification ->
         ClickableItem(
+            shapes = shapes,
             text = stringResource(notification.type.label),
             leadingIcon = notification.type.icon,
             onClick = { onNotificationClick() },
@@ -98,6 +103,7 @@ private fun PreviewAbsoluteNotification() {
                     ),
                 ),
                 onNotificationClick = {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             )
         }
     }
@@ -116,6 +122,7 @@ private fun PreviewAbsoluteNotificationNextYear() {
                     ),
                 ),
                 onNotificationClick = {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             )
         }
     }
@@ -134,6 +141,7 @@ private fun PreviewOffsetNotification() {
                     ),
                 ),
                 onNotificationClick = {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             )
         }
     }
@@ -152,6 +160,7 @@ private fun PreviewLongOffsetNotification() {
                     ),
                 ),
                 onNotificationClick = {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             )
         }
     }
@@ -170,6 +179,7 @@ private fun PreviewOffsetNotificationAtStart() {
                     ),
                 ),
                 onNotificationClick = {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             )
         }
     }

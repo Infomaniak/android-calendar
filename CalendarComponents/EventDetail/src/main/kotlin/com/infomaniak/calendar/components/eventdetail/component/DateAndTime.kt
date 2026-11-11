@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -55,10 +57,15 @@ internal fun DateAndTime(
     start: EventDetailTiming,
     end: EventDetailTiming,
     isAllDay: Boolean,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
 ) {
     ListItem(
         leadingContent = { ItemIcon(EsdsIcons.Clock) },
+        shapes = shapes,
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceBright,
+        ),
         content = {
             val startAtLocale = start.atLocale
             val endAtLocale = end.atLocale
@@ -162,6 +169,7 @@ private fun PreviewDateAndTime() {
                 EventDetailTiming.Precise(end.toInstant(endTimeZone), endTimeZone)
             },
             isAllDay = isAllDay,
+            shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
         )
     }
 

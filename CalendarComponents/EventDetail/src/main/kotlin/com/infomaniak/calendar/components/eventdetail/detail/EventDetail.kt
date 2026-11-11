@@ -73,13 +73,25 @@ fun EventDetail(
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
     Column(modifier = modifier.padding(contentPadding)) {
         with(eventDetail) {
-            Title(dotColor = eventColor, title = title, modifier = Modifier.eventSharedElement(EventSharedElement.Title))
+            Section {
+                item {
+                    Title(dotColor = eventColor, title = title, shapes = it)
+                }
+            }
 
-            DateAndTime(start, end, isAllDay, Modifier.eventSharedBounds(EventSharedElement.DateAndTime))
+            Section {
+                item {
+                    DateAndTime(start, end, isAllDay, shapes = it)
+                }
 
-            if (recurrence is EventDetailRecurrence.Recurrence) Recurrence(recurrence.getText)
+                if (recurrence is EventDetailRecurrence.Recurrence) {
+                    item {
+                        Recurrence(recurrence.getText, shapes = it)
+                    }
+                }
+            }
 
-            Section(EventSharedElement.Divider1) {
+            Section {
                 if (attendees.all.isNotEmpty()) {
                     item {
                         AttendeesButton(
@@ -94,6 +106,7 @@ fun EventDetail(
                 if (kMeetUrl?.isNotBlank() == true) {
                     item {
                         KMeetButton(
+                            shapes = it,
                             onJoin = onJoinKMeet,
                             onCopy = onCopyKMeet,
                             modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
@@ -102,38 +115,69 @@ fun EventDetail(
                 }
 
                 if (location?.isNotBlank() == true) {
-                    LocationButton(location = location, onClick = onLocationClick)
+                    item {
+                        LocationButton(location = location, shapes = it, onClick = onLocationClick)
+                    }
                 }
 
                 if (room != null) {
-                    RoomButton(room = room, onClick = onRoomClick)
+                    item {
+                        RoomButton(room = room, shapes = it, onClick = onRoomClick)
+                    }
                 }
             }
 
-            Section(EventSharedElement.Divider2) {
-                if (description?.isNotBlank() == true) {
-                    DescriptionCollapsibleButton(description = description)
+            if (description?.isNotBlank() == true || files.isNotEmpty()) {
+                Section {
+                    if (description?.isNotBlank() == true) {
+                        item {
+                            DescriptionCollapsibleButton(description = description, shapes = it)
+                        }
+                    }
+
+                    item {
+                        AttachmentFiles(files, onFileClick = { /*TODO[eventDetail]*/ }, shapes = it)
+                    }
+
+                }
+            }
+
+            if (notifications.isNotEmpty()) {
+                Section {
+                    item {
+                        Notifications(
+                            notifications = notifications,
+                            onNotificationClick = { /*TODO[eventDetail]*/ },
+                            shapes = it,
+                        )
+                    }
+                }
+            }
+
+            Section {
+                item {
+                    OccupiedStatus(
+                        isOccupied,
+                        modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus),
+                        shapes = it,
+                    )
+                }
+                item {
+                    ClassificationStatus(
+                        classification = classification,
+                        modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
+                        shapes = it,
+                    )
                 }
 
-                AttachmentFiles(files, onFileClick = { /*TODO[eventDetail]*/ })
-            }
-
-            Section(EventSharedElement.Divider3) {
-                Notifications(
-                    notifications = notifications,
-                    onNotificationClick = { /*TODO[eventDetail]*/ },
-                )
-            }
-
-            Section(EventSharedElement.Divider4) {
-                OccupiedStatus(isOccupied, modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus))
-
-                ClassificationStatus(
-                    classification = classification,
-                    modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
-                )
-
-                Calendar(calendar.color, calendar.name, Modifier.eventSharedBounds(EventSharedElement.Calendar))
+                item {
+                    Calendar(
+                        calendar.color,
+                        calendar.name,
+                        shapes = it,
+                        Modifier.eventSharedBounds(EventSharedElement.Calendar),
+                    )
+                }
             }
         }
     }
