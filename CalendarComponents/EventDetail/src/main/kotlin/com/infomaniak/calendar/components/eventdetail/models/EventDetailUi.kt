@@ -27,6 +27,7 @@ import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Bell
 import com.infomaniak.designsystem.icons.symbols.BubbleTopRightCircle
 import com.infomaniak.designsystem.icons.symbols.Symbol
+import java.util.UUID
 
 /**
  * @param calendars The calendars the event can be moved to: the writable ones, grouped by account.
@@ -64,9 +65,17 @@ data class EventDetailUi(
         val fileType: FileType by lazy { FileType.guessFromFileName(name) }
     }
 
-    /** @param sourceId Opaque id of the stored alarm it was read from, `null` for one added in the form. */
+    /**
+     * @param sourceId Opaque id of the stored alarm it was read from, `null` for one added in the form.
+     * @param uiId Tells apart reminders that are otherwise identical, which the user may add twice. Used for UI animtions.
+     */
     @Immutable
-    data class Notification(val type: Type, val time: NotificationTime, val sourceId: String? = null) {
+    data class Notification(
+        val type: Type,
+        val time: NotificationTime,
+        val sourceId: String? = null,
+        val uiId: String = sourceId ?: UUID.randomUUID().toString(),
+    ) {
         @Immutable
         enum class Type(val icon: Symbol, @StringRes val label: Int) {
             Email(EsdsIcons.Bell, R.string.notificationTypeEmail),
