@@ -191,7 +191,7 @@ private fun PreviewDateAndTime() {
 
                 PreviewSectionHeadline("Multi days")
                 DateAndTimeComponent(end = tomorrow)
-                DateAndTimeComponent(endTimeZone = tokyoTimeZone)
+                DateAndTimeComponent(end = tomorrow, endTimeZone = tokyoTimeZone)
 
                 PreviewSectionHeadline("All day")
                 DateAndTimeComponent(startTimeZone = parisTimeZone, endTimeZone = parisTimeZone, isAllDay = true)
