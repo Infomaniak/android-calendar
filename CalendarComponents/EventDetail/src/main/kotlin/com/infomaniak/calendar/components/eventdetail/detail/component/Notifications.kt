@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
+import com.infomaniak.calendar.components.eventdetail.modifier.reminderSharedBounds
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTime
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDurationOffset
 import com.infomaniak.core.common.utils.today
@@ -67,7 +68,7 @@ internal fun Notifications(
                     )
                 }
             },
-            modifier = modifier,
+            modifier = modifier.reminderSharedBounds(notification),
         )
     }
 }
