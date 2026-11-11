@@ -156,6 +156,7 @@ fun EventForm(
                         notification = notification,
                         onRemoveClick = { state.notifications.value -= notification },
                         shapes = it,
+                        modifier = Modifier.reminderSharedBounds(notification),
                     )
                 }
             }
