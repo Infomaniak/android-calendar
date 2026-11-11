@@ -17,17 +17,26 @@
  */
 package com.infomaniak.calendar.components.eventdetail.form
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -113,15 +122,9 @@ fun EventForm(
             )
         }
 
-        Section(EventSharedElement.Divider3, Modifier.animateContentSize()) {
+        Section(EventSharedElement.Divider3) {
             var isReminderOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
-
-            state.notifications.value.forEach { notification ->
-                ReminderItem(
-                    notification = notification,
-                    onRemoveClick = { state.notifications.value -= notification },
-                )
-            }
+            ReminderItems(state)
 
             AddReminderButton(onClick = { isReminderOffsetDialogVisible = true })
 
@@ -167,6 +170,67 @@ fun EventForm(
             )
         }
     }
+}
+
+@Composable
+private fun ReminderItems(state: EventFormState) {
+    val notifications = state.notifications.value
+
+    val initialNotifications = remember { notifications.toSet() }
+
+    // Removed reminders leave the state at once, but stay rendered until they've animated out
+    var lastRenderedNotifications by remember { mutableStateOf(notifications) }
+    val renderedNotifications = notifications.plusExitingFrom(lastRenderedNotifications)
+    SideEffect { lastRenderedNotifications = renderedNotifications }
+
+    renderedNotifications.forEach { notification ->
+        key(notification) { // Required for proper appearance/disappearance animation
+            AnimatedReminderItem(
+                notification = notification,
+                isVisible = notification in notifications,
+                onRemoveClick = { state.notifications.value -= notification },
+                onExitFinish = { lastRenderedNotifications -= notification },
+                // Reminders already there on entry don't animate in, nor clash with the shared-element transition
+                animateEnter = notification !in initialNotifications,
+            )
+        }
+    }
+}
+
+/** A [ReminderItem] that expands in, and shrinks out when no longer [isVisible], calling [onExitFinish] once gone. */
+@Composable
+private fun AnimatedReminderItem(
+    notification: EventDetailUi.Notification,
+    isVisible: Boolean,
+    onRemoveClick: () -> Unit,
+    onExitFinish: () -> Unit,
+    modifier: Modifier = Modifier,
+    animateEnter: Boolean = true,
+) {
+    val visibility = remember { MutableTransitionState(!animateEnter) }
+    visibility.targetState = isVisible
+
+    AnimatedVisibility(
+        visibleState = visibility,
+        modifier = modifier,
+        enter = expandVertically() + fadeIn(),
+        exit = shrinkVertically() + fadeOut(),
+    ) {
+        ReminderItem(notification = notification, onRemoveClick = onRemoveClick)
+    }
+
+    LaunchedEffect(visibility.isIdle) {
+        if (visibility.isIdle && !visibility.targetState) onExitFinish()
+    }
+}
+
+/** This list, plus the items of [previous] it no longer has (the ones exiting), put back at their former index. */
+private fun <T> List<T>.plusExitingFrom(previous: List<T>): List<T> {
+    val result = toMutableList()
+    previous.forEachIndexed { index, item ->
+        if (item !in this) result.add(index.coerceAtMost(result.size), item)
+    }
+    return result
 }
 
 @Preview

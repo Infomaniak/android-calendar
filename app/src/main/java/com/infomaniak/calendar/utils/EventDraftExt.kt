@@ -57,7 +57,7 @@ fun EventDraft.applyTo(
     attendees = attendees.toAttendeeEdit(),
     organizer = (initialOrganizer?.toOrganizer() ?: defaultOrganizer).takeIf { attendees.isNotEmpty() },
     // Stored alarms KMP can't read are missing from storedAlarms, replacing the list would delete them
-    alarms = if (notifications == storedAlarms.mapNotNull { it.toNotification() }) {
+    alarms = if (notifications.withoutUiId() == storedAlarms.mapNotNull { it.toNotification() }.withoutUiId()) {
         editData.alarms
     } else {
         AlarmListEdit.Replace(notifications.toAlarms(storedAlarms))
@@ -103,6 +103,9 @@ private fun EventDraft.bounds(): EventBounds = if (isAllDay) {
 }
 
 private fun OrganizerUi.toOrganizer(): Organizer = Organizer(email, displayName)
+
+/** Alarms stored without id get a new random [EventDetailUi.Notification.uiId] each time they're read. */
+private fun List<EventDetailUi.Notification>.withoutUiId() = map { it.copy(uiId = "") }
 
 /**
  * A notification read from a stored alarm gives that alarm back, found by its id, so it keeps the properties the form doesn't show.
