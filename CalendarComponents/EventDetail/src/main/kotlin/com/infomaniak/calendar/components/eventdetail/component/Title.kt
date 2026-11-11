@@ -58,6 +58,7 @@ internal fun Title(dotColor: Color, title: String, shapes: ListItemShapes, modif
             containerColor = MaterialTheme.colorScheme.surfaceBright,
         ),
         content = { Text(text = title, style = MaterialTheme.typography.titleLargeEmphasized, maxLines = MAX_LINES) },
+        modifier = modifier,
     )
 }
 
