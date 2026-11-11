@@ -20,6 +20,7 @@ package com.infomaniak.calendar.components.eventdetail.form
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -68,7 +69,6 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.TimeZone
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes

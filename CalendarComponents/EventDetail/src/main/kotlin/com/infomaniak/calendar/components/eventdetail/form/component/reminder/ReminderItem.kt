@@ -46,8 +46,8 @@ import com.infomaniak.core.common.R as RCommon
 internal fun ReminderItem(
     notification: EventDetailUi.Notification,
     onRemoveClick: () -> Unit,
-    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
+    shapes: ListItemShapes = ListItemDefaults.shapes(),
 ) {
     ListItem(
         modifier = modifier,
