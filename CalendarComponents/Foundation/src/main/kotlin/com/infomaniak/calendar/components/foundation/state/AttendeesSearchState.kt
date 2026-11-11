@@ -151,11 +151,10 @@ fun rememberSaveableAttendeesSearchState(
     participants: SnapshotStateSet<ParticipantUi> = rememberSaveable { mutableStateSetOf() },
     results: SnapshotStateList<AttendeesSearchResult> = rememberSaveable { mutableStateListOf() },
     searchQuery: String = "",
-    organizerSource: OrganizerSource? = null,
 ): AttendeesSearchState<OrganizerSource> = rememberSaveable(saver = AttendeesSearchState.Saver()) {
-    AttendeesSearchState<OrganizerSource>(
+    AttendeesSearchState(
         searchQueryTextFieldState = TextFieldState(initialText = searchQuery),
         results = results,
         participants = participants,
-    ).apply { this.organizerSource = organizerSource }
+    )
 }

@@ -21,22 +21,22 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.attendeessearch.AttendeesSearch
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
+import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
@@ -45,7 +45,6 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.navigation.state.LocalSharedSnackbarHostState
-import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 
@@ -56,19 +55,17 @@ fun AttendeesSearchScreen(
     viewModel: AttendeesSearchViewModel = viewModel(),
     eventFormViewModel: EventFormViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
-    val formState = (eventFormViewModel.uiState as? EventFormUiState.Loaded)?.formState ?: return
-    val attendeesSearchState = rememberSaveableAttendeesSearchState(
-        participants = remember { mutableStateSetOf<ParticipantUi>().apply { addAll(formState.form.participants) } },
-        organizerSource = formState.form.organizerSource,
-    )
+    val formState = eventFormViewModel.formState ?: return
+    val searchQueryTextFieldState = rememberTextFieldState()
+    val attendeesSearchState = remember(formState) {
+        AttendeesSearchState<OrganizerSource>(
+            searchQueryTextFieldState = searchQueryTextFieldState,
+            results = mutableStateListOf(),
+            participants = formState.participants,
+        ).apply { organizerSource = formState.organizerSource }
+    }
 
     viewModel.EnableSearch(attendeesSearchState)
-
-    LaunchedEffect(attendeesSearchState) {
-        snapshotFlow { attendeesSearchState.participants.toSet() }.collect { participants ->
-            formState.edit { it.copy(participants = participants) }
-        }
-    }
 
     AttendeesSearchScreenContent(
         topBar = { TopBar(goBack, { attendeesSearchState.attendees.size }) },

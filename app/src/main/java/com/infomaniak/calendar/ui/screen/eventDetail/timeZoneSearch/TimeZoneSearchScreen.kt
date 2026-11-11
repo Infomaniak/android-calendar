@@ -44,7 +44,7 @@ fun TimeZoneSearchScreen(
 ) {
     TimeZoneSearchScreen(
         onTimeZoneSelected = { timeZone ->
-            eventFormViewModel.edit { it.copy(dates = it.dates.pickTimeZone(isStart, timeZone)) }
+            eventFormViewModel.formState?.let { it.dates = it.dates.pickTimeZone(isStart, timeZone) }
             goBack()
         },
         goBack = goBack,

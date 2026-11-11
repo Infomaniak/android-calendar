@@ -76,19 +76,20 @@ class EventFormViewModel(
     )
         private set
 
-    private val formState: EventFormState? get() = (uiState as? EventFormUiState.Loaded)?.formState
+    /** The form once loaded, for the screens it opens. */
+    val formState: EventFormState? get() = (uiState as? EventFormUiState.Loaded)?.formState
 
     var calendars: List<EventDetailCalendarGroup>? by mutableStateOf(null)
         private set
 
     /** `false` while the form loads, and once its calendar can't be written to anymore. */
-    val canSubmit: Boolean get() = formState?.form?.let { calendars?.calendarOf(it.calendarId) } != null
+    val canSubmit: Boolean get() = formState?.let { calendars?.calendarOf(it.calendarId) } != null
 
     private var isInitialized = false
 
     init {
         savedStateHandle.setSavedStateProvider(FORM_KEY) {
-            formState?.form?.let { encodeToSavedState(EventFormValues.serializer(), it) } ?: savedState()
+            formState?.let { encodeToSavedState(EventFormValues.serializer(), it.toValues()) } ?: savedState()
         }
     }
 
@@ -133,13 +134,8 @@ class EventFormViewModel(
         }
     }
 
-    /** Edits the form once it's loaded, for the screens it opens. */
-    fun edit(change: (EventFormValues) -> EventFormValues) {
-        formState?.edit(change)
-    }
-
     fun toEventDraft(): EventDraft? {
-        val form = formState?.form ?: return null
+        val form = formState?.toValues() ?: return null
         val calendar = calendars?.calendarOf(form.calendarId) ?: return null
 
         return form.toEventDraft(calendar)
@@ -156,7 +152,7 @@ class EventFormViewModel(
         val formState = formState ?: return
         if (calendars == null || fallback == null) return
 
-        if (calendars.calendarOf(formState.form.calendarId) == null) formState.edit { it.withCalendar(fallback) }
+        if (calendars.calendarOf(formState.calendarId) == null) formState.selectCalendar(fallback)
     }
 
     @AssistedFactory

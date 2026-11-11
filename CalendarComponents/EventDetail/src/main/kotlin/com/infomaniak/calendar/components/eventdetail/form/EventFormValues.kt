@@ -31,7 +31,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 
-/** What the user filled in an event form. */
+/** What the user filled in an event form, as saved and sent. */
 @Immutable
 @Serializable
 data class EventFormValues(
@@ -53,18 +53,6 @@ data class EventFormValues(
             val me = (organizerSource as? OrganizerSource.Dynamic)?.owner
             return participants.mapNotNull { it.toAttendeeUi(me) }
         }
-
-    /** Organizing a new event as the owner of [calendar], who must then not also be one of its attendees. */
-    fun withCalendar(calendar: EventDetailCalendar): EventFormValues {
-        val owner = calendar.organizerAttendeeUi
-        if (organizerSource is OrganizerSource.Static || owner == null) return copy(calendarId = calendar.id)
-
-        return copy(
-            calendarId = calendar.id,
-            participants = participants.filterNot { it is AttendeeUi && it.email == owner.email }.toSet(),
-            organizerSource = OrganizerSource.Dynamic(owner),
-        )
-    }
 
     fun toEventDraft(calendar: EventDetailCalendar) = EventDraft(
         title = title,

@@ -28,7 +28,6 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -40,7 +39,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.tooling.preview.Preview
@@ -91,48 +89,42 @@ fun EventForm(
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
-    val form = state.form
-    val calendar = calendars.calendarOf(form.calendarId) ?: return@ProvideEventSharedTransition
-
-    val titleState = rememberTextFieldState(form.title)
-    LaunchedEffect(state, titleState) {
-        snapshotFlow { titleState.text.toString() }.collect { title -> state.edit { it.copy(title = title) } }
-    }
+    val calendar = calendars.calendarOf(state.calendarId) ?: return@ProvideEventSharedTransition
 
     Column(modifier.padding(contentPadding)) {
-        val focusRequester = rememberInitialFocusRequester(shouldRequestFocus = { titleState.text.isEmpty() })
+        val focusRequester = rememberInitialFocusRequester(shouldRequestFocus = { state.titleTextState.text.isEmpty() })
         TitleEditable(
-            dotColor = { form.eventColor.getColor(calendar) },
-            textFieldState = titleState,
+            dotColor = { state.eventColorState.value.getColor(calendar) },
+            textFieldState = state.titleTextState,
             modifier = Modifier
                 .focusRequester(focusRequester)
                 .eventSharedElement(EventSharedElement.Title),
         )
 
         AllDaySwitch(
-            checked = { form.isAllDay },
-            onCheckedChange = { isAllDay -> state.edit { it.copy(isAllDay = isAllDay) } },
+            checked = state.isAllDay::value,
+            onCheckedChange = { isChecked -> state.isAllDay.value = isChecked },
         )
 
         DateAndTimeEditable(
-            dates = form.dates,
-            isAllDay = { form.isAllDay },
-            onDatePicked = { isStart, date -> state.edit { it.copy(dates = it.dates.pickDate(isStart, date)) } },
-            onTimePicked = { isStart, time -> state.edit { it.copy(dates = it.dates.pickTime(isStart, time)) } },
+            dates = state.dates,
+            isAllDay = state.isAllDay::value,
+            onDatePicked = { isStart, date -> state.dates = state.dates.pickDate(isStart, date) },
+            onTimePicked = { isStart, time -> state.dates = state.dates.pickTime(isStart, time) },
             onTimeZoneClick = onTimeZoneClick,
             modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
         )
 
         Section(EventSharedElement.Divider1) {
             AttendeesButton(
-                attendees = { form.attendees },
+                attendees = { state.attendees },
                 onClick = onAttendeesClick,
                 modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
             )
 
             KMeetButtonSwitch(
-                checked = { form.isKMeetUrlEnabled },
-                onCheckedChange = { isEnabled -> state.edit { it.copy(isKMeetUrlEnabled = isEnabled) } },
+                checked = state.isKMeetUrlEnabled::value,
+                onCheckedChange = { isChecked -> state.isKMeetUrlEnabled.value = isChecked },
                 modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
             )
         }
@@ -141,8 +133,8 @@ fun EventForm(
             var isReminderOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
 
             ReminderItems(
-                notifications = form.notifications,
-                onRemove = { notification -> state.edit { it.copy(notifications = it.notifications - notification) } },
+                notifications = state.notifications.value,
+                onRemove = { notification -> state.notifications.value -= notification },
             )
 
             AddReminderButton(onClick = { isReminderOffsetDialogVisible = true })
@@ -152,11 +144,10 @@ fun EventForm(
                     selectedOffset = null,
                     onOffsetSelect = { offset ->
                         if (offset != null) {
-                            val notification = EventDetailUi.Notification(
+                            state.notifications.value += EventDetailUi.Notification(
                                 type = EventDetailUi.Notification.Type.Push,
                                 time = NotificationTime.Offset(offset),
                             )
-                            state.edit { it.copy(notifications = it.notifications + notification) }
                         }
                         isReminderOffsetDialogVisible = false
                     },
@@ -171,21 +162,21 @@ fun EventForm(
 
         Section(EventSharedElement.Divider4) {
             OccupiedStatusSwitch(
-                checked = { form.isOccupied },
-                onCheckedChange = { isOccupied -> state.edit { it.copy(isOccupied = isOccupied) } },
+                checked = state.isOccupied::value,
+                onCheckedChange = { isChecked -> state.isOccupied.value = isChecked },
                 modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus),
             )
 
             ClassificationStatusSwitch(
-                checked = { form.isPublic },
-                onCheckedChange = { isPublic -> state.edit { it.copy(isPublic = isPublic) } },
+                checked = state.isPublic::value,
+                onCheckedChange = { isChecked -> state.isPublic.value = isChecked },
                 modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
             )
 
             CalendarEditable(
                 selectedCalendar = calendar,
                 calendars = calendars,
-                onSelect = { calendar -> state.edit { it.withCalendar(calendar) } },
+                onSelect = state::selectCalendar,
                 modifier = Modifier.eventSharedBounds(EventSharedElement.Calendar),
             )
         }

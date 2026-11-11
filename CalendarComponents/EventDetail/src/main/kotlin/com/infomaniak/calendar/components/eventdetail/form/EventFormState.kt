@@ -17,18 +17,62 @@
  */
 package com.infomaniak.calendar.components.eventdetail.form
 
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.setValue
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.OrganizerSource
+import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 
-/** Holds the [EventFormValues] drawn by [EventForm], which only change through [edit]. */
+/** The editable state of an event form, one state per field, starting from [values] and read back with [toValues]. */
 @Stable
-class EventFormState(initialForm: EventFormValues) {
-    var form: EventFormValues by mutableStateOf(initialForm)
+class EventFormState(values: EventFormValues) {
+    val titleTextState = TextFieldState(values.title)
+    val eventColorState = mutableStateOf(values.eventColor)
+    var calendarId by mutableStateOf(values.calendarId)
         private set
+    val isAllDay = mutableStateOf(values.isAllDay)
+    var dates by mutableStateOf(values.dates)
+    val participants = mutableStateSetOf<ParticipantUi>().apply { addAll(values.participants) }
+    /** [OrganizerSource.Dynamic] for a new event, which follows the selected calendar. */
+    var organizerSource by mutableStateOf(values.organizerSource)
+        private set
+    val isKMeetUrlEnabled = mutableStateOf(values.isKMeetUrlEnabled)
+    val notifications = mutableStateOf(values.notifications)
+    val isOccupied = mutableStateOf(values.isOccupied)
+    val isPublic = mutableStateOf(values.isPublic)
 
-    fun edit(change: (EventFormValues) -> EventFormValues) {
-        form = change(form)
+    val attendees: List<AttendeeUi> by derivedStateOf {
+        val me = (organizerSource as? OrganizerSource.Dynamic)?.owner
+        participants.mapNotNull { it.toAttendeeUi(me) }
     }
+
+    /** Organizing a new event as the owner of [calendar], who must then not also be one of its attendees. */
+    fun selectCalendar(calendar: EventDetailCalendar) {
+        calendarId = calendar.id
+        val owner = calendar.organizerAttendeeUi
+        if (organizerSource is OrganizerSource.Static || owner == null) return
+
+        participants.removeAll { it is AttendeeUi && it.email == owner.email }
+        organizerSource = OrganizerSource.Dynamic(owner)
+    }
+
+    fun toValues() = EventFormValues(
+        title = titleTextState.text.toString(),
+        calendarId = calendarId,
+        eventColor = eventColorState.value,
+        isAllDay = isAllDay.value,
+        dates = dates,
+        participants = participants.toSet(),
+        organizerSource = organizerSource,
+        isKMeetUrlEnabled = isKMeetUrlEnabled.value,
+        notifications = notifications.value,
+        isOccupied = isOccupied.value,
+        isPublic = isPublic.value,
+    )
 }
