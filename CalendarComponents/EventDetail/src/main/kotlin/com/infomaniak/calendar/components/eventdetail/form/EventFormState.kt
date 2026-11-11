@@ -45,12 +45,12 @@ import kotlin.time.Duration
  * The editable state of an event form, one state per field.
  *
  * @param organizerSource [OrganizerSource.Dynamic] for a new event, which follows the selected calendar.
- * @param calendars The calendars the event can be put in, kept up to date by its owner.
+ * @param calendars The calendars the event can be put in.
  */
 @Stable
 class EventFormState(
     val titleTextState: TextFieldState,
-    calendarId: String,
+    calendar: EventDetailCalendar,
     eventColor: EventColorChoice,
     isAllDay: Boolean,
     start: LocalDateTime,
@@ -67,7 +67,7 @@ class EventFormState(
     val calendars: List<EventDetailCalendarGroup>,
 ) {
     val eventColorState = mutableStateOf(eventColor)
-    var calendarId by mutableStateOf(calendarId)
+    var calendar by mutableStateOf(calendar)
         private set
     val isAllDay = mutableStateOf(isAllDay)
     val dateAndTimeState = DateAndTimeState(
@@ -91,11 +91,6 @@ class EventFormState(
     val isOccupied = mutableStateOf(isOccupied)
     val isPublic = mutableStateOf(isPublic)
 
-    val calendar: EventDetailCalendar? get() = calendars.calendarOf(calendarId)
-
-    /** `false` while the calendars aren't known, and once the selected one can't be written to anymore. */
-    val canSubmit: Boolean get() = calendar != null
-
     val attendees: List<AttendeeUi> by derivedStateOf {
         val me = (this.organizerSource as? OrganizerSource.Dynamic)?.owner
         this.participants.mapNotNull { it.toAttendeeUi(me) }
@@ -106,7 +101,7 @@ class EventFormState(
 
     /** Organizing a new event as the owner of [calendar], who must then not also be one of its attendees. */
     fun selectCalendar(calendar: EventDetailCalendar) {
-        calendarId = calendar.id
+        this.calendar = calendar
         val owner = calendar.organizerAttendeeUi
         if (organizerSource is OrganizerSource.Static || owner == null) return
 
@@ -114,12 +109,11 @@ class EventFormState(
         organizerSource = OrganizerSource.Dynamic(owner)
     }
 
-    fun toEventDraft(): EventDraft? {
-        val calendar = calendar ?: return null
+    fun toEventDraft(): EventDraft {
         return EventDraft(
             title = titleTextState.text.toString(),
             color = eventColorState.value.getColor(calendar),
-            calendarId = calendarId,
+            calendarId = calendar.id,
             isAllDay = isAllDay.value,
             start = start,
             startTimeZone = dateAndTimeState.start.timeZone,
@@ -147,7 +141,7 @@ class EventFormState(
 
             return EventFormState(
                 titleTextState = TextFieldState(),
-                calendarId = calendar.id,
+                calendar = calendar,
                 eventColor = EventColorChoice.Default,
                 isAllDay = false,
                 start = start,
@@ -165,8 +159,4 @@ class EventFormState(
             )
         }
     }
-}
-
-fun List<EventDetailCalendarGroup>.calendarOf(id: String): EventDetailCalendar? {
-    return firstNotNullOfOrNull { group -> group.calendars.find { it.id == id } }
 }

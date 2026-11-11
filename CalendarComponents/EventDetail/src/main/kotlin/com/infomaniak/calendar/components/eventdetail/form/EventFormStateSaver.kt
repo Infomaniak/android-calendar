@@ -23,6 +23,7 @@ import androidx.compose.runtime.saveable.autoSaver
 import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.eventdetail.state.TimeZoneSaver
@@ -30,7 +31,7 @@ import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import kotlinx.datetime.LocalDateTime
 
 private const val TITLE_KEY = "title"
-private const val CALENDAR_ID_KEY = "calendarId"
+private const val CALENDAR_KEY = "calendar"
 private const val EVENT_COLOR_KEY = "eventColor"
 private const val IS_ALL_DAY_KEY = "isAllDay"
 private const val START_KEY = "start"
@@ -54,7 +55,7 @@ private val saver = mapSaver(
     save = {
         mapOf(
             TITLE_KEY to with(TextFieldState.Saver) { save(it.titleTextState) },
-            CALENDAR_ID_KEY to it.calendarId,
+            CALENDAR_KEY to it.calendar,
             EVENT_COLOR_KEY to it.eventColorState.value,
             IS_ALL_DAY_KEY to it.isAllDay.value,
             START_KEY to it.start,
@@ -75,7 +76,7 @@ private val saver = mapSaver(
         @Suppress("UNCHECKED_CAST")
         EventFormState(
             titleTextState = TextFieldState.Saver.restore(it[TITLE_KEY]!!)!!,
-            calendarId = it[CALENDAR_ID_KEY] as String,
+            calendar = it[CALENDAR_KEY] as EventDetailCalendar,
             eventColor = it[EVENT_COLOR_KEY] as EventColorChoice,
             isAllDay = it[IS_ALL_DAY_KEY] as Boolean,
             start = it[START_KEY] as LocalDateTime,

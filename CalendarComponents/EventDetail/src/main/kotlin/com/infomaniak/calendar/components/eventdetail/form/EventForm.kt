@@ -87,12 +87,10 @@ fun EventForm(
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
-    val calendar = state.calendar ?: return@ProvideEventSharedTransition
-
     Column(modifier.padding(contentPadding)) {
         val focusRequester = rememberInitialFocusRequester(shouldRequestFocus = { state.titleTextState.text.isEmpty() })
         TitleEditable(
-            dotColor = { state.eventColorState.value.getColor(calendar) },
+            dotColor = { state.eventColorState.value.getColor(state.calendar) },
             textFieldState = state.titleTextState,
             modifier = Modifier
                 .focusRequester(focusRequester)
@@ -172,7 +170,7 @@ fun EventForm(
             )
 
             CalendarEditable(
-                selectedCalendar = calendar,
+                selectedCalendar = state.calendar,
                 calendars = state.calendars,
                 onSelect = state::selectCalendar,
                 modifier = Modifier.eventSharedBounds(EventSharedElement.Calendar),

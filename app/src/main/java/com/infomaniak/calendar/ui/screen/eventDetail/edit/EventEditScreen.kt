@@ -126,7 +126,7 @@ private fun EventEditScreen(
             SubmitTopAppBar(
                 goBack = goBack,
                 onSubmit = onSubmit,
-                isSubmitEnabled = { (uiState as? EventEditScreenState.Success)?.eventFormState?.canSubmit == true },
+                isSubmitEnabled = { uiState is EventEditScreenState.Success },
                 isRecurring = (uiState as? EventEditScreenState.Success)?.isRecurring ?: false,
             )
         },

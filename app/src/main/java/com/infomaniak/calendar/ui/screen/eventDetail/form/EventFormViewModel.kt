@@ -103,7 +103,7 @@ import kotlinx.datetime.minus
         val endDate = if (event.isAllDay) end.date.minus(1, DateTimeUnit.DAY) else end.date
         formState = EventFormState(
             titleTextState = TextFieldState(event.title),
-            calendarId = event.calendar.id,
+            calendar = event.calendar,
             eventColor = event.eventColorChoice,
             isAllDay = event.isAllDay,
             start = start,

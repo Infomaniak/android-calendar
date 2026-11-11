@@ -101,7 +101,7 @@ private fun EventCreationScreen(
             SubmitTopAppBar(
                 goBack = goBack,
                 onSubmit = { onSubmit() },
-                isSubmitEnabled = { (formUiState() as? EventFormUiState.Loaded)?.formState?.canSubmit == true },
+                isSubmitEnabled = { formUiState() is EventFormUiState.Loaded },
                 isRecurring = false,
             )
         },
