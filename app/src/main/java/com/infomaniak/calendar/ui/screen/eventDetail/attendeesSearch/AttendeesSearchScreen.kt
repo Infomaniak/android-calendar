@@ -55,14 +55,15 @@ fun AttendeesSearchScreen(
     viewModel: AttendeesSearchViewModel = viewModel(),
     eventFormViewModel: EventFormViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
-    val formState = eventFormViewModel.formState ?: return
+    val formState = eventFormViewModel.formState ?: return // The parent provides it right away, so nothing to show
     val searchQueryTextFieldState = rememberTextFieldState()
     val attendeesSearchState = remember(formState) {
         AttendeesSearchState<OrganizerSource>(
             searchQueryTextFieldState = searchQueryTextFieldState,
             results = mutableStateListOf(),
             participants = formState.participants,
-        ).apply { organizerSource = formState.organizerSource }
+            organizerSource = formState.organizerSource,
+        )
     }
 
     viewModel.EnableSearch(attendeesSearchState)
@@ -116,6 +117,7 @@ private fun Preview() {
             attendeesSearchState = rememberSaveableAttendeesSearchState(
                 participants = remember { mutableStateSetOf<ParticipantUi>().apply { addAll(previewAttendees) } },
                 results = remember { mutableStateListOf<AttendeesSearchResult>().apply { addAll(previewAttendees) } },
+                organizerSource = null,
             ),
         )
     }

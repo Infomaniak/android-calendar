@@ -144,6 +144,7 @@ private fun Preview() {
             attendeesSearchState = rememberSaveableAttendeesSearchState(
                 participants = remember { mutableStateSetOf<ParticipantUi>().apply { addAll(previewAttendees) } },
                 results = remember { mutableStateListOf<AttendeesSearchResult>().apply { addAll(previewAttendees) } },
+                organizerSource = null,
             ),
             goBack = {},
             onSubmit = {},

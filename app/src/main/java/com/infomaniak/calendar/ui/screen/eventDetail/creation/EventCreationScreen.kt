@@ -71,7 +71,7 @@ fun EventCreationScreen(
 
     EventCreationScreen(
         uiState = uiState,
-        formUiState = eventFormViewModel.uiState,
+        formUiState = { eventFormViewModel.uiState },
         onSubmit = {
             val eventDraft = eventFormViewModel.formState?.toEventDraft() ?: return@EventCreationScreen
             if (viewModel.submitEvent(eventDraft)) goBack()
@@ -87,7 +87,7 @@ fun EventCreationScreen(
 @Composable
 private fun EventCreationScreen(
     uiState: EventCreationUiState,
-    formUiState: EventFormUiState,
+    formUiState: () -> EventFormUiState,
     onSubmit: () -> Unit,
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
@@ -102,7 +102,7 @@ private fun EventCreationScreen(
             SubmitTopAppBar(
                 goBack = goBack,
                 onSubmit = { onSubmit() },
-                isSubmitEnabled = { (formUiState as? EventFormUiState.Loaded)?.formState?.canSubmit == true },
+                isSubmitEnabled = { (formUiState() as? EventFormUiState.Loaded)?.formState?.canSubmit == true },
                 isRecurring = false,
             )
         },
@@ -115,10 +115,10 @@ private fun EventCreationScreen(
                 icon = EsdsIcons.CalendarCross,
                 modifier = Modifier.padding(contentPadding),
             )
-            is EventCreationUiState.Success -> when (formUiState) {
+            is EventCreationUiState.Success -> when (val uiState = formUiState()) {
                 EventFormUiState.Loading -> Unit
                 is EventFormUiState.Loaded -> EventForm(
-                    state = formUiState.formState,
+                    state = uiState.formState,
                     onAttendeesClick = goToEventsAttendees,
                     onTimeZoneClick = goToTimeZoneSearch,
                     onCustomReminderClick = goToCustomReminder,
@@ -140,7 +140,7 @@ private fun EventCreationScreenPreview() {
             uiState = EventCreationUiState.Success(
                 EventCreationCalendars(previewEventDetailCalendarGroups, previewEventDetailCalendar),
             ),
-            formUiState = EventFormUiState.Loaded(state),
+            formUiState = { EventFormUiState.Loaded(state) },
             onSubmit = {},
             goBack = {},
             goToEventsAttendees = {},
@@ -156,7 +156,7 @@ private fun PreviewEmptyWritableCalendar() {
     CalendarThemeForPreview {
         EventCreationScreen(
             uiState = EventCreationUiState.NoWritableCalendar,
-            formUiState = EventFormUiState.Loading,
+            formUiState = { EventFormUiState.Loading },
             onSubmit = {},
             goBack = {},
             goToEventsAttendees = {},

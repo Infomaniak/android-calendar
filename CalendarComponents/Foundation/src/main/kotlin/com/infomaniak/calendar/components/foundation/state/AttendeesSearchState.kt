@@ -47,9 +47,9 @@ class AttendeesSearchState<T : OrganizerSource>(
     val searchQueryTextFieldState: TextFieldState,
     val results: SnapshotStateList<AttendeesSearchResult>,
     val participants: SnapshotStateSet<ParticipantUi>,
+    organizerSource: T?,
 ) {
-    /** `null` until initialized by the screen. */
-    var organizerSource: T? by mutableStateOf(null)
+    var organizerSource: T? by mutableStateOf(organizerSource)
 
     private val me: AttendeeUi? by derivedStateOf { (organizerSource as? OrganizerSource.Dynamic)?.owner }
 
@@ -133,9 +133,8 @@ class AttendeesSearchState<T : OrganizerSource>(
             searchQueryTextFieldState = TextFieldState.Saver.restore(value[0]!!)!!,
             results = resultsSaver.restore(value[1]!!)!!,
             participants = participantsSaver.restore(value[2] as ArrayList<ParticipantUi>)!!,
-        ).apply {
-            organizerSource = value[3]?.let(organizerSourceSaver::restore)
-        }
+            organizerSource = value[3]?.let(organizerSourceSaver::restore),
+        )
     }
 
     companion object {
@@ -150,6 +149,7 @@ class AttendeesSearchState<T : OrganizerSource>(
  */
 @Composable
 fun rememberSaveableAttendeesSearchState(
+    organizerSource: OrganizerSource?,
     participants: SnapshotStateSet<ParticipantUi> = rememberSaveable { mutableStateSetOf() },
     results: SnapshotStateList<AttendeesSearchResult> = rememberSaveable { mutableStateListOf() },
     searchQuery: String = "",
@@ -158,5 +158,6 @@ fun rememberSaveableAttendeesSearchState(
         searchQueryTextFieldState = TextFieldState(initialText = searchQuery),
         results = results,
         participants = participants,
+        organizerSource = organizerSource,
     )
 }
