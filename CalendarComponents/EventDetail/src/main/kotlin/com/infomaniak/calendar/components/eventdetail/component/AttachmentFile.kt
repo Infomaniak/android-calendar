@@ -31,46 +31,48 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.core.ui.compose.theme.LocalIsThemeDarkMode
 
 @Composable
-internal fun AttachmentFiles(
-    files: List<EventDetailUi.File>,
+internal fun AttachmentFile(
+    file: EventDetailUi.File,
     onFileClick: (String) -> Unit,
     shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    files.forEach { file ->
-        ClickableItem(
-            shapes = shapes,
-            text = file.name,
-            leadingContent = {
-                val fileType = file.fileType
-                ItemIcon(fileType.icon, tint = fileType.color(LocalIsThemeDarkMode.current))
-            },
-            backgroundColor = ListItemDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceBright,
-            ),
-            onClick = { onFileClick(file.id) },
-            modifier = modifier,
-            contentPadding = contentPadding,
-            trailingContent = {},
-        )
-    }
+    ClickableItem(
+        shapes = shapes,
+        text = file.name,
+        leadingContent = {
+            val fileType = file.fileType
+            ItemIcon(fileType.icon, tint = fileType.color(LocalIsThemeDarkMode.current))
+        },
+        backgroundColor = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceBright,
+        ),
+        onClick = { onFileClick(file.id) },
+        modifier = modifier,
+        contentPadding = contentPadding,
+        trailingContent = {},
+    )
 }
 
 @Preview
 @Composable
-private fun PreviewAttachmentFiles() {
+private fun PreviewAttachmentFile() {
+    val files = listOf(
+        EventDetailUi.File("1", "How to not get fired.pdf"),
+        EventDetailUi.File("2", "Bob.txt"),
+        EventDetailUi.File("3", "Next loto results.png"),
+    )
+
     MaterialTheme {
         Surface {
-            AttachmentFiles(
-                files = listOf(
-                    EventDetailUi.File("1", "How to not get fired.pdf"),
-                    EventDetailUi.File("2", "Bob.txt"),
-                    EventDetailUi.File("3", "Next loto results.png"),
-                ),
-                onFileClick = {},
-                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
-            )
+            files.forEach { file ->
+                AttachmentFile(
+                    file = file,
+                    onFileClick = {},
+                    shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+                )
+            }
         }
     }
 }

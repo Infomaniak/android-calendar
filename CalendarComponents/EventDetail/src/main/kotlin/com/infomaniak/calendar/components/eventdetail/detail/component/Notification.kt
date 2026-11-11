@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.components.eventdetail.detail.component
 
-import android.R.attr.text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -49,33 +48,34 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 @Composable
-internal fun Notifications(
-    notifications: List<EventDetailUi.Notification>,
+internal fun Notification(
+    notification: EventDetailUi.Notification,
     onNotificationClick: () -> Unit,
     shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    notifications.forEach { notification ->
-        ClickableItem(
-            shapes = shapes,
-            text = stringResource(notification.type.label),
-            leadingIcon = notification.type.icon,
-            onClick = { onNotificationClick() },
-            contentPadding = contentPadding,
-            trailingContent = {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md)) {
-                    Text(
-                        text = notificationTimeText(notification.time),
-                        style = MaterialTheme.typography.labelLarge,
-                        textAlign = TextAlign.End,
-                        modifier = Modifier.fillMaxWidth(0.5f),
-                    )
-                }
-            },
-            modifier = modifier.reminderSharedBounds(notification),
-        )
-    }
+    ClickableItem(
+        shapes = shapes,
+        text = stringResource(notification.type.label),
+        leadingIcon = notification.type.icon,
+        onClick = { onNotificationClick() },
+        contentPadding = contentPadding,
+        trailingContent = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),
+            ) {
+                Text(
+                    text = notificationTimeText(notification.time),
+                    style = MaterialTheme.typography.labelLarge,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.fillMaxWidth(0.5f),
+                )
+            }
+        },
+        modifier = modifier.reminderSharedBounds(notification),
+    )
 }
 
 @Composable
@@ -95,13 +95,12 @@ internal fun notificationTimeText(time: NotificationTime): String {
 private fun PreviewAbsoluteNotification() {
     MaterialTheme {
         Surface {
-            Notifications(
-                notifications = listOf(
+            Notification(
+                notification =
                     EventDetailUi.Notification(
                         EventDetailUi.Notification.Type.Email,
                         NotificationTime.Absolute(Instant.parse("2026-05-20T07:00:00Z")),
                     ),
-                ),
                 onNotificationClick = {},
                 shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             )
@@ -114,12 +113,10 @@ private fun PreviewAbsoluteNotification() {
 private fun PreviewAbsoluteNotificationNextYear() {
     MaterialTheme {
         Surface {
-            Notifications(
-                notifications = listOf(
-                    EventDetailUi.Notification(
-                        EventDetailUi.Notification.Type.Email,
-                        NotificationTime.Absolute(Instant.parse("2027-05-20T07:00:00Z")),
-                    ),
+            Notification(
+                notification = EventDetailUi.Notification(
+                    EventDetailUi.Notification.Type.Email,
+                    NotificationTime.Absolute(Instant.parse("2027-05-20T07:00:00Z")),
                 ),
                 onNotificationClick = {},
                 shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
@@ -133,12 +130,10 @@ private fun PreviewAbsoluteNotificationNextYear() {
 private fun PreviewOffsetNotification() {
     MaterialTheme {
         Surface {
-            Notifications(
-                notifications = listOf(
-                    EventDetailUi.Notification(
-                        EventDetailUi.Notification.Type.Push,
-                        NotificationTime.Offset((-90).minutes),
-                    ),
+            Notification(
+                notification = EventDetailUi.Notification(
+                    EventDetailUi.Notification.Type.Push,
+                    NotificationTime.Offset((-90).minutes),
                 ),
                 onNotificationClick = {},
                 shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
@@ -152,12 +147,10 @@ private fun PreviewOffsetNotification() {
 private fun PreviewLongOffsetNotification() {
     MaterialTheme {
         Surface {
-            Notifications(
-                notifications = listOf(
-                    EventDetailUi.Notification(
-                        EventDetailUi.Notification.Type.Push,
-                        NotificationTime.Offset(90.days + 30.minutes),
-                    ),
+            Notification(
+                notification = EventDetailUi.Notification(
+                    EventDetailUi.Notification.Type.Push,
+                    NotificationTime.Offset(90.days + 30.minutes),
                 ),
                 onNotificationClick = {},
                 shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
@@ -171,12 +164,10 @@ private fun PreviewLongOffsetNotification() {
 private fun PreviewOffsetNotificationAtStart() {
     MaterialTheme {
         Surface {
-            Notifications(
-                notifications = listOf(
-                    EventDetailUi.Notification(
-                        EventDetailUi.Notification.Type.Push,
-                        NotificationTime.Offset((0).seconds),
-                    ),
+            Notification(
+                notification = EventDetailUi.Notification(
+                    EventDetailUi.Notification.Type.Push,
+                    NotificationTime.Offset((0).seconds),
                 ),
                 onNotificationClick = {},
                 shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),

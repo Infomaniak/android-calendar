@@ -31,7 +31,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
+import com.infomaniak.calendar.components.eventdetail.component.AttachmentFile
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.Calendar
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatus
@@ -44,7 +44,7 @@ import com.infomaniak.calendar.components.eventdetail.component.Title
 import com.infomaniak.calendar.components.eventdetail.component.item
 import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
-import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
+import com.infomaniak.calendar.components.eventdetail.detail.component.Notification
 import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
@@ -148,7 +148,7 @@ fun EventDetail(
 
                     files.forEach { file ->
                         item {
-                            AttachmentFiles(listOf(file), onFileClick = { /*TODO[eventDetail]*/ }, shapes = it)
+                            AttachmentFile(file, onFileClick = { /*TODO[eventDetail]*/ }, shapes = it)
                         }
                     }
                 }
@@ -156,12 +156,14 @@ fun EventDetail(
 
             if (notifications.isNotEmpty()) {
                 Section {
-                    item {
-                        Notifications(
-                            notifications = notifications,
-                            onNotificationClick = { /*TODO[eventDetail]*/ },
-                            shapes = it,
-                        )
+                    notifications.forEach { notification ->
+                        item {
+                            Notification(
+                                notification = notification,
+                                onNotificationClick = { /*TODO[eventDetail]*/ },
+                                shapes = it,
+                            )
+                        }
                     }
                 }
             }
