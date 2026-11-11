@@ -19,8 +19,6 @@ package com.infomaniak.calendar.components.foundation.models
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.Serializable
 
 @Parcelize
-@Serializable
 data class AvatarData(val url: String, val accountId: Long?) : Parcelable

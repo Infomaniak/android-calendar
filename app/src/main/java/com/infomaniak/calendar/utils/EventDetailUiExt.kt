@@ -17,7 +17,8 @@
  */
 package com.infomaniak.calendar.utils
 
-import com.infomaniak.calendar.components.eventdetail.form.EventFormValues
+import androidx.compose.foundation.text.input.TextFieldState
+import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
@@ -26,14 +27,14 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
 import kotlinx.datetime.minus
 
-fun EventDetailUi.toEventFormValues(): EventFormValues {
+fun EventDetailUi.toEventFormState(): EventFormState {
     val start = start.atTimeZone
     val end = end.atTimeZone
     // KMP ends an all-day event on the day after it, the form shows its last day
     val endDate = if (isAllDay) end.date.minus(1, DateTimeUnit.DAY) else end.date
 
-    return EventFormValues(
-        title = title,
+    return EventFormState(
+        titleTextState = TextFieldState(title),
         calendarId = calendar.id,
         eventColor = eventColorChoice,
         isAllDay = isAllDay,
@@ -48,6 +49,7 @@ fun EventDetailUi.toEventFormValues(): EventFormValues {
         notifications = notifications,
         isOccupied = isOccupied,
         isPublic = classification == EventDetailUi.Classification.Public,
+        calendars = calendars,
     )
 }
 

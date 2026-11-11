@@ -19,13 +19,10 @@ package com.infomaniak.calendar.components.foundation.models
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.Serializable
 
-@Serializable
 sealed interface ParticipantUi : Parcelable {
     /** The owner of the currently selected calendar, resolved through [toAttendeeUi]. */
     @Parcelize
-    @Serializable
     data object Me : ParticipantUi
 
     fun toAttendeeUi(me: AttendeeUi?): AttendeeUi? = when (this) {

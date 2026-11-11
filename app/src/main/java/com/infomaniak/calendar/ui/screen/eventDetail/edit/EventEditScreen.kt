@@ -21,6 +21,7 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -34,7 +35,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
-import com.infomaniak.calendar.components.eventdetail.form.EventFormValues
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
@@ -163,15 +163,13 @@ private fun Preview() {
     CalendarTheme {
         Surface {
             val formState = remember {
-                EventFormState(
-                    EventFormValues.default(
-                        calendar = previewEventDetailCalendar,
-                        date = Clock.today(),
-                        timeZone = TimeZone.currentSystemDefault(),
-                        eventDuration = 1.hours,
-                    ).copy(title = "Meeting on how to find funny preview titles"),
-                    previewEventDetailCalendarGroups,
-                )
+                EventFormState.default(
+                    calendar = previewEventDetailCalendar,
+                    date = Clock.today(),
+                    timeZone = TimeZone.currentSystemDefault(),
+                    eventDuration = 1.hours,
+                    calendars = previewEventDetailCalendarGroups,
+                ).apply { titleTextState.setTextAndPlaceCursorAtEnd("Meeting on how to find funny preview titles") }
             }
 
             EventEditScreen(

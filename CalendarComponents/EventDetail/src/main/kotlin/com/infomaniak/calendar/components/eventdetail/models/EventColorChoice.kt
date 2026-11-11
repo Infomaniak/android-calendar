@@ -21,22 +21,17 @@ import android.os.Parcelable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.infomaniak.calendar.components.eventdetail.utils.ColorParceler
-import com.infomaniak.calendar.components.eventdetail.utils.ColorSerializer
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
-import kotlinx.serialization.Serializable
 
 @Immutable
-@Serializable
 sealed interface EventColorChoice : Parcelable {
     @Parcelize
-    @Serializable
     data object Default : EventColorChoice
 
     @Parcelize
-    @Serializable
     @TypeParceler<Color, ColorParceler>
-    data class Custom(@Serializable(with = ColorSerializer::class) val color: Color) : EventColorChoice
+    data class Custom(val color: Color) : EventColorChoice
 
     fun getColor(calendar: EventDetailCalendar): Color = when (this) {
         is Default -> calendar.color

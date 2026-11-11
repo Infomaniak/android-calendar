@@ -19,19 +19,17 @@ package com.infomaniak.calendar.ui.screen.eventDetail.form
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import androidx.savedstate.SavedState
-import androidx.savedstate.read
-import androidx.savedstate.savedState
-import androidx.savedstate.serialization.decodeFromSavedState
-import androidx.savedstate.serialization.encodeToSavedState
+import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
+import androidx.lifecycle.viewmodel.compose.saveable
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
-import com.infomaniak.calendar.components.eventdetail.form.EventFormValues
+import com.infomaniak.calendar.components.eventdetail.form.Saver
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
@@ -39,7 +37,7 @@ import com.infomaniak.calendar.data.SettingsDataValues
 import com.infomaniak.calendar.ui.screen.eventDetail.EventCreationCalendarsUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.EventLoader
-import com.infomaniak.calendar.utils.toEventFormValues
+import com.infomaniak.calendar.utils.toEventFormState
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
@@ -57,11 +55,12 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 
 /**
- * Holds the [EventFormValues] of an event form, shared with the screens it opens through its ViewModelStore.
+ * Holds the [EventFormState] of an event form, shared with the screens it opens through its ViewModelStore.
  *
  * The form is saved as a whole in the [SavedStateHandle], so the screens it opens find it even when restored alone. The form's
  * screen initializes it: a restored form wins over the loaded one, and the calendars it can be put in are observed, never saved.
  */
+@OptIn(SavedStateHandleSaveableApi::class)
 @AssistedInject
 class EventFormViewModel(
     @Assisted private val savedStateHandle: SavedStateHandle,
@@ -69,22 +68,13 @@ class EventFormViewModel(
     private val eventCreationCalendarsUseCase: EventCreationCalendarsUseCase,
     private val settingsDataValues: SettingsDataValues,
 ) : ViewModel() {
-    var uiState: EventFormUiState by mutableStateOf(
-        savedStateHandle.restoredForm()?.let { EventFormUiState.Loaded(EventFormState(it, calendars = emptyList())) }
-            ?: EventFormUiState.Loading,
-    )
+    /** The form once loaded, for the screens it opens. */
+    var formState: EventFormState? by savedStateHandle.saveable(FORM_KEY, stateSaver = FormSaver) { mutableStateOf(null) }
         private set
 
-    /** The form once loaded, for the screens it opens. */
-    val formState: EventFormState? get() = (uiState as? EventFormUiState.Loaded)?.formState
+    val uiState: EventFormUiState get() = formState?.let(EventFormUiState::Loaded) ?: EventFormUiState.Loading
 
     private var isInitialized = false
-
-    init {
-        savedStateHandle.setSavedStateProvider(FORM_KEY) {
-            formState?.let { encodeToSavedState(EventFormValues.serializer(), it.toValues()) } ?: savedState()
-        }
-    }
 
     fun initCreation(date: LocalDate) {
         if (isInitialized) return
@@ -95,16 +85,12 @@ class EventFormViewModel(
             val creationCalendars = eventCreationCalendarsUseCase.creationCalendars.filterNotNull().first()
             val defaultEventDuration = settingsDataValues.defaultEventDuration.flow.first()
 
-            uiState = EventFormUiState.Loaded(
-                EventFormState(
-                    EventFormValues.default(
-                        calendar = creationCalendars.initialCalendar,
-                        date = date,
-                        timeZone = TimeZone.currentSystemDefault(),
-                        eventDuration = defaultEventDuration,
-                    ),
-                    creationCalendars.calendars,
-                ),
+            formState = EventFormState.default(
+                calendar = creationCalendars.initialCalendar,
+                date = date,
+                timeZone = TimeZone.currentSystemDefault(),
+                eventDuration = defaultEventDuration,
+                calendars = creationCalendars.calendars,
             )
         }
         viewModelScope.launch {
@@ -129,7 +115,7 @@ class EventFormViewModel(
     }
 
     private fun initForm(event: EventDetailUi) {
-        if (formState == null) uiState = EventFormUiState.Loaded(EventFormState(event.toEventFormValues(), event.calendars))
+        if (formState == null) formState = event.toEventFormState()
         updateCalendars(event.calendars, fallback = event.calendar)
     }
 
@@ -154,9 +140,9 @@ class EventFormViewModel(
     companion object {
         private const val FORM_KEY = "form"
 
-        private fun SavedStateHandle.restoredForm(): EventFormValues? {
-            val savedValues = get<SavedState>(FORM_KEY)?.takeUnless { it.read { isEmpty() } } ?: return null
-            return decodeFromSavedState(EventFormValues.serializer(), savedValues)
-        }
+        private val FormSaver = Saver<EventFormState?, Any>(
+            save = { formState -> formState?.let { with(EventFormState.Saver) { save(it) } } },
+            restore = EventFormState.Saver::restore,
+        )
     }
 }

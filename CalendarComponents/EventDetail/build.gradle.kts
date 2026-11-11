@@ -4,7 +4,6 @@ plugins {
     alias(core.plugins.compose.compiler)
     alias(core.plugins.infomaniak.android.library.flavor.aware)
     alias(core.plugins.kotlin.parcelize)
-    alias(core.plugins.kotlin.serialization)
 }
 
 val appCompileSdk: Int by rootProject.extra
@@ -56,7 +55,6 @@ dependencies {
     debugImplementation(core.compose.ui.tooling)
 
     implementation(kmpCalendar.kotlinx.datetime)
-    implementation(core.kotlinx.serialization.core)
 
     implementation(core.androidx.adaptive)
 }

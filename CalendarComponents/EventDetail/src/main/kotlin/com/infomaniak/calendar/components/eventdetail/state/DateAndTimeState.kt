@@ -219,7 +219,7 @@ private fun LocalDate.atHeightInTheMorning(timeZone: TimeZone, eventDuration: Du
     return start to end
 }
 
-private val TimeZoneSaver = Saver<TimeZone, String>(
+internal val TimeZoneSaver = Saver<TimeZone, String>(
     save = { it.id },
     restore = { TimeZone.of(it) },
 )

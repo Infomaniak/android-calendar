@@ -34,7 +34,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
-import com.infomaniak.calendar.components.eventdetail.form.EventFormValues
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.foundation.component.EmptyState
@@ -134,7 +133,15 @@ private fun EventCreationScreen(
 @Composable
 private fun EventCreationScreenPreview() {
     CalendarThemeForPreview {
-        val state = remember { EventFormState(previewEventForm, previewEventDetailCalendarGroups) }
+        val state = remember {
+            EventFormState.default(
+                calendar = previewEventDetailCalendar,
+                date = Clock.today(),
+                timeZone = TimeZone.currentSystemDefault(),
+                eventDuration = 1.hours,
+                calendars = previewEventDetailCalendarGroups,
+            )
+        }
 
         EventCreationScreen(
             uiState = EventCreationUiState.Success(
@@ -165,10 +172,3 @@ private fun PreviewEmptyWritableCalendar() {
         )
     }
 }
-
-private val previewEventForm = EventFormValues.default(
-    calendar = previewEventDetailCalendar,
-    date = Clock.today(),
-    timeZone = TimeZone.currentSystemDefault(),
-    eventDuration = 1.hours,
-)

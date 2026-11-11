@@ -27,7 +27,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.padding import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -129,8 +129,8 @@ fun EventForm(
             var isReminderOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
 
             ReminderItems(
-                notifications = state.notifications.value,
-                onRemove = { notification -> state.notifications.value -= notification },
+                notifications = state.notifications,
+                onRemove = { notification -> state.notifications.remove(notification) },
             )
 
             AddReminderButton(onClick = { isReminderOffsetDialogVisible = true })
@@ -140,9 +140,11 @@ fun EventForm(
                     selectedOffset = null,
                     onOffsetSelect = { offset ->
                         if (offset != null) {
-                            state.notifications.value += EventDetailUi.Notification(
-                                type = EventDetailUi.Notification.Type.Push,
-                                time = NotificationTime.Offset(offset),
+                            state.notifications.add(
+                                EventDetailUi.Notification(
+                                    type = EventDetailUi.Notification.Type.Push,
+                                    time = NotificationTime.Offset(offset),
+                                ),
                             )
                         }
                         isReminderOffsetDialogVisible = false
@@ -248,20 +250,18 @@ private fun Preview() {
     MaterialTheme {
         Surface {
             val state = remember {
-                EventFormState(
-                    EventFormValues.default(
-                        calendar = previewEventDetailCalendar,
-                        date = Clock.today(),
-                        timeZone = TimeZone.currentSystemDefault(),
-                        eventDuration = 1.hours,
-                    ).copy(
-                        title = "Event title",
-                        notifications = listOf(
-                            EventDetailUi.Notification(EventDetailUi.Notification.Type.Push, NotificationTime.Offset((-15).minutes)),
-                        ),
-                    ),
-                    previewEventDetailCalendarGroups,
-                )
+                EventFormState.default(
+                    calendar = previewEventDetailCalendar,
+                    date = Clock.today(),
+                    timeZone = TimeZone.currentSystemDefault(),
+                    eventDuration = 1.hours,
+                    calendars = previewEventDetailCalendarGroups,
+                ).apply {
+                    titleTextState.setTextAndPlaceCursorAtEnd("Event title")
+                    notifications.add(
+                        EventDetailUi.Notification(EventDetailUi.Notification.Type.Push, NotificationTime.Offset((-15).minutes)),
+                    )
+                }
             }
             EventForm(
                 state = state,

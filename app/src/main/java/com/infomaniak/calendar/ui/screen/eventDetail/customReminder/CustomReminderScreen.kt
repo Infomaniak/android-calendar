@@ -43,7 +43,7 @@ fun CustomReminderScreen(
 ) {
     CustomReminderScreen(
         onSubmit = { notification ->
-            eventFormViewModel.formState?.let { it.notifications.value += notification }
+            eventFormViewModel.formState?.notifications?.add(notification)
             goBack()
         },
         goBack = goBack,
