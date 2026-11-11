@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.form
 
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
@@ -30,15 +31,11 @@ import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.Saver
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.foundation.models.OrganizerSource.Static
 import com.infomaniak.calendar.data.SettingsDataValues
 import com.infomaniak.calendar.ui.screen.eventDetail.EventCreationCalendarsUseCase
-import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
-import com.infomaniak.calendar.ui.screen.eventDetail.EventLoader
-import com.infomaniak.calendar.utils.toEventFormState
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -46,13 +43,14 @@ import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
+import kotlinx.datetime.minus
 
 /**
  * Holds the [EventFormState] of an event form, shared with the screens it opens through its ViewModelStore.
@@ -62,9 +60,8 @@ import kotlinx.datetime.TimeZone
  */
 @OptIn(SavedStateHandleSaveableApi::class)
 @AssistedInject
-class EventFormViewModel(
+    class EventFormViewModel(
     @Assisted private val savedStateHandle: SavedStateHandle,
-    private val eventLoader: EventLoader,
     private val eventCreationCalendarsUseCase: EventCreationCalendarsUseCase,
     private val settingsDataValues: SettingsDataValues,
 ) : ViewModel() {
@@ -93,39 +90,35 @@ class EventFormViewModel(
                 calendars = creationCalendars.calendars,
             )
         }
-        viewModelScope.launch {
-            eventCreationCalendarsUseCase.creationCalendars.collect { creationCalendars ->
-                updateCalendars(creationCalendars?.calendars, fallback = creationCalendars?.initialCalendar)
-            }
-        }
     }
 
     /** @param event The edited event, already loaded by the event detail, kept up to date here afterwards. */
-    fun initEdition(occurrenceId: OccurrenceId, event: EventDetailUi) {
+    fun initEdition(event: EventDetailUi) {
         if (isInitialized) return
         isInitialized = true
 
-        initForm(event)
-        viewModelScope.launch {
-            eventLoader.eventDetailUi(eventLoader.eventAndCalendar(occurrenceId))
-                .filterIsInstance<EventDetailUiState.Displayable.Success>()
-                .map { it.eventDetail }
-                .collect(::initForm)
-        }
-    }
-
-    private fun initForm(event: EventDetailUi) {
-        if (formState == null) formState = event.toEventFormState()
-        updateCalendars(event.calendars, fallback = event.calendar)
-    }
-
-    /** Keeps the calendars up to date, moving the form to [fallback] when its calendar can't be written to anymore. */
-    private fun updateCalendars(calendars: List<EventDetailCalendarGroup>?, fallback: EventDetailCalendar?) {
-        val formState = formState ?: return
-        formState.calendars = calendars.orEmpty()
-        if (calendars == null || fallback == null) return
-
-        if (formState.calendar == null) formState.selectCalendar(fallback)
+        val start = event.start.atTimeZone
+        val end = event.end.atTimeZone
+        // KMP ends an all-day event on the day after it, the form shows its last day
+        val endDate = if (event.isAllDay) end.date.minus(1, DateTimeUnit.DAY) else end.date
+        formState = EventFormState(
+            titleTextState = TextFieldState(event.title),
+            calendarId = event.calendar.id,
+            eventColor = event.eventColorChoice,
+            isAllDay = event.isAllDay,
+            start = start,
+            startTimeZone = event.start.timeZone,
+            end = endDate.atTime(end.time),
+            endTimeZone = event.end.timeZone,
+            hasEndEverBeenTouched = false,
+            participants = event.attendees.all.toSet(),
+            organizerSource = Static(event.organizer),
+            isKMeetUrlEnabled = event.kMeetUrl != null,
+            notifications = event.notifications,
+            isOccupied = event.isOccupied,
+            isPublic = event.classification == EventDetailUi.Classification.Public,
+            calendars = event.calendars,
+        )
     }
 
     @AssistedFactory
@@ -146,3 +139,6 @@ class EventFormViewModel(
         )
     }
 }
+
+private val EventDetailTiming.timeZone: TimeZone
+    get() = (this as? EventDetailTiming.Precise)?.timeZone ?: TimeZone.currentSystemDefault()

@@ -64,7 +64,7 @@ class EventFormState(
     notifications: List<EventDetailUi.Notification>,
     isOccupied: Boolean,
     isPublic: Boolean,
-    calendars: List<EventDetailCalendarGroup>,
+    val calendars: List<EventDetailCalendarGroup>,
 ) {
     val eventColorState = mutableStateOf(eventColor)
     var calendarId by mutableStateOf(calendarId)
@@ -90,7 +90,6 @@ class EventFormState(
     val notifications = mutableStateListOf<EventDetailUi.Notification>().apply { addAll(notifications) }
     val isOccupied = mutableStateOf(isOccupied)
     val isPublic = mutableStateOf(isPublic)
-    var calendars by mutableStateOf(calendars)
 
     val calendar: EventDetailCalendar? get() = calendars.calendarOf(calendarId)
 

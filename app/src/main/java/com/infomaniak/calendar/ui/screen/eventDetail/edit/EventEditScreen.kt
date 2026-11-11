@@ -72,7 +72,7 @@ fun EventEditScreen(
 
     LaunchedEffect(Unit) {
         val event = eventDetailSharedDataViewModel.eventDetailUi.filterIsInstance<EventDetailUiState.Displayable.Success>().first()
-        eventFormViewModel.initEdition(occurrenceId, event.eventDetail)
+        eventFormViewModel.initEdition(event.eventDetail)
     }
 
     val formUiState = eventFormViewModel.uiState
