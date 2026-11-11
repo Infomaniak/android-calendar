@@ -55,6 +55,8 @@ class AttendeesSearchState<T : OrganizerSource>(
 
     val attendees: List<AttendeeUi> by derivedStateOf { participants.mapNotNull { it.toAttendeeUi(me) }.distinctBy { it.key } }
 
+    val alreadyPresentAttendees: Map<AttendeeUi.Key, AttendeeUi> by derivedStateOf { attendees.associateBy { it.key } }
+
     val attendeesEmailsLowercase by derivedStateOf { attendees.map { it.email.lowercase() } }
 
     fun addAttendee(attendee: AttendeeUi): AttendeeResult {

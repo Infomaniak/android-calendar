@@ -53,9 +53,10 @@ class AttendeesSearchViewModel(private val contactsManager: ContactsManager) : V
             attendeesSearchState.results.clear()
         } else {
             val results = contactsManager.search(query)
-            val alreadyPresentAttendees = attendeesSearchState.attendees.associateBy { it.key }
             attendeesSearchState.results.clear()
-            attendeesSearchState.results.addAll(results.toAttendeesUi(alreadyPresentAttendees) + AttendeesSearchResult.AddCustomAttendee)
+            attendeesSearchState.results.addAll(
+                results.toAttendeesUi(attendeesSearchState.alreadyPresentAttendees) + AttendeesSearchResult.AddCustomAttendee,
+            )
         }
     }
 }
