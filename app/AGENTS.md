@@ -150,7 +150,7 @@ app/
   `EventFormState` (also readable as `formState`, `null` until loaded), for a
   `NavDestination.EventForm.EventCreation` / `EventEdit`, in that destination's own store. `EventFormState` holds one state
   per field, like Material state holders: the title's `TextFieldState`, the participants' `SnapshotStateSet`, and a
-  `MutableState` for each other field (`dates` holds the pure `EventDates`). It is built from an `EventFormValues` (what the
+  `MutableState` for each other field, and the dates' `DateAndTimeState`. It is built from an `EventFormValues` (what the
   user filled in: an immutable, `@Serializable` value) and read back with `toValues()`, which gives the saved form. It also
   holds the calendars the form can be put in, from which it derives the selected `calendar`, `canSubmit` and `toEventDraft()`. The ViewModel saves `toValues()` as a whole under one `SavedStateHandle` key (`encodeToSavedState`), read
   live from the states when Android saves, and rebuilds the state from it when the ViewModel is created, so a child screen

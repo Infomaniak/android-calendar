@@ -59,6 +59,4 @@ dependencies {
     implementation(core.kotlinx.serialization.core)
 
     implementation(core.androidx.adaptive)
-
-    testImplementation(core.junit)
 }

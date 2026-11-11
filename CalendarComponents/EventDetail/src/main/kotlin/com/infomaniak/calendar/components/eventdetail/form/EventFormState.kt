@@ -27,9 +27,11 @@ import androidx.compose.runtime.setValue
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
+import kotlinx.datetime.atTime
 
 /**
  * The editable state of an event form, one state per field, starting from [values] and read back with [toValues].
@@ -43,7 +45,19 @@ class EventFormState(values: EventFormValues, calendars: List<EventDetailCalenda
     var calendarId by mutableStateOf(values.calendarId)
         private set
     val isAllDay = mutableStateOf(values.isAllDay)
-    var dates by mutableStateOf(values.dates)
+    val dateAndTimeState = DateAndTimeState(
+        start = DateAndTimeState.Entry(
+            date = mutableStateOf(values.start.date),
+            time = mutableStateOf(values.start.time),
+            timeZone = mutableStateOf(values.startTimeZone),
+        ),
+        end = DateAndTimeState.Entry(
+            date = mutableStateOf(values.end.date),
+            time = mutableStateOf(values.end.time),
+            timeZone = mutableStateOf(values.endTimeZone),
+        ),
+        hasEndEverBeenTouched = mutableStateOf(values.hasEndEverBeenTouched),
+    )
     val participants = mutableStateSetOf<ParticipantUi>().apply { addAll(values.participants) }
     /** [OrganizerSource.Dynamic] for a new event, which follows the selected calendar. */
     var organizerSource by mutableStateOf(values.organizerSource)
@@ -81,7 +95,11 @@ class EventFormState(values: EventFormValues, calendars: List<EventDetailCalenda
         calendarId = calendarId,
         eventColor = eventColorState.value,
         isAllDay = isAllDay.value,
-        dates = dates,
+        start = dateAndTimeState.start.date.atTime(dateAndTimeState.start.time),
+        startTimeZone = dateAndTimeState.start.timeZone,
+        end = dateAndTimeState.end.date.atTime(dateAndTimeState.end.time),
+        endTimeZone = dateAndTimeState.end.timeZone,
+        hasEndEverBeenTouched = dateAndTimeState.hasEndEverBeenTouched.value,
         participants = participants.toSet(),
         organizerSource = organizerSource,
         isKMeetUrlEnabled = isKMeetUrlEnabled.value,

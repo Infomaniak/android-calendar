@@ -25,17 +25,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
-import com.infomaniak.calendar.components.eventdetail.form.EventDateTime
-import com.infomaniak.calendar.components.eventdetail.form.EventDates
+import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
+import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRangeWithZone
@@ -95,32 +92,39 @@ internal fun DateAndTime(
     )
 }
 
+/**
+ * [dateAndTimeState] can be null so it can be initialized in two steps after the data has been read from disk. The item will be
+ * empty but still take its final size as to not create a jarring experience when the data loads in dynamically.
+ */
 @Composable
 internal fun DateAndTimeEditable(
-    dates: EventDates,
+    dateAndTimeState: DateAndTimeState?,
     isAllDay: () -> Boolean,
-    onDatePicked: (isStart: Boolean, LocalDate) -> Unit,
-    onTimePicked: (isStart: Boolean, LocalTime) -> Unit,
     onTimeZoneClick: (isStart: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val shouldDisplay = dateAndTimeState != null
+    val dateAndTimeState = dateAndTimeState ?: DateAndTimeState.Dummy
+
     Column(
-        modifier = modifier.padding(horizontal = EsdsTheme.spacing.xs),
+        modifier = modifier
+            .alpha(if (shouldDisplay) 1f else 0f)
+            .padding(horizontal = EsdsTheme.spacing.xs),
         verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
     ) {
-        with(dates) {
+        with(dateAndTimeState) {
             DateAndTimeEntry(
                 entry = start,
                 isAllDay = isAllDay,
-                onDatePicked = { onDatePicked(true, it) },
-                onTimePicked = { onTimePicked(true, it) },
+                onDatePicked = { start.pickDate(it) },
+                onTimePicked = { start.pickTime(it) },
                 onTimeZoneClick = { onTimeZoneClick(true) },
             )
             DateAndTimeEntry(
                 entry = end,
                 isAllDay = isAllDay,
-                onDatePicked = { onDatePicked(false, it) },
-                onTimePicked = { onTimePicked(false, it) },
+                onDatePicked = { end.pickDate(it) },
+                onTimePicked = { end.pickTime(it) },
                 onTimeZoneClick = { onTimeZoneClick(false) },
             )
         }
@@ -207,19 +211,16 @@ private fun PreviewDateAndTime() {
 private fun PreviewEditable() {
     MaterialTheme {
         Surface {
-            var dates by remember {
-                mutableStateOf(
-                    EventDates(
-                        start = EventDateTime(LocalDate(2026, 5, 20), LocalTime(8, 10), TimeZone.currentSystemDefault()),
-                        end = EventDateTime(LocalDate(2026, 5, 20), LocalTime(9, 0), TimeZone.currentSystemDefault()),
-                    ),
-                )
-            }
             DateAndTimeEditable(
-                dates = dates,
+                dateAndTimeState = rememberDateAndTimeState(
+                    startDate = LocalDate(2026, 5, 20),
+                    startTime = LocalTime(8, 10),
+                    startTimeZone = TimeZone.currentSystemDefault(),
+                    endDate = LocalDate(2026, 5, 20),
+                    endTime = LocalTime(9, 0),
+                    endTimeZone = TimeZone.currentSystemDefault(),
+                ),
                 isAllDay = { false },
-                onDatePicked = { isStart, date -> dates = dates.pickDate(isStart, date) },
-                onTimePicked = { isStart, time -> dates = dates.pickTime(isStart, time) },
                 onTimeZoneClick = {},
             )
         }

@@ -17,14 +17,13 @@
  */
 package com.infomaniak.calendar.utils
 
-import com.infomaniak.calendar.components.eventdetail.form.EventDateTime
-import com.infomaniak.calendar.components.eventdetail.form.EventDates
 import com.infomaniak.calendar.components.eventdetail.form.EventFormValues
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
 import kotlinx.datetime.minus
 
 fun EventDetailUi.toEventFormValues(): EventFormValues {
@@ -38,10 +37,11 @@ fun EventDetailUi.toEventFormValues(): EventFormValues {
         calendarId = calendar.id,
         eventColor = eventColorChoice,
         isAllDay = isAllDay,
-        dates = EventDates(
-            start = EventDateTime(start.date, start.time, this.start.timeZone),
-            end = EventDateTime(endDate, end.time, this.end.timeZone),
-        ),
+        start = start,
+        startTimeZone = this.start.timeZone,
+        end = endDate.atTime(end.time),
+        endTimeZone = this.end.timeZone,
+        hasEndEverBeenTouched = false,
         participants = attendees.all.toSet(),
         organizerSource = OrganizerSource.Static(organizer),
         isKMeetUrlEnabled = kMeetUrl != null,

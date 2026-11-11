@@ -44,7 +44,7 @@ fun TimeZoneSearchScreen(
 ) {
     TimeZoneSearchScreen(
         onTimeZoneSelected = { timeZone ->
-            eventFormViewModel.formState?.let { it.dates = it.dates.pickTimeZone(isStart, timeZone) }
+            eventFormViewModel.formState?.dateAndTimeState?.run { (if (isStart) start else end).pickTimeZone(timeZone) }
             goBack()
         },
         goBack = goBack,

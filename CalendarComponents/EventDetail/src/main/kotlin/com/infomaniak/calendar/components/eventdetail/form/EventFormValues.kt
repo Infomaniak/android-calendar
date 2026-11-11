@@ -23,11 +23,14 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
+import com.infomaniak.calendar.components.eventdetail.state.computeDefaultValues
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.serializers.TimeZoneSerializer
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 
@@ -39,7 +42,11 @@ data class EventFormValues(
     val calendarId: String,
     val eventColor: EventColorChoice,
     val isAllDay: Boolean,
-    val dates: EventDates,
+    val start: LocalDateTime,
+    @Serializable(with = TimeZoneSerializer::class) val startTimeZone: TimeZone,
+    val end: LocalDateTime,
+    @Serializable(with = TimeZoneSerializer::class) val endTimeZone: TimeZone,
+    val hasEndEverBeenTouched: Boolean,
     val participants: Set<ParticipantUi>,
     /** [OrganizerSource.Dynamic] for a new event, which follows the selected calendar. */
     val organizerSource: OrganizerSource?,
@@ -59,10 +66,10 @@ data class EventFormValues(
         color = eventColor.getColor(calendar),
         calendarId = calendarId,
         isAllDay = isAllDay,
-        start = dates.start.dateTime,
-        startTimeZone = dates.start.timeZone,
-        end = dates.end.dateTime,
-        endTimeZone = dates.end.timeZone,
+        start = start,
+        startTimeZone = startTimeZone,
+        end = end,
+        endTimeZone = endTimeZone,
         attendees = attendees,
         initialOrganizer = (organizerSource as? OrganizerSource.Static)?.organizer,
         isKMeetUrlEnabled = isKMeetUrlEnabled,
@@ -73,19 +80,27 @@ data class EventFormValues(
 
     companion object {
         /** A new event on [date] in [calendar], lasting [eventDuration]. */
-        fun default(calendar: EventDetailCalendar, date: LocalDate, timeZone: TimeZone, eventDuration: Duration) = EventFormValues(
-            title = "",
-            calendarId = calendar.id,
-            eventColor = EventColorChoice.Default,
-            isAllDay = false,
-            dates = EventDates.default(date, timeZone, eventDuration),
-            participants = emptySet(),
-            organizerSource = calendar.organizerAttendeeUi?.let(OrganizerSource::Dynamic),
-            isKMeetUrlEnabled = false,
-            notifications = emptyList(),
-            isOccupied = true,
-            isPublic = true,
-        )
+        fun default(calendar: EventDetailCalendar, date: LocalDate, timeZone: TimeZone, eventDuration: Duration): EventFormValues {
+            val (start, end) = computeDefaultValues(date, timeZone, eventDuration)
+
+            return EventFormValues(
+                title = "",
+                calendarId = calendar.id,
+                eventColor = EventColorChoice.Default,
+                isAllDay = false,
+                start = start,
+                startTimeZone = timeZone,
+                end = end,
+                endTimeZone = timeZone,
+                hasEndEverBeenTouched = false,
+                participants = emptySet(),
+                organizerSource = calendar.organizerAttendeeUi?.let(OrganizerSource::Dynamic),
+                isKMeetUrlEnabled = false,
+                notifications = emptyList(),
+                isOccupied = true,
+                isPublic = true,
+            )
+        }
     }
 }
 

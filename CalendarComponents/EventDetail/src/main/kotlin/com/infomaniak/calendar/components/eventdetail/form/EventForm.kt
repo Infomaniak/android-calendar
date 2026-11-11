@@ -105,10 +105,8 @@ fun EventForm(
         )
 
         DateAndTimeEditable(
-            dates = state.dates,
+            dateAndTimeState = state.dateAndTimeState,
             isAllDay = state.isAllDay::value,
-            onDatePicked = { isStart, date -> state.dates = state.dates.pickDate(isStart, date) },
-            onTimePicked = { isStart, time -> state.dates = state.dates.pickTime(isStart, time) },
             onTimeZoneClick = onTimeZoneClick,
             modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
         )
