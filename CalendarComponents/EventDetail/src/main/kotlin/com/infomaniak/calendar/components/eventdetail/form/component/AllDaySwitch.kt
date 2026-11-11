@@ -31,6 +31,7 @@ import com.infomaniak.calendar.components.eventdetail.component.items.ListItemSw
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Calendar
+import com.infomaniak.designsystem.icons.symbols.Clock
 
 @Composable
 internal fun AllDaySwitch(
@@ -44,7 +45,7 @@ internal fun AllDaySwitch(
         onCheckedChange = onCheckedChange,
         modifier = modifier,
         shapes = shapes,
-        leadingContent = { Icon(EsdsIcons.Calendar.Small, contentDescription = null) },
+        leadingContent = { Icon(EsdsIcons.Clock.Small, contentDescription = null) },
     ) {
         Text(stringResource(id = R.string.notificationAllDay))
     }

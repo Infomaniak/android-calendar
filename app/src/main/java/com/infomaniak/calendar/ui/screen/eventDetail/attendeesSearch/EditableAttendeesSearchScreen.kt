@@ -21,9 +21,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -65,28 +67,54 @@ fun EditableAttendeesSearchScreen(
 ) {
     val attendeesSearchUi by sharedViewModel.attendeesSearchState.collectAsStateWithLifecycle()
 
-    if (config.canEdit) sharedViewModel.EnableSearch()
-
     Box(modifier = modifier.fillMaxSize()) {
         when (val attendeesSearchState = attendeesSearchUi) {
             AttendeesSearchUiState.Loading -> Unit // The parent provides it right away, so nothing to show
-            is AttendeesSearchUiState.Success -> EditableAttendeesSearchScreen(
-                attendeesSearchState = attendeesSearchState.state,
-                config = config,
-                onSubmit = { scope ->
-                    val isSuccess = viewModel.updateAttendees(
-                        occurrenceId = config.occurrenceId,
-                        attendeesUpdatePayload = AttendeesUpdatePayload(
-                            attendees = attendeesSearchState.state.attendees,
-                            organizer = (attendeesSearchState.state.organizerSource as? OrganizerSource.Static)?.organizer,
-                            calendarId = CalendarId(config.calendarId),
-                        ),
-                        scope = scope,
-                    )
-                    if (isSuccess) goBack()
-                },
-                goBack = goBack,
-            )
+            is AttendeesSearchUiState.Success -> {
+                // initialize the search state for this screen since if the user goes back without confirming nothing needs to be
+                // saved
+                val attendeesSearchState = rememberEditableAttendeesSearchState(attendeesSearchState.state)
+                if (config.canEdit) sharedViewModel.EnableSearch()
+
+                LaunchedEffect(attendeesSearchState) {
+                    sharedViewModel.setAttendeesSearchState(attendeesSearchState)
+                }
+
+                EditableAttendeesSearchScreen(
+                    attendeesSearchState = attendeesSearchState,
+                    config = config,
+                    onSubmit = { scope ->
+                        val isSuccess = viewModel.updateAttendees(
+                            occurrenceId = config.occurrenceId,
+                            attendeesUpdatePayload = AttendeesUpdatePayload(
+                                attendees = attendeesSearchState.attendees,
+                                organizer = (attendeesSearchState.organizerSource as? OrganizerSource.Static)?.organizer,
+                                calendarId = CalendarId(config.calendarId),
+                            ),
+                            scope = scope,
+                        )
+                        if (isSuccess) goBack()
+                    },
+                    goBack = goBack,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun rememberEditableAttendeesSearchState(
+    source: AttendeesSearchState<*>,
+): AttendeesSearchState<OrganizerSource> {
+    return rememberSaveable(saver = AttendeesSearchState.Saver()) {
+        AttendeesSearchState<OrganizerSource>(
+            searchQueryTextFieldState = TextFieldState(),
+            results = mutableStateListOf(),
+            participants = mutableStateSetOf<ParticipantUi>().apply {
+                addAll(source.participants)
+            },
+        ).apply {
+            organizerSource = source.organizerSource
         }
     }
 }

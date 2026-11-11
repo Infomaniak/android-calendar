@@ -19,6 +19,8 @@ package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -42,11 +44,14 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Calendar
 
 @Composable
 internal fun Calendar(calendarColor: Color, calendarName: String, modifier: Modifier = Modifier) {
     ListItem(
         content = { Text(stringResource(id = R.string.sectionCalendarHeader)) },
+        leadingContent = { Icon(EsdsIcons.Calendar.Small, contentDescription = null) },
         trailingContent = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -71,7 +76,12 @@ internal fun CalendarEditable(
 
     DropDownItem(
         onClick = { isDialogVisible = true },
-        content = { Text(stringResource(id = R.string.sectionCalendarHeader)) },
+        content = {
+            Row (verticalAlignment = Alignment.CenterVertically) {
+                Icon(EsdsIcons.Calendar.Small, contentDescription = null)
+                Text(stringResource(id = R.string.sectionCalendarHeader), modifier = Modifier.padding(start = EsdsTheme.spacing.lg))
+            }
+        },
         trailingContent = {
             CalendarDot(selectedCalendar.color)
             Text(text = selectedCalendar.name, style = MaterialTheme.typography.labelLarge)
