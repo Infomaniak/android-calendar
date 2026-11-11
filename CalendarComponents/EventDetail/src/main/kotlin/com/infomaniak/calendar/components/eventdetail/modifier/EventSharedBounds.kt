@@ -24,6 +24,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 
 /**
  * Helper based on [ProvideEventSharedTransition]. Mimics the standard compose sharedBounds modifier.
@@ -38,6 +39,16 @@ internal fun Modifier.eventSharedBounds(element: EventSharedElement): Modifier {
             animatedVisibilityScope = transition.animatedVisibilityScope,
         )
     }
+}
+
+/**
+ * [eventSharedBounds] for a reminder, matched through its stored alarm. Reminders added in the form have none, and aren't
+ * shared with the detail anyway.
+ */
+@Composable
+internal fun Modifier.reminderSharedBounds(notification: EventDetailUi.Notification): Modifier {
+    val sourceId = notification.sourceId ?: return this
+    return eventSharedBounds(EventSharedElement.Reminder(sourceId))
 }
 
 /**
@@ -76,18 +87,20 @@ internal fun ProvideEventSharedTransition(
     CompositionLocalProvider(LocalEventSharedTransition provides transition, content = content)
 }
 
-internal enum class EventSharedElement {
-    Title,
-    DateAndTime,
-    Attendees,
-    KMeet,
-    OccupiedStatus,
-    ClassificationStatus,
-    Calendar,
-    Divider1,
-    Divider2,
-    Divider3,
-    Divider4,
+internal sealed interface EventSharedElement {
+    data object Title : EventSharedElement
+    data object DateAndTime : EventSharedElement
+    data object Attendees : EventSharedElement
+    data object KMeet : EventSharedElement
+    data object OccupiedStatus : EventSharedElement
+    data object ClassificationStatus : EventSharedElement
+    data object Calendar : EventSharedElement
+    data object Divider1 : EventSharedElement
+    data object Divider2 : EventSharedElement
+    data object Divider3 : EventSharedElement
+    data object Divider4 : EventSharedElement
+
+    data class Reminder(val id: String) : EventSharedElement
 }
 
 private data class EventSharedTransition(

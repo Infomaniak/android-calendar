@@ -62,6 +62,7 @@ import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElemen
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
+import com.infomaniak.calendar.components.eventdetail.modifier.reminderSharedBounds
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
@@ -216,7 +217,11 @@ private fun AnimatedReminderItem(
         enter = expandVertically() + fadeIn(),
         exit = shrinkVertically() + fadeOut(),
     ) {
-        ReminderItem(notification = notification, onRemoveClick = onRemoveClick)
+        ReminderItem(
+            notification = notification,
+            onRemoveClick = onRemoveClick,
+            modifier = Modifier.reminderSharedBounds(notification),
+        )
     }
 
     LaunchedEffect(visibility.isIdle) {
