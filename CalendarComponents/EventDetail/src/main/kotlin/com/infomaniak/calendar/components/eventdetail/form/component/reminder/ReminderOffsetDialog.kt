@@ -26,7 +26,6 @@ import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
@@ -60,7 +59,6 @@ internal fun ReminderOffsetDialog(
     onOffsetSelect: (offset: Duration?) -> Unit,
     onCustomClick: () -> Unit,
     onDismissRequest: () -> Unit,
-    shapes: ListItemShapes,
 ) {
     BasicAlertDialog(onDismissRequest = onDismissRequest) {
         Surface(
@@ -84,7 +82,6 @@ internal fun ReminderOffsetDialog(
                         onClick = { onOffsetSelect(offset) },
                         trailingContent = { RadioButton(selected = isSelected, onClick = null) },
                         colors = colors,
-                        shapes = shapes,
                     ) {
                         offset?.let { Text(it.formatDurationOffset()) } ?: Text(stringResource(R.string.alarmOffsetNone))
                     }
@@ -107,7 +104,6 @@ private fun Preview() {
             onOffsetSelect = {},
             onCustomClick = {},
             onDismissRequest = {},
-            shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
         )
     }
 }

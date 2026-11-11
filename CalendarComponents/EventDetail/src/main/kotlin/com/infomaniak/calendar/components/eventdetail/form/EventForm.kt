@@ -149,6 +149,26 @@ fun EventForm(
         }
 
         var isReminderOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
+        if (isReminderOffsetDialogVisible) {
+            ReminderOffsetDialog(
+                selectedOffset = null,
+                onOffsetSelect = { offset ->
+                    if (offset != null) {
+                        state.notifications.value += EventDetailUi.Notification(
+                            type = EventDetailUi.Notification.Type.Push,
+                            time = NotificationTime.Offset(offset),
+                        )
+                    }
+                    isReminderOffsetDialogVisible = false
+                },
+                onCustomClick = {
+                    isReminderOffsetDialogVisible = false
+                    onCustomReminderClick()
+                },
+                onDismissRequest = { isReminderOffsetDialogVisible = false },
+            )
+        }
+
         Section(Modifier.animateContentSize()) {
             state.notifications.value.forEach { notification ->
                 item {
@@ -163,29 +183,6 @@ fun EventForm(
 
             item {
                 AddReminderButton(onClick = { isReminderOffsetDialogVisible = true }, shapes = it)
-            }
-
-            if (isReminderOffsetDialogVisible) {
-                item {
-                    ReminderOffsetDialog(
-                        selectedOffset = null,
-                        onOffsetSelect = { offset ->
-                            if (offset != null) {
-                                state.notifications.value += EventDetailUi.Notification(
-                                    type = EventDetailUi.Notification.Type.Push,
-                                    time = NotificationTime.Offset(offset),
-                                )
-                            }
-                            isReminderOffsetDialogVisible = false
-                        },
-                        onCustomClick = {
-                            isReminderOffsetDialogVisible = false
-                            onCustomReminderClick()
-                        },
-                        onDismissRequest = { isReminderOffsetDialogVisible = false },
-                        shapes = it,
-                    )
-                }
             }
         }
 
