@@ -110,7 +110,7 @@ private fun baseEntryProvider(
     when (destination) {
         is NavDestination.CalendarView.Planning -> NavEntry(destination, metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
             PlanningScreen(
-                goToEventCreation = { backStack.addOnce(NavDestination.EventCreation(it)) },
+                goToEventCreation = { backStack.addOnce(NavDestination.EventForm.EventCreation(it)) },
                 goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) },
             )
         }
@@ -135,7 +135,7 @@ private fun baseEntryProvider(
             MonthScreen()
         }
 
-        is NavDestination.EventCreation -> NavEntry(
+        is NavDestination.EventForm.EventCreation -> NavEntry(
             key = destination,
             contentKey = destination.toContentKey(),
             metadata = metaDataOf(ResponsiveDialog),
@@ -144,8 +144,10 @@ private fun baseEntryProvider(
                 date = destination.date,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
                 goToEventsAttendees = { backStack.addOnce(NavDestination.AttendeeSearch(parent = destination)) },
-                goToTimeZoneSearch = { isStart -> backStack.addOnce(NavDestination.EventTimeZone(destination, isStart)) },
-                goToCustomReminder = { backStack.addOnce(NavDestination.EventCustomReminder(destination)) },
+                goToTimeZoneSearch = { isStart ->
+                    backStack.addOnce(NavDestination.EventForm.EventTimeZone(destination, isStart))
+                },
+                goToCustomReminder = { backStack.addOnce(NavDestination.EventForm.EventCustomReminder(destination)) },
             )
         }
 
@@ -157,14 +159,14 @@ private fun baseEntryProvider(
             EventDetailScreen(
                 occurrenceId = destination.occurrenceId,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
-                goToEdit = { backStack.addOnce(NavDestination.EventEdit(destination.occurrenceId)) },
+                goToEdit = { backStack.addOnce(NavDestination.EventForm.EventEdit(destination.occurrenceId)) },
                 goToEventAttendees = { config ->
-                    backStack.addOnce(NavDestination.EditableAttendeeSearch(parent = destination, config = config))
+                    backStack.addOnce(NavDestination.EventForm.EditableAttendeeSearch(parent = destination, config = config))
                 },
             )
         }
 
-        is NavDestination.EventEdit -> NavEntry(
+        is NavDestination.EventForm.EventEdit -> NavEntry(
             key = destination,
             contentKey = destination.toContentKey(),
             metadata = metaDataOf(
@@ -177,8 +179,10 @@ private fun baseEntryProvider(
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
                 goBackToCalendarView = { backStack.popUntilCalendarView(defaultCalendarView) },
                 goToEventAttendees = { backStack.addOnce(NavDestination.AttendeeSearch(parent = destination)) },
-                goToTimeZoneSearch = { isStart -> backStack.addOnce(NavDestination.EventTimeZone(destination, isStart)) },
-                goToCustomReminder = { backStack.addOnce(NavDestination.EventCustomReminder(destination)) },
+                goToTimeZoneSearch = { isStart ->
+                    backStack.addOnce(NavDestination.EventForm.EventTimeZone(destination, isStart))
+                },
+                goToCustomReminder = { backStack.addOnce(NavDestination.EventForm.EventCustomReminder(destination)) },
             )
         }
 
@@ -191,7 +195,7 @@ private fun baseEntryProvider(
             )
         }
 
-        is NavDestination.EditableAttendeeSearch -> NavEntry(
+        is NavDestination.EventForm.EditableAttendeeSearch -> NavEntry(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
@@ -201,7 +205,7 @@ private fun baseEntryProvider(
             )
         }
 
-        is NavDestination.EventTimeZone -> NavEntry(
+        is NavDestination.EventForm.EventTimeZone -> NavEntry(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
@@ -211,7 +215,7 @@ private fun baseEntryProvider(
             )
         }
 
-        is NavDestination.EventCustomReminder -> NavEntry(
+        is NavDestination.EventForm.EventCustomReminder -> NavEntry(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
@@ -308,7 +312,9 @@ private fun sceneDecoratorStrategies(
                     floatingActionButton = {
                         CalendarFab(
                             onClick = {
-                                backStack.addOnce(NavDestination.EventCreation(visibleDayState?.visibleDate ?: Clock.today()))
+                                backStack.addOnce(
+                                    NavDestination.EventForm.EventCreation(visibleDayState?.visibleDate ?: Clock.today()),
+                                )
                             },
                             modifier = Modifier.fillMaxSize(),
                         )

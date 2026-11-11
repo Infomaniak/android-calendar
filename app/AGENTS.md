@@ -56,7 +56,7 @@ app/src/main/java/com/infomaniak/calendar/
     │                              # UserCalendarsUi / CalendarSectionUi / CalendarUi / CalendarColorsUi, the calendars as the drawer and other views draw them
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
-    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, AttendeeSearch(parent: EventForm), EditableAttendeeSearch(parent, config), EventTimeZone(parent: EventForm, isStart), EventCustomReminder(parent: EventForm), Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
+    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventDetail, AttendeeSearch(parent: EventForm), EventForm.{EventCreation, EventEdit, EditableAttendeeSearch(parent, config), EventTimeZone(parent, isStart), EventCustomReminder(parent)}, Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
     │   ├── SharedViewModelStores.kt # `toContentKey` and the `shareViewModelStoreWith(parent)` metadata
     │   ├── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
@@ -149,7 +149,7 @@ app/
 - **Event form state**: `EventFormViewModel` exposes an `EventFormUiState`, `Loading` then `Loaded` with an
   `EventFormState` around the `EventFormValues` (what the user filled in, participants and organizer included: an
   immutable, `@Serializable` value, only changed through `EventFormState.edit { it.copy(…) }`), and the calendars it can be
-  put in, for a `NavDestination.EventForm` (`EventCreation` / `EventEdit`), in that destination's own store. The form is
+  put in, for a `NavDestination.EventForm.EventCreation` / `EventEdit`, in that destination's own store. The form is
   saved as a whole under one `SavedStateHandle` key (`encodeToSavedState`) and read back when the ViewModel is created, so a
   child screen restored alone after a process death still gets it. The form's screen initializes it with `initCreation(date)`
   / `initEdition(occurrenceId, loadedEvent)`, which only run once per ViewModel instance; a restored form wins over the loaded
@@ -169,7 +169,7 @@ app/
   composable reading `EventFormViewModel` from its parent's store (`viewModel(LocalSharedViewModelStoreOwner.current)` as a
   default parameter; its `uiState` is `EventFormUiState.Loading` until the form is `Loaded`, and `edit` does nothing meanwhile),
   and a private stateless one taking initial values, keeping its own draft until submitted, and reporting it through
-  `onSubmit`-like callbacks before calling `goBack`. The public one writes the result back through `EventFormState.edit`. Their key carries `parent: NavDestination.EventForm` (plus navigation-only arguments such as `isStart`), which only
+  `onSubmit`-like callbacks before calling `goBack`. The public one writes the result back through `EventFormState.edit`. Their key carries the form's destination as `parent` (plus navigation-only arguments such as `isStart`), which only
   selects the store they share.
 - **DI**: Metro `@DependencyGraph` (`AppGraph`) scoped to `AppScope`. ViewModels are auto-registered
   via multibinding (`@ContributesIntoMap` + `@ViewModelKey`) and resolved through the `metrox-viewmodel`
