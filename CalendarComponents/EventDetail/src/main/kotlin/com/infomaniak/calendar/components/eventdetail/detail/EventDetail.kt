@@ -146,10 +146,11 @@ fun EventDetail(
                         }
                     }
 
-                    item {
-                        AttachmentFiles(files, onFileClick = { /*TODO[eventDetail]*/ }, shapes = it)
+                    files.forEach { file ->
+                        item {
+                            AttachmentFiles(listOf(file), onFileClick = { /*TODO[eventDetail]*/ }, shapes = it)
+                        }
                     }
-
                 }
             }
 
