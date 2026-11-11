@@ -23,7 +23,6 @@ import com.infomaniak.calendar.BuildConfig
 import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.ui.model.UserCalendarsUi
-import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarEditData
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
@@ -50,7 +49,7 @@ class MenuDrawerViewModel(
 
     fun onCalendarVisibilityChanged(calendarId: CalendarId, isVisible: Boolean) {
         viewModelScope.launch {
-            calendarManager.updateCalendar(calendarId, edit = CalendarEditData(isVisible = isVisible))
+            calendarManager.updateCalendarVisibility(calendarId, isVisible)
         }
     }
 
