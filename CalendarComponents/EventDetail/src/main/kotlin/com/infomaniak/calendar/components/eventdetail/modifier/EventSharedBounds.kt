@@ -100,7 +100,7 @@ internal sealed interface EventSharedElement {
     data object Divider3 : EventSharedElement
     data object Divider4 : EventSharedElement
 
-    data class Reminder(val sourceId: String) : EventSharedElement
+    data class Reminder(val id: String) : EventSharedElement
 }
 
 private data class EventSharedTransition(
