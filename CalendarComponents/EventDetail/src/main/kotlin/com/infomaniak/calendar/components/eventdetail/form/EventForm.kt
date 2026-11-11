@@ -124,7 +124,7 @@ fun EventForm(
 
         Section(EventSharedElement.Divider3) {
             var isReminderOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
-            RemindItems(state)
+            ReminderItems(state)
 
             AddReminderButton(onClick = { isReminderOffsetDialogVisible = true })
 
@@ -173,7 +173,7 @@ fun EventForm(
 }
 
 @Composable
-private fun RemindItems(state: EventFormState) {
+private fun ReminderItems(state: EventFormState) {
     val notifications = state.notifications.value
 
     val initialNotifications = remember { notifications.toSet() }
