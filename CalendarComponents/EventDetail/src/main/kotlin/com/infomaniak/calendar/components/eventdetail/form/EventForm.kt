@@ -17,17 +17,25 @@
  */
 package com.infomaniak.calendar.components.eventdetail.form
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -113,14 +121,19 @@ fun EventForm(
             )
         }
 
-        Section(EventSharedElement.Divider3, Modifier.animateContentSize()) {
+        Section(EventSharedElement.Divider3) {
             var isReminderOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
+            val initialNotifications = remember { state.notifications.value.toSet() }
 
             state.notifications.value.forEach { notification ->
-                ReminderItem(
-                    notification = notification,
-                    onRemoveClick = { state.notifications.value -= notification },
-                )
+                key(notification) { // Required for proper appearance/disappearance animation
+                    AnimatedReminderItem(
+                        notification = notification,
+                        onRemoveClick = { state.notifications.value -= notification },
+                        // Reminders already there on entry don't animate in, nor clash with the shared-element transition
+                        animateEnter = notification !in initialNotifications,
+                    )
+                }
             }
 
             AddReminderButton(onClick = { isReminderOffsetDialogVisible = true })
@@ -166,6 +179,30 @@ fun EventForm(
                 modifier = Modifier.eventSharedBounds(EventSharedElement.Calendar),
             )
         }
+    }
+}
+
+/** A [ReminderItem] that expands in, and shrinks out before [onRemoveClick] is called. */
+@Composable
+private fun AnimatedReminderItem(
+    notification: EventDetailUi.Notification,
+    onRemoveClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    animateEnter: Boolean = true,
+) {
+    val visibility = remember { MutableTransitionState(!animateEnter).apply { targetState = true } }
+
+    AnimatedVisibility(
+        visibleState = visibility,
+        modifier = modifier,
+        enter = expandVertically() + fadeIn(),
+        exit = shrinkVertically() + fadeOut(),
+    ) {
+        ReminderItem(notification = notification, onRemoveClick = { visibility.targetState = false })
+    }
+
+    LaunchedEffect(visibility.isIdle) {
+        if (visibility.isIdle && !visibility.currentState) onRemoveClick()
     }
 }
 
