@@ -31,6 +31,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventBounds
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.Location
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.TimeBlocking
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.AlarmAction
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.AlarmTrigger
@@ -61,7 +62,7 @@ fun Event.toEventDetailUi(
     attendees = attendees.toAttendees(accountId, emailsByUserId),
     organizer = organizer?.toOrganizerUi(),
     kMeetUrl = meetRoomUrl,
-    location = location,
+    location = (location as? Location.Place)?.text, // TODO: Manage rooms UI
     room = null, // TODO[eventDetail]: Not carried by the KMP model yet
     urlLink = null, // TODO[eventDetail]: Not carried by the KMP model yet
     description = description,

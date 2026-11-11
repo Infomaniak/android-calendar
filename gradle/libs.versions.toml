@@ -1,7 +1,7 @@
 [versions]
 adaptiveNavigation3 = "1.3.0" # Keep aligned with Core's adaptive version
 material3 = "1.5.0-beta01" # Remove when composeBom use same version or higher
-calendarCore = "1.0.0"
+calendarCore = "2.0.0"
 designsystem = "0.7.0"
 haze = "2.0.1"
 kizitonwoseCalendar = "2.10.1"
