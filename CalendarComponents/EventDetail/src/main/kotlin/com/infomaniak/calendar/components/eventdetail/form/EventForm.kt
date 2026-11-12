@@ -29,6 +29,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -57,7 +58,6 @@ import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitc
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.AddReminderButton
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderItem
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderOffsetDialog
-import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
@@ -67,9 +67,10 @@ import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElemen
 import com.infomaniak.calendar.components.eventdetail.modifier.reminderSharedBounds
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
-import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
+import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.TimeZone
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
@@ -130,7 +131,7 @@ fun EventForm(
         Section {
             item {
                 AttendeesButton(
-                    attendees = state.attendees,
+                    attendees = { state.attendees },
                     onClick = onAttendeesClick,
                     shapes = it,
                     modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
@@ -154,9 +155,11 @@ fun EventForm(
                 selectedOffset = null,
                 onOffsetSelect = { offset ->
                     if (offset != null) {
-                        state.notifications.value += EventDetailUi.Notification(
-                            type = EventDetailUi.Notification.Type.Push,
-                            time = NotificationTime.Offset(offset),
+                        state.notifications.add(
+                            EventDetailUi.Notification(
+                                type = EventDetailUi.Notification.Type.Push,
+                                time = NotificationTime.Offset(offset),
+                            ),
                         )
                     }
                     isReminderOffsetDialogVisible = false
@@ -170,11 +173,11 @@ fun EventForm(
         }
 
         Section(Modifier.animateContentSize()) {
-            state.notifications.value.forEach { notification ->
+            state.notifications.forEach { notification ->
                 item {
                     ReminderItem(
                         notification = notification,
-                        onRemoveClick = { state.notifications.value -= notification },
+                        onRemoveClick = { state.notifications.remove(notification) },
                         shapes = it,
                         modifier = Modifier.reminderSharedBounds(notification),
                     )
@@ -211,7 +214,7 @@ fun EventForm(
                 CalendarEditable(
                     selectedCalendar = state.calendar,
                     calendars = state.calendars,
-                    onSelect = { calendar -> state.calendar = calendar },
+                    onSelect = state::selectCalendar,
                     modifier = Modifier.eventSharedBounds(EventSharedElement.Calendar),
                     shapes = it,
                 )
@@ -221,9 +224,7 @@ fun EventForm(
 }
 
 @Composable
-private fun ReminderItems(state: EventFormState) {
-    val notifications = state.notifications.value
-
+private fun ReminderItems(notifications: List<EventDetailUi.Notification>, onRemove: (EventDetailUi.Notification) -> Unit) {
     val initialNotifications = remember { notifications.toSet() }
 
     // Removed reminders leave the state at once, but stay rendered until they've animated out
@@ -236,7 +237,7 @@ private fun ReminderItems(state: EventFormState) {
             AnimatedReminderItem(
                 notification = notification,
                 isVisible = notification in notifications,
-                onRemoveClick = { state.notifications.value -= notification },
+                onRemoveClick = { onRemove(notification) },
                 onExitFinish = { lastRenderedNotifications -= notification },
                 // Reminders already there on entry don't animate in, nor clash with the shared-element transition
                 animateEnter = notification !in initialNotifications,
@@ -290,23 +291,22 @@ private fun <T> List<T>.plusExitingFrom(previous: List<T>): List<T> {
 private fun Preview() {
     MaterialTheme {
         Surface {
-            EventForm(
-                state = rememberEventFormState(
+            val state = remember {
+                EventFormState.default(
+                    calendar = previewEventDetailCalendar,
+                    date = Clock.today(),
+                    timeZone = TimeZone.currentSystemDefault(),
+                    eventDuration = 1.hours,
                     calendars = previewEventDetailCalendarGroups,
-                    initialEventColor = EventColorChoice.Default,
-                    initialCalendar = previewEventDetailCalendar,
-                    dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
-                    initialText = "Event title",
-                    attendees = { emptyList() },
-                    initialOrganizer = null,
-                    initialIsAllDay = false,
-                    initialIsKMeetUrlEnabled = false,
-                    initialNotifications = listOf(
+                ).apply {
+                    titleTextState.setTextAndPlaceCursorAtEnd("Event title")
+                    notifications.add(
                         EventDetailUi.Notification(EventDetailUi.Notification.Type.Push, NotificationTime.Offset((-15).minutes)),
-                    ),
-                    initialIsOccupied = true,
-                    initialIsPublic = true,
-                ),
+                    )
+                }
+            }
+            EventForm(
+                state = state,
                 onAttendeesClick = {},
                 onTimeZoneClick = {},
                 onCustomReminderClick = {},

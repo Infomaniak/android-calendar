@@ -25,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,25 +34,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
-import com.infomaniak.calendar.components.eventdetail.form.rememberDefaultEventForm
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
-import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
 import com.infomaniak.calendar.components.foundation.component.EmptyState
-import com.infomaniak.calendar.components.foundation.models.AttendeeUi
-import com.infomaniak.calendar.components.foundation.models.OrganizerSource
-import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
-import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
-import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomReminderResultViewModel
-import com.infomaniak.calendar.ui.screen.eventDetail.model.EventCreationCalendars
-import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchResultViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
+import com.infomaniak.core.common.utils.today
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CalendarCross
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 
 @Composable
@@ -62,54 +57,28 @@ fun EventCreationScreen(
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     goToCustomReminder: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: EventCreationViewModel = viewModel(),
-    attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
-    timeZoneSearchResultViewModel: TimeZoneSearchResultViewModel = viewModel(),
-    customReminderResultViewModel: CustomReminderResultViewModel = viewModel(),
+    eventCreationViewModel: EventCreationViewModel = viewModel(),
+    eventFormViewModel: EventFormViewModel = viewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val defaultEventDuration by viewModel.defaultEventDuration.collectAsStateWithLifecycle(null)
-
-    val formState = (uiState as? EventCreationUiState.Success)?.calendars?.let {
-        rememberDefaultEventForm(
-            calendars = it.calendars,
-            initialCalendar = it.initialCalendar,
-            dateAndTimeState = defaultEventDuration?.let { rememberDateAndTimeState(it, TimeZone.currentSystemDefault(), date) },
-            attendees = { viewModel.attendeesSearchState.attendees },
-        )
-    }
-
-    LaunchedEffect(formState?.calendar) {
-        if (formState == null) return@LaunchedEffect
-        val organizerAttendeeUi = formState.calendar.organizerAttendeeUi ?: return@LaunchedEffect
-
-        val newOrganizer = OrganizerSource.Dynamic(organizerAttendeeUi)
-
-        // It's possible that the new organizer is already in the attendees list. We need to make sure to remove it before adding
-        // to avoid having two attendees with the same email.
-        viewModel.attendeesSearchState.participants.removeAll { (it is AttendeeUi) && it.email == newOrganizer.owner.email }
-
-        viewModel.attendeesSearchState.organizerSource = newOrganizer
-    }
-
-    LaunchedEffect(formState?.dateAndTimeState) {
-        timeZoneSearchResultViewModel.applyPickedTimeZonesTo(formState?.dateAndTimeState)
-    }
-
-    LaunchedEffect(formState) {
-        customReminderResultViewModel.applyAddedRemindersTo(formState)
-    }
+    val calendarsUiState by eventCreationViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        attendeesSearchSharedDataViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
+        eventFormViewModel.initCreation(date)
+    }
+
+    val uiState = when (calendarsUiState) {
+        EventCreationUiState.Loading -> EventCreationScreenState.Loading
+        EventCreationUiState.NoWritableCalendar -> EventCreationScreenState.NoWritableCalendar
+        is EventCreationUiState.Success -> {
+            eventFormViewModel.formState?.let(EventCreationScreenState::Success) ?: EventCreationScreenState.Loading
+        }
     }
 
     EventCreationScreen(
         uiState = uiState,
-        formState = formState,
         onSubmit = {
-            val eventDraft = formState?.toEventDraft() ?: return@EventCreationScreen
-            if (viewModel.submitEvent(eventDraft)) goBack()
+            val eventDraft = eventFormViewModel.formState?.toEventDraft() ?: return@EventCreationScreen
+            if (eventCreationViewModel.submitEvent(eventDraft)) goBack()
         },
         modifier = modifier,
         goBack = goBack,
@@ -121,8 +90,7 @@ fun EventCreationScreen(
 
 @Composable
 private fun EventCreationScreen(
-    uiState: EventCreationUiState,
-    formState: EventFormState?,
+    uiState: EventCreationScreenState,
     onSubmit: () -> Unit,
     goBack: () -> Unit,
     goToEventsAttendees: () -> Unit,
@@ -137,49 +105,53 @@ private fun EventCreationScreen(
             SubmitTopAppBar(
                 goBack = goBack,
                 onSubmit = { onSubmit() },
-                isSubmitEnabled = { formState != null },
+                isSubmitEnabled = { uiState is EventCreationScreenState.Success },
                 isRecurring = false,
             )
         },
         modifier = modifier,
     ) { contentPadding ->
         when (uiState) {
-            EventCreationUiState.Loading -> Unit
-            EventCreationUiState.NoWritableCalendar -> EmptyState(
+            EventCreationScreenState.Loading -> Unit
+            EventCreationScreenState.NoWritableCalendar -> EmptyState(
                 text = stringResource(R.string.noWritableCalendar),
                 icon = EsdsIcons.CalendarCross,
                 modifier = Modifier.padding(contentPadding),
             )
-            is EventCreationUiState.Success -> formState?.let {
-                EventForm(
-                    state = it,
-                    onAttendeesClick = goToEventsAttendees,
-                    onTimeZoneClick = goToTimeZoneSearch,
-                    onCustomReminderClick = goToCustomReminder,
-                    contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
-                    modifier = Modifier.verticalScroll(scrollState),
-                )
-            }
+            is EventCreationScreenState.Success -> EventForm(
+                state = uiState.eventFormState,
+                onAttendeesClick = goToEventsAttendees,
+                onTimeZoneClick = goToTimeZoneSearch,
+                onCustomReminderClick = goToCustomReminder,
+                contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
+                modifier = Modifier.verticalScroll(scrollState),
+            )
         }
     }
+}
+
+private sealed interface EventCreationScreenState {
+    data object Loading : EventCreationScreenState
+    data object NoWritableCalendar : EventCreationScreenState
+    data class Success(val eventFormState: EventFormState) : EventCreationScreenState
 }
 
 @Preview
 @Composable
 private fun EventCreationScreenPreview() {
     CalendarThemeForPreview {
-        val state = rememberDefaultEventForm(
-            calendars = previewEventDetailCalendarGroups,
-            initialCalendar = previewEventDetailCalendar,
-            dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
-            attendees = { emptyList() },
-        )
+        val state = remember {
+            EventFormState.default(
+                calendar = previewEventDetailCalendar,
+                date = Clock.today(),
+                timeZone = TimeZone.currentSystemDefault(),
+                eventDuration = 1.hours,
+                calendars = previewEventDetailCalendarGroups,
+            )
+        }
 
         EventCreationScreen(
-            uiState = EventCreationUiState.Success(
-                EventCreationCalendars(previewEventDetailCalendarGroups, previewEventDetailCalendar),
-            ),
-            formState = state,
+            uiState = EventCreationScreenState.Success(state),
             onSubmit = {},
             goBack = {},
             goToEventsAttendees = {},
@@ -193,16 +165,8 @@ private fun EventCreationScreenPreview() {
 @Composable
 private fun PreviewEmptyWritableCalendar() {
     CalendarThemeForPreview {
-        val state = rememberDefaultEventForm(
-            calendars = previewEventDetailCalendarGroups,
-            initialCalendar = previewEventDetailCalendar,
-            dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
-            attendees = { previewAttendees },
-        )
-
         EventCreationScreen(
-            uiState = EventCreationUiState.NoWritableCalendar,
-            formState = state,
+            uiState = EventCreationScreenState.NoWritableCalendar,
             onSubmit = {},
             goBack = {},
             goToEventsAttendees = {},

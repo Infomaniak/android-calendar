@@ -17,51 +17,21 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.edit
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.createSavedStateHandle
-import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
-import com.infomaniak.calendar.components.foundation.models.OrganizerSource
-import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.manager.BackgroundEventComposer
-import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
-import com.infomaniak.calendar.utils.saveableAttendeesSearchState
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
-import dev.zacsweers.metro.Assisted
-import dev.zacsweers.metro.AssistedFactory
-import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
-import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
-import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.first
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metrox.viewmodel.ViewModelKey
 
-@AssistedInject
-class EventEditViewModel(
-    @Assisted private val savedStateHandle: SavedStateHandle,
-    private val backgroundEventComposer: BackgroundEventComposer,
-) : ViewModel() {
-    val attendeesSearchState: AttendeesSearchState<OrganizerSource.Static> = savedStateHandle.saveableAttendeesSearchState()
-
-    private var areAttendeesInitialized: Boolean
-        get() = savedStateHandle[ARE_ATTENDEES_INITIALIZED_KEY] ?: false
-        set(value) {
-            savedStateHandle[ARE_ATTENDEES_INITIALIZED_KEY] = value
-        }
-
+@Inject
+@ContributesIntoMap(AppScope::class)
+@ViewModelKey
+class EventEditViewModel(private val backgroundEventComposer: BackgroundEventComposer) : ViewModel() {
     private var isSubmitted = false
-
-    suspend fun initAttendeesSearchState(eventDetailUi: Flow<EventDetailUiState>) {
-        if (areAttendeesInitialized) return
-        val event = eventDetailUi.filterIsInstance<EventDetailUiState.Displayable.Success>().first()
-        attendeesSearchState.participants.addAll(event.eventDetail.attendees.all)
-        attendeesSearchState.organizerSource = OrganizerSource.Static(event.eventDetail.organizer)
-        areAttendeesInitialized = true
-    }
 
     /** `false` when the event was already submitted: the request is ignored. */
     fun submitEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope, eventDraft: EventDraft): Boolean {
@@ -71,18 +41,5 @@ class EventEditViewModel(
         backgroundEventComposer.updateEvent(occurrenceId, scope, eventDraft)
 
         return true
-    }
-
-    @AssistedFactory
-    @ViewModelAssistedFactoryKey(EventEditViewModel::class)
-    @ContributesIntoMap(AppScope::class)
-    fun interface Factory : ViewModelAssistedFactory {
-        override fun create(extras: CreationExtras): EventEditViewModel = create(extras.createSavedStateHandle())
-
-        fun create(@Assisted savedStateHandle: SavedStateHandle): EventEditViewModel
-    }
-
-    companion object {
-        private const val ARE_ATTENDEES_INITIALIZED_KEY = "areAttendeesInitialized"
     }
 }

@@ -18,13 +18,12 @@
 package com.infomaniak.calendar.components.eventdetail.form
 
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.setValue
 import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
@@ -32,99 +31,132 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
+import com.infomaniak.calendar.components.eventdetail.state.computeDefaultValues
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
-import com.infomaniak.calendar.components.foundation.models.OrganizerUi
+import com.infomaniak.calendar.components.foundation.models.OrganizerSource
+import com.infomaniak.calendar.components.foundation.models.ParticipantUi
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
+import kotlin.time.Duration
 
 /**
- * @param dateAndTimeState Can be null so it can be initialized in two steps after the data has been read from disk.
+ * The editable state of an event form, one state per field.
+ *
+ * @param organizerSource [OrganizerSource.Dynamic] for a new event, which follows the selected calendar.
+ * @param calendars The calendars the event can be put in.
  */
 @Stable
 class EventFormState(
     val titleTextState: TextFieldState,
-    val eventColorState: MutableState<EventColorChoice>,
-    selectedCalendarState: MutableState<EventDetailCalendar>,
-    val isAllDay: MutableState<Boolean>,
-    val dateAndTimeState: DateAndTimeState?,
-    val attendees: () -> List<AttendeeUi>,
-    /** The organizer of the edited event, never updated by the form. There either is one at the start or it will be added right before sending */
-    val initialOrganizer: OrganizerUi?,
-    val isKMeetUrlEnabled: MutableState<Boolean>,
-    val notifications: MutableState<List<EventDetailUi.Notification>>,
-    val isOccupied: MutableState<Boolean>,
-    val isPublic: MutableState<Boolean>,
+    calendar: EventDetailCalendar,
+    eventColor: EventColorChoice,
+    isAllDay: Boolean,
+    start: LocalDateTime,
+    startTimeZone: TimeZone,
+    end: LocalDateTime,
+    endTimeZone: TimeZone,
+    hasEndEverBeenTouched: Boolean,
+    participants: Set<ParticipantUi>,
+    organizerSource: OrganizerSource?,
+    isKMeetUrlEnabled: Boolean,
+    notifications: List<EventDetailUi.Notification>,
+    isOccupied: Boolean,
+    isPublic: Boolean,
     val calendars: List<EventDetailCalendarGroup>,
 ) {
-    var calendar by selectedCalendarState
+    val eventColorState = mutableStateOf(eventColor)
+    var calendar by mutableStateOf(calendar)
+        private set
+    val isAllDay = mutableStateOf(isAllDay)
+    val dateAndTimeState = DateAndTimeState(
+        start = DateAndTimeState.Entry(
+            date = mutableStateOf(start.date),
+            time = mutableStateOf(start.time),
+            timeZone = mutableStateOf(startTimeZone),
+        ),
+        end = DateAndTimeState.Entry(
+            date = mutableStateOf(end.date),
+            time = mutableStateOf(end.time),
+            timeZone = mutableStateOf(endTimeZone),
+        ),
+        hasEndEverBeenTouched = mutableStateOf(hasEndEverBeenTouched),
+    )
+    val participants = mutableStateSetOf<ParticipantUi>().apply { addAll(participants) }
+    var organizerSource by mutableStateOf(organizerSource)
+        private set
+    val isKMeetUrlEnabled = mutableStateOf(isKMeetUrlEnabled)
+    val notifications = mutableStateListOf<EventDetailUi.Notification>().apply { addAll(notifications) }
+    val isOccupied = mutableStateOf(isOccupied)
+    val isPublic = mutableStateOf(isPublic)
 
-    fun toEventDraft(): EventDraft? {
-        dateAndTimeState ?: return null
+    val attendees: List<AttendeeUi> by derivedStateOf {
+        val me = (this.organizerSource as? OrganizerSource.Dynamic)?.owner
+        this.participants.mapNotNull { it.toAttendeeUi(me) }
+    }
 
+    internal val start get() = dateAndTimeState.start.date.atTime(dateAndTimeState.start.time)
+    internal val end get() = dateAndTimeState.end.date.atTime(dateAndTimeState.end.time)
+
+    /** Organizing a new event as the owner of [calendar], who must then not also be one of its attendees. */
+    fun selectCalendar(calendar: EventDetailCalendar) {
+        this.calendar = calendar
+        val owner = calendar.organizerAttendeeUi
+        if (organizerSource is OrganizerSource.Static || owner == null) return
+
+        participants.removeAll { it is AttendeeUi && it.email == owner.email }
+        organizerSource = OrganizerSource.Dynamic(owner)
+    }
+
+    fun toEventDraft(): EventDraft {
         return EventDraft(
             title = titleTextState.text.toString(),
             color = eventColorState.value.getColor(calendar),
             calendarId = calendar.id,
             isAllDay = isAllDay.value,
-            start = dateAndTimeState.start.date.atTime(dateAndTimeState.start.time),
+            start = start,
             startTimeZone = dateAndTimeState.start.timeZone,
-            end = dateAndTimeState.end.date.atTime(dateAndTimeState.end.time),
+            end = end,
             endTimeZone = dateAndTimeState.end.timeZone,
-            attendees = attendees(),
-            initialOrganizer = initialOrganizer,
+            attendees = attendees,
+            initialOrganizer = (organizerSource as? OrganizerSource.Static)?.organizer,
             isKMeetUrlEnabled = isKMeetUrlEnabled.value,
-            notifications = notifications.value,
+            notifications = notifications.toList(),
             isOccupied = isOccupied.value,
             isPublic = isPublic.value,
         )
     }
+
+    companion object {
+        /** A new event on [date] in [calendar], lasting [eventDuration]. */
+        fun default(
+            calendar: EventDetailCalendar,
+            date: LocalDate,
+            timeZone: TimeZone,
+            eventDuration: Duration,
+            calendars: List<EventDetailCalendarGroup>,
+        ): EventFormState {
+            val (start, end) = computeDefaultValues(date, timeZone, eventDuration)
+
+            return EventFormState(
+                titleTextState = TextFieldState(),
+                calendar = calendar,
+                eventColor = EventColorChoice.Default,
+                isAllDay = false,
+                start = start,
+                startTimeZone = timeZone,
+                end = end,
+                endTimeZone = timeZone,
+                hasEndEverBeenTouched = false,
+                participants = emptySet(),
+                organizerSource = calendar.organizerAttendeeUi?.let(OrganizerSource::Dynamic),
+                isKMeetUrlEnabled = false,
+                notifications = emptyList(),
+                isOccupied = true,
+                isPublic = true,
+                calendars = calendars,
+            )
+        }
+    }
 }
-
-@Composable
-fun rememberDefaultEventForm(
-    calendars: List<EventDetailCalendarGroup>,
-    initialCalendar: EventDetailCalendar,
-    dateAndTimeState: DateAndTimeState?,
-    attendees: () -> List<AttendeeUi>,
-): EventFormState = rememberEventFormState(
-    calendars = calendars,
-    initialEventColor = EventColorChoice.Default,
-    initialCalendar = initialCalendar,
-    dateAndTimeState = dateAndTimeState,
-    initialText = "",
-    initialIsAllDay = false,
-    initialIsKMeetUrlEnabled = false,
-    initialNotifications = emptyList(),
-    attendees = attendees,
-    initialOrganizer = null,
-    initialIsOccupied = true,
-    initialIsPublic = true,
-)
-
-@Composable
-fun rememberEventFormState(
-    calendars: List<EventDetailCalendarGroup>,
-    initialEventColor: EventColorChoice,
-    initialCalendar: EventDetailCalendar,
-    dateAndTimeState: DateAndTimeState?,
-    initialText: String,
-    initialIsAllDay: Boolean,
-    initialIsKMeetUrlEnabled: Boolean,
-    initialNotifications: List<EventDetailUi.Notification>,
-    attendees: () -> List<AttendeeUi>,
-    initialOrganizer: OrganizerUi?,
-    initialIsOccupied: Boolean,
-    initialIsPublic: Boolean,
-): EventFormState = EventFormState(
-    titleTextState = rememberTextFieldState(initialText),
-    eventColorState = rememberSaveable { mutableStateOf(initialEventColor) },
-    selectedCalendarState = rememberSaveable { mutableStateOf(initialCalendar) },
-    isAllDay = rememberSaveable { mutableStateOf(initialIsAllDay) },
-    dateAndTimeState = dateAndTimeState,
-    attendees = attendees,
-    initialOrganizer = initialOrganizer,
-    isKMeetUrlEnabled = rememberSaveable { mutableStateOf(initialIsKMeetUrlEnabled) },
-    notifications = rememberSaveable { mutableStateOf(initialNotifications) },
-    isOccupied = rememberSaveable { mutableStateOf(initialIsOccupied) },
-    isPublic = rememberSaveable { mutableStateOf(initialIsPublic) },
-    calendars = calendars,
-)

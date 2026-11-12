@@ -186,7 +186,7 @@ fun rememberDateAndTimeState(
  * The start is the next full hour if the date is today, and the end is [eventDuration] after the start.
  * Otherwise, the start is 8:00 AM on the given date, and the end is [eventDuration] after the start.
  */
-private fun computeDefaultValues(
+internal fun computeDefaultValues(
     date: LocalDate,
     timeZone: TimeZone,
     eventDuration: Duration,
@@ -219,7 +219,7 @@ private fun LocalDate.atHeightInTheMorning(timeZone: TimeZone, eventDuration: Du
     return start to end
 }
 
-private val TimeZoneSaver = Saver<TimeZone, String>(
+internal val TimeZoneSaver = Saver<TimeZone, String>(
     save = { it.id },
     restore = { TimeZone.of(it) },
 )
