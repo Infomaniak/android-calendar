@@ -20,7 +20,7 @@ package com.infomaniak.calendar.ui.theme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
-import com.infomaniak.calendar.customColors.CustomColors
+import com.infomaniak.calendar.components.foundation.theme.ComponentColors
 
 val Bat = Color(0xFF1A1A1A)
 val White = Color(0xFFFFFFFF)
@@ -29,7 +29,7 @@ val White = Color(0xFFFFFFFF)
 data class CustomColorScheme(val avatarInitialsColor: Color = Color.Unspecified)
 
 object CustomColors {
-    val SegmentedItemColor @Composable get() = CustomColors.SegmentedItemColor
+    val SegmentedItemColor @Composable get() = ComponentColors.SegmentedItemColor
     val MenuDrawerContainerBackground @Composable get() = SegmentedItemColor
     val SettingItemContainerColor @Composable get() = SegmentedItemColor
 }

@@ -15,11 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.customColors
+package com.infomaniak.calendar.components.eventdetail.theme
 
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.runtime.Composable
+import com.infomaniak.calendar.components.foundation.theme.ComponentColors
 
-object CustomColors {
-    val SegmentedItemColor @Composable get() = MaterialTheme.colorScheme.surfaceBright
+internal object CustomColors {
+    val EventFormItemContainerColor @Composable get() = ComponentColors.SegmentedItemColor
+
+    val EventFormItemColors @Composable get() = ListItemDefaults.segmentedColors(containerColor = EventFormItemContainerColor)
 }

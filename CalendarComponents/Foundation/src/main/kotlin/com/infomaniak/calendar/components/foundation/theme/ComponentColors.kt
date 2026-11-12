@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 
 object ComponentColors {
-    val GridDividerColor
-        @Composable get() = MaterialTheme.colorScheme.outlineVariant
+    val GridDividerColor @Composable get() = MaterialTheme.colorScheme.outlineVariant
+
+    val SegmentedItemColor @Composable get() = MaterialTheme.colorScheme.surfaceBright
 }
