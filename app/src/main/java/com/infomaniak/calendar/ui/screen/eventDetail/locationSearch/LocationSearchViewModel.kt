@@ -72,7 +72,7 @@ class LocationSearchViewModel(
     private var resources = emptyMap<String, BookableResource>()
     private var editedTiming: Pair<OccurrenceId, EventTiming?>? = null
 
-    /** Null until known: listing the rooms before would reorder them under the user, keeping the available ones out of view. */
+    /** Null until known: the rooms are listed meanwhile with an unknown availability, then sorted once it is known. */
     @OptIn(ExperimentalCoroutinesApi::class)
     private val availability: Flow<Map<BookableResourceUuid, Boolean>?> = availabilityRequest.transformLatest { request ->
         emit(null)
@@ -87,8 +87,7 @@ class LocationSearchViewModel(
         .flatMapLatest(::resourcesOf)
         .combine(availability) { resources, availability ->
             this.resources = resources.associateBy { it.uuid.value }
-            if (availability == null) return@combine emptyList()
-            resources.map { it.toSearchRoomUi(availability[it.uuid]) }.sortedBy { it.availability.rank }
+            resources.map { it.toSearchRoomUi(availability?.get(it.uuid)) }.sortedBy { it.availability.rank }
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 

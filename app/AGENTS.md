@@ -81,7 +81,7 @@ app/src/main/java/com/infomaniak/calendar/
     │                              #   or the clicked room as its room (saved as a Location.BookableRoom);
     │                              #   LocationSearchViewModel, shared through the form's ViewModelStore, observes the bookable rooms of the form's calendar
     │                              #   as soon as EventCreation / EventEdit opens, then sorts them by availability over the form's time, and over the edited
-    │                              #   event's recurrence. Rooms are only listed once their availability is known, so they're usually ready once the search opens.
+    │                              #   event's recurrence. Rooms are listed with an unknown availability until it loads (or when it fails), then sorted.
     │                              #   Switching the form's calendar clears its room when the new calendar can't book it (compared by id).
     │                              #   A room unknown locally isn't shown in the form, it's kept on save until another location is picked.
     │                              #   A booked room (Location.BookableRoom with a known resource) maps to EventDetailUi.Room)
