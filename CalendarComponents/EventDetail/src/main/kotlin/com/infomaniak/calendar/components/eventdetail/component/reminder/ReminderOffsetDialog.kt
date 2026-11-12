@@ -99,11 +99,6 @@ internal fun ReminderOffsetDialog(
 @Composable
 private fun Preview() {
     MaterialTheme {
-        ReminderOffsetDialog(
-            selectedOffset = null,
-            onOffsetSelect = {},
-            onCustomClick = {},
-            onDismissRequest = {},
-        )
+        ReminderOffsetDialog(selectedOffset = null, onOffsetSelect = {}, onCustomClick = {}, onDismissRequest = {})
     }
 }
