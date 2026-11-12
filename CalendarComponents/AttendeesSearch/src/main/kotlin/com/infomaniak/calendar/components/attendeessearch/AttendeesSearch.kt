@@ -18,8 +18,6 @@
 package com.infomaniak.calendar.components.attendeessearch
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +36,7 @@ import com.infomaniak.calendar.components.attendeessearch.component.AttendeesLis
 import com.infomaniak.calendar.components.foundation.component.EmptyState
 import com.infomaniak.calendar.components.foundation.component.InformationBlock
 import com.infomaniak.calendar.components.foundation.component.SearchBar
+import com.infomaniak.calendar.components.foundation.component.SearchLayout
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
@@ -46,7 +45,6 @@ import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState.
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
 import com.infomaniak.calendar.components.resources.R
-import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.UsersStacked
@@ -67,15 +65,7 @@ fun AttendeesSearch(
         attendeesSearchState.attendees
     }
 
-    val horizontalContentPadding = contentPadding.onlyHorizontal()
-
-    Column(
-        modifier = modifier
-            .padding(horizontalContentPadding)
-            .padding(top = contentPadding.calculateTopPadding() + EsdsTheme.spacing.xl)
-            .padding(horizontal = EsdsTheme.spacing.xl),
-        verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xl),
-    ) {
+    SearchLayout(modifier = modifier, contentPadding = contentPadding) {
         if (isSearchable) {
             AnimatedVisibility(attendeesSearchState.attendees.size >= MAX_ATTENDEE_COUNT) {
                 InformationBlock(stringResource(R.string.attendeesLimitReached))
