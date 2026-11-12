@@ -26,6 +26,12 @@ import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -102,14 +108,18 @@ internal fun DateAndTime(
 internal fun SectionScope.dateAndTimeEditable(
     dateAndTimeState: DateAndTimeState,
     isAllDay: () -> Boolean,
+    selectedEntryState: SelectedEntryState,
     onTimeZoneClick: (isStart: Boolean) -> Unit,
 ) {
+    var selectedButton by selectedEntryState.selectedEntry
 
     with(dateAndTimeState) {
         item { shapes ->
             DateAndTimeEntry(
                 entry = start,
                 isAllDay = isAllDay,
+                selectedButton = { (selectedButton as? DateAndTimeEntry.Start)?.entryButton },
+                onSelectButton = { selectedButton = it?.let { entryButton -> DateAndTimeEntry.Start(entryButton) } },
                 onDatePicked = { start.pickDate(it) },
                 onTimePicked = { start.pickTime(it) },
                 onTimeZoneClick = { onTimeZoneClick(true) },
@@ -121,6 +131,8 @@ internal fun SectionScope.dateAndTimeEditable(
             DateAndTimeEntry(
                 entry = end,
                 isAllDay = isAllDay,
+                selectedButton = { (selectedButton as? DateAndTimeEntry.End)?.entryButton },
+                onSelectButton = { selectedButton = it?.let { entryButton -> DateAndTimeEntry.End(entryButton) } },
                 onDatePicked = { end.pickDate(it) },
                 onTimePicked = { end.pickTime(it) },
                 onTimeZoneClick = { onTimeZoneClick(false) },
@@ -128,6 +140,26 @@ internal fun SectionScope.dateAndTimeEditable(
             )
         }
     }
+}
+
+@Composable
+internal fun rememberSelectedEntryState(): SelectedEntryState {
+    val selectedButton = rememberSaveable { mutableStateOf<DateAndTimeEntry?>(null) }
+    return remember { SelectedEntryState(selectedEntry = selectedButton) }
+}
+
+internal data class SelectedEntryState(
+    val selectedEntry: MutableState<DateAndTimeEntry?>,
+)
+
+internal sealed interface DateAndTimeEntry {
+    data class Start(val entryButton: EntryButton) : DateAndTimeEntry
+    data class End(val entryButton: EntryButton) : DateAndTimeEntry
+}
+
+internal sealed interface EntryButton {
+    data object Date : EntryButton
+    data object Time : EntryButton
 }
 
 @Preview
@@ -220,10 +252,12 @@ private fun PreviewEditable() {
 
     MaterialTheme {
         Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh) {
+            val state = rememberSelectedEntryState()
             Section {
                 dateAndTimeEditable(
                     dateAndTimeState = dateAndTimeState,
                     isAllDay = { false },
+                    selectedEntryState = state,
                     onTimeZoneClick = {},
                 )
             }

@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.CalendarEditable
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatusSwitch
+import com.infomaniak.calendar.components.eventdetail.component.DateAndTimeEntry
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitch
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.ReminderItemEditable
@@ -57,7 +58,7 @@ import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
 import com.infomaniak.calendar.components.eventdetail.component.dateAndTimeEditable
 import com.infomaniak.calendar.components.eventdetail.component.item
-import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
+import com.infomaniak.calendar.components.eventdetail.component.rememberSelectedEntryState
 import com.infomaniak.calendar.components.eventdetail.component.reminder.AddReminderButton
 import com.infomaniak.calendar.components.eventdetail.component.reminder.ReminderOffsetDialog
 import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionEditable
@@ -113,6 +114,7 @@ fun EventForm(
             }
         }
 
+        val selectedEntryState = rememberSelectedEntryState()
         Section {
             item { shapes ->
                 AllDaySwitch(
@@ -125,6 +127,7 @@ fun EventForm(
             dateAndTimeEditable(
                 dateAndTimeState = state.dateAndTimeState,
                 isAllDay = state.isAllDay::value,
+                selectedEntryState = selectedEntryState,
                 onTimeZoneClick = onTimeZoneClick,
             )
         }
