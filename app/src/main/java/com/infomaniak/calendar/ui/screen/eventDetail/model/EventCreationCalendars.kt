@@ -22,6 +22,6 @@ import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 
-/** The calendars an event form can be filled with, in the shape expected by [EventForm]. */
+/** The calendars an event form can be filled with, in the shape expected by [EventForm.detail]. */
 @Immutable
 data class EventCreationCalendars(val calendars: List<EventDetailCalendarGroup>, val initialCalendar: EventDetailCalendar)

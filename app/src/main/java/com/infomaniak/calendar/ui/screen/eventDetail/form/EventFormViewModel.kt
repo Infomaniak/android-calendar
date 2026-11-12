@@ -60,16 +60,14 @@ import kotlinx.datetime.minus
  */
 @OptIn(SavedStateHandleSaveableApi::class)
 @AssistedInject
-    class EventFormViewModel(
+class EventFormViewModel(
     @Assisted private val savedStateHandle: SavedStateHandle,
     private val eventCreationCalendarsUseCase: EventCreationCalendarsUseCase,
     private val settingsDataValues: SettingsDataValues,
 ) : ViewModel() {
     /** The form once loaded, for the screens it opens. */
-    var formState: EventFormState? by savedStateHandle.saveable(FORM_KEY, stateSaver = FormSaver) { mutableStateOf(null) }
+    var formState: EventFormState? by savedStateHandle.saveable(FORM_KEY, stateSaver = NullableFormSaver) { mutableStateOf(null) }
         private set
-
-    val uiState: EventFormUiState get() = formState?.let(EventFormUiState::Loaded) ?: EventFormUiState.Loading
 
     private var isInitialized = false
 
@@ -133,7 +131,7 @@ import kotlinx.datetime.minus
     companion object {
         private const val FORM_KEY = "form"
 
-        private val FormSaver = Saver<EventFormState?, Any>(
+        private val NullableFormSaver = Saver<EventFormState?, Any>(
             save = { formState -> formState?.let { with(EventFormState.Saver) { save(it) } } },
             restore = EventFormState.Saver::restore,
         )

@@ -42,7 +42,6 @@ import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
-import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarTheme
@@ -75,10 +74,10 @@ fun EventEditScreen(
         eventFormViewModel.initEdition(event.eventDetail)
     }
 
-    val formUiState = eventFormViewModel.uiState
+    val formState = eventFormViewModel.formState
 
-    val uiState = if (eventDetailUiState is EventDetailUiState.Displayable.Success && formUiState is EventFormUiState.Loaded) {
-        EventEditScreenState.Success(formUiState.formState, isRecurring = eventDetailUiState.eventDetail.isRecurring)
+    val uiState = if (eventDetailUiState is EventDetailUiState.Displayable.Success && formState != null) {
+        EventEditScreenState.Success(formState, isRecurring = eventDetailUiState.eventDetail.isRecurring)
     } else {
         EventEditScreenState.Loading
     }

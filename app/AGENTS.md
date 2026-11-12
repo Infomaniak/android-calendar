@@ -48,7 +48,6 @@ app/src/main/java/com/infomaniak/calendar/
 │   ├── AttendeeExt.kt              # KMP Attendee → Attendees mapping for event detail
 │   ├── DayEventGroupingExt.kt      # Groups day-sliced events for calendar views
 │   ├── EventDaySliceExt.kt         # KMP EventDaySlice → OccurrenceEventUi mapping, shared by every calendar view
-│   ├── EventDetailUiExt.kt         # EventDetailUi → EventFormValues, what an edition form starts from
 │   ├── EventDraftExt.kt            # EventDraft → KMP EventEditData for creation and edition: a new form field is one line in `applyTo`; unchanged notifications leave the stored alarms alone (`AlarmListEdit.Preserve`, since `Event.alarms` lacks the ones KMP can't read), changed ones get back the stored alarm they were read from (matched by the `Notification.sourceId` holding its KMP `AlarmId`)
 │   └── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
 └── ui/
@@ -146,23 +145,24 @@ app/
   (`viewModel(LocalSharedViewModelStoreOwner.current)`); the parent calls plain `viewModel()`. Currently used for
   `EventDetailSharedDataViewModel` (the event loaded by EventDetail, reused by EventEdit), `EventFormViewModel` (below),
   and `EventDetailViewModel`, whose `AttendeesSearchState` `EditableAttendeesSearchScreen` edits.
-- **Event form state**: `EventFormViewModel` exposes an `EventFormUiState`, `Loading` then `Loaded` with an
-  `EventFormState` (also readable as `formState`, `null` until loaded), for a
-  `NavDestination.EventForm.EventCreation` / `EventEdit`, in that destination's own store. `EventFormState` holds one state
-  per field, like Material state holders: the title's `TextFieldState`, the participants' `SnapshotStateSet`, and a
-  `MutableState` for each other field, and the dates' `DateAndTimeState`. It is built from an `EventFormValues` (what the
-  user filled in: an immutable, `@Serializable` value) and read back with `toValues()`, which gives the saved form. It also
-  holds the selected `calendar` itself (saved with the form) and the calendars it can be put in, and builds `toEventDraft()`. The ViewModel saves `toValues()` as a whole under one `SavedStateHandle` key (`encodeToSavedState`), read
-  live from the states when Android saves, and rebuilds the state from it when the ViewModel is created, so a child screen
-  restored alone after a process death still gets it. The form's screen initializes it with `initCreation(date)` /
-  `initEdition(occurrenceId, event)`, which only run once per ViewModel instance; a restored form wins over the loaded one
-  (`EventFormValues.default` for a creation, `EventDetailUi.toEventFormValues()` for an edition), so no saved "initialized"
-  flag is needed. The calendars the form can be put in are never saved (empty after a restoration), and
-  `EventFormState.selectCalendar` makes a new event's owner follow the selected calendar. A new form field goes
-  in `EventFormValues` (and its `default` / `toEventDraft`), `EventFormState` (its state and `toValues`),
-  `toEventFormValues`, and the `EventForm` composable; the ViewModel doesn't change. The edit screen calls `initEdition`
-  from a `LaunchedEffect` once `EventDetailSharedDataViewModel` has loaded the event. `EventCreationViewModel` /
-  `EventEditViewModel` only keep the screen state and the submission.
+- **Event form state**: `EventFormViewModel` holds the `EventFormState` of a `NavDestination.EventForm.EventCreation` /
+  `EventEdit` as `formState`, `null` until the form's screen initializes it, in that destination's own store.
+  `EventFormState` holds one state per field, like Material state holders: the title's `TextFieldState`, the participants'
+  `SnapshotStateSet`, the notifications' `SnapshotStateList`, a `MutableState` for each other field, and the dates'
+  `DateAndTimeState`. It also holds the selected `calendar` itself and the calendars it can be put in, and builds
+  `toEventDraft()`; `EventFormState.default` starts a new event. The ViewModel saves it under one `SavedStateHandle` key
+  through `saveable` and `EventFormState.Saver` (`EventFormStateSaver.kt`: one constant key per field, delegating to each
+  state's own saver or `autoSaver` where one exists), read live from the states when Android saves, and restores it when the
+  ViewModel is created, so a child screen restored alone after a process death still gets it. The form's screen initializes
+  it with `initCreation(date)` / `initEdition(event)`, which only run once per ViewModel instance; a restored form wins over
+  the loaded one, so no saved "initialized" flag is needed. The calendars the form can be put in are never saved (empty
+  after a restoration), and `EventFormState.selectCalendar` makes a new event's owner follow the selected calendar. A new
+  form field goes in `EventFormState` (its constructor, state and `default` / `toEventDraft`), its key in
+  `EventFormStateSaver.kt`, `initEdition`, and the `EventForm` composable. The edit screen calls `initEdition` from a
+  `LaunchedEffect` once `EventDetailSharedDataViewModel` has loaded the event. Each form screen combines its sources into a
+  single private screen state (`EventCreationScreenState`, `EventEditScreenState`) that its stateless content draws:
+  `Success` only once `formState` is there. `EventCreationViewModel` / `EventEditViewModel` only keep the calendars'
+  availability (creation) and the submission.
 - **Screens opened by the event form** (time zone, custom reminder, attendees) follow the screens' usual split: a public
   composable reading `EventFormViewModel` from its parent's store (`viewModel(LocalSharedViewModelStoreOwner.current)` as a
   default parameter; its `formState` is `null` until the form is loaded), and a private stateless one taking initial values,

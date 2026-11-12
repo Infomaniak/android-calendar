@@ -49,6 +49,7 @@ class AttendeesSearchState<T : OrganizerSource>(
     val participants: SnapshotStateSet<ParticipantUi>,
     organizerSource: T?,
 ) {
+    /** `null` until initialized by the screen. */
     var organizerSource: T? by mutableStateOf(organizerSource)
 
     private val me: AttendeeUi? by derivedStateOf { (organizerSource as? OrganizerSource.Dynamic)?.owner }
