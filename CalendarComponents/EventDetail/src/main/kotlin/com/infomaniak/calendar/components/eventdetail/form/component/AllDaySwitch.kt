@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
+import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.component.items.SegmentedListItemSwitch
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -44,7 +45,7 @@ internal fun AllDaySwitch(
         onCheckedChange = onCheckedChange,
         modifier = modifier,
         shapes = shapes,
-        leadingContent = { Icon(EsdsIcons.Clock.Small, contentDescription = null) },
+        leadingContent = { ItemIcon(EsdsIcons.Clock.Small) },
     ) {
         Text(stringResource(id = R.string.notificationAllDay))
     }

@@ -40,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.calendar.CalendarChoiceDialog
 import com.infomaniak.calendar.components.eventdetail.component.calendar.CalendarDot
 import com.infomaniak.calendar.components.eventdetail.component.items.DropDownItem
+import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
@@ -57,7 +58,7 @@ internal fun Calendar(calendarColor: Color, calendarName: String, shapes: ListIt
             containerColor = MaterialTheme.colorScheme.surfaceBright,
         ),
         content = { Text(stringResource(id = R.string.sectionCalendarHeader)) },
-        leadingContent = { Icon(EsdsIcons.Calendar.Small, contentDescription = null) },
+        leadingContent = { ItemIcon(EsdsIcons.Calendar.Small) },
         trailingContent = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
