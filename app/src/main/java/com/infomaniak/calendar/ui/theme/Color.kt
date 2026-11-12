@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.theme
 
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -29,6 +30,10 @@ val White = Color(0xFFFFFFFF)
 data class CustomColorScheme(val avatarInitialsColor: Color = Color.Unspecified)
 
 object CustomColors {
-    val MenuDrawerContainerBackground @Composable get() = MaterialTheme.colorScheme.surfaceBright
-    val SettingItemContainerColor @Composable get() = MenuDrawerContainerBackground
+    val SegmentedItemColor @Composable get() = MaterialTheme.colorScheme.surfaceBright
+    val MenuDrawerContainerBackground @Composable get() = SegmentedItemColor
+    val SettingItemContainerColor @Composable get() = SegmentedItemColor
+    val EventFormItemContainerColor @Composable get() = SegmentedItemColor
+
+    val EventFormItemColors @Composable get() = ListItemDefaults.segmentedColors(containerColor = EventFormItemContainerColor)
 }
