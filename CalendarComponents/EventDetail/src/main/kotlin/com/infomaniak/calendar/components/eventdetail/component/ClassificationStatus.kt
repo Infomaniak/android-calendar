@@ -59,14 +59,12 @@ internal fun ClassificationStatusSwitch(
     onCheckedChange: (isChecked: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
-    backgroundColor: Color? = null,
 ) {
     ListItemSwitch(
         checked,
         onCheckedChange,
         modifier,
         shapes = shapes,
-        backgroundColor = backgroundColor,
         leadingContent = { ClassificationIcon() },
     ) {
         Text(text = stringResource(EventDetailUi.Classification.Public.label))

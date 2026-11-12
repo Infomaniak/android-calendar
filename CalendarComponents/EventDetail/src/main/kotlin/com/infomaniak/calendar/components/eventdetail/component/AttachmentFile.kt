@@ -45,9 +45,6 @@ internal fun AttachmentFile(
             val fileType = file.fileType
             ItemIcon(fileType.icon, tint = fileType.color(LocalIsThemeDarkMode.current))
         },
-        backgroundColor = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright,
-        ),
         onClick = { onFileClick(file.id) },
         modifier = modifier,
         contentPadding = contentPadding,

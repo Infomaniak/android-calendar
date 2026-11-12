@@ -111,7 +111,6 @@ fun EventForm(
                     checked = state.isAllDay::value,
                     onCheckedChange = { isChecked -> state.isAllDay.value = isChecked },
                     shapes = it,
-                    backgroundColor = MaterialTheme.colorScheme.surfaceBright,
                 )
             }
         }
@@ -142,7 +141,6 @@ fun EventForm(
                 KMeetButtonSwitch(
                     shapes = it,
                     checked = state.isKMeetUrlEnabled::value,
-                    backgroundColor = MaterialTheme.colorScheme.surfaceBright,
                     onCheckedChange = { isChecked -> state.isKMeetUrlEnabled.value = isChecked },
                     modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
                 )
@@ -196,7 +194,6 @@ fun EventForm(
                     onCheckedChange = { isChecked -> state.isOccupied.value = isChecked },
                     modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus),
                     shapes = it,
-                    backgroundColor = MaterialTheme.colorScheme.surfaceBright,
                 )
             }
 
@@ -206,7 +203,6 @@ fun EventForm(
                     onCheckedChange = { isChecked -> state.isPublic.value = isChecked },
                     modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
                     shapes = it,
-                    backgroundColor = MaterialTheme.colorScheme.surfaceBright,
                 )
             }
 

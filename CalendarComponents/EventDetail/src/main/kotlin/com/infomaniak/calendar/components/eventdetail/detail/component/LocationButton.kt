@@ -42,9 +42,6 @@ internal fun LocationButton(
         leadingIcon = EsdsIcons.MapPin,
         onClick = onClick,
         shapes = shapes,
-        backgroundColor = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright,
-        ),
         contentPadding = contentPadding,
         modifier = modifier,
     )

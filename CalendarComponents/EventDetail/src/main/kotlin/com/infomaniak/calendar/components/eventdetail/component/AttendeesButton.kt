@@ -44,7 +44,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus.Accepted
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus.Declined
@@ -76,9 +75,6 @@ internal fun AttendeesButton(
         contentPadding = contentPadding,
         onClick = onClick,
         shapes = shapes,
-        backgroundColor = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright,
-        ),
         leadingIcon = EsdsIcons.UsersStacked,
         text = if (attendeeList.isEmpty()) {
             stringResource(R.string.attendees)
@@ -91,7 +87,10 @@ internal fun AttendeesButton(
             { Text(text = participationSummary(attendeeList)) }
         },
         trailingContent = {
-            Row(horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 if (attendeeList.isEmpty()) {
                     Text(stringResource(R.string.noAttendeesLabel))
                 } else {

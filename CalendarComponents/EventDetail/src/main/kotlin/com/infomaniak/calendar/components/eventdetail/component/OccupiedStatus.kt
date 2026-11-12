@@ -26,7 +26,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
@@ -54,10 +53,9 @@ internal fun OccupiedStatusSwitch(
     checked: () -> Boolean,
     onCheckedChange: (isChecked: Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    backgroundColor: Color? = null,
     shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
 ) {
-    ListItemSwitch(checked, onCheckedChange, modifier, shapes = shapes, backgroundColor = backgroundColor, leadingContent = { OccupiedIcon() }) {
+    ListItemSwitch(checked, onCheckedChange, modifier, shapes = shapes, leadingContent = { OccupiedIcon() }) {
         Text(text = stringResource(R.string.occupiedLabel))
     }
 }

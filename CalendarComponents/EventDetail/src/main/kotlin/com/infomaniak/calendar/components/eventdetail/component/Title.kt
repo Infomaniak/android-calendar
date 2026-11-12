@@ -44,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIconDefaults
+import com.infomaniak.calendar.components.eventdetail.utils.CustomColors
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.theme.MaterialPreviewTheme
 
@@ -54,9 +55,7 @@ internal fun Title(dotColor: Color, title: String, shapes: ListItemShapes, modif
     ListItem(
         leadingContent = { EventColorDot(dotColor) },
         shapes = shapes,
-        colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright,
-        ),
+        colors = CustomColors.EventFormItemColors,
         content = { Text(text = title, style = MaterialTheme.typography.titleLargeEmphasized, maxLines = MAX_LINES) },
         modifier = modifier,
     )

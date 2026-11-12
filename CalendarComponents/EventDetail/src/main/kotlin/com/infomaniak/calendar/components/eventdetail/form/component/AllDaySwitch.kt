@@ -24,14 +24,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
 import com.infomaniak.calendar.components.eventdetail.component.items.ListItemSwitch
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.icons.EsdsIcons
-import com.infomaniak.designsystem.icons.symbols.Calendar
 import com.infomaniak.designsystem.icons.symbols.Clock
 
 @Composable
@@ -39,7 +37,6 @@ internal fun AllDaySwitch(
     checked: () -> Boolean,
     onCheckedChange: (isChecked: Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    backgroundColor: Color? = null,
     shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
 ) {
     ListItemSwitch(
@@ -47,7 +44,6 @@ internal fun AllDaySwitch(
         onCheckedChange = onCheckedChange,
         modifier = modifier,
         shapes = shapes,
-        backgroundColor = backgroundColor,
         leadingContent = { Icon(EsdsIcons.Clock.Small, contentDescription = null) },
     ) {
         Text(stringResource(id = R.string.notificationAllDay))

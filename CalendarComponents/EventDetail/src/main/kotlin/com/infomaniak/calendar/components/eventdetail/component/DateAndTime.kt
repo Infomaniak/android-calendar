@@ -37,6 +37,7 @@ import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
+import com.infomaniak.calendar.components.eventdetail.utils.CustomColors
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRangeWithZone
@@ -120,7 +121,7 @@ internal fun DateAndTimeEditable(
         modifier = modifier
             .alpha(if (shouldDisplay) 1f else 0f)
             .clip(shapes.shape)
-            .background(MaterialTheme.colorScheme.surfaceBright)
+            .background(CustomColors.EventFormItemContainerColor)
             .padding(EsdsTheme.spacing.md),
         verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
     ) {

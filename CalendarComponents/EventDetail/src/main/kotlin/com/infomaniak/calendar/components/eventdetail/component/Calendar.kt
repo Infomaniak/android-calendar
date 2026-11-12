@@ -98,7 +98,6 @@ internal fun CalendarEditable(
         },
         itemCount = calendars.sumOf { it.calendars.size },
         shapes = shapes,
-        backgroundColor = MaterialTheme.colorScheme.surfaceBright,
         modifier = modifier,
     )
 

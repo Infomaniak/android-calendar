@@ -48,9 +48,6 @@ internal fun RoomButton(
     ClickableItem(
         shapes = shapes,
         text = room.title,
-        backgroundColor = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright,
-        ),
         leadingIcon = EsdsIcons.DoorOpen,
         supportingContent = {
             val locale = LocalLocale.current.platformLocale

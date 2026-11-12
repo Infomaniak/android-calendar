@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemColors
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.LocalTextStyle
@@ -32,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.eventdetail.utils.CustomColors
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ChevronRight
 import com.infomaniak.designsystem.icons.symbols.ProductKmeet
@@ -44,7 +44,6 @@ internal fun ClickableItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
-    backgroundColor: ListItemColors? = null,
     shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
     trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
     supportingContent: @Composable (() -> Unit)? = null,
@@ -54,7 +53,6 @@ internal fun ClickableItem(
         leadingContent = { ItemIcon(leadingIcon) },
         onClick = onClick,
         modifier = modifier,
-        backgroundColor = backgroundColor,
         contentPadding = contentPadding,
         trailingContent = trailingContent,
         supportingContent = supportingContent,
@@ -68,7 +66,6 @@ internal fun ClickableItem(
     leadingContent: @Composable () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    backgroundColor: ListItemColors? = null,
     contentPadding: PaddingValues = PaddingValues(),
     shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
     trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
@@ -77,9 +74,7 @@ internal fun ClickableItem(
     ListItem(
         modifier = modifier,
         content = { Text(text) },
-        colors = backgroundColor ?: ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright,
-        ),
+        colors = CustomColors.EventFormItemColors,
         supportingContent = supportingContent,
         leadingContent = leadingContent,
         trailingContent = {

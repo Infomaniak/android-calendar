@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.eventdetail.utils.CustomColors
 import com.infomaniak.calendar.components.foundation.component.ListItemClickable
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -48,7 +49,6 @@ internal fun DropDownItem(
     itemCount: Int,
     shapes: ListItemShapes,
     modifier: Modifier = Modifier,
-    backgroundColor: Color? = null,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     ListItemClickable(
@@ -56,9 +56,7 @@ internal fun DropDownItem(
         contentPadding = contentPadding + ListItemDefaults.ContentPadding,
         content = content,
         shapes = shapes,
-        colors = ListItemDefaults.colors(
-            containerColor = backgroundColor ?: MaterialTheme.colorScheme.surfaceBright,
-        ),
+        colors = CustomColors.EventFormItemColors,
         trailingContent = {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),
