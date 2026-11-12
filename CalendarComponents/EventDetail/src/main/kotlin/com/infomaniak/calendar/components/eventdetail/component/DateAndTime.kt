@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -30,7 +29,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
@@ -42,7 +40,6 @@ import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatD
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRangeWithZone
 import com.infomaniak.core.common.utils.today
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Clock
 import kotlinx.datetime.DatePeriod
@@ -111,34 +108,42 @@ internal fun DateAndTimeEditable(
     dateAndTimeState: DateAndTimeState?,
     isAllDay: () -> Boolean,
     onTimeZoneClick: (isStart: Boolean) -> Unit,
-    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
 ) {
     val shouldDisplay = dateAndTimeState != null
     val dateAndTimeState = dateAndTimeState ?: DateAndTimeState.Dummy
 
     Column(
-        modifier = modifier
-            .alpha(if (shouldDisplay) 1f else 0f)
-            .clip(shapes.shape)
-            .background(CustomColors.EventFormItemContainerColor)
-            .padding(EsdsTheme.spacing.md),
-        verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
+        modifier = modifier.alpha(if (shouldDisplay) 1f else 0f),
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
     ) {
         with(dateAndTimeState) {
-            DateAndTimeEntry(
-                entry = start,
-                isAllDay = isAllDay,
-                onDatePicked = { start.pickDate(it) },
-                onTimePicked = { start.pickTime(it) },
-                onTimeZoneClick = { onTimeZoneClick(true) },
+            SegmentedListItem(
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 2),
+                colors = CustomColors.EventFormItemColors,
+                content = {
+                    DateAndTimeEntry(
+                        entry = start,
+                        isAllDay = isAllDay,
+                        onDatePicked = { start.pickDate(it) },
+                        onTimePicked = { start.pickTime(it) },
+                        onTimeZoneClick = { onTimeZoneClick(true) },
+                    )
+                },
             )
-            DateAndTimeEntry(
-                entry = end,
-                isAllDay = isAllDay,
-                onDatePicked = { end.pickDate(it) },
-                onTimePicked = { end.pickTime(it) },
-                onTimeZoneClick = { onTimeZoneClick(false) },
+
+            SegmentedListItem(
+                shapes = ListItemDefaults.segmentedShapes(index = 1, count = 2),
+                colors = CustomColors.EventFormItemColors,
+                content = {
+                    DateAndTimeEntry(
+                        entry = end,
+                        isAllDay = isAllDay,
+                        onDatePicked = { end.pickDate(it) },
+                        onTimePicked = { end.pickTime(it) },
+                        onTimeZoneClick = { onTimeZoneClick(false) },
+                    )
+                },
             )
         }
     }
@@ -234,7 +239,6 @@ private fun PreviewEditable() {
                     endTime = LocalTime(9, 0),
                     endTimeZone = TimeZone.currentSystemDefault(),
                 ),
-                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
                 isAllDay = { false },
                 onTimeZoneClick = {},
             )

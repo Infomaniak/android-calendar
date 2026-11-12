@@ -123,7 +123,6 @@ fun EventForm(
                     dateAndTimeState = state.dateAndTimeState,
                     isAllDay = state.isAllDay::value,
                     onTimeZoneClick = onTimeZoneClick,
-                    shapes = it,
                     modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
                 )
             }
