@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults.trailingContent
 import com.infomaniak.calendar.components.eventdetail.utils.CustomColors
 import com.infomaniak.calendar.components.foundation.component.ListItemClickable
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -49,6 +50,7 @@ internal fun DropDownItem(
     itemCount: Int,
     shapes: ListItemShapes,
     modifier: Modifier = Modifier,
+    leadingContent: @Composable (() -> Unit)? = null,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     ListItemClickable(
@@ -66,6 +68,7 @@ internal fun DropDownItem(
                 if (itemCount > 1) Icon(EsdsIcons.ChevronsUpDown.Small, contentDescription = null)
             }
         },
+        leadingContent = leadingContent,
         modifier = modifier,
     )
 }
@@ -78,6 +81,7 @@ private fun Preview() {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 DropDownItem(
                     content = { Text("Dropdown item") },
+                    leadingContent = {},
                     trailingContent = { Text("Value") },
                     onClick = {},
                     shapes = ListItemDefaults.segmentedShapes(index = 0, count = 2),
@@ -86,6 +90,7 @@ private fun Preview() {
 
                 DropDownItem(
                     content = { Text("Disabled item") },
+                    leadingContent = {},
                     trailingContent = { Text("Value") },
                     onClick = {},
                     shapes = ListItemDefaults.segmentedShapes(index = 1, count = 2),

@@ -84,14 +84,12 @@ internal fun CalendarEditable(
     DropDownItem(
         onClick = { isDialogVisible = true },
         content = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(EsdsIcons.Calendar.Small, contentDescription = null)
-                Text(
-                    stringResource(id = R.string.sectionCalendarHeader),
-                    modifier = Modifier.padding(start = EsdsTheme.spacing.lg),
-                )
-            }
+            Text(
+                stringResource(id = R.string.sectionCalendarHeader),
+                modifier = Modifier.padding(start = EsdsTheme.spacing.lg),
+            )
         },
+        leadingContent = { Icon(EsdsIcons.Calendar.Small, contentDescription = null) },
         trailingContent = {
             CalendarDot(selectedCalendar.color)
             Text(text = selectedCalendar.name, style = MaterialTheme.typography.labelLarge)
