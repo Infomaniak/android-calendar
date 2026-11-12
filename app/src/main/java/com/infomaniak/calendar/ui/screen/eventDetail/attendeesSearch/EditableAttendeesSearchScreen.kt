@@ -34,7 +34,6 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
-import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
@@ -74,7 +73,7 @@ fun EditableAttendeesSearchScreen(
                 occurrenceId = config.occurrenceId,
                 attendeesUpdatePayload = AttendeesUpdatePayload(
                     attendees = attendeesSearchState.attendees,
-                    organizer = (attendeesSearchState.organizerSource as? OrganizerSource.Static)?.organizer,
+                    organizer = attendeesSearchState.organizerSource?.organizer,
                     calendarId = CalendarId(config.calendarId),
                 ),
                 scope = scope,
