@@ -20,4 +20,4 @@ package com.infomaniak.calendar.components.locationsearch.models
 import androidx.compose.runtime.Immutable
 
 @Immutable
-data class RoomUi(val id: String, val name: String, val seats: Int?, val floor: Int?)
+data class SearchRoomUi(val id: String, val name: String, val seats: Int?, val floor: Int?)

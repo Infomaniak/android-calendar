@@ -62,13 +62,7 @@ fun Event.toEventDetailUi(
     attendees = attendees.toAttendees(accountId, emailsByUserId),
     organizer = organizer?.toOrganizerUi(),
     kMeetUrl = meetRoomUrl,
-    location = when (val location = location) {
-        is Location.Place -> EventDetailUi.Location.Place(location.text)
-        is Location.BookableRoom -> location.resource?.let {
-            EventDetailUi.Location.Room(id = it.uuid.value, title = it.name, seats = it.capacity, floor = it.floor, location = it.location)
-        }
-        null -> null
-    },
+    location = location?.toLocationUi(),
     urlLink = null, // TODO[eventDetail]: Not carried by the KMP model yet
     description = description,
     files = emptyList(), // TODO[eventDetail]: Not carried by the KMP model yet
@@ -82,6 +76,13 @@ private fun EventColors.toEventColorChoice(): EventColorChoice = if (sourceColor
     EventColorChoice.Default
 } else {
     EventColorChoice.Custom(Color(sourceColor))
+}
+
+private fun Location.toLocationUi(): EventDetailUi.LocationUi? = when (this) {
+    is Location.Place -> EventDetailUi.LocationUi.Place(text)
+    is Location.BookableRoom -> resource?.let {
+        EventDetailUi.LocationUi.Room(id = it.uuid.value, title = it.name, seats = it.capacity, floor = it.floor, location = it.location)
+    }
 }
 
 private fun EventTiming.toDetailTiming(isStart: Boolean): EventDetailTiming = when (val bounds = bounds) {

@@ -95,7 +95,7 @@ fun EventDetail(
                     )
                 }
 
-                location?.address?.takeIf { it.isNotBlank() }?.let { address ->
+                location?.address?.let { address ->
                     LocationButton(
                         location = address,
                         onClick = onLocationClick,
@@ -103,7 +103,7 @@ fun EventDetail(
                     )
                 }
 
-                if (location is EventDetailUi.Location.Room) {
+                if (location is EventDetailUi.LocationUi.Room) {
                     RoomButton(room = location, onClick = onRoomClick)
                 }
             }

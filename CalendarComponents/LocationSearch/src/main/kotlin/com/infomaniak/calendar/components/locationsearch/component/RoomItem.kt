@@ -27,12 +27,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.RoomDetails
-import com.infomaniak.calendar.components.locationsearch.models.RoomUi
+import com.infomaniak.calendar.components.locationsearch.models.SearchRoomUi
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.DoorOpen
 
 @Composable
-internal fun RoomItem(room: RoomUi, shapes: ListItemShapes, onClick: () -> Unit, modifier: Modifier = Modifier) {
+internal fun RoomItem(room: SearchRoomUi, shapes: ListItemShapes, onClick: () -> Unit, modifier: Modifier = Modifier) {
     SegmentedListItem(
         onClick = onClick,
         shapes = shapes,
@@ -50,7 +50,7 @@ internal fun RoomItem(room: RoomUi, shapes: ListItemShapes, onClick: () -> Unit,
 private fun Preview() {
     Surface {
         RoomItem(
-            room = RoomUi(id = "1", name = "Salle Jules Verne", seats = 100, floor = 3),
+            room = SearchRoomUi(id = "1", name = "Salle Jules Verne", seats = 100, floor = 3),
             shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             onClick = {},
         )

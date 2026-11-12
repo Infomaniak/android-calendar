@@ -47,7 +47,7 @@ data class EventDetailUi(
     val attendees: Attendees,
     val organizer: OrganizerUi?,
     val kMeetUrl: String?,
-    val location: Location?,
+    val location: LocationUi?,
     val urlLink: String?,
     val description: String?,
     val files: List<File>,
@@ -89,7 +89,13 @@ data class EventDetailUi(
         Private(R.string.privateLabel),
     }
 
-    sealed interface Location : Parcelable {
+    sealed interface LocationUi : Parcelable {
+        val label: String
+            get() = when (this) {
+                is Place -> text
+                is Room -> title
+            }
+
         val address: String?
             get() = when (this) {
                 is Place -> text
@@ -97,9 +103,9 @@ data class EventDetailUi(
             }
 
         @Parcelize
-        data class Place(val text: String) : Location
+        data class Place(val text: String) : LocationUi
 
         @Parcelize
-        data class Room(val id: String, val title: String, val seats: Int?, val floor: Int?, val location: String?) : Location
+        data class Room(val id: String, val title: String, val seats: Int?, val floor: Int?, val location: String?) : LocationUi
     }
 }

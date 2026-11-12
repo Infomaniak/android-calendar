@@ -97,9 +97,9 @@ fun EventDraft.toNewEventEditData(defaultOrganizer: Organizer?): EventEditData =
 )
 
 /** [current] is only read for a room unknown locally: the form can't show it, so saving would otherwise drop its booking. */
-private fun EventDetailUi.Location?.toLocation(current: Location?): Location? = when (this) {
-    is EventDetailUi.Location.Place -> Location.Place(text)
-    is EventDetailUi.Location.Room -> Location.BookableRoom(BookableResourceUuid(id), resource = null)
+private fun EventDetailUi.LocationUi?.toLocation(current: Location?): Location? = when (this) {
+    is EventDetailUi.LocationUi.Place -> Location.Place(text)
+    is EventDetailUi.LocationUi.Room -> Location.BookableRoom(BookableResourceUuid(id), resource = null)
     null -> current.takeIf { it is Location.BookableRoom && it.resource == null }
 }
 

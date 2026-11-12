@@ -31,7 +31,7 @@ import com.infomaniak.designsystem.icons.symbols.DoorOpen
 
 @Composable
 internal fun RoomButton(
-    room: EventDetailUi.Location.Room,
+    room: EventDetailUi.LocationUi.Room,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
@@ -51,7 +51,7 @@ internal fun RoomButton(
 private fun PreviewRoomButton() {
     MaterialTheme {
         Surface {
-            RoomButton(room = EventDetailUi.Location.Room(id = "1", title = "Japan room", seats = 5, floor = 3, location = null), onClick = {})
+            RoomButton(room = EventDetailUi.LocationUi.Room(id = "1", title = "Japan room", seats = 5, floor = 3, location = null), onClick = {})
         }
     }
 }

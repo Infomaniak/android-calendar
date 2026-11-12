@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.input.TextFieldState
@@ -41,7 +40,7 @@ import com.infomaniak.calendar.components.foundation.component.SearchBar
 import com.infomaniak.calendar.components.foundation.models.SearchableText
 import com.infomaniak.calendar.components.locationsearch.component.PlaceItem
 import com.infomaniak.calendar.components.locationsearch.component.RoomItem
-import com.infomaniak.calendar.components.locationsearch.models.RoomUi
+import com.infomaniak.calendar.components.locationsearch.models.SearchRoomUi
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -53,14 +52,14 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 @Composable
 fun LocationSearch(
     searchState: TextFieldState,
-    rooms: List<RoomUi>,
+    rooms: List<SearchRoomUi>,
     onLocationClick: (String) -> Unit,
-    onRoomClick: (RoomUi) -> Unit,
+    onRoomClick: (SearchRoomUi) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val typedLocation by remember(searchState) { derivedStateOf { searchState.text.trim().toString() } }
-    val searchableRooms = remember(rooms) { rooms.map { it to SearchableText(it.name) } }
+    val searchableRooms = remember(rooms) { rooms.associateWith { SearchableText(it.name) } }
     val visibleRooms by remember(searchableRooms) {
         derivedStateOf {
             searchableRooms.mapNotNull { (room, name) -> room.takeIf { typedLocation.isEmpty() || name.find(typedLocation) != null } }
@@ -79,8 +78,7 @@ fun LocationSearch(
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
-            contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()) +
-                PaddingValues(bottom = EsdsTheme.spacing.sm),
+            contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding() + EsdsTheme.spacing.sm),
         ) {
             val typedCount = if (typedLocation.isEmpty()) 0 else 1
             val count = typedCount + visibleRooms.size
@@ -112,9 +110,9 @@ private fun Preview() {
             LocationSearch(
                 searchState = rememberTextFieldState(),
                 rooms = listOf(
-                    RoomUi(id = "1", name = "Salle Jules Verne", seats = 100, floor = 3),
-                    RoomUi(id = "2", name = "Salle Blanche", seats = 8, floor = 1),
-                    RoomUi(id = "3", name = "Salle de sport", seats = 50, floor = 0),
+                    SearchRoomUi(id = "1", name = "Salle Jules Verne", seats = 100, floor = 3),
+                    SearchRoomUi(id = "2", name = "Salle Blanche", seats = 8, floor = 1),
+                    SearchRoomUi(id = "3", name = "Salle de sport", seats = 50, floor = 0),
                 ),
                 onLocationClick = {},
                 onRoomClick = {},

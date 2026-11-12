@@ -22,7 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
-import com.infomaniak.calendar.components.locationsearch.models.RoomUi
+import com.infomaniak.calendar.components.locationsearch.models.SearchRoomUi
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.multiplatform_calendar.bookable_resources.domain.model.BookableResource
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
@@ -31,7 +31,6 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
-import com.infomaniak.core.common.cancellable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -43,7 +42,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -62,12 +61,12 @@ class LocationSearchViewModel(
     private var resources = emptyMap<String, BookableResource>()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val rooms: StateFlow<List<RoomUi>> = calendarId
+    val rooms: StateFlow<List<SearchRoomUi>> = calendarId
         .filterNotNull()
         .flatMapLatest(::resourcesOf)
         .map { resources ->
             this.resources = resources.associateBy { it.uuid.value }
-            resources.map { it.toRoomUi() }
+            resources.map { it.toSearchRoomUi() }
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
@@ -78,7 +77,7 @@ class LocationSearchViewModel(
     }
 
     /** The form's room for a room listed in [rooms]. */
-    fun formRoomOf(room: RoomUi): EventDetailUi.Location.Room = EventDetailUi.Location.Room(
+    fun formRoomOf(room: SearchRoomUi): EventDetailUi.LocationUi.Room = EventDetailUi.LocationUi.Room(
         id = room.id,
         title = room.name,
         seats = room.seats,
@@ -95,14 +94,10 @@ class LocationSearchViewModel(
         snapshotFlow { CalendarId(formState.calendar.id) }
             .drop(1) // The form's own calendar, only switching away from it can leave its room behind
             .collectLatest { calendarId ->
-                val room = formState.location as? EventDetailUi.Location.Room ?: return@collectLatest
+                val room = formState.location as? EventDetailUi.LocationUi.Room ?: return@collectLatest
 
-                runCatching {
-                    val canBookRoom = calendarBookableResourcesManager.observeResources(calendarId).first().any { it.uuid.value == room.id }
-                    if (!canBookRoom && formState.location == room) formState.location = null
-                }.cancellable().onFailure { throwable ->
-                    SentryLog.w(TAG, "Failed to check the room against the new calendar's rooms", throwable)
-                }
+                val resources = calendarBookableResourcesManager.observeResources(calendarId).firstOrNull() ?: return@collectLatest
+                if (resources.none { it.uuid.value == room.id }) formState.location = null
             }
     }
 
@@ -114,7 +109,7 @@ class LocationSearchViewModel(
         }
     }
 
-    private fun BookableResource.toRoomUi() = RoomUi(id = uuid.value, name = name, seats = capacity, floor = floor)
+    private fun BookableResource.toSearchRoomUi() = SearchRoomUi(id = uuid.value, name = name, seats = capacity, floor = floor)
 
     companion object {
         private const val TAG = "LocationSearchViewModel"

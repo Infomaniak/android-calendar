@@ -58,7 +58,7 @@ class EventFormState(
     end: LocalDateTime,
     endTimeZone: TimeZone,
     hasEndEverBeenTouched: Boolean,
-    location: EventDetailUi.Location?,
+    location: EventDetailUi.LocationUi?,
     participants: Set<ParticipantUi>,
     organizerSource: OrganizerSource?,
     isKMeetUrlEnabled: Boolean,

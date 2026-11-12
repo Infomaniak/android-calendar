@@ -33,7 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.locationsearch.LocationSearch
-import com.infomaniak.calendar.components.locationsearch.models.RoomUi
+import com.infomaniak.calendar.components.locationsearch.models.SearchRoomUi
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
@@ -51,10 +51,10 @@ fun LocationSearchScreen(
     val rooms by locationSearchViewModel.rooms.collectAsStateWithLifecycle()
 
     LocationSearchScreen(
-        initialLocation = (formState.location as? EventDetailUi.Location.Place)?.text,
+        initialLocation = (formState.location as? EventDetailUi.LocationUi.Place)?.text,
         rooms = rooms,
         onSubmit = { location ->
-            formState.location = location?.let(EventDetailUi.Location::Place)
+            formState.location = location?.let(EventDetailUi.LocationUi::Place)
             goBack()
         },
         onRoomClick = { room ->
@@ -69,9 +69,9 @@ fun LocationSearchScreen(
 @Composable
 private fun LocationSearchScreen(
     initialLocation: String?,
-    rooms: List<RoomUi>,
+    rooms: List<SearchRoomUi>,
     onSubmit: (String?) -> Unit,
-    onRoomClick: (RoomUi) -> Unit,
+    onRoomClick: (SearchRoomUi) -> Unit,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -106,7 +106,7 @@ private fun Preview() {
     CalendarThemeForPreview {
         LocationSearchScreen(
             initialLocation = null,
-            rooms = listOf(RoomUi(id = "1", name = "Salle Jules Verne", seats = 100, floor = 3)),
+            rooms = listOf(SearchRoomUi(id = "1", name = "Salle Jules Verne", seats = 100, floor = 3)),
             onSubmit = {},
             onRoomClick = {},
             goBack = {},

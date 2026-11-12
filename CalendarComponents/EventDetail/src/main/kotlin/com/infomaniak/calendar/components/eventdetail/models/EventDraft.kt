@@ -32,7 +32,7 @@ data class EventDraft(
     val startTimeZone: TimeZone,
     val end: LocalDateTime,
     val endTimeZone: TimeZone,
-    val location: EventDetailUi.Location?,
+    val location: EventDetailUi.LocationUi?,
     val attendees: List<AttendeeUi>,
     val initialOrganizer: OrganizerUi?,
     val isKMeetUrlEnabled: Boolean,
