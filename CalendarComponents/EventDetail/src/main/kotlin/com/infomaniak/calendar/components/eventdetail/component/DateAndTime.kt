@@ -25,6 +25,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.tooling.preview.Preview
@@ -112,10 +116,14 @@ internal fun DateAndTimeEditable(
             .padding(horizontal = EsdsTheme.spacing.xs),
         verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
     ) {
+        var selectedButton by rememberSaveable { mutableStateOf<DateAndTimeEntry?>(null) }
+
         with(dateAndTimeState) {
             DateAndTimeEntry(
                 entry = start,
                 isAllDay = isAllDay,
+                selectedButton = { (selectedButton as? DateAndTimeEntry.Start)?.entryButton },
+                onSelectButton = { selectedButton = it?.let { entryButton -> DateAndTimeEntry.Start(entryButton) } },
                 onDatePicked = { start.pickDate(it) },
                 onTimePicked = { start.pickTime(it) },
                 onTimeZoneClick = { onTimeZoneClick(true) },
@@ -123,12 +131,24 @@ internal fun DateAndTimeEditable(
             DateAndTimeEntry(
                 entry = end,
                 isAllDay = isAllDay,
+                selectedButton = { (selectedButton as? DateAndTimeEntry.End)?.entryButton },
+                onSelectButton = { selectedButton = it?.let { entryButton -> DateAndTimeEntry.End(entryButton) } },
                 onDatePicked = { end.pickDate(it) },
                 onTimePicked = { end.pickTime(it) },
                 onTimeZoneClick = { onTimeZoneClick(false) },
             )
         }
     }
+}
+
+internal sealed interface DateAndTimeEntry {
+    data class Start(val entryButton: EntryButton) : DateAndTimeEntry
+    data class End(val entryButton: EntryButton) : DateAndTimeEntry
+}
+
+internal sealed interface EntryButton {
+    data object Date : EntryButton
+    data object Time : EntryButton
 }
 
 @Preview
