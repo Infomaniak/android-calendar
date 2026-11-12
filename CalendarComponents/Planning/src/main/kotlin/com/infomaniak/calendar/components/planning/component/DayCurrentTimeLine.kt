@@ -30,20 +30,19 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlin.time.Instant
 
 /**
- * Before the ongoing event that started last, otherwise before the next one to start, otherwise after the last one.
- * `null` without any timed event. Expects all-day events first, then timed ones by start.
+ * Before the ongoing timed event that started last, otherwise before the next one to start, otherwise after the last
+ * event, all-day ones included. `null` without any event. Expects all-day events first, then timed ones by start.
  */
 internal fun List<EventSummaryUi>.currentTimeIndex(now: Instant): Int? {
-    val timedEvents = withIndex().mapNotNull { (index, event) ->
-        (event as? EventSummaryUi.Normal)?.takeUnless { it.isAllDay }?.let { IndexedValue(index, it) }
-    }
-    if (timedEvents.isEmpty()) return null
+    val events = withIndex().mapNotNull { (index, event) -> (event as? EventSummaryUi.Normal)?.let { IndexedValue(index, it) } }
+    val timedEvents = events.filterNot { (_, event) -> event.isAllDay }
 
     val ongoing = timedEvents
         .filter { (_, event) -> event.start <= now && now < event.end }
         .maxByOrNull { (_, event) -> event.start }
     val upcoming = timedEvents.firstOrNull { (_, event) -> event.start > now }
-    return ongoing?.index ?: upcoming?.index ?: (timedEvents.last().index + 1)
+    val afterLast = events.lastOrNull()?.let { (index, _) -> index + 1 }
+    return ongoing?.index ?: upcoming?.index ?: afterLast
 }
 
 @Composable
