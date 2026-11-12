@@ -46,7 +46,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.detail.EventDetail
 import com.infomaniak.calendar.components.eventdetail.detail.component.ParticipationStatusButtonsToolbar
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
@@ -185,8 +184,7 @@ private fun EventDetailScreen(
 }
 
 private fun openLocationInMapApp(context: Context, location: String) {
-    // A place's name and address are on separate lines, a single line query finds it more reliably
-    val geoUri = "geo:0,0?q=${Uri.encode(location.lines().joinToString(", ") { it.trim() })}".toUri()
+    val geoUri = "geo:0,0?q=${Uri.encode(location)}".toUri()
     val mapIntent = Intent(Intent.ACTION_VIEW, geoUri)
 
     context.safeStartActivity(mapIntent)

@@ -33,7 +33,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
-import com.infomaniak.calendar.components.eventdetail.detail.component.RoomItem
 import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -72,7 +71,7 @@ internal fun LocationEditable(
     AnimatedContent(
         targetState = location(),
         modifier = modifier,
-        contentKey = { (it is LocationUi.Place) to (it as? LocationUi.Room)?.id },
+        contentKey = { it?.let { location -> location::class } },
         transitionSpec = { fadeIn() togetherWith fadeOut() using SizeTransform(clip = false) },
         label = "LocationEditable",
     ) { location ->
