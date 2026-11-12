@@ -20,8 +20,10 @@ package com.infomaniak.calendar.components.eventdetail.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,11 +35,11 @@ import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
+import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRangeWithZone
 import com.infomaniak.core.common.utils.today
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Clock
 import kotlinx.datetime.DatePeriod
@@ -55,10 +57,15 @@ internal fun DateAndTime(
     start: EventDetailTiming,
     end: EventDetailTiming,
     isAllDay: Boolean,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
 ) {
-    ListItem(
+    SegmentedListItem(
         leadingContent = { ItemIcon(EsdsIcons.Clock) },
+        shapes = shapes,
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceBright,
+        ),
         content = {
             val startAtLocale = start.atLocale
             val endAtLocale = end.atLocale
@@ -74,7 +81,7 @@ internal fun DateAndTime(
         },
         supportingContent = {
             // Floating events and all day events never need to display UTC offset
-            if (isAllDay || start !is EventDetailTiming.Precise || end !is EventDetailTiming.Precise) return@ListItem
+            if (isAllDay || start !is EventDetailTiming.Precise || end !is EventDetailTiming.Precise) return@SegmentedListItem
 
             if (start.utcOffsetAtTimeZone != start.utcOffsetAtLocale || end.utcOffsetAtTimeZone != end.utcOffsetAtLocale) {
                 Text(
@@ -107,25 +114,36 @@ internal fun DateAndTimeEditable(
     val dateAndTimeState = dateAndTimeState ?: DateAndTimeState.Dummy
 
     Column(
-        modifier = modifier
-            .alpha(if (shouldDisplay) 1f else 0f)
-            .padding(horizontal = EsdsTheme.spacing.xs),
-        verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
+        modifier = modifier.alpha(if (shouldDisplay) 1f else 0f),
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
     ) {
         with(dateAndTimeState) {
-            DateAndTimeEntry(
-                entry = start,
-                isAllDay = isAllDay,
-                onDatePicked = { start.pickDate(it) },
-                onTimePicked = { start.pickTime(it) },
-                onTimeZoneClick = { onTimeZoneClick(true) },
+            SegmentedListItem(
+                shapes = ListItemDefaults.segmentedShapes(index = 1, count = 3),
+                colors = CustomColors.EventFormItemColors,
+                content = {
+                    DateAndTimeEntry(
+                        entry = start,
+                        isAllDay = isAllDay,
+                        onDatePicked = { start.pickDate(it) },
+                        onTimePicked = { start.pickTime(it) },
+                        onTimeZoneClick = { onTimeZoneClick(true) },
+                    )
+                },
             )
-            DateAndTimeEntry(
-                entry = end,
-                isAllDay = isAllDay,
-                onDatePicked = { end.pickDate(it) },
-                onTimePicked = { end.pickTime(it) },
-                onTimeZoneClick = { onTimeZoneClick(false) },
+
+            SegmentedListItem(
+                shapes = ListItemDefaults.segmentedShapes(index = 2, count = 3),
+                colors = CustomColors.EventFormItemColors,
+                content = {
+                    DateAndTimeEntry(
+                        entry = end,
+                        isAllDay = isAllDay,
+                        onDatePicked = { end.pickDate(it) },
+                        onTimePicked = { end.pickTime(it) },
+                        onTimeZoneClick = { onTimeZoneClick(false) },
+                    )
+                },
             )
         }
     }
@@ -162,6 +180,7 @@ private fun PreviewDateAndTime() {
                 EventDetailTiming.Precise(end.toInstant(endTimeZone), endTimeZone)
             },
             isAllDay = isAllDay,
+            shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
         )
     }
 

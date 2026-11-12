@@ -23,7 +23,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
-import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
+import com.infomaniak.calendar.components.eventdetail.models.ReminderTime
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Classification
@@ -67,7 +67,7 @@ fun Event.toEventDetailUi(
     urlLink = null, // TODO[eventDetail]: Not carried by the KMP model yet
     description = description,
     files = emptyList(), // TODO[eventDetail]: Not carried by the KMP model yet
-    notifications = alarms.mapNotNull { it.toNotification() },
+    reminders = alarms.mapNotNull { it.toNotification() },
     isOccupied = timeBlocking != TimeBlocking.DoesNotBlock, // null is considered as occupied
     classification = classification.toClassification(),
     canEdit = canEdit,
@@ -89,17 +89,17 @@ private fun EventTiming.toDetailTiming(isStart: Boolean): EventDetailTiming = wh
     }
 }
 
-fun EventAlarm.toNotification(): EventDetailUi.Notification? {
+fun EventAlarm.toNotification(): EventDetailUi.Reminder? {
 
-    return EventDetailUi.Notification(
+    return EventDetailUi.Reminder(
         type = when (action) {
-            AlarmAction.Display -> EventDetailUi.Notification.Type.Push
-            AlarmAction.Email -> EventDetailUi.Notification.Type.Email
+            AlarmAction.Display -> EventDetailUi.Reminder.Type.Push
+            AlarmAction.Email -> EventDetailUi.Reminder.Type.Email
             else -> return null // Other types of alarms are not supported in the UI yet
         },
         time = when (val trigger = trigger) {
-            is AlarmTrigger.Relative -> NotificationTime.Offset(trigger.offset)
-            is AlarmTrigger.Absolute -> NotificationTime.Absolute(trigger.instant)
+            is AlarmTrigger.Relative -> ReminderTime.Offset(trigger.offset)
+            is AlarmTrigger.Absolute -> ReminderTime.Absolute(trigger.instant)
         },
         sourceId = id?.value,
     )

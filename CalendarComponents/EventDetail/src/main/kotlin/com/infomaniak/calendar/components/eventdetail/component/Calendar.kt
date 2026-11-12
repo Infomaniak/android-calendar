@@ -19,8 +19,12 @@ package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.ListItem
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,17 +40,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.calendar.CalendarChoiceDialog
 import com.infomaniak.calendar.components.eventdetail.component.calendar.CalendarDot
 import com.infomaniak.calendar.components.eventdetail.component.items.DropDownItem
+import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Calendar
 
 @Composable
-internal fun Calendar(calendarColor: Color, calendarName: String, modifier: Modifier = Modifier) {
-    ListItem(
+internal fun Calendar(calendarColor: Color, calendarName: String, shapes: ListItemShapes, modifier: Modifier = Modifier) {
+    SegmentedListItem(
+        shapes = shapes,
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceBright,
+        ),
         content = { Text(stringResource(id = R.string.sectionCalendarHeader)) },
+        leadingContent = { ItemIcon(EsdsIcons.Calendar.Small) },
         trailingContent = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -65,18 +77,26 @@ internal fun CalendarEditable(
     selectedCalendar: EventDetailCalendar,
     calendars: List<EventDetailCalendarGroup>,
     onSelect: (EventDetailCalendar) -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
 ) {
     var isDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     DropDownItem(
         onClick = { isDialogVisible = true },
-        content = { Text(stringResource(id = R.string.sectionCalendarHeader)) },
+        content = {
+            Text(
+                stringResource(id = R.string.sectionCalendarHeader),
+                modifier = Modifier.padding(start = EsdsTheme.spacing.lg),
+            )
+        },
+        leadingContent = { Icon(EsdsIcons.Calendar.Small, contentDescription = null) },
         trailingContent = {
             CalendarDot(selectedCalendar.color)
             Text(text = selectedCalendar.name, style = MaterialTheme.typography.labelLarge)
         },
         itemCount = calendars.sumOf { it.calendars.size },
+        shapes = shapes,
         modifier = modifier,
     )
 
@@ -98,7 +118,11 @@ internal fun CalendarEditable(
 private fun Preview() {
     MaterialTheme {
         Surface {
-            Calendar(calendarColor = previewEventDetailCalendar.color, calendarName = previewEventDetailCalendar.name)
+            Calendar(
+                calendarColor = previewEventDetailCalendar.color,
+                calendarName = previewEventDetailCalendar.name,
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            )
         }
     }
 }
@@ -108,7 +132,12 @@ private fun Preview() {
 private fun PreviewEditable() {
     MaterialTheme {
         Surface {
-            CalendarEditable(selectedCalendar = previewEventDetailCalendar, calendars = previewEventDetailCalendarGroups, {})
+            CalendarEditable(
+                selectedCalendar = previewEventDetailCalendar,
+                calendars = previewEventDetailCalendarGroups,
+                {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            )
         }
     }
 }

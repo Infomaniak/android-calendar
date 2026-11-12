@@ -61,7 +61,7 @@ class EventFormState(
     participants: Set<ParticipantUi>,
     organizerSource: OrganizerSource?,
     isKMeetUrlEnabled: Boolean,
-    notifications: List<EventDetailUi.Notification>,
+    reminders: List<EventDetailUi.Reminder>,
     isOccupied: Boolean,
     isPublic: Boolean,
     val calendars: List<EventDetailCalendarGroup>,
@@ -87,7 +87,7 @@ class EventFormState(
     var organizerSource by mutableStateOf(organizerSource)
         private set
     val isKMeetUrlEnabled = mutableStateOf(isKMeetUrlEnabled)
-    val notifications = mutableStateListOf<EventDetailUi.Notification>().apply { addAll(notifications) }
+    val reminders = mutableStateListOf<EventDetailUi.Reminder>().apply { addAll(reminders) }
     val isOccupied = mutableStateOf(isOccupied)
     val isPublic = mutableStateOf(isPublic)
 
@@ -122,7 +122,7 @@ class EventFormState(
             attendees = attendees,
             initialOrganizer = (organizerSource as? OrganizerSource.Static)?.organizer,
             isKMeetUrlEnabled = isKMeetUrlEnabled.value,
-            notifications = notifications.toList(),
+            reminders = reminders.toList(),
             isOccupied = isOccupied.value,
             isPublic = isPublic.value,
         )
@@ -152,7 +152,7 @@ class EventFormState(
                 participants = emptySet(),
                 organizerSource = calendar.organizerAttendeeUi?.let(OrganizerSource::Dynamic),
                 isKMeetUrlEnabled = false,
-                notifications = emptyList(),
+                reminders = emptyList(),
                 isOccupied = true,
                 isPublic = true,
                 calendars = calendars,

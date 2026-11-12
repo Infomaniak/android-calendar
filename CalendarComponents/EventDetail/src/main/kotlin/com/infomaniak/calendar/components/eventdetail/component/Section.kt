@@ -17,58 +17,44 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.Layout
-import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
-import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+
+class SectionScope {
+    val itemList = mutableListOf<@Composable (ListItemShapes) -> Unit>()
+}
+
+fun SectionScope.item(content: @Composable (ListItemShapes) -> Unit) {
+    itemList.add(content)
+}
 
 /**
  * Automatically shows or hides divider based on if any content is composed or not. This layout acts like a column.
  */
 @Composable
 internal fun Section(
-    sharedElementId: EventSharedElement,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
-    content: @Composable () -> Unit,
+    content: SectionScope.() -> Unit,
 ) {
-    Layout(
-        contents = listOf(
-            {
-                Divider(
-                    Modifier
-                        .padding(contentPadding)
-                        .eventSharedElement(sharedElementId),
-                )
-            },
-            content,
-        ),
-        modifier = modifier,
-    ) { (dividerMeasurables, contentMeasurables), constraints ->
-        if (contentMeasurables.isEmpty()) return@Layout layout(0, 0) {}
+    val items = SectionScope().apply(content).itemList
+    if (items.isEmpty()) return
 
-        val childConstraints = constraints.copy(minHeight = 0)
-        val placeables = (dividerMeasurables + contentMeasurables).map { it.measure(childConstraints) }
-
-        val width = placeables.maxOf { it.width }.coerceIn(constraints.minWidth, constraints.maxWidth)
-        val height = placeables.sumOf { it.height }.coerceIn(constraints.minHeight, constraints.maxHeight)
-
-        layout(width, height) {
-            var y = 0
-            placeables.forEach { placeable ->
-                placeable.place(0, y)
-                y += placeable.height
-            }
+    Column(
+        modifier = modifier
+            .padding(contentPadding)
+            .padding(top = EsdsTheme.spacing.md),
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+    ) {
+        items.forEachIndexed { index, item ->
+            item(ListItemDefaults.segmentedShapes(index = index, count = items.size))
         }
     }
-}
-
-@Composable
-private fun Divider(modifier: Modifier = Modifier) {
-    HorizontalDivider(modifier = modifier.padding(vertical = EsdsTheme.spacing.md))
 }

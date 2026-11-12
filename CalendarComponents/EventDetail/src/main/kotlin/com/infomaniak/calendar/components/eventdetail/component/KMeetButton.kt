@@ -23,10 +23,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
@@ -40,7 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
-import com.infomaniak.calendar.components.eventdetail.component.items.ListItemSwitch
+import com.infomaniak.calendar.components.eventdetail.component.items.SegmentedListItemSwitch
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -52,11 +53,16 @@ import com.infomaniak.core.common.R as RCommon
 internal fun KMeetButton(
     onJoin: () -> Unit,
     onCopy: () -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
 ) {
-    ListItem(
+    SegmentedListItem(
         content = { Text(stringResource(id = R.string.participateKMeetTitle)) },
         leadingContent = { KMeetIcon() },
+        shapes = shapes,
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceBright,
+        ),
         trailingContent = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -80,7 +86,7 @@ internal fun KMeetButtonSwitch(
     modifier: Modifier = Modifier,
     shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
 ) {
-    ListItemSwitch(checked, onCheckedChange, modifier, shapes, leadingContent = { KMeetIcon() }) {
+    SegmentedListItemSwitch(checked, onCheckedChange, modifier, shapes = shapes, leadingContent = { KMeetIcon() }) {
         Text(stringResource(id = R.string.kMeetMeeting))
     }
 }
@@ -111,7 +117,7 @@ private fun CopyButton(onClick: () -> Unit) {
 private fun PreviewKMeetButton() {
     MaterialTheme {
         Surface {
-            KMeetButton(onJoin = {}, onCopy = {})
+            KMeetButton(onJoin = {}, onCopy = {}, shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1))
         }
     }
 }
@@ -121,7 +127,11 @@ private fun PreviewKMeetButton() {
 private fun PreviewKMeetButtonSwitch() {
     MaterialTheme {
         Surface {
-            KMeetButtonSwitch(checked = { true }, onCheckedChange = {})
+            KMeetButtonSwitch(
+                checked = { true },
+                onCheckedChange = {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            )
         }
     }
 }

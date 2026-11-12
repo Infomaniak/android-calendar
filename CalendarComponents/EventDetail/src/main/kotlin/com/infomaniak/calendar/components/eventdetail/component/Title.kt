@@ -27,10 +27,12 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,24 +44,36 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIconDefaults
+import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.theme.MaterialPreviewTheme
 
 private const val MAX_LINES = Int.MAX_VALUE
 
 @Composable
-internal fun Title(dotColor: Color, title: String, modifier: Modifier = Modifier) {
-    ListItem(
+internal fun Title(dotColor: Color, title: String, shapes: ListItemShapes, modifier: Modifier = Modifier) {
+    SegmentedListItem(
         leadingContent = { EventColorDot(dotColor) },
+        shapes = shapes,
+        colors = CustomColors.EventFormItemColors,
         content = { Text(text = title, style = MaterialTheme.typography.titleLargeEmphasized, maxLines = MAX_LINES) },
         modifier = modifier,
     )
 }
 
 @Composable
-internal fun TitleEditable(dotColor: () -> Color, textFieldState: TextFieldState, modifier: Modifier = Modifier) {
-    ListItem(
+internal fun TitleEditable(
+    dotColor: () -> Color,
+    textFieldState: TextFieldState,
+    shapes: ListItemShapes,
+    modifier: Modifier = Modifier,
+) {
+    SegmentedListItem(
         leadingContent = { EventColorDot(dotColor()) },
+        shapes = shapes,
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceBright,
+        ),
         content = {
             BasicTextField(
                 state = textFieldState,
@@ -103,7 +117,7 @@ private const val PREVIEW_TITLE = "End of the year vacations with Santa Claus"
 private fun Preview() {
     MaterialPreviewTheme {
         Surface {
-            Title(dotColor = Color.Red, title = PREVIEW_TITLE)
+            Title(dotColor = Color.Red, title = PREVIEW_TITLE, shapes = ListItemDefaults.shapes())
         }
     }
 }
@@ -113,7 +127,11 @@ private fun Preview() {
 private fun PreviewEditable() {
     MaterialPreviewTheme {
         Surface {
-            TitleEditable(dotColor = { Color.Red }, textFieldState = rememberTextFieldState(PREVIEW_TITLE))
+            TitleEditable(
+                dotColor = { Color.Red },
+                textFieldState = rememberTextFieldState(PREVIEW_TITLE),
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            )
         }
     }
 }

@@ -52,7 +52,7 @@ data class EventDetailUi(
     val urlLink: String?,
     val description: String?,
     val files: List<File>,
-    val notifications: List<Notification>,
+    val reminders: List<Reminder>,
     val isOccupied: Boolean,
     val classification: Classification,
     val canEdit: Boolean,
@@ -73,9 +73,9 @@ data class EventDetailUi(
      */
     @Immutable
     @Parcelize
-    data class Notification(
+    data class Reminder(
         val type: Type,
-        val time: NotificationTime,
+        val time: ReminderTime,
         val sourceId: String? = null,
         val uiId: String = sourceId ?: UUID.randomUUID().toString(),
     ) : Parcelable {

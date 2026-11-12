@@ -19,6 +19,8 @@ package com.infomaniak.calendar.components.eventdetail.detail.component
 
 import android.icu.text.MessageFormat
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,10 +41,12 @@ import java.util.Locale
 internal fun RoomButton(
     room: EventDetailUi.Room,
     onClick: () -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     ClickableItem(
+        shapes = shapes,
         text = room.title,
         leadingIcon = EsdsIcons.DoorOpen,
         supportingContent = {
@@ -69,7 +73,11 @@ private fun Int.formatToOrdinal(locale: Locale): String {
 private fun PreviewRoomButton() {
     MaterialTheme {
         Surface {
-            RoomButton(room = EventDetailUi.Room("Japan room", seats = 5, floor = 3), onClick = {})
+            RoomButton(
+                room = EventDetailUi.Room("Japan room", seats = 5, floor = 3),
+                onClick = {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            )
         }
     }
 }

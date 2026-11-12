@@ -29,8 +29,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderOffsetSection
-import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderTypeSection
+import com.infomaniak.calendar.components.eventdetail.component.reminder.ReminderOffsetSection
+import com.infomaniak.calendar.components.eventdetail.component.reminder.ReminderTypeSection
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable

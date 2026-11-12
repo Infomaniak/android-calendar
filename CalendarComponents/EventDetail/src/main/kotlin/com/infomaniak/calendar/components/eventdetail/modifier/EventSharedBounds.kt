@@ -46,8 +46,8 @@ internal fun Modifier.eventSharedBounds(element: EventSharedElement): Modifier {
  * shared with the detail anyway.
  */
 @Composable
-internal fun Modifier.reminderSharedBounds(notification: EventDetailUi.Notification): Modifier {
-    val sourceId = notification.sourceId ?: return this
+internal fun Modifier.reminderSharedBounds(reminder: EventDetailUi.Reminder): Modifier {
+    val sourceId = reminder.sourceId ?: return this
     return eventSharedBounds(EventSharedElement.Reminder(sourceId))
 }
 

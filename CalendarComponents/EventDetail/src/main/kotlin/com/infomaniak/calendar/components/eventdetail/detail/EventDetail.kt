@@ -31,7 +31,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.component.AttachmentFiles
+import com.infomaniak.calendar.components.eventdetail.component.AttachmentFile
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.Calendar
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatus
@@ -39,11 +39,12 @@ import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatus
 import com.infomaniak.calendar.components.eventdetail.component.Recurrence
+import com.infomaniak.calendar.components.eventdetail.component.ReminderItem
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
+import com.infomaniak.calendar.components.eventdetail.component.item
 import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
-import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
 import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
@@ -72,62 +73,111 @@ fun EventDetail(
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
     Column(modifier = modifier.padding(contentPadding)) {
         with(eventDetail) {
-            Title(dotColor = eventColor, title = title, modifier = Modifier.eventSharedElement(EventSharedElement.Title))
-
-            DateAndTime(start, end, isAllDay, Modifier.eventSharedBounds(EventSharedElement.DateAndTime))
-
-            if (recurrence is EventDetailRecurrence.Recurrence) Recurrence(recurrence.getText)
-
-            Section(EventSharedElement.Divider1) {
-                if (attendees.all.isNotEmpty()) {
-                    AttendeesButton(
-                        attendees = { attendees.all },
-                        onClick = goToEventAttendees,
-                        modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
+            Section {
+                item {
+                    Title(
+                        dotColor = eventColor,
+                        title = title,
+                        shapes = it,
+                        modifier = Modifier.eventSharedElement(EventSharedElement.Title),
                     )
+                }
+            }
+
+            Section {
+                item {
+                    DateAndTime(
+                        start,
+                        end,
+                        isAllDay,
+                        shapes = it,
+                        modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
+                    )
+                }
+
+                if (recurrence is EventDetailRecurrence.Recurrence) {
+                    item { Recurrence(recurrence.getText, shapes = it) }
+                }
+            }
+
+            Section {
+                if (attendees.all.isNotEmpty()) {
+                    item {
+                        AttendeesButton(
+                            shapes = it,
+                            attendees = { attendees.all },
+                            onClick = goToEventAttendees,
+                            modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
+                        )
+                    }
                 }
 
                 if (kMeetUrl?.isNotBlank() == true) {
-                    KMeetButton(
-                        onJoin = onJoinKMeet,
-                        onCopy = onCopyKMeet,
-                        modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
-                    )
+                    item {
+                        KMeetButton(
+                            shapes = it,
+                            onJoin = onJoinKMeet,
+                            onCopy = onCopyKMeet,
+                            modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
+                        )
+                    }
                 }
 
                 if (location?.isNotBlank() == true) {
-                    LocationButton(location = location, onClick = onLocationClick)
+                    item { LocationButton(location = location, shapes = it, onClick = onLocationClick) }
                 }
 
                 if (room != null) {
-                    RoomButton(room = room, onClick = onRoomClick)
+                    item { RoomButton(room = room, shapes = it, onClick = onRoomClick) }
                 }
             }
 
-            Section(EventSharedElement.Divider2) {
+            Section {
                 if (description?.isNotBlank() == true) {
-                    DescriptionCollapsibleButton(description = description)
+                    item { DescriptionCollapsibleButton(description = description, shapes = it) }
                 }
 
-                AttachmentFiles(files, onFileClick = { /*TODO[eventDetail]*/ })
+                files.forEach { file ->
+                    item { AttachmentFile(file, onFileClick = { /*TODO[eventDetail]*/ }, shapes = it) }
+                }
             }
 
-            Section(EventSharedElement.Divider3) {
-                Notifications(
-                    notifications = notifications,
-                    onNotificationClick = { /*TODO[eventDetail]*/ },
-                )
+            Section {
+                reminders.forEach { reminder ->
+                    item {
+                        ReminderItem(
+                            reminder = reminder,
+                            onReminderClick = { /*TODO[eventDetail]*/ },
+                            shapes = it,
+                        )
+                    }
+                }
             }
 
-            Section(EventSharedElement.Divider4) {
-                OccupiedStatus(isOccupied, modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus))
+            Section {
+                item {
+                    OccupiedStatus(
+                        isOccupied,
+                        modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus),
+                        shapes = it,
+                    )
+                }
+                item {
+                    ClassificationStatus(
+                        classification = classification,
+                        modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
+                        shapes = it,
+                    )
+                }
 
-                ClassificationStatus(
-                    classification = classification,
-                    modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
-                )
-
-                Calendar(calendar.color, calendar.name, Modifier.eventSharedBounds(EventSharedElement.Calendar))
+                item {
+                    Calendar(
+                        calendar.color,
+                        calendar.name,
+                        shapes = it,
+                        Modifier.eventSharedBounds(EventSharedElement.Calendar),
+                    )
+                }
             }
         }
     }
