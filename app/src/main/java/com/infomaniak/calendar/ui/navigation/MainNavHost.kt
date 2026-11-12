@@ -229,7 +229,10 @@ private fun baseEntryProvider(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
-            LocationSearchScreen(goBack = { backStack.popOrReplaceRoot(defaultCalendarView) })
+            LocationSearchScreen(
+                editedOccurrenceId = (destination.parent as? NavDestination.EventForm.EventEdit)?.occurrenceId,
+                goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
+            )
         }
 
         is NavDestination.Accounts.List -> NavEntry(destination) {

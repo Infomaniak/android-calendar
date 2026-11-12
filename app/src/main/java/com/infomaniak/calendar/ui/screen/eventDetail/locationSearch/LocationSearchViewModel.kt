@@ -70,6 +70,7 @@ class LocationSearchViewModel(
 ) : ViewModel() {
     private val availabilityRequest = MutableStateFlow<RoomAvailabilityRequest?>(null)
     private var resources = emptyMap<String, BookableResource>()
+    private var editedTiming: Pair<OccurrenceId, EventTiming?>? = null
 
     /** Null until known: listing the rooms before would reorder them under the user, keeping the available ones out of view. */
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -135,12 +136,18 @@ class LocationSearchViewModel(
 
     private suspend fun availabilityOf(request: RoomAvailabilityRequest): Map<BookableResourceUuid, Boolean> {
         return runCatching {
-            val editedTiming = request.editedOccurrenceId?.let { calendarManager.observeOccurrence(it).first() }?.timing
+            val editedTiming = request.editedOccurrenceId?.let { editedTimingOf(it) }
             val timing = editedTiming?.copy(bounds = request.bounds) ?: EventTiming(bounds = request.bounds)
             calendarBookableResourcesManager.availability(request.calendarId, timing)
         }.cancellable().onFailure { throwable ->
             SentryLog.w(TAG, "Failed to load the rooms availability", throwable)
         }.getOrDefault(emptyMap())
+    }
+
+    /** Read once: only its recurrence is used, and reading an occurrence expands its whole series. */
+    private suspend fun editedTimingOf(occurrenceId: OccurrenceId): EventTiming? {
+        editedTiming?.let { (id, timing) -> if (id == occurrenceId) return timing }
+        return calendarManager.getEditData(occurrenceId)?.timing.also { editedTiming = occurrenceId to it }
     }
 
     private fun BookableResource.toSearchRoomUi(isAvailable: Boolean?) = SearchRoomUi(

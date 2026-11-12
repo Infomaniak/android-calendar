@@ -25,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -39,10 +40,12 @@ import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.calendar.components.resources.R as RComponents
 
 @Composable
 fun LocationSearchScreen(
+    editedOccurrenceId: OccurrenceId?,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
     locationSearchViewModel: LocationSearchViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
@@ -50,6 +53,10 @@ fun LocationSearchScreen(
 ) {
     val formState = eventFormViewModel.formState ?: return
     val rooms by locationSearchViewModel.rooms.collectAsStateWithLifecycle()
+
+    LaunchedEffect(formState) {
+        locationSearchViewModel.followForm(formState, editedOccurrenceId)
+    }
 
     LocationSearchScreen(
         initialLocation = (formState.location as? EventDetailUi.LocationUi.Place)?.text,
