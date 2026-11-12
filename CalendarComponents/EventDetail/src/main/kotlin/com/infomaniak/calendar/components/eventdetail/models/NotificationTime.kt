@@ -17,10 +17,15 @@
  */
 package com.infomaniak.calendar.components.eventdetail.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import kotlin.time.Duration
 import kotlin.time.Instant
 
-sealed interface NotificationTime {
+sealed interface NotificationTime : Parcelable {
+    @Parcelize
     data class Offset(val duration: Duration) : NotificationTime
+
+    @Parcelize
     data class Absolute(val instant: Instant) : NotificationTime
 }

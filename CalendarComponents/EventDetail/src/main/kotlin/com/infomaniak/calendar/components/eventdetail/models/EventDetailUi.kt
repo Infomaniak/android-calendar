@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.eventdetail.models
 
+import android.os.Parcelable
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import com.infomaniak.calendar.components.foundation.models.Attendees
@@ -27,6 +28,7 @@ import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Bell
 import com.infomaniak.designsystem.icons.symbols.BubbleTopRightCircle
 import com.infomaniak.designsystem.icons.symbols.Symbol
+import kotlinx.parcelize.Parcelize
 import java.util.UUID
 
 /**
@@ -70,12 +72,13 @@ data class EventDetailUi(
      * @param uiId Tells apart reminders that are otherwise identical, which the user may add twice. Used for UI animtions.
      */
     @Immutable
+    @Parcelize
     data class Notification(
         val type: Type,
         val time: NotificationTime,
         val sourceId: String? = null,
         val uiId: String = sourceId ?: UUID.randomUUID().toString(),
-    ) {
+    ) : Parcelable {
         @Immutable
         enum class Type(val icon: Symbol, @StringRes val label: Int) {
             Email(EsdsIcons.Bell, R.string.notificationTypeEmail),

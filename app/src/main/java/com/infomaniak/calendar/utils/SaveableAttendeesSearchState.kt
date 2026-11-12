@@ -38,6 +38,7 @@ fun <T: OrganizerSource> SavedStateHandle.saveableAttendeesSearchState(): Attend
             searchQueryTextFieldState = TextFieldState(),
             results = mutableStateListOf(),
             participants = mutableStateSetOf(),
+            organizerSource = null,
         )
     }
 }

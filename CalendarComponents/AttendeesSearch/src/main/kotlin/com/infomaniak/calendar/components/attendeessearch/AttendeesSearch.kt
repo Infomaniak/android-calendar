@@ -136,6 +136,7 @@ private fun Preview() {
                 attendeesSearchState = rememberSaveableAttendeesSearchState(
                     participants = remember { mutableStateSetOf<ParticipantUi>().apply { addAll(previewAttendees) } },
                     results = remember { previewAttendees.toMutableStateList() },
+                    organizerSource = null,
                 ),
                 onShowSnackbar = {},
             )
@@ -152,6 +153,7 @@ private fun PreviewEmptySearchState() {
                 attendeesSearchState = rememberSaveableAttendeesSearchState(
                     participants = remember { mutableStateSetOf() },
                     results = remember { mutableStateListOf() },
+                    organizerSource = null,
                 ),
                 onShowSnackbar = {},
             )
@@ -177,6 +179,7 @@ private fun MaxAttendeePreview() {
                 attendeesSearchState = rememberSaveableAttendeesSearchState(
                     participants = participants,
                     results = remember { mutableStateListOf() },
+                    organizerSource = null,
                 ),
                 onShowSnackbar = {},
             )

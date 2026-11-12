@@ -31,6 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.timezonesearch.TimeZoneSearch
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
+import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.datetime.TimeZone
 
@@ -39,11 +40,11 @@ fun TimeZoneSearchScreen(
     isStart: Boolean,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
-    timeZoneSearchResultViewModel: TimeZoneSearchResultViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
+    eventFormViewModel: EventFormViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
     TimeZoneSearchScreen(
         onTimeZoneSelected = { timeZone ->
-            timeZoneSearchResultViewModel.pickTimeZone(isStart, timeZone)
+            eventFormViewModel.formState?.dateAndTimeState?.run { (if (isStart) start else end).pickTimeZone(timeZone) }
             goBack()
         },
         goBack = goBack,

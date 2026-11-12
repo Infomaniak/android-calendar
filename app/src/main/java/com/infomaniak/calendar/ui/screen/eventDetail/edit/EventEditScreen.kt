@@ -21,11 +21,13 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -33,31 +35,23 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.form.EventForm
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
-import com.infomaniak.calendar.components.eventdetail.form.rememberEventFormState
-import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
-import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
-import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
-import com.infomaniak.calendar.components.foundation.models.OrganizerSource
-import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
-import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchSharedDataViewModel
-import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomReminderResultViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
-import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchResultViewModel
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
+import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
-import kotlinx.datetime.DateTimeUnit
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.minus
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 
 @Composable
@@ -71,31 +65,21 @@ fun EventEditScreen(
     modifier: Modifier = Modifier,
     viewModel: EventEditViewModel = viewModel(),
     eventDetailSharedDataViewModel: EventDetailSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current),
-    attendeesSearchSharedDataViewModel: AttendeesSearchSharedDataViewModel = viewModel(),
-    timeZoneSearchResultViewModel: TimeZoneSearchResultViewModel = viewModel(),
-    customReminderResultViewModel: CustomReminderResultViewModel = viewModel(),
+    eventFormViewModel: EventFormViewModel = viewModel(),
 ) {
     val eventDetailUiState = eventDetailSharedDataViewModel.eventDetailUi.collectAsStateWithLifecycle().value
 
-    val uiState = when (eventDetailUiState) {
-        EventDetailUiState.Displayable.Loading -> EventEditScreenState.Loading
-        is EventDetailUiState.Displayable.Success -> EventEditScreenState.Success(
-            eventFormState = rememberEventFormState(
-                calendars = eventDetailUiState.eventDetail.calendars,
-                initialEventColor = eventDetailUiState.eventDetail.eventColorChoice,
-                initialCalendar = eventDetailUiState.eventDetail.calendar,
-                dateAndTimeState = rememberEventDateState(eventDetailUiState.eventDetail),
-                initialText = eventDetailUiState.eventDetail.title,
-                initialIsAllDay = eventDetailUiState.eventDetail.isAllDay,
-                initialIsKMeetUrlEnabled = eventDetailUiState.eventDetail.kMeetUrl != null,
-                initialNotifications = eventDetailUiState.eventDetail.notifications,
-                attendees = { viewModel.attendeesSearchState.attendees },
-                initialOrganizer = viewModel.attendeesSearchState.organizerSource?.organizer,
-                initialIsOccupied = eventDetailUiState.eventDetail.isOccupied,
-                initialIsPublic = eventDetailUiState.eventDetail.classification == EventDetailUi.Classification.Public,
-            ),
-            isRecurring = eventDetailUiState.eventDetail.isRecurring,
-        )
+    LaunchedEffect(Unit) {
+        val event = eventDetailSharedDataViewModel.eventDetailUi.filterIsInstance<EventDetailUiState.Displayable.Success>().first()
+        eventFormViewModel.initEdition(event.eventDetail)
+    }
+
+    val formState = eventFormViewModel.formState
+
+    val uiState = if (eventDetailUiState is EventDetailUiState.Displayable.Success && formState != null) {
+        EventEditScreenState.Success(formState, isRecurring = eventDetailUiState.eventDetail.isRecurring)
+    } else {
+        EventEditScreenState.Loading
     }
 
     LaunchedEffect(occurrenceId) {
@@ -103,24 +87,7 @@ fun EventEditScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.initAttendeesSearchState(eventDetailSharedDataViewModel.eventDetailUi)
-    }
-
-    LaunchedEffect(Unit) {
         for (request in eventDetailSharedDataViewModel.goBackRequests) goBackToCalendarView()
-    }
-
-    val eventFormState = (uiState as? EventEditScreenState.Success)?.eventFormState
-    LaunchedEffect(eventFormState?.dateAndTimeState) {
-        timeZoneSearchResultViewModel.applyPickedTimeZonesTo(eventFormState?.dateAndTimeState)
-    }
-
-    LaunchedEffect(eventFormState) {
-        customReminderResultViewModel.applyAddedRemindersTo(eventFormState)
-    }
-
-    LaunchedEffect(viewModel.attendeesSearchState) {
-        attendeesSearchSharedDataViewModel.setAttendeesSearchState(viewModel.attendeesSearchState)
     }
 
     EventEditScreen(
@@ -131,7 +98,7 @@ fun EventEditScreen(
         goToCustomReminder = goToCustomReminder,
         modifier = modifier,
         onSubmit = { scope ->
-            val eventDraft = (uiState as? EventEditScreenState.Success)?.eventFormState?.toEventDraft() ?: return@EventEditScreen
+            val eventDraft = eventFormViewModel.formState?.toEventDraft() ?: return@EventEditScreen
             if (viewModel.submitEvent(occurrenceId, scope, eventDraft)) goBack()
         },
         sharedTransitionScope = LocalSharedTransitionScope.current,
@@ -158,6 +125,7 @@ private fun EventEditScreen(
             SubmitTopAppBar(
                 goBack = goBack,
                 onSubmit = onSubmit,
+                isSubmitEnabled = { uiState is EventEditScreenState.Success },
                 isRecurring = (uiState as? EventEditScreenState.Success)?.isRecurring ?: false,
             )
         },
@@ -183,26 +151,6 @@ private fun EventEditScreen(
     }
 }
 
-@Composable
-private fun rememberEventDateState(eventDetailUi: EventDetailUi): DateAndTimeState {
-    val start = eventDetailUi.start.atTimeZone
-    val end = eventDetailUi.end.atTimeZone
-    // KMP ends an all-day event on the day after it, the form shows its last day
-    val endDate = if (eventDetailUi.isAllDay) end.date.minus(1, DateTimeUnit.DAY) else end.date
-
-    return rememberDateAndTimeState(
-        startDate = start.date,
-        startTime = start.time,
-        startTimeZone = eventDetailUi.start.timeZone,
-        endDate = endDate,
-        endTime = end.time,
-        endTimeZone = eventDetailUi.end.timeZone,
-    )
-}
-
-private val EventDetailTiming.timeZone: TimeZone
-    get() = (this as? EventDetailTiming.Precise)?.timeZone ?: TimeZone.currentSystemDefault()
-
 private sealed interface EventEditScreenState {
     object Loading : EventEditScreenState
     data class Success(val eventFormState: EventFormState, val isRecurring: Boolean) : EventEditScreenState
@@ -213,24 +161,18 @@ private sealed interface EventEditScreenState {
 private fun Preview() {
     CalendarTheme {
         Surface {
+            val formState = remember {
+                EventFormState.default(
+                    calendar = previewEventDetailCalendar,
+                    date = Clock.today(),
+                    timeZone = TimeZone.currentSystemDefault(),
+                    eventDuration = 1.hours,
+                    calendars = previewEventDetailCalendarGroups,
+                ).apply { titleTextState.setTextAndPlaceCursorAtEnd("Meeting on how to find funny preview titles") }
+            }
+
             EventEditScreen(
-                uiState = EventEditScreenState.Success(
-                    eventFormState = rememberEventFormState(
-                        calendars = previewEventDetailCalendarGroups,
-                        initialEventColor = EventColorChoice.Default,
-                        initialCalendar = previewEventDetailCalendar,
-                        dateAndTimeState = rememberDateAndTimeState(1.hours, TimeZone.currentSystemDefault()),
-                        initialText = "Meeting on how to find funny preview titles",
-                        attendees = { previewAttendees },
-                        initialOrganizer = null,
-                        initialIsAllDay = false,
-                        initialIsKMeetUrlEnabled = false,
-                        initialNotifications = emptyList(),
-                        initialIsOccupied = true,
-                        initialIsPublic = true,
-                    ),
-                    isRecurring = false,
-                ),
+                uiState = EventEditScreenState.Success(formState, isRecurring = false),
                 goBack = {},
                 goToEventAttendees = {},
                 goToTimeZoneSearch = {},

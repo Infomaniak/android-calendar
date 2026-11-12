@@ -55,9 +55,12 @@ app/src/main/java/com/infomaniak/calendar/
     │                              # UserCalendarsUi / CalendarSectionUi / CalendarUi / CalendarColorsUi, the calendars as the drawer and other views draw them
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
-    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventCreation, EventDetail, EventEdit, EventAttendees(parent), EventTimeZone(parent, isStart), EventCustomReminder(parent), Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
-    │   └── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
+    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventDetail, AttendeeSearch(parent: EventForm), EventForm.{EventCreation, EventEdit, EditableAttendeeSearch(parent, config), EventTimeZone(parent, isStart), EventCustomReminder(parent)}, Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
+    │   ├── SharedViewModelStores.kt # `toContentKey` and the `shareViewModelStoreWith(parent)` metadata
+    │   ├── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
+    │   └── ViewModelStoreSavedStates.kt # Saved state of each entry's ViewModelStore, kept until the entry is popped rather than
+    │                                    # while it is composed, so a child entry can write to its parent's ViewModels
     ├── screen/
     │   ├── day/                   # DayScreen + DayViewModel
     │   ├── multiDays/             # MultiDaysScreen(dayCount) + MultiDaysViewModel — 3-day and week views share one entry (same contentKey)
@@ -68,9 +71,12 @@ app/src/main/java/com/infomaniak/calendar/
     │   ├── settings/              # SettingScreen (opened from the drawer) + nested SettingThemeScreen + SettingThemeViewModel
     │   ├── eventCreation/         # EventCreationScreen
     │   ├── eventDetail/           # EventDetailScreen + EventEditScreen + EventCreationScreen + their ViewModels, and
-    │                              # attendeesSearch/ (EventAttendeesScreen + EventAttendeesViewModel shared with its parent)
-    │                              # timeZoneSearch/ (TimeZoneSearchScreen + TimeZoneSearchResultViewModel channel back to its parent)
-    │                              # customReminder/ (CustomReminderScreen + CustomReminderResultViewModel channel back to its parent)
+    │                              # attendeesSearch/ (AttendeesSearchScreen, reading and writing the form's participants;
+    │                              # EditableAttendeesSearchScreen, reading EventDetailViewModel's AttendeesSearchState;
+    │                              # AttendeesSearchViewModel.EnableSearch searching the contacts as the query is typed)
+    │                              # form/ (EventFormViewModel: the event form state of EventCreation / EventEdit)
+    │                              # timeZoneSearch/ (TimeZoneSearchScreen: writes the picked time zone to the form)
+    │                              # customReminder/ (CustomReminderScreen: adds the made reminder to the form)
     │   └── onboarding/            # Two onboardings, each with its own page enum, sharing OnboardingPage + OnboardingButtonDefaults:
     │                              # login/ (LoginOnboardingScreen + LoginOnboardingPage + CrossAppLoginViewModel): welcome + login;
     │                              # permissions/ (PermissionsOnboardingScreen + PermissionsOnboardingPage + NextStepButton): a pager
@@ -133,13 +139,37 @@ app/
   pane while the list pane is beside it (read from the pane, not the back stack, to avoid a flicker). On compact windows
   the strategy steps aside and entries display one at a time as before.
 - **Sharing a ViewModel between a parent entry and a child entry**: the child's key carries its parent
-  (`EventAttendees(parent)`), and its metadata uses `SharedViewModelStoreNavEntryDecorator.parent(parent.toContentKey())`.
+  (`AttendeeSearch(parent)`), and its metadata uses `SharedViewModelStoreNavEntryDecorator.parent(parent.toContentKey())`.
   The parent entry must set `contentKey = destination.toContentKey()`, so both resolve the same store. The child reads the
   parent's store through `LocalSharedViewModelStoreOwner.current`, passed as a default parameter
   (`viewModel(LocalSharedViewModelStoreOwner.current)`); the parent calls plain `viewModel()`. Currently used for
-  `EventAttendeesViewModel`: each of EventCreation / EventDetail / EventEdit owns its own instance, and the parent
-  provides its `AttendeesSearchState` to it. The child shows nothing until that state is provided
-  (`AttendeesSearchUiState.Loading`).
+  `EventDetailSharedDataViewModel` (the event loaded by EventDetail, reused by EventEdit), `EventFormViewModel` (below),
+  and `EventDetailViewModel`, whose `AttendeesSearchState` `EditableAttendeesSearchScreen` edits.
+- **Event form state**: `EventFormViewModel` holds the `EventFormState` of a `NavDestination.EventForm.EventCreation` /
+  `EventEdit` as `formState`, `null` until the form's screen initializes it, in that destination's own store.
+  `EventFormState` holds one state per field, like Material state holders: the title's `TextFieldState`, the participants'
+  `SnapshotStateSet`, the notifications' `SnapshotStateList`, a `MutableState` for each other field, and the dates'
+  `DateAndTimeState`. It also holds the selected `calendar` itself and the calendars it can be put in, and builds
+  `toEventDraft()`; `EventFormState.default` starts a new event. The ViewModel saves it under one `SavedStateHandle` key
+  through `saveable` and `EventFormState.Saver` (`EventFormStateSaver.kt`: one constant key per field, delegating to each
+  state's own saver or `autoSaver` where one exists), read live from the states when Android saves, and restores it when the
+  ViewModel is created, so a child screen restored alone after a process death still gets it. The form's screen initializes
+  it with `initCreation(date)` / `initEdition(event)`, which only run once per ViewModel instance; a restored form wins over
+  the loaded one, so no saved "initialized" flag is needed. The calendars the form can be put in are never saved (empty
+  after a restoration), and `EventFormState.selectCalendar` makes a new event's owner follow the selected calendar. A new
+  form field goes in `EventFormState` (its constructor, state and `default` / `toEventDraft`), its key in
+  `EventFormStateSaver.kt`, `initEdition`, and the `EventForm` composable. The edit screen calls `initEdition` from a
+  `LaunchedEffect` once `EventDetailSharedDataViewModel` has loaded the event. Each form screen combines its sources into a
+  single private screen state (`EventCreationScreenState`, `EventEditScreenState`) that its stateless content draws:
+  `Success` only once `formState` is there. `EventCreationViewModel` / `EventEditViewModel` only keep the calendars'
+  availability (creation) and the submission.
+- **Screens opened by the event form** (time zone, custom reminder, attendees) follow the screens' usual split: a public
+  composable reading `EventFormViewModel` from its parent's store (`viewModel(LocalSharedViewModelStoreOwner.current)` as a
+  default parameter; its `formState` is `null` until the form is loaded), and a private stateless one taking initial values,
+  keeping its own draft until submitted, and reporting it through `onSubmit`-like callbacks before calling `goBack`. The
+  public one writes the result to the form's states. The attendees search edits the form's participants set directly,
+  without any copy. Their key carries the form's destination as `parent` (plus navigation-only arguments such as
+  `isStart`), which only selects the store they share.
 - **DI**: Metro `@DependencyGraph` (`AppGraph`) scoped to `AppScope`. ViewModels are auto-registered
   via multibinding (`@ContributesIntoMap` + `@ViewModelKey`) and resolved through the `metrox-viewmodel`
   `MetroViewModelFactory` (exposed as `metroViewModelFactory` by the `ViewModelGraph` the graph implements,
