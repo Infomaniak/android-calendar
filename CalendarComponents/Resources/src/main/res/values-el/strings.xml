@@ -45,6 +45,7 @@
         <item quantity="one">%1$d ίσως</item>
         <item quantity="other">%1$d ίσως</item>
     </plurals>
+    <string name="availabilityUnknownLabel">Άγνωστη διαθεσιμότητα</string>
     <string name="availableLabel">Διαθέσιμο</string>
     <string name="buttonAddReminder">Προσθήκη υπενθύμισης</string>
     <string name="buttonJoin">Εγγραφή</string>

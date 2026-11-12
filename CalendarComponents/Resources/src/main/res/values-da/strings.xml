@@ -45,6 +45,7 @@
         <item quantity="one">%1$d måske</item>
         <item quantity="other">%1$d måske</item>
     </plurals>
+    <string name="availabilityUnknownLabel">Ukendt tilgængelighed</string>
     <string name="availableLabel">Ledig</string>
     <string name="buttonAddReminder">Tilføj en påmindelse</string>
     <string name="buttonJoin">Tilmeld dig</string>

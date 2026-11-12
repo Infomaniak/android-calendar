@@ -45,6 +45,7 @@
         <item quantity="one">%1$d misschien</item>
         <item quantity="other">%1$d misschien</item>
     </plurals>
+    <string name="availabilityUnknownLabel">Beschikbaarheid onbekend</string>
     <string name="availableLabel">Beschikbaar</string>
     <string name="buttonAddReminder">Herinnering toevoegen</string>
     <string name="buttonJoin">Lid worden</string>

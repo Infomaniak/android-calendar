@@ -56,7 +56,7 @@ internal fun RoomItem(room: SearchRoomUi, shapes: ListItemShapes, onClick: () ->
                     style = MaterialTheme.typography.labelMedium,
                 )
                 RoomAvailability.Unknown -> Text(
-                    "Availability unknown", // TODO: Import the translated string from Ink
+                    stringResource(R.string.availabilityUnknownLabel),
                     color = MaterialTheme.extendedColorScheme.warning,
                     style = MaterialTheme.typography.labelMedium,
                 )

@@ -108,6 +108,6 @@ sealed interface NavDestination : NavKey {
         data class EventCustomReminder(val parent: NavDestination) : EventForm
 
         @Serializable
-        data class EventLocationSearch(val parent: NavDestination) : EventForm
+        data class EventLocationSearch(val occurrenceId: OccurrenceId? = null, val parent: NavDestination) : EventForm
     }
 }

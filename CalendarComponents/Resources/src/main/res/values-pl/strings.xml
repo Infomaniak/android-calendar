@@ -55,6 +55,7 @@
         <item quantity="many">%1$d może</item>
         <item quantity="other">%1$d może</item>
     </plurals>
+    <string name="availabilityUnknownLabel">Dostępność nieznana</string>
     <string name="availableLabel">Wolny</string>
     <string name="buttonAddReminder">Dodaj przypomnienie</string>
     <string name="buttonJoin">Dołącz</string>

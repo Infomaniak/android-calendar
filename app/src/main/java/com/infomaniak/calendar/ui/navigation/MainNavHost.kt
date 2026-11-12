@@ -148,8 +148,8 @@ private fun baseEntryProvider(
                 goToTimeZoneSearch = { isStart ->
                     backStack.addOnce(NavDestination.EventForm.EventTimeZone(destination, isStart))
                 },
-                goToCustomReminder = { backStack.addOnce(NavDestination.EventForm.EventCustomReminder(destination)) },
-                goToLocationSearch = { backStack.addOnce(NavDestination.EventForm.EventLocationSearch(destination)) },
+                goToCustomReminder = { backStack.addOnce(NavDestination.EventForm.EventCustomReminder(parent = destination)) },
+                goToLocationSearch = { backStack.addOnce(NavDestination.EventForm.EventLocationSearch(parent = destination)) },
             )
         }
 
@@ -185,7 +185,9 @@ private fun baseEntryProvider(
                     backStack.addOnce(NavDestination.EventForm.EventTimeZone(destination, isStart))
                 },
                 goToCustomReminder = { backStack.addOnce(NavDestination.EventForm.EventCustomReminder(destination)) },
-                goToLocationSearch = { backStack.addOnce(NavDestination.EventForm.EventLocationSearch(destination)) },
+                goToLocationSearch = {
+                    backStack.addOnce(NavDestination.EventForm.EventLocationSearch(destination.occurrenceId, destination))
+                },
             )
         }
 

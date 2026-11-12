@@ -45,6 +45,7 @@
         <item quantity="one">%1$d forse</item>
         <item quantity="other">%1$d forse</item>
     </plurals>
+    <string name="availabilityUnknownLabel">Disponibilità sconosciuta</string>
     <string name="availableLabel">Disponibile</string>
     <string name="buttonAddReminder">Aggiungi un promemoria</string>
     <string name="buttonJoin">Unirsi</string>
