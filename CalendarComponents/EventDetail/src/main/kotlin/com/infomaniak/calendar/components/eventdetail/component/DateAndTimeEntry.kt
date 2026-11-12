@@ -124,7 +124,7 @@ private fun DateAndTimeEntryContent(
 
     var isDatePickerVisible by rememberSaveable { mutableStateOf(false) }
 
-    val shapes = ButtonDefaults.shapes(MaterialTheme.shapes.medium, CircleShape)
+    val shapes = ButtonDefaults.shapes(CircleShape, CircleShape)
     val toggleShapes = OutlinedToggleButtonDefaults.shapesFor(ToggleButtonSize.Small)
     val toggleColors = OutlinedToggleButtonDefaults.colors(
         checkedContainerColor = MaterialTheme.colorScheme.inverseSurface.copy(alpha = EsdsTheme.opacity.subtle),
