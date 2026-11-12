@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -41,6 +42,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.tooling.preview.Preview
@@ -148,44 +150,19 @@ fun EventForm(
         }
 
         var isReminderOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
-        if (isReminderOffsetDialogVisible) {
-            ReminderOffsetDialog(
-                selectedOffset = null,
-                onOffsetSelect = { offset ->
-                    if (offset != null) {
-                        state.reminders.add(
-                            EventDetailUi.Reminder(
-                                type = EventDetailUi.Reminder.Type.Push,
-                                time = ReminderTime.Offset(offset),
-                            ),
-                        )
-                    }
-                    isReminderOffsetDialogVisible = false
-                },
-                onCustomClick = {
-                    isReminderOffsetDialogVisible = false
-                    onCustomReminderClick()
-                },
-                onDismissRequest = { isReminderOffsetDialogVisible = false },
-            )
-        }
 
-        Section(Modifier.animateContentSize()) {
-            state.reminders.forEach { reminder ->
-                item {
-                    ReminderItemEditable(
-                        reminder = reminder,
-                        onRemoveClick = { state.reminders.remove(reminder) },
-                        shapes = it,
-                        modifier = Modifier.reminderSharedBounds(reminder),
-                    )
-                }
-            }
+        ReminderItems(
+            reminders = state.reminders,
+            onRemove = { reminder -> state.reminders.remove(reminder) },
+            onAddClick = { isReminderOffsetDialogVisible = true },
+        )
 
-            item {
-                AddReminderButton(onClick = { isReminderOffsetDialogVisible = true }, shapes = it)
-            }
-        }
+        ReminderDialog(
+            reminders = state.reminders,
+            onCustomReminderClick = onCustomReminderClick,
+            isReminderOffsetDialogVisible = isReminderOffsetDialogVisible,
+            setIsReminderOffsetDialogVisible = { isReminderOffsetDialogVisible = it },
+        )
 
         Section {
             item {
@@ -220,24 +197,67 @@ fun EventForm(
 }
 
 @Composable
-private fun ReminderItems(reminders: List<EventDetailUi.Reminder>, onRemove: (EventDetailUi.Reminder) -> Unit) {
+private fun ReminderDialog(
+    reminders: SnapshotStateList<EventDetailUi.Reminder>,
+    onCustomReminderClick: () -> Unit,
+    isReminderOffsetDialogVisible: Boolean,
+    setIsReminderOffsetDialogVisible: (Boolean) -> Unit,
+) {
+    if (isReminderOffsetDialogVisible) {
+        ReminderOffsetDialog(
+            selectedOffset = null,
+            onOffsetSelect = { offset ->
+                if (offset != null) {
+                    reminders.add(
+                        EventDetailUi.Reminder(
+                            type = EventDetailUi.Reminder.Type.Push,
+                            time = ReminderTime.Offset(offset),
+                        ),
+                    )
+                }
+                setIsReminderOffsetDialogVisible(false)
+            },
+            onCustomClick = {
+                setIsReminderOffsetDialogVisible(false)
+                onCustomReminderClick()
+            },
+            onDismissRequest = { setIsReminderOffsetDialogVisible(false) },
+        )
+    }
+}
+
+@Composable
+private fun ReminderItems(
+    reminders: List<EventDetailUi.Reminder>,
+    onRemove: (EventDetailUi.Reminder) -> Unit,
+    onAddClick: () -> Unit,
+) {
     val initialReminders = remember { reminders.toSet() }
 
     // Removed reminders leave the state at once, but stay rendered until they've animated out
-    var lastRenderedReminders by remember { mutableStateOf(reminders) }
+    var lastRenderedReminders by remember { mutableStateOf(reminders.toList()) }
     val renderedReminders = reminders.plusExitingFrom(lastRenderedReminders)
     SideEffect { lastRenderedReminders = renderedReminders }
 
-    renderedReminders.forEach { reminder ->
-        key(reminder) { // Required for proper appearance/disappearance animation
-            AnimatedReminderItem(
-                reminder = reminder,
-                isVisible = reminder in reminders,
-                onRemoveClick = { onRemove(reminder) },
-                onExitFinish = { lastRenderedReminders -= reminder },
-                // Reminders already there on entry don't animate in, nor clash with the shared-element transition
-                animateEnter = reminder !in initialReminders,
-            )
+    Section(Modifier.animateContentSize()) {
+        renderedReminders.forEach { reminder ->
+            item { shapes ->
+                key(reminder) { // Required for proper appearance/disappearance animation
+                    AnimatedReminderItem(
+                        reminder = reminder,
+                        isVisible = reminder in reminders,
+                        onRemoveClick = { onRemove(reminder) },
+                        onExitFinish = { lastRenderedReminders -= reminder },
+                        // Reminders already there on entry don't animate in, nor clash with the shared-element transition
+                        animateEnter = reminder !in initialReminders,
+                        shapes = shapes,
+                    )
+                }
+            }
+        }
+
+        item {
+            AddReminderButton(onClick = onAddClick, shapes = it)
         }
     }
 }
@@ -249,6 +269,7 @@ private fun AnimatedReminderItem(
     isVisible: Boolean,
     onRemoveClick: () -> Unit,
     onExitFinish: () -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     animateEnter: Boolean = true,
 ) {
@@ -263,6 +284,7 @@ private fun AnimatedReminderItem(
     ) {
         ReminderItemEditable(
             reminder = reminder,
+            shapes = shapes,
             onRemoveClick = onRemoveClick,
             modifier = Modifier.reminderSharedBounds(reminder),
         )

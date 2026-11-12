@@ -40,6 +40,7 @@ import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.ReminderTime
 import com.infomaniak.calendar.components.eventdetail.modifier.reminderSharedBounds
+import com.infomaniak.calendar.components.eventdetail.utils.CustomColors
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTime
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDurationOffset
 import com.infomaniak.core.common.utils.today
@@ -109,6 +110,7 @@ internal fun ReminderItemEditable(
     ListItem(
         modifier = modifier,
         shapes = shapes,
+        colors = CustomColors.EventFormItemColors,
         leadingContent = { ItemIcon(reminder.type.icon) },
         trailingContent = {
             Row(
