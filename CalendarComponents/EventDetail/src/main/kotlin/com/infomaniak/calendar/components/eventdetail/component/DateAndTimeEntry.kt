@@ -37,11 +37,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedToggleButton
+import androidx.compose.material3.OutlinedToggleButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerDialog
+import androidx.compose.material3.ToggleButtonSize
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -79,6 +82,8 @@ import kotlin.time.Instant
 internal fun DateAndTimeEntry(
     entry: DateAndTimeState.Entry,
     isAllDay: () -> Boolean,
+    selectedButton: () -> EntryButton?,
+    onSelectButton: (EntryButton?) -> Unit,
     onDatePicked: (LocalDate) -> Unit,
     onTimePicked: (LocalTime) -> Unit,
     onTimeZoneClick: () -> Unit,
@@ -87,9 +92,14 @@ internal fun DateAndTimeEntry(
     val timeScrollPickerState = rememberTimeScrollPickerState(entry.time)
 
     var isDatePickerVisible by rememberSaveable { mutableStateOf(false) }
-    var isTimePickerVisible by rememberSaveable { mutableStateOf(false) }
 
     val shapes = ButtonDefaults.shapes(MaterialTheme.shapes.medium, CircleShape)
+    val toggleShapes = OutlinedToggleButtonDefaults.shapesFor(ToggleButtonSize.Small)
+    val toggleColors = OutlinedToggleButtonDefaults.colors(
+        checkedContainerColor = MaterialTheme.colorScheme.inverseSurface.copy(alpha = EsdsTheme.opacity.subtle),
+        checkedContentColor = MaterialTheme.colorScheme.onSurfaceVariant, // Like contentColor
+    )
+
     val effectSpec = MaterialTheme.motionScheme.fastEffectsSpec<Float>()
     val enter = fadeIn(effectSpec)
     val exit = fadeOut(effectSpec)
@@ -107,7 +117,12 @@ internal fun DateAndTimeEntry(
             }
 
             AnimatedVisibility(!isAllDay(), enter = enter, exit = exit) {
-                OutlinedButton(onClick = { isTimePickerVisible = !isTimePickerVisible }, shapes = shapes) {
+                OutlinedToggleButton(
+                    checked = selectedButton() == EntryButton.Time,
+                    onCheckedChange = { isChecked -> onSelectButton(if (isChecked) EntryButton.Time else null) },
+                    shapes = toggleShapes,
+                    colors = toggleColors,
+                ) {
                     Text(entry.time.formatExplicitTimeLabel())
                 }
             }
@@ -117,7 +132,7 @@ internal fun DateAndTimeEntry(
             }
         }
 
-        AnimatedVisibility(isTimePickerVisible) {
+        AnimatedVisibility(selectedButton() == EntryButton.Time) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -220,6 +235,8 @@ private fun Preview() {
                     timeZone = remember { mutableStateOf(TimeZone.UTC) },
                 ),
                 isAllDay = { false },
+                selectedButton = { EntryButton.Time },
+                onSelectButton = {},
                 onDatePicked = {},
                 onTimePicked = {},
                 onTimeZoneClick = {},
