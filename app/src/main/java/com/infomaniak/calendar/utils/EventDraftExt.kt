@@ -19,7 +19,7 @@ package com.infomaniak.calendar.utils
 
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.EventDraft
-import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
+import com.infomaniak.calendar.components.eventdetail.models.ReminderTime
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import com.infomaniak.calendar.ui.screen.eventDetail.AttendeesUpdatePayload
@@ -57,10 +57,10 @@ fun EventDraft.applyTo(
     attendees = attendees.toAttendeeEdit(),
     organizer = (initialOrganizer?.toOrganizer() ?: defaultOrganizer).takeIf { attendees.isNotEmpty() },
     // Stored alarms KMP can't read are missing from storedAlarms, replacing the list would delete them
-    alarms = if (notifications.withoutUiId() == storedAlarms.mapNotNull { it.toNotification() }.withoutUiId()) {
+    alarms = if (reminders.withoutUiId() == storedAlarms.mapNotNull { it.toNotification() }.withoutUiId()) {
         editData.alarms
     } else {
-        AlarmListEdit.Replace(notifications.toAlarms(storedAlarms))
+        AlarmListEdit.Replace(reminders.toAlarms(storedAlarms))
     },
 )
 
@@ -104,14 +104,14 @@ private fun EventDraft.bounds(): EventBounds = if (isAllDay) {
 
 private fun OrganizerUi.toOrganizer(): Organizer = Organizer(email, displayName)
 
-/** Alarms stored without id get a new random [EventDetailUi.Notification.uiId] each time they're read. */
-private fun List<EventDetailUi.Notification>.withoutUiId() = map { it.copy(uiId = "") }
+/** Alarms stored without id get a new random [EventDetailUi.Reminder.uiId] each time they're read. */
+private fun List<EventDetailUi.Reminder>.withoutUiId() = map { it.copy(uiId = "") }
 
 /**
  * A notification read from a stored alarm gives that alarm back, found by its id, so it keeps the properties the form doesn't show.
  * Stored alarms the form can't show are kept as well.
  */
-private fun List<EventDetailUi.Notification>.toAlarms(storedAlarms: List<EventAlarm>): List<EventAlarm> {
+private fun List<EventDetailUi.Reminder>.toAlarms(storedAlarms: List<EventAlarm>): List<EventAlarm> {
     val alarms = map { notification ->
         notification.sourceId?.let { sourceId -> storedAlarms.find { it.id?.value == sourceId } } ?: notification.toAlarm()
     }
@@ -119,13 +119,13 @@ private fun List<EventDetailUi.Notification>.toAlarms(storedAlarms: List<EventAl
     return alarms + storedAlarms.filter { it.toNotification() == null }
 }
 
-private fun EventDetailUi.Notification.toAlarm(): EventAlarm = EventAlarm(
+private fun EventDetailUi.Reminder.toAlarm(): EventAlarm = EventAlarm(
     action = when (type) {
-        EventDetailUi.Notification.Type.Push -> AlarmAction.Display
-        EventDetailUi.Notification.Type.Email -> AlarmAction.Email
+        EventDetailUi.Reminder.Type.Push -> AlarmAction.Display
+        EventDetailUi.Reminder.Type.Email -> AlarmAction.Email
     },
     trigger = when (val time = time) {
-        is NotificationTime.Offset -> AlarmTrigger.Relative(time.duration, TriggerRelation.Start)
-        is NotificationTime.Absolute -> AlarmTrigger.Absolute(time.instant)
+        is ReminderTime.Offset -> AlarmTrigger.Relative(time.duration, TriggerRelation.Start)
+        is ReminderTime.Absolute -> AlarmTrigger.Absolute(time.instant)
     },
 )

@@ -39,12 +39,12 @@ import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatus
 import com.infomaniak.calendar.components.eventdetail.component.Recurrence
+import com.infomaniak.calendar.components.eventdetail.component.ReminderItem
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
 import com.infomaniak.calendar.components.eventdetail.component.item
 import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
-import com.infomaniak.calendar.components.eventdetail.detail.component.Notification
 import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
@@ -153,11 +153,11 @@ fun EventDetail(
             }
 
             Section {
-                notifications.forEach { notification ->
+                reminders.forEach { reminder ->
                     item {
-                        Notification(
-                            notification = notification,
-                            onNotificationClick = { /*TODO[eventDetail]*/ },
+                        ReminderItem(
+                            reminder = reminder,
+                            onReminderClick = { /*TODO[eventDetail]*/ },
                             shapes = it,
                         )
                     }

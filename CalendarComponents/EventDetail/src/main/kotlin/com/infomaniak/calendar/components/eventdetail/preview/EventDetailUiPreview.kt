@@ -22,7 +22,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
-import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
+import com.infomaniak.calendar.components.eventdetail.models.ReminderTime
 import com.infomaniak.calendar.components.foundation.models.Attendees
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import kotlinx.datetime.TimeZone
@@ -54,14 +54,14 @@ val previewEventDetailUi = EventDetailUi(
         EventDetailUi.File("2", "Bob.txt"),
         EventDetailUi.File("3", "Next loto results.png"),
     ),
-    notifications = listOf(
-        EventDetailUi.Notification(
-            EventDetailUi.Notification.Type.Email,
-            NotificationTime.Absolute(Instant.parse("2026-05-20T07:00:00Z")),
+    reminders = listOf(
+        EventDetailUi.Reminder(
+            EventDetailUi.Reminder.Type.Email,
+            ReminderTime.Absolute(Instant.parse("2026-05-20T07:00:00Z")),
         ),
-        EventDetailUi.Notification(
-            EventDetailUi.Notification.Type.Push,
-            NotificationTime.Offset(90.days + 30.minutes),
+        EventDetailUi.Reminder(
+            EventDetailUi.Reminder.Type.Push,
+            ReminderTime.Offset(90.days + 30.minutes),
         ),
     ),
     isOccupied = true,
