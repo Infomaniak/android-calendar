@@ -119,7 +119,7 @@ internal fun DateAndTimeEditable(
     ) {
         with(dateAndTimeState) {
             SegmentedListItem(
-                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 2),
+                shapes = ListItemDefaults.segmentedShapes(index = 1, count = 3),
                 colors = CustomColors.EventFormItemColors,
                 content = {
                     DateAndTimeEntry(
@@ -133,7 +133,7 @@ internal fun DateAndTimeEditable(
             )
 
             SegmentedListItem(
-                shapes = ListItemDefaults.segmentedShapes(index = 1, count = 2),
+                shapes = ListItemDefaults.segmentedShapes(index = 2, count = 3),
                 colors = CustomColors.EventFormItemColors,
                 content = {
                     DateAndTimeEntry(

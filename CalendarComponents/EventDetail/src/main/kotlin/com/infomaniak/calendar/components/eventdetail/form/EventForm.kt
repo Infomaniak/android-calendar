@@ -115,9 +115,7 @@ fun EventForm(
                     shapes = it,
                 )
             }
-        }
 
-        Section {
             item {
                 DateAndTimeEditable(
                     dateAndTimeState = state.dateAndTimeState,
