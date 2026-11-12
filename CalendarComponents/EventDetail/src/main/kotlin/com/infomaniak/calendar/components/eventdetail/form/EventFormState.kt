@@ -45,7 +45,6 @@ import kotlin.time.Duration
  * The editable state of an event form, one state per field.
  *
  * @param organizerSource [OrganizerSource.Dynamic] for a new event, which follows the selected calendar.
- * @param room The event's room, in place of a [location]: picking one clears the other.
  * @param calendars The calendars the event can be put in.
  */
 @Stable
@@ -59,8 +58,7 @@ class EventFormState(
     end: LocalDateTime,
     endTimeZone: TimeZone,
     hasEndEverBeenTouched: Boolean,
-    location: String?,
-    room: EventDetailUi.Room?,
+    location: EventDetailUi.Location?,
     participants: Set<ParticipantUi>,
     organizerSource: OrganizerSource?,
     isKMeetUrlEnabled: Boolean,
@@ -87,9 +85,6 @@ class EventFormState(
         hasEndEverBeenTouched = mutableStateOf(hasEndEverBeenTouched),
     )
     var location by mutableStateOf(location)
-        private set
-    var room by mutableStateOf(room)
-        private set
     val participants = mutableStateSetOf<ParticipantUi>().apply { addAll(participants) }
     var organizerSource by mutableStateOf(organizerSource)
         private set
@@ -116,16 +111,6 @@ class EventFormState(
         organizerSource = OrganizerSource.Dynamic(owner)
     }
 
-    fun pickLocation(location: String?) {
-        this.location = location
-        room = null
-    }
-
-    fun pickRoom(room: EventDetailUi.Room?) {
-        this.room = room
-        location = null
-    }
-
     fun toEventDraft(): EventDraft {
         return EventDraft(
             title = titleTextState.text.toString(),
@@ -137,7 +122,6 @@ class EventFormState(
             end = end,
             endTimeZone = dateAndTimeState.end.timeZone,
             location = location,
-            roomId = room?.id,
             attendees = attendees,
             initialOrganizer = (organizerSource as? OrganizerSource.Static)?.organizer,
             isKMeetUrlEnabled = isKMeetUrlEnabled.value,
@@ -169,7 +153,6 @@ class EventFormState(
                 endTimeZone = timeZone,
                 hasEndEverBeenTouched = false,
                 location = null,
-                room = null,
                 participants = emptySet(),
                 organizerSource = calendar.organizerAttendeeUi?.let(OrganizerSource::Dynamic),
                 isKMeetUrlEnabled = false,

@@ -78,7 +78,7 @@ class LocationSearchViewModel(
     }
 
     /** The form's room for a room listed in [rooms]. */
-    fun formRoomOf(room: RoomUi): EventDetailUi.Room = EventDetailUi.Room(
+    fun formRoomOf(room: RoomUi): EventDetailUi.Location.Room = EventDetailUi.Location.Room(
         id = room.id,
         title = room.name,
         seats = room.seats,
@@ -95,11 +95,11 @@ class LocationSearchViewModel(
         snapshotFlow { CalendarId(formState.calendar.id) }
             .drop(1) // The form's own calendar, only switching away from it can leave its room behind
             .collectLatest { calendarId ->
-                val room = formState.room ?: return@collectLatest
+                val room = formState.location as? EventDetailUi.Location.Room ?: return@collectLatest
 
                 runCatching {
                     val canBookRoom = calendarBookableResourcesManager.observeResources(calendarId).first().any { it.uuid.value == room.id }
-                    if (!canBookRoom && formState.room == room) formState.pickRoom(null)
+                    if (!canBookRoom && formState.location == room) formState.location = null
                 }.cancellable().onFailure { throwable ->
                     SentryLog.w(TAG, "Failed to check the room against the new calendar's rooms", throwable)
                 }

@@ -40,7 +40,6 @@ private const val END_KEY = "end"
 private const val END_TIME_ZONE_KEY = "endTimeZone"
 private const val HAS_END_EVER_BEEN_TOUCHED_KEY = "hasEndEverBeenTouched"
 private const val LOCATION_KEY = "location"
-private const val ROOM_KEY = "room"
 private const val PARTICIPANTS_KEY = "participants"
 private const val ORGANIZER_SOURCE_KEY = "organizerSource"
 private const val IS_KMEET_URL_ENABLED_KEY = "isKMeetUrlEnabled"
@@ -66,7 +65,6 @@ private val saver = mapSaver(
             END_TIME_ZONE_KEY to with(TimeZoneSaver) { save(it.dateAndTimeState.end.timeZone) },
             HAS_END_EVER_BEEN_TOUCHED_KEY to it.dateAndTimeState.hasEndEverBeenTouched.value,
             LOCATION_KEY to it.location,
-            ROOM_KEY to it.room,
             // TODO: Use autoSaver once on Compose 1.13+, SnapshotStateSet only parcels its first element before (b/537461421)
             PARTICIPANTS_KEY to ArrayList(it.participants),
             ORGANIZER_SOURCE_KEY to it.organizerSource,
@@ -88,8 +86,7 @@ private val saver = mapSaver(
             end = it[END_KEY] as LocalDateTime,
             endTimeZone = TimeZoneSaver.restore(it[END_TIME_ZONE_KEY] as String)!!,
             hasEndEverBeenTouched = it[HAS_END_EVER_BEEN_TOUCHED_KEY] as Boolean,
-            location = it[LOCATION_KEY] as String?,
-            room = it[ROOM_KEY] as EventDetailUi.Room?,
+            location = it[LOCATION_KEY] as EventDetailUi.Location?,
             participants = (it[PARTICIPANTS_KEY] as ArrayList<ParticipantUi>).toSet(),
             organizerSource = it[ORGANIZER_SOURCE_KEY] as OrganizerSource?,
             isKMeetUrlEnabled = it[IS_KMEET_URL_ENABLED_KEY] as Boolean,

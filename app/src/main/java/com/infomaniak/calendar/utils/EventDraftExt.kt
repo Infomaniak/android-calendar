@@ -54,7 +54,7 @@ fun EventDraft.applyTo(
 ): EventEditData = editData.copy(
     title = title,
     timing = editData.timing.copy(bounds = bounds()),
-    location = locationOver(editData.location),
+    location = location.toLocation(editData.location),
     timeBlocking = if (isOccupied) TimeBlocking.Blocks else TimeBlocking.DoesNotBlock,
     calendarId = typedCalendarId,
     attendees = attendees.toAttendeeEdit(),
@@ -96,19 +96,11 @@ fun EventDraft.toNewEventEditData(defaultOrganizer: Organizer?): EventEditData =
     ),
 )
 
-/**
- * Keeps [current] when the form leaves it as is: its resolved room or the `LOCATION` text a room keeps. A room unknown
- * locally isn't shown in the form, so it's kept too while no other location is picked.
- */
-private fun EventDraft.locationOver(current: Location?): Location? {
-    val (roomId, location) = roomId to location
-    val currentRoom = current as? Location.BookableRoom
-    return when {
-        roomId != null -> currentRoom?.takeIf { it.uuid.value == roomId } ?: Location.BookableRoom(BookableResourceUuid(roomId), resource = null)
-        location != null -> if (location == (current as? Location.Place)?.text) current else Location.Place(location)
-        currentRoom != null && currentRoom.resource == null -> current
-        else -> null
-    }
+/** [current] is only read for a room unknown locally: the form can't show it, so saving would otherwise drop its booking. */
+private fun EventDetailUi.Location?.toLocation(current: Location?): Location? = when (this) {
+    is EventDetailUi.Location.Place -> Location.Place(text)
+    is EventDetailUi.Location.Room -> Location.BookableRoom(BookableResourceUuid(id), resource = null)
+    null -> current.takeIf { it is Location.BookableRoom && it.resource == null }
 }
 
 fun List<AttendeeUi>.toAttendeeEdit(): List<AttendeeEdit> = map { AttendeeEdit(email = it.email, displayName = it.displayName) }

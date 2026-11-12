@@ -62,9 +62,12 @@ fun Event.toEventDetailUi(
     attendees = attendees.toAttendees(accountId, emailsByUserId),
     organizer = organizer?.toOrganizerUi(),
     kMeetUrl = meetRoomUrl,
-    location = (location as? Location.Place)?.text,
-    room = (location as? Location.BookableRoom)?.resource?.let {
-        EventDetailUi.Room(id = it.uuid.value, title = it.name, seats = it.capacity, floor = it.floor, location = it.location)
+    location = when (val location = location) {
+        is Location.Place -> EventDetailUi.Location.Place(location.text)
+        is Location.BookableRoom -> location.resource?.let {
+            EventDetailUi.Location.Room(id = it.uuid.value, title = it.name, seats = it.capacity, floor = it.floor, location = it.location)
+        }
+        null -> null
     },
     urlLink = null, // TODO[eventDetail]: Not carried by the KMP model yet
     description = description,

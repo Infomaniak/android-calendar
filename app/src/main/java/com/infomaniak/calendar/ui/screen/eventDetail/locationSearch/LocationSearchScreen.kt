@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.locationsearch.LocationSearch
 import com.infomaniak.calendar.components.locationsearch.models.RoomUi
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
@@ -50,14 +51,14 @@ fun LocationSearchScreen(
     val rooms by locationSearchViewModel.rooms.collectAsStateWithLifecycle()
 
     LocationSearchScreen(
-        initialLocation = formState.location,
+        initialLocation = (formState.location as? EventDetailUi.Location.Place)?.text,
         rooms = rooms,
         onSubmit = { location ->
-            formState.pickLocation(location)
+            formState.location = location?.let(EventDetailUi.Location::Place)
             goBack()
         },
         onRoomClick = { room ->
-            formState.pickRoom(locationSearchViewModel.formRoomOf(room))
+            formState.location = locationSearchViewModel.formRoomOf(room)
             goBack()
         },
         goBack = goBack,
