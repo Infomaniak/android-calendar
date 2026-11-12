@@ -138,32 +138,28 @@ fun EventDetail(
                 }
             }
 
-            if (description?.isNotBlank() == true || files.isNotEmpty()) {
-                Section {
-                    if (description?.isNotBlank() == true) {
-                        item {
-                            DescriptionCollapsibleButton(description = description, shapes = it)
-                        }
+            Section {
+                if (description?.isNotBlank() == true) {
+                    item {
+                        DescriptionCollapsibleButton(description = description, shapes = it)
                     }
+                }
 
-                    files.forEach { file ->
-                        item {
-                            AttachmentFile(file, onFileClick = { /*TODO[eventDetail]*/ }, shapes = it)
-                        }
+                files.forEach { file ->
+                    item {
+                        AttachmentFile(file, onFileClick = { /*TODO[eventDetail]*/ }, shapes = it)
                     }
                 }
             }
 
-            if (notifications.isNotEmpty()) {
-                Section {
-                    notifications.forEach { notification ->
-                        item {
-                            Notification(
-                                notification = notification,
-                                onNotificationClick = { /*TODO[eventDetail]*/ },
-                                shapes = it,
-                            )
-                        }
+            Section {
+                notifications.forEach { notification ->
+                    item {
+                        Notification(
+                            notification = notification,
+                            onNotificationClick = { /*TODO[eventDetail]*/ },
+                            shapes = it,
+                        )
                     }
                 }
             }
