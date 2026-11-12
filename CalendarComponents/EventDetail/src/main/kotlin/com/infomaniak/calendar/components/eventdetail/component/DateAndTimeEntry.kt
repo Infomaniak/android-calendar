@@ -42,11 +42,8 @@ import androidx.compose.material3.OutlinedToggleButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TimePickerDialog
 import androidx.compose.material3.ToggleButtonSize
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -195,25 +192,6 @@ private fun DateSelectionDialog(initialDate: LocalDate, onDateSelected: (LocalDa
 }
 
 @Composable
-private fun TimeSelectionDialog(initialTime: LocalTime, onTimeSelected: (LocalTime) -> Unit, onDismissRequest: () -> Unit) {
-    val state = rememberTimePickerState(initialHour = initialTime.hour, initialMinute = initialTime.minute)
-
-    TimePickerDialog(
-        onDismissRequest = onDismissRequest,
-        title = {},
-        confirmButton = {
-            ConfirmButton {
-                onTimeSelected(LocalTime(state.hour, state.minute))
-                onDismissRequest()
-            }
-        },
-        dismissButton = { CancelButton(onDismissRequest) },
-    ) {
-        TimePicker(state)
-    }
-}
-
-@Composable
 private fun ConfirmButton(onClick: () -> Unit) {
     TextButton(onClick = onClick) { Text(stringResource(android.R.string.ok)) }
 }
@@ -252,18 +230,6 @@ private fun DateSelectionDialogPreview() {
         DateSelectionDialog(
             initialDate = LocalDate(2026, 10, 20),
             onDateSelected = {},
-            onDismissRequest = {},
-        )
-    }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-private fun TimeSelectionDialogPreview() {
-    MaterialTheme {
-        TimeSelectionDialog(
-            initialTime = LocalTime(14, 41),
-            onTimeSelected = {},
             onDismissRequest = {},
         )
     }
