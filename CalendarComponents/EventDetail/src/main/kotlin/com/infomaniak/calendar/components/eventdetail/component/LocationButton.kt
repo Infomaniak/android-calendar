@@ -15,8 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.form.component
+package com.infomaniak.calendar.components.eventdetail.component
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -27,6 +28,22 @@ import com.infomaniak.calendar.components.eventdetail.component.items.ClickableI
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.MapPin
+
+@Composable
+internal fun LocationButton(
+    location: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
+    ClickableItem(
+        text = location,
+        leadingIcon = EsdsIcons.MapPin,
+        onClick = onClick,
+        contentPadding = contentPadding,
+        modifier = modifier,
+    )
+}
 
 @Composable
 internal fun LocationEditable(location: () -> String?, onClick: () -> Unit, modifier: Modifier = Modifier) {
@@ -40,7 +57,17 @@ internal fun LocationEditable(location: () -> String?, onClick: () -> Unit, modi
 
 @Preview
 @Composable
-private fun Preview() {
+private fun PreviewLocationButton() {
+    MaterialTheme {
+        Surface {
+            LocationButton(location = "742 Evergreen Terrace, Springfield", onClick = {})
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewEditable() {
     MaterialTheme {
         Surface {
             LocationEditable(location = { null }, onClick = {})
@@ -50,7 +77,7 @@ private fun Preview() {
 
 @Preview
 @Composable
-private fun PreviewWithLocation() {
+private fun PreviewEditableWithLocation() {
     MaterialTheme {
         Surface {
             LocationEditable(location = { "Rue Eugène-Marziano 25, Genève" }, onClick = {})
