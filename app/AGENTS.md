@@ -76,7 +76,7 @@ app/src/main/java/com/infomaniak/calendar/
     │                              # attendeesSearch/ (AttendeesSearchScreen, reading and writing the form's participants;
     │                              # EditableAttendeesSearchScreen, reading EventDetailViewModel's AttendeesSearchState;
     │                              # AttendeesSearchViewModel.EnableSearch searching the contacts as the query is typed)
-    │                              # form/ (EventFormViewModel: the event form state of EventCreation / EventEdit)
+    │                              # form/ (EventFormViewModel: the event form state of EventCreation / EventEdit; EventFormNavigation: their sub-screen callbacks)
     │                              # timeZoneSearch/ (TimeZoneSearchScreen: writes the picked time zone to the form)
     │                              # customReminder/ (CustomReminderScreen: adds the made reminder to the form)
     │                              # locationSearch/ (LocationSearchScreen: writes the clicked place, the typed text included, to the form as its location,
