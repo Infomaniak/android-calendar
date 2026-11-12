@@ -58,10 +58,7 @@ internal fun SegmentedListItemSwitch(
             selectedSupportingContentColor = defaultColors.supportingContentColor,
             selectedOverlineContentColor = defaultColors.overlineContentColor,
         ),
-        shapes = shapes.copy(
-            selectedShape = shapes.shape,
-            pressedShape = shapes.shape,
-        ),
+        shapes = shapes,
     )
 }
 @Preview
