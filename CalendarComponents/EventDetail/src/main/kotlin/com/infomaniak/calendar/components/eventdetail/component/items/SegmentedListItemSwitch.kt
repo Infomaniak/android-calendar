@@ -17,10 +17,10 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component.items
 
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -32,7 +32,7 @@ import com.infomaniak.calendar.components.eventdetail.utils.CustomColors
 import com.infomaniak.calendar.components.resources.R
 
 @Composable
-internal fun ListItemSwitch(
+internal fun SegmentedListItemSwitch(
     checked: () -> Boolean,
     onCheckedChange: (isChecked: Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -42,7 +42,7 @@ internal fun ListItemSwitch(
 ) {
     val defaultColors = ListItemDefaults.colors()
 
-    ListItem(
+    SegmentedListItem(
         checked = checked(),
         onCheckedChange = onCheckedChange,
         content = content,
@@ -69,7 +69,7 @@ internal fun ListItemSwitch(
 private fun Preview() {
     MaterialTheme {
         Surface {
-            ListItemSwitch(
+            SegmentedListItemSwitch(
                 checked = { true },
                 onCheckedChange = {},
                 content = { Text(stringResource(id = R.string.kMeetMeeting)) },

@@ -21,10 +21,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,7 +51,7 @@ import com.infomaniak.designsystem.icons.symbols.Calendar
 
 @Composable
 internal fun Calendar(calendarColor: Color, calendarName: String, shapes: ListItemShapes, modifier: Modifier = Modifier) {
-    ListItem(
+    SegmentedListItem(
         shapes = shapes,
         colors = ListItemDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceBright,

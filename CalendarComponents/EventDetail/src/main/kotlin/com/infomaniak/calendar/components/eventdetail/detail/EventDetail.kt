@@ -96,9 +96,7 @@ fun EventDetail(
                 }
 
                 if (recurrence is EventDetailRecurrence.Recurrence) {
-                    item {
-                        Recurrence(recurrence.getText, shapes = it)
-                    }
+                    item { Recurrence(recurrence.getText, shapes = it) }
                 }
             }
 
@@ -126,29 +124,21 @@ fun EventDetail(
                 }
 
                 if (location?.isNotBlank() == true) {
-                    item {
-                        LocationButton(location = location, shapes = it, onClick = onLocationClick)
-                    }
+                    item { LocationButton(location = location, shapes = it, onClick = onLocationClick) }
                 }
 
                 if (room != null) {
-                    item {
-                        RoomButton(room = room, shapes = it, onClick = onRoomClick)
-                    }
+                    item { RoomButton(room = room, shapes = it, onClick = onRoomClick) }
                 }
             }
 
             Section {
                 if (description?.isNotBlank() == true) {
-                    item {
-                        DescriptionCollapsibleButton(description = description, shapes = it)
-                    }
+                    item { DescriptionCollapsibleButton(description = description, shapes = it) }
                 }
 
                 files.forEach { file ->
-                    item {
-                        AttachmentFile(file, onFileClick = { /*TODO[eventDetail]*/ }, shapes = it)
-                    }
+                    item { AttachmentFile(file, onFileClick = { /*TODO[eventDetail]*/ }, shapes = it) }
                 }
             }
 

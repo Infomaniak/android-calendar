@@ -23,11 +23,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
@@ -41,7 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
-import com.infomaniak.calendar.components.eventdetail.component.items.ListItemSwitch
+import com.infomaniak.calendar.components.eventdetail.component.items.SegmentedListItemSwitch
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -56,7 +56,7 @@ internal fun KMeetButton(
     shapes: ListItemShapes,
     modifier: Modifier = Modifier,
 ) {
-    ListItem(
+    SegmentedListItem(
         content = { Text(stringResource(id = R.string.participateKMeetTitle)) },
         leadingContent = { KMeetIcon() },
         shapes = shapes,
@@ -86,7 +86,7 @@ internal fun KMeetButtonSwitch(
     modifier: Modifier = Modifier,
     shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
 ) {
-    ListItemSwitch(checked, onCheckedChange, modifier, shapes = shapes, leadingContent = { KMeetIcon() }) {
+    SegmentedListItemSwitch(checked, onCheckedChange, modifier, shapes = shapes, leadingContent = { KMeetIcon() }) {
         Text(stringResource(id = R.string.kMeetMeeting))
     }
 }

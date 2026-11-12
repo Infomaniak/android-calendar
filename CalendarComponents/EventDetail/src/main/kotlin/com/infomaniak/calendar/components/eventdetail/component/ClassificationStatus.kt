@@ -18,20 +18,19 @@
 package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
-import com.infomaniak.calendar.components.eventdetail.component.items.ListItemSwitch
+import com.infomaniak.calendar.components.eventdetail.component.items.SegmentedListItemSwitch
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Lock
@@ -42,7 +41,7 @@ internal fun ClassificationStatus(
     shapes: ListItemShapes,
     modifier: Modifier = Modifier,
 ) {
-    ListItem(
+    SegmentedListItem(
         content = { Text(text = stringResource(classification.label)) },
         leadingContent = { ClassificationIcon() },
         colors = ListItemDefaults.colors(
@@ -60,7 +59,7 @@ internal fun ClassificationStatusSwitch(
     modifier: Modifier = Modifier,
     shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
 ) {
-    ListItemSwitch(
+    SegmentedListItemSwitch(
         checked,
         onCheckedChange,
         modifier,

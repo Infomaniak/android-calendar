@@ -27,12 +27,12 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,7 +52,7 @@ private const val MAX_LINES = Int.MAX_VALUE
 
 @Composable
 internal fun Title(dotColor: Color, title: String, shapes: ListItemShapes, modifier: Modifier = Modifier) {
-    ListItem(
+    SegmentedListItem(
         leadingContent = { EventColorDot(dotColor) },
         shapes = shapes,
         colors = CustomColors.EventFormItemColors,
@@ -68,7 +68,7 @@ internal fun TitleEditable(
     shapes: ListItemShapes,
     modifier: Modifier = Modifier,
 ) {
-    ListItem(
+    SegmentedListItem(
         leadingContent = { EventColorDot(dotColor()) },
         shapes = shapes,
         colors = ListItemDefaults.colors(

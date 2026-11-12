@@ -17,10 +17,10 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,7 +38,7 @@ internal fun Recurrence(text: suspend () -> String?, shapes: ListItemShapes, mod
         value = text()
     }
 
-    ListItem(
+    SegmentedListItem(
         modifier = modifier,
         shapes = shapes,
         colors = ListItemDefaults.colors(

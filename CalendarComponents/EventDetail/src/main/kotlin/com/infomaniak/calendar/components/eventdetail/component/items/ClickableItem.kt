@@ -20,11 +20,11 @@ package com.infomaniak.calendar.components.eventdetail.component.items
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -71,7 +71,7 @@ internal fun ClickableItem(
     trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
     supportingContent: @Composable (() -> Unit)? = null,
 ) {
-    ListItem(
+    SegmentedListItem(
         modifier = modifier,
         content = { Text(text) },
         colors = CustomColors.EventFormItemColors,

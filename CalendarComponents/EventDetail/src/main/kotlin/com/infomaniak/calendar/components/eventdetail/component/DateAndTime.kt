@@ -21,10 +21,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -63,7 +63,7 @@ internal fun DateAndTime(
     shapes: ListItemShapes,
     modifier: Modifier = Modifier,
 ) {
-    ListItem(
+    SegmentedListItem(
         leadingContent = { ItemIcon(EsdsIcons.Clock) },
         shapes = shapes,
         colors = ListItemDefaults.colors(
@@ -84,7 +84,7 @@ internal fun DateAndTime(
         },
         supportingContent = {
             // Floating events and all day events never need to display UTC offset
-            if (isAllDay || start !is EventDetailTiming.Precise || end !is EventDetailTiming.Precise) return@ListItem
+            if (isAllDay || start !is EventDetailTiming.Precise || end !is EventDetailTiming.Precise) return@SegmentedListItem
 
             if (start.utcOffsetAtTimeZone != start.utcOffsetAtLocale || end.utcOffsetAtTimeZone != end.utcOffsetAtLocale) {
                 Text(
