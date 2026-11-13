@@ -122,7 +122,7 @@ internal fun DateAndTimeEditable(
             DateAndTimeEntry(
                 entry = start,
                 isAllDay = isAllDay,
-                selectedButton = { (selectedButton as? DateAndTimeEntry.Start)?.entryButton },
+                selectedButton = { (selectedButton as? DateAndTimeEntry.Start)?.entryButton.takeTimeUnless(isAllDay) },
                 onSelectButton = { selectedButton = it?.let { entryButton -> DateAndTimeEntry.Start(entryButton) } },
                 onDatePicked = { start.pickDate(it) },
                 onTimePicked = { start.pickTime(it) },
@@ -131,7 +131,7 @@ internal fun DateAndTimeEditable(
             DateAndTimeEntry(
                 entry = end,
                 isAllDay = isAllDay,
-                selectedButton = { (selectedButton as? DateAndTimeEntry.End)?.entryButton },
+                selectedButton = { (selectedButton as? DateAndTimeEntry.End)?.entryButton.takeTimeUnless(isAllDay) },
                 onSelectButton = { selectedButton = it?.let { entryButton -> DateAndTimeEntry.End(entryButton) } },
                 onDatePicked = { end.pickDate(it) },
                 onTimePicked = { end.pickTime(it) },
@@ -139,6 +139,11 @@ internal fun DateAndTimeEditable(
             )
         }
     }
+}
+
+private fun EntryButton?.takeTimeUnless(isAllDay: () -> Boolean): EntryButton? = when (this) {
+    EntryButton.Time -> takeUnless { isAllDay() }
+    EntryButton.Date, null -> this
 }
 
 internal sealed interface DateAndTimeEntry {
