@@ -57,7 +57,7 @@ internal fun Calendar(calendarColor: Color, calendarName: String, shapes: ListIt
         shapes = shapes,
         colors = CustomColors.EventFormItemColors,
         content = { Text(stringResource(id = R.string.sectionCalendarHeader)) },
-        leadingContent = { ItemIcon(EsdsIcons.Calendar.Small) },
+        leadingContent = { ItemIcon(EsdsIcons.Calendar) },
         trailingContent = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
