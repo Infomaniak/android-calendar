@@ -22,12 +22,6 @@ import kotlinx.parcelize.Parcelize
 
 /** An event's location: a place, or a bookable room. */
 sealed interface LocationUi : Parcelable {
-    val label: String
-        get() = when (this) {
-            is Place -> name
-            is Room -> name
-        }
-
     /** What a maps app searches to find this location. */
     val mapsQuery: String?
         get() = when (this) {
