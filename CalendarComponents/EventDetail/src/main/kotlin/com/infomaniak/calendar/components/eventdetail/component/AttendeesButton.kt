@@ -44,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
+import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus.Accepted
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus.Declined
@@ -96,7 +97,7 @@ internal fun AttendeesButton(
                 } else {
                     StackedAvatars(attendeeList)
                 }
-                Icon(EsdsIcons.ChevronRight.Small, contentDescription = null)
+                ItemIcon(EsdsIcons.ChevronRight)
             }
         },
         modifier = modifier,

@@ -63,7 +63,7 @@ internal fun DescriptionCollapsibleButton(
     val descriptionState = rememberCollapsibleTextState(isCollapsed, COLLAPSED_MAX_LINES)
 
     val descriptionTitle = R.string.descriptionTitle
-    val leadingIcon = EsdsIcons.List.Medium
+    val leadingIcon = EsdsIcons.List
 
     // Shows or hides the button to toggle the description based on if the text is actually overflowing when collapsed or not.
     if (descriptionState.isOverflowing) {

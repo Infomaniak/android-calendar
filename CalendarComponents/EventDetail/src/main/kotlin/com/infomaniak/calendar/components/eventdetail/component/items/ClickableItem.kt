@@ -90,7 +90,7 @@ internal fun ClickableItem(
 
 internal object ClickableItemDefaults {
     val trailingContent = @Composable {
-        Icon(EsdsIcons.ChevronRight.Small, contentDescription = null)
+        ItemIcon(EsdsIcons.ChevronRight)
     }
 
     val ClickableItemShapes

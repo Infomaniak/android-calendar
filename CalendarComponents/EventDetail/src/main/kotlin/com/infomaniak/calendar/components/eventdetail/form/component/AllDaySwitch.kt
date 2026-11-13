@@ -44,7 +44,7 @@ internal fun AllDaySwitch(
         onCheckedChange = onCheckedChange,
         modifier = modifier,
         shapes = shapes,
-        leadingContent = { ItemIcon(EsdsIcons.Clock.Small) },
+        leadingContent = { ItemIcon(EsdsIcons.Clock) },
     ) {
         Text(stringResource(id = R.string.notificationAllDay))
     }
