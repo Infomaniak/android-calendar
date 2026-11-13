@@ -45,6 +45,7 @@
         <item quantity="one">%1$d ehkä</item>
         <item quantity="other">%1$d ehkä</item>
     </plurals>
+    <string name="availabilityUnknownLabel">Saatavuus tuntematon</string>
     <string name="availableLabel">Vapaa</string>
     <string name="buttonAddReminder">Lisää muistutus</string>
     <string name="buttonJoin">Liity mukaan</string>
@@ -102,6 +103,7 @@
     <string name="statusDeclinedLabel">Hylätty</string>
     <string name="statusNeedsActionLabel">Käsiteltävänä</string>
     <string name="statusTentativeLabel">Ehkä</string>
+    <string name="unavailableLabel">Ei käytettävissä</string>
     <plurals name="unitDays">
         <item quantity="one">päivä</item>
         <item quantity="other">päivää</item>

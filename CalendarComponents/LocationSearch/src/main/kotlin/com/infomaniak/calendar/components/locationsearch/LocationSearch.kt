@@ -41,6 +41,7 @@ import com.infomaniak.calendar.components.foundation.models.SearchableText
 import com.infomaniak.calendar.components.foundation.utils.onlyHorizontalAndTop
 import com.infomaniak.calendar.components.locationsearch.component.PlaceItem
 import com.infomaniak.calendar.components.locationsearch.component.RoomItem
+import com.infomaniak.calendar.components.locationsearch.models.RoomAvailability
 import com.infomaniak.calendar.components.locationsearch.models.SearchRoomUi
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -104,9 +105,9 @@ private fun Preview() {
             LocationSearch(
                 searchState = rememberTextFieldState(),
                 rooms = listOf(
-                    SearchRoomUi(id = "1", name = "Salle Jules Verne", seats = 100, floor = 3),
-                    SearchRoomUi(id = "2", name = "Salle Blanche", seats = 8, floor = 1),
-                    SearchRoomUi(id = "3", name = "Salle de sport", seats = 50, floor = 0),
+                    SearchRoomUi(id = "1", name = "Salle Jules Verne", seats = 100, floor = 3, availability = RoomAvailability.Available),
+                    SearchRoomUi(id = "2", name = "Salle Blanche", seats = 8, floor = 1, availability = RoomAvailability.Available),
+                    SearchRoomUi(id = "3", name = "Salle de sport", seats = 50, floor = 0, availability = RoomAvailability.Unavailable),
                 ),
                 onLocationClick = {},
                 onRoomClick = {},

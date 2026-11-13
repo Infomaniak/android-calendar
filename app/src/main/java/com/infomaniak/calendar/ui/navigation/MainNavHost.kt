@@ -148,8 +148,8 @@ private fun baseEntryProvider(
                 goToTimeZoneSearch = { isStart ->
                     backStack.addOnce(NavDestination.EventForm.EventTimeZone(destination, isStart))
                 },
-                goToCustomReminder = { backStack.addOnce(NavDestination.EventForm.EventCustomReminder(destination)) },
-                goToLocationSearch = { backStack.addOnce(NavDestination.EventForm.EventLocationSearch(destination)) },
+                goToCustomReminder = { backStack.addOnce(NavDestination.EventForm.EventCustomReminder(parent = destination)) },
+                goToLocationSearch = { backStack.addOnce(NavDestination.EventForm.EventLocationSearch(parent = destination)) },
             )
         }
 
@@ -185,7 +185,9 @@ private fun baseEntryProvider(
                     backStack.addOnce(NavDestination.EventForm.EventTimeZone(destination, isStart))
                 },
                 goToCustomReminder = { backStack.addOnce(NavDestination.EventForm.EventCustomReminder(destination)) },
-                goToLocationSearch = { backStack.addOnce(NavDestination.EventForm.EventLocationSearch(destination)) },
+                goToLocationSearch = {
+                    backStack.addOnce(NavDestination.EventForm.EventLocationSearch(destination.occurrenceId, destination))
+                },
             )
         }
 
@@ -229,7 +231,10 @@ private fun baseEntryProvider(
             key = destination,
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
-            LocationSearchScreen(goBack = { backStack.popOrReplaceRoot(defaultCalendarView) })
+            LocationSearchScreen(
+                editedOccurrenceId = destination.occurrenceId,
+                goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
+            )
         }
 
         is NavDestination.Accounts.List -> NavEntry(destination) {

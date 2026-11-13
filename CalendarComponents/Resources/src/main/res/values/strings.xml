@@ -45,6 +45,7 @@
         <item quantity="one">%1$d maybe</item>
         <item quantity="other">%1$d maybe</item>
     </plurals>
+    <string name="availabilityUnknownLabel">Availability unknown</string>
     <string name="availableLabel">Available</string>
     <string name="buttonAddReminder">Add a reminder</string>
     <string name="buttonJoin">Join</string>
@@ -102,6 +103,7 @@
     <string name="statusDeclinedLabel">Declined</string>
     <string name="statusNeedsActionLabel">Pending</string>
     <string name="statusTentativeLabel">Maybe</string>
+    <string name="unavailableLabel">Unavailable</string>
     <plurals name="unitDays">
         <item quantity="one">day</item>
         <item quantity="other">days</item>

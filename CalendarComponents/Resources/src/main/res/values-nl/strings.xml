@@ -45,6 +45,7 @@
         <item quantity="one">%1$d misschien</item>
         <item quantity="other">%1$d misschien</item>
     </plurals>
+    <string name="availabilityUnknownLabel">Beschikbaarheid onbekend</string>
     <string name="availableLabel">Beschikbaar</string>
     <string name="buttonAddReminder">Herinnering toevoegen</string>
     <string name="buttonJoin">Lid worden</string>
@@ -102,6 +103,7 @@
     <string name="statusDeclinedLabel">Afgewezen</string>
     <string name="statusNeedsActionLabel">In behandeling</string>
     <string name="statusTentativeLabel">Misschien</string>
+    <string name="unavailableLabel">Niet beschikbaar</string>
     <plurals name="unitDays">
         <item quantity="one">dag</item>
         <item quantity="other">dagen</item>

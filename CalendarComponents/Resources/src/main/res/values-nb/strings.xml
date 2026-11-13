@@ -45,6 +45,7 @@
         <item quantity="one">%1$d kanskje</item>
         <item quantity="other">%1$d kanskje</item>
     </plurals>
+    <string name="availabilityUnknownLabel">Ukjent tilgjengelighet</string>
     <string name="availableLabel">Ledig</string>
     <string name="buttonAddReminder">Legg til en påminnelse</string>
     <string name="buttonJoin">Bli med</string>
@@ -102,6 +103,7 @@
     <string name="statusDeclinedLabel">Avvist</string>
     <string name="statusNeedsActionLabel">Under behandling</string>
     <string name="statusTentativeLabel">Kanskje</string>
+    <string name="unavailableLabel">Utilgjengelig</string>
     <plurals name="unitDays">
         <item quantity="one">dag</item>
         <item quantity="other">dager</item>

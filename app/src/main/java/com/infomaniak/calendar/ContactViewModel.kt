@@ -23,7 +23,6 @@ import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.account.accountId
 import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.common.cancellable
-import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.multiplatform_core.account.domain.model.AccountId
 import com.infomaniak.multiplatform_core.contacts.ContactsManager
 import dev.zacsweers.metro.AppScope
@@ -80,13 +79,10 @@ class ContactViewModel(
     private suspend fun syncContacts(accountIds: MutableSet<AccountId>) {
         runCatching {
             contactsManager.sync(accountIds)
-        }.cancellable().onFailure { throwable ->
-            SentryLog.w(TAG, "Failed to sync contacts", throwable)
-        }
+        }.cancellable()
     }
 
     companion object {
-        private const val TAG = "ContactViewModel"
         private val SYNC_CONTACTS_MIN_INTERVAL = 1.minutes
     }
 }
