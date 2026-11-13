@@ -225,7 +225,7 @@ private fun ReminderDialog(
 
 @Composable
 private fun ReminderItemsSection(
-    reminders: List<EventDetailUi.Reminder>,
+    reminders: SnapshotStateList<EventDetailUi.Reminder>,
     onRemove: (EventDetailUi.Reminder) -> Unit,
     onAddClick: () -> Unit,
 ) {
