@@ -51,18 +51,18 @@ internal fun LocationEditable(
     val room = rememberLastNonNull(location as? LocationUi.Room)
 
     Column(modifier) {
-        AnimatedVisibility(visible = location is LocationUi.Place) {
-            if (place != null) {
-                PlaceButtonEditable(name = place.name, address = place.address, onClick = onClick, onRemoveClick = onRemoveClick)
-            }
-        }
-
         AnimatedVisibility(visible = location is LocationUi.Room) {
             if (room != null) {
                 RoomEditable(room = room, onClick = onClick, onRemoveClick = onRemoveClick)
                 room.address?.takeIf { it.isNotBlank() }?.let { address ->
                     PlaceEditable(name = address, address = null, onClick = onClick)
                 }
+            }
+        }
+
+        AnimatedVisibility(visible = location is LocationUi.Place) {
+            if (place != null) {
+                PlaceButtonEditable(name = place.name, address = place.address, onClick = onClick, onRemoveClick = onRemoveClick)
             }
         }
 
