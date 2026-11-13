@@ -19,7 +19,6 @@ package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
@@ -83,13 +82,8 @@ internal fun CalendarEditable(
 
     DropDownItem(
         onClick = { isDialogVisible = true },
-        content = {
-            Text(
-                stringResource(id = R.string.sectionCalendarHeader),
-                modifier = Modifier.padding(start = EsdsTheme.spacing.lg),
-            )
-        },
-        leadingContent = { Icon(EsdsIcons.Calendar.Small, contentDescription = null) },
+        content = { Text(stringResource(id = R.string.sectionCalendarHeader)) },
+        leadingContent = { ItemIcon(EsdsIcons.Calendar) },
         trailingContent = {
             CalendarDot(selectedCalendar.color)
             Text(text = selectedCalendar.name, style = MaterialTheme.typography.labelLarge)
