@@ -96,7 +96,7 @@ internal fun LocationEditable(
                     .clip(ClickableItemDefaults.ClickableItemShapes.shape)
                     .clickable(onClick = onClick),
             ) {
-                RoomItem(room = location, trailingContent = { RemoveLocationButton(onRemoveClick) })
+                Room(room = location, trailingContent = { RemoveLocationButton(onRemoveClick) })
                 location.address?.takeIf { it.isNotBlank() }?.let { address ->
                     ListItem(content = { Text(address) }, leadingContent = { ItemIcon(EsdsIcons.MapPin) })
                 }

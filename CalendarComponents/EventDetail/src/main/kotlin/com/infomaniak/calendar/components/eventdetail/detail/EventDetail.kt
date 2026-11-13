@@ -41,7 +41,7 @@ import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
 import com.infomaniak.calendar.components.eventdetail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatus
 import com.infomaniak.calendar.components.eventdetail.component.Recurrence
-import com.infomaniak.calendar.components.eventdetail.component.RoomItem
+import com.infomaniak.calendar.components.eventdetail.component.Room
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
 import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
@@ -107,7 +107,7 @@ fun EventDetail(
                         trailingContent = { Icon(EsdsIcons.SquareArrowOutUpRight.Small, contentDescription = null) },
                     )
                     is LocationUi.Room -> Column(Modifier.eventSharedBounds(EventSharedElement.Location)) {
-                        RoomItem(room = location)
+                        Room(room = location)
                         location.address?.let { address ->
                             LocationButton(
                                 name = address,

@@ -31,7 +31,7 @@ import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.DoorOpen
 
 @Composable
-internal fun RoomItem(
+internal fun Room(
     room: LocationUi.Room,
     modifier: Modifier = Modifier,
     trailingContent: (@Composable () -> Unit)? = null,
@@ -47,10 +47,10 @@ internal fun RoomItem(
 
 @Preview
 @Composable
-private fun PreviewRoomItem() {
+private fun PreviewRoom() {
     MaterialTheme {
         Surface {
-            RoomItem(room = LocationUi.Room(id = "1", name = "Japan room", seats = 5, floor = 3, address = null, availability = null))
+            Room(room = LocationUi.Room(id = "1", name = "Japan room", seats = 5, floor = 3, address = null, availability = null))
         }
     }
 }
