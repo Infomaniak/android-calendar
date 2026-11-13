@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.form.component
+package com.infomaniak.calendar.components.eventdetail.detail
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
@@ -30,6 +30,8 @@ import com.infomaniak.calendar.components.eventdetail.component.PlaceButtonEdita
 import com.infomaniak.calendar.components.eventdetail.component.PlaceEditable
 import com.infomaniak.calendar.components.eventdetail.component.RoomEditable
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
+import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
+import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
 import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -40,7 +42,7 @@ import com.infomaniak.designsystem.icons.symbols.MapPin
  * [onRemoveClick]. Switching between them, e.g. when a calendar switch drops the room, is animated.
  */
 @Composable
-internal fun LocationEditable(
+internal fun Locations(
     location: () -> LocationUi?,
     onClick: () -> Unit,
     onRemoveClick: () -> Unit,
@@ -53,16 +55,34 @@ internal fun LocationEditable(
     Column(modifier) {
         AnimatedVisibility(visible = location is LocationUi.Room) {
             if (room != null) {
-                RoomEditable(room = room, onClick = onClick, onRemoveClick = onRemoveClick)
-                room.address?.takeIf { it.isNotBlank() }?.let { address ->
-                    PlaceEditable(name = address, address = null, onClick = onClick)
+                Column {
+                    RoomEditable(
+                        room = room,
+                        onClick = onClick,
+                        onRemoveClick = onRemoveClick,
+                        modifier = Modifier.eventSharedBounds(EventSharedElement.Room),
+                    )
+                    room.address?.takeIf { it.isNotBlank() }?.let { address ->
+                        PlaceEditable(
+                            name = address,
+                            address = null,
+                            onClick = onClick,
+                            modifier = Modifier.eventSharedBounds(EventSharedElement.Place),
+                        )
+                    }
                 }
             }
         }
 
         AnimatedVisibility(visible = location is LocationUi.Place) {
             if (place != null) {
-                PlaceButtonEditable(name = place.name, address = place.address, onClick = onClick, onRemoveClick = onRemoveClick)
+                PlaceButtonEditable(
+                    name = place.name,
+                    address = place.address,
+                    onClick = onClick,
+                    onRemoveClick = onRemoveClick,
+                    modifier = Modifier.eventSharedBounds(EventSharedElement.Place),
+                )
             }
         }
 
@@ -93,7 +113,7 @@ private class LastNonNull<T : Any> {
 private fun PreviewEditable() {
     MaterialTheme {
         Surface {
-            LocationEditable(location = { null }, onClick = {}, onRemoveClick = {})
+            Locations(location = { null }, onClick = {}, onRemoveClick = {})
         }
     }
 }
@@ -103,7 +123,7 @@ private fun PreviewEditable() {
 private fun PreviewEditableWithPlace() {
     MaterialTheme {
         Surface {
-            LocationEditable(
+            Locations(
                 location = {
                     LocationUi.Place(name = "Infomaniak", address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland")
                 },
@@ -119,7 +139,7 @@ private fun PreviewEditableWithPlace() {
 private fun PreviewEditableWithRoom() {
     MaterialTheme {
         Surface {
-            LocationEditable(
+            Locations(
                 location = {
                     LocationUi.Room(
                         id = "1",

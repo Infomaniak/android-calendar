@@ -92,7 +92,8 @@ internal sealed interface EventSharedElement {
     data object DateAndTime : EventSharedElement
     data object Attendees : EventSharedElement
     data object KMeet : EventSharedElement
-    data object Location : EventSharedElement
+    data object Room : EventSharedElement
+    data object Place : EventSharedElement
     data object OccupiedStatus : EventSharedElement
     data object ClassificationStatus : EventSharedElement
     data object Calendar : EventSharedElement

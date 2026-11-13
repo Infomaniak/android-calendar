@@ -20,6 +20,7 @@ package com.infomaniak.calendar.components.eventdetail.component
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -29,7 +30,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
-import com.infomaniak.calendar.components.foundation.component.ListItemClickable
 import com.infomaniak.calendar.components.foundation.component.RoomDetails
 import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -40,11 +40,11 @@ import com.infomaniak.core.common.R as RCommon
 @Composable
 internal fun Room(
     room: LocationUi.Room,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
 ) {
-    ListItemClickable(
+    ListItem(
         onClick = onClick,
         shapes = ClickableItemDefaults.ClickableItemShapes,
         content = { Text(room.name) },
@@ -76,7 +76,10 @@ internal fun RoomEditable(room: LocationUi.Room, onClick: () -> Unit, onRemoveCl
 private fun PreviewRoom() {
     MaterialTheme {
         Surface {
-            Room(room = LocationUi.Room(id = "1", name = "Japan room", seats = 5, floor = 3, address = null, availability = null))
+            Room(
+                room = LocationUi.Room(id = "1", name = "Japan room", seats = 5, floor = 3, address = null, availability = null),
+                onClick = {},
+            )
         }
     }
 }

@@ -52,8 +52,8 @@ import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitc
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
+import com.infomaniak.calendar.components.eventdetail.detail.Locations
 import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
-import com.infomaniak.calendar.components.eventdetail.form.component.LocationEditable
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.AddReminderButton
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderItem
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderOffsetDialog
@@ -125,11 +125,10 @@ fun EventForm(
                 modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
             )
 
-            LocationEditable(
+            Locations(
                 location = { state.location },
                 onClick = onLocationClick,
                 onRemoveClick = { state.location = null },
-                modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
             )
         }
 

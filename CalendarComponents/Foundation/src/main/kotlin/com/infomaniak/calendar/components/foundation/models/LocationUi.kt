@@ -35,6 +35,12 @@ sealed interface LocationUi : Parcelable {
             is Room -> name
         }
 
+    val nameAndAddress: NameAndAddress?
+        get() = when (this) {
+            is Place -> NameAndAddress(name, address)
+            is Room -> address?.let { NameAndAddress(it, null) }
+        }
+
     /** @param address Under the place's [name], null when the name already is its address. */
     @Parcelize
     data class Place(val name: String, val address: String?) : LocationUi
@@ -53,4 +59,9 @@ sealed interface LocationUi : Parcelable {
         val address: String?,
         val availability: RoomAvailability?,
     ) : LocationUi
+
+    data class NameAndAddress(
+        val name: String,
+        val address: String?,
+    )
 }

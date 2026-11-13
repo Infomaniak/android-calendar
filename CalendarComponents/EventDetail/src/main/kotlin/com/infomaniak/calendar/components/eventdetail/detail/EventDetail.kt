@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -55,8 +54,6 @@ import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElemen
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailUi
 import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.designsystem.core.theme.EsdsTheme
-import com.infomaniak.designsystem.icons.EsdsIcons
-import com.infomaniak.designsystem.icons.symbols.SquareArrowOutUpRight
 
 /**
  * [sharedTransitionScope] and [animatedVisibilityScope] animate associated components between detail and editing.
@@ -98,26 +95,21 @@ fun EventDetail(
                     )
                 }
 
-                when (location) {
-                    is LocationUi.Place -> PlaceButton(
-                        name = location.name,
-                        address = location.address,
+                if (location is LocationUi.Room) {
+                    Room(
+                        room = location,
                         onClick = onLocationClick,
-                        modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
-                        trailingContent = { Icon(EsdsIcons.SquareArrowOutUpRight.Small, contentDescription = null) },
+                        modifier = Modifier.eventSharedBounds(EventSharedElement.Room),
                     )
-                    is LocationUi.Room -> Column(Modifier.eventSharedBounds(EventSharedElement.Location)) {
-                        Room(room = location)
-                        location.address?.let { address ->
-                            PlaceButton(
-                                name = address,
-                                address = null,
-                                onClick = onLocationClick,
-                                trailingContent = { Icon(EsdsIcons.SquareArrowOutUpRight.Small, contentDescription = null) },
-                            )
-                        }
-                    }
-                    null -> Unit
+                }
+
+                location?.nameAndAddress?.let {
+                    PlaceButton(
+                        name = it.name,
+                        address = it.address,
+                        onClick = onLocationClick,
+                        modifier = Modifier.eventSharedBounds(EventSharedElement.Place),
+                    )
                 }
             }
 

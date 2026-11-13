@@ -34,25 +34,25 @@ import com.infomaniak.calendar.components.foundation.component.ListItemClickable
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Cross
 import com.infomaniak.designsystem.icons.symbols.MapPin
+import com.infomaniak.designsystem.icons.symbols.SquareArrowOutUpRight
 import com.infomaniak.core.common.R as RCommon
 
 @Composable
+
 internal fun PlaceButton(
     name: String,
     address: String?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
-    trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
 ) {
-    ClickableItem(
-        text = name,
-        leadingIcon = EsdsIcons.MapPin,
+    InnerPlaceButton(
+        name = name,
+        address = address,
         onClick = onClick,
-        contentPadding = contentPadding,
-        supportingContent = address?.let { { Text(it) } },
         modifier = modifier,
-        trailingContent = trailingContent,
+        contentPadding = contentPadding,
+        trailingContent = { ItemIcon(EsdsIcons.SquareArrowOutUpRight) },
     )
 }
 
@@ -64,7 +64,7 @@ internal fun PlaceButtonEditable(
     onRemoveClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    PlaceButton(
+    InnerPlaceButton(
         name = name,
         address = address,
         onClick = onClick,
@@ -86,6 +86,26 @@ internal fun PlaceEditable(name: String, address: String?, modifier: Modifier = 
         leadingContent = { ItemIcon(EsdsIcons.MapPin) },
         supportingContent = address?.let { { Text(it) } },
         modifier = modifier,
+    )
+}
+
+@Composable
+private fun InnerPlaceButton(
+    name: String,
+    address: String?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
+    trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
+) {
+    ClickableItem(
+        text = name,
+        leadingIcon = EsdsIcons.MapPin,
+        onClick = onClick,
+        contentPadding = contentPadding,
+        supportingContent = address?.let { { Text(it) } },
+        modifier = modifier,
+        trailingContent = trailingContent,
     )
 }
 
