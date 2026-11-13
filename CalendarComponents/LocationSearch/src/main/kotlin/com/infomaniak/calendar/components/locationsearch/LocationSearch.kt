@@ -60,7 +60,7 @@ fun LocationSearch(
         ) {
             val results = results()
 
-            itemsIndexed(results, key = { _, result -> result.key }) { index, result ->
+            itemsIndexed(results, key = { index, result -> result.key(index) }) { index, result ->
                 val shapes = ListItemDefaults.segmentedShapes(index = index, count = results.size)
                 when (result) {
                     is LocationUi.Place -> PlaceItem(
@@ -68,11 +68,13 @@ fun LocationSearch(
                         address = result.address,
                         shapes = shapes,
                         onClick = { onLocationClick(result) },
+                        modifier = Modifier.animateItem(),
                     )
                     is LocationUi.Room -> RoomItem(
                         room = result,
                         shapes = shapes,
                         onClick = { onLocationClick(result) },
+                        modifier = Modifier.animateItem(),
                     )
                 }
             }
@@ -80,11 +82,11 @@ fun LocationSearch(
     }
 }
 
-private val LocationUi.key: String
-    get() = when (this) {
-        is LocationUi.Place -> "place:$name:$address"
-        is LocationUi.Room -> "room:$id"
-    }
+/** Places are keyed by position, so the typed one stays the same item while it's being typed. */
+private fun LocationUi.key(index: Int): String = when (this) {
+    is LocationUi.Place -> "place:$index"
+    is LocationUi.Room -> "room:$id"
+}
 
 @Preview
 @Composable
