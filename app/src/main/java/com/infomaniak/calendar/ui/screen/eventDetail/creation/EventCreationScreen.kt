@@ -39,6 +39,7 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.foundation.component.EmptyState
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.locationSearch.LocationSearchViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.core.common.utils.today
@@ -60,11 +61,17 @@ fun EventCreationScreen(
     modifier: Modifier = Modifier,
     eventCreationViewModel: EventCreationViewModel = viewModel(),
     eventFormViewModel: EventFormViewModel = viewModel(),
+    locationSearchViewModel: LocationSearchViewModel = viewModel(),
 ) {
     val calendarsUiState by eventCreationViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         eventFormViewModel.initCreation(date)
+    }
+
+    val formState = eventFormViewModel.formState
+    LaunchedEffect(formState) {
+        formState?.let { locationSearchViewModel.followForm(it) }
     }
 
     val uiState = when (calendarsUiState) {

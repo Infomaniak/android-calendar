@@ -19,37 +19,46 @@ package com.infomaniak.calendar.ui.screen.eventDetail.locationSearch
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.infomaniak.calendar.components.foundation.component.SearchBar
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.locationsearch.LocationSearch
+import com.infomaniak.calendar.components.locationsearch.models.SearchRoomUi
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.calendar.components.resources.R as RComponents
 
 @Composable
 fun LocationSearchScreen(
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
+    locationSearchViewModel: LocationSearchViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
     eventFormViewModel: EventFormViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
     val formState = eventFormViewModel.formState ?: return
+    val rooms by locationSearchViewModel.rooms.collectAsStateWithLifecycle()
 
     LocationSearchScreen(
-        initialLocation = formState.location.value,
+        initialLocation = (formState.location as? EventDetailUi.LocationUi.Place)?.text,
+        rooms = rooms,
         onSubmit = { location ->
-            formState.location.value = location
+            formState.location = location?.let(EventDetailUi.LocationUi::Place)
+            goBack()
+        },
+        onRoomClick = { room ->
+            formState.location = locationSearchViewModel.formRoomOf(room)
             goBack()
         },
         goBack = goBack,
@@ -60,7 +69,9 @@ fun LocationSearchScreen(
 @Composable
 private fun LocationSearchScreen(
     initialLocation: String?,
+    rooms: List<SearchRoomUi>,
     onSubmit: (String?) -> Unit,
+    onRoomClick: (SearchRoomUi) -> Unit,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -79,13 +90,12 @@ private fun LocationSearchScreen(
         modifier = modifier,
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.union(WindowInsets.ime),
     ) { contentPadding ->
-        SearchBar(
+        LocationSearch(
             searchState = searchState,
-            placeholder = stringResource(RComponents.string.locationSearchPlaceholder),
-            modifier = Modifier
-                .padding(contentPadding)
-                .padding(top = EsdsTheme.spacing.xl)
-                .padding(horizontal = EsdsTheme.spacing.xl),
+            rooms = rooms,
+            onLocationClick = onSubmit,
+            onRoomClick = onRoomClick,
+            contentPadding = contentPadding,
         )
     }
 }
@@ -94,6 +104,12 @@ private fun LocationSearchScreen(
 @Composable
 private fun Preview() {
     CalendarThemeForPreview {
-        LocationSearchScreen(initialLocation = null, onSubmit = {}, goBack = {})
+        LocationSearchScreen(
+            initialLocation = null,
+            rooms = listOf(SearchRoomUi(id = "1", name = "Salle Jules Verne", seats = 100, floor = 3)),
+            onSubmit = {},
+            onRoomClick = {},
+            goBack = {},
+        )
     }
 }

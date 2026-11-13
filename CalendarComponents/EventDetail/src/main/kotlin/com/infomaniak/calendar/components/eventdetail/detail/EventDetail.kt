@@ -95,16 +95,16 @@ fun EventDetail(
                     )
                 }
 
-                if (location?.isNotBlank() == true) {
+                location?.address?.let { address ->
                     LocationButton(
-                        location = location,
+                        location = address,
                         onClick = onLocationClick,
                         modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
                     )
                 }
 
-                if (room != null) {
-                    RoomButton(room = room, onClick = onRoomClick)
+                if (location is EventDetailUi.LocationUi.Room) {
+                    RoomButton(room = location, onClick = onRoomClick)
                 }
             }
 

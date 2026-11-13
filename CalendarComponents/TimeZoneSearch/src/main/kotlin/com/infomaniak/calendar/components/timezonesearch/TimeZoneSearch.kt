@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.components.timezonesearch
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -39,12 +38,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.EmptyState
 import com.infomaniak.calendar.components.foundation.component.SearchBar
+import com.infomaniak.calendar.components.foundation.component.SearchLayout
 import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
+import com.infomaniak.calendar.components.foundation.utils.onlyHorizontalAndTop
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.calendar.components.timezonesearch.component.TimeZoneItem
 import com.infomaniak.calendar.components.timezonesearch.models.TimeZoneUi
 import com.infomaniak.calendar.components.timezonesearch.models.availableTimeZones
-import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.MagnifyingGlass
@@ -86,12 +86,7 @@ private fun TimeZoneSearchContent(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    Column(
-        modifier = modifier
-            .padding(contentPadding.onlyHorizontal())
-            .padding(top = contentPadding.calculateTopPadding() + EsdsTheme.spacing.xl)
-            .padding(horizontal = EsdsTheme.spacing.xl),
-    ) {
+    SearchLayout(modifier = modifier, contentPadding = contentPadding.onlyHorizontalAndTop()) {
         SearchBar(searchQuery, modifier = Modifier.focusRequester(rememberInitialFocusRequester()))
 
         when (val results = searchResults) {

@@ -46,6 +46,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.infomaniak.calendar.components.eventdetail.detail.EventDetail
 import com.infomaniak.calendar.components.eventdetail.detail.component.ParticipationStatusButtonsToolbar
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
@@ -159,7 +160,7 @@ private fun EventDetailScreen(
                     eventDetail = state.eventDetail,
                     onJoinKMeet = { /*TODO[eventDetail]*/ },
                     onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
-                    onLocationClick = { state.eventDetail.location?.let { onLocationClick(it) } },
+                    onLocationClick = { state.eventDetail.location?.address?.let(onLocationClick) },
                     onRoomClick = { /*TODO[eventDetail]*/ },
                     goToEventAttendees = {
                         with(state.eventDetail) {

@@ -47,8 +47,7 @@ data class EventDetailUi(
     val attendees: Attendees,
     val organizer: OrganizerUi?,
     val kMeetUrl: String?,
-    val location: String?,
-    val room: Room?,
+    val location: LocationUi?,
     val urlLink: String?,
     val description: String?,
     val files: List<File>,
@@ -59,8 +58,6 @@ data class EventDetailUi(
 ) {
     val isRecurring get() = recurrence is EventDetailRecurrence.Recurrence
     val eventColor get() = eventColorChoice.getColor(calendar)
-
-    data class Room(val title: String, val seats: Int, val floor: Int)
 
     @Immutable
     data class File(val id: String, val name: String) {
@@ -90,5 +87,25 @@ data class EventDetailUi(
     enum class Classification(@StringRes val label: Int) {
         Public(R.string.publicLabel),
         Private(R.string.privateLabel),
+    }
+
+    sealed interface LocationUi : Parcelable {
+        val label: String
+            get() = when (this) {
+                is Place -> text
+                is Room -> title
+            }
+
+        val address: String?
+            get() = when (this) {
+                is Place -> text
+                is Room -> location
+            }
+
+        @Parcelize
+        data class Place(val text: String) : LocationUi
+
+        @Parcelize
+        data class Room(val id: String, val title: String, val seats: Int?, val floor: Int?, val location: String?) : LocationUi
     }
 }

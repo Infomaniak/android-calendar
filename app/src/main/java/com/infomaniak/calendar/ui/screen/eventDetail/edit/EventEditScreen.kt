@@ -43,6 +43,7 @@ import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.locationSearch.LocationSearchViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
@@ -67,6 +68,7 @@ fun EventEditScreen(
     viewModel: EventEditViewModel = viewModel(),
     eventDetailSharedDataViewModel: EventDetailSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current),
     eventFormViewModel: EventFormViewModel = viewModel(),
+    locationSearchViewModel: LocationSearchViewModel = viewModel(),
 ) {
     val eventDetailUiState = eventDetailSharedDataViewModel.eventDetailUi.collectAsStateWithLifecycle().value
 
@@ -76,6 +78,10 @@ fun EventEditScreen(
     }
 
     val formState = eventFormViewModel.formState
+
+    LaunchedEffect(formState) {
+        formState?.let { locationSearchViewModel.followForm(it) }
+    }
 
     val uiState = if (eventDetailUiState is EventDetailUiState.Displayable.Success && formState != null) {
         EventEditScreenState.Success(formState, isRecurring = eventDetailUiState.eventDetail.isRecurring)

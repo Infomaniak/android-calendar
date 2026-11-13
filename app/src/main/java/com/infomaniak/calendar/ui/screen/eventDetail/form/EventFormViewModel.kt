@@ -90,7 +90,7 @@ class EventFormViewModel(
         }
     }
 
-    /** @param event The edited event, already loaded by the event detail, kept up to date here afterwards. */
+    /** @param event The edited event, already loaded by the event detail, kept up to date here afterward. */
     fun initEdition(event: EventDetailUi) {
         if (isInitialized) return
         isInitialized = true

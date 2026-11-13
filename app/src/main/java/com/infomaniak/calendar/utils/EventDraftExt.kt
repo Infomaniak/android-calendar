@@ -23,6 +23,7 @@ import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import com.infomaniak.calendar.ui.screen.eventDetail.AttendeesUpdatePayload
+import com.infomaniak.multiplatform_calendar.bookable_resources.domain.model.BookableResourceUuid
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.AlarmListEdit
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.AttendeeEdit
@@ -53,12 +54,7 @@ fun EventDraft.applyTo(
 ): EventEditData = editData.copy(
     title = title,
     timing = editData.timing.copy(bounds = bounds()),
-    // The form only edits the place text, a room location stays as long as the text is left untouched
-    location = if (location == (editData.location as? Location.Place)?.text) {
-        editData.location
-    } else {
-        location?.let(Location::Place)
-    },
+    location = location.toLocation(editData.location),
     timeBlocking = if (isOccupied) TimeBlocking.Blocks else TimeBlocking.DoesNotBlock,
     calendarId = typedCalendarId,
     attendees = attendees.toAttendeeEdit(),
@@ -99,6 +95,13 @@ fun EventDraft.toNewEventEditData(defaultOrganizer: Organizer?): EventEditData =
         meetRoom = null,
     ),
 )
+
+/** [current] is only read for a room unknown locally: the form can't show it, so saving would otherwise drop its booking. */
+private fun EventDetailUi.LocationUi?.toLocation(current: Location?): Location? = when (this) {
+    is EventDetailUi.LocationUi.Place -> Location.Place(text)
+    is EventDetailUi.LocationUi.Room -> Location.BookableRoom(BookableResourceUuid(id), resource = null)
+    null -> current.takeIf { it is Location.BookableRoom && it.resource == null }
+}
 
 fun List<AttendeeUi>.toAttendeeEdit(): List<AttendeeEdit> = map { AttendeeEdit(email = it.email, displayName = it.displayName) }
 

@@ -77,7 +77,13 @@ app/src/main/java/com/infomaniak/calendar/
     │                              # form/ (EventFormViewModel: the event form state of EventCreation / EventEdit)
     │                              # timeZoneSearch/ (TimeZoneSearchScreen: writes the picked time zone to the form)
     │                              # customReminder/ (CustomReminderScreen: adds the made reminder to the form)
-    │                              # locationSearch/ (LocationSearchScreen: ✓ writes the search text to the form as its location)
+    │                              # locationSearch/ (LocationSearchScreen: ✓ writes the search text to the form as its location,
+    │                              #   or the clicked room as its room (saved as a Location.BookableRoom);
+    │                              #   LocationSearchViewModel, shared through the form's ViewModelStore, observes the bookable rooms of the form's calendar
+    │                              #   as soon as EventCreation / EventEdit opens, so they're ready once the search opens.
+    │                              #   Switching the form's calendar clears its room when the new calendar can't book it (compared by id).
+    │                              #   A room unknown locally isn't shown in the form, it's kept on save until another location is picked.
+    │                              #   A booked room (Location.BookableRoom with a known resource) maps to EventDetailUi.Room)
     │   └── onboarding/            # Two onboardings, each with its own page enum, sharing OnboardingPage + OnboardingButtonDefaults:
     │                              # login/ (LoginOnboardingScreen + LoginOnboardingPage + CrossAppLoginViewModel): welcome + login;
     │                              # permissions/ (PermissionsOnboardingScreen + PermissionsOnboardingPage + NextStepButton): a pager
