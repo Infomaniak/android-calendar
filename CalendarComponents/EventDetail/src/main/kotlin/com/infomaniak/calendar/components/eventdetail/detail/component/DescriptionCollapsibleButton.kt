@@ -45,6 +45,7 @@ import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.state.CollapsibleTextState
 import com.infomaniak.calendar.components.eventdetail.state.animateCollapse
 import com.infomaniak.calendar.components.eventdetail.state.rememberCollapsibleTextState
+import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ChevronDown
@@ -73,9 +74,7 @@ internal fun DescriptionCollapsibleButton(
             trailingContent = { AnimatedChevron { isCollapsed } },
             onClick = { isCollapsed = !isCollapsed },
             shapes = shapes,
-            colors = ListItemDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceBright,
-            ),
+            colors = CustomColors.EventFormItemColors,
             contentPadding = contentPadding + ListItemDefaults.ContentPadding,
         )
     } else {
@@ -84,9 +83,7 @@ internal fun DescriptionCollapsibleButton(
             supportingContent = { DescriptionContent(description, descriptionState) },
             leadingContent = { ItemIcon(leadingIcon) },
             shapes = shapes,
-            colors = ListItemDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceBright,
-            ),
+            colors = CustomColors.EventFormItemColors,
             modifier = Modifier.padding(contentPadding),
         )
     }
