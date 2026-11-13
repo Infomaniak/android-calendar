@@ -15,19 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.eventDetail.edit
+package com.infomaniak.calendar.components.eventdetail.detail.component
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
@@ -40,22 +47,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.designsystem.icons.EsdsIcons
-import com.infomaniak.designsystem.icons.symbols.Check
 import com.infomaniak.designsystem.icons.symbols.CircleCross
 import com.infomaniak.designsystem.icons.symbols.CircleInfo
-import com.infomaniak.designsystem.icons.symbols.Clock
-import com.infomaniak.designsystem.icons.symbols.Cross
 
 @Composable
 fun CompactTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
+    state: TextFieldState,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = LocalTextStyle.current,
     label: @Composable (() -> Unit)? = null,
@@ -84,81 +86,79 @@ fun CompactTextField(
     }
 
     val contentPadding = OutlinedTextFieldDefaults.contentPadding(
-        start = 16.dp,
+        start = 0.dp,
         top = 0.dp,
-        end = 8.dp,
+        end = 0.dp,
         bottom = 0.dp,
     )
 
     BasicTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier.defaultMinSize(
-            minWidth = TextFieldDefaults.MinWidth,
-        ),
+        state = state,
+        modifier = modifier
+            .fillMaxWidth()
+            .defaultMinSize(minWidth = TextFieldDefaults.MinWidth),
         textStyle = textStyle.copy(color = textColor),
-        singleLine = singleLine,
-        maxLines = maxLines,
-        interactionSource = interactionSource,
-        cursorBrush = SolidColor(
-            if (isError) colors.errorCursorColor else colors.cursorColor,
-        ),
-        decorationBox = { innerTextField ->
-            CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 24.dp) {
-                OutlinedTextFieldDefaults.DecorationBox(
-                    value = value,
-                    innerTextField = {
-                        Box(
-                            modifier = if (leadingIcon != null || trailingIcon != null) {
-                                Modifier.heightIn(min = 32.dp)
-                            } else {
-                                Modifier
-                            },
-                            contentAlignment = Alignment.CenterStart,
-                        ) {
-                            innerTextField()
-                        }
-                    },
-                    enabled = true,
-                    singleLine = singleLine,
-                    visualTransformation = VisualTransformation.None,
-                    interactionSource = interactionSource,
-                    isError = isError,
-                    label = label,
-                    placeholder = placeholder,
-                    leadingIcon = leadingIcon,
-                    trailingIcon = trailingIcon?.let { icon ->
-                        {
-                            Box(
-                                modifier = Modifier.padding(end = 16.dp),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                icon()
-                            }
-                        }
-                    },
-                    supportingText = supportingText?.let { content ->
-                        {
-                            Box(Modifier.padding(bottom = 8.dp)) {
-                                content()
-                            }
-                        }
-                    },
-                    colors = colors,
-                    contentPadding = contentPadding,
-                    container = {
-                        OutlinedTextFieldDefaults.Container(
+        lineLimits = if (singleLine) {
+            TextFieldLineLimits.SingleLine
+        } else {
+            TextFieldLineLimits.MultiLine(maxHeightInLines = maxLines)
+        },
+        decorator = { innerTextField ->
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    propagateMinConstraints = true,
+                ) {
+                    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 24.dp) {
+                        OutlinedTextFieldDefaults.DecorationBox(
+                            value = state.text.toString(),
+                            innerTextField = { innerTextField() },
                             enabled = true,
-                            isError = isError,
+                            singleLine = singleLine,
+                            visualTransformation = VisualTransformation.None,
                             interactionSource = interactionSource,
+                            isError = isError,
+                            label = label,
+                            placeholder = placeholder,
+                            leadingIcon = leadingIcon,
+                            trailingIcon = trailingIcon?.let { icon ->
+                                { Box(contentAlignment = Alignment.Center) { icon() } }
+                            },
+                            supportingText = null,
                             colors = colors,
-                            shape = shape,
-                            focusedBorderThickness = 0.dp,
-                            unfocusedBorderThickness = 0.dp,
+                            contentPadding = contentPadding,
+                            container = {
+                                OutlinedTextFieldDefaults.Container(
+                                    enabled = true,
+                                    isError = isError,
+                                    interactionSource = interactionSource,
+                                    colors = colors,
+                                    shape = shape,
+                                    focusedBorderThickness = 0.dp,
+                                    unfocusedBorderThickness = 0.dp,
+                                )
+                            },
                         )
-                    },
-                )
+                    }
+                }
+
+                if (supportingText != null) {
+                    val supportingColor = when {
+                        isError -> colors.errorSupportingTextColor
+                        focused -> colors.focusedSupportingTextColor
+                        else -> colors.unfocusedSupportingTextColor
+                    }
+
+                    CompositionLocalProvider(LocalContentColor provides supportingColor) {
+                        ProvideTextStyle(MaterialTheme.typography.bodySmall) {
+                            Box(Modifier.padding(start = 0.dp, top = 4.dp, end = 0.dp, bottom = 8.dp)) {
+                                supportingText()
+                            }
+                        }
+                    }
+                }
             }
+
         },
     )
 }
@@ -168,8 +168,7 @@ fun CompactTextField(
 private fun PreviewCompactTextField() {
     Surface {
         CompactTextField(
-            value = "Preview",
-            onValueChange = {},
+            state = rememberTextFieldState("Preview"),
             isError = false,
         )
     }
@@ -180,8 +179,7 @@ private fun PreviewCompactTextField() {
 private fun PreviewCompactTextFieldWithInfo() {
     Surface {
         CompactTextField(
-            value = "Preview",
-            onValueChange = {},
+            state = rememberTextFieldState("Preview"),
             isError = false,
             trailingIcon = { Icon(EsdsIcons.CircleInfo.Small, contentDescription = "Clock") },
         )
@@ -194,8 +192,7 @@ private fun PreviewCompactTextFieldWithInfo() {
 private fun PreviewCompactTextFieldError() {
     Surface {
         CompactTextField(
-            value = "Preview",
-            onValueChange = {},
+            state = rememberTextFieldState("Preview"),
             isError = true,
             supportingText = { Text("This is an error") },
         )
@@ -207,8 +204,7 @@ private fun PreviewCompactTextFieldError() {
 private fun PreviewCompactTextFieldErrorAndTrailingIcon() {
     Surface {
         CompactTextField(
-            value = "Preview",
-            onValueChange = {},
+            state = rememberTextFieldState("Preview"),
             isError = true,
             supportingText = { Text("This is an error") },
             trailingIcon = { Icon(EsdsIcons.CircleCross.Small, contentDescription = "Clock") },
