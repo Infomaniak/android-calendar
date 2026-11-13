@@ -22,21 +22,29 @@ import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
+import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Cross
 import com.infomaniak.designsystem.icons.symbols.MapPin
+import com.infomaniak.core.common.R as RCommon
 
 @Composable
 internal fun LocationButton(
@@ -59,13 +67,14 @@ internal fun LocationButton(
 }
 
 /**
- * Shows the picked [location]: a place, or a room under the place it's in. Only the place opens the location search, the
- * room isn't clickable. Switching between them, e.g. when a calendar switch drops the room, is animated.
+ * Shows the picked [location]: a place, or a room above the place it's in, both opening the location search and removed by
+ * [onRemoveClick]. Switching between them, e.g. when a calendar switch drops the room, is animated.
  */
 @Composable
 internal fun LocationEditable(
     location: () -> LocationUi?,
     onClick: () -> Unit,
+    onRemoveClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AnimatedContent(
@@ -76,14 +85,21 @@ internal fun LocationEditable(
         label = "LocationEditable",
     ) { location ->
         when (location) {
-            is LocationUi.Place -> {
-                LocationButton(name = location.name, address = location.address, onClick = onClick)
-            }
-            is LocationUi.Room -> Column {
+            is LocationUi.Place -> LocationButton(
+                name = location.name,
+                address = location.address,
+                onClick = onClick,
+                trailingContent = { RemoveLocationButton(onRemoveClick) },
+            )
+            is LocationUi.Room -> Column(
+                Modifier
+                    .clip(ClickableItemDefaults.ClickableItemShapes.shape)
+                    .clickable(onClick = onClick),
+            ) {
+                RoomItem(room = location, trailingContent = { RemoveLocationButton(onRemoveClick) })
                 location.address?.takeIf { it.isNotBlank() }?.let { address ->
-                    LocationButton(name = address, address = null, onClick = onClick)
+                    ListItem(content = { Text(address) }, leadingContent = { ItemIcon(EsdsIcons.MapPin) })
                 }
-                RoomItem(room = location)
             }
             null -> ClickableItem(
                 text = stringResource(R.string.locationOrRoomLabel),
@@ -91,6 +107,13 @@ internal fun LocationEditable(
                 onClick = onClick,
             )
         }
+    }
+}
+
+@Composable
+private fun RemoveLocationButton(onClick: () -> Unit) {
+    IconButton(onClick = onClick) {
+        Icon(EsdsIcons.Cross.Small, contentDescription = stringResource(RCommon.string.deleteButton))
     }
 }
 
@@ -109,7 +132,7 @@ private fun PreviewLocationButton() {
 private fun PreviewEditable() {
     MaterialTheme {
         Surface {
-            LocationEditable(location = { null }, onClick = {})
+            LocationEditable(location = { null }, onClick = {}, onRemoveClick = {})
         }
     }
 }
@@ -124,6 +147,7 @@ private fun PreviewEditableWithLocation() {
                     LocationUi.Place(name = "Infomaniak", address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland")
                 },
                 onClick = {},
+                onRemoveClick = {},
             )
         }
     }
@@ -146,6 +170,7 @@ private fun PreviewEditableWithRoom() {
                     )
                 },
                 onClick = {},
+                onRemoveClick = {},
             )
         }
     }

@@ -31,10 +31,15 @@ import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.DoorOpen
 
 @Composable
-internal fun RoomItem(room: LocationUi.Room, modifier: Modifier = Modifier) {
+internal fun RoomItem(
+    room: LocationUi.Room,
+    modifier: Modifier = Modifier,
+    trailingContent: (@Composable () -> Unit)? = null,
+) {
     ListItem(
         content = { Text(room.name) },
         leadingContent = { ItemIcon(EsdsIcons.DoorOpen) },
+        trailingContent = trailingContent,
         supportingContent = { RoomDetails(seats = room.seats, floor = room.floor) },
         modifier = modifier,
     )

@@ -106,20 +106,18 @@ fun EventDetail(
                         modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
                         trailingContent = { Icon(EsdsIcons.SquareArrowOutUpRight.Small, contentDescription = null) },
                     )
-                    is LocationUi.Room -> location.address?.let { address ->
-                        LocationButton(
-                            name = address,
-                            address = null,
-                            onClick = onLocationClick,
-                            modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
-                            trailingContent = { Icon(EsdsIcons.SquareArrowOutUpRight.Small, contentDescription = null) },
-                        )
+                    is LocationUi.Room -> Column(Modifier.eventSharedBounds(EventSharedElement.Location)) {
+                        RoomItem(room = location)
+                        location.address?.let { address ->
+                            LocationButton(
+                                name = address,
+                                address = null,
+                                onClick = onLocationClick,
+                                trailingContent = { Icon(EsdsIcons.SquareArrowOutUpRight.Small, contentDescription = null) },
+                            )
+                        }
                     }
                     null -> Unit
-                }
-
-                if (location is LocationUi.Room) {
-                    RoomItem(room = location)
                 }
             }
 

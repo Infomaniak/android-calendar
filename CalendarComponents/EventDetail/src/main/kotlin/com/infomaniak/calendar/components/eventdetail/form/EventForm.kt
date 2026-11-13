@@ -27,7 +27,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -127,6 +128,7 @@ fun EventForm(
             LocationEditable(
                 location = { state.location },
                 onClick = onLocationClick,
+                onRemoveClick = { state.location = null },
                 modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
             )
         }
