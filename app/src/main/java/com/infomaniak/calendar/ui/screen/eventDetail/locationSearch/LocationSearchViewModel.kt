@@ -49,7 +49,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -94,20 +93,19 @@ class LocationSearchViewModel(
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val places: Flow<List<LocationUi.Place>> = query.mapLatest { query ->
-        if (query.isEmpty()) emptyList() else placeSearcher.search(query)
-    }
-
     private val searchableRooms: Flow<List<Pair<LocationUi.Room, SearchableText>>> = rooms.map { rooms ->
         rooms.map { it to SearchableText(it.name) }
     }
 
-    /** The typed location first so it can be picked like a found place, then the found places, then the matching rooms. */
-    val results: StateFlow<List<LocationUi>> = combine(query, places, searchableRooms) { query, places, rooms ->
-        val typedPlaces = if (query.isEmpty()) places else listOf(LocationUi.Place(query, address = null)) + places
-        val matchingRooms = rooms.mapNotNull { (room, name) -> room.takeIf { query.isEmpty() || name.find(query) != null } }
-        typedPlaces.distinct() + matchingRooms
+    /**
+     * Every room while nothing is typed. Else the typed location, so it can be picked like a found place, the places found for
+     * it and the rooms whose name matches it, all listed at once.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val results: StateFlow<List<LocationUi>> = combine(query, searchableRooms, ::Pair).mapLatest { (query, rooms) ->
+        if (query.isEmpty()) return@mapLatest rooms.map { (room, _) -> room }
+
+        (listOf(LocationUi.Place(query, address = null)) + placeSearcher.search(query)).distinct() + rooms.matching(query)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), emptyList())
 
     fun search(query: String) {
@@ -132,9 +130,12 @@ class LocationSearchViewModel(
         snapshotFlow { CalendarId(formState.calendar.id) }
             .drop(1) // The form's own calendar, only switching away from it can leave its room behind
             .collectLatest { calendarId ->
-                val room = formState.location as? LocationUi.Room ?: return@collectLatest
+                val room = formState.location as? LocationUi.Room
+                room ?: return@collectLatest
 
-                val resources = calendarBookableResourcesManager.observeResources(calendarId).firstOrNull() ?: return@collectLatest
+                val resources = calendarBookableResourcesManager.observeResources(calendarId).firstOrNull()
+                resources ?: return@collectLatest
+
                 if (resources.none { it.uuid.value == room.id }) formState.location = null
             }
     }
@@ -165,6 +166,10 @@ class LocationSearchViewModel(
             null -> RoomAvailability.Unknown
         },
     )
+
+    private fun List<Pair<LocationUi.Room, SearchableText>>.matching(query: String): List<LocationUi.Room> {
+        return mapNotNull { (room, name) -> room.takeIf { name.find(query) != null } }
+    }
 
     private val RoomAvailability.rank
         get() = when (this) {
