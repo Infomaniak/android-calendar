@@ -68,7 +68,6 @@ internal fun RoomEditable(room: LocationUi.Room, onClick: () -> Unit, onRemoveCl
                 }
             },
         )
-        room.address?.takeIf { it.isNotBlank() }?.let { address -> Place(name = address, address = null, onClick = onClick) }
     }
 }
 

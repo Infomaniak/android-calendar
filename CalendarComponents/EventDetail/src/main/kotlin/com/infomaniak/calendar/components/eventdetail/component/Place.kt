@@ -78,7 +78,7 @@ internal fun PlaceButtonEditable(
 }
 
 @Composable
-internal fun Place(name: String, address: String?, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
+internal fun PlaceEditable(name: String, address: String?, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
     ListItemClickable(
         onClick = onClick,
         shapes = ClickableItemDefaults.ClickableItemShapes,
@@ -116,10 +116,10 @@ private fun PreviewPlaceButtonEditable() {
 
 @Preview
 @Composable
-private fun PreviewPlace() {
+private fun PreviewPlaceEditable() {
     MaterialTheme {
         Surface {
-            Place(name = "Infomaniak", address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland")
+            PlaceEditable(name = "Infomaniak", address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland")
         }
     }
 }

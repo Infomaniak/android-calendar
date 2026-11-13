@@ -54,13 +54,7 @@ fun LocationSearchScreen(
     eventFormViewModel: EventFormViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
     val formState = eventFormViewModel.formState ?: return
-    val searchState = rememberTextFieldState(
-        when (val location = formState.location) {
-            is LocationUi.Place -> location.name
-            is LocationUi.Room -> location.name
-            null -> ""
-        },
-    )
+    val searchState = rememberTextFieldState(formState.location?.searchQuery ?: "")
     val results by locationSearchViewModel.results.collectAsStateWithLifecycle()
 
     LaunchedEffect(formState) {

@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.PlaceButtonEditable
+import com.infomaniak.calendar.components.eventdetail.component.PlaceEditable
 import com.infomaniak.calendar.components.eventdetail.component.RoomEditable
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
 import com.infomaniak.calendar.components.foundation.models.LocationUi
@@ -57,7 +58,12 @@ internal fun LocationEditable(
         }
 
         AnimatedVisibility(visible = location is LocationUi.Room) {
-            if (room != null) RoomEditable(room = room, onClick = onClick, onRemoveClick = onRemoveClick)
+            if (room != null) {
+                RoomEditable(room = room, onClick = onClick, onRemoveClick = onRemoveClick)
+                room.address?.takeIf { it.isNotBlank() }?.let { address ->
+                    PlaceEditable(name = address, address = null, onClick = onClick)
+                }
+            }
         }
 
         AnimatedVisibility(visible = location == null) {
