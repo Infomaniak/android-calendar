@@ -28,7 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.component.items.SegmentedListItemSwitch
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
@@ -56,14 +55,14 @@ internal fun ClassificationStatus(
 internal fun ClassificationStatusSwitch(
     checked: () -> Boolean,
     onCheckedChange: (isChecked: Boolean) -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
-    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
 ) {
     SegmentedListItemSwitch(
         checked,
         onCheckedChange,
-        modifier,
         shapes = shapes,
+        modifier,
         leadingContent = { ClassificationIcon() },
     ) {
         Text(text = stringResource(EventDetailUi.Classification.Public.label))
@@ -98,8 +97,8 @@ private fun PreviewClassificationStatusSwitch() {
     MaterialTheme {
         Surface {
             Column {
-                ClassificationStatusSwitch(checked = { true }, onCheckedChange = {})
-                ClassificationStatusSwitch(checked = { false }, onCheckedChange = {})
+                ClassificationStatusSwitch(checked = { true }, onCheckedChange = {}, shapes = ListItemDefaults.segmentedShapes(index = 0, count = 2))
+                ClassificationStatusSwitch(checked = { false }, onCheckedChange = {}, shapes = ListItemDefaults.segmentedShapes(index = 1, count = 2))
             }
         }
     }

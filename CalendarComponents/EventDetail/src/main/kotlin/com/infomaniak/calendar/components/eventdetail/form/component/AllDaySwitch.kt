@@ -17,7 +17,7 @@
  */
 package com.infomaniak.calendar.components.eventdetail.form.component
 
-import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.component.items.SegmentedListItemSwitch
 import com.infomaniak.calendar.components.resources.R
@@ -37,8 +36,8 @@ import com.infomaniak.designsystem.icons.symbols.Clock
 internal fun AllDaySwitch(
     checked: () -> Boolean,
     onCheckedChange: (isChecked: Boolean) -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
-    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
 ) {
     SegmentedListItemSwitch(
         checked = checked,
@@ -56,7 +55,11 @@ internal fun AllDaySwitch(
 private fun Preview() {
     MaterialTheme {
         Surface {
-            AllDaySwitch(checked = { true }, onCheckedChange = {})
+            AllDaySwitch(
+                checked = { true },
+                onCheckedChange = {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            )
         }
     }
 }

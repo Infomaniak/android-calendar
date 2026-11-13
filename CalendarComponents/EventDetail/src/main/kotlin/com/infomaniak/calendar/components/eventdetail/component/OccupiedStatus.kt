@@ -28,7 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.component.items.SegmentedListItemSwitch
 import com.infomaniak.calendar.components.resources.R
@@ -52,10 +51,10 @@ internal fun OccupiedStatus(isOccupied: Boolean, shapes: ListItemShapes, modifie
 internal fun OccupiedStatusSwitch(
     checked: () -> Boolean,
     onCheckedChange: (isChecked: Boolean) -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
-    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
 ) {
-    SegmentedListItemSwitch(checked, onCheckedChange, modifier, shapes = shapes, leadingContent = { OccupiedIcon() }) {
+    SegmentedListItemSwitch(checked, onCheckedChange, shapes = shapes, leadingContent = { OccupiedIcon() }, modifier = modifier) {
         Text(text = stringResource(R.string.occupiedLabel))
     }
 }
@@ -84,8 +83,8 @@ private fun PreviewSwitch() {
     MaterialTheme {
         Surface {
             Column {
-                OccupiedStatusSwitch(checked = { true }, onCheckedChange = {})
-                OccupiedStatusSwitch(checked = { false }, onCheckedChange = {})
+                OccupiedStatusSwitch(checked = { true }, onCheckedChange = {}, shapes = ListItemDefaults.segmentedShapes(index = 0, count = 2))
+                OccupiedStatusSwitch(checked = { false }, onCheckedChange = {}, shapes = ListItemDefaults.segmentedShapes(index = 1, count = 2))
             }
         }
     }

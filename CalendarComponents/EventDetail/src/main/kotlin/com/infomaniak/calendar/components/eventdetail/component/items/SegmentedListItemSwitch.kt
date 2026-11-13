@@ -35,8 +35,8 @@ import com.infomaniak.calendar.components.resources.R
 internal fun SegmentedListItemSwitch(
     checked: () -> Boolean,
     onCheckedChange: (isChecked: Boolean) -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
-    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
     leadingContent: @Composable (() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
@@ -70,6 +70,7 @@ private fun Preview() {
                 checked = { true },
                 onCheckedChange = {},
                 content = { Text(stringResource(id = R.string.kMeetMeeting)) },
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1)
             )
         }
     }

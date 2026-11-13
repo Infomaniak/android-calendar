@@ -39,7 +39,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.component.items.SegmentedListItemSwitch
 import com.infomaniak.calendar.components.resources.R
@@ -83,10 +82,10 @@ internal fun KMeetButton(
 internal fun KMeetButtonSwitch(
     checked: () -> Boolean,
     onCheckedChange: (isChecked: Boolean) -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
-    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
 ) {
-    SegmentedListItemSwitch(checked, onCheckedChange, modifier, shapes = shapes, leadingContent = { KMeetIcon() }) {
+    SegmentedListItemSwitch(checked, onCheckedChange, shapes = shapes, leadingContent = { KMeetIcon() }, modifier = modifier) {
         Text(stringResource(id = R.string.kMeetMeeting))
     }
 }

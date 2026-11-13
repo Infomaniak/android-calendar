@@ -42,9 +42,9 @@ internal fun ClickableItem(
     text: String,
     leadingIcon: Symbol,
     onClick: () -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
-    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
     trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
     supportingContent: @Composable (() -> Unit)? = null,
 ) {
@@ -65,9 +65,9 @@ internal fun ClickableItem(
     text: String,
     leadingContent: @Composable () -> Unit,
     onClick: () -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
-    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
     trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
     supportingContent: @Composable (() -> Unit)? = null,
 ) {
@@ -107,6 +107,7 @@ private fun Preview() {
                 leadingIcon = EsdsIcons.ProductKmeet,
                 supportingContent = { Text("Supporting content") },
                 onClick = {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1)
             )
         }
     }
