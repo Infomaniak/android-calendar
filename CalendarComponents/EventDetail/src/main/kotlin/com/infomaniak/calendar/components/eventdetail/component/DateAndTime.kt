@@ -116,32 +116,22 @@ internal fun DateAndTimeEditable(
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
     ) {
         with(dateAndTimeState) {
-            SegmentedListItem(
+            DateAndTimeEntry(
+                entry = start,
+                isAllDay = isAllDay,
+                onDatePicked = { start.pickDate(it) },
+                onTimePicked = { start.pickTime(it) },
+                onTimeZoneClick = { onTimeZoneClick(true) },
                 shapes = ListItemDefaults.segmentedShapes(index = 1, count = 3),
-                colors = CustomColors.EventFormItemColors,
-                content = {
-                    DateAndTimeEntry(
-                        entry = start,
-                        isAllDay = isAllDay,
-                        onDatePicked = { start.pickDate(it) },
-                        onTimePicked = { start.pickTime(it) },
-                        onTimeZoneClick = { onTimeZoneClick(true) },
-                    )
-                },
             )
 
-            SegmentedListItem(
-                shapes = ListItemDefaults.segmentedShapes(index = 2, count = 3),
-                colors = CustomColors.EventFormItemColors,
-                content = {
-                    DateAndTimeEntry(
-                        entry = end,
-                        isAllDay = isAllDay,
-                        onDatePicked = { end.pickDate(it) },
-                        onTimePicked = { end.pickTime(it) },
-                        onTimeZoneClick = { onTimeZoneClick(false) },
-                    )
-                },
+            DateAndTimeEntry(
+                entry = end,
+                isAllDay = isAllDay,
+                onDatePicked = { end.pickDate(it) },
+                onTimePicked = { end.pickTime(it) },
+                onTimeZoneClick = { onTimeZoneClick(false) },
+                shapes = ListItemDefaults.segmentedShapes(index = 1, count = 3),
             )
         }
     }
