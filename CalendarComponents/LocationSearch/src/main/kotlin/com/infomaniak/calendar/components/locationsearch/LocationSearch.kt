@@ -20,7 +20,6 @@ package com.infomaniak.calendar.components.locationsearch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.input.TextFieldState
@@ -37,10 +36,8 @@ import com.infomaniak.calendar.components.foundation.component.SearchLayout
 import com.infomaniak.calendar.components.foundation.utils.onlyHorizontalAndTop
 import com.infomaniak.calendar.components.locationsearch.component.PlaceItem
 import com.infomaniak.calendar.components.locationsearch.component.RoomItem
-import com.infomaniak.calendar.components.locationsearch.models.LocationSearchResultUi
+import com.infomaniak.calendar.components.locationsearch.models.LocationUi
 import com.infomaniak.calendar.components.locationsearch.models.RoomAvailability
-import com.infomaniak.calendar.components.locationsearch.models.SearchPlaceUi
-import com.infomaniak.calendar.components.locationsearch.models.SearchRoomUi
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
@@ -48,9 +45,9 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 @Composable
 fun LocationSearch(
     searchState: TextFieldState,
-    results: () -> List<LocationSearchResultUi>,
-    onPlaceClick: (SearchPlaceUi) -> Unit,
-    onRoomClick: (SearchRoomUi) -> Unit,
+    results: () -> List<LocationUi>,
+    onPlaceClick: (LocationUi.Place) -> Unit,
+    onRoomClick: (LocationUi.Room) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -67,23 +64,27 @@ fun LocationSearch(
             itemsIndexed(results, key = { _, result -> result.key }) { index, result ->
                 val shapes = ListItemDefaults.segmentedShapes(index = index, count = results.size)
                 when (result) {
-                    is SearchPlaceUi -> PlaceItem(
+                    is LocationUi.Place -> PlaceItem(
                         name = result.name,
                         address = result.address,
                         shapes = shapes,
                         onClick = { onPlaceClick(result) },
                     )
-                    is SearchRoomUi -> RoomItem(room = result, shapes = shapes, onClick = { onRoomClick(result) })
+                    is LocationUi.Room -> RoomItem(
+                        room = result,
+                        shapes = shapes,
+                        onClick = { onRoomClick(result) },
+                    )
                 }
             }
         }
     }
 }
 
-private val LocationSearchResultUi.key: String
+private val LocationUi.key: String
     get() = when (this) {
-        is SearchPlaceUi -> "place:$name:$address"
-        is SearchRoomUi -> "room:$id"
+        is LocationUi.Place -> "place:$name:$address"
+        is LocationUi.Room -> "room:$id"
     }
 
 @Preview
@@ -102,8 +103,29 @@ private fun Preview() {
 }
 
 private val previewResults = listOf(
-    SearchPlaceUi(name = "Infomaniak", address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland"),
-    SearchRoomUi(id = "1", name = "Jules Verne room", seats = 100, floor = 3, availability = RoomAvailability.Available),
-    SearchRoomUi(id = "2", name = "White room", seats = 8, floor = 1, availability = RoomAvailability.Available),
-    SearchRoomUi(id = "3", name = "Gym", seats = 50, floor = 0, availability = RoomAvailability.Unavailable),
+    LocationUi.Place(
+        name = "Infomaniak",
+        address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland",
+    ),
+    LocationUi.Room(
+        id = "1",
+        name = "Jules Verne room",
+        seats = 100,
+        floor = 3,
+        availability = RoomAvailability.Available,
+    ),
+    LocationUi.Room(
+        id = "2",
+        name = "White room",
+        seats = 8,
+        floor = 1,
+        availability = RoomAvailability.Available,
+    ),
+    LocationUi.Room(
+        id = "3",
+        name = "Gym",
+        seats = 50,
+        floor = 0,
+        availability = RoomAvailability.Unavailable,
+    ),
 )

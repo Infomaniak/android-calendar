@@ -17,5 +17,20 @@
  */
 package com.infomaniak.calendar.components.locationsearch.models
 
+import androidx.compose.runtime.Immutable
+
 /** A row of the location search: a place, typed or found, or a bookable room. */
-sealed interface LocationSearchResultUi
+sealed interface LocationUi {
+    /** @param address Under the place's [name], null when the name already is its address. */
+    @Immutable
+    data class Place(val name: String, val address: String?) : LocationUi
+
+    @Immutable
+    data class Room(
+        val id: String,
+        val name: String,
+        val seats: Int?,
+        val floor: Int?,
+        val availability: RoomAvailability,
+    ) : LocationUi
+}

@@ -36,10 +36,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.locationsearch.LocationSearch
-import com.infomaniak.calendar.components.locationsearch.models.LocationSearchResultUi
+import com.infomaniak.calendar.components.locationsearch.models.LocationUi
 import com.infomaniak.calendar.components.locationsearch.models.RoomAvailability
-import com.infomaniak.calendar.components.locationsearch.models.SearchPlaceUi
-import com.infomaniak.calendar.components.locationsearch.models.SearchRoomUi
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
@@ -86,9 +84,9 @@ fun LocationSearchScreen(
 @Composable
 private fun LocationSearchScreen(
     searchState: TextFieldState,
-    results: () -> List<LocationSearchResultUi>,
-    onPlaceClick: (SearchPlaceUi) -> Unit,
-    onRoomClick: (SearchRoomUi) -> Unit,
+    results: () -> List<LocationUi>,
+    onPlaceClick: (LocationUi.Place) -> Unit,
+    onRoomClick: (LocationUi.Room) -> Unit,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -96,7 +94,7 @@ private fun LocationSearchScreen(
         topBar = {
             SubmitTopAppBar(
                 goBack = goBack,
-                onSubmit = { onPlaceClick(SearchPlaceUi(name = searchState.text.toString(), address = null)) },
+                onSubmit = { onPlaceClick(LocationUi.Place(name = searchState.text.toString(), address = null)) },
                 isSubmitEnabled = { searchState.text.isNotBlank() },
                 isRecurring = false,
                 title = { Text(stringResource(RComponents.string.locationOrRoomLabel)) },
@@ -123,8 +121,8 @@ private fun Preview() {
             searchState = rememberTextFieldState("Hall"),
             results = {
                 listOf(
-                    SearchPlaceUi(name = "Community Hall", address = "Rue de Lausanne 1, 1201 Geneva, Switzerland"),
-                    SearchRoomUi(
+                    LocationUi.Place(name = "Community Hall", address = "Rue de Lausanne 1, 1201 Geneva, Switzerland"),
+                    LocationUi.Room(
                         id = "1",
                         name = "Jules Verne room",
                         seats = 100,

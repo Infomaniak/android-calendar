@@ -23,10 +23,8 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.SearchableText
-import com.infomaniak.calendar.components.locationsearch.models.LocationSearchResultUi
+import com.infomaniak.calendar.components.locationsearch.models.LocationUi
 import com.infomaniak.calendar.components.locationsearch.models.RoomAvailability
-import com.infomaniak.calendar.components.locationsearch.models.SearchPlaceUi
-import com.infomaniak.calendar.components.locationsearch.models.SearchRoomUi
 import com.infomaniak.calendar.manager.PlaceSearcher
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.bookable_resources.domain.model.BookableResource
@@ -87,30 +85,30 @@ class LocationSearchViewModel(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val rooms: StateFlow<List<SearchRoomUi>> = availabilityRequest
+    private val rooms: StateFlow<List<LocationUi.Room>> = availabilityRequest
         .filterNotNull()
         .map { it.calendarId }
         .distinctUntilChanged()
         .flatMapLatest(calendarBookableResourcesManager::observeResources)
         .combine(availability) { resources, availability ->
             this.resources = resources.associateBy { it.uuid.value }
-            resources.map { it.toSearchRoomUi(availability?.get(it.uuid)) }.sortedBy { it.availability.rank }
+            resources.map { it.toRoomUi(availability?.get(it.uuid)) }.sortedBy { it.availability.rank }
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val places: Flow<List<SearchPlaceUi>> = query.mapLatest { query ->
+    private val places: Flow<List<LocationUi.Place>> = query.mapLatest { query ->
         if (query.isEmpty()) emptyList() else placeSearcher.search(query)
     }
 
-    private val searchableRooms: Flow<List<Pair<SearchRoomUi, SearchableText>>> = rooms.map { rooms ->
+    private val searchableRooms: Flow<List<Pair<LocationUi.Room, SearchableText>>> = rooms.map { rooms ->
         rooms.map { it to SearchableText(it.name) }
     }
 
     /** The typed location first so it can be picked like a found place, then the found places, then the matching rooms. */
-    val results: StateFlow<List<LocationSearchResultUi>> = combine(query, places, searchableRooms) { query, places, rooms ->
+    val results: StateFlow<List<LocationUi>> = combine(query, places, searchableRooms) { query, places, rooms ->
         val typedLocation = query.trim()
-        val typedPlaces = if (typedLocation.isEmpty()) places else listOf(SearchPlaceUi(typedLocation, address = null)) + places
+        val typedPlaces = if (typedLocation.isEmpty()) places else listOf(LocationUi.Place(typedLocation, address = null)) + places
         val matchingRooms = rooms.mapNotNull { (room, name) ->
             room.takeIf { typedLocation.isEmpty() || name.find(typedLocation) != null }
         }
@@ -131,7 +129,7 @@ class LocationSearchViewModel(
     }
 
     /** The form's room for a room listed in [results]. */
-    fun formRoomOf(room: SearchRoomUi): EventDetailUi.LocationUi.Room = EventDetailUi.LocationUi.Room(
+    fun formRoomOf(room: LocationUi.Room): EventDetailUi.LocationUi.Room = EventDetailUi.LocationUi.Room(
         id = room.id,
         title = room.name,
         seats = room.seats,
@@ -169,7 +167,7 @@ class LocationSearchViewModel(
         return calendarManager.getEditData(occurrenceId)?.timing.also { editedTiming = occurrenceId to it }
     }
 
-    private fun BookableResource.toSearchRoomUi(isAvailable: Boolean?) = SearchRoomUi(
+    private fun BookableResource.toRoomUi(isAvailable: Boolean?) = LocationUi.Room(
         id = uuid.value,
         name = name,
         seats = capacity,

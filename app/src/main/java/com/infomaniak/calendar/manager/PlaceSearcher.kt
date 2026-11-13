@@ -21,7 +21,7 @@ import android.content.Context
 import android.location.Address
 import android.location.Geocoder
 import android.os.Build.VERSION.SDK_INT
-import com.infomaniak.calendar.components.locationsearch.models.SearchPlaceUi
+import com.infomaniak.calendar.components.locationsearch.models.LocationUi
 import com.infomaniak.core.common.cancellable
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -41,13 +41,13 @@ class PlaceSearcher(appContext: Context) {
     private val legacyGeocoderScope = CoroutineScope(SupervisorJob() + Dispatchers.IO.limitedParallelism(1))
 
     /** Empty when the device has no geocoder or the search fails, offline for instance. */
-    suspend fun search(query: String): List<SearchPlaceUi> {
+    suspend fun search(query: String): List<LocationUi.Place> {
         val geocoder = geocoder ?: return emptyList()
 
         return runCatching { geocoder.addressesOf(query) }
             .cancellable()
             .getOrDefault(emptyList())
-            .mapNotNull { it.toSearchPlaceUi() }
+            .mapNotNull { it.toPlaceUi() }
             .distinct()
     }
 
@@ -72,10 +72,10 @@ class PlaceSearcher(appContext: Context) {
     }
 
     /** The place's name above its address, when the address doesn't already hold it (a shop, a monument…). */
-    private fun Address.toSearchPlaceUi(): SearchPlaceUi? {
-        val address = getAddressLine(0) ?: return featureName?.let { SearchPlaceUi(name = it, address = null) }
-        val name = featureName?.takeUnless { it in address } ?: return SearchPlaceUi(name = address, address = null)
-        return SearchPlaceUi(name = name, address = address)
+    private fun Address.toPlaceUi(): LocationUi.Place? {
+        val address = getAddressLine(0) ?: return featureName?.let { LocationUi.Place(name = it, address = null) }
+        val name = featureName?.takeUnless { it in address } ?: return LocationUi.Place(name = address, address = null)
+        return LocationUi.Place(name = name, address = address)
     }
 
     companion object {
