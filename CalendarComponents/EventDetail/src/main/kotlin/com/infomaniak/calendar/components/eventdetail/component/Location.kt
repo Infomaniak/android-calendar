@@ -19,74 +19,22 @@ package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
-import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
-import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Cross
 import com.infomaniak.designsystem.icons.symbols.MapPin
 import com.infomaniak.core.common.R as RCommon
-
-@Composable
-internal fun LocationButton(
-    name: String,
-    address: String?,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(),
-    trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
-) {
-    ClickableItem(
-        text = name,
-        leadingIcon = EsdsIcons.MapPin,
-        onClick = onClick,
-        contentPadding = contentPadding,
-        supportingContent = address?.let { { Text(it) } },
-        modifier = modifier,
-        trailingContent = trailingContent,
-    )
-}
-
-@Composable
-internal fun PlaceButtonEditable(
-    name: String,
-    address: String?,
-    onClick: () -> Unit,
-    onRemoveClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    LocationButton(
-        name = name,
-        address = address,
-        onClick = onClick,
-        modifier = modifier,
-        trailingContent = { RemoveLocationButton(onRemoveClick) },
-    )
-}
-
-@Composable
-internal fun Place(name: String, address: String?, modifier: Modifier = Modifier) {
-    ListItem(
-        content = { Text(name) },
-        leadingContent = { ItemIcon(EsdsIcons.MapPin) },
-        supportingContent = address?.let { { Text(it) } },
-        modifier = modifier,
-    )
-}
 
 /**
  * Shows the picked [location]: a place, or a room above the place it's in, both opening the location search and removed by
@@ -145,41 +93,6 @@ internal fun RemoveLocationButton(onClick: () -> Unit) {
 
 @Preview
 @Composable
-private fun PreviewLocationButton() {
-    MaterialTheme {
-        Surface {
-            LocationButton(name = "Infomaniak", address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland", onClick = {})
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun PreviewPlaceButtonEditable() {
-    MaterialTheme {
-        Surface {
-            PlaceButtonEditable(
-                name = "Infomaniak",
-                address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland",
-                onClick = {},
-                onRemoveClick = {},
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun PreviewPlace() {
-    MaterialTheme {
-        Surface {
-            Place(name = "Infomaniak", address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland")
-        }
-    }
-}
-
-@Preview
-@Composable
 private fun PreviewEditable() {
     MaterialTheme {
         Surface {
@@ -190,7 +103,7 @@ private fun PreviewEditable() {
 
 @Preview
 @Composable
-private fun PreviewEditableWithLocation() {
+private fun PreviewEditableWithPlace() {
     MaterialTheme {
         Surface {
             LocationEditable(

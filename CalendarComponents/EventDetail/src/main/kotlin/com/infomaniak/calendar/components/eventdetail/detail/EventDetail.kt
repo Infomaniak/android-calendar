@@ -38,7 +38,7 @@ import com.infomaniak.calendar.components.eventdetail.component.Calendar
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatus
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
-import com.infomaniak.calendar.components.eventdetail.component.LocationButton
+import com.infomaniak.calendar.components.eventdetail.component.PlaceButton
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatus
 import com.infomaniak.calendar.components.eventdetail.component.Recurrence
 import com.infomaniak.calendar.components.eventdetail.component.Room
@@ -99,7 +99,7 @@ fun EventDetail(
                 }
 
                 when (location) {
-                    is LocationUi.Place -> LocationButton(
+                    is LocationUi.Place -> PlaceButton(
                         name = location.name,
                         address = location.address,
                         onClick = onLocationClick,
@@ -109,7 +109,7 @@ fun EventDetail(
                     is LocationUi.Room -> Column(Modifier.eventSharedBounds(EventSharedElement.Location)) {
                         Room(room = location)
                         location.address?.let { address ->
-                            LocationButton(
+                            PlaceButton(
                                 name = address,
                                 address = null,
                                 onClick = onLocationClick,
