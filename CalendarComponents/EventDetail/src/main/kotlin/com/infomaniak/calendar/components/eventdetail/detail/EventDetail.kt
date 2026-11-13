@@ -144,13 +144,7 @@ fun EventDetail(
 
             Section {
                 reminders.forEach { reminder ->
-                    item {
-                        ReminderItem(
-                            reminder = reminder,
-                            onReminderClick = { /*TODO[eventDetail]*/ },
-                            shapes = it,
-                        )
-                    }
+                    item { ReminderItem(reminder = reminder, shapes = it) }
                 }
             }
 

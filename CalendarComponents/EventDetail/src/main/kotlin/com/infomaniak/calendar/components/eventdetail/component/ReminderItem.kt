@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItemDefaults
@@ -35,7 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.ReminderTime
@@ -59,29 +59,23 @@ import com.infomaniak.core.common.R as RCommon
 @Composable
 internal fun ReminderItem(
     reminder: EventDetailUi.Reminder,
-    onReminderClick: () -> Unit,
     shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    ClickableItem(
+    SegmentedListItem(
         shapes = shapes,
-        text = stringResource(reminder.type.label),
-        leadingIcon = reminder.type.icon,
-        onClick = { onReminderClick() },
-        contentPadding = contentPadding,
+        colors = CustomColors.EventFormItemColors,
+        content = { Text(stringResource(reminder.type.label)) },
+        leadingContent = { ItemIcon(reminder.type.icon) },
+        contentPadding = contentPadding + ListItemDefaults.ContentPadding,
         trailingContent = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),
-            ) {
-                Text(
-                    text = reminderTimeText(reminder.time),
-                    style = MaterialTheme.typography.labelLarge,
-                    textAlign = TextAlign.End,
-                    modifier = Modifier.fillMaxWidth(0.5f),
-                )
-            }
+            Text(
+                text = reminderTimeText(reminder.time),
+                style = MaterialTheme.typography.labelLarge,
+                textAlign = TextAlign.End,
+                modifier = Modifier.fillMaxWidth(0.5f),
+            )
         },
         modifier = modifier.reminderSharedBounds(reminder),
     )
@@ -155,7 +149,6 @@ private fun PreviewAbsoluteReminder() {
                         EventDetailUi.Reminder.Type.Email,
                         ReminderTime.Absolute(Instant.parse("2026-05-20T07:00:00Z")),
                     ),
-                onReminderClick = {},
                 shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             )
         }
@@ -172,7 +165,6 @@ private fun PreviewAbsoluteReminderNextYear() {
                     EventDetailUi.Reminder.Type.Email,
                     ReminderTime.Absolute(Instant.parse("2027-05-20T07:00:00Z")),
                 ),
-                onReminderClick = {},
                 shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             )
         }
@@ -189,7 +181,6 @@ private fun PreviewOffsetReminder() {
                     EventDetailUi.Reminder.Type.Push,
                     ReminderTime.Offset((-90).minutes),
                 ),
-                onReminderClick = {},
                 shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             )
         }
@@ -206,7 +197,6 @@ private fun PreviewLongOffsetReminder() {
                     EventDetailUi.Reminder.Type.Push,
                     ReminderTime.Offset(90.days + 30.minutes),
                 ),
-                onReminderClick = {},
                 shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             )
         }
@@ -223,7 +213,6 @@ private fun PreviewOffsetReminderAtStart() {
                     EventDetailUi.Reminder.Type.Push,
                     ReminderTime.Offset((0).seconds),
                 ),
-                onReminderClick = {},
                 shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             )
         }
