@@ -71,9 +71,7 @@ internal fun TitleEditable(
     SegmentedListItem(
         leadingContent = { EventColorDot(dotColor()) },
         shapes = shapes,
-        colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright,
-        ),
+        colors = CustomColors.EventFormItemColors,
         content = {
             BasicTextField(
                 state = textFieldState,

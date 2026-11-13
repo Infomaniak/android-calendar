@@ -63,9 +63,7 @@ internal fun DateAndTime(
     SegmentedListItem(
         leadingContent = { ItemIcon(EsdsIcons.Clock) },
         shapes = shapes,
-        colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright,
-        ),
+        colors = CustomColors.EventFormItemColors,
         content = {
             val startAtLocale = start.atLocale
             val endAtLocale = end.atLocale

@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.component.items.SegmentedListItemSwitch
+import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Briefcase
@@ -38,9 +39,7 @@ import com.infomaniak.designsystem.icons.symbols.Briefcase
 internal fun OccupiedStatus(isOccupied: Boolean, shapes: ListItemShapes, modifier: Modifier = Modifier) {
     SegmentedListItem(
         shapes = shapes,
-        colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright,
-        ),
+        colors = CustomColors.EventFormItemColors,
         content = { Text(text = stringResource(if (isOccupied) R.string.occupiedLabel else R.string.availableLabel)) },
         leadingContent = { OccupiedIcon() },
         modifier = modifier,

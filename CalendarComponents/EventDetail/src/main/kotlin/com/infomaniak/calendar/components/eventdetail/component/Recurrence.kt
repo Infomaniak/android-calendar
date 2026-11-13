@@ -29,6 +29,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
+import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CircularArrowsClockwise
 
@@ -41,9 +42,7 @@ internal fun Recurrence(text: suspend () -> String?, shapes: ListItemShapes, mod
     SegmentedListItem(
         modifier = modifier,
         shapes = shapes,
-        colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright,
-        ),
+        colors = CustomColors.EventFormItemColors,
         leadingContent = { ItemIcon(EsdsIcons.CircularArrowsClockwise) },
         content = { recurrenceText?.let { Text(text = it) } },
     )

@@ -45,6 +45,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
+import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -54,9 +55,7 @@ import com.infomaniak.designsystem.icons.symbols.Calendar
 internal fun Calendar(calendarColor: Color, calendarName: String, shapes: ListItemShapes, modifier: Modifier = Modifier) {
     SegmentedListItem(
         shapes = shapes,
-        colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright,
-        ),
+        colors = CustomColors.EventFormItemColors,
         content = { Text(stringResource(id = R.string.sectionCalendarHeader)) },
         leadingContent = { ItemIcon(EsdsIcons.Calendar.Small) },
         trailingContent = {
