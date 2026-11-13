@@ -58,10 +58,10 @@ internal fun ClassificationStatusSwitch(
     modifier: Modifier = Modifier,
 ) {
     SegmentedListItemSwitch(
-        checked,
-        onCheckedChange,
+        checked = checked,
+        onCheckedChange = onCheckedChange,
         shapes = shapes,
-        modifier,
+        modifier = modifier,
         leadingContent = { ClassificationIcon() },
     ) {
         Text(text = stringResource(EventDetailUi.Classification.Public.label))
@@ -96,8 +96,16 @@ private fun PreviewClassificationStatusSwitch() {
     MaterialTheme {
         Surface {
             Column {
-                ClassificationStatusSwitch(checked = { true }, onCheckedChange = {}, shapes = ListItemDefaults.segmentedShapes(index = 0, count = 2))
-                ClassificationStatusSwitch(checked = { false }, onCheckedChange = {}, shapes = ListItemDefaults.segmentedShapes(index = 1, count = 2))
+                ClassificationStatusSwitch(
+                    checked = { true },
+                    onCheckedChange = {},
+                    shapes = ListItemDefaults.segmentedShapes(index = 0, count = 2),
+                )
+                ClassificationStatusSwitch(
+                    checked = { false },
+                    onCheckedChange = {},
+                    shapes = ListItemDefaults.segmentedShapes(index = 1, count = 2),
+                )
             }
         }
     }
