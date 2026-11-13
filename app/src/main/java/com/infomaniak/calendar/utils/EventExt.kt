@@ -31,7 +31,6 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventBounds
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.Location
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.TimeBlocking
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.AlarmAction
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.AlarmTrigger
@@ -76,13 +75,6 @@ private fun EventColors.toEventColorChoice(): EventColorChoice = if (sourceColor
     EventColorChoice.Default
 } else {
     EventColorChoice.Custom(Color(sourceColor))
-}
-
-private fun Location.toLocationUi(): EventDetailUi.LocationUi? = when (this) {
-    is Location.Place -> EventDetailUi.LocationUi.Place(text)
-    is Location.BookableRoom -> resource?.let {
-        EventDetailUi.LocationUi.Room(id = it.uuid.value, title = it.name, seats = it.capacity, floor = it.floor, location = it.location)
-    }
 }
 
 private fun EventTiming.toDetailTiming(isStart: Boolean): EventDetailTiming = when (val bounds = bounds) {

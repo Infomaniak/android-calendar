@@ -21,12 +21,14 @@ import android.content.Context
 import android.location.Address
 import android.location.Geocoder
 import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.TIRAMISU
+import com.infomaniak.calendar.components.locationsearch.models.SearchPlaceUi
 import com.infomaniak.core.common.cancellable
 import dev.zacsweers.metro.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import java.io.IOException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -36,34 +38,44 @@ import kotlin.coroutines.resumeWithException
 class PlaceSearcher(appContext: Context) {
     private val geocoder = if (Geocoder.isPresent()) Geocoder(appContext) else null
 
+    private val legacyGeocoderScope = CoroutineScope(SupervisorJob() + Dispatchers.IO.limitedParallelism(1))
+
     /** Empty when the device has no geocoder or the search fails, offline for instance. */
-    suspend fun search(query: String): List<String> {
+    suspend fun search(query: String): List<SearchPlaceUi> {
         val geocoder = geocoder ?: return emptyList()
 
         return runCatching { geocoder.addressesOf(query) }
             .cancellable()
             .getOrDefault(emptyList())
-            .mapNotNull { it.toLocation() }
+            .mapNotNull { it.toSearchPlaceUi() }
             .distinct()
     }
 
-    private suspend fun Geocoder.addressesOf(query: String): List<Address> = if (SDK_INT >= TIRAMISU) {
+    private suspend fun Geocoder.addressesOf(query: String): List<Address> = if (SDK_INT >= 33) {
         suspendCancellableCoroutine { continuation ->
-            getFromLocationName(query, MAX_RESULTS, object : Geocoder.GeocodeListener {
-                override fun onGeocode(addresses: MutableList<Address>) = continuation.resume(addresses)
-                override fun onError(errorMessage: String?) = continuation.resumeWithException(IOException(errorMessage))
-            })
+            getFromLocationName(
+                query, MAX_RESULTS,
+                object : Geocoder.GeocodeListener {
+                    override fun onGeocode(addresses: MutableList<Address>) = continuation.resume(addresses)
+                    override fun onError(errorMessage: String?) = continuation.resumeWithException(IOException(errorMessage))
+                },
+            )
         }
     } else {
         @Suppress("DEPRECATION")
-        withContext(Dispatchers.IO) { getFromLocationName(query, MAX_RESULTS).orEmpty() }
+        val lookup = legacyGeocoderScope.async { getFromLocationName(query, MAX_RESULTS).orEmpty() }
+        try {
+            lookup.await()
+        } finally {
+            lookup.cancel() // Drops it when it hasn't started yet; a running lookup can't be interrupted, its result is ignored
+        }
     }
 
-    /** The full address, led by the place's name when the address doesn't already hold it (a shop, a monument…). */
-    private fun Address.toLocation(): String? {
-        val address = getAddressLine(0) ?: return featureName
-        val name = featureName ?: return address
-        return if (name in address) address else "$name, $address"
+    /** The place's name above its address, when the address doesn't already hold it (a shop, a monument…). */
+    private fun Address.toSearchPlaceUi(): SearchPlaceUi? {
+        val address = getAddressLine(0) ?: return featureName?.let { SearchPlaceUi(name = it, address = null) }
+        val name = featureName?.takeUnless { it in address } ?: return SearchPlaceUi(name = address, address = null)
+        return SearchPlaceUi(name = name, address = address)
     }
 
     companion object {

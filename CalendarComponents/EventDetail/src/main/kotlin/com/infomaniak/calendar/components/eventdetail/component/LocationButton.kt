@@ -20,6 +20,7 @@ package com.infomaniak.calendar.components.eventdetail.component
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -31,16 +32,18 @@ import com.infomaniak.designsystem.icons.symbols.MapPin
 
 @Composable
 internal fun LocationButton(
-    location: String,
+    name: String,
+    address: String?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     ClickableItem(
-        text = location,
+        text = name,
         leadingIcon = EsdsIcons.MapPin,
         onClick = onClick,
         contentPadding = contentPadding,
+        supportingContent = address?.let { { Text(it) } },
         modifier = modifier,
     )
 }
@@ -60,7 +63,7 @@ internal fun LocationEditable(location: () -> String?, onClick: () -> Unit, modi
 private fun PreviewLocationButton() {
     MaterialTheme {
         Surface {
-            LocationButton(location = "742 Evergreen Terrace, Springfield", onClick = {})
+            LocationButton(name = "Infomaniak", address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland", onClick = {})
         }
     }
 }
@@ -80,7 +83,7 @@ private fun PreviewEditable() {
 private fun PreviewEditableWithLocation() {
     MaterialTheme {
         Surface {
-            LocationEditable(location = { "Rue Eugène-Marziano 25, Genève" }, onClick = {})
+            LocationEditable(location = { "Rue Eugène-Marziano 25, Geneva" }, onClick = {})
         }
     }
 }

@@ -92,18 +92,20 @@ data class EventDetailUi(
     sealed interface LocationUi : Parcelable {
         val label: String
             get() = when (this) {
-                is Place -> text
+                is Place -> name
                 is Room -> title
             }
 
-        val address: String?
+        /** What a maps app searches to find this location. */
+        val mapsQuery: String?
             get() = when (this) {
-                is Place -> text
+                is Place -> address ?: name
                 is Room -> location
             }
 
+        /** @param address Under the place's [name], null when the name already is its address. */
         @Parcelize
-        data class Place(val text: String) : LocationUi
+        data class Place(val name: String, val address: String?) : LocationUi
 
         @Parcelize
         data class Room(val id: String, val title: String, val seats: Int?, val floor: Int?, val location: String?) : LocationUi

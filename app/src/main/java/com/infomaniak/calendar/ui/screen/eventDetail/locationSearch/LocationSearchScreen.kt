@@ -36,7 +36,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.locationsearch.LocationSearch
+import com.infomaniak.calendar.components.locationsearch.models.LocationSearchResultUi
 import com.infomaniak.calendar.components.locationsearch.models.RoomAvailability
+import com.infomaniak.calendar.components.locationsearch.models.SearchPlaceUi
 import com.infomaniak.calendar.components.locationsearch.models.SearchRoomUi
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
@@ -54,24 +56,22 @@ fun LocationSearchScreen(
     eventFormViewModel: EventFormViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
     val formState = eventFormViewModel.formState ?: return
-    val searchState = rememberTextFieldState((formState.location as? EventDetailUi.LocationUi.Place)?.text.orEmpty())
-    val places by locationSearchViewModel.places.collectAsStateWithLifecycle()
-    val rooms by locationSearchViewModel.rooms.collectAsStateWithLifecycle()
+    val searchState = rememberTextFieldState((formState.location as? EventDetailUi.LocationUi.Place)?.name.orEmpty())
+    val results by locationSearchViewModel.results.collectAsStateWithLifecycle()
 
     LaunchedEffect(formState) {
         locationSearchViewModel.followForm(formState, editedOccurrenceId)
     }
 
     LaunchedEffect(searchState) {
-        snapshotFlow { searchState.text.toString() }.collect(locationSearchViewModel::searchPlaces)
+        snapshotFlow { searchState.text.toString() }.collect(locationSearchViewModel::search)
     }
 
     LocationSearchScreen(
         searchState = searchState,
-        places = places,
-        rooms = rooms,
-        onSubmit = { location ->
-            formState.location = location?.let(EventDetailUi.LocationUi::Place)
+        results = { results },
+        onPlaceClick = { place ->
+            formState.location = EventDetailUi.LocationUi.Place(name = place.name, address = place.address)
             goBack()
         },
         onRoomClick = { room ->
@@ -86,9 +86,8 @@ fun LocationSearchScreen(
 @Composable
 private fun LocationSearchScreen(
     searchState: TextFieldState,
-    places: List<String>,
-    rooms: List<SearchRoomUi>,
-    onSubmit: (String?) -> Unit,
+    results: () -> List<LocationSearchResultUi>,
+    onPlaceClick: (SearchPlaceUi) -> Unit,
     onRoomClick: (SearchRoomUi) -> Unit,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -97,7 +96,7 @@ private fun LocationSearchScreen(
         topBar = {
             SubmitTopAppBar(
                 goBack = goBack,
-                onSubmit = { onSubmit(searchState.text.toString()) },
+                onSubmit = { onPlaceClick(SearchPlaceUi(name = searchState.text.toString(), address = null)) },
                 isSubmitEnabled = { searchState.text.isNotBlank() },
                 isRecurring = false,
                 title = { Text(stringResource(RComponents.string.locationOrRoomLabel)) },
@@ -108,9 +107,8 @@ private fun LocationSearchScreen(
     ) { contentPadding ->
         LocationSearch(
             searchState = searchState,
-            places = places,
-            rooms = rooms,
-            onLocationClick = onSubmit,
+            results = results,
+            onPlaceClick = onPlaceClick,
             onRoomClick = onRoomClick,
             contentPadding = contentPadding,
         )
@@ -122,10 +120,20 @@ private fun LocationSearchScreen(
 private fun Preview() {
     CalendarThemeForPreview {
         LocationSearchScreen(
-            searchState = rememberTextFieldState("Salle"),
-            places = listOf("Salle Communale, Rue de Lausanne 1, 1201 Genève, Suisse"),
-            rooms = listOf(SearchRoomUi(id = "1", name = "Salle Jules Verne", seats = 100, floor = 3, availability = RoomAvailability.Available)),
-            onSubmit = {},
+            searchState = rememberTextFieldState("Hall"),
+            results = {
+                listOf(
+                    SearchPlaceUi(name = "Community Hall", address = "Rue de Lausanne 1, 1201 Geneva, Switzerland"),
+                    SearchRoomUi(
+                        id = "1",
+                        name = "Jules Verne room",
+                        seats = 100,
+                        floor = 3,
+                        availability = RoomAvailability.Available,
+                    ),
+                )
+            },
+            onPlaceClick = {},
             onRoomClick = {},
             goBack = {},
         )

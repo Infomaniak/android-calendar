@@ -62,7 +62,7 @@ private fun Preview() {
         RoomItem(
             room = SearchRoomUi(
                 id = "1",
-                name = "Salle Jules Verne",
+                name = "Jules Verne room",
                 seats = 100,
                 floor = 3,
                 availability = RoomAvailability.Available,
@@ -80,7 +80,7 @@ private fun PreviewUnavailable() {
         RoomItem(
             room = SearchRoomUi(
                 id = "1",
-                name = "Salle Hard Rock",
+                name = "Hard Rock room",
                 seats = 6,
                 floor = 4,
                 availability = RoomAvailability.Unavailable,
@@ -98,7 +98,7 @@ private fun PreviewUnknown() {
         RoomItem(
             room = SearchRoomUi(
                 id = "1",
-                name = "Salle Jules Verne",
+                name = "Jules Verne room",
                 seats = 100,
                 floor = 3,
                 availability = RoomAvailability.Unknown,

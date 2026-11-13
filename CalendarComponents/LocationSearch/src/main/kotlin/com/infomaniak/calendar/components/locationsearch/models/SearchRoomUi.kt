@@ -26,4 +26,4 @@ data class SearchRoomUi(
     val seats: Int?,
     val floor: Int?,
     val availability: RoomAvailability,
-)
+) : LocationSearchResultUi

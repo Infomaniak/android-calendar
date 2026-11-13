@@ -23,14 +23,12 @@ import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import com.infomaniak.calendar.ui.screen.eventDetail.AttendeesUpdatePayload
-import com.infomaniak.multiplatform_calendar.bookable_resources.domain.model.BookableResourceUuid
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.AlarmListEdit
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.AttendeeEdit
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventBounds
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventEditData
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
-import com.infomaniak.multiplatform_calendar.core.domain.model.event.Location
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Organizer
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.TimeBlocking
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.ZonedWallClock
@@ -97,13 +95,6 @@ fun EventDraft.toNewEventEditData(defaultOrganizer: Organizer?): EventEditData =
         meetRoom = null,
     ),
 )
-
-/** [current] is only read for a room unknown locally: the form can't show it, so saving would otherwise drop its booking. */
-private fun EventDetailUi.LocationUi?.toLocation(current: Location?): Location? = when (this) {
-    is EventDetailUi.LocationUi.Place -> Location.Place(text)
-    is EventDetailUi.LocationUi.Room -> Location.BookableRoom(BookableResourceUuid(id), resource = null)
-    null -> current.takeIf { it is Location.BookableRoom && it.resource == null }
-}
 
 fun List<AttendeeUi>.toAttendeeEdit(): List<AttendeeEdit> = map { AttendeeEdit(email = it.email, displayName = it.displayName) }
 

@@ -95,12 +95,22 @@ fun EventDetail(
                     )
                 }
 
-                location?.address?.let { address ->
-                    LocationButton(
-                        location = address,
+                when (location) {
+                    is EventDetailUi.LocationUi.Place -> LocationButton(
+                        name = location.name,
+                        address = location.address,
                         onClick = onLocationClick,
                         modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
                     )
+                    is EventDetailUi.LocationUi.Room -> location.location?.let { address ->
+                        LocationButton(
+                            name = address,
+                            address = null,
+                            onClick = onLocationClick,
+                            modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
+                        )
+                    }
+                    null -> Unit
                 }
 
                 if (location is EventDetailUi.LocationUi.Room) {

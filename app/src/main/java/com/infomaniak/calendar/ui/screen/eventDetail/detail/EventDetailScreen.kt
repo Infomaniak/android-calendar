@@ -160,7 +160,7 @@ private fun EventDetailScreen(
                     eventDetail = state.eventDetail,
                     onJoinKMeet = { /*TODO[eventDetail]*/ },
                     onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
-                    onLocationClick = { state.eventDetail.location?.address?.let(onLocationClick) },
+                    onLocationClick = { state.eventDetail.location?.mapsQuery?.let(onLocationClick) },
                     onRoomClick = { /*TODO[eventDetail]*/ },
                     goToEventAttendees = {
                         with(state.eventDetail) {

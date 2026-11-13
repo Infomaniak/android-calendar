@@ -22,7 +22,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.foundation.models.SearchableText
+import com.infomaniak.calendar.components.locationsearch.models.LocationSearchResultUi
 import com.infomaniak.calendar.components.locationsearch.models.RoomAvailability
+import com.infomaniak.calendar.components.locationsearch.models.SearchPlaceUi
 import com.infomaniak.calendar.components.locationsearch.models.SearchRoomUi
 import com.infomaniak.calendar.manager.PlaceSearcher
 import com.infomaniak.core.common.cancellable
@@ -60,8 +63,8 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * The rooms of the event form's location search, shared through the form's ViewModelStore: the form loads them as soon as
- * it opens, so they are usually ready once the location search opens.
+ * The results of the event form's location search, shared through the form's ViewModelStore: the form loads the rooms as
+ * soon as it opens, so they are usually ready once the location search opens.
  */
 @Inject
 @ContributesIntoMap(AppScope::class)
@@ -71,7 +74,7 @@ class LocationSearchViewModel(
     private val calendarManager: CalendarManager,
     private val placeSearcher: PlaceSearcher,
 ) : ViewModel() {
-    private val placesQuery = MutableStateFlow("")
+    private val query = MutableStateFlow("")
     private val availabilityRequest = MutableStateFlow<RoomAvailabilityRequest?>(null)
     private var resources = emptyMap<String, BookableResource>()
     private var editedTiming: Pair<OccurrenceId, EventTiming?>? = null
@@ -84,7 +87,7 @@ class LocationSearchViewModel(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val rooms: StateFlow<List<SearchRoomUi>> = availabilityRequest
+    private val rooms: StateFlow<List<SearchRoomUi>> = availabilityRequest
         .filterNotNull()
         .map { it.calendarId }
         .distinctUntilChanged()
@@ -96,12 +99,26 @@ class LocationSearchViewModel(
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val places: StateFlow<List<String>> = placesQuery
-        .mapLatest { query -> if (query.isEmpty()) emptyList() else placeSearcher.search(query) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), emptyList())
+    private val places: Flow<List<SearchPlaceUi>> = query.mapLatest { query ->
+        if (query.isEmpty()) emptyList() else placeSearcher.search(query)
+    }
 
-    fun searchPlaces(query: String) {
-        placesQuery.value = query
+    private val searchableRooms: Flow<List<Pair<SearchRoomUi, SearchableText>>> = rooms.map { rooms ->
+        rooms.map { it to SearchableText(it.name) }
+    }
+
+    /** The typed location first so it can be picked like a found place, then the found places, then the matching rooms. */
+    val results: StateFlow<List<LocationSearchResultUi>> = combine(query, places, searchableRooms) { query, places, rooms ->
+        val typedLocation = query.trim()
+        val typedPlaces = if (typedLocation.isEmpty()) places else listOf(SearchPlaceUi(typedLocation, address = null)) + places
+        val matchingRooms = rooms.mapNotNull { (room, name) ->
+            room.takeIf { typedLocation.isEmpty() || name.find(typedLocation) != null }
+        }
+        typedPlaces.distinct() + matchingRooms
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), emptyList())
+
+    fun search(query: String) {
+        this.query.value = query
     }
 
     /**
@@ -113,7 +130,7 @@ class LocationSearchViewModel(
         snapshotFlow { formState.toRoomAvailabilityRequest(editedOccurrenceId) }.collect(availabilityRequest)
     }
 
-    /** The form's room for a room listed in [rooms]. */
+    /** The form's room for a room listed in [results]. */
     fun formRoomOf(room: SearchRoomUi): EventDetailUi.LocationUi.Room = EventDetailUi.LocationUi.Room(
         id = room.id,
         title = room.name,
