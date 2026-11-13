@@ -37,12 +37,12 @@ import com.infomaniak.calendar.components.eventdetail.component.Calendar
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatus
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
+import com.infomaniak.calendar.components.eventdetail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatus
 import com.infomaniak.calendar.components.eventdetail.component.Recurrence
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
 import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
-import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
 import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
@@ -96,7 +96,11 @@ fun EventDetail(
                 }
 
                 if (location?.isNotBlank() == true) {
-                    LocationButton(location = location, onClick = onLocationClick)
+                    LocationButton(
+                        location = location,
+                        onClick = onLocationClick,
+                        modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
+                    )
                 }
 
                 if (room != null) {

@@ -48,6 +48,7 @@ import com.infomaniak.calendar.components.eventdetail.component.CalendarEditable
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTimeEditable
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitch
+import com.infomaniak.calendar.components.eventdetail.component.LocationEditable
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
@@ -80,6 +81,7 @@ import kotlin.time.Duration.Companion.minutes
 fun EventForm(
     state: EventFormState,
     onAttendeesClick: () -> Unit,
+    onLocationClick: () -> Unit,
     onTimeZoneClick: (isStart: Boolean) -> Unit,
     onCustomReminderClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -120,6 +122,12 @@ fun EventForm(
                 checked = state.isKMeetUrlEnabled::value,
                 onCheckedChange = { isChecked -> state.isKMeetUrlEnabled.value = isChecked },
                 modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
+            )
+
+            LocationEditable(
+                location = state.location::value,
+                onClick = onLocationClick,
+                modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
             )
         }
 
@@ -264,6 +272,7 @@ private fun Preview() {
             EventForm(
                 state = state,
                 onAttendeesClick = {},
+                onLocationClick = {},
                 onTimeZoneClick = {},
                 onCustomReminderClick = {},
                 contentPadding = PaddingValues(16.dp),

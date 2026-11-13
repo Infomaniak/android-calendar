@@ -58,6 +58,7 @@ class EventFormState(
     end: LocalDateTime,
     endTimeZone: TimeZone,
     hasEndEverBeenTouched: Boolean,
+    location: String?,
     participants: Set<ParticipantUi>,
     organizerSource: OrganizerSource?,
     isKMeetUrlEnabled: Boolean,
@@ -83,6 +84,7 @@ class EventFormState(
         ),
         hasEndEverBeenTouched = mutableStateOf(hasEndEverBeenTouched),
     )
+    val location = mutableStateOf(location)
     val participants = mutableStateSetOf<ParticipantUi>().apply { addAll(participants) }
     var organizerSource by mutableStateOf(organizerSource)
         private set
@@ -119,6 +121,7 @@ class EventFormState(
             startTimeZone = dateAndTimeState.start.timeZone,
             end = end,
             endTimeZone = dateAndTimeState.end.timeZone,
+            location = location.value,
             attendees = attendees,
             initialOrganizer = (organizerSource as? OrganizerSource.Static)?.organizer,
             isKMeetUrlEnabled = isKMeetUrlEnabled.value,
@@ -149,6 +152,7 @@ class EventFormState(
                 end = end,
                 endTimeZone = timeZone,
                 hasEndEverBeenTouched = false,
+                location = null,
                 participants = emptySet(),
                 organizerSource = calendar.organizerAttendeeUi?.let(OrganizerSource::Dynamic),
                 isKMeetUrlEnabled = false,

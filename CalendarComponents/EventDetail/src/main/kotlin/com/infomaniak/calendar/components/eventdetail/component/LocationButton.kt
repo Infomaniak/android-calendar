@@ -15,15 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.detail.component
+package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
+import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.MapPin
 
@@ -43,12 +45,42 @@ internal fun LocationButton(
     )
 }
 
+@Composable
+internal fun LocationEditable(location: () -> String?, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    ClickableItem(
+        text = location() ?: stringResource(R.string.locationOrRoomLabel),
+        leadingIcon = EsdsIcons.MapPin,
+        onClick = onClick,
+        modifier = modifier,
+    )
+}
+
 @Preview
 @Composable
 private fun PreviewLocationButton() {
     MaterialTheme {
         Surface {
             LocationButton(location = "742 Evergreen Terrace, Springfield", onClick = {})
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewEditable() {
+    MaterialTheme {
+        Surface {
+            LocationEditable(location = { null }, onClick = {})
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewEditableWithLocation() {
+    MaterialTheme {
+        Surface {
+            LocationEditable(location = { "Rue Eugène-Marziano 25, Genève" }, onClick = {})
         }
     }
 }

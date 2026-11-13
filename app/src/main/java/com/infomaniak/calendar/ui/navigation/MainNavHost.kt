@@ -59,6 +59,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationScree
 import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomReminderScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.locationSearch.LocationSearchScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
 import com.infomaniak.calendar.ui.screen.multiDays.MultiDaysScreen
@@ -148,6 +149,7 @@ private fun baseEntryProvider(
                     backStack.addOnce(NavDestination.EventForm.EventTimeZone(destination, isStart))
                 },
                 goToCustomReminder = { backStack.addOnce(NavDestination.EventForm.EventCustomReminder(destination)) },
+                goToLocationSearch = { backStack.addOnce(NavDestination.EventForm.EventLocationSearch(destination)) },
             )
         }
 
@@ -183,6 +185,7 @@ private fun baseEntryProvider(
                     backStack.addOnce(NavDestination.EventForm.EventTimeZone(destination, isStart))
                 },
                 goToCustomReminder = { backStack.addOnce(NavDestination.EventForm.EventCustomReminder(destination)) },
+                goToLocationSearch = { backStack.addOnce(NavDestination.EventForm.EventLocationSearch(destination)) },
             )
         }
 
@@ -220,6 +223,13 @@ private fun baseEntryProvider(
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
             CustomReminderScreen(goBack = { backStack.popOrReplaceRoot(defaultCalendarView) })
+        }
+
+        is NavDestination.EventForm.EventLocationSearch -> NavEntry(
+            key = destination,
+            metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
+        ) {
+            LocationSearchScreen(goBack = { backStack.popOrReplaceRoot(defaultCalendarView) })
         }
 
         is NavDestination.Accounts.List -> NavEntry(destination) {

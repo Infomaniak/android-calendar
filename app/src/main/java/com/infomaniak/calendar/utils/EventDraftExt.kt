@@ -29,6 +29,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.AttendeeEdi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventBounds
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventEditData
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.Location
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Organizer
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.TimeBlocking
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.ZonedWallClock
@@ -52,6 +53,12 @@ fun EventDraft.applyTo(
 ): EventEditData = editData.copy(
     title = title,
     timing = editData.timing.copy(bounds = bounds()),
+    // The form only edits the place text, a room location stays as long as the text is left untouched
+    location = if (location == (editData.location as? Location.Place)?.text) {
+        editData.location
+    } else {
+        location?.let(Location::Place)
+    },
     timeBlocking = if (isOccupied) TimeBlocking.Blocks else TimeBlocking.DoesNotBlock,
     calendarId = typedCalendarId,
     attendees = attendees.toAttendeeEdit(),

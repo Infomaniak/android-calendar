@@ -62,6 +62,7 @@ fun EventEditScreen(
     goToEventAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     goToCustomReminder: () -> Unit,
+    goToLocationSearch: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventEditViewModel = viewModel(),
     eventDetailSharedDataViewModel: EventDetailSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current),
@@ -96,6 +97,7 @@ fun EventEditScreen(
         goToEventAttendees = goToEventAttendees,
         goToTimeZoneSearch = goToTimeZoneSearch,
         goToCustomReminder = goToCustomReminder,
+        goToLocationSearch = goToLocationSearch,
         modifier = modifier,
         onSubmit = { scope ->
             val eventDraft = eventFormViewModel.formState?.toEventDraft() ?: return@EventEditScreen
@@ -113,6 +115,7 @@ private fun EventEditScreen(
     goToEventAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     goToCustomReminder: () -> Unit,
+    goToLocationSearch: () -> Unit,
     onSubmit: (RecurrentEventScope) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -139,6 +142,7 @@ private fun EventEditScreen(
                 EventForm(
                     state = uiState.eventFormState,
                     onAttendeesClick = goToEventAttendees,
+                    onLocationClick = goToLocationSearch,
                     onTimeZoneClick = goToTimeZoneSearch,
                     onCustomReminderClick = goToCustomReminder,
                     modifier = Modifier.verticalScroll(scrollState),
@@ -177,6 +181,7 @@ private fun Preview() {
                 goToEventAttendees = {},
                 goToTimeZoneSearch = {},
                 goToCustomReminder = {},
+                goToLocationSearch = {},
                 onSubmit = {},
             )
         }

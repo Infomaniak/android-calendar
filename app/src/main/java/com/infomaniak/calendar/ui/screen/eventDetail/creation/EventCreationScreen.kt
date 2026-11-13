@@ -56,6 +56,7 @@ fun EventCreationScreen(
     goToEventsAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     goToCustomReminder: () -> Unit,
+    goToLocationSearch: () -> Unit,
     modifier: Modifier = Modifier,
     eventCreationViewModel: EventCreationViewModel = viewModel(),
     eventFormViewModel: EventFormViewModel = viewModel(),
@@ -85,6 +86,7 @@ fun EventCreationScreen(
         goToEventsAttendees = goToEventsAttendees,
         goToTimeZoneSearch = goToTimeZoneSearch,
         goToCustomReminder = goToCustomReminder,
+        goToLocationSearch = goToLocationSearch,
     )
 }
 
@@ -96,6 +98,7 @@ private fun EventCreationScreen(
     goToEventsAttendees: () -> Unit,
     goToTimeZoneSearch: (isStart: Boolean) -> Unit,
     goToCustomReminder: () -> Unit,
+    goToLocationSearch: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -121,6 +124,7 @@ private fun EventCreationScreen(
             is EventCreationScreenState.Success -> EventForm(
                 state = uiState.eventFormState,
                 onAttendeesClick = goToEventsAttendees,
+                onLocationClick = goToLocationSearch,
                 onTimeZoneClick = goToTimeZoneSearch,
                 onCustomReminderClick = goToCustomReminder,
                 contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
@@ -157,6 +161,7 @@ private fun EventCreationScreenPreview() {
             goToEventsAttendees = {},
             goToTimeZoneSearch = {},
             goToCustomReminder = {},
+            goToLocationSearch = {},
         )
     }
 }
@@ -172,6 +177,7 @@ private fun PreviewEmptyWritableCalendar() {
             goToEventsAttendees = {},
             goToTimeZoneSearch = {},
             goToCustomReminder = {},
+            goToLocationSearch = {},
         )
     }
 }
