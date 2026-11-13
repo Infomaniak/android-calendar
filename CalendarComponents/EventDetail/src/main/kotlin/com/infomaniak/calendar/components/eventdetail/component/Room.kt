@@ -20,9 +20,13 @@ package com.infomaniak.calendar.components.eventdetail.component
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
+import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
+import com.infomaniak.calendar.components.foundation.component.ListItemClickable
 import com.infomaniak.calendar.components.foundation.component.RoomDetails
 import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -35,10 +39,11 @@ internal fun Room(
     onClick: (() -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
 ) {
-    LocationItem(
-        name = room.name,
-        icon = EsdsIcons.DoorOpen,
+    ListItemClickable(
         onClick = onClick,
+        shapes = ClickableItemDefaults.ClickableItemShapes,
+        content = { Text(room.name) },
+        leadingContent = { ItemIcon(EsdsIcons.DoorOpen) },
         supportingContent = { RoomDetails(seats = room.seats, floor = room.floor) },
         trailingContent = trailingContent,
         modifier = modifier,
