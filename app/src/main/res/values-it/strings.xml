@@ -31,6 +31,7 @@
     <string name="deleteEventAlertTitle">Vuoi davvero eliminare questo evento?</string>
     <string name="deleteRecurringEventAlertTitle">Quali eventi vuoi eliminare?</string>
     <string name="editRecurringEventAlertTitle">Quali eventi vuoi modificare?</string>
+    <string name="endLabel">Fine</string>
     <string name="eventOccurrenceNotFound">Questo evento non è più disponibile.</string>
     <string name="generalSettingsAuthorizationsLabel">Autorizzazioni</string>
     <string name="generalSettingsDisplayLabel">Visualizza</string>
@@ -55,7 +56,9 @@
     <string name="settingsTitle">Impostazioni</string>
     <string name="signOutAccountAlertConfirm">Esci dall’account</string>
     <string name="signOutAccountAlertDescription">Questo account e i calendari ad esso associati verranno disconnessi dall’app “Calendario”. Rimarranno comunque disponibili nel tuo account online Infomaniak.</string>
+    <string name="startLabel">Inizio</string>
     <string name="syncEventsError">Errore durante il recupero degli eventi</string>
     <string name="threeDaysTitle">Tre giorni</string>
+    <string name="timeZoneLabel">Fuso orario</string>
     <string name="weekTitle">Settimana</string>
 </resources>

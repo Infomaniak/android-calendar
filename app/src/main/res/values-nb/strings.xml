@@ -31,6 +31,7 @@
     <string name="deleteEventAlertTitle">Er du sikker på at du vil slette denne hendelsen?</string>
     <string name="deleteRecurringEventAlertTitle">Hvilke hendelser vil du slette?</string>
     <string name="editRecurringEventAlertTitle">Hvilke hendelser vil du redigere?</string>
+    <string name="endLabel">Slutt</string>
     <string name="eventOccurrenceNotFound">Denne hendelsen er ikke lenger tilgjengelig.</string>
     <string name="generalSettingsAuthorizationsLabel">Tillatelser</string>
     <string name="generalSettingsDisplayLabel">Visning</string>
@@ -55,7 +56,9 @@
     <string name="settingsTitle">Innstillinger</string>
     <string name="signOutAccountAlertConfirm">Logg ut av kontoen</string>
     <string name="signOutAccountAlertDescription">Denne kontoen og de tilknyttede kalenderne vil bli koblet fra «Kalender»-appen. De vil fortsatt være tilgjengelige i din Infomaniak-nettkonto.</string>
+    <string name="startLabel">Start</string>
     <string name="syncEventsError">Feil ved henting av hendelser</string>
     <string name="threeDaysTitle">Tre dager</string>
+    <string name="timeZoneLabel">Tidssone</string>
     <string name="weekTitle">Uke</string>
 </resources>
