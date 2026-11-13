@@ -87,9 +87,9 @@ fun EventDetail(
             Section {
                 item {
                     DateAndTime(
-                        start,
-                        end,
-                        isAllDay,
+                        start = start,
+                        end = end,
+                        isAllDay = isAllDay,
                         shapes = it,
                         modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
                     )
