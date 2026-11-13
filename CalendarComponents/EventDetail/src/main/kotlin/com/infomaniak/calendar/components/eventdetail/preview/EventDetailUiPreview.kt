@@ -46,7 +46,7 @@ val previewEventDetailUi = EventDetailUi(
     ),
     organizer = null,
     kMeetUrl = "test url",
-    location = LocationUi.Room(id = "1", name = "Japan room", seats = 5, floor = 3, address = null, availability = null),
+    location = LocationUi.Room(id = "1", name = "Japan room", seats = 5, floor = 3, address = "Infomaniak\nRue Eugène-Marziano 25, 1227 Les Acacias", availability = null),
     urlLink = null,
     description = LoremIpsum(30).values.first(),
     files = listOf(

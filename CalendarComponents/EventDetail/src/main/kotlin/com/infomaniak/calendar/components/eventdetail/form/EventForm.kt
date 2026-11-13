@@ -27,7 +27,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -48,10 +49,10 @@ import com.infomaniak.calendar.components.eventdetail.component.CalendarEditable
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTimeEditable
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitch
-import com.infomaniak.calendar.components.eventdetail.component.LocationEditable
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
+import com.infomaniak.calendar.components.eventdetail.detail.Locations
 import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.AddReminderButton
 import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderItem
@@ -124,10 +125,10 @@ fun EventForm(
                 modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
             )
 
-            LocationEditable(
-                location = { state.location?.label },
+            Locations(
+                location = { state.location },
                 onClick = onLocationClick,
-                modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
+                onRemoveClick = { state.location = null },
             )
         }
 

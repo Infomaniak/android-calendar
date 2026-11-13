@@ -37,14 +37,14 @@ import com.infomaniak.calendar.components.eventdetail.component.Calendar
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatus
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
-import com.infomaniak.calendar.components.eventdetail.component.LocationButton
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatus
+import com.infomaniak.calendar.components.eventdetail.component.PlaceButton
 import com.infomaniak.calendar.components.eventdetail.component.Recurrence
+import com.infomaniak.calendar.components.eventdetail.component.Room
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
 import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
 import com.infomaniak.calendar.components.eventdetail.detail.component.Notifications
-import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
@@ -65,7 +65,6 @@ fun EventDetail(
     onCopyKMeet: () -> Unit,
     onLocationClick: () -> Unit,
     goToEventAttendees: () -> Unit,
-    onRoomClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -96,26 +95,21 @@ fun EventDetail(
                     )
                 }
 
-                when (location) {
-                    is LocationUi.Place -> LocationButton(
-                        name = location.name,
-                        address = location.address,
+                if (location is LocationUi.Room) {
+                    Room(
+                        room = location,
                         onClick = onLocationClick,
-                        modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
+                        modifier = Modifier.eventSharedBounds(EventSharedElement.Room),
                     )
-                    is LocationUi.Room -> location.address?.let { address ->
-                        LocationButton(
-                            name = address,
-                            address = null,
-                            onClick = onLocationClick,
-                            modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
-                        )
-                    }
-                    null -> Unit
                 }
 
-                if (location is LocationUi.Room) {
-                    RoomButton(room = location, onClick = onRoomClick)
+                location?.nameAndAddress?.let {
+                    PlaceButton(
+                        name = it.name,
+                        address = it.address,
+                        onClick = onLocationClick,
+                        modifier = Modifier.eventSharedBounds(EventSharedElement.Place),
+                    )
                 }
             }
 
@@ -160,7 +154,6 @@ private fun PreviewEventDetail() {
                         onJoinKMeet = {},
                         onCopyKMeet = {},
                         onLocationClick = {},
-                        onRoomClick = {},
                         goToEventAttendees = {},
                         contentPadding = PaddingValues(horizontal = EsdsTheme.spacing.lg) + it,
                     )

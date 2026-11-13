@@ -41,7 +41,10 @@ import com.infomaniak.calendar.components.locationsearch.component.RoomItem
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
-/** Lists [results] as given, under the search bar editing [searchState]. */
+/**
+ * Lists [results] as given, under the search bar editing [searchState], highlighting what's typed in them. While something is
+ * typed, [results] start with the typed place, left as is.
+ */
 @Composable
 fun LocationSearch(
     searchState: TextFieldState,
@@ -59,20 +62,25 @@ fun LocationSearch(
             contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding() + EsdsTheme.spacing.sm),
         ) {
             val results = results()
+            val query = { searchState.text.trim().toString() }
 
-            itemsIndexed(results, key = { _, result -> result.key }) { index, result ->
+            itemsIndexed(results, key = { index, result -> result.key(index) }) { index, result ->
                 val shapes = ListItemDefaults.segmentedShapes(index = index, count = results.size)
                 when (result) {
                     is LocationUi.Place -> PlaceItem(
                         name = result.name,
                         address = result.address,
+                        query = if (index == 0) NoHighlight else query,
                         shapes = shapes,
                         onClick = { onLocationClick(result) },
+                        modifier = Modifier.animateItem(),
                     )
                     is LocationUi.Room -> RoomItem(
                         room = result,
+                        query = query,
                         shapes = shapes,
                         onClick = { onLocationClick(result) },
+                        modifier = Modifier.animateItem(),
                     )
                 }
             }
@@ -80,11 +88,13 @@ fun LocationSearch(
     }
 }
 
-private val LocationUi.key: String
-    get() = when (this) {
-        is LocationUi.Place -> "place:$name:$address"
-        is LocationUi.Room -> "room:$id"
-    }
+private val NoHighlight = { "" }
+
+/** Places are keyed by position, so the typed one stays the same item while it's being typed. */
+private fun LocationUi.key(index: Int): String = when (this) {
+    is LocationUi.Place -> "place:$index"
+    is LocationUi.Room -> "room:$id"
+}
 
 @Preview
 @Composable

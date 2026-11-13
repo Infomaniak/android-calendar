@@ -87,7 +87,9 @@ app/src/main/java/com/infomaniak/calendar/
     │                              #   It merges the search's results: the typed text, the Geocoder's places, then the rooms whose name matches.
     │                              #   Switching the form's calendar clears its room when the new calendar can't book it (compared by id).
     │                              #   A room unknown locally isn't shown in the form, it's kept on save until another location is picked.
-    │                              #   A booked room (Location.BookableRoom with a known resource) maps to LocationUi.Room)
+    │                              #   A booked room (Location.BookableRoom with a known resource) maps to LocationUi.Room, shown in the detail
+    │                              #   and as the form's location, under its building's place, until another location is picked. The room row isn't clickable,
+    │                              #   and the form animates the switch when the room goes, e.g. dropped by a calendar switch)
     │   └── onboarding/            # Two onboardings, each with its own page enum, sharing OnboardingPage + OnboardingButtonDefaults:
     │                              # login/ (LoginOnboardingScreen + LoginOnboardingPage + CrossAppLoginViewModel): welcome + login;
     │                              # permissions/ (PermissionsOnboardingScreen + PermissionsOnboardingPage + NextStepButton): a pager

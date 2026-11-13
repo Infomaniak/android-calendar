@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.foundation.component.HighlightedText
 import com.infomaniak.calendar.components.foundation.component.RoomDetails
 import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.calendar.components.foundation.models.RoomAvailability
@@ -35,7 +36,13 @@ import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.DoorOpen
 
 @Composable
-internal fun RoomItem(room: LocationUi.Room, shapes: ListItemShapes, onClick: () -> Unit, modifier: Modifier = Modifier) {
+internal fun RoomItem(
+    room: LocationUi.Room,
+    query: () -> String,
+    shapes: ListItemShapes,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     SegmentedListItem(
         onClick = onClick,
         shapes = shapes,
@@ -53,7 +60,7 @@ internal fun RoomItem(room: LocationUi.Room, shapes: ListItemShapes, onClick: ()
         supportingContent = { RoomDetails(seats = room.seats, floor = room.floor) },
         modifier = modifier,
     ) {
-        Text(room.name)
+        HighlightedText(room.name, query)
     }
 }
 
@@ -70,6 +77,7 @@ private fun Preview() {
                 address = null,
                 availability = RoomAvailability.Available,
             ),
+            query = { "room" },
             shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             onClick = {},
         )
@@ -89,6 +97,7 @@ private fun PreviewUnavailable() {
                 address = null,
                 availability = RoomAvailability.Unavailable,
             ),
+            query = { "room" },
             shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             onClick = {},
         )
@@ -108,6 +117,7 @@ private fun PreviewUnknown() {
                 address = null,
                 availability = RoomAvailability.Unknown,
             ),
+            query = { "room" },
             shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             onClick = {},
         )

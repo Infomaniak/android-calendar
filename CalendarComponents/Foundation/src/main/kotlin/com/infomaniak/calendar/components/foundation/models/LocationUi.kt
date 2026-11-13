@@ -22,17 +22,23 @@ import kotlinx.parcelize.Parcelize
 
 /** An event's location: a place, or a bookable room. */
 sealed interface LocationUi : Parcelable {
-    val label: String
-        get() = when (this) {
-            is Place -> name
-            is Room -> name
-        }
-
     /** What a maps app searches to find this location. */
     val mapsQuery: String?
         get() = when (this) {
             is Place -> address ?: name
             is Room -> address
+        }
+
+    val searchQuery: String?
+        get() = when (this) {
+            is Place -> address ?: name
+            is Room -> name
+        }
+
+    val nameAndAddress: NameAndAddress?
+        get() = when (this) {
+            is Place -> NameAndAddress(name, address)
+            is Room -> address?.let { NameAndAddress(it, null) }
         }
 
     /** @param address Under the place's [name], null when the name already is its address. */
@@ -53,4 +59,9 @@ sealed interface LocationUi : Parcelable {
         val address: String?,
         val availability: RoomAvailability?,
     ) : LocationUi
+
+    data class NameAndAddress(
+        val name: String,
+        val address: String?,
+    )
 }

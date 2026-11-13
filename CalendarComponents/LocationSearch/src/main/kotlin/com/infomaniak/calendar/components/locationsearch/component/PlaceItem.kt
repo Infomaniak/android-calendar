@@ -22,10 +22,10 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.foundation.component.HighlightedText
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.MapPin
 
@@ -33,6 +33,7 @@ import com.infomaniak.designsystem.icons.symbols.MapPin
 internal fun PlaceItem(
     name: String,
     address: String?,
+    query: () -> String,
     shapes: ListItemShapes,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -42,10 +43,10 @@ internal fun PlaceItem(
         shapes = shapes,
         colors = LocationItemColors,
         leadingContent = { Icon(EsdsIcons.MapPin.Medium, contentDescription = null) },
-        supportingContent = address?.let { { Text(it) } },
+        supportingContent = address?.let { { HighlightedText(it, query) } },
         modifier = modifier,
     ) {
-        Text(name)
+        HighlightedText(name, query)
     }
 }
 
@@ -56,6 +57,7 @@ private fun Preview() {
         PlaceItem(
             name = "Infomaniak",
             address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland",
+            query = { "info" },
             shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             onClick = {},
         )
