@@ -19,13 +19,13 @@ package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
+import com.infomaniak.calendar.components.foundation.component.ListItemClickable
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Cross
 import com.infomaniak.designsystem.icons.symbols.Symbol
@@ -41,25 +41,15 @@ internal fun LocationItem(
     supportingContent: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
 ) {
-    if (onClick == null) {
-        ListItem(
-            content = { Text(name) },
-            leadingContent = { ItemIcon(icon) },
-            supportingContent = supportingContent,
-            trailingContent = trailingContent,
-            modifier = modifier,
-        )
-    } else {
-        ListItem(
-            onClick = onClick,
-            shapes = ClickableItemDefaults.ClickableItemShapes,
-            content = { Text(name) },
-            leadingContent = { ItemIcon(icon) },
-            supportingContent = supportingContent,
-            trailingContent = trailingContent,
-            modifier = modifier,
-        )
-    }
+    ListItemClickable(
+        onClick = onClick,
+        shapes = ClickableItemDefaults.ClickableItemShapes,
+        content = { Text(name) },
+        leadingContent = { ItemIcon(icon) },
+        supportingContent = supportingContent,
+        trailingContent = trailingContent,
+        modifier = modifier,
+    )
 }
 
 @Composable
