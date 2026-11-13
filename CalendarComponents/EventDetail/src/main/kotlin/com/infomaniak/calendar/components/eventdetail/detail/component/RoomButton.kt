@@ -24,20 +24,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.component.RoomDetails
+import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.DoorOpen
 
 @Composable
 internal fun RoomButton(
-    room: EventDetailUi.LocationUi.Room,
+    room: LocationUi.Room,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     ClickableItem(
-        text = room.title,
+        text = room.name,
         leadingIcon = EsdsIcons.DoorOpen,
         supportingContent = { RoomDetails(seats = room.seats, floor = room.floor) },
         onClick = onClick,
@@ -51,7 +51,7 @@ internal fun RoomButton(
 private fun PreviewRoomButton() {
     MaterialTheme {
         Surface {
-            RoomButton(room = EventDetailUi.LocationUi.Room(id = "1", title = "Japan room", seats = 5, floor = 3, location = null), onClick = {})
+            RoomButton(room = LocationUi.Room(id = "1", name = "Japan room", seats = 5, floor = 3, address = null, availability = null), onClick = {})
         }
     }
 }

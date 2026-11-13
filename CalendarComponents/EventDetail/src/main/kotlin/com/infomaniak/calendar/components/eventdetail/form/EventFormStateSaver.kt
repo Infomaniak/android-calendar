@@ -25,6 +25,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.eventdetail.state.TimeZoneSaver
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
@@ -86,7 +87,7 @@ private val saver = mapSaver(
             end = it[END_KEY] as LocalDateTime,
             endTimeZone = TimeZoneSaver.restore(it[END_TIME_ZONE_KEY] as String)!!,
             hasEndEverBeenTouched = it[HAS_END_EVER_BEEN_TOUCHED_KEY] as Boolean,
-            location = it[LOCATION_KEY] as EventDetailUi.LocationUi?,
+            location = it[LOCATION_KEY] as LocationUi?,
             participants = (it[PARTICIPANTS_KEY] as ArrayList<ParticipantUi>).toSet(),
             organizerSource = it[ORGANIZER_SOURCE_KEY] as OrganizerSource?,
             isKMeetUrlEnabled = it[IS_KMEET_URL_ENABLED_KEY] as Boolean,

@@ -20,7 +20,6 @@ package com.infomaniak.calendar.components.locationsearch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.input.TextFieldState
@@ -29,44 +28,28 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.SearchBar
 import com.infomaniak.calendar.components.foundation.component.SearchLayout
-import com.infomaniak.calendar.components.foundation.models.SearchableText
+import com.infomaniak.calendar.components.foundation.models.LocationUi
+import com.infomaniak.calendar.components.foundation.models.RoomAvailability
 import com.infomaniak.calendar.components.foundation.utils.onlyHorizontalAndTop
 import com.infomaniak.calendar.components.locationsearch.component.PlaceItem
 import com.infomaniak.calendar.components.locationsearch.component.RoomItem
-import com.infomaniak.calendar.components.locationsearch.models.RoomAvailability
-import com.infomaniak.calendar.components.locationsearch.models.SearchRoomUi
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
-/**
- * [searchState] holds the typed location, listed first so it can be picked like the rooms below it.
- * Picking the typed location reports its text through [onLocationClick], picking a room reports it through [onRoomClick].
- */
+/** Lists [results] as given, under the search bar editing [searchState]. */
 @Composable
 fun LocationSearch(
     searchState: TextFieldState,
-    rooms: List<SearchRoomUi>,
-    onLocationClick: (String) -> Unit,
-    onRoomClick: (SearchRoomUi) -> Unit,
+    results: () -> List<LocationUi>,
+    onLocationClick: (LocationUi) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    val typedLocation by remember(searchState) { derivedStateOf { searchState.text.trim().toString() } }
-    val searchableRooms = remember(rooms) { rooms.associateWith { SearchableText(it.name) } }
-    val visibleRooms by remember(searchableRooms) {
-        derivedStateOf {
-            searchableRooms.mapNotNull { (room, name) -> room.takeIf { typedLocation.isEmpty() || name.find(typedLocation) != null } }
-        }
-    }
-
     SearchLayout(modifier = modifier, contentPadding = contentPadding.onlyHorizontalAndTop()) {
         SearchBar(searchState, placeholder = stringResource(R.string.locationSearchPlaceholder))
 
@@ -75,27 +58,33 @@ fun LocationSearch(
             verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
             contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding() + EsdsTheme.spacing.sm),
         ) {
-            val typedCount = if (typedLocation.isEmpty()) 0 else 1
-            val count = typedCount + visibleRooms.size
+            val results = results()
 
-            if (typedCount > 0) item(key = "typed") {
-                PlaceItem(
-                    place = typedLocation,
-                    shapes = ListItemDefaults.segmentedShapes(index = 0, count = count),
-                    onClick = { onLocationClick(typedLocation) },
-                )
-            }
-
-            itemsIndexed(visibleRooms, key = { _, room -> "room:${room.id}" }) { index, room ->
-                RoomItem(
-                    room = room,
-                    shapes = ListItemDefaults.segmentedShapes(index = typedCount + index, count = count),
-                    onClick = { onRoomClick(room) },
-                )
+            itemsIndexed(results, key = { _, result -> result.key }) { index, result ->
+                val shapes = ListItemDefaults.segmentedShapes(index = index, count = results.size)
+                when (result) {
+                    is LocationUi.Place -> PlaceItem(
+                        name = result.name,
+                        address = result.address,
+                        shapes = shapes,
+                        onClick = { onLocationClick(result) },
+                    )
+                    is LocationUi.Room -> RoomItem(
+                        room = result,
+                        shapes = shapes,
+                        onClick = { onLocationClick(result) },
+                    )
+                }
             }
         }
     }
 }
+
+private val LocationUi.key: String
+    get() = when (this) {
+        is LocationUi.Place -> "place:$name:$address"
+        is LocationUi.Room -> "room:$id"
+    }
 
 @Preview
 @Composable
@@ -104,14 +93,40 @@ private fun Preview() {
         Surface {
             LocationSearch(
                 searchState = rememberTextFieldState(),
-                rooms = listOf(
-                    SearchRoomUi(id = "1", name = "Salle Jules Verne", seats = 100, floor = 3, availability = RoomAvailability.Available),
-                    SearchRoomUi(id = "2", name = "Salle Blanche", seats = 8, floor = 1, availability = RoomAvailability.Available),
-                    SearchRoomUi(id = "3", name = "Salle de sport", seats = 50, floor = 0, availability = RoomAvailability.Unavailable),
-                ),
+                results = { previewResults },
                 onLocationClick = {},
-                onRoomClick = {},
             )
         }
     }
 }
+
+private val previewResults = listOf(
+    LocationUi.Place(
+        name = "Infomaniak",
+        address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland",
+    ),
+    LocationUi.Room(
+        id = "1",
+        name = "Jules Verne room",
+        seats = 100,
+        floor = 3,
+        address = null,
+        availability = RoomAvailability.Available,
+    ),
+    LocationUi.Room(
+        id = "2",
+        name = "White room",
+        seats = 8,
+        floor = 1,
+        address = null,
+        availability = RoomAvailability.Available,
+    ),
+    LocationUi.Room(
+        id = "3",
+        name = "Gym",
+        seats = 50,
+        floor = 0,
+        address = null,
+        availability = RoomAvailability.Unavailable,
+    ),
+)

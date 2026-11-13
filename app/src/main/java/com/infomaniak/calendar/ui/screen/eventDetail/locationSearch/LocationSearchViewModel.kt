@@ -21,9 +21,10 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
-import com.infomaniak.calendar.components.locationsearch.models.RoomAvailability
-import com.infomaniak.calendar.components.locationsearch.models.SearchRoomUi
+import com.infomaniak.calendar.components.foundation.models.LocationUi
+import com.infomaniak.calendar.components.foundation.models.RoomAvailability
+import com.infomaniak.calendar.components.foundation.models.SearchableText
+import com.infomaniak.calendar.manager.PlaceSearcher
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.bookable_resources.domain.model.BookableResource
 import com.infomaniak.multiplatform_calendar.bookable_resources.domain.model.BookableResourceUuid
@@ -42,22 +43,24 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 /**
- * The rooms of the event form's location search, shared through the form's ViewModelStore: the form loads them as soon as
- * it opens, so they are usually ready once the location search opens.
+ * The results of the event form's location search, shared through the form's ViewModelStore: the form loads the rooms as
+ * soon as it opens, so they are usually ready once the location search opens.
  */
 @Inject
 @ContributesIntoMap(AppScope::class)
@@ -65,9 +68,11 @@ import kotlinx.coroutines.launch
 class LocationSearchViewModel(
     private val calendarBookableResourcesManager: CalendarBookableResourcesManager,
     private val calendarManager: CalendarManager,
+    private val placeSearcher: PlaceSearcher,
 ) : ViewModel() {
+    private val typedQuery = MutableStateFlow("")
+    private val query = typedQuery.map { it.trim() }.distinctUntilChanged()
     private val availabilityRequest = MutableStateFlow<RoomAvailabilityRequest?>(null)
-    private var resources = emptyMap<String, BookableResource>()
     private var editedTiming: Pair<OccurrenceId, EventTiming?>? = null
 
     /** Null until known: the rooms are listed meanwhile with an unknown availability, then sorted once it is known. */
@@ -78,16 +83,34 @@ class LocationSearchViewModel(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val rooms: StateFlow<List<SearchRoomUi>> = availabilityRequest
+    private val rooms: StateFlow<List<LocationUi.Room>> = availabilityRequest
         .filterNotNull()
         .map { it.calendarId }
         .distinctUntilChanged()
         .flatMapLatest(calendarBookableResourcesManager::observeResources)
         .combine(availability) { resources, availability ->
-            this.resources = resources.associateBy { it.uuid.value }
-            resources.map { it.toSearchRoomUi(availability?.get(it.uuid)) }.sortedBy { it.availability.rank }
+            resources.map { it.toRoomUi(availability?.get(it.uuid)) }.sortedBy { it.availability?.rank }
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    private val searchableRooms: Flow<List<Pair<LocationUi.Room, SearchableText>>> = rooms.map { rooms ->
+        rooms.map { it to SearchableText(it.name) }
+    }
+
+    /**
+     * Every room while nothing is typed. Else the typed location, so it can be picked like a found place, the places found for
+     * it and the rooms whose name matches it, all listed at once.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val results: StateFlow<List<LocationUi>> = combine(query, searchableRooms, ::Pair).mapLatest { (query, rooms) ->
+        if (query.isEmpty()) return@mapLatest rooms.map { (room, _) -> room }
+
+        (listOf(LocationUi.Place(query, address = null)) + placeSearcher.search(query)).distinct() + rooms.matching(query)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), emptyList())
+
+    fun search(query: String) {
+        typedQuery.value = query
+    }
 
     /**
      * Loads the rooms bookable in [formState]'s calendar with their availability over its time, following it as long as it's
@@ -98,15 +121,6 @@ class LocationSearchViewModel(
         snapshotFlow { formState.toRoomAvailabilityRequest(editedOccurrenceId) }.collect(availabilityRequest)
     }
 
-    /** The form's room for a room listed in [rooms]. */
-    fun formRoomOf(room: SearchRoomUi): EventDetailUi.LocationUi.Room = EventDetailUi.LocationUi.Room(
-        id = room.id,
-        title = room.name,
-        seats = room.seats,
-        floor = room.floor,
-        location = resources[room.id]?.location,
-    )
-
     /**
      * Clears [formState]'s room when the calendar it switches to can't book it. Rooms are compared by id: two accounts can
      * each have a room of the same name. A switch cancels the check of the previous one, which could drop a room the
@@ -116,9 +130,12 @@ class LocationSearchViewModel(
         snapshotFlow { CalendarId(formState.calendar.id) }
             .drop(1) // The form's own calendar, only switching away from it can leave its room behind
             .collectLatest { calendarId ->
-                val room = formState.location as? EventDetailUi.LocationUi.Room ?: return@collectLatest
+                val room = formState.location as? LocationUi.Room
+                room ?: return@collectLatest
 
-                val resources = calendarBookableResourcesManager.observeResources(calendarId).firstOrNull() ?: return@collectLatest
+                val resources = calendarBookableResourcesManager.observeResources(calendarId).firstOrNull()
+                resources ?: return@collectLatest
+
                 if (resources.none { it.uuid.value == room.id }) formState.location = null
             }
     }
@@ -137,17 +154,22 @@ class LocationSearchViewModel(
         return calendarManager.getEditData(occurrenceId)?.timing.also { editedTiming = occurrenceId to it }
     }
 
-    private fun BookableResource.toSearchRoomUi(isAvailable: Boolean?) = SearchRoomUi(
+    private fun BookableResource.toRoomUi(isAvailable: Boolean?) = LocationUi.Room(
         id = uuid.value,
         name = name,
         seats = capacity,
         floor = floor,
+        address = location,
         availability = when (isAvailable) {
             true -> RoomAvailability.Available
             false -> RoomAvailability.Unavailable
             null -> RoomAvailability.Unknown
         },
     )
+
+    private fun List<Pair<LocationUi.Room, SearchableText>>.matching(query: String): List<LocationUi.Room> {
+        return mapNotNull { (room, name) -> room.takeIf { name.find(query) != null } }
+    }
 
     private val RoomAvailability.rank
         get() = when (this) {

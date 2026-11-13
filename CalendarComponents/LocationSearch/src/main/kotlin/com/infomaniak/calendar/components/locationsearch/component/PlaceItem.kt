@@ -30,15 +30,22 @@ import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.MapPin
 
 @Composable
-internal fun PlaceItem(place: String, shapes: ListItemShapes, onClick: () -> Unit, modifier: Modifier = Modifier) {
+internal fun PlaceItem(
+    name: String,
+    address: String?,
+    shapes: ListItemShapes,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     SegmentedListItem(
         onClick = onClick,
         shapes = shapes,
         colors = LocationItemColors,
         leadingContent = { Icon(EsdsIcons.MapPin.Medium, contentDescription = null) },
+        supportingContent = address?.let { { Text(it) } },
         modifier = modifier,
     ) {
-        Text(place)
+        Text(name)
     }
 }
 
@@ -46,6 +53,11 @@ internal fun PlaceItem(place: String, shapes: ListItemShapes, onClick: () -> Uni
 @Composable
 private fun Preview() {
     Surface {
-        PlaceItem(place = "Rue Eugène-Marziano", shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1), onClick = {})
+        PlaceItem(
+            name = "Infomaniak",
+            address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland",
+            shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            onClick = {},
+        )
     }
 }

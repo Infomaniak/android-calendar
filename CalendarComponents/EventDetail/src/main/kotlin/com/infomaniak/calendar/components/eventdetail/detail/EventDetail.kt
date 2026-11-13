@@ -52,6 +52,7 @@ import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventShare
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailUi
+import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 /**
@@ -95,15 +96,25 @@ fun EventDetail(
                     )
                 }
 
-                location?.address?.let { address ->
-                    LocationButton(
-                        location = address,
+                when (location) {
+                    is LocationUi.Place -> LocationButton(
+                        name = location.name,
+                        address = location.address,
                         onClick = onLocationClick,
                         modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
                     )
+                    is LocationUi.Room -> location.address?.let { address ->
+                        LocationButton(
+                            name = address,
+                            address = null,
+                            onClick = onLocationClick,
+                            modifier = Modifier.eventSharedBounds(EventSharedElement.Location),
+                        )
+                    }
+                    null -> Unit
                 }
 
-                if (location is EventDetailUi.LocationUi.Room) {
+                if (location is LocationUi.Room) {
                     RoomButton(room = location, onClick = onRoomClick)
                 }
             }

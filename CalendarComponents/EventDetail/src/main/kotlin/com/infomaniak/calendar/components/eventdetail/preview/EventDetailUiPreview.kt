@@ -24,6 +24,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
 import com.infomaniak.calendar.components.foundation.models.Attendees
+import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import kotlinx.datetime.TimeZone
 import kotlin.time.Duration.Companion.days
@@ -45,7 +46,7 @@ val previewEventDetailUi = EventDetailUi(
     ),
     organizer = null,
     kMeetUrl = "test url",
-    location = EventDetailUi.LocationUi.Room(id = "1", title = "Japan room", seats = 5, floor = 3, location = null),
+    location = LocationUi.Room(id = "1", name = "Japan room", seats = 5, floor = 3, address = null, availability = null),
     urlLink = null,
     description = LoremIpsum(30).values.first(),
     files = listOf(
