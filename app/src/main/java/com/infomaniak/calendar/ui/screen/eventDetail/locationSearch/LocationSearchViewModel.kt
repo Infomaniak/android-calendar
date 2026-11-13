@@ -71,7 +71,8 @@ class LocationSearchViewModel(
     private val calendarManager: CalendarManager,
     private val placeSearcher: PlaceSearcher,
 ) : ViewModel() {
-    private val query = MutableStateFlow("")
+    private val typedQuery = MutableStateFlow("")
+    private val query = typedQuery.map { it.trim() }.distinctUntilChanged()
     private val availabilityRequest = MutableStateFlow<RoomAvailabilityRequest?>(null)
     private var editedTiming: Pair<OccurrenceId, EventTiming?>? = null
 
@@ -104,16 +105,13 @@ class LocationSearchViewModel(
 
     /** The typed location first so it can be picked like a found place, then the found places, then the matching rooms. */
     val results: StateFlow<List<LocationUi>> = combine(query, places, searchableRooms) { query, places, rooms ->
-        val typedLocation = query.trim()
-        val typedPlaces = if (typedLocation.isEmpty()) places else listOf(LocationUi.Place(typedLocation, address = null)) + places
-        val matchingRooms = rooms.mapNotNull { (room, name) ->
-            room.takeIf { typedLocation.isEmpty() || name.find(typedLocation) != null }
-        }
+        val typedPlaces = if (query.isEmpty()) places else listOf(LocationUi.Place(query, address = null)) + places
+        val matchingRooms = rooms.mapNotNull { (room, name) -> room.takeIf { query.isEmpty() || name.find(query) != null } }
         typedPlaces.distinct() + matchingRooms
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), emptyList())
 
     fun search(query: String) {
-        this.query.value = query
+        typedQuery.value = query
     }
 
     /**

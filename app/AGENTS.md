@@ -79,7 +79,7 @@ app/src/main/java/com/infomaniak/calendar/
     │                              # form/ (EventFormViewModel: the event form state of EventCreation / EventEdit)
     │                              # timeZoneSearch/ (TimeZoneSearchScreen: writes the picked time zone to the form)
     │                              # customReminder/ (CustomReminderScreen: adds the made reminder to the form)
-    │                              # locationSearch/ (LocationSearchScreen: ✓ writes the search text or the clicked place to the form as its location,
+    │                              # locationSearch/ (LocationSearchScreen: writes the clicked place, the typed text included, to the form as its location,
     │                              #   or the clicked room as its room (saved as a Location.BookableRoom);
     │                              #   LocationSearchViewModel, shared through the form's ViewModelStore, observes the bookable rooms of the form's calendar
     │                              #   as soon as EventCreation / EventEdit opens, then sorts them by availability over the form's time, and over the edited

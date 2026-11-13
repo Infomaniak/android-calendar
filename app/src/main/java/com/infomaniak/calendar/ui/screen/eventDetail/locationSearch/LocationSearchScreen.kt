@@ -25,6 +25,7 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,7 +38,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.calendar.components.foundation.models.RoomAvailability
 import com.infomaniak.calendar.components.locationsearch.LocationSearch
-import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
+import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -67,12 +68,8 @@ fun LocationSearchScreen(
     LocationSearchScreen(
         searchState = searchState,
         results = { results },
-        onPlaceClick = { place ->
-            formState.location = LocationUi.Place(name = place.name, address = place.address)
-            goBack()
-        },
-        onRoomClick = { room ->
-            formState.location = room.copy(availability = null)
+        onLocationClick = { location ->
+            formState.location = location
             goBack()
         },
         goBack = goBack,
@@ -84,18 +81,14 @@ fun LocationSearchScreen(
 private fun LocationSearchScreen(
     searchState: TextFieldState,
     results: () -> List<LocationUi>,
-    onPlaceClick: (LocationUi.Place) -> Unit,
-    onRoomClick: (LocationUi.Room) -> Unit,
+    onLocationClick: (LocationUi) -> Unit,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
         topBar = {
-            SubmitTopAppBar(
-                goBack = goBack,
-                onSubmit = { onPlaceClick(LocationUi.Place(name = searchState.text.toString(), address = null)) },
-                isSubmitEnabled = { searchState.text.isNotBlank() },
-                isRecurring = false,
+            TopAppBar(
+                navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
                 title = { Text(stringResource(RComponents.string.locationOrRoomLabel)) },
             )
         },
@@ -105,8 +98,7 @@ private fun LocationSearchScreen(
         LocationSearch(
             searchState = searchState,
             results = results,
-            onPlaceClick = onPlaceClick,
-            onRoomClick = onRoomClick,
+            onLocationClick = onLocationClick,
             contentPadding = contentPadding,
         )
     }
@@ -131,8 +123,7 @@ private fun Preview() {
                     ),
                 )
             },
-            onPlaceClick = {},
-            onRoomClick = {},
+            onLocationClick = {},
             goBack = {},
         )
     }

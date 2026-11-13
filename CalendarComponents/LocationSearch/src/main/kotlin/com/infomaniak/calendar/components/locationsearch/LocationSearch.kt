@@ -46,8 +46,7 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 fun LocationSearch(
     searchState: TextFieldState,
     results: () -> List<LocationUi>,
-    onPlaceClick: (LocationUi.Place) -> Unit,
-    onRoomClick: (LocationUi.Room) -> Unit,
+    onLocationClick: (LocationUi) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -68,12 +67,12 @@ fun LocationSearch(
                         name = result.name,
                         address = result.address,
                         shapes = shapes,
-                        onClick = { onPlaceClick(result) },
+                        onClick = { onLocationClick(result) },
                     )
                     is LocationUi.Room -> RoomItem(
                         room = result,
                         shapes = shapes,
-                        onClick = { onRoomClick(result) },
+                        onClick = { onLocationClick(result) },
                     )
                 }
             }
@@ -95,8 +94,7 @@ private fun Preview() {
             LocationSearch(
                 searchState = rememberTextFieldState(),
                 results = { previewResults },
-                onPlaceClick = {},
-                onRoomClick = {},
+                onLocationClick = {},
             )
         }
     }
