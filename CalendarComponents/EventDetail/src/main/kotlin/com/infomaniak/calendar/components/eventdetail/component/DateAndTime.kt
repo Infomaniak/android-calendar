@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
+import android.os.Parcelable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -52,6 +53,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
 import kotlinx.datetime.minus
 import kotlinx.datetime.toInstant
+import kotlinx.parcelize.Parcelize
 import kotlin.time.Clock
 
 @Composable
@@ -146,13 +148,17 @@ private fun EntryButton?.takeTimeUnless(isAllDay: () -> Boolean): EntryButton? =
     EntryButton.Date, null -> this
 }
 
-internal sealed interface DateAndTimeEntry {
+internal sealed interface DateAndTimeEntry : Parcelable {
+    @Parcelize
     data class Start(val entryButton: EntryButton) : DateAndTimeEntry
+    @Parcelize
     data class End(val entryButton: EntryButton) : DateAndTimeEntry
 }
 
-internal sealed interface EntryButton {
+internal sealed interface EntryButton : Parcelable {
+    @Parcelize
     data object Date : EntryButton
+    @Parcelize
     data object Time : EntryButton
 }
 
