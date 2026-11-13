@@ -30,6 +30,7 @@
     <string name="deleteEventAlertTitle">Weet u zeker dat u dit evenement wilt verwijderen?</string>
     <string name="deleteRecurringEventAlertTitle">Welke evenementen wilt u verwijderen?</string>
     <string name="editRecurringEventAlertTitle">Welke evenementen wil je bewerken?</string>
+    <string name="endLabel">Einde</string>
     <string name="eventOccurrenceNotFound">Dit evenement is niet meer beschikbaar.</string>
     <string name="generalSettingsAuthorizationsLabel">Machtigingen</string>
     <string name="generalSettingsDisplayLabel">Weergave</string>
@@ -53,7 +54,9 @@
     <string name="settingsTitle">Instellingen</string>
     <string name="signOutAccountAlertConfirm">Meld je af bij het account</string>
     <string name="signOutAccountAlertDescription">Dit account en de bijbehorende agenda’s worden losgekoppeld van de app ‘Agenda’. Ze blijven beschikbaar in uw online Infomaniak-account.</string>
+    <string name="startLabel">Begin</string>
     <string name="syncEventsError">Fout bij het ophalen van gebeurtenissen</string>
     <string name="threeDaysTitle">3 dagen</string>
+    <string name="timeZoneLabel">Tijdzone</string>
     <string name="weekTitle">Week</string>
 </resources>

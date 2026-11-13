@@ -21,22 +21,17 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ButtonShapes
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedToggleButton
@@ -59,13 +54,14 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.eventdetail.component.items.DropDownItem
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatCityName
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatExplicitTimeLabel
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortDateWithYear
+import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Globe
@@ -81,6 +77,7 @@ import kotlin.time.Instant
 
 @Composable
 internal fun DateAndTimeEntry(
+    label: String,
     entry: DateAndTimeState.Entry,
     isAllDay: () -> Boolean,
     selectedButton: () -> EntryButton?,
@@ -97,6 +94,7 @@ internal fun DateAndTimeEntry(
         modifier = modifier,
         content = {
             DateAndTimeEntryContent(
+                label = label,
                 entry = entry,
                 isAllDay = isAllDay,
                 selectedButton = selectedButton,
@@ -111,6 +109,7 @@ internal fun DateAndTimeEntry(
 
 @Composable
 private fun DateAndTimeEntryContent(
+    label: String,
     entry: DateAndTimeState.Entry,
     isAllDay: () -> Boolean,
     selectedButton: () -> EntryButton?,
@@ -142,7 +141,15 @@ private fun DateAndTimeEntryContent(
     }
 
     Column {
-        Row(horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.lg), modifier = modifier) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.lg),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier,
+        ) {
+            Text(label)
+
+            Spacer(modifier = Modifier.weight(1f))
+
             OutlinedButton(onClick = { isDatePickerVisible = true }, shapes = shapes) {
                 Text(entry.date.formatShortDateWithYear())
             }
@@ -157,20 +164,17 @@ private fun DateAndTimeEntryContent(
                     Text(entry.time.formatExplicitTimeLabel())
                 }
             }
-
-            AnimatedVisibility(!isAllDay(), enter = enter, exit = exit, modifier = Modifier.weight(1f)) {
-                TimeZoneButton(entry, shapes, onClick = onTimeZoneClick)
-            }
         }
 
         AnimatedVisibility(selectedButton() == EntryButton.Time) {
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = EsdsTheme.spacing.xl),
-                contentAlignment = Alignment.Center,
+                    .padding(top = EsdsTheme.spacing.xl),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 TimeScrollPicker(timeScrollPickerState)
+                TimeZoneButton(entry, onClick = onTimeZoneClick)
             }
         }
     }
@@ -187,21 +191,18 @@ private fun DateAndTimeEntryContent(
 @Composable
 private fun TimeZoneButton(
     entry: DateAndTimeState.Entry,
-    shapes: ButtonShapes,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier, contentAlignment = Alignment.CenterEnd) {
-        TextButton(
-            onClick = onClick,
-            colors = ButtonDefaults.textButtonColors(contentColor = LocalContentColor.current),
-            shapes = shapes,
-        ) {
-            Icon(EsdsIcons.Globe.Small, contentDescription = null)
-            Spacer(modifier = Modifier.width(EsdsTheme.spacing.md))
-            Text(entry.timeZone.formatCityName(), maxLines = 1, overflow = TextOverflow.Ellipsis)
-        }
-    }
+    DropDownItem(
+        content = { Text(stringResource(R.string.timeZoneLabel)) },
+        trailingContent = { Text(entry.timeZone.formatCityName()) },
+        onClick = onClick,
+        itemCount = Int.MAX_VALUE, // More than one
+        modifier = modifier,
+        symbol = EsdsIcons.Globe,
+        shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1), // TODO: Fix shape here or paddings
+    )
 }
 
 @Composable
@@ -241,6 +242,7 @@ private fun Preview() {
     MaterialTheme {
         Surface {
             DateAndTimeEntry(
+                label = "Start",
                 entry = DateAndTimeState.Entry(
                     date = remember { mutableStateOf(LocalDate(2026, 10, 20)) },
                     time = remember { mutableStateOf(LocalTime(14, 41)) },

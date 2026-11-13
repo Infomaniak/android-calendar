@@ -30,6 +30,7 @@
     <string name="deleteEventAlertTitle">Haluatko varmasti poistaa tämän tapahtuman?</string>
     <string name="deleteRecurringEventAlertTitle">Mitkä tapahtumat haluat poistaa?</string>
     <string name="editRecurringEventAlertTitle">Mitä tapahtumia haluat muokata?</string>
+    <string name="endLabel">Loppu</string>
     <string name="eventOccurrenceNotFound">Tämä tapahtuma ei ole enää saatavilla.</string>
     <string name="generalSettingsAuthorizationsLabel">Luvat</string>
     <string name="generalSettingsDisplayLabel">Näyttö</string>
@@ -53,7 +54,9 @@
     <string name="settingsTitle">Asetukset</string>
     <string name="signOutAccountAlertConfirm">Kirjaudu ulos tililtä</string>
     <string name="signOutAccountAlertDescription">Tämä tili ja siihen liittyvät kalenterit irrotetaan ”Kalenteri”-sovelluksesta. Ne ovat edelleen käytettävissä Infomaniak-verkkotililläsi.</string>
+    <string name="startLabel">Alku</string>
     <string name="syncEventsError">Virhe noudettaessa tapahtumia</string>
     <string name="threeDaysTitle">3 päivää</string>
+    <string name="timeZoneLabel">Aikavyöhyke</string>
     <string name="weekTitle">Viikko</string>
 </resources>

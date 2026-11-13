@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
+import android.os.Parcelable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ListItemDefaults
@@ -33,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
@@ -43,6 +45,7 @@ import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRangeWithZone
+import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Clock
@@ -54,6 +57,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
 import kotlinx.datetime.minus
 import kotlinx.datetime.toInstant
+import kotlinx.parcelize.Parcelize
 import kotlin.time.Clock
 
 @Composable
@@ -116,6 +120,7 @@ internal fun SectionScope.dateAndTimeEditable(
     with(dateAndTimeState) {
         item { shapes ->
             DateAndTimeEntry(
+                label = stringResource(R.string.startLabel),
                 entry = start,
                 isAllDay = isAllDay,
                 selectedButton = { (selectedButton as? DateAndTimeEntry.Start)?.entryButton.takeTimeUnless(isAllDay) },
@@ -129,6 +134,7 @@ internal fun SectionScope.dateAndTimeEditable(
 
         item { shapes ->
             DateAndTimeEntry(
+                label = stringResource(R.string.endLabel),
                 entry = end,
                 isAllDay = isAllDay,
                 selectedButton = { (selectedButton as? DateAndTimeEntry.End)?.entryButton.takeTimeUnless(isAllDay) },
@@ -157,13 +163,17 @@ internal data class SelectedEntryState(
     val selectedEntry: MutableState<DateAndTimeEntry?>,
 )
 
-internal sealed interface DateAndTimeEntry {
+internal sealed interface DateAndTimeEntry : Parcelable {
+    @Parcelize
     data class Start(val entryButton: EntryButton) : DateAndTimeEntry
+    @Parcelize
     data class End(val entryButton: EntryButton) : DateAndTimeEntry
 }
 
-internal sealed interface EntryButton {
+internal sealed interface EntryButton : Parcelable {
+    @Parcelize
     data object Date : EntryButton
+    @Parcelize
     data object Time : EntryButton
 }
 
