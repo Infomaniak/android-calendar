@@ -232,7 +232,7 @@ private fun baseEntryProvider(
             metadata = metaDataOf(ResponsiveDialog, shareViewModelStoreWith(destination.parent)),
         ) {
             LocationSearchScreen(
-                editedOccurrenceId = (destination.parent as? NavDestination.EventForm.EventEdit)?.occurrenceId,
+                editedOccurrenceId = destination.occurrenceId,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
             )
         }

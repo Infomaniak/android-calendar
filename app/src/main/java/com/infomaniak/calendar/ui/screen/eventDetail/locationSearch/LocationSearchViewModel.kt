@@ -25,7 +25,6 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.locationsearch.models.RoomAvailability
 import com.infomaniak.calendar.components.locationsearch.models.SearchRoomUi
 import com.infomaniak.core.common.cancellable
-import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.multiplatform_calendar.bookable_resources.domain.model.BookableResource
 import com.infomaniak.multiplatform_calendar.bookable_resources.domain.model.BookableResourceUuid
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
@@ -43,7 +42,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -84,7 +82,7 @@ class LocationSearchViewModel(
         .filterNotNull()
         .map { it.calendarId }
         .distinctUntilChanged()
-        .flatMapLatest(::resourcesOf)
+        .flatMapLatest(calendarBookableResourcesManager::observeResources)
         .combine(availability) { resources, availability ->
             this.resources = resources.associateBy { it.uuid.value }
             resources.map { it.toSearchRoomUi(availability?.get(it.uuid)) }.sortedBy { it.availability.rank }
@@ -125,22 +123,12 @@ class LocationSearchViewModel(
             }
     }
 
-    /** [calendarId]'s bookable resources, none if they can't be observed so a later calendar can still load its own. */
-    private fun resourcesOf(calendarId: CalendarId): Flow<List<BookableResource>> {
-        return calendarBookableResourcesManager.observeResources(calendarId).catch { throwable ->
-            SentryLog.w(TAG, "Failed to observe the bookable resources", throwable)
-            emit(emptyList())
-        }
-    }
-
     private suspend fun availabilityOf(request: RoomAvailabilityRequest): Map<BookableResourceUuid, Boolean> {
         return runCatching {
             val editedTiming = request.editedOccurrenceId?.let { editedTimingOf(it) }
             val timing = editedTiming?.copy(bounds = request.bounds) ?: EventTiming(bounds = request.bounds)
             calendarBookableResourcesManager.availability(request.calendarId, timing)
-        }.cancellable().onFailure { throwable ->
-            SentryLog.w(TAG, "Failed to load the rooms availability", throwable)
-        }.getOrDefault(emptyMap())
+        }.cancellable().getOrDefault(emptyMap())
     }
 
     /** Read once: only its recurrence is used, and reading an occurrence expands its whole series. */
@@ -167,8 +155,4 @@ class LocationSearchViewModel(
             RoomAvailability.Unavailable -> 1
             RoomAvailability.Unknown -> 2
         }
-
-    companion object {
-        private const val TAG = "LocationSearchViewModel"
-    }
 }
