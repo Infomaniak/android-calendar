@@ -148,7 +148,7 @@ fun EventForm(
 
         var isReminderOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
 
-        ReminderItems(
+        ReminderItemsSection(
             reminders = state.reminders,
             onRemove = { reminder -> state.reminders.remove(reminder) },
             onAddClick = { isReminderOffsetDialogVisible = true },
@@ -224,7 +224,7 @@ private fun ReminderDialog(
 }
 
 @Composable
-private fun ReminderItems(
+private fun ReminderItemsSection(
     reminders: List<EventDetailUi.Reminder>,
     onRemove: (EventDetailUi.Reminder) -> Unit,
     onAddClick: () -> Unit,
