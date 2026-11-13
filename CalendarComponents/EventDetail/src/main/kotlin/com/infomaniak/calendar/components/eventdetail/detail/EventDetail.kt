@@ -172,10 +172,10 @@ fun EventDetail(
 
                 item {
                     Calendar(
-                        calendar.color,
-                        calendar.name,
+                        calendarColor = calendar.color,
+                        calendarName = calendar.name,
                         shapes = it,
-                        Modifier.eventSharedBounds(EventSharedElement.Calendar),
+                        modifier = Modifier.eventSharedBounds(EventSharedElement.Calendar),
                     )
                 }
             }
