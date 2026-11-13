@@ -59,6 +59,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationScree
 import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomReminderScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.edit.EventEditScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormNavigation
 import com.infomaniak.calendar.ui.screen.eventDetail.locationSearch.LocationSearchScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch.TimeZoneSearchScreen
 import com.infomaniak.calendar.ui.screen.month.MonthScreen
@@ -72,6 +73,7 @@ import com.infomaniak.calendar.ui.screen.settings.SettingThemeScreen
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.utils.NavigationTransition
 import com.infomaniak.core.common.utils.today
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlin.time.Clock
 
 @Composable
@@ -144,12 +146,7 @@ private fun baseEntryProvider(
             EventCreationScreen(
                 date = destination.date,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
-                goToEventsAttendees = { backStack.addOnce(NavDestination.AttendeeSearch(parent = destination)) },
-                goToTimeZoneSearch = { isStart ->
-                    backStack.addOnce(NavDestination.EventForm.EventTimeZone(destination, isStart))
-                },
-                goToCustomReminder = { backStack.addOnce(NavDestination.EventForm.EventCustomReminder(parent = destination)) },
-                goToLocationSearch = { backStack.addOnce(NavDestination.EventForm.EventLocationSearch(parent = destination)) },
+                navigation = backStack.eventFormNavigation(form = destination, editedOccurrenceId = null),
             )
         }
 
@@ -180,14 +177,7 @@ private fun baseEntryProvider(
                 occurrenceId = destination.occurrenceId,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
                 goBackToCalendarView = { backStack.popUntilCalendarView(defaultCalendarView) },
-                goToEventAttendees = { backStack.addOnce(NavDestination.AttendeeSearch(parent = destination)) },
-                goToTimeZoneSearch = { isStart ->
-                    backStack.addOnce(NavDestination.EventForm.EventTimeZone(destination, isStart))
-                },
-                goToCustomReminder = { backStack.addOnce(NavDestination.EventForm.EventCustomReminder(destination)) },
-                goToLocationSearch = {
-                    backStack.addOnce(NavDestination.EventForm.EventLocationSearch(destination.occurrenceId, destination))
-                },
+                navigation = backStack.eventFormNavigation(form = destination, editedOccurrenceId = destination.occurrenceId),
             )
         }
 
@@ -281,6 +271,16 @@ private fun baseEntryProvider(
         }
     }
 }
+
+private fun NavBackStack<NavDestination>.eventFormNavigation(
+    form: NavDestination.EventForm,
+    editedOccurrenceId: OccurrenceId?,
+) = EventFormNavigation(
+    goToAttendees = { addOnce(NavDestination.AttendeeSearch(parent = form)) },
+    goToTimeZoneSearch = { isStart -> addOnce(NavDestination.EventForm.EventTimeZone(form, isStart)) },
+    goToCustomReminder = { addOnce(NavDestination.EventForm.EventCustomReminder(parent = form)) },
+    goToLocationSearch = { addOnce(NavDestination.EventForm.EventLocationSearch(editedOccurrenceId, form)) },
+)
 
 /**
  * Settings sub-pages pair up as list | detail at any depth: the last entry is the detail and the one before it the list, so

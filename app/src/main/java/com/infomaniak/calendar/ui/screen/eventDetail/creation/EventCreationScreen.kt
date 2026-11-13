@@ -38,6 +38,7 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.foundation.component.EmptyState
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
+import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormNavigation
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.locationSearch.LocationSearchViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
@@ -54,10 +55,7 @@ import kotlin.time.Duration.Companion.hours
 fun EventCreationScreen(
     date: LocalDate,
     goBack: () -> Unit,
-    goToEventsAttendees: () -> Unit,
-    goToTimeZoneSearch: (isStart: Boolean) -> Unit,
-    goToCustomReminder: () -> Unit,
-    goToLocationSearch: () -> Unit,
+    navigation: EventFormNavigation,
     modifier: Modifier = Modifier,
     eventCreationViewModel: EventCreationViewModel = viewModel(),
     eventFormViewModel: EventFormViewModel = viewModel(),
@@ -90,10 +88,7 @@ fun EventCreationScreen(
         },
         modifier = modifier,
         goBack = goBack,
-        goToEventsAttendees = goToEventsAttendees,
-        goToTimeZoneSearch = goToTimeZoneSearch,
-        goToCustomReminder = goToCustomReminder,
-        goToLocationSearch = goToLocationSearch,
+        navigation = navigation,
     )
 }
 
@@ -102,10 +97,7 @@ private fun EventCreationScreen(
     uiState: EventCreationScreenState,
     onSubmit: () -> Unit,
     goBack: () -> Unit,
-    goToEventsAttendees: () -> Unit,
-    goToTimeZoneSearch: (isStart: Boolean) -> Unit,
-    goToCustomReminder: () -> Unit,
-    goToLocationSearch: () -> Unit,
+    navigation: EventFormNavigation,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -130,10 +122,10 @@ private fun EventCreationScreen(
             )
             is EventCreationScreenState.Success -> EventForm(
                 state = uiState.eventFormState,
-                onAttendeesClick = goToEventsAttendees,
-                onLocationClick = goToLocationSearch,
-                onTimeZoneClick = goToTimeZoneSearch,
-                onCustomReminderClick = goToCustomReminder,
+                onAttendeesClick = navigation.goToAttendees,
+                onLocationClick = navigation.goToLocationSearch,
+                onTimeZoneClick = navigation.goToTimeZoneSearch,
+                onCustomReminderClick = navigation.goToCustomReminder,
                 contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                 modifier = Modifier.verticalScroll(scrollState),
             )
@@ -165,10 +157,12 @@ private fun EventCreationScreenPreview() {
             uiState = EventCreationScreenState.Success(state),
             onSubmit = {},
             goBack = {},
-            goToEventsAttendees = {},
-            goToTimeZoneSearch = {},
-            goToCustomReminder = {},
-            goToLocationSearch = {},
+            navigation = EventFormNavigation(
+                goToAttendees = {},
+                goToTimeZoneSearch = {},
+                goToCustomReminder = {},
+                goToLocationSearch = {},
+            ),
         )
     }
 }
@@ -181,10 +175,12 @@ private fun PreviewEmptyWritableCalendar() {
             uiState = EventCreationScreenState.NoWritableCalendar,
             onSubmit = {},
             goBack = {},
-            goToEventsAttendees = {},
-            goToTimeZoneSearch = {},
-            goToCustomReminder = {},
-            goToLocationSearch = {},
+            navigation = EventFormNavigation(
+                goToAttendees = {},
+                goToTimeZoneSearch = {},
+                goToCustomReminder = {},
+                goToLocationSearch = {},
+            ),
         )
     }
 }
