@@ -18,18 +18,23 @@
 package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.foundation.component.ListItemClickable
 import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Cross
 import com.infomaniak.designsystem.icons.symbols.MapPin
+import com.infomaniak.core.common.R as RCommon
 
 @Composable
 internal fun PlaceButton(
@@ -64,7 +69,11 @@ internal fun PlaceButtonEditable(
         address = address,
         onClick = onClick,
         modifier = modifier,
-        trailingContent = { RemoveLocationButton(onRemoveClick) },
+        trailingContent = {
+            IconButton(onClick = onRemoveClick) {
+                Icon(EsdsIcons.Cross.Small, contentDescription = stringResource(RCommon.string.deleteButton))
+            }
+        },
     )
 }
 

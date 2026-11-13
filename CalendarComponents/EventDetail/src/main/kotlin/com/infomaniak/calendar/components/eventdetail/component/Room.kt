@@ -18,11 +18,14 @@
 package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
@@ -30,7 +33,9 @@ import com.infomaniak.calendar.components.foundation.component.ListItemClickable
 import com.infomaniak.calendar.components.foundation.component.RoomDetails
 import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.Cross
 import com.infomaniak.designsystem.icons.symbols.DoorOpen
+import com.infomaniak.core.common.R as RCommon
 
 @Composable
 internal fun Room(
@@ -54,7 +59,15 @@ internal fun Room(
 @Composable
 internal fun RoomEditable(room: LocationUi.Room, onClick: () -> Unit, onRemoveClick: () -> Unit, modifier: Modifier = Modifier) {
     Column(modifier) {
-        Room(room = room, onClick = onClick, trailingContent = { RemoveLocationButton(onRemoveClick) })
+        Room(
+            room = room,
+            onClick = onClick,
+            trailingContent = {
+                IconButton(onClick = onRemoveClick) {
+                    Icon(EsdsIcons.Cross.Small, contentDescription = stringResource(RCommon.string.deleteButton))
+                }
+            },
+        )
         room.address?.takeIf { it.isNotBlank() }?.let { address -> Place(name = address, address = null, onClick = onClick) }
     }
 }
