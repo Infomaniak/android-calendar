@@ -29,8 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.RoomDetails
-import com.infomaniak.calendar.components.locationsearch.models.LocationUi
-import com.infomaniak.calendar.components.locationsearch.models.RoomAvailability
+import com.infomaniak.calendar.components.foundation.models.LocationUi
+import com.infomaniak.calendar.components.foundation.models.RoomAvailability
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.DoorOpen
 
@@ -41,12 +41,14 @@ internal fun RoomItem(room: LocationUi.Room, shapes: ListItemShapes, onClick: ()
         shapes = shapes,
         colors = LocationItemColors,
         leadingContent = { Icon(EsdsIcons.DoorOpen.Medium, contentDescription = null) },
-        overlineContent = {
-            Text(
-                text = stringResource(room.availability.labelRes),
-                color = room.availability.color(),
-                style = MaterialTheme.typography.labelMedium,
-            )
+        overlineContent = room.availability?.let { availability ->
+            {
+                Text(
+                    text = stringResource(availability.labelRes),
+                    color = availability.color(),
+                    style = MaterialTheme.typography.labelMedium,
+                )
+            }
         },
         supportingContent = { RoomDetails(seats = room.seats, floor = room.floor) },
         modifier = modifier,
@@ -65,6 +67,7 @@ private fun Preview() {
                 name = "Jules Verne room",
                 seats = 100,
                 floor = 3,
+                address = null,
                 availability = RoomAvailability.Available,
             ),
             shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
@@ -83,6 +86,7 @@ private fun PreviewUnavailable() {
                 name = "Hard Rock room",
                 seats = 6,
                 floor = 4,
+                address = null,
                 availability = RoomAvailability.Unavailable,
             ),
             shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
@@ -101,6 +105,7 @@ private fun PreviewUnknown() {
                 name = "Jules Verne room",
                 seats = 100,
                 floor = 3,
+                address = null,
                 availability = RoomAvailability.Unknown,
             ),
             shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),

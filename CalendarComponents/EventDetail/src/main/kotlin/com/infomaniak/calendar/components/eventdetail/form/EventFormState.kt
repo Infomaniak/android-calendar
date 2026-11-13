@@ -33,6 +33,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.eventdetail.state.computeDefaultValues
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import kotlinx.datetime.LocalDate
@@ -58,7 +59,7 @@ class EventFormState(
     end: LocalDateTime,
     endTimeZone: TimeZone,
     hasEndEverBeenTouched: Boolean,
-    location: EventDetailUi.LocationUi?,
+    location: LocationUi?,
     participants: Set<ParticipantUi>,
     organizerSource: OrganizerSource?,
     isKMeetUrlEnabled: Boolean,

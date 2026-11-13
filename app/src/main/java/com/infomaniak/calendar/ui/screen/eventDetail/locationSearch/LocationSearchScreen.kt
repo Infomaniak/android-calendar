@@ -34,10 +34,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.foundation.models.LocationUi
+import com.infomaniak.calendar.components.foundation.models.RoomAvailability
 import com.infomaniak.calendar.components.locationsearch.LocationSearch
-import com.infomaniak.calendar.components.locationsearch.models.LocationUi
-import com.infomaniak.calendar.components.locationsearch.models.RoomAvailability
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
@@ -54,7 +53,7 @@ fun LocationSearchScreen(
     eventFormViewModel: EventFormViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
     val formState = eventFormViewModel.formState ?: return
-    val searchState = rememberTextFieldState((formState.location as? EventDetailUi.LocationUi.Place)?.name.orEmpty())
+    val searchState = rememberTextFieldState((formState.location as? LocationUi.Place)?.name.orEmpty())
     val results by locationSearchViewModel.results.collectAsStateWithLifecycle()
 
     LaunchedEffect(formState) {
@@ -69,11 +68,11 @@ fun LocationSearchScreen(
         searchState = searchState,
         results = { results },
         onPlaceClick = { place ->
-            formState.location = EventDetailUi.LocationUi.Place(name = place.name, address = place.address)
+            formState.location = LocationUi.Place(name = place.name, address = place.address)
             goBack()
         },
         onRoomClick = { room ->
-            formState.location = locationSearchViewModel.formRoomOf(room)
+            formState.location = room.copy(availability = null)
             goBack()
         },
         goBack = goBack,
@@ -127,6 +126,7 @@ private fun Preview() {
                         name = "Jules Verne room",
                         seats = 100,
                         floor = 3,
+                        address = null,
                         availability = RoomAvailability.Available,
                     ),
                 )

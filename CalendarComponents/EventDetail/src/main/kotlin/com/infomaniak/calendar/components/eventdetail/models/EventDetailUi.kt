@@ -21,6 +21,7 @@ import android.os.Parcelable
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import com.infomaniak.calendar.components.foundation.models.Attendees
+import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.filetypes.FileType
@@ -89,25 +90,4 @@ data class EventDetailUi(
         Private(R.string.privateLabel),
     }
 
-    sealed interface LocationUi : Parcelable {
-        val label: String
-            get() = when (this) {
-                is Place -> name
-                is Room -> title
-            }
-
-        /** What a maps app searches to find this location. */
-        val mapsQuery: String?
-            get() = when (this) {
-                is Place -> address ?: name
-                is Room -> location
-            }
-
-        /** @param address Under the place's [name], null when the name already is its address. */
-        @Parcelize
-        data class Place(val name: String, val address: String?) : LocationUi
-
-        @Parcelize
-        data class Room(val id: String, val title: String, val seats: Int?, val floor: Int?, val location: String?) : LocationUi
-    }
 }

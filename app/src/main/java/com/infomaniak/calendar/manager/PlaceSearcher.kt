@@ -21,7 +21,7 @@ import android.content.Context
 import android.location.Address
 import android.location.Geocoder
 import android.os.Build.VERSION.SDK_INT
-import com.infomaniak.calendar.components.locationsearch.models.LocationUi
+import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.core.common.cancellable
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.CoroutineScope

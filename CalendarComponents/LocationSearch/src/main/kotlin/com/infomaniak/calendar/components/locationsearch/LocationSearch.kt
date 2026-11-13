@@ -33,11 +33,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.SearchBar
 import com.infomaniak.calendar.components.foundation.component.SearchLayout
+import com.infomaniak.calendar.components.foundation.models.LocationUi
+import com.infomaniak.calendar.components.foundation.models.RoomAvailability
 import com.infomaniak.calendar.components.foundation.utils.onlyHorizontalAndTop
 import com.infomaniak.calendar.components.locationsearch.component.PlaceItem
 import com.infomaniak.calendar.components.locationsearch.component.RoomItem
-import com.infomaniak.calendar.components.locationsearch.models.LocationUi
-import com.infomaniak.calendar.components.locationsearch.models.RoomAvailability
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
@@ -112,6 +112,7 @@ private val previewResults = listOf(
         name = "Jules Verne room",
         seats = 100,
         floor = 3,
+        address = null,
         availability = RoomAvailability.Available,
     ),
     LocationUi.Room(
@@ -119,6 +120,7 @@ private val previewResults = listOf(
         name = "White room",
         seats = 8,
         floor = 1,
+        address = null,
         availability = RoomAvailability.Available,
     ),
     LocationUi.Room(
@@ -126,6 +128,7 @@ private val previewResults = listOf(
         name = "Gym",
         seats = 50,
         floor = 0,
+        address = null,
         availability = RoomAvailability.Unavailable,
     ),
 )

@@ -15,22 +15,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.locationsearch.models
+package com.infomaniak.calendar.components.foundation.models
 
-import androidx.compose.runtime.Immutable
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-/** A row of the location search: a place, typed or found, or a bookable room. */
-sealed interface LocationUi {
+/** An event's location: a place, or a bookable room. */
+sealed interface LocationUi : Parcelable {
+    val label: String
+        get() = when (this) {
+            is Place -> name
+            is Room -> name
+        }
+
+    /** What a maps app searches to find this location. */
+    val mapsQuery: String?
+        get() = when (this) {
+            is Place -> address ?: name
+            is Room -> address
+        }
+
     /** @param address Under the place's [name], null when the name already is its address. */
-    @Immutable
+    @Parcelize
     data class Place(val name: String, val address: String?) : LocationUi
 
-    @Immutable
+    /**
+     * @param id The bookable resource's id.
+     * @param address Where the room is, e.g. its building's address.
+     * @param availability Over the event's time, only known in the location search.
+     */
+    @Parcelize
     data class Room(
         val id: String,
         val name: String,
         val seats: Int?,
         val floor: Int?,
-        val availability: RoomAvailability,
+        val address: String?,
+        val availability: RoomAvailability?,
     ) : LocationUi
 }

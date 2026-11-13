@@ -51,7 +51,7 @@ app/src/main/java/com/infomaniak/calendar/
 │   ├── EventDaySliceExt.kt         # KMP EventDaySlice → OccurrenceEventUi mapping, shared by every calendar view
 │   ├── EventDraftExt.kt            # EventDraft → KMP EventEditData for creation and edition: a new form field is one line in `applyTo`; unchanged notifications leave the stored alarms alone (`AlarmListEdit.Preserve`, since `Event.alarms` lacks the ones KMP can't read), changed ones get back the stored alarm they were read from (matched by the `Notification.sourceId` holding its KMP `AlarmId`)
 │   ├── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
-│   └── LocationExt.kt              # KMP Location ↔ EventDetailUi.LocationUi: a place's name and address are read from and written to the `LOCATION` text until KMP stores them
+│   └── LocationExt.kt              # KMP Location ↔ Foundation's LocationUi: a place's name and address are read from and written to the `LOCATION` text until KMP stores them
 └── ui/
     ├── model/                     # OccurrenceEventUi calendar item carrying KMP OccurrenceId and attendee summary; TimelineUiState;
     │                              # UserCalendarsUi / CalendarSectionUi / CalendarUi / CalendarColorsUi, the calendars as the drawer and other views draw them
@@ -87,7 +87,7 @@ app/src/main/java/com/infomaniak/calendar/
     │                              #   It merges the search's results: the typed text, the Geocoder's places, then the rooms whose name matches.
     │                              #   Switching the form's calendar clears its room when the new calendar can't book it (compared by id).
     │                              #   A room unknown locally isn't shown in the form, it's kept on save until another location is picked.
-    │                              #   A booked room (Location.BookableRoom with a known resource) maps to EventDetailUi.LocationUi.Room)
+    │                              #   A booked room (Location.BookableRoom with a known resource) maps to LocationUi.Room)
     │   └── onboarding/            # Two onboardings, each with its own page enum, sharing OnboardingPage + OnboardingButtonDefaults:
     │                              # login/ (LoginOnboardingScreen + LoginOnboardingPage + CrossAppLoginViewModel): welcome + login;
     │                              # permissions/ (PermissionsOnboardingScreen + PermissionsOnboardingPage + NextStepButton): a pager

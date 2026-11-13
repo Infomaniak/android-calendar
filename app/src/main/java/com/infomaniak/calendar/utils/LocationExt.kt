@@ -17,29 +17,36 @@
  */
 package com.infomaniak.calendar.utils
 
-import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.multiplatform_calendar.bookable_resources.domain.model.BookableResourceUuid
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Location
 
-fun Location.toLocationUi(): EventDetailUi.LocationUi? = when (this) {
+fun Location.toLocationUi(): LocationUi? = when (this) {
     is Location.Place -> toPlaceUi()
     is Location.BookableRoom -> resource?.let {
-        EventDetailUi.LocationUi.Room(id = it.uuid.value, title = it.name, seats = it.capacity, floor = it.floor, location = it.location)
+        LocationUi.Room(
+            id = it.uuid.value,
+            name = it.name,
+            seats = it.capacity,
+            floor = it.floor,
+            address = it.location,
+            availability = null,
+        )
     }
 }
 
 /** [current] is only read for a room unknown locally: the form can't show it, so saving would otherwise drop its booking. */
-fun EventDetailUi.LocationUi?.toLocation(current: Location?): Location? = when (this) {
-    is EventDetailUi.LocationUi.Place -> Location.Place(toLocationText())
-    is EventDetailUi.LocationUi.Room -> Location.BookableRoom(BookableResourceUuid(id), resource = null)
+fun LocationUi?.toLocation(current: Location?): Location? = when (this) {
+    is LocationUi.Place -> Location.Place(toLocationText())
+    is LocationUi.Room -> Location.BookableRoom(BookableResourceUuid(id), resource = null)
     null -> current.takeIf { it is Location.BookableRoom && it.resource == null }
 }
 
 // TODO: Wait for the KMP decision on how a place's name and address are stored, it only holds the `LOCATION` text for now
-private fun Location.Place.toPlaceUi(): EventDetailUi.LocationUi.Place {
+private fun Location.Place.toPlaceUi(): LocationUi.Place {
     val lines = text.lines()
-    return EventDetailUi.LocationUi.Place(name = lines.first(), address = lines.drop(1).joinToString("\n").ifBlank { null })
+    return LocationUi.Place(name = lines.first(), address = lines.drop(1).joinToString("\n").ifBlank { null })
 }
 
 // TODO: Wait for the KMP decision on how a place's name and address are stored, it only holds the `LOCATION` text for now
-private fun EventDetailUi.LocationUi.Place.toLocationText(): String = listOfNotNull(name, address).joinToString("\n")
+private fun LocationUi.Place.toLocationText(): String = listOfNotNull(name, address).joinToString("\n")
