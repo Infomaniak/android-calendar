@@ -18,7 +18,6 @@
 package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.Icon
@@ -30,7 +29,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
@@ -63,6 +61,33 @@ internal fun LocationButton(
     )
 }
 
+@Composable
+internal fun PlaceButtonEditable(
+    name: String,
+    address: String?,
+    onClick: () -> Unit,
+    onRemoveClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LocationButton(
+        name = name,
+        address = address,
+        onClick = onClick,
+        modifier = modifier,
+        trailingContent = { RemoveLocationButton(onRemoveClick) },
+    )
+}
+
+@Composable
+internal fun Place(name: String, address: String?, modifier: Modifier = Modifier) {
+    ListItem(
+        content = { Text(name) },
+        leadingContent = { ItemIcon(EsdsIcons.MapPin) },
+        supportingContent = address?.let { { Text(it) } },
+        modifier = modifier,
+    )
+}
+
 /**
  * Shows the picked [location]: a place, or a room above the place it's in, both opening the location search and removed by
  * [onRemoveClick]. Switching between them, e.g. when a calendar switch drops the room, is animated.
@@ -81,28 +106,12 @@ internal fun LocationEditable(
     Column(modifier) {
         AnimatedVisibility(visible = location is LocationUi.Place) {
             if (place != null) {
-                LocationButton(
-                    name = place.name,
-                    address = place.address,
-                    onClick = onClick,
-                    trailingContent = { RemoveLocationButton(onRemoveClick) },
-                )
+                PlaceButtonEditable(name = place.name, address = place.address, onClick = onClick, onRemoveClick = onRemoveClick)
             }
         }
 
         AnimatedVisibility(visible = location is LocationUi.Room) {
-            if (room != null) {
-                Column(
-                    Modifier
-                        .clip(ClickableItemDefaults.ClickableItemShapes.shape)
-                        .clickable(onClick = onClick),
-                ) {
-                    Room(room = room, trailingContent = { RemoveLocationButton(onRemoveClick) })
-                    room.address?.takeIf { it.isNotBlank() }?.let { address ->
-                        ListItem(content = { Text(address) }, leadingContent = { ItemIcon(EsdsIcons.MapPin) })
-                    }
-                }
-            }
+            if (room != null) RoomEditable(room = room, onClick = onClick, onRemoveClick = onRemoveClick)
         }
 
         AnimatedVisibility(visible = location == null) {
@@ -128,7 +137,7 @@ private class LastNonNull<T : Any> {
 }
 
 @Composable
-private fun RemoveLocationButton(onClick: () -> Unit) {
+internal fun RemoveLocationButton(onClick: () -> Unit) {
     IconButton(onClick = onClick) {
         Icon(EsdsIcons.Cross.Small, contentDescription = stringResource(RCommon.string.deleteButton))
     }
@@ -140,6 +149,31 @@ private fun PreviewLocationButton() {
     MaterialTheme {
         Surface {
             LocationButton(name = "Infomaniak", address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland", onClick = {})
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewPlaceButtonEditable() {
+    MaterialTheme {
+        Surface {
+            PlaceButtonEditable(
+                name = "Infomaniak",
+                address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland",
+                onClick = {},
+                onRemoveClick = {},
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewPlace() {
+    MaterialTheme {
+        Surface {
+            Place(name = "Infomaniak", address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland")
         }
     }
 }
