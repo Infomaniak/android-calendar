@@ -17,18 +17,12 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
-import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.foundation.component.RoomDetails
 import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -38,13 +32,15 @@ import com.infomaniak.designsystem.icons.symbols.DoorOpen
 internal fun Room(
     room: LocationUi.Room,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
 ) {
-    ListItem(
-        content = { Text(room.name) },
-        leadingContent = { ItemIcon(EsdsIcons.DoorOpen) },
-        trailingContent = trailingContent,
+    LocationItem(
+        name = room.name,
+        icon = EsdsIcons.DoorOpen,
+        onClick = onClick,
         supportingContent = { RoomDetails(seats = room.seats, floor = room.floor) },
+        trailingContent = trailingContent,
         modifier = modifier,
     )
 }
@@ -52,13 +48,9 @@ internal fun Room(
 /** [room] above the place it's in, all of it opening the location search and removed by [onRemoveClick]. */
 @Composable
 internal fun RoomEditable(room: LocationUi.Room, onClick: () -> Unit, onRemoveClick: () -> Unit, modifier: Modifier = Modifier) {
-    Column(
-        modifier
-            .clip(ClickableItemDefaults.ClickableItemShapes.shape)
-            .clickable(onClick = onClick),
-    ) {
-        Room(room = room, trailingContent = { RemoveLocationButton(onRemoveClick) })
-        room.address?.takeIf { it.isNotBlank() }?.let { address -> Place(name = address, address = null) }
+    Column(modifier) {
+        Room(room = room, onClick = onClick, trailingContent = { RemoveLocationButton(onRemoveClick) })
+        room.address?.takeIf { it.isNotBlank() }?.let { address -> Place(name = address, address = null, onClick = onClick) }
     }
 }
 

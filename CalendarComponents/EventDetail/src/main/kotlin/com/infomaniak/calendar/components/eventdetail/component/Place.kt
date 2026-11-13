@@ -18,7 +18,6 @@
 package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -27,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
-import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.MapPin
 
@@ -69,10 +67,11 @@ internal fun PlaceButtonEditable(
 }
 
 @Composable
-internal fun Place(name: String, address: String?, modifier: Modifier = Modifier) {
-    ListItem(
-        content = { Text(name) },
-        leadingContent = { ItemIcon(EsdsIcons.MapPin) },
+internal fun Place(name: String, address: String?, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
+    LocationItem(
+        name = name,
+        icon = EsdsIcons.MapPin,
+        onClick = onClick,
         supportingContent = address?.let { { Text(it) } },
         modifier = modifier,
     )

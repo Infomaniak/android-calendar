@@ -38,8 +38,8 @@ import com.infomaniak.calendar.components.eventdetail.component.Calendar
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatus
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
-import com.infomaniak.calendar.components.eventdetail.component.PlaceButton
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatus
+import com.infomaniak.calendar.components.eventdetail.component.PlaceButton
 import com.infomaniak.calendar.components.eventdetail.component.Recurrence
 import com.infomaniak.calendar.components.eventdetail.component.Room
 import com.infomaniak.calendar.components.eventdetail.component.Section

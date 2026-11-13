@@ -15,12 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.component
+package com.infomaniak.calendar.components.eventdetail.form.component
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -28,13 +26,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.eventdetail.component.PlaceButtonEditable
+import com.infomaniak.calendar.components.eventdetail.component.RoomEditable
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
 import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.icons.EsdsIcons
-import com.infomaniak.designsystem.icons.symbols.Cross
 import com.infomaniak.designsystem.icons.symbols.MapPin
-import com.infomaniak.core.common.R as RCommon
 
 /**
  * Shows the picked [location]: a place, or a room above the place it's in, both opening the location search and removed by
@@ -82,13 +80,6 @@ private fun <T : Any> rememberLastNonNull(value: T?): T? {
 
 private class LastNonNull<T : Any> {
     var value: T? = null
-}
-
-@Composable
-internal fun RemoveLocationButton(onClick: () -> Unit) {
-    IconButton(onClick = onClick) {
-        Icon(EsdsIcons.Cross.Small, contentDescription = stringResource(RCommon.string.deleteButton))
-    }
 }
 
 @Preview
