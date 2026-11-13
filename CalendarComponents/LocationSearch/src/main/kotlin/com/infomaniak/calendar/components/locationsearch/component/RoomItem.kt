@@ -31,8 +31,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.RoomDetails
 import com.infomaniak.calendar.components.locationsearch.models.RoomAvailability
 import com.infomaniak.calendar.components.locationsearch.models.SearchRoomUi
-import com.infomaniak.calendar.components.resources.R
-import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.DoorOpen
 
@@ -44,23 +42,11 @@ internal fun RoomItem(room: SearchRoomUi, shapes: ListItemShapes, onClick: () ->
         colors = LocationItemColors,
         leadingContent = { Icon(EsdsIcons.DoorOpen.Medium, contentDescription = null) },
         overlineContent = {
-            when (room.availability) {
-                RoomAvailability.Available -> Text(
-                    stringResource(R.string.availableLabel),
-                    color = MaterialTheme.extendedColorScheme.success,
-                    style = MaterialTheme.typography.labelMedium,
-                )
-                RoomAvailability.Unavailable -> Text(
-                    stringResource(R.string.unavailableLabel),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.labelMedium,
-                )
-                RoomAvailability.Unknown -> Text(
-                    stringResource(R.string.availabilityUnknownLabel),
-                    color = MaterialTheme.extendedColorScheme.warning,
-                    style = MaterialTheme.typography.labelMedium,
-                )
-            }
+            Text(
+                text = stringResource(room.availability.labelRes),
+                color = room.availability.color(),
+                style = MaterialTheme.typography.labelMedium,
+            )
         },
         supportingContent = { RoomDetails(seats = room.seats, floor = room.floor) },
         modifier = modifier,
@@ -74,7 +60,13 @@ internal fun RoomItem(room: SearchRoomUi, shapes: ListItemShapes, onClick: () ->
 private fun Preview() {
     Surface {
         RoomItem(
-            room = SearchRoomUi(id = "1", name = "Salle Jules Verne", seats = 100, floor = 3, availability = RoomAvailability.Available),
+            room = SearchRoomUi(
+                id = "1",
+                name = "Salle Jules Verne",
+                seats = 100,
+                floor = 3,
+                availability = RoomAvailability.Available,
+            ),
             shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             onClick = {},
         )
@@ -86,7 +78,13 @@ private fun Preview() {
 private fun PreviewUnavailable() {
     Surface {
         RoomItem(
-            room = SearchRoomUi(id = "1", name = "Salle Hard Rock", seats = 6, floor = 4, availability = RoomAvailability.Unavailable),
+            room = SearchRoomUi(
+                id = "1",
+                name = "Salle Hard Rock",
+                seats = 6,
+                floor = 4,
+                availability = RoomAvailability.Unavailable,
+            ),
             shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             onClick = {},
         )
@@ -98,7 +96,13 @@ private fun PreviewUnavailable() {
 private fun PreviewUnknown() {
     Surface {
         RoomItem(
-            room = SearchRoomUi(id = "1", name = "Salle Jules Verne", seats = 100, floor = 3, availability = RoomAvailability.Unknown),
+            room = SearchRoomUi(
+                id = "1",
+                name = "Salle Jules Verne",
+                seats = 100,
+                floor = 3,
+                availability = RoomAvailability.Unknown,
+            ),
             shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             onClick = {},
         )

@@ -17,8 +17,15 @@
  */
 package com.infomaniak.calendar.components.locationsearch.models
 
-enum class RoomAvailability {
-    Available,
-    Unavailable,
-    Unknown,
+import androidx.annotation.StringRes
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
+
+enum class RoomAvailability(@StringRes val labelRes: Int, val color: @Composable () -> Color) {
+    Available(R.string.availableLabel, { MaterialTheme.extendedColorScheme.success }),
+    Unavailable(R.string.unavailableLabel, { MaterialTheme.colorScheme.error }),
+    Unknown(R.string.availabilityUnknownLabel, { MaterialTheme.extendedColorScheme.warning }),
 }
