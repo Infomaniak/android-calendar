@@ -17,11 +17,7 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.SizeTransform
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
@@ -77,37 +74,57 @@ internal fun LocationEditable(
     onRemoveClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    AnimatedContent(
-        targetState = location(),
-        modifier = modifier,
-        contentKey = { it?.let { location -> location::class } },
-        transitionSpec = { fadeIn() togetherWith fadeOut() using SizeTransform(clip = false) },
-        label = "LocationEditable",
-    ) { location ->
-        when (location) {
-            is LocationUi.Place -> LocationButton(
-                name = location.name,
-                address = location.address,
-                onClick = onClick,
-                trailingContent = { RemoveLocationButton(onRemoveClick) },
-            )
-            is LocationUi.Room -> Column(
-                Modifier
-                    .clip(ClickableItemDefaults.ClickableItemShapes.shape)
-                    .clickable(onClick = onClick),
-            ) {
-                Room(room = location, trailingContent = { RemoveLocationButton(onRemoveClick) })
-                location.address?.takeIf { it.isNotBlank() }?.let { address ->
-                    ListItem(content = { Text(address) }, leadingContent = { ItemIcon(EsdsIcons.MapPin) })
+    val location = location()
+    val place = rememberLastNonNull(location as? LocationUi.Place)
+    val room = rememberLastNonNull(location as? LocationUi.Room)
+
+    Column(modifier) {
+        AnimatedVisibility(visible = location is LocationUi.Place) {
+            if (place != null) {
+                LocationButton(
+                    name = place.name,
+                    address = place.address,
+                    onClick = onClick,
+                    trailingContent = { RemoveLocationButton(onRemoveClick) },
+                )
+            }
+        }
+
+        AnimatedVisibility(visible = location is LocationUi.Room) {
+            if (room != null) {
+                Column(
+                    Modifier
+                        .clip(ClickableItemDefaults.ClickableItemShapes.shape)
+                        .clickable(onClick = onClick),
+                ) {
+                    Room(room = room, trailingContent = { RemoveLocationButton(onRemoveClick) })
+                    room.address?.takeIf { it.isNotBlank() }?.let { address ->
+                        ListItem(content = { Text(address) }, leadingContent = { ItemIcon(EsdsIcons.MapPin) })
+                    }
                 }
             }
-            null -> ClickableItem(
+        }
+
+        AnimatedVisibility(visible = location == null) {
+            ClickableItem(
                 text = stringResource(R.string.locationOrRoomLabel),
                 leadingIcon = EsdsIcons.MapPin,
                 onClick = onClick,
             )
         }
     }
+}
+
+/** [value], or the last non-null one while it's null, so a location is still shown while its [AnimatedVisibility] hides it. */
+@Composable
+private fun <T : Any> rememberLastNonNull(value: T?): T? {
+    val last = remember { LastNonNull<T>() }
+    if (value != null) last.value = value
+    return last.value
+}
+
+private class LastNonNull<T : Any> {
+    var value: T? = null
 }
 
 @Composable
