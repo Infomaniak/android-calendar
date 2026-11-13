@@ -227,7 +227,7 @@ private fun PreviewDateAndTime() {
 @Composable
 private fun PreviewEditable() {
     MaterialTheme {
-        Surface {
+        Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh) {
             DateAndTimeEditable(
                 dateAndTimeState = rememberDateAndTimeState(
                     startDate = LocalDate(2026, 5, 20),
