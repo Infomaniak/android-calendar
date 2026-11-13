@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ListItemDefaults
@@ -28,7 +27,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
@@ -101,37 +99,33 @@ internal fun DateAndTime(
  * [dateAndTimeState] can be null so it can be initialized in two steps after the data has been read from disk. The item will be
  * empty but still take its final size as to not create a jarring experience when the data loads in dynamically.
  */
-@Composable
-internal fun DateAndTimeEditable(
+internal fun SectionScope.dateAndTimeEditable(
     dateAndTimeState: DateAndTimeState?,
     isAllDay: () -> Boolean,
     onTimeZoneClick: (isStart: Boolean) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-    val shouldDisplay = dateAndTimeState != null
     val dateAndTimeState = dateAndTimeState ?: DateAndTimeState.Dummy
 
-    Column(
-        modifier = modifier.alpha(if (shouldDisplay) 1f else 0f),
-        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
-    ) {
-        with(dateAndTimeState) {
+    with(dateAndTimeState) {
+        item { shapes ->
             DateAndTimeEntry(
                 entry = start,
                 isAllDay = isAllDay,
                 onDatePicked = { start.pickDate(it) },
                 onTimePicked = { start.pickTime(it) },
                 onTimeZoneClick = { onTimeZoneClick(true) },
-                shapes = ListItemDefaults.segmentedShapes(index = 1, count = 3),
+                shapes = shapes,
             )
+        }
 
+        item { shapes ->
             DateAndTimeEntry(
                 entry = end,
                 isAllDay = isAllDay,
                 onDatePicked = { end.pickDate(it) },
                 onTimePicked = { end.pickTime(it) },
                 onTimeZoneClick = { onTimeZoneClick(false) },
-                shapes = ListItemDefaults.segmentedShapes(index = 1, count = 3),
+                shapes = shapes,
             )
         }
     }
@@ -216,20 +210,24 @@ private fun PreviewDateAndTime() {
 @Preview
 @Composable
 private fun PreviewEditable() {
+    val dateAndTimeState = rememberDateAndTimeState(
+        startDate = LocalDate(2026, 5, 20),
+        startTime = LocalTime(8, 10),
+        startTimeZone = TimeZone.currentSystemDefault(),
+        endDate = LocalDate(2026, 5, 20),
+        endTime = LocalTime(9, 0),
+        endTimeZone = TimeZone.currentSystemDefault(),
+    )
+
     MaterialTheme {
         Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh) {
-            DateAndTimeEditable(
-                dateAndTimeState = rememberDateAndTimeState(
-                    startDate = LocalDate(2026, 5, 20),
-                    startTime = LocalTime(8, 10),
-                    startTimeZone = TimeZone.currentSystemDefault(),
-                    endDate = LocalDate(2026, 5, 20),
-                    endTime = LocalTime(9, 0),
-                    endTimeZone = TimeZone.currentSystemDefault(),
-                ),
-                isAllDay = { false },
-                onTimeZoneClick = {},
-            )
+            Section {
+                dateAndTimeEditable(
+                    dateAndTimeState = dateAndTimeState,
+                    isAllDay = { false },
+                    onTimeZoneClick = {},
+                )
+            }
         }
     }
 }

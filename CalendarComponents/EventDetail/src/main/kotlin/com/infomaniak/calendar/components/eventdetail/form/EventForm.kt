@@ -50,12 +50,12 @@ import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.CalendarEditable
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatusSwitch
-import com.infomaniak.calendar.components.eventdetail.component.DateAndTimeEditable
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitch
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.ReminderItemEditable
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
+import com.infomaniak.calendar.components.eventdetail.component.dateAndTimeEditable
 import com.infomaniak.calendar.components.eventdetail.component.item
 import com.infomaniak.calendar.components.eventdetail.component.reminder.AddReminderButton
 import com.infomaniak.calendar.components.eventdetail.component.reminder.ReminderOffsetDialog
@@ -108,22 +108,19 @@ fun EventForm(
         }
 
         Section {
-            item {
+            item { shapes ->
                 AllDaySwitch(
                     checked = state.isAllDay::value,
-                    onCheckedChange = { isChecked -> state.isAllDay.value = isChecked },
-                    shapes = it,
+                    onCheckedChange = { state.isAllDay.value = it },
+                    shapes = shapes,
                 )
             }
 
-            item {
-                DateAndTimeEditable(
-                    dateAndTimeState = state.dateAndTimeState,
-                    isAllDay = state.isAllDay::value,
-                    onTimeZoneClick = onTimeZoneClick,
-                    modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
-                )
-            }
+            dateAndTimeEditable(
+                dateAndTimeState = state.dateAndTimeState,
+                isAllDay = state.isAllDay::value,
+                onTimeZoneClick = onTimeZoneClick,
+            )
         }
 
         Section {
