@@ -44,6 +44,7 @@ import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState.Companion.MAX_ATTENDEE_COUNT
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
 import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
+import com.infomaniak.calendar.components.foundation.utils.onlyHorizontalAndTop
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -65,7 +66,7 @@ fun AttendeesSearch(
         attendeesSearchState.attendees
     }
 
-    SearchLayout(modifier = modifier, contentPadding = contentPadding) {
+    SearchLayout(modifier = modifier, contentPadding = contentPadding.onlyHorizontalAndTop()) {
         if (isSearchable) {
             AnimatedVisibility(attendeesSearchState.attendees.size >= MAX_ATTENDEE_COUNT) {
                 InformationBlock(stringResource(R.string.attendeesLimitReached))

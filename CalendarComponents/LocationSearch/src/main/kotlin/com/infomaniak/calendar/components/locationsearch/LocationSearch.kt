@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.SearchBar
 import com.infomaniak.calendar.components.foundation.component.SearchLayout
 import com.infomaniak.calendar.components.foundation.models.SearchableText
+import com.infomaniak.calendar.components.foundation.utils.onlyHorizontalAndTop
 import com.infomaniak.calendar.components.locationsearch.component.PlaceItem
 import com.infomaniak.calendar.components.locationsearch.component.RoomItem
 import com.infomaniak.calendar.components.locationsearch.models.SearchRoomUi
@@ -65,7 +66,7 @@ fun LocationSearch(
         }
     }
 
-    SearchLayout(modifier = modifier, contentPadding = contentPadding) {
+    SearchLayout(modifier = modifier, contentPadding = contentPadding.onlyHorizontalAndTop()) {
         SearchBar(searchState, placeholder = stringResource(R.string.locationSearchPlaceholder))
 
         LazyColumn(

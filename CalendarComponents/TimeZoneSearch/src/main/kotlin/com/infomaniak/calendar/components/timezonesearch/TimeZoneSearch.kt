@@ -40,6 +40,7 @@ import com.infomaniak.calendar.components.foundation.component.EmptyState
 import com.infomaniak.calendar.components.foundation.component.SearchBar
 import com.infomaniak.calendar.components.foundation.component.SearchLayout
 import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
+import com.infomaniak.calendar.components.foundation.utils.onlyHorizontalAndTop
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.calendar.components.timezonesearch.component.TimeZoneItem
 import com.infomaniak.calendar.components.timezonesearch.models.TimeZoneUi
@@ -85,7 +86,7 @@ private fun TimeZoneSearchContent(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    SearchLayout(modifier = modifier, contentPadding = contentPadding) {
+    SearchLayout(modifier = modifier, contentPadding = contentPadding.onlyHorizontalAndTop()) {
         SearchBar(searchQuery, modifier = Modifier.focusRequester(rememberInitialFocusRequester()))
 
         when (val results = searchResults) {

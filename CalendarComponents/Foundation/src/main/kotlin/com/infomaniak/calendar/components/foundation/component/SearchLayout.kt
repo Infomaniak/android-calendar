@@ -24,10 +24,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
-/** The layout shared by the search screens: their search bar above their results. [contentPadding]'s bottom is left to [content]. */
+/** The layout shared by the search screens: their search bar above their results, inside [contentPadding]. */
 @Composable
 fun SearchLayout(
     modifier: Modifier = Modifier,
@@ -36,9 +35,8 @@ fun SearchLayout(
 ) {
     Column(
         modifier = modifier
-            .padding(contentPadding.onlyHorizontal())
-            .padding(top = contentPadding.calculateTopPadding() + EsdsTheme.spacing.xl)
-            .padding(horizontal = EsdsTheme.spacing.xl),
+            .padding(contentPadding)
+            .padding(start = EsdsTheme.spacing.xl, top = EsdsTheme.spacing.xl, end = EsdsTheme.spacing.xl),
         verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.threeXl),
         content = content,
     )
