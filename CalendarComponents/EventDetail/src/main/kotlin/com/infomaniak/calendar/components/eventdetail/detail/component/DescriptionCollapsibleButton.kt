@@ -21,6 +21,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
@@ -49,6 +50,7 @@ import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ChevronDown
+import com.infomaniak.designsystem.icons.symbols.CircleCross
 import com.infomaniak.designsystem.icons.symbols.List
 
 private const val COLLAPSED_MAX_LINES = 3
@@ -100,6 +102,30 @@ private fun DescriptionContent(description: String, state: CollapsibleTextState)
             modifier = Modifier.animateCollapse(state),
         )
     }
+}
+
+@Composable
+internal fun DescriptionEditable(
+    state: TextFieldState,
+    shapes: ListItemShapes,
+    modifier: Modifier = Modifier,
+    leadingIcon: @Composable (() -> Unit)? = null,
+) {
+    SegmentedListItem(
+        shapes = shapes,
+        colors = CustomColors.EventFormItemColors,
+        content = {
+            CompactTextField(
+                state = state,
+                placeholder = { Text(stringResource(R.string.descriptionTitle)) },
+                isError = true,
+                supportingText = { Text("This is an error") },
+                trailingIcon = { Icon(EsdsIcons.CircleCross.Small, contentDescription = "Error") },
+            )
+        },
+        leadingContent = leadingIcon,
+        modifier = modifier,
+    )
 }
 
 @Composable
