@@ -17,11 +17,15 @@
  */
 package com.infomaniak.calendar.components.eventdetail.detail.component
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
@@ -30,135 +34,103 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.LocalMinimumInteractiveComponentSize
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.semantics.error
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.designsystem.icons.EsdsIcons
-import com.infomaniak.designsystem.icons.symbols.CircleCross
-import com.infomaniak.designsystem.icons.symbols.CircleInfo
+import com.infomaniak.designsystem.icons.symbols.CircleCrossFilled
 
 @Composable
 fun CompactTextField(
     state: TextFieldState,
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = LocalTextStyle.current,
-    label: @Composable (() -> Unit)? = null,
-    placeholder: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    leadingIcon: @Composable (() -> Unit)? = null,
-    supportingText: @Composable (() -> Unit)? = null,
+    placeholder: String = "",
+    supportingText: String = "",
     isError: Boolean = false,
-    singleLine: Boolean = false,
-    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
-    shape: Shape = OutlinedTextFieldDefaults.shape,
-    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = Color.Transparent,
-        unfocusedBorderColor = Color.Transparent,
-        disabledBorderColor = Color.Transparent,
-        errorBorderColor = Color.Transparent,
-    ),
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val focused by interactionSource.collectIsFocusedAsState()
-
-    val textColor = when {
-        textStyle.color != Color.Unspecified -> textStyle.color
-        focused -> colors.focusedTextColor
-        else -> colors.unfocusedTextColor
-    }
-
-    val contentPadding = OutlinedTextFieldDefaults.contentPadding(
-        start = 0.dp,
-        top = 0.dp,
-        end = 0.dp,
-        bottom = 0.dp,
+    val colors = MaterialTheme.colorScheme
+    val textStyle = MaterialTheme.typography.bodyLarge.copy(
+        color = colors.onSurface,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
     )
 
     BasicTextField(
         state = state,
+        lineLimits = TextFieldLineLimits.SingleLine,
+        textStyle = textStyle,
+        cursorBrush = SolidColor(colors.primary),
         modifier = modifier
             .fillMaxWidth()
-            .defaultMinSize(minWidth = TextFieldDefaults.MinWidth),
-        textStyle = textStyle.copy(color = textColor),
-        lineLimits = if (singleLine) {
-            TextFieldLineLimits.SingleLine
-        } else {
-            TextFieldLineLimits.MultiLine(maxHeightInLines = maxLines)
-        },
-        decorator = { innerTextField ->
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    propagateMinConstraints = true,
-                ) {
-                    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 24.dp) {
-                        OutlinedTextFieldDefaults.DecorationBox(
-                            value = state.text.toString(),
-                            innerTextField = { innerTextField() },
-                            enabled = true,
-                            singleLine = singleLine,
-                            visualTransformation = VisualTransformation.None,
-                            interactionSource = interactionSource,
-                            isError = isError,
-                            label = label,
-                            placeholder = placeholder,
-                            leadingIcon = leadingIcon,
-                            trailingIcon = trailingIcon?.let { icon ->
-                                { Box(contentAlignment = Alignment.Center) { icon() } }
-                            },
-                            supportingText = null,
-                            colors = colors,
-                            contentPadding = contentPadding,
-                            container = {
-                                OutlinedTextFieldDefaults.Container(
-                                    enabled = true,
-                                    isError = isError,
-                                    interactionSource = interactionSource,
-                                    colors = colors,
-                                    shape = shape,
-                                    focusedBorderThickness = 0.dp,
-                                    unfocusedBorderThickness = 0.dp,
-                                )
-                            },
-                        )
-                    }
+            .semantics {
+                if (isError && supportingText.isNotBlank()) {
+                    error(supportingText)
                 }
+            },
+        decorator = { innerTextField ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .minimumInteractiveComponentSize(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                CompositionLocalProvider(
+                    LocalContentColor provides colors.onSurfaceVariant,
+                ) {
+                    leadingIcon?.invoke()
 
-                if (supportingText != null) {
-                    val supportingColor = when {
-                        isError -> colors.errorSupportingTextColor
-                        focused -> colors.focusedSupportingTextColor
-                        else -> colors.unfocusedSupportingTextColor
-                    }
-
-                    CompositionLocalProvider(LocalContentColor provides supportingColor) {
-                        ProvideTextStyle(MaterialTheme.typography.bodySmall) {
-                            Box(Modifier.padding(start = 0.dp, top = 4.dp, end = 0.dp, bottom = 8.dp)) {
-                                supportingText()
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                    ) {
+                        Box(contentAlignment = Alignment.CenterStart) {
+                            if (state.text.isEmpty()) {
+                                Text(
+                                    text = placeholder,
+                                    style = textStyle,
+                                    color = colors.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
                             }
+                            innerTextField()
+                        }
+
+                        AnimatedVisibility(
+                            visible = isError && supportingText.isNotBlank(),
+                            enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
+                            exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut(),
+                        ) {
+                            Text(
+                                text = supportingText,
+                                color = colors.error,
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    platformStyle = PlatformTextStyle(includeFontPadding = false),
+                                ),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(top = 2.dp),
+                            )
                         }
                     }
+
+                    trailingIcon?.invoke()
                 }
             }
-
         },
     )
 }
@@ -176,28 +148,16 @@ private fun PreviewCompactTextField() {
 
 @Preview
 @Composable
-private fun PreviewCompactTextFieldWithInfo() {
+private fun PreviewCompactTextFieldWithTrailingIcon() {
     Surface {
         CompactTextField(
             state = rememberTextFieldState("Preview"),
             isError = false,
-            trailingIcon = { Icon(EsdsIcons.CircleInfo.Small, contentDescription = "Clock") },
+            trailingIcon = { Icon(EsdsIcons.CircleCrossFilled.ExtraSmall, contentDescription = "Clock") },
         )
     }
 }
 
-
-@Preview
-@Composable
-private fun PreviewCompactTextFieldError() {
-    Surface {
-        CompactTextField(
-            state = rememberTextFieldState("Preview"),
-            isError = true,
-            supportingText = { Text("This is an error") },
-        )
-    }
-}
 
 @Preview
 @Composable
@@ -206,8 +166,8 @@ private fun PreviewCompactTextFieldErrorAndTrailingIcon() {
         CompactTextField(
             state = rememberTextFieldState("Preview"),
             isError = true,
-            supportingText = { Text("This is an error") },
-            trailingIcon = { Icon(EsdsIcons.CircleCross.Small, contentDescription = "Clock") },
+            supportingText = "Error message",
+            trailingIcon = { Icon(EsdsIcons.CircleCrossFilled.ExtraSmall, contentDescription = "Clock") },
         )
     }
 }
