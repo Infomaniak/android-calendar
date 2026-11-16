@@ -100,11 +100,10 @@ internal fun DateAndTime(
  * empty but still take its final size as to not create a jarring experience when the data loads in dynamically.
  */
 internal fun SectionScope.dateAndTimeEditable(
-    dateAndTimeState: DateAndTimeState?,
+    dateAndTimeState: DateAndTimeState,
     isAllDay: () -> Boolean,
     onTimeZoneClick: (isStart: Boolean) -> Unit,
 ) {
-    val dateAndTimeState = dateAndTimeState ?: DateAndTimeState.Dummy
 
     with(dateAndTimeState) {
         item { shapes ->
