@@ -35,7 +35,6 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Cerca i contatti per aggiungerli all’evento</string>
     <string name="attendeesEmptyStateTitle">Nessun invitato</string>
-    <string name="attendeesLimitReached">Ha raggiunto il limite di 100 invitati</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d in attesa</item>
         <item quantity="other">%d in attesa</item>
@@ -67,6 +66,7 @@
     <string name="descriptionTitle">Descrizione</string>
     <string name="emptyStateNoTimeZone">Nessun fuso orario trovato</string>
     <string name="eventTitle">Titolo dell’evento</string>
+    <string name="eventValidationTooManyAttendees">Non puoi avere più di %d invitati</string>
     <plurals name="hourAmount">
         <item quantity="one">%d ora</item>
         <item quantity="other">%d ore</item>

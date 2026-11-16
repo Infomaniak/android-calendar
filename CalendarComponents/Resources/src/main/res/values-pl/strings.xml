@@ -41,7 +41,6 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Wyszukaj kontakty, aby dodać je do wydarzenia</string>
     <string name="attendeesEmptyStateTitle">Brak gości</string>
-    <string name="attendeesLimitReached">Osiągnięto limit 100 gości</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d oczekujący</item>
         <item quantity="few">%d oczekujących</item>
@@ -81,6 +80,7 @@
     <string name="descriptionTitle">Opis</string>
     <string name="emptyStateNoTimeZone">Nie znaleziono stref czasowych</string>
     <string name="eventTitle">Tytuł wydarzenia</string>
+    <string name="eventValidationTooManyAttendees">Nie można zaprosić więcej niż %d gości</string>
     <plurals name="hourAmount">
         <item quantity="one">%d godzina</item>
         <item quantity="few">%d godziny</item>

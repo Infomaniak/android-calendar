@@ -35,7 +35,6 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Αναζητήστε επαφές για να τις προσθέσετε στην εκδήλωση</string>
     <string name="attendeesEmptyStateTitle">Δεν υπάρχουν καλεσμένοι</string>
-    <string name="attendeesLimitReached">Έχετε φτάσει το όριο των 100 καλεσμένων</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d σε αναμονή</item>
         <item quantity="other">%d σε αναμονή</item>
@@ -67,6 +66,7 @@
     <string name="descriptionTitle">Περιγραφή</string>
     <string name="emptyStateNoTimeZone">Δεν βρέθηκαν ζώνες ώρας</string>
     <string name="eventTitle">Τίτλος εκδήλωσης</string>
+    <string name="eventValidationTooManyAttendees">Δεν μπορείτε να έχετε περισσότερους από %d καλεσμένους</string>
     <plurals name="hourAmount">
         <item quantity="one">%d ώρα</item>
         <item quantity="other">%d ώρες</item>

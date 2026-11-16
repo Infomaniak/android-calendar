@@ -35,7 +35,6 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Hae yhteystietoja lisätäksesi ne tapahtumaan</string>
     <string name="attendeesEmptyStateTitle">Ei vieraita</string>
-    <string name="attendeesLimitReached">Olet saavuttanut 100 vieraan rajan</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d odottaa</item>
         <item quantity="other">%d odottaa</item>
@@ -67,6 +66,7 @@
     <string name="descriptionTitle">Kuvaus</string>
     <string name="emptyStateNoTimeZone">Aikavyöhykkeitä ei löytynyt</string>
     <string name="eventTitle">Tapahtuman nimi</string>
+    <string name="eventValidationTooManyAttendees">Vieraita voi olla enintään %d</string>
     <plurals name="hourAmount">
         <item quantity="one">%d tunti</item>
         <item quantity="other">%d tuntia</item>
