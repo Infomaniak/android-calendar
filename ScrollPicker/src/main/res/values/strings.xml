@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- TODO: Placeholders, to be replaced by the translated strings -->
+    <string name="timePickerHoursLabel">Hours</string>
+    <string name="timePickerMinutesLabel">Minutes</string>
+</resources>

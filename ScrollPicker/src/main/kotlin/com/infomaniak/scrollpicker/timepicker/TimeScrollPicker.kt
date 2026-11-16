@@ -36,10 +36,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.infomaniak.scrollpicker.R
 import com.infomaniak.scrollpicker.ScrollPicker
 import com.infomaniak.scrollpicker.ScrollPickerDefaults
 import com.infomaniak.scrollpicker.ScrollPickerState
@@ -52,6 +56,14 @@ import java.text.DateFormatSymbols
 
 private val PickerWidth = 110.dp
 private val Hours24 = (0..23).toList()
+
+@Composable
+private fun wheelModifier(labelRes: Int): Modifier {
+    val label = stringResource(labelRes)
+    return Modifier
+        .width(PickerWidth)
+        .semantics { contentDescription = label }
+}
 
 @Composable
 fun TimeScrollPicker(state: TimeScrollPickerState, modifier: Modifier = Modifier) {
@@ -78,7 +90,7 @@ private fun HourPicker24(state: TimeScrollPickerState) {
         itemLabel = ::twoDigits,
         onInput = String::toIntOrNull,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-        modifier = Modifier.width(PickerWidth),
+        modifier = wheelModifier(R.string.timePickerHoursLabel),
     )
 }
 
@@ -91,7 +103,7 @@ private fun MinutePicker(state: TimeScrollPickerState, imeAction: ImeAction) {
         itemLabel = ::twoDigits,
         onInput = String::toIntOrNull,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = imeAction),
-        modifier = Modifier.width(PickerWidth),
+        modifier = wheelModifier(R.string.timePickerMinutesLabel),
     )
 }
 
@@ -111,7 +123,7 @@ private fun HourPicker12(state: TimeScrollPickerState) {
         // Keeps the half of the day already chosen, so typing "12" doesn't flip it.
         onInput = { text -> text.toIntOrNull()?.takeIf { it in 1..12 }?.let { it % 12 + 12 * (state.hour / 12) } },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-        modifier = Modifier.width(PickerWidth),
+        modifier = wheelModifier(R.string.timePickerHoursLabel),
     )
 }
 
