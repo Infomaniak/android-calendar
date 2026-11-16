@@ -26,10 +26,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
@@ -121,13 +123,14 @@ internal fun DateAndTimeEditable(
         verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
     ) {
         var selectedButton by rememberSaveable { mutableStateOf<DateAndTimeEntry?>(null) }
+        LaunchedEffect(isAllDay) { snapshotFlow(isAllDay).collect { if (it) selectedButton = null } }
 
         with(dateAndTimeState) {
             DateAndTimeEntry(
                 label = stringResource(R.string.startLabel),
                 entry = start,
                 isAllDay = isAllDay,
-                selectedButton = { (selectedButton as? DateAndTimeEntry.Start)?.entryButton.takeTimeUnless(isAllDay) },
+                selectedButton = { (selectedButton as? DateAndTimeEntry.Start)?.entryButton },
                 onSelectButton = { selectedButton = it?.let { entryButton -> DateAndTimeEntry.Start(entryButton) } },
                 onDatePicked = { start.pickDate(it) },
                 onTimePicked = { start.pickTime(it) },
@@ -137,7 +140,7 @@ internal fun DateAndTimeEditable(
                 label = stringResource(R.string.endLabel),
                 entry = end,
                 isAllDay = isAllDay,
-                selectedButton = { (selectedButton as? DateAndTimeEntry.End)?.entryButton.takeTimeUnless(isAllDay) },
+                selectedButton = { (selectedButton as? DateAndTimeEntry.End)?.entryButton },
                 onSelectButton = { selectedButton = it?.let { entryButton -> DateAndTimeEntry.End(entryButton) } },
                 onDatePicked = { end.pickDate(it) },
                 onTimePicked = { end.pickTime(it) },
@@ -145,11 +148,6 @@ internal fun DateAndTimeEditable(
             )
         }
     }
-}
-
-private fun EntryButton?.takeTimeUnless(isAllDay: () -> Boolean): EntryButton? = when (this) {
-    EntryButton.Time -> takeUnless { isAllDay() }
-    EntryButton.Date, null -> this
 }
 
 internal sealed interface DateAndTimeEntry : Parcelable {
