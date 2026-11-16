@@ -58,4 +58,6 @@ dependencies {
     implementation(kmpCalendar.kotlinx.datetime)
 
     implementation(core.androidx.adaptive)
+
+    testImplementation(core.junit)
 }
