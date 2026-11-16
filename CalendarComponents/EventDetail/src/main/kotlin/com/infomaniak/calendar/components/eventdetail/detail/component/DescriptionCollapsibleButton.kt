@@ -22,8 +22,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
@@ -43,17 +45,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
+import com.infomaniak.calendar.components.eventdetail.component.items.ItemIconDefaults
 import com.infomaniak.calendar.components.eventdetail.state.CollapsibleTextState
 import com.infomaniak.calendar.components.eventdetail.state.animateCollapse
 import com.infomaniak.calendar.components.eventdetail.state.rememberCollapsibleTextState
 import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.core.common.R as RCommon
+
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ChevronDown
-import com.infomaniak.designsystem.icons.symbols.CircleCross
+import com.infomaniak.designsystem.icons.symbols.CircleCrossFilled
 import com.infomaniak.designsystem.icons.symbols.List
 
 private const val COLLAPSED_MAX_LINES = 3
+private const val DESCRIPTION_MAX_CHARACTERS = 1_000
 
 @Composable
 internal fun DescriptionCollapsibleButton(
@@ -111,19 +117,32 @@ internal fun DescriptionEditable(
     modifier: Modifier = Modifier,
     leadingIcon: @Composable (() -> Unit)? = null,
 ) {
+    val isTooLong = state.text.length > DESCRIPTION_MAX_CHARACTERS
+
     SegmentedListItem(
         shapes = shapes,
         colors = CustomColors.EventFormItemColors,
         content = {
             CompactTextField(
                 state = state,
-                placeholder = { Text(stringResource(R.string.descriptionTitle)) },
-                isError = true,
-                supportingText = { Text("This is an error") },
-                trailingIcon = { Icon(EsdsIcons.CircleCross.Small, contentDescription = "Error") },
+                placeholder = "Description",
+                isError = isTooLong,
+                supportingText = if (isTooLong) "Max 1000 Characters" else "",
+                leadingIcon = leadingIcon,
+                trailingIcon = if (state.text.isNotEmpty()) {
+                    {
+                        IconButton(onClick = { state.clearText() }) {
+                            Icon(
+                                imageVector = ItemIconDefaults.getSymbolSize(EsdsIcons.CircleCrossFilled),
+                                contentDescription = stringResource(RCommon.string.contentDescriptionClear),
+                            )
+                        }
+                    }
+                } else {
+                    null
+                },
             )
         },
-        leadingContent = leadingIcon,
         modifier = modifier,
     )
 }
