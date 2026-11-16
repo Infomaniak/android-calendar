@@ -32,17 +32,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
-data class Item(
-    val isVisible: Boolean,
-    val content: @Composable (ListItemShapes) -> Unit,
-)
-
 class SectionScope {
-    val itemList = mutableListOf<Item>()
+    val itemList = mutableListOf<SectionItem>()
 }
 
 fun SectionScope.item(isVisible: Boolean = true, content: @Composable (ListItemShapes) -> Unit) {
-    itemList.add(Item(isVisible, content))
+    itemList.add(SectionItem(isVisible, content))
 }
 
 /**
@@ -83,4 +78,9 @@ internal fun Section(
         }
     }
 }
+
+data class SectionItem(
+    val isVisible: Boolean,
+    val content: @Composable (ListItemShapes) -> Unit,
+)
 

@@ -49,12 +49,13 @@ internal fun SectionScope.locations(
     onRemoveClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    item(isVisible = location() is LocationUi.Room) { shapes ->
-        val currentLocation = location()
+    val currentLocation = location()
+    val isRoom = currentLocation is LocationUi.Room
+    item(isVisible = isRoom) { shapes ->
         val room = rememberLastNonNull(currentLocation as? LocationUi.Room)
 
         AnimatedVisibility(
-            visible = currentLocation is LocationUi.Room,
+            visible = isRoom,
             modifier = modifier,
         ) {
             room?.let {
@@ -69,15 +70,13 @@ internal fun SectionScope.locations(
         }
     }
 
-    item(isVisible = location() is LocationUi.Room && !(location() as? LocationUi.Room)?.address.isNullOrBlank()) { shapes ->
+    val isAddressVisible = isRoom && !currentLocation.address.isNullOrBlank()
+    item(isVisible = isAddressVisible) { shapes ->
         val currentLocation = location()
         val room = rememberLastNonNull(currentLocation as? LocationUi.Room)
         val address = room?.address?.takeIf { it.isNotBlank() }
 
-        AnimatedVisibility(
-            visible = currentLocation is LocationUi.Room &&
-                    !currentLocation.address.isNullOrBlank(),
-        ) {
+        AnimatedVisibility(visible = isAddressVisible) {
             address?.let {
                 PlaceEditable(
                     name = it,
@@ -90,11 +89,12 @@ internal fun SectionScope.locations(
         }
     }
 
-    item(isVisible = location() is LocationUi.Place) { shapes ->
+    val isPlace = currentLocation is LocationUi.Place
+    item(isVisible = isPlace) { shapes ->
         val currentLocation = location()
         val place = rememberLastNonNull(currentLocation as? LocationUi.Place)
 
-        AnimatedVisibility(visible = currentLocation is LocationUi.Place) {
+        AnimatedVisibility(visible = isPlace) {
             place?.let {
                 PlaceButtonEditable(
                     name = it.name,
@@ -108,8 +108,9 @@ internal fun SectionScope.locations(
         }
     }
 
-    item(isVisible = location() == null) { shapes ->
-        AnimatedVisibility(visible = location() == null) {
+    val hasLocation = currentLocation == null
+    item(isVisible = hasLocation) { shapes ->
+        AnimatedVisibility(visible = hasLocation) {
             ClickableItem(
                 text = stringResource(R.string.locationOrRoomLabel),
                 shapes = shapes,
