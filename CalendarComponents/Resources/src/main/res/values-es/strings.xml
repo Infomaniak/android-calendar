@@ -67,6 +67,7 @@
     <string name="emptyStateNoTimeZone">No se han encontrado zonas horarias</string>
     <string name="eventTitle">Título del evento</string>
     <string name="eventValidationTooManyAttendees">No puedes tener más de %d invitados</string>
+    <string name="eventValidationCharacterLimitExceeded">Has superado el límite de caracteres</string>
     <plurals name="hourAmount">
         <item quantity="one">%d hora</item>
         <item quantity="other">%d horas</item>

@@ -43,12 +43,15 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CircleCrossFilled
 
@@ -59,18 +62,27 @@ fun CompactTextField(
     placeholder: String = "",
     supportingText: String = "",
     isError: Boolean = false,
+    lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     val colors = MaterialTheme.colorScheme
+    val showError = isError && supportingText.isNotBlank()
     val textStyle = MaterialTheme.typography.bodyLarge.copy(
         color = colors.onSurface,
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     )
+    val isSingleLine = lineLimits is TextFieldLineLimits.SingleLine
+    val verticalAlignment = if (isSingleLine) {
+        Alignment.CenterVertically
+    } else {
+        Alignment.Top
+    }
+    val contentAlignment = if (isSingleLine) Alignment.CenterStart else Alignment.TopStart
 
     BasicTextField(
         state = state,
-        lineLimits = TextFieldLineLimits.SingleLine,
+        lineLimits = lineLimits,
         textStyle = textStyle,
         cursorBrush = SolidColor(colors.primary),
         modifier = modifier
@@ -84,20 +96,16 @@ fun CompactTextField(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(top = if (isSingleLine) 0.dp else EsdsTheme.spacing.sm)
                     .minimumInteractiveComponentSize(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = verticalAlignment,
+                horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xl),
             ) {
-                CompositionLocalProvider(
-                    LocalContentColor provides colors.onSurfaceVariant,
-                ) {
+                CompositionLocalProvider(LocalContentColor provides colors.onSurfaceVariant) {
                     leadingIcon?.invoke()
 
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(2.dp),
-                    ) {
-                        Box(contentAlignment = Alignment.CenterStart) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = contentAlignment) {
                             if (state.text.isEmpty()) {
                                 Text(
                                     text = placeholder,
@@ -111,7 +119,7 @@ fun CompactTextField(
                         }
 
                         AnimatedVisibility(
-                            visible = isError && supportingText.isNotBlank(),
+                            visible = showError,
                             enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
                             exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut(),
                         ) {
@@ -140,7 +148,7 @@ fun CompactTextField(
 private fun PreviewCompactTextField() {
     Surface {
         CompactTextField(
-            state = rememberTextFieldState("Preview"),
+            state = rememberTextFieldState(stringResource(R.string.descriptionTitle)),
             isError = false,
         )
     }
@@ -151,8 +159,21 @@ private fun PreviewCompactTextField() {
 private fun PreviewCompactTextFieldWithTrailingIcon() {
     Surface {
         CompactTextField(
-            state = rememberTextFieldState("Preview"),
+            state = rememberTextFieldState(stringResource(R.string.descriptionTitle)),
             isError = false,
+            trailingIcon = { Icon(EsdsIcons.CircleCrossFilled.ExtraSmall, contentDescription = "Clock") },
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewCompactTextFieldMultilineWithTrailingIcon() {
+    Surface {
+        CompactTextField(
+            state = rememberTextFieldState(stringResource(R.string.descriptionTitle)),
+            isError = false,
+            lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 3),
             trailingIcon = { Icon(EsdsIcons.CircleCrossFilled.ExtraSmall, contentDescription = "Clock") },
         )
     }
@@ -164,9 +185,9 @@ private fun PreviewCompactTextFieldWithTrailingIcon() {
 private fun PreviewCompactTextFieldErrorAndTrailingIcon() {
     Surface {
         CompactTextField(
-            state = rememberTextFieldState("Preview"),
+            state = rememberTextFieldState(stringResource(R.string.descriptionTitle)),
             isError = true,
-            supportingText = "Error message",
+            supportingText = stringResource(R.string.eventValidationCharacterLimitExceeded),
             trailingIcon = { Icon(EsdsIcons.CircleCrossFilled.ExtraSmall, contentDescription = "Clock") },
         )
     }

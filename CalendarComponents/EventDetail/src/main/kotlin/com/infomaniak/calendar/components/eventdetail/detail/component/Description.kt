@@ -21,11 +21,10 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
@@ -45,21 +44,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
-import com.infomaniak.calendar.components.eventdetail.component.items.ItemIconDefaults
 import com.infomaniak.calendar.components.eventdetail.state.CollapsibleTextState
 import com.infomaniak.calendar.components.eventdetail.state.animateCollapse
 import com.infomaniak.calendar.components.eventdetail.state.rememberCollapsibleTextState
 import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.resources.R
-import com.infomaniak.core.common.R as RCommon
-
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ChevronDown
-import com.infomaniak.designsystem.icons.symbols.CircleCrossFilled
 import com.infomaniak.designsystem.icons.symbols.List
 
 private const val COLLAPSED_MAX_LINES = 3
-private const val DESCRIPTION_MAX_CHARACTERS = 1_000
+private const val DESCRIPTION_MAX_CHARACTERS = 5_000
 
 @Composable
 internal fun DescriptionCollapsibleButton(
@@ -125,22 +120,13 @@ internal fun DescriptionEditable(
         content = {
             CompactTextField(
                 state = state,
-                placeholder = "Description",
+                placeholder = stringResource(R.string.descriptionTitle),
                 isError = isTooLong,
-                supportingText = if (isTooLong) "Max 1000 Characters" else "",
+                lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 2), // minHeightInLines has to be 2 so the leading
+                // icon doesn't move up when adding the second line
+                supportingText = if (isTooLong) stringResource(R.string.eventValidationCharacterLimitExceeded) else "",
                 leadingIcon = leadingIcon,
-                trailingIcon = if (state.text.isNotEmpty()) {
-                    {
-                        IconButton(onClick = { state.clearText() }) {
-                            Icon(
-                                imageVector = ItemIconDefaults.getSymbolSize(EsdsIcons.CircleCrossFilled),
-                                contentDescription = stringResource(RCommon.string.contentDescriptionClear),
-                            )
-                        }
-                    }
-                } else {
-                    null
-                },
+                trailingIcon = null,
             )
         },
         modifier = modifier,
@@ -181,6 +167,20 @@ private fun PreviewOverflow() {
                 description = LoremIpsum(35).values.first(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewDescriptionEditable() {
+    MaterialTheme {
+        Surface {
+            DescriptionEditable(
+                state = TextFieldState("Description"),
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+                leadingIcon = { ItemIcon(EsdsIcons.List.Medium) },
             )
         }
     }
