@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
@@ -167,8 +170,15 @@ private fun DateAndTimeEntryContent(
         }
 
         AnimatedVisibility(selectedButton() == EntryButton.Time) {
+            val bringIntoViewRequester = remember { BringIntoViewRequester() }
+            // Waits for the expansion to end, so the whole picker is scrolled into view
+            LaunchedEffect(transition.currentState) {
+                if (transition.currentState == EnterExitState.Visible) bringIntoViewRequester.bringIntoView()
+            }
+
             Column(
                 modifier = Modifier
+                    .bringIntoViewRequester(bringIntoViewRequester)
                     .fillMaxWidth()
                     .padding(top = EsdsTheme.spacing.xl),
                 horizontalAlignment = Alignment.CenterHorizontally,
