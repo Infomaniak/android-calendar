@@ -210,6 +210,7 @@ the picker runs its `ImeAction`: `Next`/`Previous` move focus to the neighbourin
 hours "9" jumps to minutes); the last picker of a chain should use `Done`. A `FocusRequester` or `focusProperties` in its
 `modifier` reaches the input field, so focus can be moved from code. Pickers whose states share a `ScrollPickerGroupState`
 (`rememberScrollPickerState(group = …)`) react as one: while any is edited, all only show their selected value.
+Closing the keyboard ends the input and brings the wheels back.
 
 ## Key Integration Points
 

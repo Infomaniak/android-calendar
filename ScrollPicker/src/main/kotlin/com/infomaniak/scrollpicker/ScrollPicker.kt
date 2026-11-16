@@ -24,13 +24,16 @@ import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -50,6 +53,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -91,6 +95,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -103,6 +109,7 @@ import kotlin.math.roundToInt
  * complete and the [ImeAction] of [keyboardOptions] is performed: [ImeAction.Next] and [ImeAction.Previous] move the
  * focus, e.g. to the next picker (typing "9" in an hour picker labelled "00" to "23" goes straight to the minutes),
  * [ImeAction.None] does nothing and any other action ends the input. The keyboard's action key does the same.
+ * Closing the keyboard also ends the input, bringing the wheel back.
  *
  * Input can also be started from code with a [androidx.compose.ui.focus.FocusRequester] given in [modifier], while
  * [androidx.compose.ui.focus.focusProperties] in [modifier] changes where [ImeAction.Next] and [ImeAction.Previous] go.
@@ -120,6 +127,7 @@ import kotlin.math.roundToInt
  * @param horizontalAlignment where the labels sit within the picker's width, e.g. to line up hours on their end and
  * minutes on their start.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun <T> ScrollPicker(
     items: List<T>,
@@ -155,6 +163,14 @@ fun <T> ScrollPicker(
     LaunchedEffect(listState) {
         listState.interactionSource.interactions.collect {
             if (it is DragInteraction.Start && group.isEditing) focusManager.clearFocus()
+        }
+    }
+
+    // Closing the keyboard keeps the focus, so end the input ourselves to bring the wheels back.
+    val isImeVisible by rememberUpdatedState(WindowInsets.isImeVisible)
+    LaunchedEffect(state) {
+        snapshotFlow { isImeVisible }.drop(1).filter { !it }.collect {
+            if (state.isEditing) focusManager.clearFocus()
         }
     }
 
