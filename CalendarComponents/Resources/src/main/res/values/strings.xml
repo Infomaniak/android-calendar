@@ -35,7 +35,6 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Search for contacts to add them to the event</string>
     <string name="attendeesEmptyStateTitle">No attendees</string>
-    <string name="attendeesLimitReached">You have reached the limit of 100 attendees</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d pending</item>
         <item quantity="other">%d pending</item>
@@ -67,6 +66,7 @@
     <string name="descriptionTitle">Description</string>
     <string name="emptyStateNoTimeZone">No time zones found</string>
     <string name="eventTitle">Event title</string>
+    <string name="eventValidationTooManyAttendees">You cannot have more than %d guests</string>
     <plurals name="hourAmount">
         <item quantity="one">%d hour</item>
         <item quantity="other">%d hours</item>

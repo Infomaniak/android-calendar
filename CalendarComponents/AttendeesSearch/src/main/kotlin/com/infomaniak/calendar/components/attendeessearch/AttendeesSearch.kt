@@ -43,8 +43,8 @@ import com.infomaniak.calendar.components.foundation.preview.previewAttendees
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState.Companion.MAX_ATTENDEE_COUNT
 import com.infomaniak.calendar.components.foundation.state.rememberSaveableAttendeesSearchState
-import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
 import com.infomaniak.calendar.components.foundation.utils.onlyHorizontalAndTop
+import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -69,7 +69,7 @@ fun AttendeesSearch(
     SearchLayout(modifier = modifier, contentPadding = contentPadding.onlyHorizontalAndTop()) {
         if (isSearchable) {
             AnimatedVisibility(attendeesSearchState.attendees.size >= MAX_ATTENDEE_COUNT) {
-                InformationBlock(stringResource(R.string.attendeesLimitReached))
+                InformationBlock(stringResource(R.string.eventValidationTooManyAttendees, MAX_ATTENDEE_COUNT))
             }
 
             val focusRequester = rememberInitialFocusRequester(shouldRequestFocus = { attendeesSearchState.attendees.isEmpty() })
@@ -96,14 +96,14 @@ fun AttendeesSearch(
                 query = { attendeesSearchState.searchQueryTextFieldState.text.toString() },
                 onAddCustomAttendee = {
                     val result = attendeesSearchState.addCustomAttendee()
-                    result.messageRes?.let { onShowSnackbar(resources.getString(it)) }
+                    result.getMessage?.let { onShowSnackbar(resources.it()) }
                 },
                 onRemove = attendeesSearchState::removeAttendee,
                 modifier = Modifier.padding(vertical = EsdsTheme.spacing.sm),
                 onClick = if (isDisplayingSearchResults) {
                     { attendee ->
                         val result = attendeesSearchState.addAttendee(attendee)
-                        result.messageRes?.let { onShowSnackbar(resources.getString(it)) }
+                        result.getMessage?.let { onShowSnackbar(resources.it()) }
                     }
                 } else {
                     null

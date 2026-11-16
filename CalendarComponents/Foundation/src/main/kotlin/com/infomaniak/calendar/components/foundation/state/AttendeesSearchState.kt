@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.foundation.state
 
+import android.content.res.Resources
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.runtime.Composable
@@ -99,16 +100,16 @@ class AttendeesSearchState<T : OrganizerSource>(
         searchQueryTextFieldState.clearText()
     }
 
-    enum class CustomAttendeeResult(val messageRes: Int? = null) {
+    enum class CustomAttendeeResult(val getMessage: (Resources.() -> String)? = null) {
         Added,
-        AlreadyPresent(RCore.string.emailAlreadyUsed),
-        InvalidEmail(RCore.string.emailInvalid),
-        LimitReached(RComponents.string.attendeesLimitReached),
+        AlreadyPresent({ getString(RCore.string.emailAlreadyUsed) }),
+        InvalidEmail({ getString(RCore.string.emailInvalid) }),
+        LimitReached({ getString(RComponents.string.eventValidationTooManyAttendees, MAX_ATTENDEE_COUNT) }),
     }
 
-    enum class AttendeeResult(val messageRes: Int? = null) {
+    enum class AttendeeResult(val getMessage: (Resources.() -> String)? = null) {
         Added,
-        LimitReached(RComponents.string.attendeesLimitReached),
+        LimitReached({ getString(RComponents.string.eventValidationTooManyAttendees, MAX_ATTENDEE_COUNT) }),
     }
 
     class Saver<T : OrganizerSource> : androidx.compose.runtime.saveable.Saver<AttendeesSearchState<T>, List<Any?>> {

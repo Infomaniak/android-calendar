@@ -35,7 +35,6 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Sök efter kontakter för att lägga till dem i händelsen</string>
     <string name="attendeesEmptyStateTitle">Inga gäster</string>
-    <string name="attendeesLimitReached">Du har nått gränsen på 100 gäster</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d väntande</item>
         <item quantity="other">%d väntande</item>
@@ -67,6 +66,7 @@
     <string name="descriptionTitle">Beskrivning</string>
     <string name="emptyStateNoTimeZone">Inga tidszoner hittades</string>
     <string name="eventTitle">Evenemangstitel</string>
+    <string name="eventValidationTooManyAttendees">Du kan inte ha fler än %d gäster</string>
     <plurals name="hourAmount">
         <item quantity="one">%d timme</item>
         <item quantity="other">%d timmar</item>
