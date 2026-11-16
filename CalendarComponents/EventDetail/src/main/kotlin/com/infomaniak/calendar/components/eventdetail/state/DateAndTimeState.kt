@@ -47,9 +47,15 @@ data class DateAndTimeState(
     val end: Entry,
     val hasEndEverBeenTouched: MutableState<Boolean>,
 ) {
+    /**
+     * Start and duration when the current end time session began, a session being consecutive end time picks. The end's
+     * wheel picks every row it passes, so the duration would otherwise already be zero once the end goes before the start.
+     */
+    private var endTimeSessionOrigin: Pair<Instant, Duration>? = null
+
     fun Entry.pickDate(date: LocalDate) = edit { this.date = date }
 
-    fun Entry.pickTime(time: LocalTime) = edit { this.time = time }
+    fun Entry.pickTime(time: LocalTime) = edit(isEndTimeSession = this == end) { this.time = time }
 
     fun Entry.pickTimeZone(timeZone: TimeZone) = edit {
         val isEditingStart = this == start
@@ -62,28 +68,32 @@ data class DateAndTimeState(
         }
     }
 
-    private fun Entry.edit(change: () -> Unit) {
+    private fun Entry.edit(isEndTimeSession: Boolean = false, change: () -> Unit) {
         // TODO: This interval displacement doesn't work if the user is setting an all day event and the time component of
         //  both entries are at 0:00 and the range comprises a day of 23 or 25 hours.
         //  Adapt the interval computation to take into account days 23 or 25 hours. Changing the date, should not change the time.
         val previousInterval = end.instant - start.instant
+
+        endTimeSessionOrigin = if (isEndTimeSession) endTimeSessionOrigin ?: (start.instant to previousInterval) else null
+        val (initialStart, initialInterval) = endTimeSessionOrigin ?: (start.instant to previousInterval)
 
         change()
 
         val isEditingStart = this == start
         if (isEditingStart.not()) hasEndEverBeenTouched.value = true
 
-        applyCorrections(isEditingStart, previousInterval)
+        applyCorrections(isEditingStart, initialStart, initialInterval)
     }
 
     /** Single place adjusting the other values after the user picked a new one. */
-    private fun applyCorrections(isEditingStart: Boolean, previousInterval: Duration) {
+    private fun applyCorrections(isEditingStart: Boolean, initialStart: Instant, initialInterval: Duration) {
         val isOverlapping = start.instant > end.instant
 
         if (isEditingStart) {
-            if (isOverlapping || hasEndEverBeenTouched.value.not()) end.instant = start.instant + previousInterval
+            if (isOverlapping || hasEndEverBeenTouched.value.not()) end.instant = start.instant + initialInterval
         } else {
-            if (isOverlapping) start.instant = end.instant - previousInterval
+            // Only pushes the start back, so it stays put when the end is scrolled forward again
+            if (end.instant < initialStart) start.instant = minOf(start.instant, end.instant - initialInterval)
         }
     }
 
