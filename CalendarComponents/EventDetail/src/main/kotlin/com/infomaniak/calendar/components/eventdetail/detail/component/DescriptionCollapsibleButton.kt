@@ -23,9 +23,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,11 +41,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.state.CollapsibleTextState
 import com.infomaniak.calendar.components.eventdetail.state.animateCollapse
 import com.infomaniak.calendar.components.eventdetail.state.rememberCollapsibleTextState
+import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ChevronDown
@@ -53,29 +54,36 @@ import com.infomaniak.designsystem.icons.symbols.List
 private const val COLLAPSED_MAX_LINES = 3
 
 @Composable
-internal fun DescriptionCollapsibleButton(description: String, contentPadding: PaddingValues = PaddingValues()) {
+internal fun DescriptionCollapsibleButton(
+    description: String,
+    shapes: ListItemShapes,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
     var isCollapsed by rememberSaveable { mutableStateOf(true) }
     val descriptionState = rememberCollapsibleTextState(isCollapsed, COLLAPSED_MAX_LINES)
 
     val descriptionTitle = R.string.descriptionTitle
-    val leadingIcon = EsdsIcons.List.Medium
+    val leadingIcon = EsdsIcons.List
 
     // Shows or hides the button to toggle the description based on if the text is actually overflowing when collapsed or not.
     if (descriptionState.isOverflowing) {
-        ListItem(
+        SegmentedListItem(
             content = { Text(stringResource(descriptionTitle)) },
             supportingContent = { DescriptionContent(description, descriptionState) },
             leadingContent = { ItemIcon(leadingIcon) },
             trailingContent = { AnimatedChevron { isCollapsed } },
             onClick = { isCollapsed = !isCollapsed },
-            shapes = ClickableItemDefaults.ClickableItemShapes,
+            shapes = shapes,
+            colors = CustomColors.EventFormItemColors,
             contentPadding = contentPadding + ListItemDefaults.ContentPadding,
         )
     } else {
-        ListItem(
+        SegmentedListItem(
             content = { Text(stringResource(descriptionTitle)) },
             supportingContent = { DescriptionContent(description, descriptionState) },
             leadingContent = { ItemIcon(leadingIcon) },
+            shapes = shapes,
+            colors = CustomColors.EventFormItemColors,
             modifier = Modifier.padding(contentPadding),
         )
     }
@@ -113,6 +121,7 @@ private fun Preview() {
             DescriptionCollapsibleButton(
                 description = LoremIpsum(15).values.first(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             )
         }
     }
@@ -126,6 +135,7 @@ private fun PreviewOverflow() {
             DescriptionCollapsibleButton(
                 description = LoremIpsum(35).values.first(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             )
         }
     }

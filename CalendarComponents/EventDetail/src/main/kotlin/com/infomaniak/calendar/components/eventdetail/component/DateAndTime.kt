@@ -17,27 +17,27 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
+import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRangeWithZone
 import com.infomaniak.core.common.utils.today
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Clock
 import kotlinx.datetime.DatePeriod
@@ -55,10 +55,13 @@ internal fun DateAndTime(
     start: EventDetailTiming,
     end: EventDetailTiming,
     isAllDay: Boolean,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
 ) {
-    ListItem(
+    SegmentedListItem(
         leadingContent = { ItemIcon(EsdsIcons.Clock) },
+        shapes = shapes,
+        colors = CustomColors.EventFormItemColors,
         content = {
             val startAtLocale = start.atLocale
             val endAtLocale = end.atLocale
@@ -74,7 +77,7 @@ internal fun DateAndTime(
         },
         supportingContent = {
             // Floating events and all day events never need to display UTC offset
-            if (isAllDay || start !is EventDetailTiming.Precise || end !is EventDetailTiming.Precise) return@ListItem
+            if (isAllDay || start !is EventDetailTiming.Precise || end !is EventDetailTiming.Precise) return@SegmentedListItem
 
             if (start.utcOffsetAtTimeZone != start.utcOffsetAtLocale || end.utcOffsetAtTimeZone != end.utcOffsetAtLocale) {
                 Text(
@@ -96,36 +99,32 @@ internal fun DateAndTime(
  * [dateAndTimeState] can be null so it can be initialized in two steps after the data has been read from disk. The item will be
  * empty but still take its final size as to not create a jarring experience when the data loads in dynamically.
  */
-@Composable
-internal fun DateAndTimeEditable(
-    dateAndTimeState: DateAndTimeState?,
+internal fun SectionScope.dateAndTimeEditable(
+    dateAndTimeState: DateAndTimeState,
     isAllDay: () -> Boolean,
     onTimeZoneClick: (isStart: Boolean) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-    val shouldDisplay = dateAndTimeState != null
-    val dateAndTimeState = dateAndTimeState ?: DateAndTimeState.Dummy
 
-    Column(
-        modifier = modifier
-            .alpha(if (shouldDisplay) 1f else 0f)
-            .padding(horizontal = EsdsTheme.spacing.xs),
-        verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xs),
-    ) {
-        with(dateAndTimeState) {
+    with(dateAndTimeState) {
+        item { shapes ->
             DateAndTimeEntry(
                 entry = start,
                 isAllDay = isAllDay,
                 onDatePicked = { start.pickDate(it) },
                 onTimePicked = { start.pickTime(it) },
                 onTimeZoneClick = { onTimeZoneClick(true) },
+                shapes = shapes,
             )
+        }
+
+        item { shapes ->
             DateAndTimeEntry(
                 entry = end,
                 isAllDay = isAllDay,
                 onDatePicked = { end.pickDate(it) },
                 onTimePicked = { end.pickTime(it) },
                 onTimeZoneClick = { onTimeZoneClick(false) },
+                shapes = shapes,
             )
         }
     }
@@ -162,6 +161,7 @@ private fun PreviewDateAndTime() {
                 EventDetailTiming.Precise(end.toInstant(endTimeZone), endTimeZone)
             },
             isAllDay = isAllDay,
+            shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
         )
     }
 
@@ -209,20 +209,24 @@ private fun PreviewDateAndTime() {
 @Preview
 @Composable
 private fun PreviewEditable() {
+    val dateAndTimeState = rememberDateAndTimeState(
+        startDate = LocalDate(2026, 5, 20),
+        startTime = LocalTime(8, 10),
+        startTimeZone = TimeZone.currentSystemDefault(),
+        endDate = LocalDate(2026, 5, 20),
+        endTime = LocalTime(9, 0),
+        endTimeZone = TimeZone.currentSystemDefault(),
+    )
+
     MaterialTheme {
-        Surface {
-            DateAndTimeEditable(
-                dateAndTimeState = rememberDateAndTimeState(
-                    startDate = LocalDate(2026, 5, 20),
-                    startTime = LocalTime(8, 10),
-                    startTimeZone = TimeZone.currentSystemDefault(),
-                    endDate = LocalDate(2026, 5, 20),
-                    endTime = LocalTime(9, 0),
-                    endTimeZone = TimeZone.currentSystemDefault(),
-                ),
-                isAllDay = { false },
-                onTimeZoneClick = {},
-            )
+        Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh) {
+            Section {
+                dateAndTimeEditable(
+                    dateAndTimeState = dateAndTimeState,
+                    isAllDay = { false },
+                    onTimeZoneClick = {},
+                )
+            }
         }
     }
 }

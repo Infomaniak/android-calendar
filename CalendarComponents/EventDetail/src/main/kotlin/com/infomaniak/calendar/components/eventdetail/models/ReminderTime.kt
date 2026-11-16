@@ -22,10 +22,10 @@ import kotlinx.parcelize.Parcelize
 import kotlin.time.Duration
 import kotlin.time.Instant
 
-sealed interface NotificationTime : Parcelable {
+sealed interface ReminderTime : Parcelable {
     @Parcelize
-    data class Offset(val duration: Duration) : NotificationTime
+    data class Offset(val duration: Duration) : ReminderTime
 
     @Parcelize
-    data class Absolute(val instant: Instant) : NotificationTime
+    data class Absolute(val instant: Instant) : ReminderTime
 }

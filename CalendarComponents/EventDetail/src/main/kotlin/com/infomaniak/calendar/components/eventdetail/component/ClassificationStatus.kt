@@ -18,27 +18,34 @@
 package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
-import com.infomaniak.calendar.components.eventdetail.component.items.ListItemSwitch
+import com.infomaniak.calendar.components.eventdetail.component.items.SegmentedListItemSwitch
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Lock
 
 @Composable
-internal fun ClassificationStatus(classification: EventDetailUi.Classification, modifier: Modifier = Modifier) {
-    ListItem(
+internal fun ClassificationStatus(
+    classification: EventDetailUi.Classification,
+    shapes: ListItemShapes,
+    modifier: Modifier = Modifier,
+) {
+    SegmentedListItem(
         content = { Text(text = stringResource(classification.label)) },
         leadingContent = { ClassificationIcon() },
+        colors = CustomColors.EventFormItemColors,
+        shapes = shapes,
         modifier = modifier,
     )
 }
@@ -47,10 +54,16 @@ internal fun ClassificationStatus(classification: EventDetailUi.Classification, 
 internal fun ClassificationStatusSwitch(
     checked: () -> Boolean,
     onCheckedChange: (isChecked: Boolean) -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
-    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
 ) {
-    ListItemSwitch(checked, onCheckedChange, modifier, shapes, leadingContent = { ClassificationIcon() }) {
+    SegmentedListItemSwitch(
+        checked = checked,
+        onCheckedChange = onCheckedChange,
+        shapes = shapes,
+        modifier = modifier,
+        leadingContent = { ClassificationIcon() },
+    ) {
         Text(text = stringResource(EventDetailUi.Classification.Public.label))
     }
 }
@@ -66,7 +79,12 @@ private fun PreviewClassificationStatus() {
     MaterialTheme {
         Surface {
             Column {
-                EventDetailUi.Classification.entries.forEach { ClassificationStatus(classification = it) }
+                EventDetailUi.Classification.entries.forEach {
+                    ClassificationStatus(
+                        classification = it,
+                        shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+                    )
+                }
             }
         }
     }
@@ -78,8 +96,16 @@ private fun PreviewClassificationStatusSwitch() {
     MaterialTheme {
         Surface {
             Column {
-                ClassificationStatusSwitch(checked = { true }, onCheckedChange = {})
-                ClassificationStatusSwitch(checked = { false }, onCheckedChange = {})
+                ClassificationStatusSwitch(
+                    checked = { true },
+                    onCheckedChange = {},
+                    shapes = ListItemDefaults.segmentedShapes(index = 0, count = 2),
+                )
+                ClassificationStatusSwitch(
+                    checked = { false },
+                    onCheckedChange = {},
+                    shapes = ListItemDefaults.segmentedShapes(index = 1, count = 2),
+                )
             }
         }
     }

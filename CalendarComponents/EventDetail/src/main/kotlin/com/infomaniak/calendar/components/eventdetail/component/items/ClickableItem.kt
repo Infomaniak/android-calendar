@@ -20,17 +20,18 @@ package com.infomaniak.calendar.components.eventdetail.component.items
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ChevronRight
 import com.infomaniak.designsystem.icons.symbols.ProductKmeet
@@ -41,9 +42,9 @@ internal fun ClickableItem(
     text: String,
     leadingIcon: Symbol,
     onClick: () -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
-    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
     trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
     supportingContent: @Composable (() -> Unit)? = null,
 ) {
@@ -64,15 +65,16 @@ internal fun ClickableItem(
     text: String,
     leadingContent: @Composable () -> Unit,
     onClick: () -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
-    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
     trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
     supportingContent: @Composable (() -> Unit)? = null,
 ) {
-    ListItem(
+    SegmentedListItem(
         modifier = modifier,
         content = { Text(text) },
+        colors = CustomColors.EventFormItemColors,
         supportingContent = supportingContent,
         leadingContent = leadingContent,
         trailingContent = {
@@ -88,7 +90,7 @@ internal fun ClickableItem(
 
 internal object ClickableItemDefaults {
     val trailingContent = @Composable {
-        Icon(EsdsIcons.ChevronRight.Small, contentDescription = null)
+        ItemIcon(EsdsIcons.ChevronRight)
     }
 
     val ClickableItemShapes
@@ -105,6 +107,7 @@ private fun Preview() {
                 leadingIcon = EsdsIcons.ProductKmeet,
                 supportingContent = { Text("Supporting content") },
                 onClick = {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1)
             )
         }
     }

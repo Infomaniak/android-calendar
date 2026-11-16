@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.form.component.reminder
+package com.infomaniak.calendar.components.eventdetail.component.reminder
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.selection.selectableGroup
@@ -31,12 +31,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.resources.R
 
-private val reminderTypes = listOf(EventDetailUi.Notification.Type.Push, EventDetailUi.Notification.Type.Email)
+private val reminderTypes = listOf(EventDetailUi.Reminder.Type.Push, EventDetailUi.Reminder.Type.Email)
 
 @Composable
 internal fun ReminderTypeSection(
-    selectedType: EventDetailUi.Notification.Type,
-    onTypeSelect: (EventDetailUi.Notification.Type) -> Unit,
+    selectedType: EventDetailUi.Reminder.Type,
+    onTypeSelect: (EventDetailUi.Reminder.Type) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
@@ -63,7 +63,7 @@ internal fun ReminderTypeSection(
 private fun Preview() {
     MaterialTheme {
         Surface {
-            ReminderTypeSection(selectedType = EventDetailUi.Notification.Type.Push, onTypeSelect = {})
+            ReminderTypeSection(selectedType = EventDetailUi.Reminder.Type.Push, onTypeSelect = {})
         }
     }
 }

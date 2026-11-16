@@ -26,7 +26,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
-import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
+import com.infomaniak.calendar.components.eventdetail.models.ReminderTime
 import com.infomaniak.calendar.components.resources.R
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -37,13 +37,13 @@ import kotlin.time.Duration.Companion.minutes
 class CustomReminderState(
     val amountTextFieldState: TextFieldState,
     val unit: MutableState<ReminderUnit>,
-    val type: MutableState<EventDetailUi.Notification.Type>,
+    val type: MutableState<EventDetailUi.Reminder.Type>,
 ) {
     val amount: Int? get() = amountTextFieldState.text.toString().toIntOrNull()?.takeIf { it > 0 }
 
-    fun toNotification(): EventDetailUi.Notification? {
+    fun toNotification(): EventDetailUi.Reminder? {
         val amount = amount ?: return null
-        return EventDetailUi.Notification(type = type.value, time = NotificationTime.Offset(-unit.value.duration * amount))
+        return EventDetailUi.Reminder(type = type.value, time = ReminderTime.Offset(-unit.value.duration * amount))
     }
 }
 
@@ -57,5 +57,5 @@ enum class ReminderUnit(val duration: Duration, @PluralsRes val labelRes: Int) {
 fun rememberCustomReminderState(): CustomReminderState = CustomReminderState(
     amountTextFieldState = rememberTextFieldState("30"),
     unit = rememberSaveable { mutableStateOf(ReminderUnit.Minutes) },
-    type = rememberSaveable { mutableStateOf(EventDetailUi.Notification.Type.Push) },
+    type = rememberSaveable { mutableStateOf(EventDetailUi.Reminder.Type.Push) },
 )

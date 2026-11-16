@@ -31,9 +31,12 @@ import androidx.compose.material3.ButtonShapes
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -53,6 +56,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
+import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatCityName
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatExplicitTimeLabel
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortDateWithYear
@@ -73,6 +77,32 @@ internal fun DateAndTimeEntry(
     onDatePicked: (LocalDate) -> Unit,
     onTimePicked: (LocalTime) -> Unit,
     onTimeZoneClick: () -> Unit,
+    shapes: ListItemShapes,
+    modifier: Modifier = Modifier,
+) {
+    SegmentedListItem(
+        shapes = shapes,
+        colors = CustomColors.EventFormItemColors,
+        modifier = modifier,
+        content = {
+            DateAndTimeEntryContent(
+                entry = entry,
+                isAllDay = isAllDay,
+                onTimeZoneClick = onTimeZoneClick,
+                onDatePicked = onDatePicked,
+                onTimePicked = onTimePicked,
+            )
+        },
+    )
+}
+
+@Composable
+private fun DateAndTimeEntryContent(
+    entry: DateAndTimeState.Entry,
+    isAllDay: () -> Boolean,
+    onTimeZoneClick: () -> Unit,
+    onDatePicked: (LocalDate) -> Unit,
+    onTimePicked: (LocalTime) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isDatePickerVisible by rememberSaveable { mutableStateOf(false) }
@@ -197,6 +227,7 @@ private fun Preview() {
                     time = remember { mutableStateOf(LocalTime(14, 41)) },
                     timeZone = remember { mutableStateOf(TimeZone.UTC) },
                 ),
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
                 isAllDay = { false },
                 onDatePicked = {},
                 onTimePicked = {},

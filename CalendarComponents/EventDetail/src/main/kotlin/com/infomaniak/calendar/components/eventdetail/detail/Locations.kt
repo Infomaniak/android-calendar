@@ -18,7 +18,6 @@
 package com.infomaniak.calendar.components.eventdetail.detail
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -29,6 +28,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.PlaceButtonEditable
 import com.infomaniak.calendar.components.eventdetail.component.PlaceEditable
 import com.infomaniak.calendar.components.eventdetail.component.RoomEditable
+import com.infomaniak.calendar.components.eventdetail.component.Section
+import com.infomaniak.calendar.components.eventdetail.component.SectionScope
+import com.infomaniak.calendar.components.eventdetail.component.item
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
@@ -41,54 +43,77 @@ import com.infomaniak.designsystem.icons.symbols.MapPin
  * Shows the picked [location]: a place, or a room above the place it's in, both opening the location search and removed by
  * [onRemoveClick]. Switching between them, e.g. when a calendar switch drops the room, is animated.
  */
-@Composable
-internal fun Locations(
+internal fun SectionScope.locations(
     location: () -> LocationUi?,
     onClick: () -> Unit,
     onRemoveClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val location = location()
-    val place = rememberLastNonNull(location as? LocationUi.Place)
-    val room = rememberLastNonNull(location as? LocationUi.Room)
+    val currentLocation = location()
+    val isRoom = currentLocation is LocationUi.Room
+    item(isVisible = isRoom) { shapes ->
+        val room = rememberLastNonNull(currentLocation as? LocationUi.Room)
 
-    Column(modifier) {
-        AnimatedVisibility(visible = location is LocationUi.Room) {
-            if (room != null) {
-                Column {
-                    RoomEditable(
-                        room = room,
-                        onClick = onClick,
-                        onRemoveClick = onRemoveClick,
-                        modifier = Modifier.eventSharedBounds(EventSharedElement.Room),
-                    )
-                    room.address?.takeIf { it.isNotBlank() }?.let { address ->
-                        PlaceEditable(
-                            name = address,
-                            address = null,
-                            onClick = onClick,
-                            modifier = Modifier.eventSharedBounds(EventSharedElement.Place),
-                        )
-                    }
-                }
+        AnimatedVisibility(
+            visible = isRoom,
+            modifier = modifier,
+        ) {
+            room?.let {
+                RoomEditable(
+                    room = it,
+                    onClick = onClick,
+                    shapes = shapes,
+                    onRemoveClick = onRemoveClick,
+                    modifier = Modifier.eventSharedBounds(EventSharedElement.Room),
+                )
             }
         }
+    }
 
-        AnimatedVisibility(visible = location is LocationUi.Place) {
-            if (place != null) {
-                PlaceButtonEditable(
-                    name = place.name,
-                    address = place.address,
+    val isAddressVisible = isRoom && !currentLocation.address.isNullOrBlank()
+    item(isVisible = isAddressVisible) { shapes ->
+        val currentLocation = location()
+        val room = rememberLastNonNull(currentLocation as? LocationUi.Room)
+        val address = room?.address?.takeIf { it.isNotBlank() }
+
+        AnimatedVisibility(visible = isAddressVisible) {
+            address?.let {
+                PlaceEditable(
+                    name = it,
+                    address = null,
                     onClick = onClick,
-                    onRemoveClick = onRemoveClick,
+                    shapes = shapes,
                     modifier = Modifier.eventSharedBounds(EventSharedElement.Place),
                 )
             }
         }
+    }
 
-        AnimatedVisibility(visible = location == null) {
+    val isPlace = currentLocation is LocationUi.Place
+    item(isVisible = isPlace) { shapes ->
+        val currentLocation = location()
+        val place = rememberLastNonNull(currentLocation as? LocationUi.Place)
+
+        AnimatedVisibility(visible = isPlace) {
+            place?.let {
+                PlaceButtonEditable(
+                    name = it.name,
+                    address = it.address,
+                    onClick = onClick,
+                    onRemoveClick = onRemoveClick,
+                    shapes = shapes,
+                    modifier = Modifier.eventSharedBounds(EventSharedElement.Place),
+                )
+            }
+        }
+    }
+
+    val hasLocation = currentLocation == null
+    item(isVisible = hasLocation) { shapes ->
+        AnimatedVisibility(visible = hasLocation) {
             ClickableItem(
                 text = stringResource(R.string.locationOrRoomLabel),
+                shapes = shapes,
                 leadingIcon = EsdsIcons.MapPin,
                 onClick = onClick,
             )
@@ -113,7 +138,9 @@ private class LastNonNull<T : Any> {
 private fun PreviewEditable() {
     MaterialTheme {
         Surface {
-            Locations(location = { null }, onClick = {}, onRemoveClick = {})
+            Section {
+                locations(location = { null }, onClick = {}, onRemoveClick = {})
+            }
         }
     }
 }
@@ -123,13 +150,16 @@ private fun PreviewEditable() {
 private fun PreviewEditableWithPlace() {
     MaterialTheme {
         Surface {
-            Locations(
-                location = {
-                    LocationUi.Place(name = "Infomaniak", address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland")
-                },
-                onClick = {},
-                onRemoveClick = {},
-            )
+            Section {
+                locations(
+                    location = {
+                        LocationUi.Place(name = "Infomaniak", address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland")
+                    },
+                    onClick = {},
+                    onRemoveClick = {},
+                )
+            }
+
         }
     }
 }
@@ -139,20 +169,22 @@ private fun PreviewEditableWithPlace() {
 private fun PreviewEditableWithRoom() {
     MaterialTheme {
         Surface {
-            Locations(
-                location = {
-                    LocationUi.Room(
-                        id = "1",
-                        name = "Jules Verne room",
-                        seats = 100,
-                        floor = 3,
-                        address = "Infomaniak\nRue Eugène-Marziano 25, 1227 Les Acacias",
-                        availability = null,
-                    )
-                },
-                onClick = {},
-                onRemoveClick = {},
-            )
+            Section {
+                locations(
+                    location = {
+                        LocationUi.Room(
+                            id = "1",
+                            name = "Jules Verne room",
+                            seats = 100,
+                            floor = 3,
+                            address = "Infomaniak\nRue Eugène-Marziano 25, 1227 Les Acacias",
+                            availability = null,
+                        )
+                    },
+                    onClick = {},
+                    onRemoveClick = {},
+                )
+            }
         }
     }
 }

@@ -20,16 +20,18 @@ package com.infomaniak.calendar.components.eventdetail.component
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
+import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.foundation.component.RoomDetails
 import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -41,12 +43,14 @@ import com.infomaniak.core.common.R as RCommon
 internal fun Room(
     room: LocationUi.Room,
     onClick: () -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     trailingContent: (@Composable () -> Unit)? = null,
 ) {
-    ListItem(
+    SegmentedListItem(
         onClick = onClick,
-        shapes = ClickableItemDefaults.ClickableItemShapes,
+        shapes = shapes,
+        colors = CustomColors.EventFormItemColors,
         content = { Text(room.name) },
         leadingContent = { ItemIcon(EsdsIcons.DoorOpen) },
         supportingContent = { RoomDetails(seats = room.seats, floor = room.floor) },
@@ -57,10 +61,17 @@ internal fun Room(
 
 /** [room] above the place it's in, all of it opening the location search and removed by [onRemoveClick]. */
 @Composable
-internal fun RoomEditable(room: LocationUi.Room, onClick: () -> Unit, onRemoveClick: () -> Unit, modifier: Modifier = Modifier) {
+internal fun RoomEditable(
+    room: LocationUi.Room,
+    onClick: () -> Unit,
+    onRemoveClick: () -> Unit,
+    shapes: ListItemShapes,
+    modifier: Modifier = Modifier,
+) {
     Column(modifier) {
         Room(
             room = room,
+            shapes = shapes,
             onClick = onClick,
             trailingContent = {
                 IconButton(onClick = onRemoveClick) {
@@ -79,6 +90,7 @@ private fun PreviewRoom() {
             Room(
                 room = LocationUi.Room(id = "1", name = "Japan room", seats = 5, floor = 3, address = null, availability = null),
                 onClick = {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             )
         }
     }
@@ -98,6 +110,7 @@ private fun PreviewRoomEditable() {
                     address = "Infomaniak\nRue Eugène-Marziano 25, 1227 Les Acacias",
                     availability = null,
                 ),
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
                 onClick = {},
                 onRemoveClick = {},
             )

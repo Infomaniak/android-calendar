@@ -20,6 +20,7 @@ package com.infomaniak.calendar.components.eventdetail.form
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -29,6 +30,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -40,6 +42,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,18 +50,19 @@ import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.CalendarEditable
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatusSwitch
-import com.infomaniak.calendar.components.eventdetail.component.DateAndTimeEditable
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitch
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSwitch
+import com.infomaniak.calendar.components.eventdetail.component.ReminderItemEditable
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
-import com.infomaniak.calendar.components.eventdetail.detail.Locations
+import com.infomaniak.calendar.components.eventdetail.component.dateAndTimeEditable
+import com.infomaniak.calendar.components.eventdetail.component.item
+import com.infomaniak.calendar.components.eventdetail.component.reminder.AddReminderButton
+import com.infomaniak.calendar.components.eventdetail.component.reminder.ReminderOffsetDialog
+import com.infomaniak.calendar.components.eventdetail.detail.locations
 import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
-import com.infomaniak.calendar.components.eventdetail.form.component.reminder.AddReminderButton
-import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderItem
-import com.infomaniak.calendar.components.eventdetail.form.component.reminder.ReminderOffsetDialog
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
-import com.infomaniak.calendar.components.eventdetail.models.NotificationTime
+import com.infomaniak.calendar.components.eventdetail.models.ReminderTime
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
 import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventSharedTransition
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
@@ -92,132 +96,182 @@ fun EventForm(
 ) = ProvideEventSharedTransition(sharedTransitionScope, animatedVisibilityScope) {
     Column(modifier.padding(contentPadding)) {
         val focusRequester = rememberInitialFocusRequester(shouldRequestFocus = { state.titleTextState.text.isEmpty() })
-        TitleEditable(
-            dotColor = { state.eventColorState.value.getColor(state.calendar) },
-            textFieldState = state.titleTextState,
-            modifier = Modifier
-                .focusRequester(focusRequester)
-                .eventSharedElement(EventSharedElement.Title),
-        )
+        Section {
+            item {
+                TitleEditable(
+                    dotColor = { state.eventColorState.value.getColor(state.calendar) },
+                    shapes = it,
+                    textFieldState = state.titleTextState,
+                    modifier = Modifier
+                        .focusRequester(focusRequester)
+                        .eventSharedElement(EventSharedElement.Title),
+                )
+            }
+        }
 
-        AllDaySwitch(
-            checked = state.isAllDay::value,
-            onCheckedChange = { isChecked -> state.isAllDay.value = isChecked },
-        )
+        Section {
+            item { shapes ->
+                AllDaySwitch(
+                    checked = state.isAllDay::value,
+                    onCheckedChange = { state.isAllDay.value = it },
+                    shapes = shapes,
+                )
+            }
 
-        DateAndTimeEditable(
-            dateAndTimeState = state.dateAndTimeState,
-            isAllDay = state.isAllDay::value,
-            onTimeZoneClick = onTimeZoneClick,
-            modifier = Modifier.eventSharedBounds(EventSharedElement.DateAndTime),
-        )
-
-        Section(EventSharedElement.Divider1) {
-            AttendeesButton(
-                attendees = { state.attendees },
-                onClick = onAttendeesClick,
-                modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
+            dateAndTimeEditable(
+                dateAndTimeState = state.dateAndTimeState,
+                isAllDay = state.isAllDay::value,
+                onTimeZoneClick = onTimeZoneClick,
             )
+        }
 
-            KMeetButtonSwitch(
-                checked = state.isKMeetUrlEnabled::value,
-                onCheckedChange = { isChecked -> state.isKMeetUrlEnabled.value = isChecked },
-                modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
-            )
+        Section {
+            item {
+                AttendeesButton(
+                    attendees = { state.attendees },
+                    onClick = onAttendeesClick,
+                    shapes = it,
+                    modifier = Modifier.eventSharedElement(EventSharedElement.Attendees),
+                )
+            }
 
-            Locations(
+            item {
+                KMeetButtonSwitch(
+                    shapes = it,
+                    checked = state.isKMeetUrlEnabled::value,
+                    onCheckedChange = { isChecked -> state.isKMeetUrlEnabled.value = isChecked },
+                    modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
+                )
+            }
+
+            locations(
                 location = { state.location },
                 onClick = onLocationClick,
                 onRemoveClick = { state.location = null },
             )
         }
 
-        Section(EventSharedElement.Divider3) {
-            var isReminderOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
+        var isReminderOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
 
-            ReminderItems(
-                notifications = state.notifications,
-                onRemove = { notification -> state.notifications.remove(notification) },
-            )
+        ReminderItemsSection(
+            reminders = state.reminders,
+            onRemove = { reminder -> state.reminders.remove(reminder) },
+            onAddClick = { isReminderOffsetDialogVisible = true },
+        )
 
-            AddReminderButton(onClick = { isReminderOffsetDialogVisible = true })
+        ReminderDialog(
+            reminders = state.reminders,
+            onCustomReminderClick = onCustomReminderClick,
+            isReminderOffsetDialogVisible = isReminderOffsetDialogVisible,
+            setIsReminderOffsetDialogVisible = { isReminderOffsetDialogVisible = it },
+        )
 
-            if (isReminderOffsetDialogVisible) {
-                ReminderOffsetDialog(
-                    selectedOffset = null,
-                    onOffsetSelect = { offset ->
-                        if (offset != null) {
-                            state.notifications.add(
-                                EventDetailUi.Notification(
-                                    type = EventDetailUi.Notification.Type.Push,
-                                    time = NotificationTime.Offset(offset),
-                                ),
-                            )
-                        }
-                        isReminderOffsetDialogVisible = false
-                    },
-                    onCustomClick = {
-                        isReminderOffsetDialogVisible = false
-                        onCustomReminderClick()
-                    },
-                    onDismissRequest = { isReminderOffsetDialogVisible = false },
+        Section {
+            item {
+                OccupiedStatusSwitch(
+                    checked = state.isOccupied::value,
+                    onCheckedChange = { isChecked -> state.isOccupied.value = isChecked },
+                    modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus),
+                    shapes = it,
+                )
+            }
+
+            item {
+                ClassificationStatusSwitch(
+                    checked = state.isPublic::value,
+                    onCheckedChange = { isChecked -> state.isPublic.value = isChecked },
+                    modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
+                    shapes = it,
+                )
+            }
+
+            item {
+                CalendarEditable(
+                    selectedCalendar = state.calendar,
+                    calendars = state.calendars,
+                    onSelect = state::selectCalendar,
+                    modifier = Modifier.eventSharedBounds(EventSharedElement.Calendar),
+                    shapes = it,
                 )
             }
         }
-
-        Section(EventSharedElement.Divider4) {
-            OccupiedStatusSwitch(
-                checked = state.isOccupied::value,
-                onCheckedChange = { isChecked -> state.isOccupied.value = isChecked },
-                modifier = Modifier.eventSharedBounds(EventSharedElement.OccupiedStatus),
-            )
-
-            ClassificationStatusSwitch(
-                checked = state.isPublic::value,
-                onCheckedChange = { isChecked -> state.isPublic.value = isChecked },
-                modifier = Modifier.eventSharedBounds(EventSharedElement.ClassificationStatus),
-            )
-
-            CalendarEditable(
-                selectedCalendar = state.calendar,
-                calendars = state.calendars,
-                onSelect = state::selectCalendar,
-                modifier = Modifier.eventSharedBounds(EventSharedElement.Calendar),
-            )
-        }
     }
 }
 
 @Composable
-private fun ReminderItems(notifications: List<EventDetailUi.Notification>, onRemove: (EventDetailUi.Notification) -> Unit) {
-    val initialNotifications = remember { notifications.toSet() }
+private fun ReminderDialog(
+    reminders: SnapshotStateList<EventDetailUi.Reminder>,
+    onCustomReminderClick: () -> Unit,
+    isReminderOffsetDialogVisible: Boolean,
+    setIsReminderOffsetDialogVisible: (Boolean) -> Unit,
+) {
+    if (isReminderOffsetDialogVisible) {
+        ReminderOffsetDialog(
+            selectedOffset = null,
+            onOffsetSelect = { offset ->
+                if (offset != null) {
+                    reminders.add(
+                        EventDetailUi.Reminder(
+                            type = EventDetailUi.Reminder.Type.Push,
+                            time = ReminderTime.Offset(offset),
+                        ),
+                    )
+                }
+                setIsReminderOffsetDialogVisible(false)
+            },
+            onCustomClick = {
+                setIsReminderOffsetDialogVisible(false)
+                onCustomReminderClick()
+            },
+            onDismissRequest = { setIsReminderOffsetDialogVisible(false) },
+        )
+    }
+}
+
+@Composable
+private fun ReminderItemsSection(
+    reminders: SnapshotStateList<EventDetailUi.Reminder>,
+    onRemove: (EventDetailUi.Reminder) -> Unit,
+    onAddClick: () -> Unit,
+) {
+    val initialReminders = remember { reminders.toSet() }
 
     // Removed reminders leave the state at once, but stay rendered until they've animated out
-    var lastRenderedNotifications by remember { mutableStateOf(notifications) }
-    val renderedNotifications = notifications.plusExitingFrom(lastRenderedNotifications)
-    SideEffect { lastRenderedNotifications = renderedNotifications }
+    var lastRenderedReminders by remember { mutableStateOf(reminders.toList()) }
+    val renderedReminders = reminders.plusExitingFrom(lastRenderedReminders)
+    SideEffect { lastRenderedReminders = renderedReminders }
 
-    renderedNotifications.forEach { notification ->
-        key(notification) { // Required for proper appearance/disappearance animation
-            AnimatedReminderItem(
-                notification = notification,
-                isVisible = notification in notifications,
-                onRemoveClick = { onRemove(notification) },
-                onExitFinish = { lastRenderedNotifications -= notification },
-                // Reminders already there on entry don't animate in, nor clash with the shared-element transition
-                animateEnter = notification !in initialNotifications,
-            )
+    Section(Modifier.animateContentSize()) {
+        renderedReminders.forEach { reminder ->
+            item { shapes ->
+                key(reminder) { // Required for proper appearance/disappearance animation
+                    AnimatedReminderItem(
+                        reminder = reminder,
+                        isVisible = reminder in reminders,
+                        onRemoveClick = { onRemove(reminder) },
+                        onExitFinish = { lastRenderedReminders -= reminder },
+                        // Reminders already there on entry don't animate in, nor clash with the shared-element transition
+                        animateEnter = reminder !in initialReminders,
+                        shapes = shapes,
+                    )
+                }
+            }
+        }
+
+        item {
+            AddReminderButton(onClick = onAddClick, shapes = it)
         }
     }
 }
 
-/** A [ReminderItem] that expands in, and shrinks out when no longer [isVisible], calling [onExitFinish] once gone. */
+/** A [ReminderItemEditable] that expands in, and shrinks out when no longer [isVisible], calling [onExitFinish] once gone. */
 @Composable
 private fun AnimatedReminderItem(
-    notification: EventDetailUi.Notification,
+    reminder: EventDetailUi.Reminder,
     isVisible: Boolean,
     onRemoveClick: () -> Unit,
     onExitFinish: () -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     animateEnter: Boolean = true,
 ) {
@@ -230,10 +284,11 @@ private fun AnimatedReminderItem(
         enter = expandVertically() + fadeIn(),
         exit = shrinkVertically() + fadeOut(),
     ) {
-        ReminderItem(
-            notification = notification,
+        ReminderItemEditable(
+            reminder = reminder,
+            shapes = shapes,
             onRemoveClick = onRemoveClick,
-            modifier = Modifier.reminderSharedBounds(notification),
+            modifier = Modifier.reminderSharedBounds(reminder),
         )
     }
 
@@ -255,7 +310,7 @@ private fun <T> List<T>.plusExitingFrom(previous: List<T>): List<T> {
 @Composable
 private fun Preview() {
     MaterialTheme {
-        Surface {
+        Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
             val state = remember {
                 EventFormState.default(
                     calendar = previewEventDetailCalendar,
@@ -265,8 +320,8 @@ private fun Preview() {
                     calendars = previewEventDetailCalendarGroups,
                 ).apply {
                     titleTextState.setTextAndPlaceCursorAtEnd("Event title")
-                    notifications.add(
-                        EventDetailUi.Notification(EventDetailUi.Notification.Type.Push, NotificationTime.Offset((-15).minutes)),
+                    reminders.add(
+                        EventDetailUi.Reminder(EventDetailUi.Reminder.Type.Push, ReminderTime.Offset((-15).minutes)),
                     )
                 }
             }

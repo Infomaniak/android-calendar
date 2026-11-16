@@ -17,10 +17,10 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component.items
 
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -28,20 +28,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.resources.R
 
 @Composable
-internal fun ListItemSwitch(
+internal fun SegmentedListItemSwitch(
     checked: () -> Boolean,
     onCheckedChange: (isChecked: Boolean) -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
-    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
     leadingContent: @Composable (() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     val defaultColors = ListItemDefaults.colors()
 
-    ListItem(
+    SegmentedListItem(
         checked = checked(),
         onCheckedChange = onCheckedChange,
         content = content,
@@ -49,7 +50,8 @@ internal fun ListItemSwitch(
         trailingContent = { Switch(checked = checked(), onCheckedChange = null) },
         modifier = modifier,
         colors = ListItemDefaults.colors(
-            selectedContainerColor = defaultColors.containerColor,
+            containerColor = CustomColors.EventFormItemContainerColor,
+            selectedContainerColor = CustomColors.EventFormItemContainerColor,
             selectedContentColor = defaultColors.contentColor,
             selectedLeadingContentColor = defaultColors.leadingContentColor,
             selectedTrailingContentColor = defaultColors.trailingContentColor,
@@ -64,10 +66,11 @@ internal fun ListItemSwitch(
 private fun Preview() {
     MaterialTheme {
         Surface {
-            ListItemSwitch(
+            SegmentedListItemSwitch(
                 checked = { true },
                 onCheckedChange = {},
                 content = { Text(stringResource(id = R.string.kMeetMeeting)) },
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1)
             )
         }
     }

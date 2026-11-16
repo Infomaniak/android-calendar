@@ -17,58 +17,70 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.Layout
-import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
-import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+
+class SectionScope {
+    val itemList = mutableListOf<SectionItem>()
+}
+
+fun SectionScope.item(isVisible: Boolean = true, content: @Composable (ListItemShapes) -> Unit) {
+    itemList.add(SectionItem(isVisible, content))
+}
 
 /**
  * Automatically shows or hides divider based on if any content is composed or not. This layout acts like a column.
  */
 @Composable
 internal fun Section(
-    sharedElementId: EventSharedElement,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
-    content: @Composable () -> Unit,
+    content: SectionScope.() -> Unit,
 ) {
-    Layout(
-        contents = listOf(
-            {
-                Divider(
-                    Modifier
-                        .padding(contentPadding)
-                        .eventSharedElement(sharedElementId),
-                )
-            },
-            content,
-        ),
-        modifier = modifier,
-    ) { (dividerMeasurables, contentMeasurables), constraints ->
-        if (contentMeasurables.isEmpty()) return@Layout layout(0, 0) {}
+    val items = SectionScope().apply(content).itemList
+    if (items.isEmpty()) return
 
-        val childConstraints = constraints.copy(minHeight = 0)
-        val placeables = (dividerMeasurables + contentMeasurables).map { it.measure(childConstraints) }
+    Column(
+        modifier = modifier
+            .padding(contentPadding)
+            .padding(top = EsdsTheme.spacing.md),
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+    ) {
+        val visibleCount = items.count { it.isVisible }
+        var visibleIndex = 0
 
-        val width = placeables.maxOf { it.width }.coerceIn(constraints.minWidth, constraints.maxWidth)
-        val height = placeables.sumOf { it.height }.coerceIn(constraints.minHeight, constraints.maxHeight)
+        items.forEach { item ->
+            var previousShapes by remember { mutableStateOf<ListItemShapes?>(null) }
 
-        layout(width, height) {
-            var y = 0
-            placeables.forEach { placeable ->
-                placeable.place(0, y)
-                y += placeable.height
+            val shapes = if (item.isVisible) {
+                ListItemDefaults.segmentedShapes(index = visibleIndex++, count = visibleCount)
+            } else {
+                previousShapes ?: ListItemDefaults.segmentedShapes(index = 0, count = 1)
             }
+
+            SideEffect {
+                if (item.isVisible) previousShapes = shapes
+            }
+
+            item.content(shapes)
         }
     }
 }
 
-@Composable
-private fun Divider(modifier: Modifier = Modifier) {
-    HorizontalDivider(modifier = modifier.padding(vertical = EsdsTheme.spacing.md))
-}
+data class SectionItem(
+    val isVisible: Boolean,
+    val content: @Composable (ListItemShapes) -> Unit,
+)
+

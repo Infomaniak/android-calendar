@@ -25,9 +25,9 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.infomaniak.calendar.components.eventdetail.models.EventColorChoice
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.eventdetail.state.TimeZoneSaver
 import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
-import com.infomaniak.calendar.components.eventdetail.state.TimeZoneSaver
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import kotlinx.datetime.LocalDateTime
 
@@ -44,11 +44,11 @@ private const val LOCATION_KEY = "location"
 private const val PARTICIPANTS_KEY = "participants"
 private const val ORGANIZER_SOURCE_KEY = "organizerSource"
 private const val IS_KMEET_URL_ENABLED_KEY = "isKMeetUrlEnabled"
-private const val NOTIFICATIONS_KEY = "notifications"
+private const val REMINDERS_KEY = "reminders"
 private const val IS_OCCUPIED_KEY = "isOccupied"
 private const val IS_PUBLIC_KEY = "isPublic"
 
-private val notificationsSaver = autoSaver<SnapshotStateList<EventDetailUi.Notification>>()
+private val remindersSaver = autoSaver<SnapshotStateList<EventDetailUi.Reminder>>()
 
 /** Saves every field of an [EventFormState] but its calendars: restored empty, they are left to its owner. */
 val EventFormState.Companion.Saver: Saver<EventFormState, Any> get() = saver
@@ -70,7 +70,7 @@ private val saver = mapSaver(
             PARTICIPANTS_KEY to ArrayList(it.participants),
             ORGANIZER_SOURCE_KEY to it.organizerSource,
             IS_KMEET_URL_ENABLED_KEY to it.isKMeetUrlEnabled.value,
-            NOTIFICATIONS_KEY to with(notificationsSaver) { save(it.notifications) },
+            REMINDERS_KEY to with(remindersSaver) { save(it.reminders) },
             IS_OCCUPIED_KEY to it.isOccupied.value,
             IS_PUBLIC_KEY to it.isPublic.value,
         )
@@ -91,7 +91,7 @@ private val saver = mapSaver(
             participants = (it[PARTICIPANTS_KEY] as ArrayList<ParticipantUi>).toSet(),
             organizerSource = it[ORGANIZER_SOURCE_KEY] as OrganizerSource?,
             isKMeetUrlEnabled = it[IS_KMEET_URL_ENABLED_KEY] as Boolean,
-            notifications = notificationsSaver.restore(it[NOTIFICATIONS_KEY]!!)!!,
+            reminders = remindersSaver.restore(it[REMINDERS_KEY]!!)!!,
             isOccupied = it[IS_OCCUPIED_KEY] as Boolean,
             isPublic = it[IS_PUBLIC_KEY] as Boolean,
             calendars = emptyList(),

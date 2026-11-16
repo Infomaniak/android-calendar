@@ -43,7 +43,7 @@ fun CustomReminderScreen(
 ) {
     CustomReminderScreen(
         onSubmit = { notification ->
-            eventFormViewModel.formState?.notifications?.add(notification)
+            eventFormViewModel.formState?.reminders?.add(notification)
             goBack()
         },
         goBack = goBack,
@@ -53,7 +53,7 @@ fun CustomReminderScreen(
 
 @Composable
 private fun CustomReminderScreen(
-    onSubmit: (EventDetailUi.Notification) -> Unit,
+    onSubmit: (EventDetailUi.Reminder) -> Unit,
     goBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {

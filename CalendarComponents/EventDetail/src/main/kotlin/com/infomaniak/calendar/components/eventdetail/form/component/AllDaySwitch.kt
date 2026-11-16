@@ -17,7 +17,7 @@
  */
 package com.infomaniak.calendar.components.eventdetail.form.component
 
-import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -26,25 +26,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
-import com.infomaniak.calendar.components.eventdetail.component.items.ListItemSwitch
+import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
+import com.infomaniak.calendar.components.eventdetail.component.items.SegmentedListItemSwitch
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.icons.EsdsIcons
-import com.infomaniak.designsystem.icons.symbols.Calendar
+import com.infomaniak.designsystem.icons.symbols.Clock
 
 @Composable
 internal fun AllDaySwitch(
     checked: () -> Boolean,
     onCheckedChange: (isChecked: Boolean) -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
-    shapes: ListItemShapes = ClickableItemDefaults.ClickableItemShapes,
 ) {
-    ListItemSwitch(
+    SegmentedListItemSwitch(
         checked = checked,
         onCheckedChange = onCheckedChange,
         modifier = modifier,
         shapes = shapes,
-        leadingContent = { Icon(EsdsIcons.Calendar.Small, contentDescription = null) },
+        leadingContent = { ItemIcon(EsdsIcons.Clock) },
     ) {
         Text(stringResource(id = R.string.notificationAllDay))
     }
@@ -55,7 +55,11 @@ internal fun AllDaySwitch(
 private fun Preview() {
     MaterialTheme {
         Surface {
-            AllDaySwitch(checked = { true }, onCheckedChange = {})
+            AllDaySwitch(
+                checked = { true },
+                onCheckedChange = {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            )
         }
     }
 }

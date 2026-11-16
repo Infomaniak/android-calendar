@@ -17,8 +17,10 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,17 +29,20 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
+import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CircularArrowsClockwise
 
 @Composable
-internal fun Recurrence(text: suspend () -> String?, modifier: Modifier = Modifier) {
+internal fun Recurrence(text: suspend () -> String?, shapes: ListItemShapes, modifier: Modifier = Modifier) {
     val recurrenceText by produceState<String?>(null, text) {
         value = text()
     }
 
-    ListItem(
+    SegmentedListItem(
         modifier = modifier,
+        shapes = shapes,
+        colors = CustomColors.EventFormItemColors,
         leadingContent = { ItemIcon(EsdsIcons.CircularArrowsClockwise) },
         content = { recurrenceText?.let { Text(text = it) } },
     )
@@ -48,7 +53,7 @@ internal fun Recurrence(text: suspend () -> String?, modifier: Modifier = Modifi
 private fun Preview() {
     MaterialTheme {
         Surface {
-            Recurrence({ "Every day" })
+            Recurrence({ "Every day" }, shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1))
         }
     }
 }

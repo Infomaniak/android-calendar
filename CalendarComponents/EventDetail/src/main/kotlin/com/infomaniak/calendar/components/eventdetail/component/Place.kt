@@ -20,6 +20,8 @@ package com.infomaniak.calendar.components.eventdetail.component
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
+import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.foundation.component.ListItemClickable
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Cross
@@ -43,6 +46,7 @@ internal fun PlaceButton(
     name: String,
     address: String?,
     onClick: () -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -50,6 +54,7 @@ internal fun PlaceButton(
         name = name,
         address = address,
         onClick = onClick,
+        shapes = shapes,
         modifier = modifier,
         contentPadding = contentPadding,
         trailingContent = { ItemIcon(EsdsIcons.SquareArrowOutUpRight) },
@@ -62,12 +67,14 @@ internal fun PlaceButtonEditable(
     address: String?,
     onClick: () -> Unit,
     onRemoveClick: () -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
 ) {
     InnerPlaceButton(
         name = name,
         address = address,
         onClick = onClick,
+        shapes = shapes,
         modifier = modifier,
         trailingContent = {
             IconButton(onClick = onRemoveClick) {
@@ -78,10 +85,17 @@ internal fun PlaceButtonEditable(
 }
 
 @Composable
-internal fun PlaceEditable(name: String, address: String?, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
+internal fun PlaceEditable(
+    name: String,
+    address: String?,
+    shapes: ListItemShapes,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+) {
     ListItemClickable(
         onClick = onClick,
-        shapes = ClickableItemDefaults.ClickableItemShapes,
+        shapes = shapes,
+        colors = CustomColors.EventFormItemColors,
         content = { Text(name) },
         leadingContent = { ItemIcon(EsdsIcons.MapPin) },
         supportingContent = address?.let { { Text(it) } },
@@ -94,12 +108,14 @@ private fun InnerPlaceButton(
     name: String,
     address: String?,
     onClick: () -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     trailingContent: @Composable () -> Unit = ClickableItemDefaults.trailingContent,
 ) {
     ClickableItem(
         text = name,
+        shapes = shapes,
         leadingIcon = EsdsIcons.MapPin,
         onClick = onClick,
         contentPadding = contentPadding,
@@ -114,7 +130,12 @@ private fun InnerPlaceButton(
 private fun PreviewPlaceButton() {
     MaterialTheme {
         Surface {
-            PlaceButton(name = "Infomaniak", address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland", onClick = {})
+            PlaceButton(
+                name = "Infomaniak",
+                address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland",
+                onClick = {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            )
         }
     }
 }
@@ -129,6 +150,7 @@ private fun PreviewPlaceButtonEditable() {
                 address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland",
                 onClick = {},
                 onRemoveClick = {},
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             )
         }
     }
@@ -139,7 +161,11 @@ private fun PreviewPlaceButtonEditable() {
 private fun PreviewPlaceEditable() {
     MaterialTheme {
         Surface {
-            PlaceEditable(name = "Infomaniak", address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland")
+            PlaceEditable(
+                name = "Infomaniak",
+                address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland",
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            )
         }
     }
 }
