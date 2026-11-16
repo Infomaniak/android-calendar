@@ -88,6 +88,7 @@ include(":CalendarComponents:AttendeesSearch")
 include(":CalendarComponents:Foundation")
 include(":CalendarComponents:Planning")
 include(":CalendarComponents:TimeZoneSearch")
+include(":CalendarComponents:LocationSearch")
 include(":CalendarComponents:Resources")
 
 // Read local.properties first (git-ignored), then fall back to gradle.properties.

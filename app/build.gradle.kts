@@ -155,6 +155,7 @@ dependencies {
     implementation(project(":CalendarComponents:Planning"))
     implementation(project(":CalendarComponents:Resources"))
     implementation(project(":CalendarComponents:TimeZoneSearch"))
+    implementation(project(":CalendarComponents:LocationSearch"))
 
     if (useCalendarCoreCompositeBuild) {
         implementation(libs.infomaniak.multiplatform.calendar.core.submodule)

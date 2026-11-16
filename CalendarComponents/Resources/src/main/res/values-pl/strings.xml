@@ -41,7 +41,6 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Wyszukaj kontakty, aby dodać je do wydarzenia</string>
     <string name="attendeesEmptyStateTitle">Brak gości</string>
-    <string name="attendeesLimitReached">Osiągnięto limit 100 gości</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d oczekujący</item>
         <item quantity="few">%d oczekujących</item>
@@ -55,6 +54,7 @@
         <item quantity="many">%1$d może</item>
         <item quantity="other">%1$d może</item>
     </plurals>
+    <string name="availabilityUnknownLabel">Dostępność nieznana</string>
     <string name="availableLabel">Wolny</string>
     <string name="buttonAddReminder">Dodaj przypomnienie</string>
     <string name="buttonJoin">Dołącz</string>
@@ -80,6 +80,7 @@
     <string name="descriptionTitle">Opis</string>
     <string name="emptyStateNoTimeZone">Nie znaleziono stref czasowych</string>
     <string name="eventTitle">Tytuł wydarzenia</string>
+    <string name="eventValidationTooManyAttendees">Nie można zaprosić więcej niż %d gości</string>
     <plurals name="hourAmount">
         <item quantity="one">%d godzina</item>
         <item quantity="few">%d godziny</item>
@@ -87,6 +88,8 @@
         <item quantity="other">%d godzina</item>
     </plurals>
     <string name="kMeetMeeting">Spotkanie kMeet</string>
+    <string name="locationOrRoomLabel">Lokalizacja lub pomieszczenie</string>
+    <string name="locationSearchPlaceholder">Dodaj lokalizację</string>
     <plurals name="minuteAmount">
         <item quantity="one">%d minuta</item>
         <item quantity="few">%d minuty</item>
@@ -120,6 +123,7 @@
     <string name="statusDeclinedLabel">Odrzucono</string>
     <string name="statusNeedsActionLabel">W toku</string>
     <string name="statusTentativeLabel">Może</string>
+    <string name="unavailableLabel">Niedostępna</string>
     <plurals name="unitDays">
         <item quantity="one">dzień</item>
         <item quantity="few">dni</item>

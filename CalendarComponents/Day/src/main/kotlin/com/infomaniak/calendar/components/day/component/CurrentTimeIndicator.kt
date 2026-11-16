@@ -17,52 +17,25 @@
  */
 package com.infomaniak.calendar.components.day.component
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
-import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
+import com.infomaniak.calendar.components.foundation.component.CurrentTimeLine
 import kotlinx.datetime.LocalDateTime
 
 internal val LocalDateTime.minuteOfDay: Int get() = hour * MINUTES_PER_HOUR + minute
 
-private val CurrentTimeDotRadius = 4.dp
-private val LineWidth = 1.dp
-
-/**
- * Purely visual: a landmark for reading the grid at a glance. It carries no semantics on purpose,
- * having nothing to announce that the clock does not already say.
- *
- * Runs across its whole width, its dot centred on its start edge.
- */
 @Composable
 internal fun CurrentTimeIndicator(minuteOfDay: Int, state: TimelineState, modifier: Modifier = Modifier) {
-    val color = MaterialTheme.extendedColorScheme.datavizPink
-
-    Canvas(modifier = modifier) {
-        val y = state.verticalOffsetOf(minuteOfDay).toPx()
-
-        drawLine(
-            color = color,
-            start = Offset(0f, y),
-            end = Offset(size.width, y),
-            strokeWidth = LineWidth.toPx(),
-        )
-
-        val startX = if (layoutDirection == LayoutDirection.Ltr) 0f else size.width
-        drawCircle(color = color, radius = CurrentTimeDotRadius.toPx(), center = Offset(startX, y))
-    }
+    CurrentTimeLine(modifier = modifier, lineY = { state.verticalOffsetOf(minuteOfDay).toPx() })
 }
 
 /** Room for the dot, which hangs off the start edge. */

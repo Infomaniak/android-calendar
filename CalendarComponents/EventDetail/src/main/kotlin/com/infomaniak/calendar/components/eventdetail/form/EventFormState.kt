@@ -33,6 +33,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDraft
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.eventdetail.state.computeDefaultValues
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import kotlinx.datetime.LocalDate
@@ -58,6 +59,7 @@ class EventFormState(
     end: LocalDateTime,
     endTimeZone: TimeZone,
     hasEndEverBeenTouched: Boolean,
+    location: LocationUi?,
     participants: Set<ParticipantUi>,
     organizerSource: OrganizerSource?,
     isKMeetUrlEnabled: Boolean,
@@ -83,6 +85,7 @@ class EventFormState(
         ),
         hasEndEverBeenTouched = mutableStateOf(hasEndEverBeenTouched),
     )
+    var location by mutableStateOf(location)
     val participants = mutableStateSetOf<ParticipantUi>().apply { addAll(participants) }
     var organizerSource by mutableStateOf(organizerSource)
         private set
@@ -119,6 +122,7 @@ class EventFormState(
             startTimeZone = dateAndTimeState.start.timeZone,
             end = end,
             endTimeZone = dateAndTimeState.end.timeZone,
+            location = location,
             attendees = attendees,
             initialOrganizer = (organizerSource as? OrganizerSource.Static)?.organizer,
             isKMeetUrlEnabled = isKMeetUrlEnabled.value,
@@ -149,6 +153,7 @@ class EventFormState(
                 end = end,
                 endTimeZone = timeZone,
                 hasEndEverBeenTouched = false,
+                location = null,
                 participants = emptySet(),
                 organizerSource = calendar.organizerAttendeeUi?.let(OrganizerSource::Dynamic),
                 isKMeetUrlEnabled = false,

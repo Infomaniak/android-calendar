@@ -38,7 +38,9 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.foundation.component.EmptyState
 import com.infomaniak.calendar.ui.component.topAppBar.SubmitTopAppBar
+import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormNavigation
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.locationSearch.LocationSearchViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.core.common.utils.today
@@ -53,17 +55,21 @@ import kotlin.time.Duration.Companion.hours
 fun EventCreationScreen(
     date: LocalDate,
     goBack: () -> Unit,
-    goToEventsAttendees: () -> Unit,
-    goToTimeZoneSearch: (isStart: Boolean) -> Unit,
-    goToCustomReminder: () -> Unit,
+    navigation: EventFormNavigation,
     modifier: Modifier = Modifier,
     eventCreationViewModel: EventCreationViewModel = viewModel(),
     eventFormViewModel: EventFormViewModel = viewModel(),
+    locationSearchViewModel: LocationSearchViewModel = viewModel(),
 ) {
     val calendarsUiState by eventCreationViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         eventFormViewModel.initCreation(date)
+    }
+
+    val formState = eventFormViewModel.formState
+    LaunchedEffect(formState) {
+        formState?.let { locationSearchViewModel.followForm(it, editedOccurrenceId = null) }
     }
 
     val uiState = when (calendarsUiState) {
@@ -82,9 +88,7 @@ fun EventCreationScreen(
         },
         modifier = modifier,
         goBack = goBack,
-        goToEventsAttendees = goToEventsAttendees,
-        goToTimeZoneSearch = goToTimeZoneSearch,
-        goToCustomReminder = goToCustomReminder,
+        navigation = navigation,
     )
 }
 
@@ -93,9 +97,7 @@ private fun EventCreationScreen(
     uiState: EventCreationScreenState,
     onSubmit: () -> Unit,
     goBack: () -> Unit,
-    goToEventsAttendees: () -> Unit,
-    goToTimeZoneSearch: (isStart: Boolean) -> Unit,
-    goToCustomReminder: () -> Unit,
+    navigation: EventFormNavigation,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -120,9 +122,10 @@ private fun EventCreationScreen(
             )
             is EventCreationScreenState.Success -> EventForm(
                 state = uiState.eventFormState,
-                onAttendeesClick = goToEventsAttendees,
-                onTimeZoneClick = goToTimeZoneSearch,
-                onCustomReminderClick = goToCustomReminder,
+                onAttendeesClick = navigation.goToAttendees,
+                onLocationClick = navigation.goToLocationSearch,
+                onTimeZoneClick = navigation.goToTimeZoneSearch,
+                onCustomReminderClick = navigation.goToCustomReminder,
                 contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                 modifier = Modifier.verticalScroll(scrollState),
             )
@@ -154,9 +157,12 @@ private fun EventCreationScreenPreview() {
             uiState = EventCreationScreenState.Success(state),
             onSubmit = {},
             goBack = {},
-            goToEventsAttendees = {},
-            goToTimeZoneSearch = {},
-            goToCustomReminder = {},
+            navigation = EventFormNavigation(
+                goToAttendees = {},
+                goToTimeZoneSearch = {},
+                goToCustomReminder = {},
+                goToLocationSearch = {},
+            ),
         )
     }
 }
@@ -169,9 +175,12 @@ private fun PreviewEmptyWritableCalendar() {
             uiState = EventCreationScreenState.NoWritableCalendar,
             onSubmit = {},
             goBack = {},
-            goToEventsAttendees = {},
-            goToTimeZoneSearch = {},
-            goToCustomReminder = {},
+            navigation = EventFormNavigation(
+                goToAttendees = {},
+                goToTimeZoneSearch = {},
+                goToCustomReminder = {},
+                goToLocationSearch = {},
+            ),
         )
     }
 }

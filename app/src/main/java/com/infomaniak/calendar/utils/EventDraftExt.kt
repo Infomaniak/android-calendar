@@ -37,6 +37,8 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.Alarm
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.EventAlarm
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.TriggerRelation
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 
 val EventDraft.typedCalendarId: CalendarId get() = CalendarId(calendarId)
@@ -52,6 +54,7 @@ fun EventDraft.applyTo(
 ): EventEditData = editData.copy(
     title = title,
     timing = editData.timing.copy(bounds = bounds()),
+    location = location.toLocation(editData.location),
     timeBlocking = if (isOccupied) TimeBlocking.Blocks else TimeBlocking.DoesNotBlock,
     calendarId = typedCalendarId,
     attendees = attendees.toAttendeeEdit(),
@@ -96,7 +99,16 @@ fun EventDraft.toNewEventEditData(defaultOrganizer: Organizer?): EventEditData =
 fun List<AttendeeUi>.toAttendeeEdit(): List<AttendeeEdit> = map { AttendeeEdit(email = it.email, displayName = it.displayName) }
 
 /** The bounds the form describes, knowing it shows the last day of an all-day event where KMP expects the day after it. */
-private fun EventDraft.bounds(): EventBounds = if (isAllDay) {
+private fun EventDraft.bounds(): EventBounds = eventBounds(isAllDay, start, startTimeZone, end, endTimeZone)
+
+/** The bounds of an event edited from [start] to [end], both included, when it [isAllDay]. */
+fun eventBounds(
+    isAllDay: Boolean,
+    start: LocalDateTime,
+    startTimeZone: TimeZone,
+    end: LocalDateTime,
+    endTimeZone: TimeZone,
+): EventBounds = if (isAllDay) {
     EventBounds.AllDay(start = start.date, end = end.date.plus(1, DateTimeUnit.DAY))
 } else {
     EventBounds.Zoned(start = ZonedWallClock(start, startTimeZone), end = ZonedWallClock(end, endTimeZone))

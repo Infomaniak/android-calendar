@@ -37,7 +37,6 @@ dependencies {
     api(project(":CalendarComponents:Foundation"))
     implementation(project(":CalendarComponents:Resources"))
 
-    implementation(core.infomaniak.core.ui.compose.basics)
 
     implementation(libs.infomaniak.designsystem.foundation)
     implementation(libs.infomaniak.designsystem.icons)

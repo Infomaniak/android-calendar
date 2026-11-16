@@ -40,7 +40,6 @@ dependencies {
 
     implementation(core.infomaniak.core.avatar)
     implementation(core.infomaniak.core.common)
-    implementation(core.infomaniak.core.ui.compose.basics)
 
     implementation(libs.infomaniak.designsystem.foundation)
     implementation(libs.infomaniak.designsystem.icons)

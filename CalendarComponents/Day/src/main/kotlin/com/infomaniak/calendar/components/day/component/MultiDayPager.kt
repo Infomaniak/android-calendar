@@ -63,6 +63,7 @@ import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
 import com.infomaniak.calendar.components.foundation.theme.ComponentColors
+import com.infomaniak.calendar.components.foundation.utils.onlyHorizontalAndTop
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
@@ -262,9 +263,6 @@ private fun Modifier.verticalEndDivider(color: Color = ComponentColors.GridDivid
         strokeWidth = GridLineThickness.toPx(),
     )
 }
-@Composable
-private fun PaddingValues.onlyHorizontalAndTop(): PaddingValues = onlyHorizontal() + PaddingValues(top = calculateTopPadding())
-
 private val previewDates = Clock.today().let { today -> List(3) { today.plus(it, DateTimeUnit.DAY) } }
 
 @Preview

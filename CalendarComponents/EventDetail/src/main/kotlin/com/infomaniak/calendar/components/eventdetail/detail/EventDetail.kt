@@ -38,14 +38,14 @@ import com.infomaniak.calendar.components.eventdetail.component.ClassificationSt
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatus
+import com.infomaniak.calendar.components.eventdetail.component.PlaceButton
 import com.infomaniak.calendar.components.eventdetail.component.Recurrence
 import com.infomaniak.calendar.components.eventdetail.component.ReminderItem
+import com.infomaniak.calendar.components.eventdetail.component.Room
 import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.Title
 import com.infomaniak.calendar.components.eventdetail.component.item
 import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionCollapsibleButton
-import com.infomaniak.calendar.components.eventdetail.detail.component.LocationButton
-import com.infomaniak.calendar.components.eventdetail.detail.component.RoomButton
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailRecurrence
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.modifier.EventSharedElement
@@ -53,6 +53,7 @@ import com.infomaniak.calendar.components.eventdetail.modifier.ProvideEventShare
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedBounds
 import com.infomaniak.calendar.components.eventdetail.modifier.eventSharedElement
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailUi
+import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 /**
@@ -65,7 +66,6 @@ fun EventDetail(
     onCopyKMeet: () -> Unit,
     onLocationClick: () -> Unit,
     goToEventAttendees: () -> Unit,
-    onRoomClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -123,12 +123,27 @@ fun EventDetail(
                     }
                 }
 
-                if (location?.isNotBlank() == true) {
-                    item { LocationButton(location = location, shapes = it, onClick = onLocationClick) }
+                if (location is LocationUi.Room) {
+                    item {
+                        Room(
+                            room = location,
+                            onClick = onLocationClick,
+                            modifier = Modifier.eventSharedBounds(EventSharedElement.Room),
+                            shapes = it,
+                        )
+                    }
                 }
 
-                if (room != null) {
-                    item { RoomButton(room = room, shapes = it, onClick = onRoomClick) }
+                location?.nameAndAddress?.let {
+                    item { shapes ->
+                        PlaceButton(
+                            name = it.name,
+                            address = it.address,
+                            onClick = onLocationClick,
+                            modifier = Modifier.eventSharedBounds(EventSharedElement.Place),
+                            shapes = shapes,
+                        )
+                    }
                 }
             }
 
@@ -189,7 +204,6 @@ private fun PreviewEventDetail() {
                         onJoinKMeet = {},
                         onCopyKMeet = {},
                         onLocationClick = {},
-                        onRoomClick = {},
                         goToEventAttendees = {},
                         contentPadding = PaddingValues(horizontal = EsdsTheme.spacing.lg) + it,
                     )

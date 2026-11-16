@@ -21,7 +21,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -42,15 +44,19 @@ import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
 import com.infomaniak.calendar.components.foundation.state.DateState
+import com.infomaniak.calendar.components.foundation.state.rememberCurrentInstant
 import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortDayNameUppercase
+import com.infomaniak.calendar.components.planning.component.DayCurrentTimeLine
 import com.infomaniak.calendar.components.planning.component.DayIndicator
+import com.infomaniak.calendar.components.planning.component.currentTimeIndex
 import com.infomaniak.calendar.components.planning.component.emptyState.OtherDayEmptyState
 import com.infomaniak.calendar.components.planning.component.emptyState.TodayEmptyState
 import com.infomaniak.calendar.components.planning.preview.PlanningPreviewParameter
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.LocalDate
+import kotlin.time.Instant
 
 @Composable
 fun Planning(
@@ -63,6 +69,7 @@ fun Planning(
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val today by rememberToday()
+    val currentInstant = rememberCurrentInstant()
 
     LazyColumn(
         state = lazyListState,
@@ -82,6 +89,7 @@ fun Planning(
                     date = date,
                     events = eventsOf(date),
                     today = today,
+                    currentInstant = currentInstant::value,
                     lazyListState = lazyListState,
                     index = index,
                     goToEventCreation = goToEventCreation,
@@ -97,6 +105,7 @@ private fun Day(
     date: LocalDate,
     events: List<EventSummaryUi>?,
     today: LocalDate,
+    currentInstant: () -> Instant,
     lazyListState: LazyListState,
     index: Int,
     goToEventCreation: (LocalDate) -> Unit,
@@ -113,10 +122,21 @@ private fun Day(
             modifier = Modifier.stickyDayIndicator(lazyListState, index),
         )
 
-        Column(verticalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md)) {
-            events?.forEach { event ->
-                key(event.id) { DayEvent(event, date, goToEventCreation, onEventClick) }
+        events?.let {
+            Column {
+                val currentTimeIndex = if (date == today) events.currentTimeIndex(now = currentInstant()) else null
+
+                events.forEachIndexed { index, event ->
+                    when {
+                        index == currentTimeIndex -> DayCurrentTimeLine()
+                        index > 0 -> Spacer(Modifier.height(EsdsTheme.spacing.md))
+                    }
+                    key(event.id) { DayEvent(event, date, goToEventCreation, onEventClick) }
+                }
+
+                if (currentTimeIndex == events.size) DayCurrentTimeLine()
             }
+
         }
     }
 }

@@ -90,7 +90,7 @@ class EventFormViewModel(
         }
     }
 
-    /** @param event The edited event, already loaded by the event detail, kept up to date here afterwards. */
+    /** @param event The edited event, already loaded by the event detail, kept up to date here afterward. */
     fun initEdition(event: EventDetailUi) {
         if (isInitialized) return
         isInitialized = true
@@ -109,6 +109,7 @@ class EventFormViewModel(
             end = endDate.atTime(end.time),
             endTimeZone = event.end.timeZone,
             hasEndEverBeenTouched = false,
+            location = event.location,
             participants = event.attendees.all.toSet(),
             organizerSource = Static(event.organizer),
             isKMeetUrlEnabled = event.kMeetUrl != null,

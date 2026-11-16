@@ -43,19 +43,21 @@ app/src/main/java/com/infomaniak/calendar/
 │   ├── VisibleDateManager.kt       # App-scoped: single visible-date source, restored/saved by MainViewModel
 │   ├── VisibleMonthManager.kt      # App-scoped: event dots derived from the shared visible date's month
 │   ├── VisibleEventsManager.kt     # App-scoped: one observation of the day-sliced events around the visible date, for every view
-│   └── DayEventsLoader.kt          # App-scoped: VisibleEventsManager's events split into all-day and timed, for the day views
+│   ├── DayEventsLoader.kt          # App-scoped: VisibleEventsManager's events split into all-day and timed, for the day views
+│   └── PlaceSearcher.kt            # Location search's places, from the platform Geocoder (none on devices without one)
 ├── utils/
 │   ├── AttendeeExt.kt              # KMP Attendee → Attendees mapping for event detail
 │   ├── DayEventGroupingExt.kt      # Groups day-sliced events for calendar views
 │   ├── EventDaySliceExt.kt         # KMP EventDaySlice → OccurrenceEventUi mapping, shared by every calendar view
 │   ├── EventDraftExt.kt            # EventDraft → KMP EventEditData for creation and edition: a new form field is one line in `applyTo`; unchanged notifications leave the stored alarms alone (`AlarmListEdit.Preserve`, since `Event.alarms` lacks the ones KMP can't read), changed ones get back the stored alarm they were read from (matched by the `Notification.sourceId` holding its KMP `AlarmId`)
-│   └── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
+│   ├── EventExt.kt                 # KMP Event → EventDetailUi mapping, shared by every view opening an event
+│   └── LocationExt.kt              # KMP Location ↔ Foundation's LocationUi: a place's name and address are read from and written to the `LOCATION` text until KMP stores them
 └── ui/
     ├── model/                     # OccurrenceEventUi calendar item carrying KMP OccurrenceId and attendee summary; TimelineUiState;
     │                              # UserCalendarsUi / CalendarSectionUi / CalendarUi / CalendarColorsUi, the calendars as the drawer and other views draw them
     ├── navigation/
     │   ├── MainNavHost.kt          # Top-level NavDisplay; manual `when` entry provider (dynamic per-key metadata)
-    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventDetail, AttendeeSearch(parent: EventForm), EventForm.{EventCreation, EventEdit, EditableAttendeeSearch(parent, config), EventTimeZone(parent, isStart), EventCustomReminder(parent)}, Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
+    │   ├── NavDestination.kt       # Navigation keys (Calendar views, EventDetail, AttendeeSearch(parent: EventForm), EventForm.{EventCreation, EventEdit, EditableAttendeeSearch(parent, config), EventTimeZone(parent, isStart), EventCustomReminder(parent), EventLocationSearch(parent)}, Accounts, Settings.Main / Settings.Theme, Onboarding.Login(onlyLogin) / Onboarding.Permissions)
     │   ├── SharedViewModelStores.kt # `toContentKey` and the `shareViewModelStoreWith(parent)` metadata
     │   ├── SharedViewModelStoreNavEntryDecorator.kt # NavEntryDecorator + `LocalSharedViewModelStoreOwner`: lets a child entry
     │                                                # reach the ViewModelStore of a parent entry (declared via `parent(contentKey)` metadata)
@@ -74,9 +76,20 @@ app/src/main/java/com/infomaniak/calendar/
     │                              # attendeesSearch/ (AttendeesSearchScreen, reading and writing the form's participants;
     │                              # EditableAttendeesSearchScreen, reading EventDetailViewModel's AttendeesSearchState;
     │                              # AttendeesSearchViewModel.EnableSearch searching the contacts as the query is typed)
-    │                              # form/ (EventFormViewModel: the event form state of EventCreation / EventEdit)
+    │                              # form/ (EventFormViewModel: the event form state of EventCreation / EventEdit; EventFormNavigation: their sub-screen callbacks)
     │                              # timeZoneSearch/ (TimeZoneSearchScreen: writes the picked time zone to the form)
     │                              # customReminder/ (CustomReminderScreen: adds the made reminder to the form)
+    │                              # locationSearch/ (LocationSearchScreen: writes the clicked place, the typed text included, to the form as its location,
+    │                              #   or the clicked room as its room (saved as a Location.BookableRoom);
+    │                              #   LocationSearchViewModel, shared through the form's ViewModelStore, observes the bookable rooms of the form's calendar
+    │                              #   as soon as EventCreation / EventEdit opens, then sorts them by availability over the form's time, and over the edited
+    │                              #   event's recurrence. Rooms are listed with an unknown availability until it loads (or when it fails), then sorted.
+    │                              #   It merges the search's results: the typed text, the Geocoder's places, then the rooms whose name matches.
+    │                              #   Switching the form's calendar clears its room when the new calendar can't book it (compared by id).
+    │                              #   A room unknown locally isn't shown in the form, it's kept on save until another location is picked.
+    │                              #   A booked room (Location.BookableRoom with a known resource) maps to LocationUi.Room, shown in the detail
+    │                              #   and as the form's location, under its building's place, until another location is picked. The room row isn't clickable,
+    │                              #   and the form animates the switch when the room goes, e.g. dropped by a calendar switch)
     │   └── onboarding/            # Two onboardings, each with its own page enum, sharing OnboardingPage + OnboardingButtonDefaults:
     │                              # login/ (LoginOnboardingScreen + LoginOnboardingPage + CrossAppLoginViewModel): welcome + login;
     │                              # permissions/ (PermissionsOnboardingScreen + PermissionsOnboardingPage + NextStepButton): a pager
@@ -163,7 +176,7 @@ app/
   single private screen state (`EventCreationScreenState`, `EventEditScreenState`) that its stateless content draws:
   `Success` only once `formState` is there. `EventCreationViewModel` / `EventEditViewModel` only keep the calendars'
   availability (creation) and the submission.
-- **Screens opened by the event form** (time zone, custom reminder, attendees) follow the screens' usual split: a public
+- **Screens opened by the event form** (time zone, custom reminder, attendees, location) follow the screens' usual split: a public
   composable reading `EventFormViewModel` from its parent's store (`viewModel(LocalSharedViewModelStoreOwner.current)` as a
   default parameter; its `formState` is `null` until the form is loaded), and a private stateless one taking initial values,
   keeping its own draft until submitted, and reporting it through `onSubmit`-like callbacks before calling `goBack`. The

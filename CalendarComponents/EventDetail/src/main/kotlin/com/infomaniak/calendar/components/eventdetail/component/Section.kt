@@ -24,15 +24,25 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
+data class Item(
+    val isVisible: Boolean,
+    val content: @Composable (ListItemShapes) -> Unit,
+)
+
 class SectionScope {
-    val itemList = mutableListOf<@Composable (ListItemShapes) -> Unit>()
+    val itemList = mutableListOf<Item>()
 }
 
-fun SectionScope.item(content: @Composable (ListItemShapes) -> Unit) {
-    itemList.add(content)
+fun SectionScope.item(isVisible: Boolean = true, content: @Composable (ListItemShapes) -> Unit) {
+    itemList.add(Item(isVisible, content))
 }
 
 /**
@@ -53,8 +63,24 @@ internal fun Section(
             .padding(top = EsdsTheme.spacing.md),
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
     ) {
-        items.forEachIndexed { index, item ->
-            item(ListItemDefaults.segmentedShapes(index = index, count = items.size))
+        val visibleCount = items.count { it.isVisible }
+        var visibleIndex = 0
+
+        items.forEach { item ->
+            var previousShapes by remember { mutableStateOf<ListItemShapes?>(null) }
+
+            val shapes = if (item.isVisible) {
+                ListItemDefaults.segmentedShapes(index = visibleIndex++, count = visibleCount)
+            } else {
+                previousShapes ?: ListItemDefaults.segmentedShapes(index = 0, count = 1)
+            }
+
+            SideEffect {
+                if (item.isVisible) previousShapes = shapes
+            }
+
+            item.content(shapes)
         }
     }
 }
+

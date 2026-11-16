@@ -42,7 +42,9 @@ import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailSharedDataViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
+import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormNavigation
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
+import com.infomaniak.calendar.ui.screen.eventDetail.locationSearch.LocationSearchViewModel
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
@@ -59,13 +61,12 @@ fun EventEditScreen(
     occurrenceId: OccurrenceId,
     goBack: () -> Unit,
     goBackToCalendarView: () -> Unit,
-    goToEventAttendees: () -> Unit,
-    goToTimeZoneSearch: (isStart: Boolean) -> Unit,
-    goToCustomReminder: () -> Unit,
+    navigation: EventFormNavigation,
     modifier: Modifier = Modifier,
     viewModel: EventEditViewModel = viewModel(),
     eventDetailSharedDataViewModel: EventDetailSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current),
     eventFormViewModel: EventFormViewModel = viewModel(),
+    locationSearchViewModel: LocationSearchViewModel = viewModel(),
 ) {
     val eventDetailUiState = eventDetailSharedDataViewModel.eventDetailUi.collectAsStateWithLifecycle().value
 
@@ -75,6 +76,10 @@ fun EventEditScreen(
     }
 
     val formState = eventFormViewModel.formState
+
+    LaunchedEffect(formState) {
+        formState?.let { locationSearchViewModel.followForm(it, editedOccurrenceId = occurrenceId) }
+    }
 
     val uiState = if (eventDetailUiState is EventDetailUiState.Displayable.Success && formState != null) {
         EventEditScreenState.Success(formState, isRecurring = eventDetailUiState.eventDetail.isRecurring)
@@ -93,9 +98,7 @@ fun EventEditScreen(
     EventEditScreen(
         uiState = uiState,
         goBack = goBack,
-        goToEventAttendees = goToEventAttendees,
-        goToTimeZoneSearch = goToTimeZoneSearch,
-        goToCustomReminder = goToCustomReminder,
+        navigation = navigation,
         modifier = modifier,
         onSubmit = { scope ->
             val eventDraft = eventFormViewModel.formState?.toEventDraft() ?: return@EventEditScreen
@@ -110,9 +113,7 @@ fun EventEditScreen(
 private fun EventEditScreen(
     uiState: EventEditScreenState,
     goBack: () -> Unit,
-    goToEventAttendees: () -> Unit,
-    goToTimeZoneSearch: (isStart: Boolean) -> Unit,
-    goToCustomReminder: () -> Unit,
+    navigation: EventFormNavigation,
     onSubmit: (RecurrentEventScope) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -138,9 +139,10 @@ private fun EventEditScreen(
             is EventEditScreenState.Success -> {
                 EventForm(
                     state = uiState.eventFormState,
-                    onAttendeesClick = goToEventAttendees,
-                    onTimeZoneClick = goToTimeZoneSearch,
-                    onCustomReminderClick = goToCustomReminder,
+                    onAttendeesClick = navigation.goToAttendees,
+                    onLocationClick = navigation.goToLocationSearch,
+                    onTimeZoneClick = navigation.goToTimeZoneSearch,
+                    onCustomReminderClick = navigation.goToCustomReminder,
                     modifier = Modifier.verticalScroll(scrollState),
                     contentPadding = contentPadding + Dimens.EventDetailScreensHorizontalPadding,
                     sharedTransitionScope = sharedTransitionScope,
@@ -174,9 +176,12 @@ private fun Preview() {
             EventEditScreen(
                 uiState = EventEditScreenState.Success(formState, isRecurring = false),
                 goBack = {},
-                goToEventAttendees = {},
-                goToTimeZoneSearch = {},
-                goToCustomReminder = {},
+                navigation = EventFormNavigation(
+                    goToAttendees = {},
+                    goToTimeZoneSearch = {},
+                    goToCustomReminder = {},
+                    goToLocationSearch = {},
+                ),
                 onSubmit = {},
             )
         }

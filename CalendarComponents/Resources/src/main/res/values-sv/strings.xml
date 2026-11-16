@@ -35,7 +35,6 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Sök efter kontakter för att lägga till dem i händelsen</string>
     <string name="attendeesEmptyStateTitle">Inga gäster</string>
-    <string name="attendeesLimitReached">Du har nått gränsen på 100 gäster</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d väntande</item>
         <item quantity="other">%d väntande</item>
@@ -45,6 +44,7 @@
         <item quantity="one">%1$d kanske</item>
         <item quantity="other">%1$d kanske</item>
     </plurals>
+    <string name="availabilityUnknownLabel">Tillgänglighet okänd</string>
     <string name="availableLabel">Ledig</string>
     <string name="buttonAddReminder">Lägg till en påminnelse</string>
     <string name="buttonJoin">Gå med</string>
@@ -66,11 +66,14 @@
     <string name="descriptionTitle">Beskrivning</string>
     <string name="emptyStateNoTimeZone">Inga tidszoner hittades</string>
     <string name="eventTitle">Evenemangstitel</string>
+    <string name="eventValidationTooManyAttendees">Du kan inte ha fler än %d gäster</string>
     <plurals name="hourAmount">
         <item quantity="one">%d timme</item>
         <item quantity="other">%d timmar</item>
     </plurals>
     <string name="kMeetMeeting">kMeet-möte</string>
+    <string name="locationOrRoomLabel">Plats eller rum</string>
+    <string name="locationSearchPlaceholder">Lägg till en plats</string>
     <plurals name="minuteAmount">
         <item quantity="one">%d minut</item>
         <item quantity="other">%d minuter</item>
@@ -100,6 +103,7 @@
     <string name="statusDeclinedLabel">Avvisat</string>
     <string name="statusNeedsActionLabel">Väntar på beslut</string>
     <string name="statusTentativeLabel">Kanske</string>
+    <string name="unavailableLabel">Inte tillgänglig</string>
     <plurals name="unitDays">
         <item quantity="one">dag</item>
         <item quantity="other">dagar</item>

@@ -19,7 +19,9 @@ package com.infomaniak.calendar.components.foundation.state
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -29,6 +31,18 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
+/** Current instant, re-emitted on every minute boundary. */
+@Composable
+fun rememberCurrentInstant(): State<Instant> {
+    return produceState(initialValue = Clock.System.now()) {
+        while (true) {
+            val now = Clock.System.now()
+            value = now
+            delay(now.untilNextMinute())
+        }
+    }
+}
+
 /**
  * Current date and time, re-emitted on every minute boundary.
  *
@@ -37,13 +51,8 @@ import kotlin.time.Instant
  */
 @Composable
 fun rememberCurrentDateTime(timeZone: TimeZone = TimeZone.currentSystemDefault()): State<LocalDateTime> {
-    return produceState(initialValue = Clock.System.now().toLocalDateTime(timeZone), timeZone) {
-        while (true) {
-            val now = Clock.System.now()
-            value = now.toLocalDateTime(timeZone)
-            delay(now.untilNextMinute())
-        }
-    }
+    val currentInstant = rememberCurrentInstant()
+    return remember(timeZone) { derivedStateOf { currentInstant.value.toLocalDateTime(timeZone) } }
 }
 
 private fun Instant.untilNextMinute() = 1.minutes - (toEpochMilliseconds() % 1.minutes.inWholeMilliseconds).milliseconds

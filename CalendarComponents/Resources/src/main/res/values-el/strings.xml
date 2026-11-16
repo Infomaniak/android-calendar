@@ -35,7 +35,6 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Αναζητήστε επαφές για να τις προσθέσετε στην εκδήλωση</string>
     <string name="attendeesEmptyStateTitle">Δεν υπάρχουν καλεσμένοι</string>
-    <string name="attendeesLimitReached">Έχετε φτάσει το όριο των 100 καλεσμένων</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d σε αναμονή</item>
         <item quantity="other">%d σε αναμονή</item>
@@ -45,6 +44,7 @@
         <item quantity="one">%1$d ίσως</item>
         <item quantity="other">%1$d ίσως</item>
     </plurals>
+    <string name="availabilityUnknownLabel">Άγνωστη διαθεσιμότητα</string>
     <string name="availableLabel">Διαθέσιμο</string>
     <string name="buttonAddReminder">Προσθήκη υπενθύμισης</string>
     <string name="buttonJoin">Εγγραφή</string>
@@ -66,11 +66,14 @@
     <string name="descriptionTitle">Περιγραφή</string>
     <string name="emptyStateNoTimeZone">Δεν βρέθηκαν ζώνες ώρας</string>
     <string name="eventTitle">Τίτλος εκδήλωσης</string>
+    <string name="eventValidationTooManyAttendees">Δεν μπορείτε να έχετε περισσότερους από %d καλεσμένους</string>
     <plurals name="hourAmount">
         <item quantity="one">%d ώρα</item>
         <item quantity="other">%d ώρες</item>
     </plurals>
     <string name="kMeetMeeting">Συνάντηση kMeet</string>
+    <string name="locationOrRoomLabel">Τοποθεσία ή δωμάτιο</string>
+    <string name="locationSearchPlaceholder">Προσθήκη τοποθεσίας</string>
     <plurals name="minuteAmount">
         <item quantity="one">%d λεπτό</item>
         <item quantity="other">%d λεπτά</item>
@@ -100,6 +103,7 @@
     <string name="statusDeclinedLabel">Απορρίφθηκε</string>
     <string name="statusNeedsActionLabel">Σε εκκρεμότητα</string>
     <string name="statusTentativeLabel">Ίσως</string>
+    <string name="unavailableLabel">Μη διαθέσιμη</string>
     <plurals name="unitDays">
         <item quantity="one">ημέρα</item>
         <item quantity="other">ημέρες</item>

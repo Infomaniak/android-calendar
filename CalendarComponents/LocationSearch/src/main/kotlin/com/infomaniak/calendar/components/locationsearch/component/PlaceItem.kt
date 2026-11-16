@@ -15,48 +15,51 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.eventdetail.detail.component
+package com.infomaniak.calendar.components.locationsearch.component
 
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
+import com.infomaniak.calendar.components.foundation.component.HighlightedText
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.MapPin
 
 @Composable
-internal fun LocationButton(
-    location: String,
+internal fun PlaceItem(
+    name: String,
+    address: String?,
+    query: () -> String,
     shapes: ListItemShapes,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(),
 ) {
-    ClickableItem(
-        text = location,
-        leadingIcon = EsdsIcons.MapPin,
+    SegmentedListItem(
         onClick = onClick,
         shapes = shapes,
-        contentPadding = contentPadding,
+        colors = LocationItemColors,
+        leadingContent = { Icon(EsdsIcons.MapPin.Medium, contentDescription = null) },
+        supportingContent = address?.let { { HighlightedText(it, query) } },
         modifier = modifier,
-    )
+    ) {
+        HighlightedText(name, query)
+    }
 }
 
 @Preview
 @Composable
-private fun PreviewLocationButton() {
-    MaterialTheme {
-        Surface {
-            LocationButton(
-                location = "742 Evergreen Terrace, Springfield",
-                onClick = {},
-                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
-            )
-        }
+private fun Preview() {
+    Surface {
+        PlaceItem(
+            name = "Infomaniak",
+            address = "Rue Eugène-Marziano 25, 1227 Les Acacias, Switzerland",
+            query = { "info" },
+            shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            onClick = {},
+        )
     }
 }

@@ -35,7 +35,6 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Hae yhteystietoja lisätäksesi ne tapahtumaan</string>
     <string name="attendeesEmptyStateTitle">Ei vieraita</string>
-    <string name="attendeesLimitReached">Olet saavuttanut 100 vieraan rajan</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d odottaa</item>
         <item quantity="other">%d odottaa</item>
@@ -45,6 +44,7 @@
         <item quantity="one">%1$d ehkä</item>
         <item quantity="other">%1$d ehkä</item>
     </plurals>
+    <string name="availabilityUnknownLabel">Saatavuus tuntematon</string>
     <string name="availableLabel">Vapaa</string>
     <string name="buttonAddReminder">Lisää muistutus</string>
     <string name="buttonJoin">Liity mukaan</string>
@@ -66,11 +66,14 @@
     <string name="descriptionTitle">Kuvaus</string>
     <string name="emptyStateNoTimeZone">Aikavyöhykkeitä ei löytynyt</string>
     <string name="eventTitle">Tapahtuman nimi</string>
+    <string name="eventValidationTooManyAttendees">Vieraita voi olla enintään %d</string>
     <plurals name="hourAmount">
         <item quantity="one">%d tunti</item>
         <item quantity="other">%d tuntia</item>
     </plurals>
     <string name="kMeetMeeting">kMeet-kokous</string>
+    <string name="locationOrRoomLabel">Paikka tai huone</string>
+    <string name="locationSearchPlaceholder">Lisää sijainti</string>
     <plurals name="minuteAmount">
         <item quantity="one">%d minuutti</item>
         <item quantity="other">%d minuuttia</item>
@@ -100,6 +103,7 @@
     <string name="statusDeclinedLabel">Hylätty</string>
     <string name="statusNeedsActionLabel">Käsiteltävänä</string>
     <string name="statusTentativeLabel">Ehkä</string>
+    <string name="unavailableLabel">Ei käytettävissä</string>
     <plurals name="unitDays">
         <item quantity="one">päivä</item>
         <item quantity="other">päivää</item>

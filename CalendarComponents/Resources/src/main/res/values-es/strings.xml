@@ -35,7 +35,6 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Busca contactos para añadirlos al evento</string>
     <string name="attendeesEmptyStateTitle">Sin invitados</string>
-    <string name="attendeesLimitReached">Ha alcanzado el límite de 100 invitados</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d pendiente</item>
         <item quantity="other">%d pendientes</item>
@@ -45,6 +44,7 @@
         <item quantity="one">%1$d quizás</item>
         <item quantity="other">%1$d quizás</item>
     </plurals>
+    <string name="availabilityUnknownLabel">Disponibilidad desconocida</string>
     <string name="availableLabel">Disponible</string>
     <string name="buttonAddReminder">Añadir un recordatorio</string>
     <string name="buttonJoin">Unirse</string>
@@ -66,11 +66,14 @@
     <string name="descriptionTitle">Descripción</string>
     <string name="emptyStateNoTimeZone">No se han encontrado zonas horarias</string>
     <string name="eventTitle">Título del evento</string>
+    <string name="eventValidationTooManyAttendees">No puedes tener más de %d invitados</string>
     <plurals name="hourAmount">
         <item quantity="one">%d hora</item>
         <item quantity="other">%d horas</item>
     </plurals>
     <string name="kMeetMeeting">Reunión de kMeet</string>
+    <string name="locationOrRoomLabel">Ubicación o sala</string>
+    <string name="locationSearchPlaceholder">Añadir un lugar</string>
     <plurals name="minuteAmount">
         <item quantity="one">%d minuto</item>
         <item quantity="other">%d minutos</item>
@@ -100,6 +103,7 @@
     <string name="statusDeclinedLabel">Rechazado</string>
     <string name="statusNeedsActionLabel">Pendiente</string>
     <string name="statusTentativeLabel">Quizás</string>
+    <string name="unavailableLabel">No disponible</string>
     <plurals name="unitDays">
         <item quantity="one">día</item>
         <item quantity="other">días</item>

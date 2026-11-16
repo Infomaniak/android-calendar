@@ -19,22 +19,15 @@ package com.infomaniak.calendar.components.foundation.state
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
-import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.LocalDate
-import kotlin.time.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
-/**
- * Remembers the current date and emits a new value on each day change.
- *
- * The returned [State] holds today's date and is intended to update automatically
- * whenever the day rolls over, so that composables reading it recompose with the new date.
- *
- * Note: the automatic update logic is not yet implemented. For now this simply holds the
- * date captured at first composition and never changes.
- */
+/** Current date, updated when the day rolls over so that composables reading it recompose with the new date. */
 @Composable
 fun rememberToday(): State<LocalDate> {
-    return remember { mutableStateOf(Clock.today()) }
+    val currentInstant = rememberCurrentInstant()
+    return remember { derivedStateOf { currentInstant.value.toLocalDateTime(TimeZone.currentSystemDefault()).date } }
 }

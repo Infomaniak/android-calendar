@@ -21,12 +21,14 @@ import android.os.Build.VERSION.SDK_INT
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Typography
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import com.infomaniak.calendar.components.foundation.preview.EventColorsUiFactory
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
 import com.infomaniak.calendar.ui.screen.planning.toEventColorsUi
@@ -85,7 +87,7 @@ fun CalendarTheme(
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = Typography,
+            typography = Typography(fontFamily = FontFamily.SansSerif),
         ) {
             ProvideBottomSheetTheme(content = content)
         }

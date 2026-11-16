@@ -59,6 +59,7 @@ import com.infomaniak.calendar.components.eventdetail.component.dateAndTimeEdita
 import com.infomaniak.calendar.components.eventdetail.component.item
 import com.infomaniak.calendar.components.eventdetail.component.reminder.AddReminderButton
 import com.infomaniak.calendar.components.eventdetail.component.reminder.ReminderOffsetDialog
+import com.infomaniak.calendar.components.eventdetail.detail.locations
 import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.ReminderTime
@@ -85,6 +86,7 @@ import kotlin.time.Duration.Companion.minutes
 fun EventForm(
     state: EventFormState,
     onAttendeesClick: () -> Unit,
+    onLocationClick: () -> Unit,
     onTimeZoneClick: (isStart: Boolean) -> Unit,
     onCustomReminderClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -141,6 +143,12 @@ fun EventForm(
                     modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
                 )
             }
+
+            locations(
+                location = { state.location },
+                onClick = onLocationClick,
+                onRemoveClick = { state.location = null },
+            )
         }
 
         var isReminderOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
@@ -302,7 +310,7 @@ private fun <T> List<T>.plusExitingFrom(previous: List<T>): List<T> {
 @Composable
 private fun Preview() {
     MaterialTheme {
-        Surface {
+        Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
             val state = remember {
                 EventFormState.default(
                     calendar = previewEventDetailCalendar,
@@ -320,6 +328,7 @@ private fun Preview() {
             EventForm(
                 state = state,
                 onAttendeesClick = {},
+                onLocationClick = {},
                 onTimeZoneClick = {},
                 onCustomReminderClick = {},
                 contentPadding = PaddingValues(16.dp),

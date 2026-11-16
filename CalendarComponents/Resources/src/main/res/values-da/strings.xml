@@ -35,7 +35,6 @@
     </plurals>
     <string name="attendeesEmptyStateDescription">Søg efter kontakter for at tilføje dem til begivenheden</string>
     <string name="attendeesEmptyStateTitle">Ingen gæster</string>
-    <string name="attendeesLimitReached">Du har nået grænsen på 100 gæster</string>
     <plurals name="attendeesPendingCount">
         <item quantity="one">%d afventende</item>
         <item quantity="other">%d afventende</item>
@@ -45,6 +44,7 @@
         <item quantity="one">%1$d måske</item>
         <item quantity="other">%1$d måske</item>
     </plurals>
+    <string name="availabilityUnknownLabel">Ukendt tilgængelighed</string>
     <string name="availableLabel">Ledig</string>
     <string name="buttonAddReminder">Tilføj en påmindelse</string>
     <string name="buttonJoin">Tilmeld dig</string>
@@ -66,11 +66,14 @@
     <string name="descriptionTitle">Beskrivelse</string>
     <string name="emptyStateNoTimeZone">Ingen tidszoner fundet</string>
     <string name="eventTitle">Arrangementstitel</string>
+    <string name="eventValidationTooManyAttendees">Du kan ikke have mere end %d gæster</string>
     <plurals name="hourAmount">
         <item quantity="one">%d time</item>
         <item quantity="other">%d timer</item>
     </plurals>
     <string name="kMeetMeeting">kMeet-møde</string>
+    <string name="locationOrRoomLabel">Sted eller lokale</string>
+    <string name="locationSearchPlaceholder">Tilføj et sted</string>
     <plurals name="minuteAmount">
         <item quantity="one">%d minut</item>
         <item quantity="other">%d minutter</item>
@@ -100,6 +103,7 @@
     <string name="statusDeclinedLabel">Afvist</string>
     <string name="statusNeedsActionLabel">Afventer</string>
     <string name="statusTentativeLabel">Måske</string>
+    <string name="unavailableLabel">Ikke tilgængelig</string>
     <plurals name="unitDays">
         <item quantity="one">dag</item>
         <item quantity="other">dage</item>
