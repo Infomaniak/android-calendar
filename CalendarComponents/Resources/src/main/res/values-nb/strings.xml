@@ -67,6 +67,7 @@
     <string name="emptyStateNoTimeZone">Ingen tidssoner funnet</string>
     <string name="eventTitle">Arrangementstittel</string>
     <string name="eventValidationTooManyAttendees">Du kan ikke ha flere enn %d gjester</string>
+    <string name="eventValidationCharacterLimitExceeded">Du har overskredet tegngrensen</string>
     <plurals name="hourAmount">
         <item quantity="one">%d time</item>
         <item quantity="other">%d timer</item>

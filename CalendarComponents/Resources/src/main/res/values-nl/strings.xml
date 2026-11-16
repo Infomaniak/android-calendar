@@ -67,6 +67,7 @@
     <string name="emptyStateNoTimeZone">Geen tijdzones gevonden</string>
     <string name="eventTitle">Titel van het evenement</string>
     <string name="eventValidationTooManyAttendees">Je kunt niet meer dan %d gasten uitnodigen</string>
+    <string name="eventValidationCharacterLimitExceeded">Je hebt de tekenlimiet overschreden</string>
     <plurals name="hourAmount">
         <item quantity="one">%d uur</item>
         <item quantity="other">%d uur</item>

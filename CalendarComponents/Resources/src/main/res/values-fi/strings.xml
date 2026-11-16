@@ -67,6 +67,7 @@
     <string name="emptyStateNoTimeZone">Aikavyöhykkeitä ei löytynyt</string>
     <string name="eventTitle">Tapahtuman nimi</string>
     <string name="eventValidationTooManyAttendees">Vieraita voi olla enintään %d</string>
+    <string name="eventValidationCharacterLimitExceeded">Olet ylittänyt merkkirajan</string>
     <plurals name="hourAmount">
         <item quantity="one">%d tunti</item>
         <item quantity="other">%d tuntia</item>

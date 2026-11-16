@@ -67,6 +67,7 @@
     <string name="emptyStateNoTimeZone">Δεν βρέθηκαν ζώνες ώρας</string>
     <string name="eventTitle">Τίτλος εκδήλωσης</string>
     <string name="eventValidationTooManyAttendees">Δεν μπορείτε να έχετε περισσότερους από %d καλεσμένους</string>
+    <string name="eventValidationCharacterLimitExceeded">Έχετε υπερβεί το όριο χαρακτήρων</string>
     <plurals name="hourAmount">
         <item quantity="one">%d ώρα</item>
         <item quantity="other">%d ώρες</item>
