@@ -111,7 +111,7 @@ private fun EventCreationScreen(
             SubmitTopAppBar(
                 goBack = goBack,
                 onSubmit = { onSubmit() },
-                isSubmitEnabled = { uiState is EventCreationScreenState.Success },
+                isSubmitEnabled = { isSubmitEnabled(uiState) },
                 isRecurring = false,
             )
         },
@@ -136,6 +136,11 @@ private fun EventCreationScreen(
             )
         }
     }
+}
+
+private fun isSubmitEnabled(uiState: EventCreationScreenState): Boolean {
+    return uiState is EventCreationScreenState.Success &&
+            uiState.eventFormState.descriptionTextState.text.length <= EventFormState.DESCRIPTION_MAX_CHARACTERS
 }
 
 private sealed interface EventCreationScreenState {

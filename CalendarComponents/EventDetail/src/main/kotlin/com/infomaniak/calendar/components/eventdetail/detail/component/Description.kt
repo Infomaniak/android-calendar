@@ -44,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
+import com.infomaniak.calendar.components.eventdetail.form.EventFormState.Companion.DESCRIPTION_MAX_CHARACTERS
 import com.infomaniak.calendar.components.eventdetail.state.CollapsibleTextState
 import com.infomaniak.calendar.components.eventdetail.state.animateCollapse
 import com.infomaniak.calendar.components.eventdetail.state.rememberCollapsibleTextState
@@ -54,7 +55,6 @@ import com.infomaniak.designsystem.icons.symbols.ChevronDown
 import com.infomaniak.designsystem.icons.symbols.List
 
 private const val COLLAPSED_MAX_LINES = 3
-private const val DESCRIPTION_MAX_CHARACTERS = 10_000
 
 @Composable
 internal fun DescriptionCollapsibleButton(
