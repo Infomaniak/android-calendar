@@ -39,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
@@ -123,11 +124,32 @@ internal fun DescriptionEditable(
         content = {
             CompactTextField(
                 state = state,
-                placeholder = stringResource(R.string.descriptionTitle),
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.descriptionTitle),
+                        color = CompactTextFieldDefaults.colors().focusedPlaceholderColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                },
                 isError = isTooLong,
                 lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 2), // minHeightInLines has to be 2 so the leading
                 // icon doesn't move up when adding the second line
-                supportingText = if (isTooLong) errorMessage else "",
+                supportingText = {
+                    if (isTooLong) {
+                        Text(
+                            text = stringResource(R.string.eventValidationCharacterLimitExceeded) +
+                                    " $extraCharacters / $DESCRIPTION_MAX_CHARACTERS",
+                            color = CompactTextFieldDefaults.colors().errorSupportingTextColor,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                platformStyle = PlatformTextStyle(includeFontPadding = false),
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(top = 2.dp),
+                        )
+                    }
+                },
                 leadingIcon = leadingIcon,
                 trailingIcon = null,
             )
