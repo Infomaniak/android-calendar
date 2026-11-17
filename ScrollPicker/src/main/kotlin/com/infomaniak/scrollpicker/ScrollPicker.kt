@@ -191,7 +191,9 @@ fun <T> ScrollPicker(
         contentAlignment = Alignment.Center,
     ) {
         if (onInput != null) Box(
-            Modifier.matchParentSize().zIndex(if (state.isEditing) 1f else 0f),
+            Modifier
+                .matchParentSize()
+                .zIndex(if (state.isEditing) 1f else 0f),
             contentAlignment = Alignment.Center,
         ) {
             ScrollPickerInputField(
@@ -214,7 +216,9 @@ fun <T> ScrollPicker(
         }
 
         BoxWithConstraints(
-            modifier = Modifier.matchParentSize().clipToBounds(),
+            modifier = Modifier
+                .matchParentSize()
+                .clipToBounds(),
             contentAlignment = Alignment.Center,
         ) {
             val rowHeight = with(density) { itemHeightPx.toDp() }
