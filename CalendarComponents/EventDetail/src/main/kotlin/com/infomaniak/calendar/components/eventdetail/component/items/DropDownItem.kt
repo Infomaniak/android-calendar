@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
@@ -51,12 +50,12 @@ internal fun DropDownItem(
     itemCount: Int,
     shapes: ListItemShapes,
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(),
+    contentPadding: PaddingValues = ListItemDefaults.ContentPadding,
     symbol: Symbol? = null,
 ) {
     ListItemClickable(
         onClick = onClick,
-        contentPadding = contentPadding + ListItemDefaults.ContentPadding,
+        contentPadding = contentPadding,
         content = content,
         leadingContent = symbol?.let { { ItemIcon(it) } },
         shapes = shapes,
