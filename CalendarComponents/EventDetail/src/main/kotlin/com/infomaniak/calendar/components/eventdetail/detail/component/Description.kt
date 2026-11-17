@@ -54,7 +54,7 @@ import com.infomaniak.designsystem.icons.symbols.ChevronDown
 import com.infomaniak.designsystem.icons.symbols.List
 
 private const val COLLAPSED_MAX_LINES = 3
-private const val DESCRIPTION_MAX_CHARACTERS = 5_000
+private const val DESCRIPTION_MAX_CHARACTERS = 10_000
 
 @Composable
 internal fun DescriptionCollapsibleButton(
@@ -113,6 +113,9 @@ internal fun DescriptionEditable(
     leadingIcon: @Composable (() -> Unit)? = null,
 ) {
     val isTooLong = state.text.length > DESCRIPTION_MAX_CHARACTERS
+    val extraCharacters = DESCRIPTION_MAX_CHARACTERS - state.text.length
+    val errorMessage = stringResource(R.string.eventValidationCharacterLimitExceeded) +
+            " $extraCharacters / $DESCRIPTION_MAX_CHARACTERS"
 
     SegmentedListItem(
         shapes = shapes,
@@ -124,7 +127,7 @@ internal fun DescriptionEditable(
                 isError = isTooLong,
                 lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 2), // minHeightInLines has to be 2 so the leading
                 // icon doesn't move up when adding the second line
-                supportingText = if (isTooLong) stringResource(R.string.eventValidationCharacterLimitExceeded) else "",
+                supportingText = if (isTooLong) errorMessage else "",
                 leadingIcon = leadingIcon,
                 trailingIcon = null,
             )
