@@ -22,11 +22,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +41,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -43,7 +50,10 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.channels.Channel
 
 @Composable
@@ -118,4 +128,38 @@ private fun FocusManager.performImeAction(imeAction: ImeAction) {
 
 private fun List<String>.anyLongerStartingWith(text: String): Boolean {
     return any { it.length > text.length && it.startsWith(text, ignoreCase = true) }
+}
+
+@Preview
+@Composable
+private fun ScrollPickerInputFieldPreview() {
+    val items = remember { (0..23).toList() }
+    val labels = remember(items) { items.map { it.toString().padStart(2, '0') } }
+    val state = remember(items) { ScrollPickerState(initialIndex = 10).apply { setItems(items.size, loop = false) } }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(focusRequester) { focusRequester.requestFocus() }
+
+    MaterialTheme {
+        Surface {
+            val colors = ScrollPickerDefaults.colors()
+            Box(Modifier.padding(16.dp)) {
+                ScrollPickerInputField(
+                    items = items,
+                    labels = labels,
+                    state = state,
+                    onInput = String::toIntOrNull,
+                    enabled = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+                    textStyle = ScrollPickerDefaults.textStyle.copy(color = colors.activeSelectedTextColor),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    cursorColor = colors.cursorColor,
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(ScrollPickerDefaults.ItemHeight)
+                        .focusRequester(focusRequester),
+                )
+            }
+        }
+    }
 }
