@@ -1,5 +1,18 @@
 # Month view — final plan (after 3-way challenge)
 
+## Context
+Android's Month view is a placeholder (`MonthScreen` is a fake list, `MonthViewModel` only exposes loading). iOS already
+ships a real one: a pager of month grids where multi-day events are drawn as bars across each week row, stacked in lanes,
+with a "+N" when a day has more events than fit.
+
+The problem is data. KMP only exposes `observeDaySlices`: events cut into one slice per day, empty days omitted. A month
+grid needs week-level segments (start column, span, lane), which KMP doesn't serve yet. iOS works around it by packing
+slices into week layouts on the client (`MonthWeekLayout`, marked "should move to KMP").
+
+So Android must do the same packing locally for now, but behind a seam that a future KMP month API replaces by deleting
+one file and swapping one loader body — without touching the UI components. Every visual feature (today highlight,
+outside-month dimming, overflow) stays in its own file so it can be removed independently.
+
 Challengers: YAGNI minimalist, KMP-boundary architect, Compose perf/UX skeptic. Draft: plan-draft.md.
 
 ## Principles
