@@ -18,6 +18,7 @@
 package com.infomaniak.scrollpicker.timepicker
 
 import android.text.format.DateFormat
+import androidx.annotation.PluralsRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,9 +37,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -78,11 +78,13 @@ private fun HourPicker24(state: TimeScrollPickerState) {
     ScrollPicker(
         items = Hours24,
         state = state.hourState,
+        contentDescription = pluralStringResource(R.plurals.unitHours, 1),
         loop = true,
         itemLabel = ::twoDigits,
+        itemAccessibilityDescription = quantityDescription(R.plurals.hourAmount),
         onInput = String::toIntOrNull,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-        modifier = Modifier.wheelModifier(R.string.timePickerHoursLabel),
+        modifier = Modifier.width(PickerWidth),
     )
 }
 
@@ -91,11 +93,13 @@ private fun MinutePicker(state: TimeScrollPickerState, imeAction: ImeAction) {
     ScrollPicker(
         items = (0..59).toList(),
         state = state.minuteState,
+        contentDescription = pluralStringResource(R.plurals.unitMinutes, 1),
         loop = true,
         itemLabel = ::twoDigits,
+        itemAccessibilityDescription = quantityDescription(R.plurals.minuteAmount),
         onInput = String::toIntOrNull,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = imeAction),
-        modifier = Modifier.wheelModifier(R.string.timePickerMinutesLabel),
+        modifier = Modifier.width(PickerWidth),
     )
 }
 
@@ -106,17 +110,27 @@ private fun MinutePicker(state: TimeScrollPickerState, imeAction: ImeAction) {
 @Composable
 private fun HourPicker12(state: TimeScrollPickerState) {
     LaunchedEffect(state) { state.keepAmPmSyncedWithHourHalfLoop() }
+    val describeHour = quantityDescription(R.plurals.hourAmount)
 
     ScrollPicker(
         items = Hours24,
         state = state.hourState,
+        contentDescription = pluralStringResource(R.plurals.unitHours, 1),
         loop = true,
         itemLabel = ::convert24HoursItemsTo12HourLabels,
+        itemAccessibilityDescription = { describeHour(to12Hour(it)) },
         // Keeps the half of the day already chosen, so typing "12" doesn't flip it.
         onInput = { text -> text.toIntOrNull()?.takeIf { it in 1..12 }?.let { it % 12 + 12 * (state.hour / 12) } },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-        modifier = Modifier.wheelModifier(R.string.timePickerHoursLabel),
+        modifier = Modifier.width(PickerWidth),
     )
+}
+
+/** Describes a value as its quantity, e.g. "9 hours". */
+@Composable
+private fun quantityDescription(@PluralsRes id: Int): (Int) -> String {
+    val resources = LocalResources.current
+    return remember(resources, id) { { resources.getQuantityString(id, it, it) } }
 }
 
 /** Items are 0 for AM and 1 for PM, labelled in the current locale. */
@@ -127,6 +141,7 @@ private fun AmPmPicker(state: TimeScrollPickerState) {
     ScrollPicker(
         items = listOf(0, 1),
         state = state.amPmState,
+        contentDescription = null,
         itemLabel = labels::get,
         onInput = { text ->
             labels.indexOfFirst { text.isNotEmpty() && it.startsWith(text, ignoreCase = true) }.takeIf { it >= 0 }
@@ -149,14 +164,6 @@ fun rememberTimeScrollPickerState(
     return remember(is24Hour, hourState, minuteState, amPmState) {
         TimeScrollPickerState(is24Hour, hourState, minuteState, amPmState)
     }
-}
-
-@Composable
-private fun Modifier.wheelModifier(labelRes: Int): Modifier {
-    val label = stringResource(labelRes)
-    return this
-        .width(PickerWidth)
-        .semantics { contentDescription = label }
 }
 
 /** Both clocks' hour wheels share [hourState], whose index is the hour of the day. */
@@ -191,10 +198,13 @@ private suspend fun TimeScrollPickerState.keepAmPmSyncedWithHourHalfLoop() = cor
 
 private fun twoDigits(number: Int) = number.toString().padStart(2, '0')
 
+/** Converts an hour of the day (0 to 23) to its 12-hour clock value (1 to 12). */
+private fun to12Hour(hour: Int): Int = (hour + 11) % 12 + 1
+
 /**
  * @param hour Hour value represented as 24-hour format
  */
-private fun convert24HoursItemsTo12HourLabels(hour: Int): String = twoDigits((hour + 11) % 12 + 1)
+private fun convert24HoursItemsTo12HourLabels(hour: Int): String = twoDigits(to12Hour(hour))
 
 @Preview
 @Composable
