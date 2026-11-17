@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -45,21 +46,25 @@ class ScrollPickerState(initialIndex: Int = 0, val group: ScrollPickerGroupState
     /** Whether this picker is being edited by hand. */
     internal val isEditing: Boolean get() = group.editingPicker == this
 
-    /** Index in the picker's items of the value currently selected. */
-    var selectedIndex by mutableIntStateOf(initialIndex)
-        internal set
-
     internal val lazyListState = LazyListState(initialIndex)
 
     /** Index in [lazyListState] of the selected row, which differs from [selectedIndex] when the picker loops. */
-    internal var selectedListIndex = initialIndex
+    internal var selectedListIndex by mutableIntStateOf(initialIndex)
+        private set
 
-    private var itemCount = 0
+    private var itemCount by mutableIntStateOf(0)
 
-    /** Number of items when the picker loops, 0 otherwise. */
-    private var loopSize = 0
+    private var loop by mutableStateOf(false)
+    private val loopSize: Int get() = if (loop) itemCount else 0
 
+    /** Index in the picker's items of the value currently selected. */
+    val selectedIndex: Int
+        get() = if (itemCount == 0) selectedListIndex else itemIndexOf(selectedListIndex).coerceIn(0, itemCount - 1)
     val isScrollInProgress: Boolean get() = lazyListState.isScrollInProgress
+
+    suspend fun scrollToIndex(index: Int) = lazyListState.scrollToItem(listIndexOf(index))
+
+    suspend fun animateScrollToIndex(index: Int) = lazyListState.animateScrollToItem(listIndexOf(index))
 
     /**
      * Centers the selection among [itemCount] items, in the middle of the virtual rows when looping, before the wheel is
@@ -69,9 +74,8 @@ class ScrollPickerState(initialIndex: Int = 0, val group: ScrollPickerGroupState
         val looping = loop && itemCount > 0
         val index = selectedIndex.coerceIn(0, (itemCount - 1).coerceAtLeast(0))
         this.itemCount = itemCount
-        loopSize = if (looping) itemCount else 0
+        this.loop = looping
         selectedListIndex = if (looping) LOOP_START + index else index
-        selectedIndex = index
         lazyListState.requestScrollToItem(selectedListIndex)
         return if (looping) LOOP_ITEM_COUNT else itemCount
     }
@@ -86,20 +90,14 @@ class ScrollPickerState(initialIndex: Int = 0, val group: ScrollPickerGroupState
             lazyListState.firstVisibleItemIndex + if (lazyListState.firstVisibleItemScrollOffset > itemHeightPx / 2) 1 else 0
         }.collect { listIndex ->
             selectedListIndex = listIndex
-            selectedIndex = itemIndexOf(listIndex).coerceIn(0, itemCount - 1)
         }
     }
-
-    suspend fun scrollToIndex(index: Int) = lazyListState.scrollToItem(listIndexOf(index))
-
-    suspend fun animateScrollToIndex(index: Int) = lazyListState.animateScrollToItem(listIndexOf(index))
 
     /** Selects [index] immediately, without waiting for the wheel to scroll there. */
     internal fun select(index: Int) {
         val listIndex = listIndexOf(index)
         lazyListState.requestScrollToItem(listIndex)
         selectedListIndex = listIndex
-        selectedIndex = index
     }
 
     /** The row showing the item at [index], taking the shortest way round when looping. */

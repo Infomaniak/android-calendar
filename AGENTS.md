@@ -199,18 +199,21 @@ All CalendarComponents source lives **in this repository**. Changes to these mod
 ## ScrollPicker
 
 `:ScrollPicker` (`ScrollPicker/`, package `com.infomaniak.scrollpicker`) is a wheel picker meant to move to its own
-repository later, so it depends on nothing from this repo (no `:app`, no CalendarComponents, no Infomaniak Design System):
-only Compose and Material 3, through the plain `core.plugins.android.library` plugin. Its API follows Material component
-conventions: `ScrollPicker(items, state, …)` is generic over its items (numbers, text, …), hoists its selection in a
-`ScrollPickerState` (`rememberScrollPickerState`), can loop infinitely, accepts typed input when `onInput` is given, and
-is themed through `ScrollPickerColors` / `ScrollPickerDefaults`, whose defaults read `MaterialTheme`. It scrolls, flings
-and snaps a `LazyColumn` of three rows; tapping the centre row opens a hidden text field where every keystroke that maps
-to an item updates `selectedIndex` immediately (so a form submitted mid-typing reads it). Once no longer input can match,
+repository later, so it has no dependency on `:app` or CalendarComponents. It uses Compose, Material 3, and the Infomaniak
+Design System foundation for its default styling, through the plain `core.plugins.android.library` plugin. Its API
+follows Material component conventions: `ScrollPicker(items, state, …)` is generic over its items (numbers, text, …),
+hoists its selection in a `ScrollPickerState` (`rememberScrollPickerState`), can loop infinitely, accepts typed input
+when `onInput` is given, and is themed through `ScrollPickerColors` / `ScrollPickerDefaults`, whose defaults read
+`MaterialTheme`. It scrolls, flings and snaps a `LazyColumn`, three rows high by default and centered in any given height;
+tapping the centre row opens a text field where every keystroke that maps to an item updates `selectedIndex` immediately
+(so a form submitted mid-typing reads it). Once no longer input can match,
 the picker runs its `ImeAction`: `Next`/`Previous` move focus to the neighbouring focusable, which chains pickers (an
 hours "9" jumps to minutes); the last picker of a chain should use `Done`. A `FocusRequester` or `focusProperties` in its
 `modifier` reaches the input field, so focus can be moved from code. Pickers whose states share a `ScrollPickerGroupState`
 (`rememberScrollPickerState(group = …)`) react as one: while any is edited, all only show their selected value.
-Closing the keyboard ends the input and brings the wheels back.
+Closing the keyboard ends the input and brings the wheels back. The selected item is derived from the selected wheel row;
+manual input and snapping/haptics are kept separately from the wheel's rendering. The wheel exposes an adjustable value
+and an edit action to accessibility services; while editing, the text field exposes its own semantics.
 
 ## Key Integration Points
 
