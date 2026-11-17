@@ -23,6 +23,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -211,6 +212,10 @@ private fun TimeZoneButton(
         itemCount = Int.MAX_VALUE, // More than one
         modifier = modifier,
         symbol = EsdsIcons.Globe,
+        contentPadding = PaddingValues(
+            top = ListItemDefaults.ContentPadding.calculateTopPadding(),
+            bottom = ListItemDefaults.ContentPadding.calculateBottomPadding(),
+        ),
         shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1), // TODO: Fix shape here or paddings
     )
 }
