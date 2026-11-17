@@ -62,6 +62,10 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CircleCrossFilled
 
+/**
+ * A compact text field component that supports single-line and multi-line input,
+ * with customizable colors, icons, and supporting text that is close to the input.
+ */
 @Composable
 fun CompactTextField(
     state: TextFieldState,
