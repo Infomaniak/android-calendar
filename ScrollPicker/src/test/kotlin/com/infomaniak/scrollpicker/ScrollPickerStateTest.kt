@@ -58,6 +58,21 @@ class ScrollPickerStateTest {
     }
 
     @Test
+    fun selectionSetFromCodeIsSelectedBeforeTheWheelGetsThere() {
+        val state = ScrollPickerState(initialIndex = 2)
+        state.setItems(itemCount = 10, loop = true)
+        val wheelRow = state.selectedListIndex
+
+        state.selectedIndex = 7
+        assertEquals(7, state.selectedIndex)
+        assertEquals(wheelRow, state.selectedListIndex)
+
+        state.select(4)
+        assertEquals(wheelRow + 2, state.selectedListIndex)
+        assertEquals(4, state.selectedIndex)
+    }
+
+    @Test
     fun previousPickerLosingFocusDoesNotEndTheNewPickersEditing() {
         val group = ScrollPickerGroupState()
         val first = ScrollPickerState(group = group)

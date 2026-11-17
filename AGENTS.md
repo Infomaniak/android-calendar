@@ -211,7 +211,8 @@ the picker runs its `ImeAction`: `Next`/`Previous` move focus to the neighbourin
 hours "9" jumps to minutes); the last picker of a chain should use `Done`. A `FocusRequester` or `focusProperties` in its
 `modifier` reaches the input field, so focus can be moved from code. Pickers whose states share a `ScrollPickerGroupState`
 (`rememberScrollPickerState(group = …)`) react as one: while any is edited, all only show their selected value.
-Closing the keyboard ends the input and brings the wheels back. The selected item is derived from the selected wheel row;
+Closing the keyboard ends the input and brings the wheels back. The selected item follows the wheel's selected row, but
+setting `selectedIndex` takes effect at once and the wheel animates there on its own, unless a drag interrupts it;
 manual input and snapping/haptics are kept separately from the wheel's rendering. The wheel exposes an adjustable value
 and an edit action to accessibility services; while editing, the text field exposes its own semantics.
 

@@ -27,6 +27,11 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
 
 private const val LOOP_ITEM_COUNT = 100_000
 private const val LOOP_START = LOOP_ITEM_COUNT / 2
@@ -57,9 +62,23 @@ class ScrollPickerState(initialIndex: Int = 0, val group: ScrollPickerGroupState
     private var loop by mutableStateOf(false)
     private val loopSize: Int get() = if (loop) itemCount else 0
 
-    /** Index in the picker's items of the value currently selected. */
-    val selectedIndex: Int
+    /** Index in the picker's items of the one shown by the selected row. */
+    private val wheelIndex: Int
         get() = if (itemCount == 0) selectedListIndex else itemIndexOf(selectedListIndex).coerceIn(0, itemCount - 1)
+
+    /** Index set from code that the wheel is animating to, null when the selection follows the wheel. */
+    private var targetIndex by mutableStateOf<Int?>(null)
+
+    /**
+     * Index in the picker's items of the value currently selected. Setting it takes effect at once and the wheel animates
+     * there, unless a drag interrupts it.
+     */
+    var selectedIndex: Int
+        get() = targetIndex ?: wheelIndex
+        internal set(value) {
+            targetIndex = value
+        }
+
     val isScrollInProgress: Boolean get() = lazyListState.isScrollInProgress
 
     suspend fun scrollToIndex(index: Int) = lazyListState.scrollToItem(listIndexOf(index))
@@ -93,16 +112,31 @@ class ScrollPickerState(initialIndex: Int = 0, val group: ScrollPickerGroupState
         }
     }
 
+    /** Animates the wheel to each [selectedIndex] set from code. */
+    internal suspend fun animateToSelection() {
+        snapshotFlow { targetIndex }.filterNotNull().collectLatest { index ->
+            try {
+                lazyListState.animateScrollToItem(listIndexOf(index))
+                select(index)
+            } catch (e: CancellationException) {
+                // A new target or the wheel leaving keeps the target, a drag hands the selection back to the wheel.
+                currentCoroutineContext().ensureActive()
+                targetIndex = null
+            }
+        }
+    }
+
     /** Selects [index] immediately, without waiting for the wheel to scroll there. */
     internal fun select(index: Int) {
         val listIndex = listIndexOf(index)
         lazyListState.requestScrollToItem(listIndex)
         selectedListIndex = listIndex
+        targetIndex = null
     }
 
     /** The row showing the item at [index], taking the shortest way round when looping. */
     private fun listIndexOf(index: Int): Int {
-        var delta = index - selectedIndex
+        var delta = index - wheelIndex
         if (loopSize > 0) delta = (delta + loopSize / 2).mod(loopSize) - loopSize / 2
         return selectedListIndex + delta
     }
