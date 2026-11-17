@@ -27,7 +27,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.CircleShape
@@ -59,6 +61,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import com.infomaniak.calendar.components.eventdetail.component.items.DropDownItem
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
@@ -66,6 +69,7 @@ import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatC
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatExplicitTimeLabel
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortDateWithYear
 import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Globe
@@ -96,6 +100,7 @@ internal fun DateAndTimeEntry(
         shapes = shapes,
         colors = CustomColors.EventFormItemColors,
         modifier = modifier,
+        contentPadding = PaddingValues(),
         content = {
             DateAndTimeEntryContent(
                 label = label,
@@ -106,6 +111,7 @@ internal fun DateAndTimeEntry(
                 onTimeZoneClick = onTimeZoneClick,
                 onDatePicked = onDatePicked,
                 onTimePicked = onTimePicked,
+                contentPadding = ListItemDefaults.ContentPadding,
             )
         },
     )
@@ -122,6 +128,7 @@ private fun DateAndTimeEntryContent(
     onDatePicked: (LocalDate) -> Unit,
     onTimePicked: (LocalTime) -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     val timeScrollPickerState = rememberTimeScrollPickerState(entry.time)
 
@@ -138,17 +145,22 @@ private fun DateAndTimeEntryContent(
     val enter = fadeIn(effectSpec)
     val exit = fadeOut(effectSpec)
 
+    val horizontalContentPadding = contentPadding.onlyHorizontal()
+    val bottomContentPadding = contentPadding.calculateBottomPadding()
+
     val currentOnTimePicked by rememberUpdatedState(onTimePicked)
     LaunchedEffect(timeScrollPickerState, entry) {
         launch { snapshotFlow { timeScrollPickerState.time }.collect { if (it != entry.time) currentOnTimePicked(it) } }
         launch { snapshotFlow { entry.time }.collect { if (it != timeScrollPickerState.time) timeScrollPickerState.select(it) } }
     }
 
-    Column {
+    Column(modifier = modifier.padding(top = contentPadding.calculateTopPadding())) {
+        val isTimeSelected = selectedButton() == EntryButton.Time
+
         Row(
             horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.lg),
             verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier,
+            modifier = Modifier.padding(horizontalContentPadding),
         ) {
             Text(label)
 
@@ -160,7 +172,7 @@ private fun DateAndTimeEntryContent(
 
             AnimatedVisibility(!isAllDay(), enter = enter, exit = exit) {
                 OutlinedToggleButton(
-                    checked = selectedButton() == EntryButton.Time,
+                    checked = isTimeSelected,
                     onCheckedChange = { isChecked -> onSelectButton(if (isChecked) EntryButton.Time else null) },
                     shapes = toggleShapes,
                     colors = toggleColors,
@@ -170,7 +182,7 @@ private fun DateAndTimeEntryContent(
             }
         }
 
-        AnimatedVisibility(selectedButton() == EntryButton.Time) {
+        AnimatedVisibility(isTimeSelected) {
             val bringIntoViewRequester = remember { BringIntoViewRequester() }
             // Waits for the expansion to end, so the whole picker is scrolled into view
             LaunchedEffect(transition.currentState) {
@@ -184,9 +196,18 @@ private fun DateAndTimeEntryContent(
                     .padding(top = EsdsTheme.spacing.xl),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                TimeScrollPicker(timeScrollPickerState)
-                TimeZoneButton(entry, onClick = onTimeZoneClick)
+                TimeScrollPicker(timeScrollPickerState, modifier = Modifier.padding(horizontalContentPadding))
+                TimeZoneButton(
+                    entry = entry,
+                    onClick = onTimeZoneClick,
+                    contentPadding = horizontalContentPadding + timeZoneVerticalPadding(bottomContentPadding),
+                )
             }
+        }
+
+        // The bottom content padding is either displayed by this spacer or the TimeZoneButton depending on which is the visible one of the two
+        AnimatedVisibility(!isTimeSelected) {
+            Spacer(modifier = Modifier.height(bottomContentPadding))
         }
     }
 
@@ -199,11 +220,18 @@ private fun DateAndTimeEntryContent(
     }
 }
 
+// Default top padding of the timezone item + custom bottom padding of the parent
+private fun timeZoneVerticalPadding(bottomContentPadding: Dp): PaddingValues = PaddingValues(
+    bottom = bottomContentPadding,
+    top = ListItemDefaults.ContentPadding.calculateTopPadding(),
+)
+
 @Composable
 private fun TimeZoneButton(
     entry: DateAndTimeState.Entry,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = ListItemDefaults.ContentPadding,
 ) {
     DropDownItem(
         content = { Text(stringResource(R.string.timeZoneLabel)) },
@@ -212,11 +240,8 @@ private fun TimeZoneButton(
         itemCount = Int.MAX_VALUE, // More than one
         modifier = modifier,
         symbol = EsdsIcons.Globe,
-        contentPadding = PaddingValues(
-            top = ListItemDefaults.ContentPadding.calculateTopPadding(),
-            bottom = ListItemDefaults.ContentPadding.calculateBottomPadding(),
-        ),
-        shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1), // TODO: Fix shape here or paddings
+        shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+        contentPadding = contentPadding,
     )
 }
 
