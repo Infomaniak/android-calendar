@@ -65,6 +65,7 @@
     </plurals>
     <string name="descriptionTitle">Beskrivelse</string>
     <string name="emptyStateNoTimeZone">Ingen tidssoner funnet</string>
+    <string name="endLabel">Slutt</string>
     <string name="eventTitle">Arrangementstittel</string>
     <string name="eventValidationTooManyAttendees">Du kan ikke ha flere enn %d gjester</string>
     <plurals name="hourAmount">
@@ -99,10 +100,12 @@
     </plurals>
     <string name="sectionCalendarHeader">Kalender</string>
     <string name="sectionOrganizerHeader">Arrangør</string>
+    <string name="startLabel">Start</string>
     <string name="statusAcceptedLabel">Godkjent</string>
     <string name="statusDeclinedLabel">Avvist</string>
     <string name="statusNeedsActionLabel">Under behandling</string>
     <string name="statusTentativeLabel">Kanskje</string>
+    <string name="timeZoneLabel">Tidssone</string>
     <string name="unavailableLabel">Utilgjengelig</string>
     <plurals name="unitDays">
         <item quantity="one">dag</item>

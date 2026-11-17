@@ -65,6 +65,7 @@
     </plurals>
     <string name="descriptionTitle">Kuvaus</string>
     <string name="emptyStateNoTimeZone">Aikavyöhykkeitä ei löytynyt</string>
+    <string name="endLabel">Loppu</string>
     <string name="eventTitle">Tapahtuman nimi</string>
     <string name="eventValidationTooManyAttendees">Vieraita voi olla enintään %d</string>
     <plurals name="hourAmount">
@@ -99,10 +100,12 @@
     </plurals>
     <string name="sectionCalendarHeader">Kalenteri</string>
     <string name="sectionOrganizerHeader">Järjestäjä</string>
+    <string name="startLabel">Alku</string>
     <string name="statusAcceptedLabel">Hyväksytty</string>
     <string name="statusDeclinedLabel">Hylätty</string>
     <string name="statusNeedsActionLabel">Käsiteltävänä</string>
     <string name="statusTentativeLabel">Ehkä</string>
+    <string name="timeZoneLabel">Aikavyöhyke</string>
     <string name="unavailableLabel">Ei käytettävissä</string>
     <plurals name="unitDays">
         <item quantity="one">päivä</item>
