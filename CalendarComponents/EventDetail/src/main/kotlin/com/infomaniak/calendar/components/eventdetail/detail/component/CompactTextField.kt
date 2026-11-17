@@ -34,14 +34,18 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.error
@@ -62,16 +66,13 @@ fun CompactTextField(
     placeholder: String = "",
     supportingText: String = "",
     isError: Boolean = false,
+    colors: TextFieldColors = CompactTextFieldDefaults.colors(),
     lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
 ) {
-    val colors = MaterialTheme.colorScheme
     val showError = isError && supportingText.isNotBlank()
-    val textStyle = MaterialTheme.typography.bodyLarge.copy(
-        color = colors.onSurface,
-        platformStyle = PlatformTextStyle(includeFontPadding = false),
-    )
+
     val isSingleLine = lineLimits is TextFieldLineLimits.SingleLine
     val verticalAlignment = if (isSingleLine) {
         Alignment.CenterVertically
@@ -83,8 +84,8 @@ fun CompactTextField(
     BasicTextField(
         state = state,
         lineLimits = lineLimits,
-        textStyle = textStyle,
-        cursorBrush = SolidColor(colors.primary),
+        textStyle = LocalTextStyle.current.copy(color = colors.focusedTextColor),
+        cursorBrush = SolidColor(colors.focusedTextColor),
         modifier = modifier
             .fillMaxWidth()
             .semantics {
@@ -101,7 +102,7 @@ fun CompactTextField(
                 verticalAlignment = verticalAlignment,
                 horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xl),
             ) {
-                CompositionLocalProvider(LocalContentColor provides colors.onSurfaceVariant) {
+                CompositionLocalProvider(LocalContentColor provides colors.focusedTextColor) {
                     leadingIcon?.invoke()
 
                     Column(modifier = Modifier.weight(1f)) {
@@ -109,8 +110,7 @@ fun CompactTextField(
                             if (state.text.isEmpty()) {
                                 Text(
                                     text = placeholder,
-                                    style = textStyle,
-                                    color = colors.onSurfaceVariant,
+                                    color = colors.focusedPlaceholderColor,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )
@@ -125,7 +125,7 @@ fun CompactTextField(
                         ) {
                             Text(
                                 text = supportingText,
-                                color = colors.error,
+                                color = colors.errorSupportingTextColor,
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     platformStyle = PlatformTextStyle(includeFontPadding = false),
                                 ),
@@ -141,6 +141,25 @@ fun CompactTextField(
             }
         },
     )
+}
+
+private object CompactTextFieldDefaults {
+    @Composable
+    fun colors(
+        focusedTextColor: Color = MaterialTheme.colorScheme.onSurface,
+        unfocusedTextColor: Color = MaterialTheme.colorScheme.onSurface,
+        focusedPlaceholderColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = EsdsTheme.opacity.strong),
+        unfocusedPlaceholderColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = EsdsTheme.opacity.strong),
+        errorSupportingTextColor: Color = MaterialTheme.colorScheme.error,
+    ): TextFieldColors {
+        return TextFieldDefaults.colors(
+            focusedTextColor = focusedTextColor,
+            unfocusedTextColor = unfocusedTextColor,
+            errorSupportingTextColor = errorSupportingTextColor,
+            focusedPlaceholderColor = focusedPlaceholderColor,
+            unfocusedPlaceholderColor = unfocusedPlaceholderColor,
+        )
+    }
 }
 
 @Preview
