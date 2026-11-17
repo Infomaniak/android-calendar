@@ -58,14 +58,6 @@ private val PickerWidth = 110.dp
 private val Hours24 = (0..23).toList()
 
 @Composable
-private fun wheelModifier(labelRes: Int): Modifier {
-    val label = stringResource(labelRes)
-    return Modifier
-        .width(PickerWidth)
-        .semantics { contentDescription = label }
-}
-
-@Composable
 fun TimeScrollPicker(state: TimeScrollPickerState, modifier: Modifier = Modifier) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         if (state.is24Hour) {
@@ -157,6 +149,14 @@ fun rememberTimeScrollPickerState(
     return remember(is24Hour, hourState, minuteState, amPmState) {
         TimeScrollPickerState(is24Hour, hourState, minuteState, amPmState)
     }
+}
+
+@Composable
+private fun wheelModifier(labelRes: Int): Modifier {
+    val label = stringResource(labelRes)
+    return Modifier
+        .width(PickerWidth)
+        .semantics { contentDescription = label }
 }
 
 /** Both clocks' hour wheels share [hourState], whose index is the hour of the day. */
