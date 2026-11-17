@@ -65,6 +65,7 @@
     </plurals>
     <string name="descriptionTitle">Περιγραφή</string>
     <string name="emptyStateNoTimeZone">Δεν βρέθηκαν ζώνες ώρας</string>
+    <string name="endLabel">Τέλος</string>
     <string name="eventTitle">Τίτλος</string>
     <string name="eventValidationCharacterLimitExceeded">Όριο χαρακτήρων ξεπερασμένο</string>
     <string name="eventValidationTooManyAttendees">Δεν μπορείτε να έχετε περισσότερους από %d καλεσμένους</string>
@@ -100,6 +101,7 @@
     </plurals>
     <string name="sectionCalendarHeader">Ημερολόγιο</string>
     <string name="sectionOrganizerHeader">Διοργανωτής</string>
+    <string name="startLabel">Έναρξη</string>
     <string name="statusAcceptedLabel">Εγκρίθηκε</string>
     <string name="statusDeclinedLabel">Απορρίφθηκε</string>
     <string name="statusNeedsActionLabel">Σε εκκρεμότητα</string>
