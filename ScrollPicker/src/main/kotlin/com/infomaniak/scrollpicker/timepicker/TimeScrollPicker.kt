@@ -82,7 +82,7 @@ private fun HourPicker24(state: TimeScrollPickerState) {
         itemLabel = ::twoDigits,
         onInput = String::toIntOrNull,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-        modifier = wheelModifier(R.string.timePickerHoursLabel),
+        modifier = Modifier.wheelModifier(R.string.timePickerHoursLabel),
     )
 }
 
@@ -95,7 +95,7 @@ private fun MinutePicker(state: TimeScrollPickerState, imeAction: ImeAction) {
         itemLabel = ::twoDigits,
         onInput = String::toIntOrNull,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = imeAction),
-        modifier = wheelModifier(R.string.timePickerMinutesLabel),
+        modifier = Modifier.wheelModifier(R.string.timePickerMinutesLabel),
     )
 }
 
@@ -115,7 +115,7 @@ private fun HourPicker12(state: TimeScrollPickerState) {
         // Keeps the half of the day already chosen, so typing "12" doesn't flip it.
         onInput = { text -> text.toIntOrNull()?.takeIf { it in 1..12 }?.let { it % 12 + 12 * (state.hour / 12) } },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-        modifier = wheelModifier(R.string.timePickerHoursLabel),
+        modifier = Modifier.wheelModifier(R.string.timePickerHoursLabel),
     )
 }
 
@@ -152,9 +152,9 @@ fun rememberTimeScrollPickerState(
 }
 
 @Composable
-private fun wheelModifier(labelRes: Int): Modifier {
+private fun Modifier.wheelModifier(labelRes: Int): Modifier {
     val label = stringResource(labelRes)
-    return Modifier
+    return this
         .width(PickerWidth)
         .semantics { contentDescription = label }
 }
