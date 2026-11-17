@@ -39,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -124,6 +125,7 @@ internal fun DescriptionEditable(
         content = {
             CompactTextField(
                 state = state,
+                modifier = Modifier.semantics { if (isTooLong) error(errorMessage) },
                 placeholder = {
                     Text(
                         text = stringResource(R.string.descriptionTitle),
@@ -138,8 +140,7 @@ internal fun DescriptionEditable(
                 supportingText = {
                     if (isTooLong) {
                         Text(
-                            text = stringResource(R.string.eventValidationCharacterLimitExceeded) +
-                                    " $extraCharacters / $DESCRIPTION_MAX_CHARACTERS",
+                            text = errorMessage,
                             color = CompactTextFieldDefaults.colors().errorSupportingTextColor,
                             style = MaterialTheme.typography.bodySmall.copy(
                                 platformStyle = PlatformTextStyle(includeFontPadding = false),
