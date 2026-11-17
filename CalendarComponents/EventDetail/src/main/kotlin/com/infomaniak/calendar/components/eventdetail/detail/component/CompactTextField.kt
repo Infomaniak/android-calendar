@@ -99,6 +99,8 @@ fun CompactTextField(
             state = state,
             lineLimits = lineLimits,
             textStyle = mergedTextStyle,
+            enabled = enabled,
+            interactionSource = interactionSource,
             cursorBrush = SolidColor(colors.focusedTextColor),
             modifier = modifier
                 .fillMaxWidth()
