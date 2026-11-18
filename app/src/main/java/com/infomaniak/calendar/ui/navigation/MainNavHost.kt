@@ -100,6 +100,7 @@ fun MainNavHost(
                 entryProvider = baseEntryProvider(
                     backStack = backStack,
                     defaultCalendarView = defaultCalendarView,
+                    selectCalendarView = selectCalendarView,
                 ),
                 sceneDecoratorStrategies = sceneDecoratorStrategies(backStack, selectCalendarView),
                 sceneStrategies = sceneStrategies(windowSizeClass),
@@ -114,6 +115,7 @@ fun MainNavHost(
 private fun baseEntryProvider(
     backStack: NavBackStack<NavDestination>,
     defaultCalendarView: NavDestination.CalendarView,
+    selectCalendarView: (NavDestination.CalendarView) -> Unit,
 ): (NavDestination) -> NavEntry<NavDestination> = { destination ->
     when (destination) {
         is NavDestination.CalendarView.Planning -> NavEntry(destination, metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
@@ -140,7 +142,10 @@ private fun baseEntryProvider(
         }
 
         is NavDestination.CalendarView.Month -> NavEntry(destination, metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-            MonthScreen()
+            MonthScreen(
+                goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) },
+                goToDay = { selectCalendarView(NavDestination.CalendarView.Day) },
+            )
         }
 
         is NavDestination.EventForm.EventCreation -> NavEntry(

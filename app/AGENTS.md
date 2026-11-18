@@ -66,7 +66,10 @@ app/src/main/java/com/infomaniak/calendar/
     ├── screen/
     │   ├── day/                   # DayScreen + DayViewModel
     │   ├── multiDays/             # MultiDaysScreen(dayCount) + MultiDaysViewModel — 3-day and week views share one entry (same contentKey)
-    │   ├── month/                 # MonthScreen + MonthViewModel
+    │   ├── month/                 # MonthScreen (CalendarComponents' MonthPager; a day tap opens Day on it) + MonthViewModel
+    │                              # (months around the visible one, laid out with their events). pendingKmp/ (temporary, TODO[kmpMonth]):
+    │                              #   buildMonths and packWeek lay a month's events into lanes, as iOS MonthWeekLayout does,
+    │                              #   until KMP returns them; the package then goes and only MonthViewModel's source changes
     │   ├── planning/              # PlanningScreen + PlanningViewModel (events from VisibleEventsManager) + PlanningEventGroupingExt
     │   ├── accounts/              # AccountsListScreen + AccountActionsScreen + AccountsViewModel + AccountItem
     │                              # Drawer-backed account list, per-account detail/logout screen, and remove-account flow
@@ -393,8 +396,9 @@ fun MyComponent(
   `snapshotFlow` for date-dependent queries. `MainViewModel` binds the manager to `SavedStateHandle` under
   `"visibleDate"`; the saved-state provider stores the date string in a `Bundle` under the same key, and binding restores
   it when present. Restoration only initializes a fresh manager. `MainActivity` passes the same mutable state to Foundation's
-  `VisibleDayState`, provided through `LocalVisibleDayState`. Months are derived in `VisibleMonthManager`; screens do
-  not report them separately. Jump commands remain independent of the date the content reaches.
+  `VisibleDayState`, provided through `LocalVisibleDayState`. Months are derived in `VisibleMonthManager`: its
+  `loadedMonths` (the visible one and its neighbours) feed both the mini calendar's dots and the Month view; screens do not
+  report them separately. Jump commands remain independent of the date the content reaches.
 
 ### Testing
 

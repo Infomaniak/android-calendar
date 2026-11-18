@@ -18,6 +18,11 @@
 package com.infomaniak.calendar.components.foundation.utils
 
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.YearMonth
+import kotlinx.datetime.yearMonth
 
 /** The dates the calendar views let the user scroll or swipe to. */
 val NAVIGABLE_DATES: ClosedRange<LocalDate> = LocalDate(1900, 1, 1)..LocalDate(2199, 12, 31)
+
+/** The months of [NAVIGABLE_DATES]. */
+val NAVIGABLE_MONTHS: ClosedRange<YearMonth> = NAVIGABLE_DATES.start.yearMonth..NAVIGABLE_DATES.endInclusive.yearMonth
