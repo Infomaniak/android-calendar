@@ -33,7 +33,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 
-private const val LOOP_ITEM_COUNT = 100_000
+private const val LOOP_ITEM_COUNT = Int.MAX_VALUE
 private const val LOOP_START = LOOP_ITEM_COUNT / 2
 
 @Composable
@@ -142,7 +142,7 @@ class ScrollPickerState(initialIndex: Int = 0, val group: ScrollPickerGroupState
     }
 
     companion object {
-        fun Saver(group: ScrollPickerGroupState): Saver<ScrollPickerState, Int> = Saver<ScrollPickerState, Int>(
+        fun Saver(group: ScrollPickerGroupState): Saver<ScrollPickerState, Int> = Saver(
             save = { it.selectedIndex },
             restore = { ScrollPickerState(it, group) },
         )

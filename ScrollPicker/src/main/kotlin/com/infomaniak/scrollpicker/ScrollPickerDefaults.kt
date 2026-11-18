@@ -45,7 +45,7 @@ object ScrollPickerDefaults {
         inactiveTextColor: Color = textColor.copy(alpha = InactiveAlpha),
         pressedTextColor: Color = MaterialTheme.colorScheme.primary,
         inactivePressedTextColor: Color = pressedTextColor.copy(alpha = InactiveAlpha),
-        disabledTextColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = DisabledAlpha),
+        disabledTextColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = DISABLED_ALPHA),
         cursorColor: Color = MaterialTheme.colorScheme.primary,
     ): ScrollPickerColors = ScrollPickerColors(
         textColor = inactiveTextColor,
@@ -57,5 +57,5 @@ object ScrollPickerDefaults {
     )
 
     val InactiveAlpha @Composable get() = EsdsTheme.opacity.medium
-    private const val DisabledAlpha = 0.38f
+    private const val DISABLED_ALPHA = 0.38f
 }
