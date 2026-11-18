@@ -70,8 +70,8 @@ class ScrollPickerState(initialIndex: Int = 0, val group: ScrollPickerGroupState
     private var targetIndex by mutableStateOf<Int?>(null)
 
     /**
-     * Index in the picker's items of the value currently selected. Setting it takes effect at once and the wheel animates
-     * there, unless a drag interrupts it.
+     * Index in the picker's items of the value currently selected. Within this module, Setting it takes effect at once and the
+     * wheel animates there, unless a drag interrupts it.
      */
     var selectedIndex: Int
         get() = targetIndex ?: wheelIndex
