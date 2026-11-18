@@ -89,6 +89,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.roundToInt
 
 /**
@@ -287,7 +289,14 @@ private fun Modifier.pickerSemantics(
         steps = (itemCount - 2).coerceAtLeast(0),
     )
     if (enabled && itemCount > 0) setProgress { target ->
-        scope.launch { state.scrollToIndex(target.roundToInt().coerceIn(0, itemCount - 1)) }
+        // With two items, steps is 0 so TalkBack treats the range as continuous and moves by a 20th of it (e.g. 0.05),
+        // which rounding would bring back to the current index. Rounding towards the requested direction moves one item.
+        val index = when {
+            target > selectedIndex -> ceil(target)
+            target < selectedIndex -> floor(target)
+            else -> target
+        }.roundToInt()
+        scope.launch { state.scrollToIndex(index.coerceIn(0, itemCount - 1)) }
         true
     }
     if (enabled && itemCount > 0 && inputFocusRequester != null) onClick {
