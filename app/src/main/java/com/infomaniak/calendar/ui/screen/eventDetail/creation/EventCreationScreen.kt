@@ -139,8 +139,7 @@ private fun EventCreationScreen(
 }
 
 private fun isSubmitEnabled(uiState: EventCreationScreenState): Boolean {
-    return uiState is EventCreationScreenState.Success &&
-            uiState.eventFormState.descriptionTextState.text.length <= EventFormState.DESCRIPTION_MAX_CHARACTERS
+    return uiState is EventCreationScreenState.Success && uiState.eventFormState.isValid()
 }
 
 private sealed interface EventCreationScreenState {
