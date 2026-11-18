@@ -27,10 +27,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -40,7 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.foundation.component.DayCircle
 import com.infomaniak.calendar.components.foundation.state.DateState
-import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatFullDateWithYear
+import com.infomaniak.calendar.components.foundation.utils.dayContentDescription
 import com.infomaniak.calendar.components.foundation.utils.verticalEndDivider
 import com.infomaniak.calendar.components.month.layout.MonthDefaults
 import com.infomaniak.calendar.components.resources.R
@@ -65,7 +63,7 @@ internal fun MonthDayCell(
         isToday -> DateState.Today
         else -> DateState.None
     }
-    val description = dayDescription(date, eventCount)
+    val description = dayContentDescription(date, eventCount)
     val todayDescription = if (isToday) stringResource(R.string.contentDescriptionToday) else null
 
     Box(
@@ -89,13 +87,6 @@ internal fun MonthDayCell(
 /** Tints the whole cell, the only today cue left on a day outside the month, whose number is dimmed instead. */
 @Composable
 private fun todayTint() = MaterialTheme.colorScheme.primary.copy(alpha = EsdsTheme.opacity.subtle)
-
-@Composable
-private fun dayDescription(date: LocalDate, eventCount: Int): String {
-    val fullDate = date.formatFullDateWithYear()
-    val events = if (eventCount == 0) null else pluralStringResource(R.plurals.contentDescriptionEventCount, eventCount, eventCount)
-    return remember(fullDate, events) { listOfNotNull(fullDate, events).joinToString() }
-}
 
 @Preview
 @Composable

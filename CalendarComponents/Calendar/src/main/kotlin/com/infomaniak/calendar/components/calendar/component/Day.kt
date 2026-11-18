@@ -49,7 +49,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalViewConfiguration
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -62,7 +61,7 @@ import com.infomaniak.calendar.components.foundation.component.DayCircle
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
 import com.infomaniak.calendar.components.foundation.state.DateState
-import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatFullDateWithYear
+import com.infomaniak.calendar.components.foundation.utils.dayContentDescription
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -83,17 +82,7 @@ internal fun Day(
     modifier: Modifier = Modifier,
     notMonthFraction: () -> Float = { 1f },
 ) {
-    val fullDate = date.formatFullDateWithYear()
-
-    val dots = dotsFor()
-    val eventsDescription = if (dots.isEmpty()) {
-        null
-    } else {
-        pluralStringResource(R.plurals.contentDescriptionEventCount, dots.size, dots.size)
-    }
-    val dayDescription = remember(fullDate, eventsDescription) {
-        listOfNotNull(fullDate, eventsDescription).joinToString()
-    }
+    val dayDescription = dayContentDescription(date, eventCount = dotsFor().size)
 
     val stateDescriptionToday = if (dateState == DateState.Today) stringResource(R.string.contentDescriptionToday) else null
     val interactionSource = remember { MutableInteractionSource() }
