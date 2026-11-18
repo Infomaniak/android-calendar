@@ -41,12 +41,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import com.infomaniak.calendar.components.day.TimelineDefaults
-import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults
 import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.theme.ComponentColors
+import com.infomaniak.calendar.components.foundation.theme.Dimens
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortTimeLabel
 import kotlinx.datetime.LocalTime
 
@@ -106,7 +106,7 @@ internal fun HourLines(state: TimelineState, modifier: Modifier = Modifier) {
                         color = color,
                         start = Offset(0f, y),
                         end = Offset(size.width, y),
-                        strokeWidth = EventLayoutDefaults.GridLineThickness.toPx(),
+                        strokeWidth = Dimens.GridLineThickness.toPx(),
                     )
                 }
             },

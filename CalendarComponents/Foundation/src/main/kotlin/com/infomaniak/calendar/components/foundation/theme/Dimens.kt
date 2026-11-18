@@ -21,4 +21,10 @@ import androidx.compose.ui.unit.dp
 
 object Dimens {
     val FloatingToolbarElevation = 3.dp
+
+    /**
+     * A hairline, finer than the smallest step the spacing scale has: the calendar grids' lines, and the gap keeping two
+     * events from touching.
+     */
+    val GridLineThickness = 0.5.dp
 }

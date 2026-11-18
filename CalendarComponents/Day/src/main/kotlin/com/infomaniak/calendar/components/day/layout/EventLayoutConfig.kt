@@ -21,7 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.foundation.theme.Dimens
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Immutable
@@ -40,9 +40,6 @@ object EventLayoutDefaults {
     val TitleHeight: Dp @Composable get() = EsdsTheme.spacing.twoXl
     val MinEventWidth: Dp @Composable get() = EsdsTheme.spacing.xs
     val MinEventHeight: Dp @Composable get() = EsdsTheme.spacing.xl
-
-    /** A hairline keeping two events from touching, finer than the smallest step the scale has. */
-    val GridLineThickness: Dp = 0.5.dp
 }
 
 @Composable
@@ -53,6 +50,6 @@ fun eventLayoutConfig(): EventLayoutConfig = with(LocalDensity.current) {
         titleHeight = EventLayoutDefaults.TitleHeight.toPx(),
         minEventWidth = EventLayoutDefaults.MinEventWidth.toPx(),
         minEventHeight = EventLayoutDefaults.MinEventHeight.toPx(),
-        verticalSpacing = EventLayoutDefaults.GridLineThickness.toPx(),
+        verticalSpacing = Dimens.GridLineThickness.toPx(),
     )
 }
