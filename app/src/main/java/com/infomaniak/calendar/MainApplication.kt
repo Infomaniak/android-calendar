@@ -23,7 +23,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.infomaniak.calendar.crossAppLogin.DeviceInfoUpdateWorker
 import com.infomaniak.calendar.di.AppGraph
 import com.infomaniak.calendar.di.metroAndroidExtensions.MetroApplication
-import com.infomaniak.calendar.notification.NotificationHelper
 import com.infomaniak.calendar.utils.CaldavDebugConfig
 import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.core.common.AssociatedUserDataCleanable
@@ -64,7 +63,7 @@ class MainApplication : Application(), MetroApplication {
         MatomoCalendar.addTrackingCallbackForDebugLog()
         initCrossAppLogin()
 
-        NotificationHelper.initNotificationChannels(this)
+        appGraph.calendarNotificationChannels.startObserving(applicationScope)
         appGraph.alarmScheduler.startObserving(applicationScope)
 
         initStoredAccounts()

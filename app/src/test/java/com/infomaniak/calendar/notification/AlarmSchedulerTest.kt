@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.notification
 
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventBounds
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
@@ -252,6 +253,7 @@ class AlarmSchedulerTest {
     private fun testAlarm(id: String, firesAtMs: Long, title: String = "Test Event $id"): UpcomingAlarm {
         val event = EventSummary(
             occurrenceId = OccurrenceId.Master(EventId("event://$id")),
+            calendarId = CalendarId("calendar://main"),
             title = title,
             location = null,
             status = null,
@@ -268,6 +270,7 @@ class AlarmSchedulerTest {
             isBookable = false,
             isRecurring = false,
             myStatus = null,
+            canEdit = true,
         )
         return UpcomingAlarm(
             id = createUpcomingAlarmId(id),

@@ -148,6 +148,7 @@ class AlarmScheduler @Inject constructor(
         val alarmId: String,
         val triggerAtMs: Long,
         val occurrenceIdJson: String,
+        val calendarIdUrl: String,
         val title: String,
         val location: String?,
         val startMs: Long,
@@ -230,6 +231,7 @@ class AlarmScheduler @Inject constructor(
             data = "calendar://alarm/${registration.alarmId}".toUri()
             putExtra(EXTRA_ALARM_ID, registration.alarmId)
             putExtra(EXTRA_OCCURRENCE_ID_JSON, registration.occurrenceIdJson)
+            putExtra(EXTRA_CALENDAR_ID, registration.calendarIdUrl)
             putExtra(EXTRA_EVENT_TITLE, registration.title)
             putExtra(EXTRA_EVENT_LOCATION, registration.location)
             putExtra(EXTRA_EVENT_START_MS, registration.startMs)
@@ -252,6 +254,7 @@ class AlarmScheduler @Inject constructor(
         const val ACTION_REFRESH_ALARMS = "com.infomaniak.calendar.ACTION_REFRESH_ALARMS"
         const val EXTRA_ALARM_ID = "com.infomaniak.calendar.EXTRA_ALARM_ID"
         const val EXTRA_OCCURRENCE_ID_JSON = "com.infomaniak.calendar.EXTRA_OCCURRENCE_ID_JSON"
+        const val EXTRA_CALENDAR_ID = "com.infomaniak.calendar.EXTRA_CALENDAR_ID"
         const val EXTRA_EVENT_TITLE = "com.infomaniak.calendar.EXTRA_EVENT_TITLE"
         const val EXTRA_EVENT_LOCATION = "com.infomaniak.calendar.EXTRA_EVENT_LOCATION"
         const val EXTRA_EVENT_START_MS = "com.infomaniak.calendar.EXTRA_EVENT_START_MS"
@@ -291,6 +294,7 @@ class AlarmScheduler @Inject constructor(
             alarmId = id.value,
             triggerAtMs = firesAt.toEpochMilliseconds(),
             occurrenceIdJson = Json.encodeToString(OccurrenceId.serializer(), event.occurrenceId),
+            calendarIdUrl = event.calendarId.url,
             title = event.title,
             location = event.location,
             startMs = event.timing.startInstant(timeZone).toEpochMilliseconds(),

@@ -18,7 +18,6 @@
 package com.infomaniak.calendar.notification
 
 import android.app.Notification
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -31,29 +30,17 @@ import androidx.core.net.toUri
 import com.infomaniak.calendar.MainActivity
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.utils.toBitmap
-import com.infomaniak.core.notifications.buildNotificationChannel
-import com.infomaniak.core.notifications.createNotificationChannels
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CalendarNumberOne
 import java.util.Date
 
 object NotificationHelper {
 
-    const val CHANNEL_EVENT_REMINDERS = "event_reminders"
     const val EXTRA_OCCURRENCE_ID_JSON = "com.infomaniak.calendar.EXTRA_OCCURRENCE_ID_JSON"
-
-    fun initNotificationChannels(context: Context) {
-        val channel = buildNotificationChannel(
-            channelId = CHANNEL_EVENT_REMINDERS,
-            name = context.getString(R.string.notificationChannelEventRemindersTitle),
-            importance = NotificationManager.IMPORTANCE_HIGH,
-            description = context.getString(R.string.notificationChannelEventRemindersDescription),
-        )
-        context.createNotificationChannels(listOf(channel))
-    }
 
     fun buildEventNotification(
         context: Context,
+        channelId: String,
         occurrenceIdJson: String,
         title: String,
         location: String?,
@@ -80,7 +67,7 @@ object NotificationHelper {
         val contentText = if (!location.isNullOrBlank()) "$timeText • $location" else timeText
         val notificationTitle = title.ifBlank { context.getString(R.string.notificationDefaultEventTitle) }
 
-        return NotificationCompat.Builder(context, CHANNEL_EVENT_REMINDERS)
+        return NotificationCompat.Builder(context, channelId)
             .setSmallIcon(IconCompat.createWithBitmap(EsdsIcons.CalendarNumberOne.Medium.toBitmap(Density(context))))
             .setContentTitle(notificationTitle)
             .setContentText(contentText)
