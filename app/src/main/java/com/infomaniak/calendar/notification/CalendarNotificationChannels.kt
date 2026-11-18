@@ -70,9 +70,13 @@ class CalendarNotificationChannels(
         }
     }
 
+    fun hasChannel(calendarId: CalendarId): Boolean {
+        return notificationManager?.getNotificationChannel(channelId(calendarId)) != null
+    }
+
     /** Creates the channel of [calendarId] if it's missing, for an alarm firing before [startObserving] synced it. */
     suspend fun ensureChannel(calendarId: CalendarId) {
-        if (notificationManager?.getNotificationChannel(channelId(calendarId)) != null) return
+        if (hasChannel(calendarId)) return
         val (sections, emails) = wantedChannels().first()
         syncChannels(sections, emails)
     }
