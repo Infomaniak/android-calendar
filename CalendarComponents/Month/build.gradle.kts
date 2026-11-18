@@ -58,6 +58,7 @@ dependencies {
     implementation(core.infomaniak.core.common)
     implementation(core.infomaniak.core.ui.compose.basics)
     implementation(libs.infomaniak.designsystem.foundation)
+    implementation(libs.infomaniak.designsystem.icons)
 
     implementation(platform(core.compose.bom))
     implementation(core.compose.foundation)
