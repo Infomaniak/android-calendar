@@ -43,6 +43,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -78,6 +79,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -134,8 +136,8 @@ fun <T> ScrollPicker(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     itemHeight: Dp = ScrollPickerDefaults.ItemHeight,
-    textStyle: TextStyle = ScrollPickerDefaults.inactiveTextStyle,
-    selectedTextStyle: TextStyle = ScrollPickerDefaults.textStyle,
+    textStyle: TextStyle = ScrollPickerDefaults.textStyle,
+    inactiveTextStyle: TextStyle = ScrollPickerDefaults.inactiveTextStyle,
     colors: ScrollPickerColors = ScrollPickerDefaults.colors(),
 ) {
     val labels = remember(items, itemLabel) { items.map(itemLabel) }
@@ -171,8 +173,8 @@ fun <T> ScrollPicker(
     }
 
     val textMeasurer = rememberTextMeasurer()
-    val width = remember(labels, textStyle, selectedTextStyle, textMeasurer, density) {
-        with(density) { textMeasurer.widestWidth(labels, textStyle, selectedTextStyle).toDp() }
+    val width = remember(labels, textStyle, inactiveTextStyle, textMeasurer, density) {
+        with(density) { textMeasurer.widestWidth(labels, textStyle, inactiveTextStyle).toDp() }
     }
 
     val scope = rememberCoroutineScope()
@@ -205,7 +207,7 @@ fun <T> ScrollPicker(
                 onInput = onInput,
                 enabled = enabled,
                 keyboardOptions = keyboardOptions,
-                textStyle = selectedTextStyle.copy(color = colors.textColor(enabled, active = true, selected = true)),
+                textStyle = textStyle.copy(color = colors.textColor(enabled, pressed = true, inactive = false)),
                 horizontalAlignment = horizontalAlignment,
                 cursorColor = colors.cursorColor,
                 modifier = Modifier
@@ -245,7 +247,7 @@ fun <T> ScrollPicker(
                         enabled = enabled,
                         textMeasurer = textMeasurer,
                         textStyle = textStyle,
-                        selectedTextStyle = selectedTextStyle,
+                        inactiveTextStyle = inactiveTextStyle,
                         horizontalAlignment = horizontalAlignment,
                         colors = colors,
                         onClick = { onItemClick(listIndex) },
@@ -263,11 +265,11 @@ fun <T> ScrollPicker(
 }
 
 /** Width of the widest of [labels], in whichever style is wider. Measured once, so skips the measurer's cache. */
-private fun TextMeasurer.widestWidth(labels: List<String>, textStyle: TextStyle, selectedTextStyle: TextStyle): Int {
+private fun TextMeasurer.widestWidth(labels: List<String>, textStyle: TextStyle, inactiveTextStyle: TextStyle): Int {
     return labels.maxOfOrNull { label ->
         maxOf(
             measure(label, textStyle, skipCache = true).size.width,
-            measure(label, selectedTextStyle, skipCache = true).size.width,
+            measure(label, inactiveTextStyle, skipCache = true).size.width,
         )
     } ?: 0
 }
@@ -306,8 +308,8 @@ private fun Modifier.pickerSemantics(
 }
 
 /**
- * Draws the label twice: with [textStyle] outside the selection area, the center row of the wheel, and with
- * [selectedTextStyle] inside it, so an item crossing its border is split between both styles. Only the latter is drawn
+ * Draws the label twice: with [inactiveTextStyle] outside the selection area, the center row of the wheel, and with
+ * [textStyle] inside it, so an item crossing its border is split between both styles. Only the latter is drawn
  * while a picker of the [group] is edited.
  */
 @Composable
@@ -319,7 +321,7 @@ private fun ScrollPickerItem(
     enabled: Boolean,
     textMeasurer: TextMeasurer,
     textStyle: TextStyle,
-    selectedTextStyle: TextStyle,
+    inactiveTextStyle: TextStyle,
     horizontalAlignment: Alignment.Horizontal,
     colors: ScrollPickerColors,
     onClick: () -> Unit,
@@ -331,20 +333,20 @@ private fun ScrollPickerItem(
             .clickable(interactionSource = null, indication = null, enabled = enabled, onClick = onClick)
             .drawWithCache {
                 val text = textMeasurer.measure(label, textStyle)
-                val selectedText = textMeasurer.measure(label, selectedTextStyle)
+                val inactiveText = textMeasurer.measure(label, inactiveTextStyle)
                 onDrawBehind {
-                    val active = listState.isScrollInProgress
+                    val pressed = listState.isScrollInProgress
                     // Read while drawing so that scrolling only redraws. The row at the wheel's content start is selected.
                     val selectionTop =
                         (listState.firstVisibleItemIndex - listIndex) * size.height + listState.firstVisibleItemScrollOffset
                     val selectionBottom = selectionTop + size.height
                     if (!group.isEditing) {
                         clipRect(top = selectionTop, bottom = selectionBottom, clipOp = ClipOp.Difference) {
-                            drawAligned(text, horizontalAlignment, colors.textColor(enabled, active, selected = false))
+                            drawAligned(inactiveText, horizontalAlignment, colors.textColor(enabled, pressed, inactive = true))
                         }
                     }
                     clipRect(top = selectionTop, bottom = selectionBottom) {
-                        drawAligned(selectedText, horizontalAlignment, colors.textColor(enabled, active, selected = true))
+                        drawAligned(text, horizontalAlignment, colors.textColor(enabled, pressed, inactive = false))
                     }
                 }
             },
@@ -396,7 +398,7 @@ private fun TextPreview() {
 @Preview
 @Composable
 private fun TimePreview() {
-    MaterialTheme {
+    MaterialTheme(typography = Typography(fontFamily = FontFamily.SansSerif)) { // Use correct typography with emphasized tokens defined for expressive
         Scaffold {
             Column(
                 Modifier

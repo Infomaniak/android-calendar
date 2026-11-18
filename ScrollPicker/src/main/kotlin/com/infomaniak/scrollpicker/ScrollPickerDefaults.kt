@@ -48,10 +48,10 @@ object ScrollPickerDefaults {
         disabledTextColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = DISABLED_ALPHA),
         cursorColor: Color = MaterialTheme.colorScheme.primary,
     ): ScrollPickerColors = ScrollPickerColors(
-        textColor = inactiveTextColor,
-        selectedTextColor = textColor,
-        activeTextColor = inactivePressedTextColor,
-        activeSelectedTextColor = pressedTextColor,
+        textColor = textColor,
+        inactiveTextColor = inactiveTextColor,
+        pressedTextColor = pressedTextColor,
+        inactivePressedTextColor = inactivePressedTextColor,
         disabledTextColor = disabledTextColor,
         cursorColor = cursorColor,
     )

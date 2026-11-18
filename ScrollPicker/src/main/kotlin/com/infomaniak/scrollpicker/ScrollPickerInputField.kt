@@ -151,7 +151,7 @@ private fun ScrollPickerInputFieldPreview() {
                     onInput = String::toIntOrNull,
                     enabled = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-                    textStyle = ScrollPickerDefaults.textStyle.copy(color = colors.activeSelectedTextColor),
+                    textStyle = ScrollPickerDefaults.textStyle.copy(color = colors.pressedTextColor),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     cursorColor = colors.cursorColor,
                     modifier = Modifier
