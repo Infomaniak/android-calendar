@@ -82,6 +82,11 @@ fun MainNavHost(
     defaultCalendarView: NavDestination.CalendarView,
     onCalendarViewSelected: (NavDestination.CalendarView) -> Unit,
 ) {
+    val selectCalendarView: (NavDestination.CalendarView) -> Unit = { destination ->
+        onCalendarViewSelected(destination)
+        backStack.replaceRoot(destination)
+    }
+
     SharedTransitionLayout {
         CompositionLocalProvider(LocalSharedTransitionScope provides this@SharedTransitionLayout) {
             val windowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass
@@ -96,7 +101,7 @@ fun MainNavHost(
                     backStack = backStack,
                     defaultCalendarView = defaultCalendarView,
                 ),
-                sceneDecoratorStrategies = sceneDecoratorStrategies(backStack, onCalendarViewSelected),
+                sceneDecoratorStrategies = sceneDecoratorStrategies(backStack, selectCalendarView),
                 sceneStrategies = sceneStrategies(windowSizeClass),
                 sharedTransitionScope = this@SharedTransitionLayout,
                 transitionSpec = { NavigationTransition.contentTransform },
@@ -310,7 +315,7 @@ private fun <T : NavKey> sceneStrategies(windowSizeClass: WindowSizeClass): List
 
 private fun sceneDecoratorStrategies(
     backStack: NavBackStack<NavDestination>,
-    onCalendarViewSelected: (NavDestination.CalendarView) -> Unit,
+    selectCalendarView: (NavDestination.CalendarView) -> Unit,
 ): List<SceneDecoratorStrategy<NavDestination>> {
     val navigationStrategy: NavigationDecoratorStrategy<NavDestination> =
         NavigationDecoratorStrategy(
@@ -318,10 +323,7 @@ private fun sceneDecoratorStrategies(
                 val visibleDayState = LocalVisibleDayState.current
 
                 CalendarHorizontalFloatingToolbar(
-                    onNavigationButtonClicked = { destination ->
-                        onCalendarViewSelected(destination)
-                        backStack.replaceRoot(destination)
-                    },
+                    onNavigationButtonClicked = selectCalendarView,
                     onCurrentDayClicked = { visibleDayState?.jumpTo(Clock.today()) },
                     currentDestination = { backStack.getLastCalendarView() },
                     floatingActionButton = {
