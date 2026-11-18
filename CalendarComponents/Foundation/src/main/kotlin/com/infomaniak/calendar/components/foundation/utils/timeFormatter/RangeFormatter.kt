@@ -95,7 +95,8 @@ internal fun formatTimeRange(
     return joinRange(formattedStart, formattedEnd)
 }
 
-internal fun formatDateTimeRange(
+/** Non-Composable variant of [formatDateTimeRange], for callers outside of a composition such as notifications. */
+fun formatDateTimeRange(
     start: LocalDateTime,
     end: LocalDateTime,
     locale: Locale,
@@ -162,7 +163,8 @@ private fun assembleDateTimeRange(
     return joinRange(formattedStart, formattedEnd)
 }
 
-internal fun formatDateRange(startDate: LocalDate, endDate: LocalDate, locale: Locale, currentYear: Int): String {
+/** Non-Composable variant of [formatDateRange], for callers outside of a composition such as notifications. */
+fun formatDateRange(startDate: LocalDate, endDate: LocalDate, locale: Locale, currentYear: Int): String {
     val formattedStart = startDate.formatFullDate(locale, currentYear)
 
     return if (startDate == endDate) {

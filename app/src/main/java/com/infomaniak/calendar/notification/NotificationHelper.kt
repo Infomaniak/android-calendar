@@ -29,10 +29,19 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
 import com.infomaniak.calendar.MainActivity
 import com.infomaniak.calendar.R
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateRange
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRange
 import com.infomaniak.calendar.utils.toBitmap
+import com.infomaniak.core.common.utils.today
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CalendarNumberOne
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.toLocalDateTime
 import java.util.Date
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 object NotificationHelper {
 
@@ -85,7 +94,22 @@ object NotificationHelper {
         endInstantMs: Long,
         isAllDay: Boolean,
     ): String {
-        if (isAllDay) return context.getString(R.string.notificationAllDay)
+        val timeZone = TimeZone.currentSystemDefault()
+        val start = Instant.fromEpochMilliseconds(startInstantMs).toLocalDateTime(timeZone)
+        val end = Instant.fromEpochMilliseconds(endInstantMs).toLocalDateTime(timeZone)
+        val locale = context.resources.configuration.locales[0]
+        val currentYear = Clock.today(timeZone).year
+
+        if (isAllDay) {
+            // An all-day event ends exclusively, at the start of the day following its last one
+            val lastDay = end.date.minus(1, DateTimeUnit.DAY)
+            if (lastDay <= start.date) return context.getString(R.string.notificationAllDay)
+            return formatDateRange(start.date, lastDay, locale, currentYear)
+        }
+
+        if (start.date != end.date) {
+            return formatDateTimeRange(start, end, locale, DateFormat.is24HourFormat(context), currentYear)
+        }
 
         val timeFormat = DateFormat.getTimeFormat(context)
         val startTime = timeFormat.format(Date(startInstantMs))
