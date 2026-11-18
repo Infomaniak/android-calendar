@@ -19,6 +19,9 @@ package com.infomaniak.calendar.components.eventdetail.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,9 +41,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.error
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.component.items.SegmentedListItemSwitch
+import com.infomaniak.calendar.components.eventdetail.detail.component.CompactTextField
+import com.infomaniak.calendar.components.eventdetail.detail.component.CompactTextFieldDefaults
+import com.infomaniak.calendar.components.eventdetail.form.EventFormState.Companion.KMEET_MAX_CHARACTERS
 import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -87,6 +98,58 @@ internal fun KMeetButtonSwitch(
     SegmentedListItemSwitch(checked, onCheckedChange, shapes = shapes, leadingContent = { KMeetIcon() }, modifier = modifier) {
         Text(stringResource(id = R.string.kMeetMeeting))
     }
+}
+
+@Composable
+internal fun KMeetEditable(
+    state: TextFieldState,
+    shapes: ListItemShapes,
+    modifier: Modifier = Modifier,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+) {
+    val isTooLong = state.text.length > KMEET_MAX_CHARACTERS
+    val extraCharacters = KMEET_MAX_CHARACTERS - state.text.length
+    val errorMessage = stringResource(R.string.eventValidationCharacterLimitExceeded) +
+            " $extraCharacters / $KMEET_MAX_CHARACTERS"
+
+    SegmentedListItem(
+        shapes = shapes,
+        colors = CustomColors.EventFormItemColors,
+        content = {
+            CompactTextField(
+                state = state,
+                modifier = Modifier.semantics { if (isTooLong) error(errorMessage) },
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.kMeetMeeting),
+                        color = CompactTextFieldDefaults.colors().focusedPlaceholderColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                },
+                isError = isTooLong,
+                lineLimits = TextFieldLineLimits.SingleLine,
+                supportingText = {
+                    if (isTooLong) {
+                        Text(
+                            text = errorMessage,
+                            color = CompactTextFieldDefaults.colors().errorSupportingTextColor,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                platformStyle = PlatformTextStyle(includeFontPadding = false),
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(top = 2.dp),
+                        )
+                    }
+                },
+                leadingIcon = leadingIcon,
+                trailingIcon = trailingIcon,
+            )
+        },
+        modifier = modifier,
+    )
 }
 
 @Composable

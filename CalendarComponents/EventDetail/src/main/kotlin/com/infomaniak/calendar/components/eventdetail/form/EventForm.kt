@@ -51,6 +51,7 @@ import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.CalendarEditable
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitch
+import com.infomaniak.calendar.components.eventdetail.component.KMeetEditable
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.ReminderItemEditable
 import com.infomaniak.calendar.components.eventdetail.component.Section
@@ -75,7 +76,10 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.CircleCross
+import com.infomaniak.designsystem.icons.symbols.CircleCrossFilled
 import com.infomaniak.designsystem.icons.symbols.List
+import com.infomaniak.designsystem.icons.symbols.ProductKmeet
 import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
@@ -140,12 +144,16 @@ fun EventForm(
             }
 
             item {
-                KMeetButtonSwitch(
-                    shapes = it,
-                    checked = state.isKMeetUrlEnabled::value,
-                    onCheckedChange = { isChecked -> state.isKMeetUrlEnabled.value = isChecked },
-                    modifier = Modifier.eventSharedBounds(EventSharedElement.KMeet),
-                )
+                Section {
+                    item {
+                        KMeetEditable(
+                            leadingIcon = { ItemIcon(EsdsIcons.ProductKmeet.Medium) },
+                            state = state.descriptionTextState,
+                            shapes = it,
+                            trailingIcon = { ItemIcon(EsdsIcons.CircleCross.Medium) },
+                        )
+                    }
+                }
             }
 
             locations(
