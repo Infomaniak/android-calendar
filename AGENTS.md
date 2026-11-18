@@ -132,8 +132,8 @@ only narrow to `Normal<*>` and would still need an unchecked cast — an unsafe 
 
 ### Flavors
 
-Most CalendarComponents modules that contain **code** (`Foundation`, `Event`, `Planning`, `Day`, `Calendar`, `EventDetail`)
-applies the `core.plugins.infomaniak.android.library.flavor.aware` convention plugin instead of the plain
+Most CalendarComponents modules that contain **code** (`Foundation`, `Event`, `Planning`, `Day`, `Month`, `Calendar`,
+`EventDetail`) apply the `core.plugins.infomaniak.android.library.flavor.aware` convention plugin instead of the plain
 `core.plugins.android.library`. That plugin declares the same `distribution` flavor dimension (`standard` default /
 `fdroid`) as the app. It is required because `Foundation` depends on `core.infomaniak.core.avatar`, which is itself
 flavor-aware (see `Core/Avatar/build.gradle.kts`) — AGP requires a consumer module to declare matching product flavors
@@ -157,6 +157,7 @@ When adding a new CalendarComponents module, apply the flavor-aware plugin if it
 | `:CalendarComponents:EventDetail` | `com.infomaniak.calendar.components.eventdetail` | Event detail module — the `detail` package contains the read-only `EventDetail` Composable, while the `form` package contains the editable `EventForm` shared by event editing and creation (it takes an `EventFormState`, one state per field, saved through `EventFormState.Saver`), and `CustomReminder`, the content of the screen making a custom reminder. Matching fields can opt into shared-element transitions through optional Compose animation scopes and internal element keys, without depending on app navigation or domain identifier types. Re-exports Foundation and `core.infomaniak.core.filetypes` via `api` since both appear in `EventDetailUi`. |
 | `:CalendarComponents:TimeZoneSearch` | `com.infomaniak.calendar.components.timezonesearch` | `TimeZoneSearch` Composable — searchable list of ICU's canonical location time zones, each with its localized name, city and country, and UTC offset (formatters in Foundation's `TimeZoneFormatter`). Filters locally; reports the clicked `TimeZone`. Re-exports Foundation and `kotlinx-datetime` via `api`. |
 | `:CalendarComponents:LocationSearch` | `com.infomaniak.calendar.components.locationsearch` | `LocationSearch` Composable — the location search bar over one segmented list of Foundation's `LocationUi` it is given, merged and filtered by the caller: places (`LocationUi.Place`, their name above their address) and bookable rooms (`LocationUi.Room`, with their `RoomAvailability` above their name). The search text is highlighted in them (Foundation's `HighlightedText`), except in the typed place leading the results while something is typed. Picking a place or a room reports it through `onLocationClick`. Each room shows Foundation's `RoomDetails` (capacity and floor), also used by the event detail's room. Re-exports Foundation via `api`. |
+| `:CalendarComponents:Month` | `com.infomaniak.calendar.components.month` | Month view. Its input is a `MonthUi` per month: the weeks it touches, each carrying its 7 dates and the event segments packed over them (`MonthEventSegmentUi`: start column, span, lane). Packing happens on the data side. Re-exports Foundation via `api`. |
 
 ### Dependency graph
 
@@ -167,16 +168,17 @@ When adding a new CalendarComponents module, apply the flavor-aware plugin if it
 | `Event`    | `Foundation`      | —                              |
 | `Planning` | `Foundation`      | `Event`, `Resources`           |
 | `Day`      | `Foundation`      | `Event`, `Resources`           |
+| `Month`    | `Foundation`      | `Event`, `Resources`           |
 | `Calendar` | `Foundation`      | `Resources`                    |
 | `TimeZoneSearch` | `Foundation` | `Resources`                |
 | `LocationSearch` | `Foundation` | `Resources`                |
 
 `Absence` and `Resources` have no CalendarComponents dependencies; `Foundation` depends on `Resources` only as `implementation`
 (for resource ids carried by its models, e.g. `ParticipationStatus.countPluralRes`). `Event` re-exports `Foundation` via `api` since its
-public `EventItem` signature exposes `Foundation` types. `Planning` and `Day` each declare their own **direct** `api`
+public `EventItem` signature exposes `Foundation` types. `Planning`, `Day` and `Month` each declare their own **direct** `api`
 dependency on `Foundation` (its types appear in their own public signatures) and depend on `Event` and `Resources` as
 `implementation` only (internal implementation details, not part of their own public API surface — not re-exported).
-`Planning` and `Day` are the two top-level entry points for consumers, one per calendar view; each transitively brings
+`Planning`, `Day` and `Month` are the top-level entry points for consumers, one per calendar view; each transitively brings
 in the stack it needs.
 
 ### What is final vs placeholder
