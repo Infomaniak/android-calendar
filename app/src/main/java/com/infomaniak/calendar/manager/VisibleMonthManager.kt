@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.YearMonthRange
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.yearMonth
@@ -45,14 +46,18 @@ class VisibleMonthManager(
 ) {
     private val timeZone = TimeZone.currentSystemDefault()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val eventDots: Flow<Map<LocalDate, List<EventColorsUi>>> = visibleDateManager.visibleDateFlow
+    /** The visible month and those around it, kept loaded so a swipe lands on a month that already has its content. */
+    val loadedMonths: Flow<YearMonthRange> = visibleDateManager.visibleDateFlow
         .map { it.yearMonth }
         .distinctUntilChanged()
-        .flatMapLatest { month ->
+        .map { it.minus(MONTH_MARGIN, DateTimeUnit.MONTH)..it.plus(MONTH_MARGIN, DateTimeUnit.MONTH) }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val eventDots: Flow<Map<LocalDate, List<EventColorsUi>>> = loadedMonths
+        .flatMapLatest { months ->
             calendarManager.observeMonthlyDotColors(
-                startMonth = month.minus(MONTH_MARGIN, DateTimeUnit.MONTH),
-                endMonth = month.plus(MONTH_MARGIN, DateTimeUnit.MONTH),
+                startMonth = months.start,
+                endMonth = months.endInclusive,
                 timeZone = timeZone,
             )
         }
@@ -63,7 +68,7 @@ class VisibleMonthManager(
     }
 
     companion object {
-        /** Months kept loaded on each side of the visible one, so a swipe lands on a month that already has its dots. */
+        /** Months kept loaded on each side of the visible one. */
         private const val MONTH_MARGIN = 1
     }
 }

@@ -41,7 +41,7 @@ app/src/main/java/com/infomaniak/calendar/
 │   │                               # the background for the event ViewModels, so their screens close at once; MainActivity shows
 │   │                               # its errors
 │   ├── VisibleDateManager.kt       # App-scoped: single visible-date source, restored/saved by MainViewModel
-│   ├── VisibleMonthManager.kt      # App-scoped: event dots derived from the shared visible date's month
+│   ├── VisibleMonthManager.kt      # App-scoped: the months loaded around the shared visible date, and their event dots
 │   ├── VisibleEventsManager.kt     # App-scoped: one observation of the day-sliced events around the visible date, for every view
 │   ├── DayEventsLoader.kt          # App-scoped: VisibleEventsManager's events split into all-day and timed, for the day views
 │   └── PlaceSearcher.kt            # Location search's places, from the platform Geocoder (none on devices without one)
