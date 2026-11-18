@@ -79,21 +79,6 @@ fun formatDateRange(
     timeZone: TimeZone = TimeZone.currentSystemDefault(),
     currentYear: Int = Clock.today(timeZone).year,
 ): String = formatDateRange(startDate, endDate, currentLocale(), currentYear)
-//endregion
-
-//region Underlying testable logic
-internal fun formatTimeRange(
-    start: Instant,
-    end: Instant,
-    locale: Locale,
-    timeZone: TimeZone,
-    use24HourFormat: Boolean,
-): String {
-    val formattedStart = start.toLocalDateTime(timeZone).time.formatTime(locale, use24HourFormat)
-    val formattedEnd = end.toLocalDateTime(timeZone).time.formatTime(locale, use24HourFormat)
-
-    return joinRange(formattedStart, formattedEnd)
-}
 
 /** Non-Composable variant of [formatDateTimeRange], for callers outside of a composition such as notifications. */
 fun formatDateTimeRange(
@@ -110,6 +95,32 @@ fun formatDateTimeRange(
     locale = locale,
     currentYear = currentYear,
 )
+
+/** Non-Composable variant of [formatDateRange], for callers outside of a composition such as notifications. */
+fun formatDateRange(startDate: LocalDate, endDate: LocalDate, locale: Locale, currentYear: Int): String {
+    val formattedStart = startDate.formatFullDate(locale, currentYear)
+
+    return if (startDate == endDate) {
+        formattedStart
+    } else {
+        joinRange(formattedStart, endDate.formatFullDate(locale, currentYear))
+    }
+}
+//endregion
+
+//region Underlying testable logic
+internal fun formatTimeRange(
+    start: Instant,
+    end: Instant,
+    locale: Locale,
+    timeZone: TimeZone,
+    use24HourFormat: Boolean,
+): String {
+    val formattedStart = start.toLocalDateTime(timeZone).time.formatTime(locale, use24HourFormat)
+    val formattedEnd = end.toLocalDateTime(timeZone).time.formatTime(locale, use24HourFormat)
+
+    return joinRange(formattedStart, formattedEnd)
+}
 
 internal fun formatDateTimeRangeWithZone(
     start: LocalDateTime,
@@ -161,17 +172,6 @@ private fun assembleDateTimeRange(
     val formattedEnd = if (start.date == end.date) formattedEndTime else end.withFormattedTime(formattedEndTime)
 
     return joinRange(formattedStart, formattedEnd)
-}
-
-/** Non-Composable variant of [formatDateRange], for callers outside of a composition such as notifications. */
-fun formatDateRange(startDate: LocalDate, endDate: LocalDate, locale: Locale, currentYear: Int): String {
-    val formattedStart = startDate.formatFullDate(locale, currentYear)
-
-    return if (startDate == endDate) {
-        formattedStart
-    } else {
-        joinRange(formattedStart, endDate.formatFullDate(locale, currentYear))
-    }
 }
 //endregion
 
