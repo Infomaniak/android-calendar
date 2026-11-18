@@ -47,15 +47,9 @@ data class DateAndTimeState(
     val end: Entry,
     val hasEndEverBeenTouched: MutableState<Boolean>,
 ) {
-    /**
-     * Start and duration when the current end time session began, a session being consecutive end time picks. The end's
-     * wheel picks every row it passes, so the duration would otherwise already be zero once the end goes before the start.
-     */
-    private var endTimeSessionOrigin: Pair<Instant, Duration>? = null
-
     fun Entry.pickDate(date: LocalDate) = edit { this.date = date }
 
-    fun Entry.pickTime(time: LocalTime) = edit(isEndTimeSession = this == end) { this.time = time }
+    fun Entry.pickTime(time: LocalTime) = edit { this.time = time }
 
     fun Entry.pickTimeZone(timeZone: TimeZone) = edit {
         val isEditingStart = this == start
@@ -68,15 +62,17 @@ data class DateAndTimeState(
         }
     }
 
-    private fun Entry.edit(isEndTimeSession: Boolean = false, change: () -> Unit) {
-        // TODO: This interval displacement doesn't work if the user is setting an all day event and the time component of
-        //  both entries are at 0:00 and the range comprises a day of 23 or 25 hours.
-        //  Adapt the interval computation to take into account days 23 or 25 hours. Changing the date, should not change the time.
-        val previousInterval = end.instant - start.instant
-
-        endTimeSessionOrigin = if (isEndTimeSession) endTimeSessionOrigin ?: (start.instant to previousInterval) else null
-        val (initialStart, initialInterval) = endTimeSessionOrigin ?: (start.instant to previousInterval)
-
+    /**
+     * Applies [change], then corrects the other values from [initialStart] and [initialInterval], the current ones by default.
+     */
+    // TODO: This interval displacement doesn't work if the user is setting an all day event and the time component of
+    //  both entries are at 0:00 and the range comprises a day of 23 or 25 hours.
+    //  Adapt the interval computation to take into account days 23 or 25 hours. Changing the date, should not change the time.
+    internal fun Entry.edit(
+        initialStart: Instant = start.instant,
+        initialInterval: Duration = end.instant - start.instant,
+        change: () -> Unit,
+    ) {
         change()
 
         val isEditingStart = this == start

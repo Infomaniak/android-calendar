@@ -36,10 +36,23 @@ class DateAndTimeStateTest {
     fun scrollingTheEndBeforeTheStart_keepsTheDuration_andLeavesTheStartWhenScrolledBack() = with(
         DateAndTimeState(start = entry(10), end = entry(11), hasEndEverBeenTouched = mutableStateOf(false)),
     ) {
-        (10 downTo 8).forEach { end.pickTime(LocalTime(it, 0)) }
+        val session = EndTimeSession(this)
+
+        (10 downTo 8).forEach { session.pickTime(LocalTime(it, 0)) }
         assertEquals(LocalTime(7, 0), start.time)
 
-        (9..12).forEach { end.pickTime(LocalTime(it, 0)) }
+        (9..12).forEach { session.pickTime(LocalTime(it, 0)) }
+        assertEquals(LocalTime(7, 0), start.time)
+    }
+
+    @Test
+    fun aNewSession_keepsTheDurationSetInThePreviousOne() = with(
+        DateAndTimeState(start = entry(10), end = entry(11), hasEndEverBeenTouched = mutableStateOf(false)),
+    ) {
+        EndTimeSession(this).pickTime(LocalTime(12, 0))
+
+        val session = EndTimeSession(this)
+        (11 downTo 9).forEach { session.pickTime(LocalTime(it, 0)) }
         assertEquals(LocalTime(7, 0), start.time)
     }
 }
