@@ -103,6 +103,8 @@ class EventFormState(
     internal val start get() = dateAndTimeState.start.date.atTime(dateAndTimeState.start.time)
     internal val end get() = dateAndTimeState.end.date.atTime(dateAndTimeState.end.time)
 
+    fun isValid(): Boolean = descriptionTextState.text.length <= DESCRIPTION_MAX_CHARACTERS
+
     /** Organizing a new event as the owner of [calendar], who must then not also be one of its attendees. */
     fun selectCalendar(calendar: EventDetailCalendar) {
         this.calendar = calendar

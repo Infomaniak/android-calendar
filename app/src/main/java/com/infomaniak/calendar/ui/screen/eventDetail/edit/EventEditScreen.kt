@@ -159,8 +159,7 @@ private fun EventEditScreen(
 }
 
 private fun isSubmitEnabled(uiState: EventEditScreenState): Boolean {
-    return uiState is EventEditScreenState.Success &&
-            uiState.eventFormState.descriptionTextState.text.length <= EventFormState.DESCRIPTION_MAX_CHARACTERS
+    return uiState is EventEditScreenState.Success && uiState.eventFormState.isValid()
 }
 
 private sealed interface EventEditScreenState {
