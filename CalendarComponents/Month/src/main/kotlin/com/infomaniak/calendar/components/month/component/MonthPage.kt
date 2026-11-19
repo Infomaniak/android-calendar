@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
+import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.calendar.components.foundation.utils.onlyHorizontalAndTop
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortDayNameUppercase
 import com.infomaniak.calendar.components.month.layout.laneMetrics
@@ -59,11 +60,11 @@ import kotlinx.datetime.onDay
 @Composable
 internal fun MonthPage(
     month: MonthUi,
-    today: LocalDate,
     onDayClick: (LocalDate) -> Unit,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    today: LocalDate = rememberToday().value,
 ) {
     Column(modifier.padding(contentPadding.onlyHorizontalAndTop())) {
         WeekdayHeader(month.weeks.first().dates)
@@ -76,15 +77,15 @@ private fun WeekdayHeader(dates: List<LocalDate>, modifier: Modifier = Modifier)
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = EsdsTheme.spacing.sm)
+            .padding(bottom = EsdsTheme.spacing.xl)
             .semantics(mergeDescendants = true) { heading() },
     ) {
         dates.forEach { date ->
             Text(
                 text = date.formatShortDayNameUppercase(),
                 modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
             )

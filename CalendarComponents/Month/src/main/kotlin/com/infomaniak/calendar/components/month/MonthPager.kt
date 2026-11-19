@@ -24,14 +24,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
-import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.calendar.components.foundation.utils.FollowSelectedPage
 import com.infomaniak.calendar.components.month.component.MonthPage
 import com.infomaniak.calendar.components.month.model.MonthUi
@@ -68,13 +66,10 @@ fun MonthPager(
         onPageChanged = { onVisibleMonthChanged(monthRange.monthAt(it)) },
     )
 
-    val today by rememberToday()
-
     HorizontalPager(state = pagerState, modifier = modifier) { page ->
         monthOf(monthRange.monthAt(page))?.let { month ->
             MonthPage(
                 month = month,
-                today = today,
                 onDayClick = onDayClick,
                 onEventClick = onEventClick,
                 contentPadding = contentPadding,
@@ -113,7 +108,7 @@ private fun PreviewMonthPager(monthOf: (YearMonth) -> MonthUi? = ::previewMonth)
         Surface {
             MonthPager(
                 monthRange = previewFiveWeeksMonth.minus(1, DateTimeUnit.MONTH)..
-                    previewFiveWeeksMonth.plus(1, DateTimeUnit.MONTH),
+                        previewFiveWeeksMonth.plus(1, DateTimeUnit.MONTH),
                 selectedMonth = { previewFiveWeeksMonth },
                 monthOf = monthOf,
                 onVisibleMonthChanged = {},

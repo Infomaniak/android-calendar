@@ -45,9 +45,9 @@ import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
 import com.infomaniak.calendar.ui.model.TimelineUiState
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
-import com.infomaniak.calendar.ui.navigation.FloatingToolbarClearance
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
@@ -127,7 +127,7 @@ private fun DayScreen(
             onEventClick = { goToEventDetail(it.occurrenceId) },
             headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
             timelineModifier = Modifier.hazeSource(hazeState),
-            contentPadding = contentPadding + PaddingValues(bottom = FloatingToolbarClearance),
+            contentPadding = contentPadding + PaddingValues(bottom = Dimens.FloatingToolbarClearance),
             // Placed here rather than on each page: the hour grid's vertical scroll reaches it through
             // the pager, which only consumes the horizontal axis.
             modifier = Modifier

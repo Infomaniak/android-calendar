@@ -28,7 +28,9 @@ import androidx.compose.ui.platform.LocalDensity
 @Composable
 internal fun laneMetrics(): LaneMetrics = with(LocalDensity.current) {
     LaneMetrics(
-        headerHeight = MonthDefaults.DayNumberSize.roundToPx() + MonthDefaults.DayNumberPadding.roundToPx() * 2,
+        headerHeight = MonthDefaults.DayNumberSize.roundToPx()
+                + MonthDefaults.DayNumberPadding.calculateTopPadding().roundToPx()
+                + MonthDefaults.DayNumberPadding.calculateBottomPadding().roundToPx(),
         laneHeight = MonthDefaults.LaneHeight.roundToPx(),
         laneSpacing = MonthDefaults.LaneSpacing.roundToPx(),
     )
@@ -39,7 +41,6 @@ internal fun laneMetrics(): LaneMetrics = with(LocalDensity.current) {
  * and followed by [laneSpacing].
  */
 internal data class LaneMetrics(val headerHeight: Int, val laneHeight: Int, val laneSpacing: Int) {
-
     private val laneStep get() = laneHeight + laneSpacing
 
     /** How many lanes fit in a row [rowHeight] tall, counting the spacing below the last one. */

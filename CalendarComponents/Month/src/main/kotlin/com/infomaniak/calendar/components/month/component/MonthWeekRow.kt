@@ -47,8 +47,8 @@ import com.infomaniak.calendar.components.month.model.MonthWeekUi
 import com.infomaniak.calendar.components.month.preview.previewFiveWeeksMonth
 import com.infomaniak.calendar.components.month.preview.previewMonth
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.onDay
 import kotlinx.datetime.YearMonth
+import kotlinx.datetime.onDay
 import kotlinx.datetime.yearMonth
 import kotlin.math.roundToInt
 

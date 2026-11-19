@@ -38,26 +38,38 @@ import kotlin.time.Instant
 internal val previewSixWeeksMonth = YearMonth(2026, 3)
 internal val previewFiveWeeksMonth = YearMonth(2026, 5)
 
-internal val previewEvent: EventSummaryUi.Normal = previewEventOf("Revue design Calendar", Color(0xFF8B5CF6))
-internal val previewCancelledEvent: EventSummaryUi.Normal =
-    previewEventOf("Meeting dev", Color(0xFFD4426E), status = EventStatus.Cancelled)
-internal val previewDeclinedEvent: EventSummaryUi.Normal =
-    previewEventOf("Apéro", Color(0xFF10B981), myStatus = ParticipationStatus.Declined)
-internal val previewTentativeEvent: EventSummaryUi.Normal =
-    previewEventOf("Dentiste", Color(0xFF3B82F6), myStatus = ParticipationStatus.Tentative)
-internal val previewPendingEvent: EventSummaryUi.Normal =
-    previewEventOf("Repas du mois avec l'équipe", Color(0xFFE5B94E), myStatus = ParticipationStatus.NeedsAction)
+internal val previewEvent: EventSummaryUi.Normal = previewEventOf("Review design Calendar", Color(0xFF8B5CF6))
+internal val previewCancelledEvent: EventSummaryUi.Normal = previewEventOf(
+    title = "Meeting dev",
+    color = Color(0xFFD4426E),
+    status = EventStatus.Cancelled,
+)
+internal val previewDeclinedEvent: EventSummaryUi.Normal = previewEventOf(
+    title = "Afterwork",
+    color = Color(0xFF10B981),
+    myStatus = ParticipationStatus.Declined,
+)
+internal val previewTentativeEvent: EventSummaryUi.Normal = previewEventOf(
+    title = "Dentist",
+    color = Color(0xFF3B82F6),
+    myStatus = ParticipationStatus.Tentative,
+)
+internal val previewPendingEvent: EventSummaryUi.Normal = previewEventOf(
+    title = "Team lunch",
+    color = Color(0xFFE5B94E),
+    myStatus = ParticipationStatus.NeedsAction,
+)
 
 /**
  * A week with more events on its second day than a short row can show, and events of every status. Only meant for a
  * week fully within its month, as segments never cover days of other months.
  */
 internal val previewSegments: List<MonthEventSegmentUi> = listOf(
-    MonthEventSegmentUi(previewEventOf("Vacances", Color(0xFFE5B94E)), startColumn = 0, span = 5, lane = 0),
+    MonthEventSegmentUi(previewEventOf("Vacations", Color(0xFFE5B94E)), startColumn = 0, span = 5, lane = 0),
     MonthEventSegmentUi(previewEvent, startColumn = 1, span = 1, lane = 1),
     MonthEventSegmentUi(previewEventOf("Standup", Color(0xFF3B82F6)), startColumn = 1, span = 1, lane = 2),
     MonthEventSegmentUi(previewEventOf("Tennis", Color(0xFF10B981)), startColumn = 1, span = 1, lane = 3),
-    MonthEventSegmentUi(previewEventOf("Aller courir", Color(0xFFD4426E)), startColumn = 1, span = 1, lane = 4),
+    MonthEventSegmentUi(previewEventOf("Go running", Color(0xFFD4426E)), startColumn = 1, span = 1, lane = 4),
     MonthEventSegmentUi(previewCancelledEvent, startColumn = 3, span = 1, lane = 1),
     MonthEventSegmentUi(previewDeclinedEvent, startColumn = 4, span = 2, lane = 1),
     MonthEventSegmentUi(previewTentativeEvent, startColumn = 5, span = 1, lane = 0),

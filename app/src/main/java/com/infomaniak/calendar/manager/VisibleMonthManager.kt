@@ -68,7 +68,7 @@ class VisibleMonthManager(
     }
 
     companion object {
-        /** Months kept loaded on each side of the visible one. */
+        /** Months kept loaded on each side of the visible one, so a swipe lands on a month that's already loaded. */
         private const val MONTH_MARGIN = 1
     }
 }

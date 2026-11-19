@@ -18,6 +18,8 @@
 package com.infomaniak.calendar.ui.screen.month
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.plus
@@ -40,9 +42,9 @@ import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
 import com.infomaniak.calendar.ui.model.occurrenceId
-import com.infomaniak.calendar.ui.navigation.FloatingToolbarClearance
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
@@ -93,7 +95,11 @@ private fun MonthScreen(
                 calendarExpansionProgress = { calendarExpansionState.progress },
                 hazeState = hazeState,
                 calendar = {
-                    AnimatedVisibility(visible = calendarExpansionState.isExpanded) {
+                    AnimatedVisibility(
+                        visible = calendarExpansionState.isExpanded,
+                        enter = expandVertically(),
+                        exit = shrinkVertically(),
+                    ) {
                         HorizontalMonthSelector(
                             selectedMonth = { visibleDayState.visibleDate.yearMonth },
                             onMonthSelected = { visibleDayState.jumpTo(it.firstDay) },
@@ -114,7 +120,7 @@ private fun MonthScreen(
                 goToDay()
             },
             onEventClick = { goToEventDetail(it.occurrenceId) },
-            contentPadding = contentPadding + PaddingValues(bottom = FloatingToolbarClearance),
+            contentPadding = contentPadding + PaddingValues(bottom = Dimens.FloatingToolbarClearance),
             modifier = Modifier
                 .fillMaxSize()
                 .hazeSource(hazeState),

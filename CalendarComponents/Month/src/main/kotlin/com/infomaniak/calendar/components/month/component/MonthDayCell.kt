@@ -68,7 +68,7 @@ internal fun MonthDayCell(
 
     Box(
         modifier = modifier
-            .then(if (isToday) Modifier.background(todayTint()) else Modifier)
+            .todayTint(isToday)
             .verticalEndDivider()
             .clickable(role = Role.Button, onClick = onClick)
             .clearAndSetSemantics {
@@ -86,7 +86,9 @@ internal fun MonthDayCell(
 
 /** Tints the whole cell, the only today cue left on a day outside the month, whose number is dimmed instead. */
 @Composable
-private fun todayTint() = MaterialTheme.colorScheme.primary.copy(alpha = EsdsTheme.opacity.subtle)
+private fun Modifier.todayTint(isToday: Boolean): Modifier {
+    return if (isToday) background(MaterialTheme.colorScheme.primary.copy(alpha = EsdsTheme.opacity.subtle)) else this
+}
 
 @Preview
 @Composable

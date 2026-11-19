@@ -212,7 +212,7 @@ enum class EventIcons(
 
 object EventItemDefaults {
     val AllDayTitleStyle: TextStyle
-        @Composable @ReadOnlyComposable get() = MaterialTheme.typography.bodySmallEmphasized.copy(fontWeight = FontWeight.Medium)
+        @Composable @ReadOnlyComposable get() = MaterialTheme.typography.bodySmallEmphasized
 
     val AllDayLabel = @Composable {
         Text(stringResource(R.string.allDayLabel), style = MaterialTheme.typography.bodySmall)

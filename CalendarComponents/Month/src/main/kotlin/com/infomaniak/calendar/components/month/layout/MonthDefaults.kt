@@ -24,40 +24,41 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import com.infomaniak.calendar.components.event.EventItemDefaults
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 internal object MonthDefaults {
-    val DayNumberStyle: TextStyle
-        @Composable @ReadOnlyComposable get() = MaterialTheme.typography.labelMedium
-    /** The title of an all-day [com.infomaniak.calendar.components.event.EventItem], so both read alike. */
-    val EventTitleStyle: TextStyle
-        @Composable @ReadOnlyComposable get() = EventItemDefaults.AllDayTitleStyle
+    val DayNumberStyle: TextStyle @Composable @ReadOnlyComposable get() = MaterialTheme.typography.bodySmall
+    // Just like all day events for coherence
+    val EventTitleStyle: TextStyle @Composable @ReadOnlyComposable get() = EventItemDefaults.AllDayTitleStyle
 
     /** The day number's circle: one line of [DayNumberStyle] with room around it. */
     val DayNumberSize: Dp
-        @Composable @ReadOnlyComposable get() = DayNumberStyle.lineHeightDp() + EsdsTheme.spacing.xs * 2
+        @Composable @ReadOnlyComposable get() {
+            return max(
+                DayNumberStyle.lineHeightDp() + EsdsTheme.spacing.twoXs * 2,
+                20.dp,
+            )
+        }
     /** Room between the day number's circle and the edges of its cell, above the first lane. */
-    val DayNumberPadding: Dp
-        @Composable @ReadOnlyComposable get() = EsdsTheme.spacing.md
-
-    /** Room around an event's title, its start padding clearing the card's accent bar. */
-    val EventTitlePadding: PaddingValues
+    val DayNumberPadding: PaddingValues
         @Composable @ReadOnlyComposable get() = PaddingValues(
-            start = EsdsTheme.spacing.xs,
             top = EsdsTheme.spacing.twoXs,
-            bottom = EsdsTheme.spacing.twoXs,
+            bottom = EsdsTheme.spacing.md,
         )
-    /** An event chip: one line of [EventTitleStyle] within its [EventTitlePadding]. */
+
+    // Padding inside the EventItemCard
+    val EventTitlePadding: PaddingValues @Composable @ReadOnlyComposable get() = PaddingValues(start = EsdsTheme.spacing.xs)
+    // Height of a MonthEventChip
     val LaneHeight: Dp
         @Composable @ReadOnlyComposable get() = with(EventTitlePadding) {
             calculateTopPadding() + EventTitleStyle.lineHeightDp() + calculateBottomPadding()
         }
-    val LaneSpacing: Dp
-        @Composable @ReadOnlyComposable get() = EsdsTheme.spacing.twoXs
+    val LaneSpacing: Dp @Composable @ReadOnlyComposable get() = EsdsTheme.spacing.twoXs
     /** Room between an event and the edges of the first and last days it covers. */
-    val EventHorizontalInset: Dp
-        @Composable @ReadOnlyComposable get() = EsdsTheme.spacing.xs
+    val EventHorizontalInset: Dp @Composable @ReadOnlyComposable get() = EsdsTheme.spacing.xs
 
     @Composable
     @ReadOnlyComposable
