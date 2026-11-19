@@ -110,7 +110,6 @@ internal fun DescriptionEditable(
     state: TextFieldState,
     shapes: ListItemShapes,
     modifier: Modifier = Modifier,
-    leadingIcon: @Composable (() -> Unit)? = null,
 ) {
     val isTooLong = state.text.length > DESCRIPTION_MAX_CHARACTERS
     val extraCharacters = DESCRIPTION_MAX_CHARACTERS - state.text.length
@@ -132,7 +131,7 @@ internal fun DescriptionEditable(
                 },
                 errorMessage = errorMessage,
                 lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 1),
-                leadingIcon = leadingIcon,
+                leadingIcon = { ItemIcon(EsdsIcons.List) },
                 trailingIcon = null,
             )
         },
@@ -187,7 +186,6 @@ private fun PreviewDescriptionEditable() {
             DescriptionEditable(
                 state = TextFieldState("Description"),
                 shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
-                leadingIcon = { ItemIcon(EsdsIcons.List.Medium) },
             )
         }
     }
