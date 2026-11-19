@@ -27,8 +27,8 @@ import org.junit.Test
 
 class DateAndTimeStateTest {
 
-    private fun entry(hour: Int) = DateAndTimeState.Entry(
-        date = mutableStateOf(LocalDate(2026, 11, 16)),
+    private fun entry(hour: Int, day: Int = 16) = DateAndTimeState.Entry(
+        date = mutableStateOf(LocalDate(2026, 11, day)),
         timeState = TimeScrollPickerState(LocalTime(hour, 0)),
         timeZone = mutableStateOf(TimeZone.UTC),
     )
@@ -58,12 +58,33 @@ class DateAndTimeStateTest {
     }
 
     @Test
-    fun scrollingTheStartPastATouchedEnd_keepsTheDurationTheSessionBeganWith() = with(
+    fun scrollingTheStartPastATouchedEnd_keepsTheDurationTheSessionBeganWith_andLeavesTheEndWhenScrolledBack() = with(
         DateAndTimeState(start = entry(10), end = entry(11), hasEndEverBeenTouched = mutableStateOf(true)),
     ) {
         val session = TimeSession(this, start)
 
         (11..12).forEach { session.pickTime(LocalTime(it, 0)) }
         assertEquals(LocalTime(13, 0), end.time)
+
+        (11 downTo 10).forEach { session.pickTime(LocalTime(it, 0)) }
+        assertEquals(LocalTime(13, 0), end.time)
+    }
+
+    @Test
+    fun pickingTheStartDateAfterTheEnd_movesTheEndKeepingTheDuration() = with(
+        DateAndTimeState(start = entry(10), end = entry(11), hasEndEverBeenTouched = mutableStateOf(true)),
+    ) {
+        start.pickDate(LocalDate(2026, 11, 18))
+        assertEquals(LocalDate(2026, 11, 18), end.date)
+        assertEquals(LocalTime(11, 0), end.time)
+    }
+
+    @Test
+    fun pickingTheEndDateBeforeTheStart_movesTheStartKeepingTheDuration() = with(
+        DateAndTimeState(start = entry(10), end = entry(11, day = 17), hasEndEverBeenTouched = mutableStateOf(false)),
+    ) {
+        end.pickDate(LocalDate(2026, 11, 14))
+        assertEquals(LocalDate(2026, 11, 13), start.date)
+        assertEquals(LocalTime(10, 0), start.time)
     }
 }
