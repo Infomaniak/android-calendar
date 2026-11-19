@@ -41,7 +41,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
@@ -130,7 +129,6 @@ internal fun DescriptionEditable(
                 placeholder = {
                     Text(
                         text = stringResource(R.string.descriptionTitle),
-                        color = CompactTextFieldDefaults.colors().focusedPlaceholderColor,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -141,10 +139,6 @@ internal fun DescriptionEditable(
                     if (isTooLong) {
                         Text(
                             text = errorMessage,
-                            color = CompactTextFieldDefaults.colors().errorSupportingTextColor,
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                platformStyle = PlatformTextStyle(includeFontPadding = false),
-                            ),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(top = 2.dp),
