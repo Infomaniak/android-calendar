@@ -50,13 +50,12 @@ import androidx.compose.material3.ToggleButtonSize
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -75,7 +74,6 @@ import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Globe
 import com.infomaniak.scrollpicker.timepicker.TimeScrollPicker
 import com.infomaniak.scrollpicker.timepicker.rememberTimeScrollPickerState
-import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
@@ -130,7 +128,7 @@ private fun DateAndTimeEntryContent(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    val timeScrollPickerState = rememberTimeScrollPickerState(entry.time)
+    SideEffect { entry.timeState.onTimeChange = onTimePicked }
 
     var isDatePickerVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -147,12 +145,6 @@ private fun DateAndTimeEntryContent(
 
     val horizontalContentPadding = contentPadding.onlyHorizontal()
     val bottomContentPadding = contentPadding.calculateBottomPadding()
-
-    val currentOnTimePicked by rememberUpdatedState(onTimePicked)
-    LaunchedEffect(timeScrollPickerState, entry) {
-        launch { snapshotFlow { timeScrollPickerState.time }.collect { if (it != entry.time) currentOnTimePicked(it) } }
-        launch { snapshotFlow { entry.time }.collect { if (it != timeScrollPickerState.time) timeScrollPickerState.select(it) } }
-    }
 
     Column(modifier = modifier.padding(top = contentPadding.calculateTopPadding())) {
         val isTimeSelected = selectedButton() == EntryButton.Time
@@ -196,7 +188,7 @@ private fun DateAndTimeEntryContent(
                     .padding(top = EsdsTheme.spacing.xl),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                TimeScrollPicker(timeScrollPickerState, modifier = Modifier.padding(horizontalContentPadding))
+                TimeScrollPicker(entry.timeState, modifier = Modifier.padding(horizontalContentPadding))
                 TimeZoneButton(
                     entry = entry,
                     onClick = onTimeZoneClick,
@@ -285,7 +277,7 @@ private fun Preview() {
                 label = "Start",
                 entry = DateAndTimeState.Entry(
                     date = remember { mutableStateOf(LocalDate(2026, 10, 20)) },
-                    time = remember { mutableStateOf(LocalTime(14, 41)) },
+                    timeState = rememberTimeScrollPickerState(LocalTime(14, 41)),
                     timeZone = remember { mutableStateOf(TimeZone.UTC) },
                 ),
                 shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),

@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.eventdetail.state
 
 import androidx.compose.runtime.mutableStateOf
+import com.infomaniak.scrollpicker.timepicker.TimeScrollPickerState
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
@@ -28,7 +29,7 @@ class DateAndTimeStateTest {
 
     private fun entry(hour: Int) = DateAndTimeState.Entry(
         date = mutableStateOf(LocalDate(2026, 11, 16)),
-        time = mutableStateOf(LocalTime(hour, 0)),
+        timeState = TimeScrollPickerState(LocalTime(hour, 0)),
         timeZone = mutableStateOf(TimeZone.UTC),
     )
 
