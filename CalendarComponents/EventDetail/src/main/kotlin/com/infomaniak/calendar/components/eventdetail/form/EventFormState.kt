@@ -36,6 +36,7 @@ import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
+import com.infomaniak.scrollpicker.timepicker.TimeScrollPickerState
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -76,12 +77,12 @@ class EventFormState(
     val dateAndTimeState = DateAndTimeState(
         start = DateAndTimeState.Entry(
             date = mutableStateOf(start.date),
-            time = mutableStateOf(start.time),
+            timeState = TimeScrollPickerState(start.time),
             timeZone = mutableStateOf(startTimeZone),
         ),
         end = DateAndTimeState.Entry(
             date = mutableStateOf(end.date),
-            time = mutableStateOf(end.time),
+            timeState = TimeScrollPickerState(end.time),
             timeZone = mutableStateOf(endTimeZone),
         ),
         hasEndEverBeenTouched = mutableStateOf(hasEndEverBeenTouched),

@@ -27,6 +27,8 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.infomaniak.core.common.utils.today
+import com.infomaniak.scrollpicker.timepicker.TimeScrollPickerState
+import com.infomaniak.scrollpicker.timepicker.rememberTimeScrollPickerState
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
@@ -96,13 +98,16 @@ data class DateAndTimeState(
     @Stable
     class Entry(
         date: MutableState<LocalDate>,
-        time: MutableState<LocalTime>,
+        internal val timeState: TimeScrollPickerState,
         timeZone: MutableState<TimeZone>,
     ) {
         var date by date
             internal set
-        var time by time
-            internal set
+        var time
+            get() = timeState.time
+            internal set(value) {
+                timeState.time = value
+            }
         var timeZone by timeZone
             internal set
 
@@ -115,7 +120,6 @@ data class DateAndTimeState(
             }
     }
 
-
     companion object {
         /**
          * Dummy instance just to have something non-null to compute layout sizes on
@@ -123,12 +127,12 @@ data class DateAndTimeState(
         val Dummy = DateAndTimeState(
             start = Entry(
                 date = mutableStateOf(LocalDate(2000, 12, 31)),
-                time = mutableStateOf(LocalTime(11, 0)),
+                timeState = TimeScrollPickerState(LocalTime(11, 0)),
                 timeZone = mutableStateOf(TimeZone.UTC),
             ),
             end = Entry(
                 date = mutableStateOf(LocalDate(2000, 12, 31)),
-                time = mutableStateOf(LocalTime(11, 0)),
+                timeState = TimeScrollPickerState(LocalTime(11, 0)),
                 timeZone = mutableStateOf(TimeZone.UTC),
             ),
             hasEndEverBeenTouched = mutableStateOf(false),
@@ -150,13 +154,13 @@ fun rememberDateAndTimeState(
 ): DateAndTimeState {
     val start = DateAndTimeState.Entry(
         date = rememberSaveable { mutableStateOf(startDate) },
-        time = rememberSaveable { mutableStateOf(startTime) },
+        timeState = rememberTimeScrollPickerState(startTime),
         timeZone = rememberSaveable(stateSaver = TimeZoneSaver) { mutableStateOf(startTimeZone) },
     )
 
     val end = DateAndTimeState.Entry(
         date = rememberSaveable { mutableStateOf(endDate) },
-        time = rememberSaveable { mutableStateOf(endTime) },
+        timeState = rememberTimeScrollPickerState(endTime),
         timeZone = rememberSaveable(stateSaver = TimeZoneSaver) { mutableStateOf(endTimeZone) },
     )
 

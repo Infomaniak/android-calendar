@@ -30,9 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -46,11 +44,6 @@ import androidx.compose.ui.unit.dp
 import com.infomaniak.scrollpicker.R
 import com.infomaniak.scrollpicker.ScrollPicker
 import com.infomaniak.scrollpicker.ScrollPickerDefaults
-import com.infomaniak.scrollpicker.ScrollPickerState
-import com.infomaniak.scrollpicker.rememberScrollPickerGroupState
-import com.infomaniak.scrollpicker.rememberScrollPickerState
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalTime
 import java.text.DateFormatSymbols
 
@@ -59,31 +52,38 @@ private val Hours24 = (0..23).toList()
 
 /** Needs a bounded width: its wheels share the width it is given. */
 @Composable
-fun TimeScrollPicker(state: TimeScrollPickerState, modifier: Modifier = Modifier) {
+fun TimeScrollPicker(
+    state: TimeScrollPickerState,
+    modifier: Modifier = Modifier,
+    is24Hour: Boolean = DateFormat.is24HourFormat(LocalContext.current),
+) {
+    val wheels = remember(state) { TimeWheels(state.time) }
+    LaunchedEffect(wheels) { wheels.followAndPickOn(state) }
+
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         // Wheels share the width left by the separators, shrinking below PreferredWheelWidth when it runs out.
         val wheelModifier = Modifier
             .weight(1f, fill = false)
             .width(PreferredWheelWidth)
 
-        if (state.is24Hour) {
-            HourPicker24(state, modifier = wheelModifier)
+        if (is24Hour) {
+            HourPicker24(wheels, modifier = wheelModifier)
             Text(text = ":", style = ScrollPickerDefaults.textStyle)
-            MinutePicker(state, ImeAction.Done, modifier = wheelModifier)
+            MinutePicker(wheels, ImeAction.Done, modifier = wheelModifier)
         } else {
-            HourPicker12(state, modifier = wheelModifier)
+            HourPicker12(wheels, modifier = wheelModifier)
             Text(text = ":", style = ScrollPickerDefaults.textStyle)
-            MinutePicker(state, ImeAction.Next, modifier = wheelModifier)
-            AmPmPicker(state, modifier = wheelModifier)
+            MinutePicker(wheels, ImeAction.Next, modifier = wheelModifier)
+            AmPmPicker(wheels, modifier = wheelModifier)
         }
     }
 }
 
 @Composable
-private fun HourPicker24(state: TimeScrollPickerState, modifier: Modifier = Modifier) {
+private fun HourPicker24(wheels: TimeWheels, modifier: Modifier = Modifier) {
     ScrollPicker(
         items = Hours24,
-        state = state.hourState,
+        state = wheels.hourState,
         contentDescription = pluralStringResource(R.plurals.unitHours, 1),
         loop = true,
         itemLabel = ::twoDigits,
@@ -95,10 +95,10 @@ private fun HourPicker24(state: TimeScrollPickerState, modifier: Modifier = Modi
 }
 
 @Composable
-private fun MinutePicker(state: TimeScrollPickerState, imeAction: ImeAction, modifier: Modifier = Modifier) {
+private fun MinutePicker(wheels: TimeWheels, imeAction: ImeAction, modifier: Modifier = Modifier) {
     ScrollPicker(
         items = (0..59).toList(),
-        state = state.minuteState,
+        state = wheels.minuteState,
         contentDescription = pluralStringResource(R.plurals.unitMinutes, 1),
         loop = true,
         itemLabel = ::twoDigits,
@@ -114,19 +114,19 @@ private fun MinutePicker(state: TimeScrollPickerState, imeAction: ImeAction, mod
  * derived from which half of the loop we're on. This lets us keep a single [ScrollPickerState] for both formats.
  */
 @Composable
-private fun HourPicker12(state: TimeScrollPickerState, modifier: Modifier = Modifier) {
-    LaunchedEffect(state) { state.keepAmPmSyncedWithHourHalfLoop() }
+private fun HourPicker12(wheels: TimeWheels, modifier: Modifier = Modifier) {
+    LaunchedEffect(wheels) { wheels.keepAmPmSyncedWithHourHalf() }
     val describeHour = quantityDescription(R.plurals.hourAmount)
 
     ScrollPicker(
         items = Hours24,
-        state = state.hourState,
+        state = wheels.hourState,
         contentDescription = pluralStringResource(R.plurals.unitHours, 1),
         loop = true,
         itemLabel = ::convert24HoursItemsTo12HourLabels,
         itemAccessibilityDescription = { describeHour(to12Hour(it)) },
         // Keeps the half of the day already chosen, so typing "12" doesn't flip it.
-        onInput = { text -> text.toIntOrNull()?.takeIf { it in 1..12 }?.let { it % 12 + 12 * (state.hour / 12) } },
+        onInput = { text -> text.toIntOrNull()?.takeIf { it in 1..12 }?.let { it % 12 + 12 * (wheels.hourState.selectedIndex / 12) } },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
         modifier = modifier,
     )
@@ -141,12 +141,12 @@ private fun quantityDescription(@PluralsRes id: Int): (Int) -> String {
 
 /** Items are 0 for AM and 1 for PM, labelled in the current locale. */
 @Composable
-private fun AmPmPicker(state: TimeScrollPickerState, modifier: Modifier = Modifier) {
+private fun AmPmPicker(wheels: TimeWheels, modifier: Modifier = Modifier) {
     val locale = LocalConfiguration.current.locales[0]
     val labels = remember(locale) { DateFormatSymbols.getInstance(locale).amPmStrings.toList() }
     ScrollPicker(
         items = listOf(0, 1),
-        state = state.amPmState,
+        state = wheels.amPmState,
         contentDescription = null,
         itemLabel = labels::get,
         onInput = { text ->
@@ -155,51 +155,6 @@ private fun AmPmPicker(state: TimeScrollPickerState, modifier: Modifier = Modifi
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         modifier = modifier,
     )
-}
-
-@Composable
-fun rememberTimeScrollPickerState(
-    initialTime: LocalTime = LocalTime(0, 0),
-    is24Hour: Boolean = DateFormat.is24HourFormat(LocalContext.current),
-): TimeScrollPickerState {
-    val group = rememberScrollPickerGroupState()
-    val hourState = rememberScrollPickerState(initialIndex = initialTime.hour, group = group)
-    val minuteState = rememberScrollPickerState(initialIndex = initialTime.minute, group = group)
-    val amPmState = rememberScrollPickerState(initialIndex = initialTime.hour / 12, group = group)
-
-    return remember(is24Hour, hourState, minuteState, amPmState) {
-        TimeScrollPickerState(is24Hour, hourState, minuteState, amPmState)
-    }
-}
-
-/** Both clocks' hour wheels share [hourState], whose index is the hour of the day. */
-@Stable
-class TimeScrollPickerState(
-    internal val is24Hour: Boolean,
-    internal val hourState: ScrollPickerState,
-    internal val minuteState: ScrollPickerState,
-    internal val amPmState: ScrollPickerState,
-) {
-    val hour: Int get() = hourState.selectedIndex
-    val minute: Int get() = minuteState.selectedIndex
-    val time: LocalTime get() = LocalTime(hour, minute)
-
-    /** Sets the time of both [hourState] and [minuteState] automatically. [amPmState] is updated by [keepAmPmSyncedWithHourHalfLoop] */
-    fun select(time: LocalTime) {
-        hourState.selectedIndex = time.hour
-        minuteState.selectedIndex = time.minute
-    }
-}
-
-/** Shows the hour's half of the day on the AM/PM wheel, and moves the hour by 12 when AM/PM is picked. */
-private suspend fun TimeScrollPickerState.keepAmPmSyncedWithHourHalfLoop() = coroutineScope {
-    launch { snapshotFlow { hour / 12 }.collect { amPmState.selectedIndex = it } }
-    launch {
-        snapshotFlow { amPmState.selectedIndex }.collect {
-            // Lands on the same label, so the jump doesn't show.
-            if (it != hour / 12) hourState.select(hour % 12 + 12 * it)
-        }
-    }
 }
 
 private fun twoDigits(number: Int) = number.toString().padStart(2, '0')
@@ -218,7 +173,8 @@ private fun Preview24() {
     MaterialTheme {
         Scaffold {
             TimeScrollPicker(
-                rememberTimeScrollPickerState(LocalTime(10, 30), is24Hour = true),
+                rememberTimeScrollPickerState(LocalTime(10, 30)),
+                is24Hour = true,
                 modifier = Modifier
                     .padding(it)
                     .padding(top = 56.dp),
@@ -238,11 +194,11 @@ private fun Preview12() {
                     .padding(top = 56.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                val state = rememberTimeScrollPickerState(LocalTime(10, 30), is24Hour = false)
+                val state = rememberTimeScrollPickerState(LocalTime(10, 30))
 
-                Text(LocalTime(state.hour, state.minute).toString(), style = MaterialTheme.typography.titleLarge)
+                Text(state.time.toString(), style = MaterialTheme.typography.titleLarge)
 
-                TimeScrollPicker(state)
+                TimeScrollPicker(state, is24Hour = false)
             }
         }
     }
@@ -254,10 +210,11 @@ private fun Preview12Narrow() {
     MaterialTheme {
         Scaffold {
             TimeScrollPicker(
-                rememberTimeScrollPickerState(LocalTime(10, 30), is24Hour = false),
+                rememberTimeScrollPickerState(LocalTime(10, 30)),
                 modifier = Modifier
                     .padding(it)
                     .padding(top = 56.dp),
+                is24Hour = false,
             )
         }
     }
