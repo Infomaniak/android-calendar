@@ -147,7 +147,7 @@ private fun MultiDaysScreen(
             timelineModifier = Modifier.hazeSource(hazeState),
             contentPadding = contentPadding,
             // A week's columns are too narrow for an ellipsis: it would take the room of the few letters that fit.
-            eventTextOverflow = if (isWeek) TextOverflow.Clip else TextOverflow.Ellipsis,
+            eventTextOverflow = TextOverflow.Clip,
             // Placed here rather than on each page: the hour grid's vertical scroll reaches it through
             // the pager, which only consumes the horizontal axis.
             modifier = Modifier
