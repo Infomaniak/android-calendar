@@ -39,8 +39,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.error
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
@@ -116,8 +114,8 @@ internal fun DescriptionEditable(
 ) {
     val isTooLong = state.text.length > DESCRIPTION_MAX_CHARACTERS
     val extraCharacters = DESCRIPTION_MAX_CHARACTERS - state.text.length
-    val errorMessage = stringResource(R.string.eventValidationCharacterLimitExceeded) +
-            " $extraCharacters / $DESCRIPTION_MAX_CHARACTERS"
+    val errorMessage = if (isTooLong) stringResource(R.string.eventValidationCharacterLimitExceeded) +
+            " $extraCharacters / $DESCRIPTION_MAX_CHARACTERS" else null
 
     SegmentedListItem(
         shapes = shapes,
@@ -125,7 +123,6 @@ internal fun DescriptionEditable(
         content = {
             CompactTextField(
                 state = state,
-                modifier = Modifier.semantics { if (isTooLong) error(errorMessage) },
                 placeholder = {
                     Text(
                         text = stringResource(R.string.descriptionTitle),
@@ -133,18 +130,8 @@ internal fun DescriptionEditable(
                         overflow = TextOverflow.Ellipsis,
                     )
                 },
-                isError = isTooLong,
+                errorMessage = errorMessage,
                 lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 1),
-                supportingText = {
-                    if (isTooLong) {
-                        Text(
-                            text = errorMessage,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(top = 2.dp),
-                        )
-                    }
-                },
                 leadingIcon = leadingIcon,
                 trailingIcon = null,
             )

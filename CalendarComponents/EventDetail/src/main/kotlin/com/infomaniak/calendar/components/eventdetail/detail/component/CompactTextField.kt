@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
@@ -48,6 +49,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -57,9 +59,12 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -76,10 +81,9 @@ fun CompactTextField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     textStyle: TextStyle = LocalTextStyle.current,
-    isError: Boolean = false,
     colors: TextFieldColors = CompactTextFieldDefaults.colors(),
     lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
-    supportingText: @Composable (() -> Unit)? = null,
+    errorMessage: String? = null,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
@@ -88,6 +92,7 @@ fun CompactTextField(
     val interactionSource = interactionSource ?: remember { MutableInteractionSource() }
     // If color is not provided via the text style, use content color as a default
     val focused = interactionSource.collectIsFocusedAsState().value
+    val isError = errorMessage != null
     val textColor = textStyle.color.takeOrElse { colors.textColor(enabled, isError, focused) }
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
 
@@ -125,7 +130,7 @@ fun CompactTextField(
             cursorBrush = SolidColor(colors.focusedTextColor),
             modifier = modifier
                 .fillMaxWidth()
-                .semantics(mergeDescendants = true) {},
+                .semantics(mergeDescendants = true) { errorMessage?.let(::error) },
             decorator = { innerTextField ->
                 Row(
                     modifier = Modifier
@@ -154,12 +159,21 @@ fun CompactTextField(
                                 enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
                                 exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut(),
                             ) {
-                                supportingText?.let {
-                                    CompositionLocalProvider(
-                                        LocalContentColor provides colors.supportingTextColor(enabled, isError, focused),
-                                        LocalTextStyle provides MaterialTheme.typography.bodySmall,
-                                    ) { it() }
+                                // Keeps the last message visible while the exit animation runs
+                                var lastErrorMessage by remember { mutableStateOf("") }
+                                errorMessage?.let { lastErrorMessage = it }
+                                CompositionLocalProvider(
+                                    LocalContentColor provides colors.supportingTextColor(enabled, isError, focused),
+                                    LocalTextStyle provides MaterialTheme.typography.bodySmall,
+                                ) {
+                                    Text(
+                                        text = lastErrorMessage,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.padding(top = 2.dp),
+                                    )
                                 }
+
                             }
                         }
 
@@ -196,7 +210,6 @@ private fun PreviewCompactTextField() {
     Surface {
         CompactTextField(
             state = rememberTextFieldState(stringResource(R.string.descriptionTitle)),
-            isError = false,
         )
     }
 }
@@ -207,7 +220,6 @@ private fun PreviewCompactTextFieldWithTrailingIcon() {
     Surface {
         CompactTextField(
             state = rememberTextFieldState(stringResource(R.string.descriptionTitle)),
-            isError = false,
             trailingIcon = { Icon(EsdsIcons.CircleCrossFilled.ExtraSmall, contentDescription = "Clock") },
         )
     }
@@ -219,7 +231,6 @@ private fun PreviewCompactTextFieldMultilineWithTrailingIcon() {
     Surface {
         CompactTextField(
             state = rememberTextFieldState(stringResource(R.string.descriptionTitle)),
-            isError = false,
             lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 3),
             trailingIcon = { Icon(EsdsIcons.CircleCrossFilled.ExtraSmall, contentDescription = "Clock") },
         )
@@ -233,8 +244,7 @@ private fun PreviewCompactTextFieldErrorAndTrailingIcon() {
     Surface {
         CompactTextField(
             state = rememberTextFieldState(stringResource(R.string.descriptionTitle)),
-            isError = true,
-            supportingText = { Text(stringResource(R.string.eventValidationCharacterLimitExceeded)) },
+            errorMessage = stringResource(R.string.eventValidationCharacterLimitExceeded),
             trailingIcon = { Icon(EsdsIcons.CircleCrossFilled.ExtraSmall, contentDescription = "Clock") },
         )
     }
