@@ -51,8 +51,6 @@ data class DateAndTimeState(
 ) {
     fun Entry.pickDate(date: LocalDate) = edit { this.date = date }
 
-    fun Entry.pickTime(time: LocalTime) = edit { this.time = time }
-
     fun Entry.pickTimeZone(timeZone: TimeZone) = edit {
         val isEditingStart = this == start
         if (isEditingStart) {

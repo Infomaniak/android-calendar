@@ -37,7 +37,7 @@ class DateAndTimeStateTest {
     fun scrollingTheEndBeforeTheStart_keepsTheDuration_andLeavesTheStartWhenScrolledBack() = with(
         DateAndTimeState(start = entry(10), end = entry(11), hasEndEverBeenTouched = mutableStateOf(false)),
     ) {
-        val session = EndTimeSession(this)
+        val session = TimeSession(this, end)
 
         (10 downTo 8).forEach { session.pickTime(LocalTime(it, 0)) }
         assertEquals(LocalTime(7, 0), start.time)
@@ -50,10 +50,20 @@ class DateAndTimeStateTest {
     fun aNewSession_keepsTheDurationSetInThePreviousOne() = with(
         DateAndTimeState(start = entry(10), end = entry(11), hasEndEverBeenTouched = mutableStateOf(false)),
     ) {
-        EndTimeSession(this).pickTime(LocalTime(12, 0))
+        TimeSession(this, end).pickTime(LocalTime(12, 0))
 
-        val session = EndTimeSession(this)
+        val session = TimeSession(this, end)
         (11 downTo 9).forEach { session.pickTime(LocalTime(it, 0)) }
         assertEquals(LocalTime(7, 0), start.time)
+    }
+
+    @Test
+    fun scrollingTheStartPastATouchedEnd_keepsTheDurationTheSessionBeganWith() = with(
+        DateAndTimeState(start = entry(10), end = entry(11), hasEndEverBeenTouched = mutableStateOf(true)),
+    ) {
+        val session = TimeSession(this, start)
+
+        (11..12).forEach { session.pickTime(LocalTime(it, 0)) }
+        assertEquals(LocalTime(13, 0), end.time)
     }
 }
