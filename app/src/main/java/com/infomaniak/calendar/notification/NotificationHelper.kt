@@ -35,9 +35,8 @@ import com.infomaniak.calendar.utils.toBitmap
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CalendarNumberOne
-import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDateRange
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -54,7 +53,7 @@ object NotificationHelper {
         location: String?,
         startInstantMs: Long,
         endInstantMs: Long,
-        isAllDay: Boolean,
+        allDayDates: LocalDateRange?,
     ): Notification {
         val clickIntent = Intent(context, MainActivity::class.java).apply {
             action = Intent.ACTION_VIEW
@@ -71,7 +70,7 @@ object NotificationHelper {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-        val timeText = formatTimingText(context, startInstantMs, endInstantMs, isAllDay)
+        val timeText = formatTimingText(context, startInstantMs, endInstantMs, allDayDates)
         val contentText = if (!location.isNullOrBlank()) "$timeText • $location" else timeText
         val notificationTitle = title.ifBlank { context.getString(R.string.notificationDefaultEventTitle) }
 
@@ -91,21 +90,20 @@ object NotificationHelper {
         context: Context,
         startInstantMs: Long,
         endInstantMs: Long,
-        isAllDay: Boolean,
+        allDayDates: LocalDateRange?,
     ): String {
         val timeZone = TimeZone.currentSystemDefault()
-        val start = Instant.fromEpochMilliseconds(startInstantMs).toLocalDateTime(timeZone)
-        val end = Instant.fromEpochMilliseconds(endInstantMs).toLocalDateTime(timeZone)
         val locale = context.resources.configuration.locales[0]
         val today = Clock.today(timeZone)
 
-        if (isAllDay) {
-            // An all-day event ends exclusively, at the start of the day following its last one
-            val lastDay = maxOf(start.date, end.date.minus(1, DateTimeUnit.DAY))
-            if (lastDay == start.date && start.date == today) return context.getString(R.string.notificationAllDay)
-            return formatShortDateRange(start.date, lastDay, locale, today.year)
+        if (allDayDates != null) {
+            val firstDay = allDayDates.start
+            if (firstDay == allDayDates.endInclusive && firstDay == today) return context.getString(R.string.notificationAllDay)
+            return formatShortDateRange(firstDay, allDayDates.endInclusive, locale, today.year)
         }
 
+        val start = Instant.fromEpochMilliseconds(startInstantMs).toLocalDateTime(timeZone)
+        val end = Instant.fromEpochMilliseconds(endInstantMs).toLocalDateTime(timeZone)
         return formatShortDateTimeRange(start, end, locale, DateFormat.is24HourFormat(context), today)
     }
 }

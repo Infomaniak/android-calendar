@@ -27,6 +27,7 @@ import androidx.core.content.getSystemService
 import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.core.sentry.SentryLog
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventBounds
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.UpcomingAlarm
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
@@ -47,7 +48,10 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDateRange
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
 import kotlinx.serialization.json.Json
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
@@ -153,7 +157,8 @@ class AlarmScheduler @Inject constructor(
         val location: String?,
         val startMs: Long,
         val endMs: Long,
-        val isAllDay: Boolean,
+        // Kept as dates: anchored in a time zone, they could be read as other days in another one
+        val allDayDates: LocalDateRange?,
         // Granting exact alarm access back changes it for every alarm, so they all get registered again as exact ones
         val isExact: Boolean,
     )
@@ -236,7 +241,10 @@ class AlarmScheduler @Inject constructor(
             putExtra(EXTRA_EVENT_LOCATION, registration.location)
             putExtra(EXTRA_EVENT_START_MS, registration.startMs)
             putExtra(EXTRA_EVENT_END_MS, registration.endMs)
-            putExtra(EXTRA_IS_ALL_DAY, registration.isAllDay)
+            registration.allDayDates?.let {
+                putExtra(EXTRA_ALL_DAY_FIRST_DAY, it.start.toEpochDays())
+                putExtra(EXTRA_ALL_DAY_LAST_DAY, it.endInclusive.toEpochDays())
+            }
         }
     }
 
@@ -259,7 +267,8 @@ class AlarmScheduler @Inject constructor(
         const val EXTRA_EVENT_LOCATION = "com.infomaniak.calendar.EXTRA_EVENT_LOCATION"
         const val EXTRA_EVENT_START_MS = "com.infomaniak.calendar.EXTRA_EVENT_START_MS"
         const val EXTRA_EVENT_END_MS = "com.infomaniak.calendar.EXTRA_EVENT_END_MS"
-        const val EXTRA_IS_ALL_DAY = "com.infomaniak.calendar.EXTRA_IS_ALL_DAY"
+        const val EXTRA_ALL_DAY_FIRST_DAY = "com.infomaniak.calendar.EXTRA_ALL_DAY_FIRST_DAY"
+        const val EXTRA_ALL_DAY_LAST_DAY = "com.infomaniak.calendar.EXTRA_ALL_DAY_LAST_DAY"
 
         private const val TAG = "AlarmScheduler"
         private val ALARM_HORIZON = 30.days
@@ -299,7 +308,10 @@ class AlarmScheduler @Inject constructor(
             location = event.location,
             startMs = event.timing.startInstant(timeZone).toEpochMilliseconds(),
             endMs = event.timing.endInstant(timeZone).toEpochMilliseconds(),
-            isAllDay = event.timing.isAllDay,
+            allDayDates = (event.timing.bounds as? EventBounds.AllDay)?.let {
+                // An all-day event ends exclusively, at the start of the day following its last one
+                it.start..maxOf(it.start, it.end.minus(1, DateTimeUnit.DAY))
+            },
             isExact = isExact,
         )
     }

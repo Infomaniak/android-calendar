@@ -33,6 +33,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateRange
 import kotlin.time.Duration.Companion.seconds
 
 class AlarmReceiver : BroadcastReceiver() {
@@ -71,10 +73,16 @@ class AlarmReceiver : BroadcastReceiver() {
             location = getStringExtra(AlarmScheduler.EXTRA_EVENT_LOCATION),
             startInstantMs = getLongExtra(AlarmScheduler.EXTRA_EVENT_START_MS, 0L),
             endInstantMs = getLongExtra(AlarmScheduler.EXTRA_EVENT_END_MS, 0L),
-            isAllDay = getBooleanExtra(AlarmScheduler.EXTRA_IS_ALL_DAY, false),
+            allDayDates = getAllDayDates(),
         )
         // Tagged with the full ID, as its hash code could be the same as another reminder's
         return (alarmId ?: occurrenceIdJson) to notification
+    }
+
+    private fun Intent.getAllDayDates(): LocalDateRange? {
+        if (!hasExtra(AlarmScheduler.EXTRA_ALL_DAY_FIRST_DAY)) return null
+        val firstDay = LocalDate.fromEpochDays(getLongExtra(AlarmScheduler.EXTRA_ALL_DAY_FIRST_DAY, 0L))
+        return firstDay..LocalDate.fromEpochDays(getLongExtra(AlarmScheduler.EXTRA_ALL_DAY_LAST_DAY, 0L))
     }
 
     /**
