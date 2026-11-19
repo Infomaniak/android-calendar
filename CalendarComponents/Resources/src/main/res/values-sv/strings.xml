@@ -66,8 +66,8 @@
     <string name="descriptionTitle">Beskrivning</string>
     <string name="emptyStateNoTimeZone">Inga tidszoner hittades</string>
     <string name="eventTitle">Evenemangstitel</string>
+    <string name="eventValidationCharacterLimitExceeded">Teckenbegränsning överskriden</string>
     <string name="eventValidationTooManyAttendees">Du kan inte ha fler än %d gäster</string>
-    <string name="eventValidationCharacterLimitExceeded">Du har överskridit teckengränsen</string>
     <plurals name="hourAmount">
         <item quantity="one">%d timme</item>
         <item quantity="other">%d timmar</item>

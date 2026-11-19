@@ -66,8 +66,8 @@
     <string name="descriptionTitle">Description</string>
     <string name="emptyStateNoTimeZone">Aucun fuseau horaire trouvé</string>
     <string name="eventTitle">Évènement</string>
+    <string name="eventValidationCharacterLimitExceeded">Limite de caractères dépassée</string>
     <string name="eventValidationTooManyAttendees">Vous ne pouvez pas avoir plus de %d invités</string>
-    <string name="eventValidationCharacterLimitExceeded">Vous avez dépassé la limite de caractères</string>
     <plurals name="hourAmount">
         <item quantity="one">%d heure</item>
         <item quantity="other">%d heures</item>
