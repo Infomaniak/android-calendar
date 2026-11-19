@@ -27,6 +27,8 @@ import java.util.Locale
 
 private const val FULL_DATE_SKELETON = "EEEEdMMMM"
 private const val FULL_DATE_WITH_YEAR_SKELETON = "yEEEEdMMMM"
+private const val SHORT_DATE_SKELETON = "dMMM"
+private const val SHORT_DATE_WITH_YEAR_SKELETON = "ydMMM"
 
 private const val SHORT_DAY_NAME_PATTERN = "EEE"
 private const val DAY_WITH_SHORT_MONTH_PATTERN = "EEEE - d MMM"
@@ -69,6 +71,11 @@ fun LocalDate.formatShortDateWithYear(): String {
 //region Underlying testable logic
 internal fun LocalDate.formatFullDate(locale: Locale, currentYear: Int): String {
     return format(if (year == currentYear) FULL_DATE_SKELETON else FULL_DATE_WITH_YEAR_SKELETON, locale)
+}
+
+/** `Nov 20`, or `Nov 20, 2027` outside of [currentYear]. */
+internal fun LocalDate.formatShortDate(locale: Locale, currentYear: Int): String {
+    return format(if (year == currentYear) SHORT_DATE_SKELETON else SHORT_DATE_WITH_YEAR_SKELETON, locale)
 }
 
 internal fun LocalDate.format(skeleton: String, locale: Locale): String {

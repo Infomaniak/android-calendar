@@ -80,31 +80,39 @@ fun formatDateRange(
     currentYear: Int = Clock.today(timeZone).year,
 ): String = formatDateRange(startDate, endDate, currentLocale(), currentYear)
 
-/** Non-Composable variant of [formatDateTimeRange], for callers outside of a composition such as notifications. */
-fun formatDateTimeRange(
+/**
+ * `10:30 - 11:30` when on [today], `Nov 20, 10:30 - 11:30` on another day, or `Nov 19, 10:30 - Nov 20, 11:30` over several days.
+ * Not Composable, for callers outside of a composition such as notifications.
+ */
+fun formatShortDateTimeRange(
     start: LocalDateTime,
     end: LocalDateTime,
     locale: Locale,
     use24HourFormat: Boolean,
-    currentYear: Int,
-): String = assembleDateTimeRange(
-    start = start,
-    end = end,
-    formattedStartTime = start.time.formatTime(locale, use24HourFormat),
-    formattedEndTime = end.time.formatTime(locale, use24HourFormat),
-    locale = locale,
-    currentYear = currentYear,
-)
+    today: LocalDate,
+): String {
+    val startTime = start.time.formatTime(locale, use24HourFormat)
+    val endTime = end.time.formatTime(locale, use24HourFormat)
 
-/** Non-Composable variant of [formatDateRange], for callers outside of a composition such as notifications. */
-fun formatDateRange(startDate: LocalDate, endDate: LocalDate, locale: Locale, currentYear: Int): String {
-    val formattedStart = startDate.formatFullDate(locale, currentYear)
-
-    return if (startDate == endDate) {
-        formattedStart
-    } else {
-        joinRange(formattedStart, endDate.formatFullDate(locale, currentYear))
+    fun LocalDateTime.withShortDate(formattedTime: String): String {
+        return joinDateAndTime(date.formatShortDate(locale, today.year), formattedTime, locale)
     }
+
+    return when {
+        start.date != end.date -> joinRange(start.withShortDate(startTime), end.withShortDate(endTime))
+        start.date == today -> joinRange(startTime, endTime)
+        else -> joinRange(start.withShortDate(startTime), endTime)
+    }
+}
+
+/**
+ * `Nov 20`, or `Nov 19 - Nov 20` when the inclusive [endDate] differs from [startDate].
+ * Not Composable, for callers outside of a composition such as notifications.
+ */
+fun formatShortDateRange(startDate: LocalDate, endDate: LocalDate, locale: Locale, currentYear: Int): String {
+    val formattedStart = startDate.formatShortDate(locale, currentYear)
+
+    return if (startDate == endDate) formattedStart else joinRange(formattedStart, endDate.formatShortDate(locale, currentYear))
 }
 //endregion
 
@@ -121,6 +129,21 @@ internal fun formatTimeRange(
 
     return joinRange(formattedStart, formattedEnd)
 }
+
+internal fun formatDateTimeRange(
+    start: LocalDateTime,
+    end: LocalDateTime,
+    locale: Locale,
+    use24HourFormat: Boolean,
+    currentYear: Int,
+): String = assembleDateTimeRange(
+    start = start,
+    end = end,
+    formattedStartTime = start.time.formatTime(locale, use24HourFormat),
+    formattedEndTime = end.time.formatTime(locale, use24HourFormat),
+    locale = locale,
+    currentYear = currentYear,
+)
 
 internal fun formatDateTimeRangeWithZone(
     start: LocalDateTime,
@@ -172,6 +195,16 @@ private fun assembleDateTimeRange(
     val formattedEnd = if (start.date == end.date) formattedEndTime else end.withFormattedTime(formattedEndTime)
 
     return joinRange(formattedStart, formattedEnd)
+}
+
+internal fun formatDateRange(startDate: LocalDate, endDate: LocalDate, locale: Locale, currentYear: Int): String {
+    val formattedStart = startDate.formatFullDate(locale, currentYear)
+
+    return if (startDate == endDate) {
+        formattedStart
+    } else {
+        joinRange(formattedStart, endDate.formatFullDate(locale, currentYear))
+    }
 }
 //endregion
 

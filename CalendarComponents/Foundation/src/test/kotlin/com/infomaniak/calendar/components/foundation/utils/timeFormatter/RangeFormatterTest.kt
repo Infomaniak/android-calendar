@@ -160,6 +160,33 @@ class RangeFormatterTest {
         }
     }
 
+    @Test
+    fun `short range of today only shows the hours`() {
+        assertEquals("08:00 - 09:00", formatShort(TODAY, LATER_TODAY))
+    }
+
+    @Test
+    fun `short range of another day shows its date once`() {
+        assertEquals("May 21, 08:00 - 09:00", formatShort("2026-05-21T08:00:00+02:00", TOMORROW))
+    }
+
+    @Test
+    fun `short range over several days shows both dates, even from today`() {
+        assertEquals("May 20, 08:00 - May 21, 09:00", formatShort(TODAY, TOMORROW))
+    }
+
+    @Test
+    fun `short range carries the year outside of the current one`() {
+        val formatted = formatShort("2026-12-31T23:00:00+01:00", "2027-01-01T01:00:00+01:00")
+        assertEquals("Dec 31, 23:00 - Jan 1, 2027, 01:00", formatted)
+    }
+
+    @Test
+    fun `short date range shows a single date or both bounds`() {
+        assertEquals("May 20", formatShortDateRange(LocalDate(2026, 5, 20), LocalDate(2026, 5, 20), LOCALE, CURRENT_YEAR))
+        assertEquals("May 20 - May 22", formatShortDateRange(LocalDate(2026, 5, 20), LocalDate(2026, 5, 22), LOCALE, CURRENT_YEAR))
+    }
+
     companion object {
         private val LOCALE = Locale.ENGLISH
         private val PARIS = TimeZone.of("Europe/Paris")
@@ -180,6 +207,14 @@ class RangeFormatterTest {
             locale = locale,
             use24HourFormat = use24HourFormat,
             currentYear = CURRENT_YEAR,
+        )
+
+        private fun formatShort(start: String, end: String): String = formatShortDateTimeRange(
+            start = Instant.parse(start).toLocalDateTime(PARIS),
+            end = Instant.parse(end).toLocalDateTime(PARIS),
+            locale = LOCALE,
+            use24HourFormat = true,
+            today = LocalDate(CURRENT_YEAR, 5, 20),
         )
 
         private fun formatDate(startDate: LocalDate, endDate: LocalDate): String {
