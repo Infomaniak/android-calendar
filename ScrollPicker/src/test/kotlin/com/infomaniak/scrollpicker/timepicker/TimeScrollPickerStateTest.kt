@@ -28,25 +28,24 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class TimeWheelsTest {
+class TimeScrollPickerStateTest {
 
     @Test
     fun onlyTimesPickedOnTheWheelsReachTheState() = runTest {
         val state = TimeScrollPickerState(LocalTime(10, 0, 30))
         val picks = mutableListOf<LocalTime>()
         state.onTimeChange = { picks += it; state.time = it }
-        val wheels = TimeWheels(state.time)
-        backgroundScope.launch { wheels.followAndPickOn(state) }
+        backgroundScope.launch { state.syncWheels() }
 
         settle()
         assertEquals(emptyList<LocalTime>(), picks)
 
         state.time = LocalTime(14, 0)
         settle()
-        assertEquals(14, wheels.hourState.selectedIndex)
+        assertEquals(14, state.hourState.selectedIndex)
         assertEquals(emptyList<LocalTime>(), picks)
 
-        wheels.minuteState.select(15)
+        state.minuteState.select(15)
         settle()
         assertEquals(listOf(LocalTime(14, 15)), picks)
     }
@@ -55,13 +54,26 @@ class TimeWheelsTest {
     fun wheelsGoBackWhenAPickIsRejected() = runTest {
         val state = TimeScrollPickerState(LocalTime(10, 0))
         state.onTimeChange = {}
-        val wheels = TimeWheels(state.time)
-        backgroundScope.launch { wheels.followAndPickOn(state) }
+        backgroundScope.launch { state.syncWheels() }
         settle()
 
-        wheels.minuteState.select(15)
+        state.minuteState.select(15)
         settle()
-        assertEquals(0, wheels.minuteState.selectedIndex)
+        assertEquals(0, state.minuteState.selectedIndex)
+    }
+
+    @Test
+    fun wheelsLeftStaleWhileHiddenDoNotPick() = runTest {
+        val state = TimeScrollPickerState(LocalTime(10, 0))
+        val picks = mutableListOf<LocalTime>()
+        state.onTimeChange = { picks += it }
+        state.time = LocalTime(16, 30)
+
+        backgroundScope.launch { state.syncWheels() }
+        settle()
+        assertEquals(emptyList<LocalTime>(), picks)
+        assertEquals(16, state.hourState.selectedIndex)
+        assertEquals(30, state.minuteState.selectedIndex)
     }
 
     private fun TestScope.settle() {

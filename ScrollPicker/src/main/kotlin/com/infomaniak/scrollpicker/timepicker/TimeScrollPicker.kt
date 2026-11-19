@@ -57,8 +57,7 @@ fun TimeScrollPicker(
     modifier: Modifier = Modifier,
     is24Hour: Boolean = DateFormat.is24HourFormat(LocalContext.current),
 ) {
-    val wheels = remember(state) { TimeWheels(state.time) }
-    LaunchedEffect(wheels) { wheels.followAndPickOn(state) }
+    LaunchedEffect(state) { state.syncWheels() }
 
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         // Wheels share the width left by the separators, shrinking below PreferredWheelWidth when it runs out.
@@ -67,23 +66,23 @@ fun TimeScrollPicker(
             .width(PreferredWheelWidth)
 
         if (is24Hour) {
-            HourPicker24(wheels, modifier = wheelModifier)
+            HourPicker24(state, modifier = wheelModifier)
             Text(text = ":", style = ScrollPickerDefaults.textStyle)
-            MinutePicker(wheels, ImeAction.Done, modifier = wheelModifier)
+            MinutePicker(state, ImeAction.Done, modifier = wheelModifier)
         } else {
-            HourPicker12(wheels, modifier = wheelModifier)
+            HourPicker12(state, modifier = wheelModifier)
             Text(text = ":", style = ScrollPickerDefaults.textStyle)
-            MinutePicker(wheels, ImeAction.Next, modifier = wheelModifier)
-            AmPmPicker(wheels, modifier = wheelModifier)
+            MinutePicker(state, ImeAction.Next, modifier = wheelModifier)
+            AmPmPicker(state, modifier = wheelModifier)
         }
     }
 }
 
 @Composable
-private fun HourPicker24(wheels: TimeWheels, modifier: Modifier = Modifier) {
+private fun HourPicker24(state: TimeScrollPickerState, modifier: Modifier = Modifier) {
     ScrollPicker(
         items = Hours24,
-        state = wheels.hourState,
+        state = state.hourState,
         contentDescription = pluralStringResource(R.plurals.unitHours, 1),
         loop = true,
         itemLabel = ::twoDigits,
@@ -95,10 +94,10 @@ private fun HourPicker24(wheels: TimeWheels, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun MinutePicker(wheels: TimeWheels, imeAction: ImeAction, modifier: Modifier = Modifier) {
+private fun MinutePicker(state: TimeScrollPickerState, imeAction: ImeAction, modifier: Modifier = Modifier) {
     ScrollPicker(
         items = (0..59).toList(),
-        state = wheels.minuteState,
+        state = state.minuteState,
         contentDescription = pluralStringResource(R.plurals.unitMinutes, 1),
         loop = true,
         itemLabel = ::twoDigits,
@@ -114,19 +113,19 @@ private fun MinutePicker(wheels: TimeWheels, imeAction: ImeAction, modifier: Mod
  * derived from which half of the loop we're on. This lets us keep a single [ScrollPickerState] for both formats.
  */
 @Composable
-private fun HourPicker12(wheels: TimeWheels, modifier: Modifier = Modifier) {
-    LaunchedEffect(wheels) { wheels.keepAmPmSyncedWithHourHalf() }
+private fun HourPicker12(state: TimeScrollPickerState, modifier: Modifier = Modifier) {
+    LaunchedEffect(state) { state.keepAmPmSyncedWithHourHalf() }
     val describeHour = quantityDescription(R.plurals.hourAmount)
 
     ScrollPicker(
         items = Hours24,
-        state = wheels.hourState,
+        state = state.hourState,
         contentDescription = pluralStringResource(R.plurals.unitHours, 1),
         loop = true,
         itemLabel = ::convert24HoursItemsTo12HourLabels,
         itemAccessibilityDescription = { describeHour(to12Hour(it)) },
         // Keeps the half of the day already chosen, so typing "12" doesn't flip it.
-        onInput = { text -> text.toIntOrNull()?.takeIf { it in 1..12 }?.let { it % 12 + 12 * (wheels.hourState.selectedIndex / 12) } },
+        onInput = { text -> text.toIntOrNull()?.takeIf { it in 1..12 }?.let { it % 12 + 12 * (state.hourState.selectedIndex / 12) } },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
         modifier = modifier,
     )
@@ -141,12 +140,12 @@ private fun quantityDescription(@PluralsRes id: Int): (Int) -> String {
 
 /** Items are 0 for AM and 1 for PM, labelled in the current locale. */
 @Composable
-private fun AmPmPicker(wheels: TimeWheels, modifier: Modifier = Modifier) {
+private fun AmPmPicker(state: TimeScrollPickerState, modifier: Modifier = Modifier) {
     val locale = LocalConfiguration.current.locales[0]
     val labels = remember(locale) { DateFormatSymbols.getInstance(locale).amPmStrings.toList() }
     ScrollPicker(
         items = listOf(0, 1),
-        state = wheels.amPmState,
+        state = state.amPmState,
         contentDescription = null,
         itemLabel = labels::get,
         onInput = { text ->

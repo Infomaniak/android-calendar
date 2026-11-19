@@ -232,7 +232,8 @@ its own copy of the `unitHours` / `unitMinutes` and `hourAmount` / `minuteAmount
 `TimeScrollPicker`'s 12-hour wheel holds all 24 hours (labelled 12 to 11 twice), so one
 `hourState` serves both clocks and its index is the hour of the day; the AM/PM wheel only mirrors its half.
 Like `TextFieldState`, `TimeScrollPickerState` (`rememberTimeScrollPickerState`) is the single source of truth of the
-time, seconds included: the wheels are internal, unsaved, rebuilt from it, and follow it when it is set from code.
+time, seconds included: it holds the wheels' states internally, saves only the time and rebuilds them from it, and
+moves them to it when it is set from code or the picker is shown again.
 Only times picked on the wheels go through its optional `onTimeChange` (like `SliderState.onValueChange`), which commits
 them itself; without it they are set directly. `DateAndTimeState.Entry.time` reads this state, and `DateAndTimeEntry` sets
 `onTimeChange` to its `onTimePicked` (`pickTime` or the `EndTimeSession`), so corrections apply before the commit.
