@@ -234,9 +234,9 @@ its own copy of the `unitHours` / `unitMinutes` and `hourAmount` / `minuteAmount
 Like `TextFieldState`, `TimeScrollPickerState` (`rememberTimeScrollPickerState`) is the single source of truth of the
 time, seconds included: it holds the wheels' states internally, saves only the time and rebuilds them from it, and
 moves them to it when it is set from code or the picker is shown again.
-Only times picked on the wheels go through its optional `onTimeChange` (like `SliderState.onValueChange`), which commits
-them itself; without it they are set directly. `DateAndTimeState.Entry.time` reads this state, and `DateAndTimeEntry` sets
-`onTimeChange` to its `onTimePicked` (`pickTime` or the `EndTimeSession`), so corrections apply before the commit.
+Only times picked on the wheels go through `TimeScrollPicker`'s `onTimeChange` (like a text field's `onValueChange`),
+which commits them itself and defaults to setting them directly. `DateAndTimeState.Entry.time` reads this state, and
+`DateAndTimeEntry` passes its `onTimePicked` (`pickTime` or the `EndTimeSession`), so corrections apply before the commit.
 
 ## Key Integration Points
 

@@ -50,7 +50,6 @@ import androidx.compose.material3.ToggleButtonSize
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -128,8 +127,6 @@ private fun DateAndTimeEntryContent(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    SideEffect { entry.timeState.onTimeChange = onTimePicked }
-
     var isDatePickerVisible by rememberSaveable { mutableStateOf(false) }
 
     val shapes = ButtonDefaults.shapes(CircleShape, CircleShape)
@@ -188,7 +185,11 @@ private fun DateAndTimeEntryContent(
                     .padding(top = EsdsTheme.spacing.xl),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                TimeScrollPicker(entry.timeState, modifier = Modifier.padding(horizontalContentPadding))
+                TimeScrollPicker(
+                    entry.timeState,
+                    modifier = Modifier.padding(horizontalContentPadding),
+                    onTimeChange = onTimePicked,
+                )
                 TimeZoneButton(
                     entry = entry,
                     onClick = onTimeZoneClick,
