@@ -64,10 +64,10 @@ internal fun DayView(
     weekNumbering: WeekNumbering,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
-    highlightState: EventHighlightState? = null,
     headerModifier: Modifier = Modifier,
     timelineModifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    highlightState: EventHighlightState? = null,
     headerTrailingContent: @Composable () -> Unit = {},
 ) {
     val density = LocalDensity.current
