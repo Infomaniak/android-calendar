@@ -29,7 +29,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
@@ -46,12 +46,16 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
@@ -61,6 +65,7 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CircleCrossFilled
+import kotlin.math.roundToInt
 
 /**
  * A compact text field component that supports single-line and multi-line input,
@@ -96,7 +101,18 @@ fun CompactTextField(
     } else {
         Alignment.Top
     }
-    val contentAlignment = if (isSingleLine) Alignment.CenterStart else Alignment.TopStart
+
+    var firstLineHeightPx by remember { mutableIntStateOf(0) }
+    val firstLineHeight = with(LocalDensity.current) { firstLineHeightPx.toDp() }
+
+    // In multiline, icons are centered on the first line (or the placeholder) instead of the top of the field
+    val alignedIcon: @Composable (@Composable () -> Unit) -> Unit = { icon ->
+        if (isSingleLine) {
+            icon()
+        } else {
+            Box(modifier = Modifier.heightIn(min = firstLineHeight), contentAlignment = Alignment.Center) { icon() }
+        }
+    }
 
     CompositionLocalProvider(LocalTextSelectionColors provides colors.textSelectionColors) {
         BasicTextField(
@@ -104,6 +120,11 @@ fun CompactTextField(
             lineLimits = lineLimits,
             textStyle = mergedTextStyle,
             enabled = enabled,
+            onTextLayout = { getResult ->
+                getResult()?.takeIf { it.lineCount > 0 }?.let {
+                    firstLineHeightPx = (it.getLineBottom(0) - it.getLineTop(0)).roundToInt()
+                }
+            },
             interactionSource = interactionSource,
             cursorBrush = SolidColor(colors.focusedTextColor),
             modifier = modifier
@@ -113,16 +134,15 @@ fun CompactTextField(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = if (isSingleLine) 0.dp else EsdsTheme.spacing.sm)
-                        .minimumInteractiveComponentSize(),
+                        .then(if (isSingleLine) Modifier.minimumInteractiveComponentSize() else Modifier),
                     verticalAlignment = verticalAlignment,
                     horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xl),
                 ) {
                     CompositionLocalProvider(LocalContentColor provides colors.focusedTextColor) {
-                        leadingIcon?.invoke()
+                        leadingIcon?.let { alignedIcon(it) }
 
                         Column(modifier = Modifier.weight(1f)) {
-                            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = contentAlignment) {
+                            Box(modifier = Modifier.fillMaxWidth()) {
                                 if (state.text.isEmpty()) {
                                     placeholder?.invoke()
                                 }

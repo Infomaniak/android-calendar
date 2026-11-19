@@ -136,8 +136,7 @@ internal fun DescriptionEditable(
                     )
                 },
                 isError = isTooLong,
-                lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 2), // minHeightInLines has to be 2 so the leading
-                // icon doesn't move up when adding the second line
+                lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 1),
                 supportingText = {
                     if (isTooLong) {
                         Text(
