@@ -143,9 +143,7 @@ fun CompactTextField(
                     CompositionLocalProvider(LocalContentColor provides colors.focusedTextColor) {
                         leadingIcon?.let { alignedIcon(it) }
 
-                        Column(modifier = Modifier
-                            .weight(1f)
-                            .padding(2.dp)) {
+                        Column(modifier = Modifier.weight(1f)) {
                             Box(modifier = Modifier.fillMaxWidth()) {
                                 if (state.text.isEmpty()) {
                                     placeholder?.let {
