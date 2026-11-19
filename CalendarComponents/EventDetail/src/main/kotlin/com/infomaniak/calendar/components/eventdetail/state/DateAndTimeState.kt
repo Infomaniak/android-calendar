@@ -103,11 +103,10 @@ data class DateAndTimeState(
     ) {
         var date by date
             internal set
-        var time
-            get() = timeState.time
-            internal set(value) {
-                timeState.time = value
-            }
+
+        var time by timeState::time
+            internal set
+
         var timeZone by timeZone
             internal set
 
