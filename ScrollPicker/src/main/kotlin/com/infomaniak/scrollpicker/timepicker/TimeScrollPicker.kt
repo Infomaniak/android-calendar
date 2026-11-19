@@ -34,6 +34,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -61,14 +62,21 @@ import java.text.DateFormatSymbols
 private val PreferredWheelWidth = 110.dp
 private val Hours24 = (0..23).toList()
 
-/** Needs a bounded width: its wheels share the width it is given. */
+/**
+ * Needs a bounded width: its wheels share the width it is given.
+ *
+ * @param onTimeChange called with each time picked on the wheels, which it commits to [state] itself, like a text field's
+ * `onValueChange`, so it may correct or reject it.
+ */
 @Composable
 fun TimeScrollPicker(
     state: TimeScrollPickerState,
     modifier: Modifier = Modifier,
+    onTimeChange: (LocalTime) -> Unit = { state.time = it },
     is24Hour: Boolean = DateFormat.is24HourFormat(LocalContext.current),
 ) {
-    LaunchedEffect(state) { state.syncWheels() }
+    val currentOnTimeChange by rememberUpdatedState(onTimeChange)
+    LaunchedEffect(state) { state.syncWheels { currentOnTimeChange(it) } }
 
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         // Wheels share the width left by the separators, shrinking below PreferredWheelWidth when it runs out.
@@ -181,9 +189,6 @@ class TimeScrollPickerState(initialTime: LocalTime = LocalTime(0, 0)) {
     /** Setting it moves the wheels there. Its seconds are kept, the wheels only showing hours and minutes. */
     var time by mutableStateOf(initialTime)
 
-    /** Called with each time picked on the wheels instead of setting [time], like `SliderState.onValueChange`. */
-    var onTimeChange: ((LocalTime) -> Unit)? = null
-
     private val group = ScrollPickerGroupState()
 
     /** Shared by both clocks' hour wheels, its index is the hour of the day. */
@@ -194,8 +199,8 @@ class TimeScrollPickerState(initialTime: LocalTime = LocalTime(0, 0)) {
     internal val hour: Int get() = hourState.selectedIndex
     private val minute: Int get() = minuteState.selectedIndex
 
-    /** Moves the wheels to [time] when it's set, and hands it the times picked on them, while the picker is shown. */
-    internal suspend fun syncWheels() = coroutineScope {
+    /** Moves the wheels to [time] when it's set, and hands the times picked on them to [onPick], while the picker is shown. */
+    internal suspend fun syncWheels(onPick: (LocalTime) -> Unit) = coroutineScope {
         // The wheels kept their position while the picker was hidden, so they must show [time] before being observed.
         if (!shows(time)) jumpTo(time)
 
@@ -203,16 +208,11 @@ class TimeScrollPickerState(initialTime: LocalTime = LocalTime(0, 0)) {
         launch {
             snapshotFlow { LocalTime(hour, minute) }.collect {
                 if (shows(time)) return@collect
-                pick(it)
+                onPick(it)
                 // The pick may be rejected or changed without changing [time], which the first flow wouldn't see.
                 if (!shows(time)) select(time)
             }
         }
-    }
-
-    private fun pick(time: LocalTime) {
-        val onTimeChange = onTimeChange
-        if (onTimeChange == null) this.time = time else onTimeChange(time)
     }
 
     private fun shows(time: LocalTime) = hour == time.hour && minute == time.minute

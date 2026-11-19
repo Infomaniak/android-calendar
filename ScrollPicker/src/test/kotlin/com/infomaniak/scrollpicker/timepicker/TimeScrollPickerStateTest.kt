@@ -34,8 +34,7 @@ class TimeScrollPickerStateTest {
     fun onlyTimesPickedOnTheWheelsReachTheState() = runTest {
         val state = TimeScrollPickerState(LocalTime(10, 0, 30))
         val picks = mutableListOf<LocalTime>()
-        state.onTimeChange = { picks += it; state.time = it }
-        backgroundScope.launch { state.syncWheels() }
+        backgroundScope.launch { state.syncWheels { picks += it; state.time = it } }
 
         settle()
         assertEquals(emptyList<LocalTime>(), picks)
@@ -53,8 +52,7 @@ class TimeScrollPickerStateTest {
     @Test
     fun wheelsGoBackWhenAPickIsRejected() = runTest {
         val state = TimeScrollPickerState(LocalTime(10, 0))
-        state.onTimeChange = {}
-        backgroundScope.launch { state.syncWheels() }
+        backgroundScope.launch { state.syncWheels {} }
         settle()
 
         state.minuteState.select(15)
@@ -66,10 +64,9 @@ class TimeScrollPickerStateTest {
     fun wheelsLeftStaleWhileHiddenDoNotPick() = runTest {
         val state = TimeScrollPickerState(LocalTime(10, 0))
         val picks = mutableListOf<LocalTime>()
-        state.onTimeChange = { picks += it }
         state.time = LocalTime(16, 30)
 
-        backgroundScope.launch { state.syncWheels() }
+        backgroundScope.launch { state.syncWheels { picks += it } }
         settle()
         assertEquals(emptyList<LocalTime>(), picks)
         assertEquals(16, state.hourState.selectedIndex)
