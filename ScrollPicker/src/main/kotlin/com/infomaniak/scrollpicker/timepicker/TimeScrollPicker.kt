@@ -54,27 +54,33 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalTime
 import java.text.DateFormatSymbols
 
-private val PickerWidth = 110.dp
+private val PreferredWheelWidth = 110.dp
 private val Hours24 = (0..23).toList()
 
+/** Needs a bounded width: its wheels share the width it is given. */
 @Composable
 fun TimeScrollPicker(state: TimeScrollPickerState, modifier: Modifier = Modifier) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        // Wheels share the width left by the separators, shrinking below PreferredWheelWidth when it runs out.
+        val wheelModifier = Modifier
+            .weight(1f, fill = false)
+            .width(PreferredWheelWidth)
+
         if (state.is24Hour) {
-            HourPicker24(state)
+            HourPicker24(state, modifier = wheelModifier)
             Text(text = ":", style = ScrollPickerDefaults.textStyle)
-            MinutePicker(state, ImeAction.Done)
+            MinutePicker(state, ImeAction.Done, modifier = wheelModifier)
         } else {
-            HourPicker12(state)
+            HourPicker12(state, modifier = wheelModifier)
             Text(text = ":", style = ScrollPickerDefaults.textStyle)
-            MinutePicker(state, ImeAction.Next)
-            AmPmPicker(state)
+            MinutePicker(state, ImeAction.Next, modifier = wheelModifier)
+            AmPmPicker(state, modifier = wheelModifier)
         }
     }
 }
 
 @Composable
-private fun HourPicker24(state: TimeScrollPickerState) {
+private fun HourPicker24(state: TimeScrollPickerState, modifier: Modifier = Modifier) {
     ScrollPicker(
         items = Hours24,
         state = state.hourState,
@@ -84,12 +90,12 @@ private fun HourPicker24(state: TimeScrollPickerState) {
         itemAccessibilityDescription = quantityDescription(R.plurals.hourAmount),
         onInput = String::toIntOrNull,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-        modifier = Modifier.width(PickerWidth),
+        modifier = modifier,
     )
 }
 
 @Composable
-private fun MinutePicker(state: TimeScrollPickerState, imeAction: ImeAction) {
+private fun MinutePicker(state: TimeScrollPickerState, imeAction: ImeAction, modifier: Modifier = Modifier) {
     ScrollPicker(
         items = (0..59).toList(),
         state = state.minuteState,
@@ -99,7 +105,7 @@ private fun MinutePicker(state: TimeScrollPickerState, imeAction: ImeAction) {
         itemAccessibilityDescription = quantityDescription(R.plurals.minuteAmount),
         onInput = String::toIntOrNull,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = imeAction),
-        modifier = Modifier.width(PickerWidth),
+        modifier = modifier,
     )
 }
 
@@ -108,7 +114,7 @@ private fun MinutePicker(state: TimeScrollPickerState, imeAction: ImeAction) {
  * derived from which half of the loop we're on. This lets us keep a single [ScrollPickerState] for both formats.
  */
 @Composable
-private fun HourPicker12(state: TimeScrollPickerState) {
+private fun HourPicker12(state: TimeScrollPickerState, modifier: Modifier = Modifier) {
     LaunchedEffect(state) { state.keepAmPmSyncedWithHourHalfLoop() }
     val describeHour = quantityDescription(R.plurals.hourAmount)
 
@@ -122,7 +128,7 @@ private fun HourPicker12(state: TimeScrollPickerState) {
         // Keeps the half of the day already chosen, so typing "12" doesn't flip it.
         onInput = { text -> text.toIntOrNull()?.takeIf { it in 1..12 }?.let { it % 12 + 12 * (state.hour / 12) } },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-        modifier = Modifier.width(PickerWidth),
+        modifier = modifier,
     )
 }
 
@@ -135,7 +141,7 @@ private fun quantityDescription(@PluralsRes id: Int): (Int) -> String {
 
 /** Items are 0 for AM and 1 for PM, labelled in the current locale. */
 @Composable
-private fun AmPmPicker(state: TimeScrollPickerState) {
+private fun AmPmPicker(state: TimeScrollPickerState, modifier: Modifier = Modifier) {
     val locale = LocalConfiguration.current.locales[0]
     val labels = remember(locale) { DateFormatSymbols.getInstance(locale).amPmStrings.toList() }
     ScrollPicker(
@@ -147,7 +153,7 @@ private fun AmPmPicker(state: TimeScrollPickerState) {
             labels.indexOfFirst { text.isNotEmpty() && it.startsWith(text, ignoreCase = true) }.takeIf { it >= 0 }
         },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        modifier = Modifier.width(PickerWidth),
+        modifier = modifier,
     )
 }
 
@@ -238,6 +244,21 @@ private fun Preview12() {
 
                 TimeScrollPicker(state)
             }
+        }
+    }
+}
+
+@Preview(widthDp = 240)
+@Composable
+private fun Preview12Narrow() {
+    MaterialTheme {
+        Scaffold {
+            TimeScrollPicker(
+                rememberTimeScrollPickerState(LocalTime(10, 30), is24Hour = false),
+                modifier = Modifier
+                    .padding(it)
+                    .padding(top = 56.dp),
+            )
         }
     }
 }
