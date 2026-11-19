@@ -112,8 +112,7 @@ internal fun DescriptionEditable(
 ) {
     val isTooLong = state.text.length > DESCRIPTION_MAX_CHARACTERS
     val extraCharacters = DESCRIPTION_MAX_CHARACTERS - state.text.length
-    val errorMessage = if (isTooLong) stringResource(R.string.eventValidationCharacterLimitExceeded) +
-            " $extraCharacters / $DESCRIPTION_MAX_CHARACTERS" else null
+    val errorMessage = stringResource(R.string.eventValidationCharacterLimitExceeded) + " $extraCharacters"
 
     SegmentedListItem(
         shapes = shapes,
@@ -121,14 +120,15 @@ internal fun DescriptionEditable(
         content = {
             CompactTextField(
                 state = state,
-                placeholder = {
+                isError = isTooLong,
+                placeholder = { Text(stringResource(R.string.descriptionTitle), maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                supportingText = {
                     Text(
-                        text = stringResource(R.string.descriptionTitle),
+                        text = errorMessage,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                 },
-                errorMessage = errorMessage,
                 lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 1),
                 leadingIcon = { DescriptionIcon() },
                 trailingIcon = null,

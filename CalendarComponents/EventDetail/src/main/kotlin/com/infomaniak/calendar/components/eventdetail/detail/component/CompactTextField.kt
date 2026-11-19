@@ -49,7 +49,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -62,7 +61,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.resources.R
@@ -70,6 +68,7 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CircleCrossFilled
 import kotlin.math.roundToInt
+import com.infomaniak.core.common.R as RCommon
 
 /**
  * A compact text field component that supports single-line and multi-line input,
@@ -83,7 +82,8 @@ fun CompactTextField(
     textStyle: TextStyle = LocalTextStyle.current,
     colors: TextFieldColors = CompactTextFieldDefaults.colors(),
     lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
-    errorMessage: String? = null,
+    isError: Boolean = false,
+    supportingText: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
@@ -92,7 +92,6 @@ fun CompactTextField(
     val interactionSource = interactionSource ?: remember { MutableInteractionSource() }
     // If color is not provided via the text style, use content color as a default
     val focused = interactionSource.collectIsFocusedAsState().value
-    val isError = errorMessage != null
     val textColor = textStyle.color.takeOrElse { colors.textColor(enabled, isError, focused) }
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
 
@@ -115,6 +114,8 @@ fun CompactTextField(
         }
     }
 
+    val invalidInputMessage = stringResource(RCommon.string.invalidInput)
+
     CompositionLocalProvider(LocalTextSelectionColors provides colors.textSelectionColors) {
         BasicTextField(
             state = state,
@@ -130,7 +131,7 @@ fun CompactTextField(
             cursorBrush = SolidColor(colors.focusedTextColor),
             modifier = modifier
                 .fillMaxWidth()
-                .semantics(mergeDescendants = true) { errorMessage?.let(::error) },
+                .semantics(mergeDescendants = true) { if (isError) error(invalidInputMessage) },
             decorator = { innerTextField ->
                 Row(
                     modifier = Modifier
@@ -142,7 +143,9 @@ fun CompactTextField(
                     CompositionLocalProvider(LocalContentColor provides colors.focusedTextColor) {
                         leadingIcon?.let { alignedIcon(it) }
 
-                        Column(modifier = Modifier.weight(1f)) {
+                        Column(modifier = Modifier
+                            .weight(1f)
+                            .padding(2.dp)) {
                             Box(modifier = Modifier.fillMaxWidth()) {
                                 if (state.text.isEmpty()) {
                                     placeholder?.let {
@@ -159,19 +162,11 @@ fun CompactTextField(
                                 enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
                                 exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut(),
                             ) {
-                                // Keeps the last message visible while the exit animation runs
-                                var lastErrorMessage by remember { mutableStateOf("") }
-                                errorMessage?.let { lastErrorMessage = it }
                                 CompositionLocalProvider(
                                     LocalContentColor provides colors.supportingTextColor(enabled, isError, focused),
                                     LocalTextStyle provides MaterialTheme.typography.bodySmall,
                                 ) {
-                                    Text(
-                                        text = lastErrorMessage,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        modifier = Modifier.padding(top = 2.dp),
-                                    )
+                                    supportingText?.invoke()
                                 }
 
                             }
@@ -244,7 +239,8 @@ private fun PreviewCompactTextFieldErrorAndTrailingIcon() {
     Surface {
         CompactTextField(
             state = rememberTextFieldState(stringResource(R.string.descriptionTitle)),
-            errorMessage = stringResource(R.string.eventValidationCharacterLimitExceeded),
+            isError = true,
+            supportingText = { Text(stringResource(R.string.eventValidationCharacterLimitExceeded)) },
             trailingIcon = { Icon(EsdsIcons.CircleCrossFilled.ExtraSmall, contentDescription = "Clock") },
         )
     }
