@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.notification
 
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventBounds
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventColors
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventId
@@ -30,6 +31,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.TriggerRelation
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.UpcomingAlarm
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.UpcomingAlarmId
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import org.junit.Assert.assertEquals
@@ -249,25 +251,49 @@ class AlarmSchedulerTest {
         return (unchanged + toSchedule).associateBy { it.alarmId }
     }
 
-    private fun testAlarm(id: String, firesAtMs: Long, title: String = "Test Event $id"): UpcomingAlarm {
+    @Test
+    fun `all-day alarms keep the event's days whatever the time zone`() {
+        val alarm = testAlarm(
+            id = "all-day",
+            firesAtMs = 2_000_000L,
+            bounds = EventBounds.AllDay(start = LocalDate(2026, 11, 19), end = LocalDate(2026, 11, 21)),
+        )
+
+        val plan = AlarmScheduler.computeAlarmSyncPlan(
+            upcomingAlarms = listOf(alarm),
+            previouslyScheduledIds = emptySet(),
+            registeredAlarms = emptyMap(),
+            nowMs = 1_000_000L,
+            timeZone = TimeZone.of("America/Los_Angeles"),
+        )
+
+        assertEquals(LocalDate(2026, 11, 19)..LocalDate(2026, 11, 20), plan.toSchedule.single().allDayDates)
+    }
+
+    private fun testAlarm(
+        id: String,
+        firesAtMs: Long,
+        title: String = "Test Event $id",
+        bounds: EventBounds = EventBounds.Zoned(
+            start = ZonedWallClock(LocalDateTime(2026, 9, 18, 10, 0), TimeZone.UTC),
+            end = ZonedWallClock(LocalDateTime(2026, 9, 18, 11, 0), TimeZone.UTC),
+        ),
+    ): UpcomingAlarm {
         val event = EventSummary(
             occurrenceId = OccurrenceId.Master(EventId("event://$id")),
+            calendarId = CalendarId("calendar://main"),
             title = title,
             location = null,
             status = null,
             colors = EventColors.from(eventSourceColor = 0, calendarSourceColor = 0),
-            timing = EventTiming(
-                bounds = EventBounds.Zoned(
-                    start = ZonedWallClock(LocalDateTime(2026, 9, 18, 10, 0), TimeZone.UTC),
-                    end = ZonedWallClock(LocalDateTime(2026, 9, 18, 11, 0), TimeZone.UTC),
-                ),
-            ),
+            timing = EventTiming(bounds = bounds),
             hasAttendees = false,
             hasMeetRoom = false,
             hasPlace = false,
             isBookable = false,
             isRecurring = false,
             myStatus = null,
+            canEdit = true,
         )
         return UpcomingAlarm(
             id = createUpcomingAlarmId(id),
