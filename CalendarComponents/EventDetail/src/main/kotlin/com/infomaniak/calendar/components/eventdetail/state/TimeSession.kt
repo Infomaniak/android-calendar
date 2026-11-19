@@ -22,20 +22,20 @@ import androidx.compose.runtime.remember
 import kotlinx.datetime.LocalTime
 
 /**
- * Consecutive end time picks, all corrected from the start and duration the session began with. The end's wheel picks every
- * row it passes, so the duration would otherwise already be zero once the end goes before the start.
+ * Consecutive time picks on [entry], all corrected from the start and duration the session began with. A wheel picks every
+ * row it passes, so the duration would otherwise already be zero once one entry goes past the other.
  */
-internal class EndTimeSession(private val state: DateAndTimeState) {
+internal class TimeSession(private val state: DateAndTimeState, private val entry: DateAndTimeState.Entry) {
     private val initialStart = state.start.instant
     private val initialInterval = state.end.instant - initialStart
 
-    fun pickTime(time: LocalTime) = with(state) { end.edit(initialStart, initialInterval) { end.time = time } }
+    fun pickTime(time: LocalTime) = with(state) { entry.edit(initialStart, initialInterval) { entry.time = time } }
 }
 
 /**
- * A session lasts while the end time picker stays open ([isOpen]), and restarts if a date or time zone is picked meanwhile.
+ * A session lasts while [entry]'s time picker stays open ([isOpen]), and restarts if a date or time zone is picked meanwhile.
  */
 @Composable
-internal fun DateAndTimeState.rememberEndTimeSession(isOpen: Boolean): EndTimeSession {
-    return remember(this, isOpen, start.date, start.timeZone, end.date, end.timeZone) { EndTimeSession(this) }
+internal fun DateAndTimeState.rememberTimeSession(entry: DateAndTimeState.Entry, isOpen: Boolean): TimeSession {
+    return remember(this, entry, isOpen, start.date, start.timeZone, end.date, end.timeZone) { TimeSession(this, entry) }
 }

@@ -43,7 +43,7 @@ import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
-import com.infomaniak.calendar.components.eventdetail.state.rememberEndTimeSession
+import com.infomaniak.calendar.components.eventdetail.state.rememberTimeSession
 import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRange
@@ -123,6 +123,7 @@ internal fun SectionScope.dateAndTimeEditable(
     with(dateAndTimeState) {
         item { shapes ->
             LaunchedEffect(isAllDay) { snapshotFlow(isAllDay).collect { if (it) selectedButton = null } }
+            val timeSession = rememberTimeSession(start, isOpen = selectedButton == DateAndTimeEntry.Start(EntryButton.Time))
 
             DateAndTimeEntry(
                 label = stringResource(R.string.startLabel),
@@ -131,14 +132,14 @@ internal fun SectionScope.dateAndTimeEditable(
                 selectedButton = { (selectedButton as? DateAndTimeEntry.Start)?.entryButton },
                 onSelectButton = { selectedButton = it?.let { entryButton -> DateAndTimeEntry.Start(entryButton) } },
                 onDatePicked = { start.pickDate(it) },
-                onTimePicked = { start.pickTime(it) },
+                onTimePicked = { timeSession.pickTime(it) },
                 onTimeZoneClick = { onTimeZoneClick(true) },
                 shapes = shapes,
             )
         }
 
         item { shapes ->
-            val endTimeSession = rememberEndTimeSession(isOpen = selectedButton == DateAndTimeEntry.End(EntryButton.Time))
+            val timeSession = rememberTimeSession(end, isOpen = selectedButton == DateAndTimeEntry.End(EntryButton.Time))
 
             DateAndTimeEntry(
                 label = stringResource(R.string.endLabel),
@@ -147,7 +148,7 @@ internal fun SectionScope.dateAndTimeEditable(
                 selectedButton = { (selectedButton as? DateAndTimeEntry.End)?.entryButton },
                 onSelectButton = { selectedButton = it?.let { entryButton -> DateAndTimeEntry.End(entryButton) } },
                 onDatePicked = { end.pickDate(it) },
-                onTimePicked = { endTimeSession.pickTime(it) },
+                onTimePicked = { timeSession.pickTime(it) },
                 onTimeZoneClick = { onTimeZoneClick(false) },
                 shapes = shapes,
             )
