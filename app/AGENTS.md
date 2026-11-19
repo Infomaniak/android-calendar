@@ -26,7 +26,7 @@ app/src/main/java/com/infomaniak/calendar/
 ├── MainApplication.kt              # Application class, initialises Metro AppGraph, Sentry and Matomo
 ├── MainActivity.kt                 # Single Activity, hosts Compose content
 ├── MatomoCalendar.kt               # Matomo tracker (implements Core's Matomo interface)
-├── notification/                   # Event notifications & AlarmManager scheduling (AlarmScheduler, AlarmReceiver, BootReceiver, NotificationHelper)
+├── notification/                   # Event notifications & AlarmManager scheduling (AlarmScheduler, AlarmReceiver, BootReceiver, NotificationHelper, CalendarNotificationChannels)
 ├── di/
 │   ├── AppGraph.kt                 # Metro @DependencyGraph (AppScope) — inherits CalendarCoreGraph, ViewModelGraph (metrox) + worker support
 │   └── metroAndroidExtensions/     # Portable Metro↔Android glue (no :app coupling)
@@ -195,6 +195,11 @@ app/
   boot, app update, time / time zone change and once exact alarm access is granted. The 30-day window doesn't follow the
   clock, so each refresh also sets an inexact, non-wakeup `ACTION_REFRESH_ALARMS` alarm one day later (handled by
   `AlarmReceiver`) to move it forward.
+  Reminders go to one notification channel per calendar (`CalendarNotificationChannels`, started from `MainApplication`),
+  grouped per account under its email, like Mail's per-mailbox channels. Channels follow `CalendarManager.observeCalendars`:
+  created / renamed with their calendar and deleted with it (a channel created again gets its settings back). Each alarm
+  carries its calendar ID (`EventSummary.calendarId`), and `AlarmReceiver` creates the channel if it's still missing
+  (capped at 1 s) since a notification on an unknown channel is dropped.
   Each process registers every alarm once (the system may have dropped them while it was dead: force stop, hibernation,
   revoked exact alarm access), then only registers alarms whose content (`AlarmRegistration`) changed. Failed
   registrations aren't kept (neither in memory nor in the persisted `scheduledAlarmIds`), so they're retried next sync,

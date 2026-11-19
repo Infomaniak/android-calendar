@@ -27,6 +27,7 @@ import com.infomaniak.calendar.data.SettingsDataValues
 import com.infomaniak.calendar.di.metroAndroidExtensions.AndroidComponentProvider
 import com.infomaniak.calendar.manager.CachedCalendarManager
 import com.infomaniak.calendar.notification.AlarmScheduler
+import com.infomaniak.calendar.notification.CalendarNotificationChannels
 import com.infomaniak.calendar.utils.ConfigUtils
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.core.login.InfomaniakLogin
@@ -75,6 +76,8 @@ interface AppGraph : AndroidComponentProvider, ViewModelGraph {
     val settingsDataValues: SettingsDataValues
 
     val alarmScheduler: AlarmScheduler
+
+    val calendarNotificationChannels: CalendarNotificationChannels
 
     @Provides
     @SingleIn(AppScope::class)
