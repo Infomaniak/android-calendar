@@ -30,7 +30,6 @@
     <string name="deleteEventAlertTitle">Czy na pewno chcesz usunąć to wydarzenie?</string>
     <string name="deleteRecurringEventAlertTitle">Które wydarzenia chcesz usunąć?</string>
     <string name="editRecurringEventAlertTitle">Które wydarzenia chcesz edytować?</string>
-    <string name="endLabel">Koniec</string>
     <string name="eventOccurrenceNotFound">To wydarzenie nie jest już dostępne.</string>
     <string name="generalSettingsAuthorizationsLabel">Uprawnienia</string>
     <string name="generalSettingsDisplayLabel">Wyświetlacz</string>
@@ -54,7 +53,6 @@
     <string name="settingsTitle">Ustawienia</string>
     <string name="signOutAccountAlertConfirm">Wyloguj się z konta</string>
     <string name="signOutAccountAlertDescription">To konto oraz powiązane z nim kalendarze zostaną odłączone od aplikacji „Kalendarz”. Będą one nadal dostępne na Twoim koncie internetowym Infomaniak.</string>
-    <string name="startLabel">Początek</string>
     <string name="syncEventsError">Błąd podczas pobierania wydarzeń</string>
     <string name="threeDaysTitle">3 dni</string>
     <string name="timeZoneLabel">Strefa czasowa</string>

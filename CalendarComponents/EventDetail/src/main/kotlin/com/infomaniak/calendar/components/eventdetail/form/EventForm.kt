@@ -50,7 +50,6 @@ import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.CalendarEditable
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatusSwitch
-import com.infomaniak.calendar.components.eventdetail.component.DateAndTimeEntry
 import com.infomaniak.calendar.components.eventdetail.component.KMeetButtonSwitch
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatusSwitch
 import com.infomaniak.calendar.components.eventdetail.component.ReminderItemEditable
