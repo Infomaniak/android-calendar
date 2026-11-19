@@ -178,7 +178,6 @@ fun rememberTimeScrollPickerState(initialTime: LocalTime = LocalTime(0, 0)): Tim
  */
 @Stable
 class TimeScrollPickerState(initialTime: LocalTime = LocalTime(0, 0)) {
-
     /** Setting it moves the wheels there. Its seconds are kept, the wheels only showing hours and minutes. */
     var time by mutableStateOf(initialTime)
 
