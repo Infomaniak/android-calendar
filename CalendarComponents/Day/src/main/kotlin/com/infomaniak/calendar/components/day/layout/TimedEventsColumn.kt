@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.infomaniak.calendar.components.day.TimelineDefaults
+import com.infomaniak.calendar.components.day.highlight.EventHighlightState
 import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.model.TimedEvent
@@ -47,6 +48,8 @@ import kotlin.math.roundToInt
  *
  * The column takes its width from its constraints, so it must be given a bounded one, e.g. with
  * `Modifier.width` when days are laid out in a horizontally scrolling row.
+ *
+ * Given a [highlightState], a long press on a card holds its event up in it.
  */
 @Composable
 internal fun TimedEventsColumn(
@@ -55,6 +58,7 @@ internal fun TimedEventsColumn(
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
     textOverflow: TextOverflow = TextOverflow.Ellipsis,
+    highlightState: EventHighlightState? = null,
 ) {
     val density = LocalDensity.current
     val config = eventLayoutConfig()
@@ -77,6 +81,7 @@ internal fun TimedEventsColumn(
             onEventClick = onEventClick,
             modifier = Modifier.matchParentSize(),
             textOverflow = textOverflow,
+            highlightState = highlightState,
         )
     }
 }

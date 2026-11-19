@@ -38,6 +38,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.day.highlight.EventHighlightState
 import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
@@ -63,6 +64,7 @@ internal fun DayView(
     weekNumbering: WeekNumbering,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
+    highlightState: EventHighlightState? = null,
     headerModifier: Modifier = Modifier,
     timelineModifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
@@ -77,6 +79,7 @@ internal fun DayView(
             date = date,
             events = events,
             state = state,
+            highlightState = highlightState,
             onEventClick = onEventClick,
             contentPadding = dayPadding + PaddingValues(top = headerHeight + EsdsTheme.spacing.md),
             modifier = timelineModifier.fillMaxSize(),

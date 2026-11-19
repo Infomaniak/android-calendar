@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.day
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -27,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.component.DayView
 import com.infomaniak.calendar.components.day.component.FollowSelectedDate
+import com.infomaniak.calendar.components.day.highlight.HighlightedEventOverlay
+import com.infomaniak.calendar.components.day.highlight.rememberEventHighlightState
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.DayPages
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
@@ -61,20 +64,28 @@ fun DayPager(
 
     FollowSelectedDate(pagerState, pages, selectedDate, onVisibleDateChanged)
 
-    HorizontalPager(state = pagerState, modifier = modifier) { page ->
-        val date = pages.firstDateOf(page)
+    val highlightState = rememberEventHighlightState()
 
-        DayView(
-            date = date,
-            events = eventsOf(date),
-            state = state,
-            weekNumbering = weekNumbering,
-            onEventClick = onEventClick,
-            headerModifier = headerModifier,
-            timelineModifier = timelineModifier,
-            contentPadding = contentPadding,
-            headerTrailingContent = headerTrailingContent,
-        )
+    // The highlighted event is drawn over the pager, so neither the page edge nor the header hides it.
+    Box(modifier = modifier, propagateMinConstraints = true) {
+        HorizontalPager(state = pagerState, userScrollEnabled = !highlightState.isHeld) { page ->
+            val date = pages.firstDateOf(page)
+
+            DayView(
+                date = date,
+                events = eventsOf(date),
+                state = state,
+                highlightState = highlightState,
+                weekNumbering = weekNumbering,
+                onEventClick = onEventClick,
+                headerModifier = headerModifier,
+                timelineModifier = timelineModifier,
+                contentPadding = contentPadding,
+                headerTrailingContent = headerTrailingContent,
+            )
+        }
+
+        HighlightedEventOverlay(highlightState, modifier = Modifier.matchParentSize())
     }
 }
 
