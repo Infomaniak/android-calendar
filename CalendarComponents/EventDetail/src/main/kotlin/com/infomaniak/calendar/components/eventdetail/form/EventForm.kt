@@ -158,7 +158,6 @@ fun EventForm(
         Section {
             item {
                 DescriptionEditable(
-                    leadingIcon = { ItemIcon(EsdsIcons.List.Medium) },
                     state = state.descriptionTextState,
                     shapes = it,
                 )
