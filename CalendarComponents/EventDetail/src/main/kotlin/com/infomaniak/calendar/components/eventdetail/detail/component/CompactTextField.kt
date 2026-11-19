@@ -60,7 +60,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -88,11 +87,8 @@ fun CompactTextField(
 ) {
     val interactionSource = interactionSource ?: remember { MutableInteractionSource() }
     // If color is not provided via the text style, use content color as a default
-    val textColor =
-        textStyle.color.takeOrElse {
-            val focused = interactionSource.collectIsFocusedAsState().value
-            colors.textColor(enabled, isError, focused)
-        }
+    val focused = interactionSource.collectIsFocusedAsState().value
+    val textColor = textStyle.color.takeOrElse { colors.textColor(enabled, isError, focused) }
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
 
     val isSingleLine = lineLimits is TextFieldLineLimits.SingleLine
@@ -144,7 +140,11 @@ fun CompactTextField(
                         Column(modifier = Modifier.weight(1f)) {
                             Box(modifier = Modifier.fillMaxWidth()) {
                                 if (state.text.isEmpty()) {
-                                    placeholder?.invoke()
+                                    placeholder?.let {
+                                        CompositionLocalProvider(
+                                            LocalContentColor provides colors.placeholderColor(enabled, isError, focused),
+                                        ) { it() }
+                                    }
                                 }
                                 innerTextField()
                             }
@@ -154,7 +154,12 @@ fun CompactTextField(
                                 enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
                                 exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut(),
                             ) {
-                                supportingText?.invoke()
+                                supportingText?.let {
+                                    CompositionLocalProvider(
+                                        LocalContentColor provides colors.supportingTextColor(enabled, isError, focused),
+                                        LocalTextStyle provides MaterialTheme.typography.bodySmall,
+                                    ) { it() }
+                                }
                             }
                         }
 
