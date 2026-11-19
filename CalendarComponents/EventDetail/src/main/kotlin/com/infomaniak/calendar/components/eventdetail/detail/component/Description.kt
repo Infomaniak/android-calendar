@@ -66,14 +66,13 @@ internal fun DescriptionCollapsibleButton(
     val descriptionState = rememberCollapsibleTextState(isCollapsed, COLLAPSED_MAX_LINES)
 
     val descriptionTitle = R.string.descriptionTitle
-    val leadingIcon = EsdsIcons.List
 
     // Shows or hides the button to toggle the description based on if the text is actually overflowing when collapsed or not.
     if (descriptionState.isOverflowing) {
         SegmentedListItem(
             content = { Text(stringResource(descriptionTitle)) },
             supportingContent = { DescriptionContent(description, descriptionState) },
-            leadingContent = { ItemIcon(leadingIcon) },
+            leadingContent = { DescriptionIcon() },
             trailingContent = { AnimatedChevron { isCollapsed } },
             onClick = { isCollapsed = !isCollapsed },
             shapes = shapes,
@@ -84,7 +83,7 @@ internal fun DescriptionCollapsibleButton(
         SegmentedListItem(
             content = { Text(stringResource(descriptionTitle)) },
             supportingContent = { DescriptionContent(description, descriptionState) },
-            leadingContent = { ItemIcon(leadingIcon) },
+            leadingContent = { DescriptionIcon() },
             shapes = shapes,
             colors = CustomColors.EventFormItemColors,
             modifier = Modifier.padding(contentPadding),
@@ -131,7 +130,7 @@ internal fun DescriptionEditable(
                 },
                 errorMessage = errorMessage,
                 lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 1),
-                leadingIcon = { ItemIcon(EsdsIcons.List) },
+                leadingIcon = { DescriptionIcon() },
                 trailingIcon = null,
             )
         },
@@ -148,6 +147,11 @@ private fun AnimatedChevron(isCollapsed: () -> Boolean) {
         contentDescription = null,
         modifier = Modifier.graphicsLayer { rotationZ = animatedChevronRotation.value },
     )
+}
+
+@Composable
+private fun DescriptionIcon() {
+    ItemIcon(EsdsIcons.List)
 }
 
 @Preview
