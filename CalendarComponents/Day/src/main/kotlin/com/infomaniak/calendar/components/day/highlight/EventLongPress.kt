@@ -80,10 +80,12 @@ private class LongPressHighlightNode(
         currentValueOf(LocalHapticFeedback).performHapticFeedback(HapticFeedbackType.LongPress)
         val card = requireLayoutCoordinates()
         state.show(
-            timedEvent = timedEvent,
-            startBounds = overlay.localBoundingBoxOf(card, clipBounds = true),
-            fingerY = overlay.localPositionOf(card, longPress.position).y,
-            areaBounds = overlay.localBoundingBoxOf(area, clipBounds = true),
+            EventHighlight(
+                timedEvent = timedEvent,
+                startBounds = overlay.localBoundingBoxOf(card, clipBounds = true),
+                areaBounds = overlay.localBoundingBoxOf(area, clipBounds = true),
+                fingerY = overlay.localPositionOf(card, longPress.position).y,
+            ),
         )
         longPress.consume()
 

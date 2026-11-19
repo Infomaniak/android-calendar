@@ -48,7 +48,7 @@ private val FingerClearance = 24.dp
  */
 @Composable
 internal fun HighlightedEventOverlay(state: EventHighlightState, modifier: Modifier = Modifier) {
-    val highlighted = state.highlighted
+    val highlight = state.highlight
     val scrimColor = MaterialTheme.colorScheme.scrim
     val cardShape = MaterialTheme.shapes.small
     // The card colours are translucent tints, so an opaque backing keeps the events below from showing through.
@@ -61,12 +61,12 @@ internal fun HighlightedEventOverlay(state: EventHighlightState, modifier: Modif
         modifier = modifier
             .onPlaced { state.overlayCoordinates = it }
             .drawBehind {
-                if (state.highlighted != null) drawRect(scrimColor, alpha = SCRIM_ALPHA * state.progress.coerceIn(0f, 1f))
+                if (state.highlight != null) drawRect(scrimColor, alpha = SCRIM_ALPHA * state.progress.coerceIn(0f, 1f))
             },
         content = {
-            if (highlighted != null) {
+            if (highlight != null) {
                 EventItem(
-                    event = highlighted.event,
+                    event = highlight.timedEvent.event,
                     onClick = {},
                     modifier = Modifier.graphicsLayer {
                         shadowElevation = HighlightElevation.toPx() * state.progress.coerceIn(0f, 1f)
@@ -76,10 +76,11 @@ internal fun HighlightedEventOverlay(state: EventHighlightState, modifier: Modif
             }
         },
     ) { measurables, constraints ->
-        val card = measurables.firstOrNull()?.let { measurable ->
-            val area = state.areaBounds
+        val card = highlight?.let { measurables.firstOrNull() }?.let { measurable ->
+            val area = highlight.areaBounds
             val height = measurable.minIntrinsicHeight(area.width.roundToInt()).toFloat()
-            val bounds = lerp(state.startBounds, unfoldedBounds(state.fingerY, area, height, margin, clearance), state.progress)
+            val unfolded = unfoldedBounds(highlight.fingerY, area, height, margin, clearance)
+            val bounds = lerp(highlight.startBounds, unfolded, state.progress)
 
             measurable.measure(
                 Constraints.fixed(bounds.width.roundToInt().coerceAtLeast(0), bounds.height.roundToInt().coerceAtLeast(0)),

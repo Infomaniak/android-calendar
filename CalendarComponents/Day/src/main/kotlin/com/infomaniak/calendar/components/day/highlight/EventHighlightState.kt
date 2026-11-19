@@ -23,16 +23,11 @@ import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
-import com.infomaniak.calendar.components.day.model.TimedEvent
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 private const val HIGHLIGHT_DAMPING_RATIO = 0.8f
@@ -43,32 +38,16 @@ internal fun rememberEventHighlightState(): EventHighlightState {
     return remember(scope) { EventHighlightState(scope) }
 }
 
-/**
- * The event a long press holds up, unfolded over the days so it can be read in full.
- *
- * The card grows from where it sat in its column, [startBounds], to the whole width of [areaBounds],
- * as [progress] goes from 0 to 1, and shrinks back once the finger lifts. Both rectangles, like
- * [fingerY], are expressed in the coordinates of the overlay drawing it, [overlayCoordinates].
- */
+/** The [EventHighlight] a long press holds up, unfolded as [progress] goes from 0 to 1 and folded back once released. */
 @Stable
 internal class EventHighlightState(private val scope: CoroutineScope) {
 
-    var highlighted: TimedEvent? by mutableStateOf(null)
-        private set
+    private val highlightState = mutableStateOf<EventHighlight?>(null)
+    val highlight: EventHighlight? by highlightState
 
+    private val isHeldState = mutableStateOf(false)
     /** Whether the finger still holds the event up: the timeline stays put until it lifts. */
-    var isHeld: Boolean by mutableStateOf(false)
-        private set
-
-    var startBounds: Rect by mutableStateOf(Rect.Zero)
-        private set
-
-    var areaBounds: Rect by mutableStateOf(Rect.Zero)
-        private set
-
-    /** Where the finger pressed, so the unfolded card can open above it rather than under it. */
-    var fingerY: Float by mutableFloatStateOf(0f)
-        private set
+    val isHeld: Boolean by isHeldState
 
     /** Set while laid out, and only read once a long press needs to know where its card is. */
     var overlayCoordinates: LayoutCoordinates? = null
@@ -76,18 +55,13 @@ internal class EventHighlightState(private val scope: CoroutineScope) {
     private val progressAnimatable = Animatable(0f)
     val progress: Float get() = progressAnimatable.value
 
-    private var animation: Job? = null
+    // Each animation cancels the running one, so a cancelled fold-back never clears the highlight.
+    fun show(highlight: EventHighlight) {
+        val isAnotherEvent = this.highlight?.timedEvent != highlight.timedEvent
+        highlightState.value = highlight
+        isHeldState.value = true
 
-    fun show(timedEvent: TimedEvent, startBounds: Rect, fingerY: Float, areaBounds: Rect) {
-        val isAnotherEvent = highlighted != timedEvent
-        highlighted = timedEvent
-        this.startBounds = startBounds
-        this.areaBounds = areaBounds
-        this.fingerY = fingerY
-        isHeld = true
-
-        animation?.cancel()
-        animation = scope.launch {
+        scope.launch {
             // The same event, pressed again while it folds back, unfolds from where it is.
             if (isAnotherEvent) progressAnimatable.snapTo(0f)
             progressAnimatable.animateTo(1f, highlightSpring)
@@ -96,12 +70,11 @@ internal class EventHighlightState(private val scope: CoroutineScope) {
 
     fun hide() {
         if (!isHeld) return
-        isHeld = false
+        isHeldState.value = false
 
-        animation?.cancel()
-        animation = scope.launch {
+        scope.launch {
             progressAnimatable.animateTo(0f, highlightSpring)
-            highlighted = null
+            highlightState.value = null
         }
     }
 

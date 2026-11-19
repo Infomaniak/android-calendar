@@ -101,7 +101,7 @@ internal fun ResizableEventLayout(
 /** Held up by a long press, and hidden while the overlay draws it in its place. */
 private fun Modifier.highlightable(state: EventHighlightState, timedEvent: TimedEvent): Modifier = this
     .highlightOnLongPress(state, timedEvent)
-    .graphicsLayer { alpha = if (state.highlighted == timedEvent) 0f else 1f }
+    .graphicsLayer { alpha = if (state.highlight?.timedEvent == timedEvent) 0f else 1f }
 
 /**
  * The layout only places what the solver hands it, so the preview has to resolve the overlaps
