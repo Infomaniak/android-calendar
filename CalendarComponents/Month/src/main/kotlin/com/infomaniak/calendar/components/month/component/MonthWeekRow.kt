@@ -53,13 +53,14 @@ import kotlinx.datetime.yearMonth
 import kotlin.math.roundToInt
 
 /**
- * A week of the month grid: its days, with the events of the week over them in [laneCount] lanes. Taps between the
- * events reach the days below.
+ * A week of the month grid: its days, [selectedDate] marked, with the events of the week over them in [laneCount] lanes.
+ * Taps between the events reach the days below.
  */
 @Composable
 internal fun MonthWeekRow(
     week: MonthWeekUi,
     month: YearMonth,
+    selectedDate: () -> LocalDate,
     today: LocalDate,
     laneMetrics: LaneMetrics,
     laneCount: Int,
@@ -73,6 +74,7 @@ internal fun MonthWeekRow(
                 MonthDayCell(
                     date = date,
                     isInMonth = date.yearMonth == month,
+                    isSelected = date == selectedDate(),
                     isToday = date == today,
                     eventCount = week.eventCountOf(column),
                     onClick = { onDayClick(date) },
@@ -172,6 +174,7 @@ private fun PreviewWeekRow(weekIndex: Int, laneCount: Int) {
             MonthWeekRow(
                 week = month.weeks[weekIndex],
                 month = month.month,
+                selectedDate = { month.month.onDay(8) },
                 today = month.month.onDay(6),
                 laneMetrics = laneMetrics,
                 laneCount = laneCount,

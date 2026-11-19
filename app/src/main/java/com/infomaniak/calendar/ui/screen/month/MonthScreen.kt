@@ -112,7 +112,7 @@ private fun MonthScreen(
     ) { contentPadding ->
         MonthPager(
             monthRange = NAVIGABLE_MONTHS,
-            selectedMonth = { visibleDayState.visibleDate.yearMonth },
+            selectedDate = { visibleDayState.visibleDate },
             monthOf = { months()[it] },
             onVisibleMonthChanged = visibleDayState::showMonth,
             onDayClick = { date ->

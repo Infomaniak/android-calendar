@@ -30,23 +30,15 @@ class MonthRowHeightsTest {
 
     @Test
     fun rowsSharingTheHeightFillItExactly() {
-        val heights = monthRowHeights(IntSize(700, 1003), bottomPadding = 0, fiveWeeks, metrics)
+        val heights = monthRowHeights(IntSize(700, 1003), fiveWeeks, metrics)
 
         assertEquals(200, heights.height)
         assertEquals(203, heights.lastHeight)
     }
 
     @Test
-    fun theLastRowReachesUnderTheBottomPadding() {
-        val heights = monthRowHeights(IntSize(700, 1080), bottomPadding = 80, fiveWeeks, metrics)
-
-        assertEquals(200, heights.height)
-        assertEquals(280, heights.lastHeight)
-    }
-
-    @Test
     fun squareRowsLeaveTheHeightTheyDoNotNeedEmpty() {
-        val heights = monthRowHeights(IntSize(761, 585), bottomPadding = 0, fiveWeeks, metrics)
+        val heights = monthRowHeights(IntSize(761, 585), fiveWeeks, metrics)
 
         assertEquals(108, heights.height)
         assertEquals(108, heights.lastHeight)
@@ -54,7 +46,7 @@ class MonthRowHeightsTest {
 
     @Test
     fun rowsAreNeverShorterThanASingleLaneNeeds() {
-        val heights = monthRowHeights(IntSize(100, 200), bottomPadding = 0, fiveWeeks, metrics)
+        val heights = monthRowHeights(IntSize(100, 200), fiveWeeks, metrics)
 
         assertEquals(metrics.rowHeightFor(laneCount = 1), heights.height)
     }

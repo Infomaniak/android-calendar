@@ -40,16 +40,18 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.minus
 import kotlinx.datetime.monthsUntil
+import kotlinx.datetime.onDay
 import kotlinx.datetime.plus
+import kotlinx.datetime.yearMonth
 
 /**
- * Pages through the months of [monthRange], following [selectedMonth]. A month [monthOf] doesn't have yet stays blank
- * until it does.
+ * Pages through the months of [monthRange], following the month of [selectedDate], which is marked. A month [monthOf]
+ * doesn't have yet stays blank until it does.
  */
 @Composable
 fun MonthPager(
     monthRange: ClosedRange<YearMonth>,
-    selectedMonth: () -> YearMonth,
+    selectedDate: () -> LocalDate,
     monthOf: (YearMonth) -> MonthUi?,
     onVisibleMonthChanged: (YearMonth) -> Unit,
     onDayClick: (LocalDate) -> Unit,
@@ -58,6 +60,7 @@ fun MonthPager(
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val pageCount = remember(monthRange) { monthRange.monthCount }
+    val selectedMonth = { selectedDate().yearMonth }
     val pagerState = rememberPagerState(initialPage = monthRange.pageOf(selectedMonth())) { pageCount }
 
     FollowSelectedPage(
@@ -70,6 +73,7 @@ fun MonthPager(
         monthOf(monthRange.monthAt(page))?.let { month ->
             MonthPage(
                 month = month,
+                selectedDate = selectedDate,
                 onDayClick = onDayClick,
                 onEventClick = onEventClick,
                 contentPadding = contentPadding,
@@ -109,7 +113,7 @@ private fun PreviewMonthPager(monthOf: (YearMonth) -> MonthUi? = ::previewMonth)
             MonthPager(
                 monthRange = previewFiveWeeksMonth.minus(1, DateTimeUnit.MONTH)..
                         previewFiveWeeksMonth.plus(1, DateTimeUnit.MONTH),
-                selectedMonth = { previewFiveWeeksMonth },
+                selectedDate = { previewFiveWeeksMonth.onDay(20) },
                 monthOf = monthOf,
                 onVisibleMonthChanged = {},
                 onDayClick = {},

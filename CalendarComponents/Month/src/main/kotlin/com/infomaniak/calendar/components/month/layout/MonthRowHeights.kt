@@ -21,29 +21,20 @@ import androidx.compose.ui.unit.IntSize
 import com.infomaniak.calendar.components.month.model.MonthWeekUi
 
 /**
- * The rows of a page of [pageSize] showing [weeks], never shorter than a single lane needs. They share the height above
- * [bottomPadding], and the last one reaches under it, so the grid goes down to the page's edge behind what the host draws
- * there. Lanes must be counted from [MonthRowHeights.height], never from the extended last row.
+ * The rows filling [availableSize] with [weeks], never shorter than a single lane needs. When they share its height, the
+ * last one takes the pixels the division drops, so the rows fill it exactly.
  */
-internal fun monthRowHeights(
-    pageSize: IntSize,
-    bottomPadding: Int,
-    weeks: List<MonthWeekUi>,
-    laneMetrics: LaneMetrics,
-): MonthRowHeights {
-    val rowsSize = IntSize(pageSize.width, pageSize.height - bottomPadding)
-
+internal fun monthRowHeights(availableSize: IntSize, weeks: List<MonthWeekUi>, laneMetrics: LaneMetrics): MonthRowHeights {
     fun rowHeights(height: Int, droppedPixels: Int): MonthRowHeights {
         val rowHeight = height.coerceAtLeast(laneMetrics.rowHeightFor(laneCount = 1))
         // Rows raised to a lane's height already overflow the page: there is nothing left to fill.
         val fillingPixels = if (rowHeight == height) droppedPixels else 0
-        return MonthRowHeights(rowHeight, lastHeight = rowHeight + fillingPixels + bottomPadding)
+        return MonthRowHeights(rowHeight, lastHeight = rowHeight + fillingPixels)
     }
 
-    return when (MonthGridSizing.of(rowsSize)) {
-        // The last row takes the pixels the division drops, so the rows fill the height exactly.
-        MonthGridSizing.Fill -> rowHeights(rowsSize.height / weeks.size, droppedPixels = rowsSize.height % weeks.size)
-        MonthGridSizing.Square -> rowHeights(rowsSize.width / weeks.first().dates.size, droppedPixels = 0)
+    return when (MonthGridSizing.of(availableSize)) {
+        MonthGridSizing.Fill -> rowHeights(availableSize.height / weeks.size, droppedPixels = availableSize.height % weeks.size)
+        MonthGridSizing.Square -> rowHeights(availableSize.width / weeks.first().dates.size, droppedPixels = 0)
     }
 }
 

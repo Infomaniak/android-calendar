@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,13 +47,15 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.LocalDate
 
 /**
- * A day of the month grid: its number at the top, the today tint over the whole cell, and its end separator. The whole
- * cell opens the day, and is announced with its [eventCount], hidden events included.
+ * A day of the month grid: its number at the top, marked when [isSelected] (or else when [isToday], like the mini
+ * calendar), the today tint over the whole cell, and its end separator. The whole cell opens the day, and is announced
+ * with its [eventCount], hidden events included.
  */
 @Composable
 internal fun MonthDayCell(
     date: LocalDate,
     isInMonth: Boolean,
+    isSelected: Boolean,
     isToday: Boolean,
     eventCount: Int,
     onClick: () -> Unit,
@@ -60,6 +63,7 @@ internal fun MonthDayCell(
 ) {
     val dateState = when {
         !isInMonth -> DateState.NotMonth
+        isSelected -> DateState.Selected
         isToday -> DateState.Today
         else -> DateState.None
     }
@@ -73,6 +77,7 @@ internal fun MonthDayCell(
             .clickable(role = Role.Button, onClick = onClick)
             .clearAndSetSemantics {
                 contentDescription = description
+                selected = dateState == DateState.Selected
                 todayDescription?.let { stateDescription = it }
             }
             .padding(MonthDefaults.DayNumberPadding),
@@ -99,11 +104,26 @@ private fun Preview() {
         Surface {
             Row {
                 val cellModifier = Modifier.size(width = 56.dp, height = 80.dp)
-                MonthDayCell(date, isInMonth = true, isToday = false, eventCount = 0, onClick = {}, modifier = cellModifier)
-                MonthDayCell(date, isInMonth = true, isToday = true, eventCount = 2, onClick = {}, modifier = cellModifier)
-                MonthDayCell(date, isInMonth = false, isToday = false, eventCount = 0, onClick = {}, modifier = cellModifier)
-                MonthDayCell(date, isInMonth = false, isToday = true, eventCount = 0, onClick = {}, modifier = cellModifier)
+                PreviewCell(date, isInMonth = true, isSelected = false, isToday = false, eventCount = 0, cellModifier)
+                PreviewCell(date, isInMonth = true, isSelected = false, isToday = true, eventCount = 2, cellModifier)
+                PreviewCell(date, isInMonth = true, isSelected = true, isToday = false, eventCount = 1, cellModifier)
+                PreviewCell(date, isInMonth = true, isSelected = true, isToday = true, eventCount = 0, cellModifier)
+                PreviewCell(date, isInMonth = false, isSelected = false, isToday = false, eventCount = 0, cellModifier)
+                PreviewCell(date, isInMonth = false, isSelected = false, isToday = true, eventCount = 0, cellModifier)
+                PreviewCell(date, isInMonth = false, isSelected = true, isToday = false, eventCount = 0, cellModifier)
             }
         }
     }
+}
+
+@Composable
+private fun PreviewCell(
+    date: LocalDate,
+    isInMonth: Boolean,
+    isSelected: Boolean,
+    isToday: Boolean,
+    eventCount: Int,
+    modifier: Modifier,
+) {
+    MonthDayCell(date, isInMonth, isSelected, isToday, eventCount, onClick = {}, modifier = modifier)
 }

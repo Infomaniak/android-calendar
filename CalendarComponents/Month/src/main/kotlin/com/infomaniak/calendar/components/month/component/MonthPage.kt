@@ -54,12 +54,13 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.onDay
 
 /**
- * A month: the weekday header over its weeks. The rows share the page's height, minus the bottom of [contentPadding],
- * unless that leaves them too short, where they scroll instead.
+ * A month: the weekday header over its weeks, [selectedDate] marked. The rows share the page's height above the bottom of
+ * [contentPadding], unless that leaves them too short, where they scroll instead, that padding staying below the last one.
  */
 @Composable
 internal fun MonthPage(
     month: MonthUi,
+    selectedDate: () -> LocalDate,
     onDayClick: (LocalDate) -> Unit,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
@@ -68,7 +69,15 @@ internal fun MonthPage(
 ) {
     Column(modifier.padding(contentPadding.onlyHorizontalAndTop())) {
         WeekdayHeader(month.weeks.first().dates)
-        WeekRows(month, today, contentPadding.calculateBottomPadding(), onDayClick, onEventClick, Modifier.weight(1f))
+        WeekRows(
+            month = month,
+            selectedDate = selectedDate,
+            today = today,
+            bottomPadding = contentPadding.calculateBottomPadding(),
+            onDayClick = onDayClick,
+            onEventClick = onEventClick,
+            modifier = Modifier.weight(1f),
+        )
     }
 }
 
@@ -96,6 +105,7 @@ private fun WeekdayHeader(dates: List<LocalDate>, modifier: Modifier = Modifier)
 @Composable
 private fun WeekRows(
     month: MonthUi,
+    selectedDate: () -> LocalDate,
     today: LocalDate,
     bottomPadding: Dp,
     onDayClick: (LocalDate) -> Unit,
@@ -106,16 +116,21 @@ private fun WeekRows(
 
     BoxWithConstraints(modifier) {
         val laneMetrics = laneMetrics()
-        val pageSize = IntSize(constraints.maxWidth, constraints.maxHeight)
-        val rowHeights = monthRowHeights(pageSize, with(density) { bottomPadding.roundToPx() }, month.weeks, laneMetrics)
+        val rowsSize = IntSize(constraints.maxWidth, constraints.maxHeight - with(density) { bottomPadding.roundToPx() })
+        val rowHeights = monthRowHeights(rowsSize, month.weeks, laneMetrics)
         val laneCount = laneMetrics.laneCount(rowHeights.height)
 
-        Column(Modifier.verticalScroll(rememberScrollState())) {
+        Column(
+            Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = bottomPadding),
+        ) {
             month.weeks.forEachIndexed { index, week ->
                 val height = if (index == month.weeks.lastIndex) rowHeights.lastHeight else rowHeights.height
                 MonthWeekRow(
                     week = week,
                     month = month.month,
+                    selectedDate = selectedDate,
                     today = today,
                     laneMetrics = laneMetrics,
                     laneCount = laneCount,
@@ -154,6 +169,7 @@ private fun PreviewMonthPage(month: MonthUi, contentPadding: PaddingValues = Pad
         Surface {
             MonthPage(
                 month = month,
+                selectedDate = { month.month.onDay(20) },
                 today = month.month.onDay(12),
                 onDayClick = {},
                 onEventClick = {},
