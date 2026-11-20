@@ -36,8 +36,9 @@ import androidx.compose.ui.unit.sp
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 @Composable
-fun EmojiSegmentedListItem(emoji: String, text: String, shapes: ListItemShapes) {
+fun EmojiSegmentedListItem(emoji: String, text: String, shapes: ListItemShapes, modifier: Modifier = Modifier) {
     SegmentedListItem(
+        modifier = modifier,
         leadingContent = {
             Text(
                 text = emoji,
