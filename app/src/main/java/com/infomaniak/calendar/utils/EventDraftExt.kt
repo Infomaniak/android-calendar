@@ -29,6 +29,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.AttendeeEdi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventBounds
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventEditData
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventTiming
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.MeetRoom
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Organizer
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.TimeBlocking
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.ZonedWallClock
@@ -50,6 +51,7 @@ val EventDraft.typedCalendarId: CalendarId get() = CalendarId(calendarId)
 fun EventDraft.applyTo(
     editData: EventEditData,
     storedAlarms: List<EventAlarm>,
+    generatedMeetRoom: MeetRoom?,
     defaultOrganizer: Organizer?,
 ): EventEditData = editData.copy(
     title = title,
@@ -59,6 +61,12 @@ fun EventDraft.applyTo(
     calendarId = typedCalendarId,
     attendees = attendees.toAttendeeEdit(),
     description = description,
+   meetRoom = when (kMeetUrl) {
+        null -> null
+        editData.meetRoom?.url -> editData.meetRoom
+        generatedMeetRoom?.url -> generatedMeetRoom
+        else -> null // need kmp to accept an url not MeetRoom
+    },
     organizer = (initialOrganizer?.toOrganizer() ?: defaultOrganizer).takeIf { attendees.isNotEmpty() },
     // Stored alarms KMP can't read are missing from storedAlarms, replacing the list would delete them
     alarms = if (reminders.withoutUiId() == storedAlarms.mapNotNull { it.toNotification() }.withoutUiId()) {
@@ -79,9 +87,10 @@ fun EventEditData.updateWithAttendeesAndOrganizer(
     )
 }
 
-fun EventDraft.toNewEventEditData(defaultOrganizer: Organizer?): EventEditData = applyTo(
+fun EventDraft.toNewEventEditData(defaultOrganizer: Organizer?, generatedMeetRoom: MeetRoom?): EventEditData = applyTo(
     storedAlarms = emptyList(),
     defaultOrganizer = defaultOrganizer,
+    generatedMeetRoom = generatedMeetRoom,
     editData = EventEditData(
         title = "",
         timing = EventTiming(bounds = bounds()),

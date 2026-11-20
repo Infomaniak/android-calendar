@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.ui.screen.eventDetail.form
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
@@ -36,6 +37,11 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource.Static
 import com.infomaniak.calendar.data.SettingsDataValues
 import com.infomaniak.calendar.ui.screen.eventDetail.EventCreationCalendarsUseCase
+import com.infomaniak.core.common.cancellable
+import com.infomaniak.core.sentry.SentryLog
+import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.MeetRoom
+import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -43,6 +49,7 @@ import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -64,12 +71,18 @@ class EventFormViewModel(
     @Assisted private val savedStateHandle: SavedStateHandle,
     private val eventCreationCalendarsUseCase: EventCreationCalendarsUseCase,
     private val settingsDataValues: SettingsDataValues,
+    private val calendarManager: CalendarManager,
 ) : ViewModel() {
     /** The form once loaded, for the screens it opens. */
     var formState: EventFormState? by savedStateHandle.saveable(FORM_KEY, stateSaver = NullableFormSaver) { mutableStateOf(null) }
         private set
 
     private var isInitialized = false
+
+    /** In memory only: after process death, a generated URL is saved like a typed one, without its description block. */
+    var generatedMeetRoom: MeetRoom? = null
+        private set
+    private var generateKMeetJob: Job? = null
 
     fun initCreation(date: LocalDate) {
         if (isInitialized) return
@@ -113,12 +126,27 @@ class EventFormViewModel(
             participants = event.attendees.all.toSet(),
             organizerSource = Static(event.organizer),
             isKMeetUrlEnabled = event.kMeetUrl != null,
+            kMeetUrlTextState = TextFieldState(event.kMeetUrl.orEmpty()),
             descriptionTextState = TextFieldState(event.description.orEmpty()),
             reminders = event.reminders,
             isOccupied = event.isOccupied,
             isPublic = event.classification == EventDetailUi.Classification.Public,
             calendars = event.calendars,
         )
+    }
+
+    fun generateKMeetUrl() {
+        val formState = formState ?: return
+        if (generateKMeetJob?.isActive == true) return
+        generateKMeetJob = viewModelScope.launch {
+            runCatching { calendarManager.generateMeetRoom(CalendarId(formState.calendar.id)) }
+                .cancellable()
+                .onSuccess { room ->
+                    generatedMeetRoom = room
+                    formState.kMeetUrlTextState.setTextAndPlaceCursorAtEnd(room.url)
+                }
+                .onFailure { SentryLog.e(TAG, "generateKMeetUrl() failed", it) }
+        }
     }
 
     @AssistedFactory
@@ -132,6 +160,7 @@ class EventFormViewModel(
 
     companion object {
         private const val FORM_KEY = "form"
+        private const val TAG = "EventFormViewModel"
 
         private val NullableFormSaver = Saver<EventFormState?, Any>(
             save = { formState -> formState?.let { with(EventFormState.Saver) { save(it) } } },

@@ -44,6 +44,7 @@ private const val LOCATION_KEY = "location"
 private const val PARTICIPANTS_KEY = "participants"
 private const val ORGANIZER_SOURCE_KEY = "organizerSource"
 private const val IS_KMEET_URL_ENABLED_KEY = "isKMeetUrlEnabled"
+private const val KMEET_URL_KEY = "kMeetUrl"
 private const val DESCRIPTION_KEY = "description"
 private const val REMINDERS_KEY = "reminders"
 private const val IS_OCCUPIED_KEY = "isOccupied"
@@ -71,6 +72,7 @@ private val saver = mapSaver(
             PARTICIPANTS_KEY to ArrayList(it.participants),
             ORGANIZER_SOURCE_KEY to it.organizerSource,
             IS_KMEET_URL_ENABLED_KEY to it.isKMeetUrlEnabled.value,
+            KMEET_URL_KEY to with(TextFieldState.Saver) { save(it.kMeetUrlTextState) },
             DESCRIPTION_KEY to with(TextFieldState.Saver) { save(it.descriptionTextState) },
             REMINDERS_KEY to with(remindersSaver) { save(it.reminders) },
             IS_OCCUPIED_KEY to it.isOccupied.value,
@@ -93,6 +95,7 @@ private val saver = mapSaver(
             participants = (it[PARTICIPANTS_KEY] as ArrayList<ParticipantUi>).toSet(),
             organizerSource = it[ORGANIZER_SOURCE_KEY] as OrganizerSource?,
             isKMeetUrlEnabled = it[IS_KMEET_URL_ENABLED_KEY] as Boolean,
+            kMeetUrlTextState = TextFieldState.Saver.restore(it[KMEET_URL_KEY]!!)!!,
             descriptionTextState = TextFieldState.Saver.restore(it[DESCRIPTION_KEY]!!)!!,
             reminders = remindersSaver.restore(it[REMINDERS_KEY]!!)!!,
             isOccupied = it[IS_OCCUPIED_KEY] as Boolean,

@@ -36,7 +36,7 @@ import com.infomaniak.calendar.components.eventdetail.component.AttendeesButton
 import com.infomaniak.calendar.components.eventdetail.component.Calendar
 import com.infomaniak.calendar.components.eventdetail.component.ClassificationStatus
 import com.infomaniak.calendar.components.eventdetail.component.DateAndTime
-import com.infomaniak.calendar.components.eventdetail.component.KMeetButton
+import com.infomaniak.calendar.components.eventdetail.component.KMeet
 import com.infomaniak.calendar.components.eventdetail.component.OccupiedStatus
 import com.infomaniak.calendar.components.eventdetail.component.PlaceButton
 import com.infomaniak.calendar.components.eventdetail.component.Recurrence
@@ -114,7 +114,7 @@ fun EventDetail(
 
                 if (kMeetUrl?.isNotBlank() == true) {
                     item {
-                        KMeetButton(
+                        KMeet(
                             shapes = it,
                             onJoin = onJoinKMeet,
                             onCopy = onCopyKMeet,

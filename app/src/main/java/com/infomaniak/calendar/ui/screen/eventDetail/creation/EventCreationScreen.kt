@@ -86,6 +86,7 @@ fun EventCreationScreen(
 
     EventCreationScreen(
         uiState = uiState,
+        generateKMeetUrl = { "" },
         onSubmit = {
             val eventDraft = eventFormViewModel.formState?.toEventDraft() ?: return@EventCreationScreen
             if (eventCreationViewModel.submitEvent(eventDraft)) goBack()
@@ -99,6 +100,7 @@ fun EventCreationScreen(
 @Composable
 private fun EventCreationScreen(
     uiState: EventCreationScreenState,
+    generateKMeetUrl: () -> String,
     onSubmit: () -> Unit,
     goBack: () -> Unit,
     navigation: EventFormNavigation,
@@ -166,6 +168,7 @@ private fun EventCreationScreenPreview() {
             uiState = EventCreationScreenState.Success(state),
             onSubmit = {},
             goBack = {},
+            generateKMeetUrl = { "" },
             navigation = EventFormNavigation(
                 goToAttendees = {},
                 goToTimeZoneSearch = {},
@@ -184,6 +187,7 @@ private fun PreviewEmptyWritableCalendar() {
             uiState = EventCreationScreenState.NoWritableCalendar,
             onSubmit = {},
             goBack = {},
+            generateKMeetUrl = { "" },
             navigation = EventFormNavigation(
                 goToAttendees = {},
                 goToTimeZoneSearch = {},

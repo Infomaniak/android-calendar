@@ -54,6 +54,7 @@ import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import io.sentry.Breadcrumb.navigation
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.TimeZone
@@ -108,6 +109,7 @@ fun EventEditScreen(
             val eventDraft = eventFormViewModel.formState?.toEventDraft() ?: return@EventEditScreen
             if (viewModel.submitEvent(occurrenceId, scope, eventDraft)) goBack()
         },
+        onGenerateKmeetUrl = { eventFormViewModel.generateKMeetUrl() },
         sharedTransitionScope = LocalSharedTransitionScope.current,
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
     )
@@ -119,6 +121,7 @@ private fun EventEditScreen(
     goBack: () -> Unit,
     navigation: EventFormNavigation,
     onSubmit: (RecurrentEventScope) -> Unit,
+    onGenerateKmeetUrl: () -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
@@ -192,6 +195,7 @@ private fun Preview() {
                     goToLocationSearch = {},
                 ),
                 onSubmit = {},
+                onGenerateKmeetUrl = {},
             )
         }
     }

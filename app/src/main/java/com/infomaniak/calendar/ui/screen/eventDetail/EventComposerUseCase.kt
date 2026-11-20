@@ -26,9 +26,9 @@ import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.account.accountId
 import com.infomaniak.calendar.utils.applyTo
-import com.infomaniak.calendar.utils.updateWithAttendeesAndOrganizer
 import com.infomaniak.calendar.utils.toNewEventEditData
 import com.infomaniak.calendar.utils.typedCalendarId
+import com.infomaniak.calendar.utils.updateWithAttendeesAndOrganizer
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
@@ -54,7 +54,7 @@ class EventComposerUseCase @Inject constructor(
     suspend fun createEvent(eventDraft: EventDraft): SaveEventResult {
         return runCatching {
             val defaultOrganizer = eventDraft.typedCalendarId.toOrganizer()
-            calendarManager.createEvent(eventDraft.toNewEventEditData(defaultOrganizer))
+            calendarManager.createEvent(eventDraft.toNewEventEditData(defaultOrganizer, generatedMeetRoom = null))
 
             calendarDataValues.saveLastUsedCalendar(eventDraft)
 
@@ -72,6 +72,7 @@ class EventComposerUseCase @Inject constructor(
                     editData = editData,
                     storedAlarms = event.alarms,
                     defaultOrganizer = eventDraft.typedCalendarId.toOrganizer(),
+                    generatedMeetRoom = null,
                 ),
             )
 

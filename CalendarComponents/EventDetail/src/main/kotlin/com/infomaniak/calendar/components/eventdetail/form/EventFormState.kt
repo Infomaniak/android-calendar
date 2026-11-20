@@ -63,6 +63,7 @@ class EventFormState(
     participants: Set<ParticipantUi>,
     organizerSource: OrganizerSource?,
     isKMeetUrlEnabled: Boolean,
+    val kMeetUrlTextState: TextFieldState,
     val descriptionTextState: TextFieldState,
     reminders: List<EventDetailUi.Reminder>,
     isOccupied: Boolean,
@@ -103,7 +104,8 @@ class EventFormState(
     internal val start get() = dateAndTimeState.start.date.atTime(dateAndTimeState.start.time)
     internal val end get() = dateAndTimeState.end.date.atTime(dateAndTimeState.end.time)
 
-    fun isValid(): Boolean = descriptionTextState.text.length <= DESCRIPTION_MAX_CHARACTERS
+    fun isValid(): Boolean = descriptionTextState.text.length <= DESCRIPTION_MAX_CHARACTERS &&
+            kMeetUrlTextState.text.length <= MEET_MAX_CHARACTERS
 
     /** Organizing a new event as the owner of [calendar], who must then not also be one of its attendees. */
     fun selectCalendar(calendar: EventDetailCalendar) {
@@ -129,6 +131,7 @@ class EventFormState(
             attendees = attendees,
             initialOrganizer = (organizerSource as? OrganizerSource.Static)?.organizer,
             isKMeetUrlEnabled = isKMeetUrlEnabled.value,
+            kMeetUrl = kMeetUrlTextState.text.toString().ifEmpty { null },
             description = descriptionTextState.text.toString().ifEmpty { null },
             reminders = reminders.toList(),
             isOccupied = isOccupied.value,
@@ -138,7 +141,7 @@ class EventFormState(
 
     companion object {
         const val DESCRIPTION_MAX_CHARACTERS = 10_000
-        const val KMEET_MAX_CHARACTERS = 1_000
+        const val MEET_MAX_CHARACTERS = 1_000
 
         /** A new event on [date] in [calendar], lasting [eventDuration]. */
         fun default(
@@ -164,6 +167,7 @@ class EventFormState(
                 participants = emptySet(),
                 organizerSource = calendar.organizerAttendeeUi?.let(OrganizerSource::Dynamic),
                 isKMeetUrlEnabled = false,
+                kMeetUrlTextState = TextFieldState(),
                 descriptionTextState = TextFieldState(),
                 reminders = emptyList(),
                 isOccupied = true,
