@@ -83,7 +83,7 @@ sealed class EventItemStatus(
 
     data class Pending(override val eventColors: EventColorsUi) : EventItemStatus(
         cardColors = { containerVariantColors(eventColors) },
-        cardBorder = { BorderStroke(2.dp, eventColors.sourceColor) },
+        cardBorder = { BorderStroke(1.dp, eventColors.sourceColor) },
     )
 
     companion object {
