@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.day.component
+package com.infomaniak.calendar.components.day
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -61,12 +61,18 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.day.TimelineDefaults
+import com.infomaniak.calendar.components.day.component.CurrentTimeIndicator
+import com.infomaniak.calendar.components.day.component.DayColumnHeader
+import com.infomaniak.calendar.components.day.component.FollowSelectedDate
+import com.infomaniak.calendar.components.day.component.HourLabelOverhang
+import com.infomaniak.calendar.components.day.component.HourLabels
+import com.infomaniak.calendar.components.day.component.HourLines
+import com.infomaniak.calendar.components.day.component.minuteOfDay
+import com.infomaniak.calendar.components.day.component.verticalTimelineScroll
 import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults.GridLineThickness
 import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.DayPages
-import com.infomaniak.calendar.components.day.pinchToZoom
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
