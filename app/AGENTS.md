@@ -145,6 +145,8 @@ app/
   DSL): the DSL can't read the key while building `metadata`, which `AttendeeSearch` needs in order to declare its parent.
   Entries are decorated with `rememberSaveableStateHolderNavEntryDecorator()` followed by
   `rememberSharedViewModelStoreNavEntryDecorator()`, in that order.
+- **Calendar views are roots**: picking one replaces the whole back stack, so back leaves the app. The one exception is
+  a Month day click, which opens Day above Month so back returns to Month.
 - **List/detail (Settings)**: Material 3's `ListDetailSceneStrategy` (`adaptive-navigation3`) lays settings out side by
   side on wide windows. The root settings entry is always `metaDataOf(SettingsListPane)` (it brings the
   `SettingDetailPlaceholder` shown while nothing is opened). Build every sub-page with `backStack.settingsSubPageEntry`
