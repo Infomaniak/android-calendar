@@ -122,7 +122,7 @@ internal fun DescriptionEditable(
                 state = state,
                 isError = isTooLong,
                 placeholder = { Text(stringResource(R.string.descriptionTitle), maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                supportingText = {
+                errorText = {
                     Text(
                         text = errorMessage,
                         maxLines = 1,
