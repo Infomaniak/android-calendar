@@ -33,7 +33,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,18 +40,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.TimelineDefaults
-import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults.GridLineThickness
 import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.pinchToZoom
@@ -62,8 +56,9 @@ import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
-import com.infomaniak.calendar.components.foundation.theme.ComponentColors
+import com.infomaniak.calendar.components.foundation.utils.VerticalGridLine
 import com.infomaniak.calendar.components.foundation.utils.onlyHorizontalAndTop
+import com.infomaniak.calendar.components.foundation.utils.verticalEndDivider
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
@@ -151,10 +146,7 @@ private fun MultiDayTimeline(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.CenterEnd,
                 ) {
-                    VerticalDivider(
-                        thickness = GridLineThickness,
-                        color = ComponentColors.GridDividerColor,
-                    )
+                    VerticalGridLine()
                 }
             },
             content = { date ->
@@ -252,17 +244,6 @@ private fun RowScope.DayColumn(content: @Composable () -> Unit) {
     }
 }
 
-/** A vertical line, drawn at the end of the component */
-@Composable
-private fun Modifier.verticalEndDivider(color: Color = ComponentColors.GridDividerColor): Modifier = drawBehind {
-    val x = if (layoutDirection == LayoutDirection.Ltr) size.width else 0f
-    drawLine(
-        color = color,
-        start = Offset(x, 0f),
-        end = Offset(x, size.height),
-        strokeWidth = GridLineThickness.toPx(),
-    )
-}
 private val previewDates = Clock.today().let { today -> List(3) { today.plus(it, DateTimeUnit.DAY) } }
 
 @Preview

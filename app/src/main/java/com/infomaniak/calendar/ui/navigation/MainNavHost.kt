@@ -82,6 +82,11 @@ fun MainNavHost(
     defaultCalendarView: NavDestination.CalendarView,
     onCalendarViewSelected: (NavDestination.CalendarView) -> Unit,
 ) {
+    val goToCalendarView: (NavDestination.CalendarView) -> Unit = { destination ->
+        onCalendarViewSelected(destination)
+        backStack.replaceRoot(destination)
+    }
+
     SharedTransitionLayout {
         CompositionLocalProvider(LocalSharedTransitionScope provides this@SharedTransitionLayout) {
             val windowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass
@@ -95,8 +100,9 @@ fun MainNavHost(
                 entryProvider = baseEntryProvider(
                     backStack = backStack,
                     defaultCalendarView = defaultCalendarView,
+                    goToCalendarView = goToCalendarView,
                 ),
-                sceneDecoratorStrategies = sceneDecoratorStrategies(backStack, onCalendarViewSelected),
+                sceneDecoratorStrategies = sceneDecoratorStrategies(backStack, goToCalendarView),
                 sceneStrategies = sceneStrategies(windowSizeClass),
                 sharedTransitionScope = this@SharedTransitionLayout,
                 transitionSpec = { NavigationTransition.contentTransform },
@@ -109,6 +115,7 @@ fun MainNavHost(
 private fun baseEntryProvider(
     backStack: NavBackStack<NavDestination>,
     defaultCalendarView: NavDestination.CalendarView,
+    goToCalendarView: (NavDestination.CalendarView) -> Unit,
 ): (NavDestination) -> NavEntry<NavDestination> = { destination ->
     when (destination) {
         is NavDestination.CalendarView.Planning -> NavEntry(destination, metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
@@ -135,7 +142,11 @@ private fun baseEntryProvider(
         }
 
         is NavDestination.CalendarView.Month -> NavEntry(destination, metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-            MonthScreen()
+            MonthScreen(
+                goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) },
+                // Above Month rather than replacing it, so back returns to Month.
+                goToDay = { backStack.addOnce(NavDestination.CalendarView.Day) },
+            )
         }
 
         is NavDestination.EventForm.EventCreation -> NavEntry(
@@ -310,7 +321,7 @@ private fun <T : NavKey> sceneStrategies(windowSizeClass: WindowSizeClass): List
 
 private fun sceneDecoratorStrategies(
     backStack: NavBackStack<NavDestination>,
-    onCalendarViewSelected: (NavDestination.CalendarView) -> Unit,
+    goToCalendarView: (NavDestination.CalendarView) -> Unit,
 ): List<SceneDecoratorStrategy<NavDestination>> {
     val navigationStrategy: NavigationDecoratorStrategy<NavDestination> =
         NavigationDecoratorStrategy(
@@ -318,10 +329,7 @@ private fun sceneDecoratorStrategies(
                 val visibleDayState = LocalVisibleDayState.current
 
                 CalendarHorizontalFloatingToolbar(
-                    onNavigationButtonClicked = { destination ->
-                        onCalendarViewSelected(destination)
-                        backStack.replaceRoot(destination)
-                    },
+                    onNavigationButtonClicked = goToCalendarView,
                     onCurrentDayClicked = { visibleDayState?.jumpTo(Clock.today()) },
                     currentDestination = { backStack.getLastCalendarView() },
                     floatingActionButton = {
