@@ -23,9 +23,11 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.union
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.timezonesearch.TimeZoneSearch
@@ -34,6 +36,7 @@ import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.datetime.TimeZone
+import com.infomaniak.calendar.components.resources.R as RComponents
 
 @Composable
 fun TimeZoneSearchScreen(
@@ -62,7 +65,7 @@ private fun TimeZoneSearchScreen(
         topBar = {
             TopAppBar(
                 navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
-                title = {},
+                title = { Text(stringResource(RComponents.string.timeZoneLabel)) },
             )
         },
         modifier = modifier,

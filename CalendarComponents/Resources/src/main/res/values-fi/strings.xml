@@ -103,6 +103,7 @@
     <string name="statusDeclinedLabel">Hylätty</string>
     <string name="statusNeedsActionLabel">Käsiteltävänä</string>
     <string name="statusTentativeLabel">Ehkä</string>
+    <string name="timeZoneLabel">Aikavyöhyke</string>
     <string name="unavailableLabel">Ei käytettävissä</string>
     <plurals name="unitDays">
         <item quantity="one">päivä</item>

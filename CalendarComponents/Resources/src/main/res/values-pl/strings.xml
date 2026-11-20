@@ -123,6 +123,7 @@
     <string name="statusDeclinedLabel">Odrzucono</string>
     <string name="statusNeedsActionLabel">W toku</string>
     <string name="statusTentativeLabel">Może</string>
+    <string name="timeZoneLabel">Strefa czasowa</string>
     <string name="unavailableLabel">Niedostępna</string>
     <plurals name="unitDays">
         <item quantity="one">dzień</item>
