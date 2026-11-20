@@ -20,6 +20,8 @@ package com.infomaniak.calendar.components.month.component
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -41,7 +44,9 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.state.rememberToday
+import com.infomaniak.calendar.components.foundation.utils.horizontalBottomDivider
 import com.infomaniak.calendar.components.foundation.utils.onlyHorizontalAndTop
+import com.infomaniak.calendar.components.foundation.utils.verticalStartDivider
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortDayNameUppercase
 import com.infomaniak.calendar.components.month.layout.laneMetrics
 import com.infomaniak.calendar.components.month.layout.monthRowHeights
@@ -67,6 +72,11 @@ internal fun MonthPage(
     contentPadding: PaddingValues = PaddingValues(),
     today: LocalDate = rememberToday().value,
 ) {
+    val layoutDirection = LocalLayoutDirection.current
+    // Pages touch, so the grids of consecutive months do too unless some horizontal padding separates them.
+    val touchesPreviousGrid = contentPadding.calculateStartPadding(layoutDirection) == 0.dp &&
+            contentPadding.calculateEndPadding(layoutDirection) == 0.dp
+
     Column(modifier.padding(contentPadding.onlyHorizontalAndTop())) {
         WeekdayHeader(month.weeks.first().dates)
         WeekRows(
@@ -74,6 +84,7 @@ internal fun MonthPage(
             selectedDate = selectedDate,
             today = today,
             bottomPadding = contentPadding.calculateBottomPadding(),
+            touchesPreviousGrid = touchesPreviousGrid,
             onDayClick = onDayClick,
             onEventClick = onEventClick,
             modifier = Modifier.weight(1f),
@@ -108,6 +119,7 @@ private fun WeekRows(
     selectedDate: () -> LocalDate,
     today: LocalDate,
     bottomPadding: Dp,
+    touchesPreviousGrid: Boolean,
     onDayClick: (LocalDate) -> Unit,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
@@ -123,7 +135,8 @@ private fun WeekRows(
         Column(
             Modifier
                 .verticalScroll(rememberScrollState())
-                .padding(bottom = bottomPadding),
+                .padding(bottom = bottomPadding)
+                .outerGridEdges(touchesPreviousGrid),
         ) {
             month.weeks.forEachIndexed { index, week ->
                 val height = if (index == month.weeks.lastIndex) rowHeights.lastHeight else rowHeights.height
@@ -145,10 +158,25 @@ private fun WeekRows(
     }
 }
 
+/**
+ * Closes the grid, whose rows and days only draw their top and end lines: along its bottom, and along its start unless
+ * it [touchesPreviousGrid], whose last days' end line already runs there and would be doubled.
+ */
+@Composable
+private fun Modifier.outerGridEdges(touchesPreviousGrid: Boolean): Modifier {
+    return horizontalBottomDivider().then(if (touchesPreviousGrid) Modifier else Modifier.verticalStartDivider())
+}
+
 @Preview
 @Composable
 private fun Preview() {
     PreviewMonthPage(previewMonth(previewFiveWeeksMonth), contentPadding = PaddingValues(bottom = 80.dp))
+}
+
+@Preview(name = "Inset from the end")
+@Composable
+private fun PreviewInsetFromEnd() {
+    PreviewMonthPage(previewMonth(previewFiveWeeksMonth), contentPadding = PaddingValues(end = 24.dp))
 }
 
 @Preview(name = "Six weeks")

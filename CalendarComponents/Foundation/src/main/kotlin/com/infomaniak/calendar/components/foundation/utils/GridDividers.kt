@@ -25,8 +25,10 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -45,23 +47,45 @@ fun VerticalGridLine(modifier: Modifier = Modifier) {
     VerticalDivider(modifier, Dimens.GridLineThickness, ComponentColors.GridDividerColor)
 }
 
-/** A grid line along the end edge of the component, behind its content. */
+/** A grid line along the end edge of the component, behind its content, centered on that edge to be shared with the next one. */
 @Composable
 fun Modifier.verticalEndDivider(color: Color = ComponentColors.GridDividerColor): Modifier = drawBehind {
     val x = if (layoutDirection == LayoutDirection.Ltr) size.width else 0f
-    drawLine(
-        color = color,
-        start = Offset(x, 0f),
-        end = Offset(x, size.height),
-        strokeWidth = Dimens.GridLineThickness.toPx(),
-    )
+    drawGridLine(color, start = Offset(x, 0f), end = Offset(x, size.height))
+}
+
+/** A grid line along the start edge of the component, over its content, inside it as it closes a grid. */
+@Composable
+fun Modifier.verticalStartDivider(color: Color = ComponentColors.GridDividerColor): Modifier = drawWithContent {
+    drawContent()
+    val halfStroke = Dimens.GridLineThickness.toPx() / 2
+    val x = if (layoutDirection == LayoutDirection.Ltr) halfStroke else size.width - halfStroke
+    drawGridLine(color, start = Offset(x, 0f), end = Offset(x, size.height))
+}
+
+/** A grid line along the bottom edge of the component, over its content, inside it as it closes a grid. */
+@Composable
+fun Modifier.horizontalBottomDivider(color: Color = ComponentColors.GridDividerColor): Modifier = drawWithContent {
+    drawContent()
+    val y = size.height - Dimens.GridLineThickness.toPx() / 2
+    drawGridLine(color, start = Offset(0f, y), end = Offset(size.width, y))
+}
+
+private fun DrawScope.drawGridLine(color: Color, start: Offset, end: Offset) {
+    drawLine(color = color, start = start, end = end, strokeWidth = Dimens.GridLineThickness.toPx())
 }
 
 @Preview
 @Composable
 private fun Preview() {
     Surface {
-        Box(Modifier.size(64.dp).verticalEndDivider()) {
+        Box(
+            Modifier
+                .size(64.dp)
+                .verticalStartDivider()
+                .verticalEndDivider()
+                .horizontalBottomDivider(),
+        ) {
             HorizontalGridLine()
             VerticalGridLine()
         }
