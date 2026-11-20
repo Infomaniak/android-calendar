@@ -20,6 +20,8 @@ package com.infomaniak.calendar.components.eventdetail.state
 import androidx.compose.runtime.mutableStateOf
 import com.infomaniak.scrollpicker.timepicker.TimeScrollPickerState
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.atTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import org.junit.Assert.assertEquals
@@ -27,9 +29,9 @@ import org.junit.Test
 
 class DateAndTimeStateTest {
 
-    private fun entry(hour: Int, day: Int = 16) = DateAndTimeState.Entry(
+    private fun entry(hour: Int, minute: Int = 0, day: Int = 16) = DateAndTimeState.Entry(
         date = mutableStateOf(LocalDate(2026, 11, day)),
-        timeState = TimeScrollPickerState(LocalTime(hour, 0)),
+        timeState = TimeScrollPickerState(LocalTime(hour, minute)),
         timeZone = mutableStateOf(TimeZone.UTC),
     )
 
@@ -63,11 +65,37 @@ class DateAndTimeStateTest {
     ) {
         val session = TimeSession(this, start)
 
-        (11..12).forEach { session.pickTime(LocalTime(it, 0)) }
-        assertEquals(LocalTime(13, 0), end.time)
+        (11..13).forEach { session.pickTime(LocalTime(it, 0)) }
+        assertEquals(LocalTime(14, 0), end.time)
 
-        (11 downTo 10).forEach { session.pickTime(LocalTime(it, 0)) }
-        assertEquals(LocalTime(13, 0), end.time)
+        (12 downTo 10).forEach { session.pickTime(LocalTime(it, 0)) }
+        assertEquals(LocalTime(14, 0), end.time)
+    }
+
+    @Test
+    fun scrollingTheEndPastMidnightBeforeTheStart_keepsTheDuration() = with(
+        DateAndTimeState(
+            start = entry(0, minute = 30),
+            end = entry(1, minute = 30),
+            hasEndEverBeenTouched = mutableStateOf(false),
+        ),
+    ) {
+        val session = TimeSession(this, end)
+
+        listOf(LocalTime(0, 30), LocalTime(0, 29), LocalTime(0, 28)).forEach(session::pickTime)
+        assertEquals(LocalDate(2026, 11, 15), start.date)
+        assertEquals(LocalTime(23, 28), start.time)
+    }
+
+    @Test
+    fun aDatePickedDuringASession_restartsIt() = with(
+        DateAndTimeState(start = entry(10), end = entry(11), hasEndEverBeenTouched = mutableStateOf(false)),
+    ) {
+        val session = TimeSession(this, end)
+
+        start.pickDate(LocalDate(2026, 11, 18))
+        session.pickTime(LocalTime(9, 0))
+        assertEquals(LocalDateTime(2026, 11, 18, 8, 0), start.date.atTime(start.time))
     }
 
     @Test
