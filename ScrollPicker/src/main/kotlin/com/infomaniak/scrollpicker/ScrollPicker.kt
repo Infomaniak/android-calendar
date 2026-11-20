@@ -74,6 +74,7 @@ import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.progressBarRangeInfo
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.stateDescription
@@ -226,6 +227,7 @@ fun <T> ScrollPicker(
                 horizontalAlignment = horizontalAlignment,
                 cursorColor = colors.cursorColor,
                 modifier = Modifier
+                    .semantics { if (contentDescription != null) this.contentDescription = contentDescription }
                     .fillMaxWidth()
                     .height(itemHeight)
                     .focusRequester(inputFocusRequester)

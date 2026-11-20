@@ -226,7 +226,8 @@ setting `selectedIndex` takes effect at once and the wheel animates there on its
 manual input and snapping/haptics are kept separately from the wheel's rendering. The wheel exposes an adjustable value
 and an edit action to accessibility services, following Material's `ScrollField`: a
 `contentDescription` naming what the wheel selects, and the selected item read through `itemAccessibilityDescription`
-(the label by default); while editing, the text field exposes its own semantics. `TimeScrollPicker` describes its wheels with
+(the label by default); while editing, the text field keeps the same `contentDescription` through non-clearing semantics,
+preserving its native text-editing actions. `TimeScrollPicker` describes its wheels with
 its own copy of the `unitHours` / `unitMinutes` and `hourAmount` / `minuteAmount` plurals, duplicated from
 `:CalendarComponents:Resources` (with their translations) since the module can't depend on it.
 `TimeScrollPicker`'s 12-hour wheel holds all 24 hours (labelled 12 to 11 twice), so one
