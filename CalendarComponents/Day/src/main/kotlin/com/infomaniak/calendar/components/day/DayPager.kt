@@ -41,10 +41,17 @@ import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlin.time.Clock
 
+/**
+ * One day per page, swiped a day at a time.
+ *
+ * @param onEventMoved Called when an event held up by a long press is dragged and dropped, with the
+ * start it was dropped on: the quarter of an hour nearest to the card's top.
+ */
 @Composable
 fun DayPager(
     dateRange: ClosedRange<LocalDate>,
@@ -59,13 +66,14 @@ fun DayPager(
     timelineModifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     headerTrailingContent: @Composable () -> Unit = {},
+    onEventMoved: ((EventSummaryUi.Normal, LocalDateTime) -> Unit)? = null,
 ) {
     val pages = remember(dateRange) { DayPages(dateRange, daysPerPage = 1) }
     val pagerState = rememberPagerState(initialPage = pages.pageOf(selectedDate())) { pages.count }
 
     FollowSelectedDate(pagerState, pages, selectedDate, onVisibleDateChanged)
 
-    val highlightState = rememberEventHighlightState()
+    val highlightState = rememberEventHighlightState(onEventMoved)
 
     // The highlighted event is drawn over the pager, so neither the page edge nor the header hides it.
     Box(modifier = modifier.releaseHighlightOnSecondPointer(highlightState), propagateMinConstraints = true) {

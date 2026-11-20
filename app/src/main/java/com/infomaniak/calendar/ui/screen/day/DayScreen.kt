@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.day
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -125,6 +126,8 @@ private fun DayScreen(
             headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
             timelineModifier = Modifier.hazeSource(hazeState),
             contentPadding = contentPadding,
+            //TODO[eventDragAndDrop]: Move the event to the slot it was dropped on
+            onEventMoved = { event, newStart -> Log.d("EventDragAndDrop", "${event.title} dropped at $newStart") },
             // Placed here rather than on each page: the hour grid's vertical scroll reaches it through
             // the pager, which only consumes the horizontal axis.
             modifier = Modifier

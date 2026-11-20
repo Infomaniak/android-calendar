@@ -73,6 +73,7 @@ import com.infomaniak.calendar.components.day.highlight.EventHighlightState
 import com.infomaniak.calendar.components.day.highlight.HighlightedEventOverlay
 import com.infomaniak.calendar.components.day.highlight.eventHighlightArea
 import com.infomaniak.calendar.components.day.highlight.releaseHighlightOnSecondPointer
+import com.infomaniak.calendar.components.day.highlight.eventDropTarget
 import com.infomaniak.calendar.components.day.highlight.rememberEventHighlightState
 import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults.GridLineThickness
 import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
@@ -92,6 +93,7 @@ import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlin.time.Clock
@@ -108,6 +110,8 @@ import kotlin.time.Clock
  *
  * @param eventTextOverflow How the events' texts are cut. Narrow columns show more of them with
  * [TextOverflow.Clip], the ellipsis taking the room of the letters it replaces.
+ * @param onEventMoved Called when an event held up by a long press is dragged and dropped, with the
+ * start it was dropped on: the day under the finger, at the quarter of an hour nearest to the card's top.
  */
 @Composable
 fun MultiDayPager(
@@ -125,6 +129,7 @@ fun MultiDayPager(
     timelineModifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     eventTextOverflow: TextOverflow = TextOverflow.Ellipsis,
+    onEventMoved: ((EventSummaryUi.Normal, LocalDateTime) -> Unit)? = null,
 ) {
     require(daysPerPage in 1..visibleDayCount) { "daysPerPage must be between 1 and visibleDayCount" }
 
@@ -149,6 +154,7 @@ fun MultiDayPager(
             timelineModifier = timelineModifier,
             contentPadding = contentPadding,
             eventTextOverflow = eventTextOverflow,
+            onEventMoved = onEventMoved,
         )
     }
 }
@@ -167,13 +173,14 @@ private fun MultiDayPagerContent(
     timelineModifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     eventTextOverflow: TextOverflow = TextOverflow.Ellipsis,
+    onEventMoved: ((EventSummaryUi.Normal, LocalDateTime) -> Unit)? = null,
 ) {
     val density = LocalDensity.current
     var headerHeight by remember { mutableStateOf(0.dp) }
     // The grid runs to the end edge, keeping all the room it can for the days' content.
     val contentPadding = contentPadding + PaddingValues(start = EsdsTheme.spacing.md)
     val pageSize = remember(pages, visibleDayCount) { DaysPageSize(pages.daysPerPage, visibleDayCount) }
-    val highlightState = rememberEventHighlightState()
+    val highlightState = rememberEventHighlightState(onEventMoved)
 
     Box(modifier.releaseHighlightOnSecondPointer(highlightState)) {
         MultiDayTimeline(
@@ -268,7 +275,8 @@ private fun MultiDayTimeline(
                         onEventClick = onEventClick,
                         modifier = Modifier
                             .matchParentSize()
-                            .padding(horizontal = 1.dp),
+                            .padding(horizontal = 1.dp)
+                            .eventDropTarget(highlightState, date),
                         textOverflow = eventTextOverflow,
                         highlightState = highlightState,
                     )

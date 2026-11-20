@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.multiDays
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -148,6 +149,8 @@ private fun MultiDaysScreen(
             contentPadding = contentPadding,
             // A week's columns are too narrow for an ellipsis: it would take the room of the few letters that fit.
             eventTextOverflow = TextOverflow.Clip,
+            //TODO[eventDragAndDrop]: Move the event to the slot it was dropped on
+            onEventMoved = { event, newStart -> Log.d("EventDragAndDrop", "${event.title} dropped at $newStart") },
             // Placed here rather than on each page: the hour grid's vertical scroll reaches it through
             // the pager, which only consumes the horizontal axis.
             modifier = Modifier
