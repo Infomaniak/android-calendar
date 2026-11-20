@@ -58,6 +58,7 @@ fun EventDraft.applyTo(
     timeBlocking = if (isOccupied) TimeBlocking.Blocks else TimeBlocking.DoesNotBlock,
     calendarId = typedCalendarId,
     attendees = attendees.toAttendeeEdit(),
+    description = description,
     organizer = (initialOrganizer?.toOrganizer() ?: defaultOrganizer).takeIf { attendees.isNotEmpty() },
     // Stored alarms KMP can't read are missing from storedAlarms, replacing the list would delete them
     alarms = if (reminders.withoutUiId() == storedAlarms.mapNotNull { it.toNotification() }.withoutUiId()) {

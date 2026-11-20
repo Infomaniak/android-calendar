@@ -66,6 +66,7 @@
     <string name="descriptionTitle">Descrição</string>
     <string name="emptyStateNoTimeZone">Nenhum fuso horário encontrado</string>
     <string name="eventTitle">Título do evento</string>
+    <string name="eventValidationCharacterLimitExceeded">Limite de caracteres excedido</string>
     <string name="eventValidationTooManyAttendees">Não pode ter mais de %d convidados</string>
     <plurals name="hourAmount">
         <item quantity="one">%d hora</item>
