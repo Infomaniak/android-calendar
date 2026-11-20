@@ -220,6 +220,7 @@ class TimeScrollPickerState(initialTime: LocalTime = LocalTime(0, 0)) {
     private fun select(time: LocalTime) {
         hourState.selectedIndex = time.hour
         minuteState.selectedIndex = time.minute
+        amPmState.selectedIndex = time.hour / 12
     }
 
     private fun jumpTo(time: LocalTime) {

@@ -61,6 +61,18 @@ class TimeScrollPickerStateTest {
     }
 
     @Test
+    fun amPmWheelGoesBackWhenAPickIsRejected() = runTest {
+        val state = TimeScrollPickerState(LocalTime(11, 0))
+        backgroundScope.launch { state.syncWheels {} }
+        settle()
+
+        state.hourState.select(23)
+        state.amPmState.select(1)
+        settle()
+        assertEquals(0, state.amPmState.selectedIndex)
+    }
+
+    @Test
     fun wheelsLeftStaleWhileHiddenDoNotPick() = runTest {
         val state = TimeScrollPickerState(LocalTime(10, 0))
         val picks = mutableListOf<LocalTime>()
