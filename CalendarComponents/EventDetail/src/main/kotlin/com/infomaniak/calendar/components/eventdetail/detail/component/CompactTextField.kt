@@ -138,41 +138,43 @@ fun CompactTextField(
                     verticalAlignment = verticalAlignment,
                     horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.xl),
                 ) {
-                    CompositionLocalProvider(LocalContentColor provides colors.focusedTextColor) {
-                        leadingIcon?.let { alignedIcon(it) }
+                    leadingIcon?.let {
+                        CompositionLocalProvider(
+                            LocalContentColor provides colors.leadingIconColor(enabled, isError, focused),
+                        ) { alignedIcon(it) }
+                    }
 
-                        Column(modifier = Modifier.weight(1f)) {
-                            Box(modifier = Modifier.fillMaxWidth()) {
-                                if (state.text.isEmpty()) {
-                                    placeholder?.let {
-                                        CompositionLocalProvider(
-                                            LocalContentColor provides colors.placeholderColor(enabled, isError, focused),
-                                        ) { it() }
-                                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            if (state.text.isEmpty()) {
+                                placeholder?.let {
+                                    CompositionLocalProvider(
+                                        LocalContentColor provides colors.placeholderColor(enabled, isError, focused),
+                                    ) { it() }
                                 }
-                                innerTextField()
                             }
-
-                            AnimatedVisibility(
-                                visible = isError,
-                                enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
-                                exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut(),
-                            ) {
-                                CompositionLocalProvider(
-                                    LocalContentColor provides colors.supportingTextColor(enabled, isError, focused),
-                                    LocalTextStyle provides MaterialTheme.typography.bodySmall,
-                                ) {
-                                    errorText?.invoke()
-                                }
-
-                            }
+                            innerTextField()
                         }
 
-                        trailingIcon?.let {
+                        AnimatedVisibility(
+                            visible = isError,
+                            enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
+                            exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut(),
+                        ) {
                             CompositionLocalProvider(
-                                LocalContentColor provides colors.trailingIconColor(enabled, isError, focused),
-                            ) { it() }
+                                LocalContentColor provides colors.supportingTextColor(enabled, isError, focused),
+                                LocalTextStyle provides MaterialTheme.typography.bodySmall,
+                            ) {
+                                errorText?.invoke()
+                            }
+
                         }
+                    }
+
+                    trailingIcon?.let {
+                        CompositionLocalProvider(
+                            LocalContentColor provides colors.trailingIconColor(enabled, isError, focused),
+                        ) { it() }
                     }
                 }
             },
@@ -193,6 +195,9 @@ internal object CompactTextFieldDefaults {
         errorTrailingIconColor: Color = MaterialTheme.colorScheme.error,
         cursorColor: Color = focusedTextColor,
         errorCursorColor: Color = MaterialTheme.colorScheme.error,
+        focusedLeadingIconColor: Color = focusedTextColor,
+        unfocusedLeadingIconColor: Color = unfocusedTextColor,
+        errorLeadingIconColor: Color = focusedTextColor,
     ): TextFieldColors {
         return TextFieldDefaults.colors(
             focusedTextColor = focusedTextColor,
@@ -205,6 +210,9 @@ internal object CompactTextFieldDefaults {
             errorTrailingIconColor = errorTrailingIconColor,
             cursorColor = cursorColor,
             errorCursorColor = errorCursorColor,
+            focusedLeadingIconColor = focusedLeadingIconColor,
+            unfocusedLeadingIconColor = unfocusedLeadingIconColor,
+            errorLeadingIconColor = errorLeadingIconColor,
         )
     }
 }
