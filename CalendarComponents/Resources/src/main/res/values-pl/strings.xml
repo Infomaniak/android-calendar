@@ -79,6 +79,7 @@
     </plurals>
     <string name="descriptionTitle">Opis</string>
     <string name="emptyStateNoTimeZone">Nie znaleziono stref czasowych</string>
+    <string name="endLabel">Koniec</string>
     <string name="eventTitle">Tytuł wydarzenia</string>
     <string name="eventValidationTooManyAttendees">Nie można zaprosić więcej niż %d gości</string>
     <plurals name="hourAmount">
@@ -119,10 +120,12 @@
     </plurals>
     <string name="sectionCalendarHeader">Kalendarz</string>
     <string name="sectionOrganizerHeader">Organizator</string>
+    <string name="startLabel">Początek</string>
     <string name="statusAcceptedLabel">Zaakceptowano</string>
     <string name="statusDeclinedLabel">Odrzucono</string>
     <string name="statusNeedsActionLabel">W toku</string>
     <string name="statusTentativeLabel">Może</string>
+    <string name="timeZoneLabel">Strefa czasowa</string>
     <string name="unavailableLabel">Niedostępna</string>
     <plurals name="unitDays">
         <item quantity="one">dzień</item>

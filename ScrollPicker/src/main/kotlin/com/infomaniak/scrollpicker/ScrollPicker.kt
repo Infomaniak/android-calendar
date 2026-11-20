@@ -41,6 +41,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
@@ -73,7 +74,9 @@ import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.progressBarRangeInfo
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextMeasurer
@@ -114,8 +117,11 @@ import kotlin.math.roundToInt
  *
  * @param items the values to pick from, numbers, text or anything [itemLabel] can render.
  * @param state hoisted selection and scroll state, see [rememberScrollPickerState].
+ * @param contentDescription text used by accessibility services to describe what this picker selects, e.g. "Hours".
  * @param loop whether the wheel wraps around infinitely instead of stopping at the first and last item.
  * @param itemLabel the text displayed for an item.
+ * @param itemAccessibilityDescription the text accessibility services announce for an item, e.g. "9 hours" for "09".
+ * It should match the text rendered by [itemLabel].
  * @param onInput parses the text typed after clicking the selected item, returning `null` to reject it.
  * When `null`, the selected item isn't clickable and values can only be picked by scrolling.
  * @param keyboardOptions keyboard used for manual input, e.g. [androidx.compose.ui.text.input.KeyboardType.Number].
@@ -128,10 +134,12 @@ import kotlin.math.roundToInt
 fun <T> ScrollPicker(
     items: List<T>,
     state: ScrollPickerState,
+    contentDescription: String?,
     modifier: Modifier = Modifier,
     loop: Boolean = false,
     enabled: Boolean = true,
     itemLabel: (T) -> String = { it.toString() },
+    itemAccessibilityDescription: (T) -> String = itemLabel,
     onInput: ((String) -> T?)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
@@ -141,6 +149,7 @@ fun <T> ScrollPicker(
     colors: ScrollPickerColors = ScrollPickerDefaults.colors(),
 ) {
     val labels = remember(items, itemLabel) { items.map(itemLabel) }
+    val descriptions = remember(items, itemAccessibilityDescription) { items.map(itemAccessibilityDescription) }
     val itemCount = labels.size
     val listState = state.lazyListState
     val listItemCount = remember(state, itemCount, loop) { state.setItems(itemCount, loop) }
@@ -191,7 +200,14 @@ fun <T> ScrollPicker(
     }
 
     Box(
-        modifier = modifier.pickerSemantics(labels, state, enabled, scope, onInput?.let { inputFocusRequester }),
+        modifier = modifier.pickerSemantics(
+            contentDescription = contentDescription,
+            descriptions = descriptions,
+            state = state,
+            enabled = enabled,
+            scope = scope,
+            inputFocusRequester = onInput?.let { inputFocusRequester },
+        ),
         contentAlignment = Alignment.Center,
     ) {
         if (onInput != null) Box(
@@ -211,6 +227,7 @@ fun <T> ScrollPicker(
                 horizontalAlignment = horizontalAlignment,
                 cursorColor = colors.cursorColor,
                 modifier = Modifier
+                    .semantics { if (contentDescription != null) this.contentDescription = contentDescription }
                     .fillMaxWidth()
                     .height(itemHeight)
                     .focusRequester(inputFocusRequester)
@@ -276,15 +293,17 @@ private fun TextMeasurer.widestWidth(labels: List<String>, textStyle: TextStyle,
 
 /** Exposes one adjustable value until editing, when the input field exposes its own semantics. */
 private fun Modifier.pickerSemantics(
-    labels: List<String>,
+    contentDescription: String?,
+    descriptions: List<String>,
     state: ScrollPickerState,
     enabled: Boolean,
     scope: CoroutineScope,
     inputFocusRequester: FocusRequester?,
 ): Modifier = if (state.isEditing) this else clearAndSetSemantics {
-    val itemCount = labels.size
+    val itemCount = descriptions.size
     val selectedIndex = state.selectedIndex
-    labels.getOrNull(selectedIndex)?.let { stateDescription = it }
+    if (contentDescription != null) this.contentDescription = contentDescription
+    descriptions.getOrNull(selectedIndex)?.let { stateDescription = it }
     progressBarRangeInfo = ProgressBarRangeInfo(
         current = selectedIndex.toFloat(),
         range = 0f..(itemCount - 1).coerceAtLeast(0).toFloat(),
@@ -369,6 +388,7 @@ private fun NumbersPreview() {
                 ScrollPicker(
                     items = (0..59).toList(),
                     state = rememberScrollPickerState(),
+                    contentDescription = null,
                     loop = true,
                     itemLabel = ::twoDigits,
                     onInput = String::toIntOrNull,
@@ -387,9 +407,19 @@ private fun TextPreview() {
             Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                 val items = listOf("Minutes", "Hours", "Days", "Weeks")
 
-                ScrollPicker(items = items, state = rememberScrollPickerState(), horizontalAlignment = Alignment.End)
-                ScrollPicker(items = items, state = rememberScrollPickerState())
-                ScrollPicker(items = items, state = rememberScrollPickerState(), horizontalAlignment = Alignment.Start)
+                ScrollPicker(
+                    items = items,
+                    state = rememberScrollPickerState(),
+                    contentDescription = null,
+                    horizontalAlignment = Alignment.End,
+                )
+                ScrollPicker(items = items, state = rememberScrollPickerState(), contentDescription = null)
+                ScrollPicker(
+                    items = items,
+                    state = rememberScrollPickerState(),
+                    contentDescription = null,
+                    horizontalAlignment = Alignment.Start,
+                )
             }
         }
     }
@@ -410,6 +440,7 @@ private fun TimePreview() {
                     ScrollPicker(
                         items = (0..23).toList(),
                         state = rememberScrollPickerState(initialIndex = 10, group = group),
+                        contentDescription = null,
                         loop = true,
                         itemLabel = ::twoDigits,
                         onInput = String::toIntOrNull,
@@ -420,6 +451,7 @@ private fun TimePreview() {
                     ScrollPicker(
                         items = (0..59).toList(),
                         state = rememberScrollPickerState(group = group),
+                        contentDescription = null,
                         loop = true,
                         itemLabel = ::twoDigits,
                         onInput = String::toIntOrNull,

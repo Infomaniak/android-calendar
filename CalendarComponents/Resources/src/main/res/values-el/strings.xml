@@ -65,6 +65,7 @@
     </plurals>
     <string name="descriptionTitle">Περιγραφή</string>
     <string name="emptyStateNoTimeZone">Δεν βρέθηκαν ζώνες ώρας</string>
+    <string name="endLabel">Τέλος</string>
     <string name="eventTitle">Τίτλος εκδήλωσης</string>
     <string name="eventValidationTooManyAttendees">Δεν μπορείτε να έχετε περισσότερους από %d καλεσμένους</string>
     <plurals name="hourAmount">
@@ -99,10 +100,12 @@
     </plurals>
     <string name="sectionCalendarHeader">Ημερολόγιο</string>
     <string name="sectionOrganizerHeader">Διοργανωτής</string>
+    <string name="startLabel">Έναρξη</string>
     <string name="statusAcceptedLabel">Εγκρίθηκε</string>
     <string name="statusDeclinedLabel">Απορρίφθηκε</string>
     <string name="statusNeedsActionLabel">Σε εκκρεμότητα</string>
     <string name="statusTentativeLabel">Ίσως</string>
+    <string name="timeZoneLabel">Ζώνη ώρας</string>
     <string name="unavailableLabel">Μη διαθέσιμη</string>
     <plurals name="unitDays">
         <item quantity="one">ημέρα</item>

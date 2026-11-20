@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.eventdetail.component
 
+import android.os.Parcelable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ListItemDefaults
@@ -26,17 +27,28 @@ import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.state.DateAndTimeState
 import com.infomaniak.calendar.components.eventdetail.state.rememberDateAndTimeState
+import com.infomaniak.calendar.components.eventdetail.state.rememberTimeSession
 import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRange
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTimeRangeWithZone
+import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Clock
@@ -48,6 +60,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
 import kotlinx.datetime.minus
 import kotlinx.datetime.toInstant
+import kotlinx.parcelize.Parcelize
 import kotlin.time.Clock
 
 @Composable
@@ -102,32 +115,69 @@ internal fun DateAndTime(
 internal fun SectionScope.dateAndTimeEditable(
     dateAndTimeState: DateAndTimeState,
     isAllDay: () -> Boolean,
+    selectedEntryState: SelectedEntryState,
     onTimeZoneClick: (isStart: Boolean) -> Unit,
 ) {
+    var selectedButton by selectedEntryState.selectedEntry
 
     with(dateAndTimeState) {
         item { shapes ->
+            LaunchedEffect(isAllDay) { snapshotFlow(isAllDay).collect { if (it) selectedButton = null } }
+            val timeSession = rememberTimeSession(start, isOpen = selectedButton == DateAndTimeEntry.Start(EntryButton.Time))
+
             DateAndTimeEntry(
+                label = stringResource(R.string.startLabel),
                 entry = start,
                 isAllDay = isAllDay,
+                selectedButton = { (selectedButton as? DateAndTimeEntry.Start)?.entryButton },
+                onSelectButton = { selectedButton = it?.let { entryButton -> DateAndTimeEntry.Start(entryButton) } },
                 onDatePicked = { start.pickDate(it) },
-                onTimePicked = { start.pickTime(it) },
+                onTimePicked = { timeSession.pickTime(it) },
                 onTimeZoneClick = { onTimeZoneClick(true) },
                 shapes = shapes,
             )
         }
 
         item { shapes ->
+            val timeSession = rememberTimeSession(end, isOpen = selectedButton == DateAndTimeEntry.End(EntryButton.Time))
+
             DateAndTimeEntry(
+                label = stringResource(R.string.endLabel),
                 entry = end,
                 isAllDay = isAllDay,
+                selectedButton = { (selectedButton as? DateAndTimeEntry.End)?.entryButton },
+                onSelectButton = { selectedButton = it?.let { entryButton -> DateAndTimeEntry.End(entryButton) } },
                 onDatePicked = { end.pickDate(it) },
-                onTimePicked = { end.pickTime(it) },
+                onTimePicked = { timeSession.pickTime(it) },
                 onTimeZoneClick = { onTimeZoneClick(false) },
                 shapes = shapes,
             )
         }
     }
+}
+
+@Composable
+internal fun rememberSelectedEntryState(): SelectedEntryState {
+    val selectedButton = rememberSaveable { mutableStateOf<DateAndTimeEntry?>(null) }
+    return remember { SelectedEntryState(selectedEntry = selectedButton) }
+}
+
+internal data class SelectedEntryState(
+    val selectedEntry: MutableState<DateAndTimeEntry?>,
+)
+
+internal sealed interface DateAndTimeEntry : Parcelable {
+    @Parcelize
+    data class Start(val entryButton: EntryButton) : DateAndTimeEntry
+    @Parcelize
+    data class End(val entryButton: EntryButton) : DateAndTimeEntry
+}
+
+internal sealed interface EntryButton : Parcelable {
+    @Parcelize
+    data object Date : EntryButton
+    @Parcelize
+    data object Time : EntryButton
 }
 
 @Preview
@@ -220,10 +270,12 @@ private fun PreviewEditable() {
 
     MaterialTheme {
         Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh) {
+            val state = rememberSelectedEntryState()
             Section {
                 dateAndTimeEditable(
                     dateAndTimeState = dateAndTimeState,
                     isAllDay = { false },
+                    selectedEntryState = state,
                     onTimeZoneClick = {},
                 )
             }

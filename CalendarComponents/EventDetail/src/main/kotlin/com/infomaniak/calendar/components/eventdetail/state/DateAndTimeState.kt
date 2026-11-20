@@ -27,6 +27,8 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.infomaniak.core.common.utils.today
+import com.infomaniak.scrollpicker.timepicker.TimeScrollPickerState
+import com.infomaniak.scrollpicker.timepicker.rememberTimeScrollPickerState
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
@@ -49,8 +51,6 @@ data class DateAndTimeState(
 ) {
     fun Entry.pickDate(date: LocalDate) = edit { this.date = date }
 
-    fun Entry.pickTime(time: LocalTime) = edit { this.time = time }
-
     fun Entry.pickTimeZone(timeZone: TimeZone) = edit {
         val isEditingStart = this == start
         if (isEditingStart) {
@@ -62,41 +62,53 @@ data class DateAndTimeState(
         }
     }
 
-    private fun Entry.edit(change: () -> Unit) {
-        // TODO: This interval displacement doesn't work if the user is setting an all day event and the time component of
-        //  both entries are at 0:00 and the range comprises a day of 23 or 25 hours.
-        //  Adapt the interval computation to take into account days 23 or 25 hours. Changing the date, should not change the time.
-        val previousInterval = end.instant - start.instant
-
+    /**
+     * Applies [change], then corrects the other values from [initialStart] and [initialInterval], the current ones by default.
+     */
+    // TODO: This interval displacement doesn't work if the user is setting an all day event and the time component of
+    //  both entries are at 0:00 and the range comprises a day of 23 or 25 hours.
+    //  Adapt the interval computation to take into account days 23 or 25 hours. Changing the date, should not change the time.
+    internal fun Entry.edit(
+        initialStart: Instant = start.instant,
+        initialInterval: Duration = end.instant - start.instant,
+        change: () -> Unit,
+    ) {
         change()
 
         val isEditingStart = this == start
         if (isEditingStart.not()) hasEndEverBeenTouched.value = true
 
-        applyCorrections(isEditingStart, previousInterval)
+        applyCorrections(isEditingStart, initialStart, initialInterval)
     }
 
     /** Single place adjusting the other values after the user picked a new one. */
-    private fun applyCorrections(isEditingStart: Boolean, previousInterval: Duration) {
-        val isOverlapping = start.instant > end.instant
-
+    private fun applyCorrections(isEditingStart: Boolean, initialStart: Instant, initialInterval: Duration) {
         if (isEditingStart) {
-            if (isOverlapping || hasEndEverBeenTouched.value.not()) end.instant = start.instant + previousInterval
+            when {
+                hasEndEverBeenTouched.value.not() -> end.instant = start.instant + initialInterval
+                // Only pushes the end forward, so it stays put when the start is scrolled back again
+                start.instant > initialStart + initialInterval -> {
+                    end.instant = maxOf(end.instant, start.instant + initialInterval)
+                }
+            }
         } else {
-            if (isOverlapping) start.instant = end.instant - previousInterval
+            // Only pushes the start back, so it stays put when the end is scrolled forward again
+            if (end.instant < initialStart) start.instant = minOf(start.instant, end.instant - initialInterval)
         }
     }
 
     @Stable
     class Entry(
         date: MutableState<LocalDate>,
-        time: MutableState<LocalTime>,
+        internal val timeState: TimeScrollPickerState,
         timeZone: MutableState<TimeZone>,
     ) {
         var date by date
             internal set
-        var time by time
+
+        var time by timeState::time
             internal set
+
         var timeZone by timeZone
             internal set
 
@@ -109,7 +121,6 @@ data class DateAndTimeState(
             }
     }
 
-
     companion object {
         /**
          * Dummy instance just to have something non-null to compute layout sizes on
@@ -117,12 +128,12 @@ data class DateAndTimeState(
         val Dummy = DateAndTimeState(
             start = Entry(
                 date = mutableStateOf(LocalDate(2000, 12, 31)),
-                time = mutableStateOf(LocalTime(11, 0)),
+                timeState = TimeScrollPickerState(LocalTime(11, 0)),
                 timeZone = mutableStateOf(TimeZone.UTC),
             ),
             end = Entry(
                 date = mutableStateOf(LocalDate(2000, 12, 31)),
-                time = mutableStateOf(LocalTime(11, 0)),
+                timeState = TimeScrollPickerState(LocalTime(11, 0)),
                 timeZone = mutableStateOf(TimeZone.UTC),
             ),
             hasEndEverBeenTouched = mutableStateOf(false),
@@ -144,13 +155,13 @@ fun rememberDateAndTimeState(
 ): DateAndTimeState {
     val start = DateAndTimeState.Entry(
         date = rememberSaveable { mutableStateOf(startDate) },
-        time = rememberSaveable { mutableStateOf(startTime) },
+        timeState = rememberTimeScrollPickerState(startTime),
         timeZone = rememberSaveable(stateSaver = TimeZoneSaver) { mutableStateOf(startTimeZone) },
     )
 
     val end = DateAndTimeState.Entry(
         date = rememberSaveable { mutableStateOf(endDate) },
-        time = rememberSaveable { mutableStateOf(endTime) },
+        timeState = rememberTimeScrollPickerState(endTime),
         timeZone = rememberSaveable(stateSaver = TimeZoneSaver) { mutableStateOf(endTimeZone) },
     )
 
