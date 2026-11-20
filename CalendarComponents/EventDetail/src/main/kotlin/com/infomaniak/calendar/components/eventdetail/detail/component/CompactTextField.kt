@@ -126,7 +126,7 @@ fun CompactTextField(
                 }
             },
             interactionSource = interactionSource,
-            cursorBrush = SolidColor(colors.focusedTextColor),
+            cursorBrush = SolidColor(colors.cursorColor(isError)),
             modifier = modifier
                 .fillMaxWidth()
                 .semantics(mergeDescendants = true) { if (isError) error(invalidInputMessage) },
@@ -191,6 +191,8 @@ internal object CompactTextFieldDefaults {
         focusedTrailingIconColor: Color = focusedTextColor,
         unfocusedTrailingIconColor: Color = unfocusedTextColor,
         errorTrailingIconColor: Color = MaterialTheme.colorScheme.error,
+        cursorColor: Color = focusedTextColor,
+        errorCursorColor: Color = MaterialTheme.colorScheme.error,
     ): TextFieldColors {
         return TextFieldDefaults.colors(
             focusedTextColor = focusedTextColor,
@@ -201,6 +203,8 @@ internal object CompactTextFieldDefaults {
             focusedTrailingIconColor = focusedTrailingIconColor,
             unfocusedTrailingIconColor = unfocusedTrailingIconColor,
             errorTrailingIconColor = errorTrailingIconColor,
+            cursorColor = cursorColor,
+            errorCursorColor = errorCursorColor,
         )
     }
 }
