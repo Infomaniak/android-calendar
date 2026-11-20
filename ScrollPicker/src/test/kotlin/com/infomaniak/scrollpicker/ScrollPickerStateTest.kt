@@ -34,7 +34,7 @@ class ScrollPickerStateTest {
         assertEquals(2, state.selectedListIndex)
         assertEquals(2, state.selectedIndex)
 
-        assertEquals(100_000, state.setItems(itemCount = 10, loop = true))
+        assertEquals(Int.MAX_VALUE, state.setItems(itemCount = 10, loop = true))
         state.select(9)
         assertEquals(9, state.itemIndexOf(state.selectedListIndex))
         assertEquals(9, state.selectedIndex)
