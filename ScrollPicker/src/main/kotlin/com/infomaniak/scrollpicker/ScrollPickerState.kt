@@ -1,0 +1,150 @@
+/*
+ * Infomaniak Calendar - Android
+ * Copyright (C) 2026 Infomaniak Network SA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.infomaniak.scrollpicker
+
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
+
+private const val LOOP_ITEM_COUNT = Int.MAX_VALUE
+private const val LOOP_START = LOOP_ITEM_COUNT / 2
+
+@Composable
+fun rememberScrollPickerState(
+    initialIndex: Int = 0,
+    group: ScrollPickerGroupState = rememberScrollPickerGroupState(),
+): ScrollPickerState {
+    return rememberSaveable(group, saver = ScrollPickerState.Saver(group)) { ScrollPickerState(initialIndex, group) }
+}
+
+/** @param group links this picker to others sharing it, see [ScrollPickerGroupState]. Defaults to a group of its own. */
+@Stable
+class ScrollPickerState(initialIndex: Int = 0, val group: ScrollPickerGroupState = ScrollPickerGroupState()) {
+
+    /** Whether this picker is being edited by hand. */
+    internal val isEditing: Boolean get() = group.editingPicker == this
+
+    internal val lazyListState = LazyListState(initialIndex)
+
+    /** Index in [lazyListState] of the selected row, which differs from [selectedIndex] when the picker loops. */
+    internal var selectedListIndex by mutableIntStateOf(initialIndex)
+        private set
+
+    private var itemCount by mutableIntStateOf(0)
+
+    private var loop by mutableStateOf(false)
+    private val loopSize: Int get() = if (loop) itemCount else 0
+
+    /** Index in the picker's items of the one shown by the selected row. */
+    private val wheelIndex: Int
+        get() = if (itemCount == 0) selectedListIndex else itemIndexOf(selectedListIndex).coerceIn(0, itemCount - 1)
+
+    /** Index set from code that the wheel is animating to, null when the selection follows the wheel. */
+    private var targetIndex by mutableStateOf<Int?>(null)
+
+    /**
+     * Index in the picker's items of the value currently selected. Within this module, Setting it takes effect at once and the
+     * wheel animates there, unless a drag interrupts it.
+     */
+    var selectedIndex: Int
+        get() = targetIndex ?: wheelIndex
+        internal set(value) {
+            targetIndex = value
+        }
+
+    val isScrollInProgress: Boolean get() = lazyListState.isScrollInProgress
+
+    suspend fun scrollToIndex(index: Int) = lazyListState.scrollToItem(listIndexOf(index))
+
+    suspend fun animateScrollToIndex(index: Int) = lazyListState.animateScrollToItem(listIndexOf(index))
+
+    /**
+     * Centers the selection among [itemCount] items, in the middle of the virtual rows when looping, before the wheel is
+     * first measured. Returns the wheel's number of rows.
+     */
+    internal fun setItems(itemCount: Int, loop: Boolean): Int {
+        val looping = loop && itemCount > 0
+        val index = selectedIndex.coerceIn(0, (itemCount - 1).coerceAtLeast(0))
+        this.itemCount = itemCount
+        this.loop = looping
+        selectedListIndex = if (looping) LOOP_START + index else index
+        lazyListState.requestScrollToItem(selectedListIndex)
+        return if (looping) LOOP_ITEM_COUNT else itemCount
+    }
+
+    /** Index in the picker's items of the one shown by the row at [listIndex]. */
+    internal fun itemIndexOf(listIndex: Int) = if (loopSize > 0) (listIndex - LOOP_START).mod(loopSize) else listIndex
+
+    /** Keeps the selection on the row nearest to the wheel's center while it scrolls. */
+    internal suspend fun followCenteredRow(itemHeightPx: Int) {
+        if (itemCount == 0) return
+        snapshotFlow {
+            lazyListState.firstVisibleItemIndex + if (lazyListState.firstVisibleItemScrollOffset > itemHeightPx / 2) 1 else 0
+        }.collect { listIndex ->
+            selectedListIndex = listIndex
+        }
+    }
+
+    /** Animates the wheel to each [selectedIndex] set from code. */
+    internal suspend fun animateToSelection() {
+        snapshotFlow { targetIndex }.filterNotNull().collectLatest { index ->
+            try {
+                lazyListState.animateScrollToItem(listIndexOf(index))
+                select(index)
+            } catch (e: CancellationException) {
+                // A new target or the wheel leaving keeps the target, a drag hands the selection back to the wheel.
+                currentCoroutineContext().ensureActive()
+                targetIndex = null
+            }
+        }
+    }
+
+    /** Selects [index] immediately, without waiting for the wheel to scroll there. */
+    internal fun select(index: Int) {
+        val listIndex = listIndexOf(index)
+        lazyListState.requestScrollToItem(listIndex)
+        selectedListIndex = listIndex
+        targetIndex = null
+    }
+
+    /** The row showing the item at [index], taking the shortest way round when looping. */
+    private fun listIndexOf(index: Int): Int {
+        var delta = index - wheelIndex
+        if (loopSize > 0) delta = (delta + loopSize / 2).mod(loopSize) - loopSize / 2
+        return selectedListIndex + delta
+    }
+
+    companion object {
+        fun Saver(group: ScrollPickerGroupState): Saver<ScrollPickerState, Int> = Saver(
+            save = { it.selectedIndex },
+            restore = { ScrollPickerState(it, group) },
+        )
+    }
+}
