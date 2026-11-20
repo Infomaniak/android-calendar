@@ -69,6 +69,11 @@ import com.infomaniak.calendar.components.day.component.HourLabels
 import com.infomaniak.calendar.components.day.component.HourLines
 import com.infomaniak.calendar.components.day.component.minuteOfDay
 import com.infomaniak.calendar.components.day.component.verticalTimelineScroll
+import com.infomaniak.calendar.components.day.highlight.EventHighlightState
+import com.infomaniak.calendar.components.day.highlight.HighlightedEventOverlay
+import com.infomaniak.calendar.components.day.highlight.eventHighlightArea
+import com.infomaniak.calendar.components.day.highlight.releaseHighlightOnSecondPointer
+import com.infomaniak.calendar.components.day.highlight.rememberEventHighlightState
 import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults.GridLineThickness
 import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
 import com.infomaniak.calendar.components.day.model.DayEvents
@@ -168,14 +173,16 @@ private fun MultiDayPagerContent(
     // The grid runs to the end edge, keeping all the room it can for the days' content.
     val contentPadding = contentPadding + PaddingValues(start = EsdsTheme.spacing.md)
     val pageSize = remember(pages, visibleDayCount) { DaysPageSize(pages.daysPerPage, visibleDayCount) }
+    val highlightState = rememberEventHighlightState()
 
-    Box(modifier) {
+    Box(modifier.releaseHighlightOnSecondPointer(highlightState)) {
         MultiDayTimeline(
             pagerState = pagerState,
             pages = pages,
             pageSize = pageSize,
             eventsOf = eventsOf,
             state = state,
+            highlightState = highlightState,
             onEventClick = onEventClick,
             eventTextOverflow = eventTextOverflow,
             contentPadding = contentPadding + PaddingValues(top = headerHeight + EsdsTheme.spacing.md),
@@ -190,6 +197,8 @@ private fun MultiDayPagerContent(
             modifier = headerModifier.fillMaxWidth(),
             contentPadding = contentPadding.onlyHorizontalAndTop(),
         )
+
+        HighlightedEventOverlay(highlightState, modifier = Modifier.matchParentSize(), contentPadding = contentPadding)
     }
 }
 
@@ -198,6 +207,8 @@ private fun MultiDayPagerContent(
  *
  * The gutter and every page scroll vertically on their own, all on the same [state], so they move as
  * one. A pinch is caught above them all, since its fingers can land on two different pages.
+ *
+ * An event held up by a long press unfolds across the whole pager, which stays put until it is let go.
  */
 @Composable
 private fun MultiDayTimeline(
@@ -206,6 +217,7 @@ private fun MultiDayTimeline(
     pageSize: PageSize,
     eventsOf: (LocalDate) -> DayEvents,
     state: TimelineState,
+    highlightState: EventHighlightState,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     eventTextOverflow: TextOverflow,
     modifier: Modifier = Modifier,
@@ -225,21 +237,27 @@ private fun MultiDayTimeline(
             modifier = Modifier
                 .width(TimelineDefaults.HourGutterWidth)
                 .fillMaxHeight()
-                .verticalTimelineScroll(state, contentPadding, overscrollEffect = null)
+                .verticalTimelineScroll(state, contentPadding, overscrollEffect = null, enabled = !highlightState.isHeld)
                 .verticalEndDivider(),
         )
 
         HorizontalPager(
             state = pagerState,
             pageSize = pageSize,
-            userScrollEnabled = !state.isPinching,
+            userScrollEnabled = !state.isPinching && !highlightState.isHeld,
             modifier = Modifier
                 .weight(1f)
-                .fillMaxHeight(),
+                .fillMaxHeight()
+                .eventHighlightArea(),
         ) { page ->
             DaysRow(
                 dates = pages.datesOf(page),
-                modifier = Modifier.verticalTimelineScroll(state, contentPadding, overscrollEffect = null),
+                modifier = Modifier.verticalTimelineScroll(
+                    state = state,
+                    contentPadding = contentPadding,
+                    overscrollEffect = null,
+                    enabled = !highlightState.isHeld,
+                ),
             ) { date ->
                 Box(modifier = Modifier.verticalEndDivider()) {
                     HourLines(state = state, modifier = Modifier.fillMaxWidth())
@@ -252,6 +270,7 @@ private fun MultiDayTimeline(
                             .matchParentSize()
                             .padding(horizontal = 1.dp),
                         textOverflow = eventTextOverflow,
+                        highlightState = highlightState,
                     )
 
                     if (currentDateTime.date == date) {
