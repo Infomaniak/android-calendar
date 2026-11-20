@@ -365,7 +365,7 @@ fun MyComponent(
 ```
 
 - Always accept `modifier: Modifier = Modifier` as the first optional parameter for reusable Composables.
-- Prefer `@Preview` Composables next to the Composable they preview.
+- Every UI component must have a Compose `@Preview` in the same file, covering meaningful states and useful design cases.
 - Place theme tokens in `ui/theme/` and use `CalendarTheme { ... }` as the outermost wrapper in every entry point and
   preview.
 
