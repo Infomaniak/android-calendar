@@ -129,7 +129,7 @@ fun CompactTextField(
             cursorBrush = SolidColor(colors.cursorColor(isError)),
             modifier = modifier
                 .fillMaxWidth()
-                .semantics(mergeDescendants = true) { if (isError) error(invalidInputMessage) },
+                .semantics { if (isError) error(invalidInputMessage) },
             decorator = { innerTextField ->
                 Row(
                     modifier = Modifier
