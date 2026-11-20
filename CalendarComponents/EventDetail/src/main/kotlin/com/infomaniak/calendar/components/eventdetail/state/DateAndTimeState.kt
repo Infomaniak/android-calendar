@@ -83,10 +83,14 @@ data class DateAndTimeState(
 
     /** Single place adjusting the other values after the user picked a new one. */
     private fun applyCorrections(isEditingStart: Boolean, initialStart: Instant, initialInterval: Duration) {
-        val isOverlapping = start.instant > end.instant
-
         if (isEditingStart) {
-            if (isOverlapping || hasEndEverBeenTouched.value.not()) end.instant = start.instant + initialInterval
+            when {
+                hasEndEverBeenTouched.value.not() -> end.instant = start.instant + initialInterval
+                // Only pushes the end forward, so it stays put when the start is scrolled back again
+                start.instant > initialStart + initialInterval -> {
+                    end.instant = maxOf(end.instant, start.instant + initialInterval)
+                }
+            }
         } else {
             // Only pushes the start back, so it stays put when the end is scrolled forward again
             if (end.instant < initialStart) start.instant = minOf(start.instant, end.instant - initialInterval)

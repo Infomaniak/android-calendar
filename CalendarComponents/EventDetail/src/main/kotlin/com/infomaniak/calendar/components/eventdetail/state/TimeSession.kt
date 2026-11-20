@@ -24,18 +24,26 @@ import kotlinx.datetime.LocalTime
 /**
  * Consecutive time picks on [entry], all corrected from the start and duration the session began with. A wheel picks every
  * row it passes, so the duration would otherwise already be zero once one entry goes past the other.
+ *
+ * It begins again when the range changed since its last pick (a date or time zone picked meanwhile), but not when its own
+ * corrections move a date.
  */
 internal class TimeSession(private val state: DateAndTimeState, private val entry: DateAndTimeState.Entry) {
-    private val initialStart = state.start.instant
-    private val initialInterval = state.end.instant - initialStart
+    private var initialRange = state.range()
+    private var lastRange = initialRange
 
-    fun pickTime(time: LocalTime) = with(state) { entry.edit(initialStart, initialInterval) { entry.time = time } }
+    fun pickTime(time: LocalTime) = with(state) {
+        if (range() != lastRange) initialRange = range()
+        val (initialStart, initialEnd) = initialRange
+        entry.edit(initialStart, initialEnd - initialStart) { entry.time = time }
+        lastRange = range()
+    }
 }
 
-/**
- * A session lasts while [entry]'s time picker stays open ([isOpen]), and restarts if a date or time zone is picked meanwhile.
- */
+/** A session lasts while [entry]'s time picker stays open ([isOpen]). */
 @Composable
 internal fun DateAndTimeState.rememberTimeSession(entry: DateAndTimeState.Entry, isOpen: Boolean): TimeSession {
-    return remember(this, entry, isOpen, start.date, start.timeZone, end.date, end.timeZone) { TimeSession(this, entry) }
+    return remember(this, entry, isOpen) { TimeSession(this, entry) }
 }
+
+private fun DateAndTimeState.range() = start.instant to end.instant
