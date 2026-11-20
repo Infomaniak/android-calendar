@@ -123,7 +123,7 @@ private fun PreviewCell(
     isSelected: Boolean,
     isToday: Boolean,
     eventCount: Int,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     MonthDayCell(date, isInMonth, isSelected, isToday, eventCount, onClick = {}, modifier = modifier)
 }
