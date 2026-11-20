@@ -103,6 +103,7 @@
     <string name="statusDeclinedLabel">Declined</string>
     <string name="statusNeedsActionLabel">Pending</string>
     <string name="statusTentativeLabel">Maybe</string>
+    <string name="timeZoneLabel">Time zone</string>
     <string name="unavailableLabel">Unavailable</string>
     <plurals name="unitDays">
         <item quantity="one">day</item>
