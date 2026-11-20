@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.infomaniak.calendar.components.day.TimelineDefaults
@@ -53,6 +54,7 @@ internal fun TimedEventsColumn(
     hourHeight: Dp,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
+    textOverflow: TextOverflow = TextOverflow.Ellipsis,
 ) {
     val density = LocalDensity.current
     val config = eventLayoutConfig()
@@ -74,6 +76,7 @@ internal fun TimedEventsColumn(
             placements = placements,
             onEventClick = onEventClick,
             modifier = Modifier.matchParentSize(),
+            textOverflow = textOverflow,
         )
     }
 }

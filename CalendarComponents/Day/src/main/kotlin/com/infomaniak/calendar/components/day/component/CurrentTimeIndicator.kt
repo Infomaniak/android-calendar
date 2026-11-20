@@ -34,8 +34,13 @@ import kotlinx.datetime.LocalDateTime
 internal val LocalDateTime.minuteOfDay: Int get() = hour * MINUTES_PER_HOUR + minute
 
 @Composable
-internal fun CurrentTimeIndicator(minuteOfDay: Int, state: TimelineState, modifier: Modifier = Modifier) {
-    CurrentTimeLine(modifier = modifier, lineY = { state.verticalOffsetOf(minuteOfDay).toPx() })
+internal fun CurrentTimeIndicator(
+    minuteOfDay: Int,
+    state: TimelineState,
+    modifier: Modifier = Modifier,
+    isDotInside: Boolean = false,
+) {
+    CurrentTimeLine(modifier = modifier, isDotInside = isDotInside, lineY = { state.verticalOffsetOf(minuteOfDay).toPx() })
 }
 
 /** Room for the dot, which hangs off the start edge. */

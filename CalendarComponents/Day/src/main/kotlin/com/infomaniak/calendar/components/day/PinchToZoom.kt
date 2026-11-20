@@ -23,18 +23,31 @@ import androidx.compose.foundation.gestures.calculateCentroid
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.isSpecified
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.Density
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.PinchAnchor
 
-internal fun Modifier.pinchToZoom(state: TimelineState): Modifier = pointerInput(state) {
+/**
+ * Zooms the timeline of [state] under a pinch.
+ *
+ * Placed inside the scrolled content, the pointer y already is the content y. Placed above several
+ * timelines scrolling as one, [contentYOf] translates the y it gets into the content's, and an
+ * [PointerEventPass.Initial] [pass] lets it take the pinch before any of them starts scrolling.
+ */
+internal fun Modifier.pinchToZoom(
+    state: TimelineState,
+    pass: PointerEventPass = PointerEventPass.Main,
+    contentYOf: Density.(y: Float) -> Float = { it },
+): Modifier = pointerInput(state, pass) {
     awaitEachGesture {
-        awaitFirstDown(requireUnconsumed = false)
+        awaitFirstDown(requireUnconsumed = false, pass = pass)
         var anchor: PinchAnchor? = null
 
         try {
             do {
-                val event = awaitPointerEvent()
+                val event = awaitPointerEvent(pass)
                 val pressed = event.changes.count { it.pressed }
 
                 if (pressed > 1) {
@@ -43,7 +56,7 @@ internal fun Modifier.pinchToZoom(state: TimelineState): Modifier = pointerInput
                     // Centroid coordinates are expressed in the whole content's coordinate system, not the viewport's coordinate system.
                     val centroid = event.calculateCentroid()
                     if (centroid.isSpecified) {
-                        val pinchAnchor = anchor ?: state.anchorAt(contentY = centroid.y, density = this)
+                        val pinchAnchor = anchor ?: state.anchorAt(contentY = contentYOf(centroid.y), density = this)
 
                         state.zoomAround(pinchAnchor, zoom = event.calculateZoom(), density = this)
                         anchor = pinchAnchor
