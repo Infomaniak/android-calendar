@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
@@ -62,7 +61,6 @@ import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
@@ -170,7 +168,11 @@ fun CompactTextField(
                             }
                         }
 
-                        trailingIcon?.invoke()
+                        trailingIcon?.let {
+                            CompositionLocalProvider(
+                                LocalContentColor provides colors.trailingIconColor(enabled, isError, focused),
+                            ) { it() }
+                        }
                     }
                 }
             },
@@ -186,6 +188,9 @@ internal object CompactTextFieldDefaults {
         focusedPlaceholderColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = EsdsTheme.opacity.strong),
         unfocusedPlaceholderColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = EsdsTheme.opacity.strong),
         errorSupportingTextColor: Color = MaterialTheme.colorScheme.error,
+        focusedTrailingIconColor: Color = focusedTextColor,
+        unfocusedTrailingIconColor: Color = unfocusedTextColor,
+        errorTrailingIconColor: Color = MaterialTheme.colorScheme.error,
     ): TextFieldColors {
         return TextFieldDefaults.colors(
             focusedTextColor = focusedTextColor,
@@ -193,6 +198,9 @@ internal object CompactTextFieldDefaults {
             errorSupportingTextColor = errorSupportingTextColor,
             focusedPlaceholderColor = focusedPlaceholderColor,
             unfocusedPlaceholderColor = unfocusedPlaceholderColor,
+            focusedTrailingIconColor = focusedTrailingIconColor,
+            unfocusedTrailingIconColor = unfocusedTrailingIconColor,
+            errorTrailingIconColor = errorTrailingIconColor,
         )
     }
 }
