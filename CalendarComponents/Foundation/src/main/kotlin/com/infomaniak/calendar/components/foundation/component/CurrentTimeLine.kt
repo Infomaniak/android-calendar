@@ -39,10 +39,15 @@ private val LineWidth = 1.dp
  * Purely visual: a landmark for reading the current time at a glance. It carries no semantics on purpose,
  * having nothing to announce that the clock does not already say.
  *
- * Runs across its whole width at [lineY], its dot centred on its start edge.
+ * Runs across its whole width at [lineY], its dot centred on its start edge, or held just inside it
+ * when [isDotInside], for a line whose start edge has nothing beyond it to overhang.
  */
 @Composable
-fun CurrentTimeLine(modifier: Modifier = Modifier, lineY: DrawScope.() -> Float = { center.y }) {
+fun CurrentTimeLine(
+    modifier: Modifier = Modifier,
+    isDotInside: Boolean = false,
+    lineY: DrawScope.() -> Float = { center.y },
+) {
     val color = MaterialTheme.extendedColorScheme.datavizPink
 
     Canvas(modifier = modifier.defaultMinSize(minHeight = DotRadius * 2)) {
@@ -55,7 +60,8 @@ fun CurrentTimeLine(modifier: Modifier = Modifier, lineY: DrawScope.() -> Float 
             strokeWidth = LineWidth.toPx(),
         )
 
-        val startX = if (layoutDirection == LayoutDirection.Ltr) 0f else size.width
+        val inset = if (isDotInside) DotRadius.toPx() else 0f
+        val startX = if (layoutDirection == LayoutDirection.Ltr) inset else size.width - inset
         drawCircle(color = color, radius = DotRadius.toPx(), center = Offset(startX, y))
     }
 }

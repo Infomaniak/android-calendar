@@ -255,10 +255,13 @@ private fun MultiDayTimeline(
                     )
 
                     if (currentDateTime.date == date) {
+                        // Inside its column: the pager clips whatever overhangs the first one, and every
+                        // column holds it the same way so it does not shift as the days are swiped.
                         CurrentTimeIndicator(
                             minuteOfDay = currentDateTime.minuteOfDay,
                             state = state,
                             modifier = Modifier.matchParentSize(),
+                            isDotInside = true,
                         )
                     }
                 }
