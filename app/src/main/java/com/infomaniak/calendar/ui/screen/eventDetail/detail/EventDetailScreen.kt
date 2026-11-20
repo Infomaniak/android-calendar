@@ -101,6 +101,7 @@ fun EventDetailScreen(
         goToEventAttendees = { canEdit, isRecurring, calendarId ->
             goToEventAttendees(EditAttendeesConfig(occurrenceId, canEdit, isRecurring, calendarId))
         },
+        onParticipationStatusChange = { status -> viewModel.updateParticipationStatus(occurrenceId, status) },
         modifier = modifier,
     )
 }
@@ -113,6 +114,7 @@ private fun EventDetailScreen(
     goToEventAttendees: (canEdit: Boolean, isRecurring: Boolean, calendarId: String) -> Unit,
     onDelete: (RecurrentEventScope) -> Unit,
     onLocationClick: (String) -> Unit,
+    onParticipationStatusChange: (ParticipationStatus) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
@@ -142,7 +144,7 @@ private fun EventDetailScreen(
             (state as? EventDetailUiState.Displayable.Success)?.eventDetail?.attendees?.me?.let { me ->
                 ParticipationStatusButtonsToolbar(
                     participationStatus = { me.status ?: ParticipationStatus.NeedsAction }, // me.status can never be null here
-                    onParticipationStatusChange = { /*TODO[eventDetail]*/ },
+                    onParticipationStatusChange = onParticipationStatusChange,
                     scrollBehavior = floatingToolbarScrollBehavior,
                 )
             }
@@ -202,6 +204,7 @@ private fun Preview() {
                 goToEventAttendees = { _, _, _ -> },
                 onDelete = {},
                 onLocationClick = {},
+                onParticipationStatusChange = {},
             )
         }
     }
