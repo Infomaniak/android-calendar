@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.EventItemCard
+import com.infomaniak.calendar.components.event.EventItemCardShape
 import com.infomaniak.calendar.components.event.toEventItemStatus
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.month.layout.MonthDefaults
@@ -43,7 +44,13 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 internal fun MonthEventChip(event: EventSummaryUi.Normal, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val status = event.toEventItemStatus()
 
-    EventItemCard(status, onClick, modifier, contentPadding = MonthDefaults.EventTitlePadding) {
+    EventItemCard(
+        status = status,
+        onClick = onClick,
+        modifier = modifier,
+        contentPadding = MonthDefaults.EventTitlePadding,
+        shape = EventItemCardShape.Squared,
+    ) {
         Text(
             text = event.title,
             style = MonthDefaults.EventTitleStyle,
