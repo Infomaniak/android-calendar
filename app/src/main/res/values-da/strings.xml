@@ -17,7 +17,6 @@
   -->
 <resources>
     <string name="accountsTitle">Konti</string>
-    <string name="attendeesSearchTitle">Tilføj deltagere</string>
     <string name="buttonAddAccount">Tilføj en konto</string>
     <string name="buttonAllEvents">Alle begivenheder</string>
     <string name="buttonLogOut">Log ud</string>
@@ -37,7 +36,6 @@
     <string name="generalSettingsNotificationsLabel">Notifikationer</string>
     <string name="monthTitle">Måned</string>
     <string name="noWritableCalendar">Ingen redigerbar kalender fundet</string>
-    <string name="notificationAllDay">Hele dagen</string>
     <string name="notificationChannelEventRemindersDescription">Notifikationer om kommende arrangementer og påmindelser</string>
     <string name="notificationChannelEventRemindersTitle">Begivenhedspåmindelser</string>
     <string name="notificationDefaultDescription">Hændelsesalarm</string>
@@ -56,6 +54,6 @@
     <string name="signOutAccountAlertConfirm">Log ud af kontoen</string>
     <string name="signOutAccountAlertDescription">Denne konto og de tilknyttede kalendere vil blive afkoblet fra appen »Kalender«. De vil fortsat være tilgængelige på din Infomaniak-onlinekonto.</string>
     <string name="syncEventsError">Fejl ved hentning af begivenheder</string>
-    <string name="threeDaysTitle">Tre dage</string>
+    <string name="threeDaysTitle">3 dage</string>
     <string name="weekTitle">Uge</string>
 </resources>
