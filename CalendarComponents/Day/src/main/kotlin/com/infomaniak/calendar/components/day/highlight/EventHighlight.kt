@@ -19,11 +19,13 @@ package com.infomaniak.calendar.components.day.highlight
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.text.style.TextOverflow
 import com.infomaniak.calendar.components.day.model.TimedEvent
 
 /**
  * An event held up by a long press. Its card grows from where it sat in its column, [startBounds], to the whole width
  * of [areaBounds], opening near the finger, [fingerY]. All of them are in the coordinates of the overlay drawing it.
+ * Dragged, it is drawn the way its column draws it again, its texts cut by [textOverflow].
  */
 @Immutable
 internal data class EventHighlight(
@@ -31,4 +33,5 @@ internal data class EventHighlight(
     val startBounds: Rect,
     val areaBounds: Rect,
     val fingerY: Float,
+    val textOverflow: TextOverflow,
 )

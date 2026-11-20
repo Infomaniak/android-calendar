@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.TimelineDefaults
 import com.infomaniak.calendar.components.day.highlight.EventHighlightState
+import com.infomaniak.calendar.components.day.highlight.eventDropTarget
 import com.infomaniak.calendar.components.day.highlight.eventHighlightArea
 import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
 import com.infomaniak.calendar.components.day.model.DayEvents
@@ -83,7 +84,8 @@ internal fun DayTimeline(
             modifier = Modifier
                 .matchParentSize()
                 .padding(start = gutterWidth, end = endPadding)
-                .eventHighlightArea(),
+                .eventHighlightArea()
+                .then(highlightState?.let { Modifier.eventDropTarget(it, date) } ?: Modifier),
             highlightState = highlightState,
         )
 

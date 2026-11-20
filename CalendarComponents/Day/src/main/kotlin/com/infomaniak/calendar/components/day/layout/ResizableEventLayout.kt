@@ -74,7 +74,7 @@ internal fun ResizableEventLayout(
                     visibleHeight = remember(index) { { currentPlacements.value[index].visibleHeight } },
                     onClick = { onEventClick(timedEvent.event) },
                     textOverflow = textOverflow,
-                    modifier = highlightState?.let { Modifier.highlightable(it, timedEvent) } ?: Modifier,
+                    modifier = highlightState?.let { Modifier.highlightable(it, timedEvent, textOverflow) } ?: Modifier,
                 )
             }
         },
@@ -98,10 +98,18 @@ internal fun ResizableEventLayout(
     }
 }
 
-/** Held up by a long press, and hidden while the overlay draws it in its place. */
-private fun Modifier.highlightable(state: EventHighlightState, timedEvent: TimedEvent): Modifier = this
-    .highlightOnLongPress(state, timedEvent)
-    .graphicsLayer { alpha = if (state.highlight?.timedEvent == timedEvent) 0f else 1f }
+/** Held up by a long press, hidden while the overlay draws it in its place, and only traced while dragged elsewhere. */
+private fun Modifier.highlightable(state: EventHighlightState, timedEvent: TimedEvent, textOverflow: TextOverflow): Modifier = this
+    .highlightOnLongPress(state, timedEvent, textOverflow)
+    .graphicsLayer {
+        alpha = when {
+            state.highlight?.timedEvent != timedEvent -> 1f
+            state.isDragging -> DRAGGED_TRACE_ALPHA
+            else -> 0f
+        }
+    }
+
+private const val DRAGGED_TRACE_ALPHA = 0.35f
 
 /**
  * The layout only places what the solver hands it, so the preview has to resolve the overlaps

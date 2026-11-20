@@ -31,6 +31,8 @@ import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.day.component.ResizableEventItem
+import com.infomaniak.calendar.components.day.component.titleSizingFor
 import com.infomaniak.calendar.components.event.EventItem
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlin.math.max
@@ -48,7 +50,8 @@ private val FingerClearance = 24.dp
  * The card unfolds from its place in its column to the whole width of its area, written the way the
  * Planning writes an event. It opens just above the finger so the finger doesn't hide it, or just
  * below when there is no room above, and always fully inside the area, out of the [contentPadding]
- * where bars may be drawn over the overlay.
+ * where bars may be drawn over the overlay. Dragged, it folds back to the size and the look it has in
+ * its column, shifted by the finger's way.
  */
 @Composable
 internal fun HighlightedEventOverlay(
@@ -74,14 +77,27 @@ internal fun HighlightedEventOverlay(
             },
         content = {
             if (highlight != null) {
-                EventItem(
-                    event = highlight.timedEvent.event,
-                    onClick = null,
-                    modifier = Modifier.graphicsLayer {
-                        shadowElevation = HighlightElevation.toPx() * state.progress.coerceIn(0f, 1f)
-                        shape = cardShape
-                    }.background(backingColor, cardShape),
-                )
+                val cardModifier = Modifier.graphicsLayer {
+                    val lift = if (state.isDragging) 1f else state.progress.coerceIn(0f, 1f)
+                    shadowElevation = HighlightElevation.toPx() * lift
+                    shape = cardShape
+                }.background(backingColor, cardShape)
+
+                if (state.isDragging) {
+                    val startBounds = highlight.startBounds
+                    ResizableEventItem(
+                        timedEvent = highlight.timedEvent,
+                        titleSizing = with(density) {
+                            titleSizingFor(visibleHeight = startBounds.height.toDp(), width = startBounds.width.toDp())
+                        },
+                        visibleHeight = { startBounds.height },
+                        onClick = {},
+                        modifier = cardModifier,
+                        textOverflow = highlight.textOverflow,
+                    )
+                } else {
+                    EventItem(event = highlight.timedEvent.event, onClick = null, modifier = cardModifier)
+                }
             }
         },
     ) { measurables, constraints ->
@@ -92,12 +108,17 @@ internal fun HighlightedEventOverlay(
                     bottom = min(it.bottom, constraints.maxHeight - contentPadding.calculateBottomPadding().toPx()),
                 )
             }
-            // A short area (landscape, large font) can't fit the whole card: it is clipped rather than pushed out of the area.
-            val height = measurable.minIntrinsicHeight(area.width.roundToInt()).toFloat()
-                .coerceAtMost(area.height - 2 * margin)
-                .coerceAtLeast(0f)
+            val height = if (state.isDragging) {
+                // Loose, the card folds back to its own height, whatever it would take across the area.
+                highlight.startBounds.height
+            } else {
+                // A short area (landscape, large font) can't fit the whole card: it is clipped rather than pushed out of the area.
+                measurable.minIntrinsicHeight(area.width.roundToInt()).toFloat()
+                    .coerceAtMost(area.height - 2 * margin)
+                    .coerceAtLeast(0f)
+            }
             val unfolded = unfoldedBounds(highlight.fingerY, area, height, margin, clearance)
-            val bounds = lerp(highlight.startBounds, unfolded, state.progress)
+            val bounds = lerp(highlight.startBounds, unfolded, state.progress).translate(state.dragOffset)
 
             measurable.measure(
                 Constraints.fixed(bounds.width.roundToInt().coerceAtLeast(0), bounds.height.roundToInt().coerceAtLeast(0)),
