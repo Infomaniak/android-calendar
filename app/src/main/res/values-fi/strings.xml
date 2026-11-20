@@ -17,7 +17,6 @@
   -->
 <resources>
     <string name="accountsTitle">Tilit</string>
-    <string name="attendeesSearchTitle">Lisää osallistujia</string>
     <string name="buttonAddAccount">Lisää tili</string>
     <string name="buttonAllEvents">Kaikki tapahtumat</string>
     <string name="buttonLogOut">Kirjaudu ulos</string>
@@ -37,7 +36,6 @@
     <string name="generalSettingsNotificationsLabel">Ilmoitukset</string>
     <string name="monthTitle">Kuukausi</string>
     <string name="noWritableCalendar">Muokattavaa kalenteria ei löytynyt</string>
-    <string name="notificationAllDay">Koko päivä</string>
     <string name="notificationChannelEventRemindersDescription">Ilmoitukset tulevista tapahtumista ja muistutuksista</string>
     <string name="notificationChannelEventRemindersTitle">Tapahtumamuistutukset</string>
     <string name="notificationDefaultDescription">Tapahtumahälytys</string>
@@ -56,6 +54,6 @@
     <string name="signOutAccountAlertConfirm">Kirjaudu ulos tililtä</string>
     <string name="signOutAccountAlertDescription">Tämä tili ja siihen liittyvät kalenterit irrotetaan ”Kalenteri”-sovelluksesta. Ne ovat edelleen käytettävissä Infomaniak-verkkotililläsi.</string>
     <string name="syncEventsError">Virhe noudettaessa tapahtumia</string>
-    <string name="threeDaysTitle">Kolme päivää</string>
+    <string name="threeDaysTitle">3 päivää</string>
     <string name="weekTitle">Viikko</string>
 </resources>
