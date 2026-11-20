@@ -20,7 +20,7 @@ package com.infomaniak.calendar.components.day.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -338,16 +338,49 @@ private fun TextUnit.roundedToStep(): TextUnit = ((value / TitleSizeStep.value).
 @Preview(widthDp = 220)
 @Composable
 private fun ResizableEventItemPreview() {
+    ResizableEventItemSample(width = 220.dp, height = TimelineDefaults.HourHeight)
+}
+
+/** A card narrow enough to cut its texts, which end on an ellipsis. */
+@Preview(widthDp = 48)
+@Composable
+private fun NarrowResizableEventItemPreview() {
+    ResizableEventItemSample(width = 48.dp, height = TimelineDefaults.HourHeight)
+}
+
+/** The same narrow card, its texts clipped at its edge instead, as the week view shows them. */
+@Preview(widthDp = 48)
+@Composable
+private fun ClippedResizableEventItemPreview() {
+    ResizableEventItemSample(width = 48.dp, height = TimelineDefaults.HourHeight, textOverflow = TextOverflow.Clip)
+}
+
+/** A card too narrow to show even one character of its texts: only its colour remains. */
+@Preview(widthDp = 20)
+@Composable
+private fun TooNarrowResizableEventItemPreview() {
+    ResizableEventItemSample(width = 20.dp, height = TimelineDefaults.HourHeight)
+}
+
+/** A card so short its title is down to [MinTitleSize], on one line with no details under it. */
+@Preview(widthDp = 220)
+@Composable
+private fun ShortResizableEventItemPreview() {
+    ResizableEventItemSample(width = 220.dp, height = MinTitleHeight)
+}
+
+@Composable
+private fun ResizableEventItemSample(width: Dp, height: Dp, textOverflow: TextOverflow = TextOverflow.Ellipsis) {
     Surface {
-        val cardHeight = TimelineDefaults.HourHeight
-        val cardHeightPx = with(LocalDensity.current) { cardHeight.toPx() }
+        val heightPx = with(LocalDensity.current) { height.toPx() }
 
         ResizableEventItem(
             timedEvent = previewDayEvents.timed.first(),
-            titleSizing = titleSizingFor(visibleHeight = cardHeight, width = 220.dp),
-            visibleHeight = { cardHeightPx },
+            titleSizing = titleSizingFor(visibleHeight = height, width = width),
+            visibleHeight = { heightPx },
             onClick = {},
-            modifier = Modifier.height(cardHeight),
+            modifier = Modifier.size(width, height),
+            textOverflow = textOverflow,
         )
     }
 }
