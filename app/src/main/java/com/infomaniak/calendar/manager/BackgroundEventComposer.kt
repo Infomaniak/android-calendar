@@ -24,6 +24,7 @@ import com.infomaniak.calendar.ui.screen.eventDetail.EventComposerUseCase
 import com.infomaniak.calendar.ui.screen.eventDetail.SaveEventResult
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationReply
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
@@ -68,6 +69,10 @@ class BackgroundEventComposer @Inject constructor(private val eventComposerUseCa
 
     fun updateEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope, eventDraft: EventDraft) {
         enqueue { eventComposerUseCase.updateEvent(occurrenceId, scope, eventDraft) == SaveEventResult.Success }
+    }
+
+    fun updateParticipationStatus(occurrenceId: OccurrenceId, scope: RecurrentEventScope, reply: ParticipationReply) {
+        enqueue { eventComposerUseCase.updateParticipationStatus(occurrenceId, scope, reply) == SaveEventResult.Success }
     }
 
     fun deleteEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope) {

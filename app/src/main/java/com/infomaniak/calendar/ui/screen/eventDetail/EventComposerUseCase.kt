@@ -34,6 +34,7 @@ import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Organizer
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationReply
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.recurrence.RecurrenceScope
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
 import dev.zacsweers.metro.Inject
@@ -97,6 +98,18 @@ class EventComposerUseCase @Inject constructor(
                 ),
             )
 
+            SaveEventResult.Success
+        }.cancellable().getOrDefault(SaveEventResult.Error)
+    }
+
+    suspend fun updateParticipationStatus(
+        occurrenceId: OccurrenceId,
+        scope: RecurrentEventScope,
+        reply: ParticipationReply,
+    ): SaveEventResult {
+        return runCatching {
+            val event = calendarManager.getOccurrence(occurrenceId) ?: return SaveEventResult.Error
+            calendarManager.updateParticipationStatus(event.targetFor(scope.toRecurrenceScope()), reply)
             SaveEventResult.Success
         }.cancellable().getOrDefault(SaveEventResult.Error)
     }

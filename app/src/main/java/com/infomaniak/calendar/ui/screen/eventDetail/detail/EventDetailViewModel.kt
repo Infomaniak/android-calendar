@@ -22,12 +22,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
+import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.calendar.components.foundation.state.AttendeesSearchState
 import com.infomaniak.calendar.manager.BackgroundEventComposer
 import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.utils.saveableAttendeesSearchState
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.ParticipationReply
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -59,6 +61,16 @@ class EventDetailViewModel(
         backgroundEventComposer.deleteEvent(occurrenceId, scope)
 
         return true
+    }
+
+    fun updateParticipationStatus(occurrenceId: OccurrenceId, status: ParticipationStatus) {
+        val reply = when (status) {
+            ParticipationStatus.Accepted -> ParticipationReply.Accepted
+            ParticipationStatus.Declined -> ParticipationReply.Declined
+            ParticipationStatus.Tentative -> ParticipationReply.Tentative
+            else -> return
+        }
+        backgroundEventComposer.updateParticipationStatus(occurrenceId, RecurrentEventScope.ThisEvent, reply)
     }
 
     @AssistedFactory

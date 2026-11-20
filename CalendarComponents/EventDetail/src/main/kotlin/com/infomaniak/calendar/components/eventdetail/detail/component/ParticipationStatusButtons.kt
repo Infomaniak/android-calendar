@@ -69,7 +69,7 @@ fun ParticipationStatusButtonsToolbar(
     windowInsets: WindowInsets = BottomAppBarDefaults.windowInsets,
     scrollBehavior: FloatingToolbarScrollBehavior? = null,
 ) {
-    var selectedStatus by remember(participationStatus) { mutableStateOf(participationStatus()) }
+    var selectedStatus by remember(participationStatus()) { mutableStateOf(participationStatus()) }
 
     HorizontalFloatingToolbar(
         expanded = true,
