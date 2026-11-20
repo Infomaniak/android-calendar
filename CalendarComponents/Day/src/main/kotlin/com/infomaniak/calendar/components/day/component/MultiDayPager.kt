@@ -37,7 +37,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -45,7 +44,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -81,7 +79,6 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
@@ -142,39 +139,6 @@ fun MultiDayPager(
             contentPadding = contentPadding,
             eventTextOverflow = eventTextOverflow,
         )
-    }
-}
-
-@Composable
-private fun FollowSelectedDate(
-    pagerState: PagerState,
-    pages: DayPages,
-    selectedDate: () -> LocalDate,
-    onVisibleDateChanged: (LocalDate) -> Unit,
-) {
-    // The page a jump is travelling to, while it travels. The pager reports every page it crosses on
-    // the way, and those are the jump's own doing: reported back as a date the user moved to, they
-    // would end the jump at the first page it passes over.
-    var travellingTo by remember(pagerState) { mutableStateOf<Int?>(null) }
-
-    LaunchedEffect(pagerState) {
-        snapshotFlow { selectedDate() }.collectLatest { date ->
-            val page = pages.pageOf(date)
-            if (page == pagerState.currentPage) return@collectLatest
-
-            travellingTo = page
-            try {
-                pagerState.animateScrollToPage(page)
-            } finally {
-                travellingTo = null
-            }
-        }
-    }
-
-    LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.currentPage }.collect { page ->
-            if (travellingTo == null && pages.pageOf(selectedDate()) != page) onVisibleDateChanged(pages.firstDateOf(page))
-        }
     }
 }
 
