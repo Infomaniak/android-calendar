@@ -59,6 +59,7 @@ internal fun HighlightedEventOverlay(state: EventHighlightState, modifier: Modif
 
     Layout(
         modifier = modifier
+            .letPointersThrough()
             .onPlaced { state.overlayCoordinates = it }
             .drawBehind {
                 if (state.highlight != null) drawRect(scrimColor, alpha = SCRIM_ALPHA * state.progress.coerceIn(0f, 1f))
@@ -67,7 +68,7 @@ internal fun HighlightedEventOverlay(state: EventHighlightState, modifier: Modif
             if (highlight != null) {
                 EventItem(
                     event = highlight.timedEvent.event,
-                    onClick = {},
+                    onClick = null,
                     modifier = Modifier.graphicsLayer {
                         shadowElevation = HighlightElevation.toPx() * state.progress.coerceIn(0f, 1f)
                         shape = cardShape
