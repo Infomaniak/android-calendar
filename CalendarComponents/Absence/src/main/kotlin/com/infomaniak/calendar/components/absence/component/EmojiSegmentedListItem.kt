@@ -35,6 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
+private val EmojiIconSize @Composable get() = EsdsTheme.icon.sizeSm
+
 @Composable
 internal fun EmojiSegmentedListItem(emoji: String, text: String, shapes: ListItemShapes, modifier: Modifier = Modifier) {
     SegmentedListItem(
@@ -42,12 +44,12 @@ internal fun EmojiSegmentedListItem(emoji: String, text: String, shapes: ListIte
         leadingContent = {
             Text(
                 text = emoji,
-                modifier = Modifier.size(EsdsTheme.icon.sizeSm),
+                modifier = Modifier.size(EmojiIconSize),
                 // If font has no monospace emojis
                 autoSize = TextAutoSize.StepBased(minFontSize = 14.sp, maxFontSize = 16.sp),
                 textAlign = TextAlign.Center,
                 // Force line height to not scale with sp so icons stay aligned with other SegmentedItemList
-                lineHeight = with(LocalDensity.current) { 20.dp.toSp() },
+                lineHeight = with(LocalDensity.current) { EmojiIconSize.toSp() },
             )
         },
         content = { Text(text) },
