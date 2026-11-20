@@ -238,6 +238,8 @@ moves them to it when it is set from code or the picker is shown again.
 Only times picked on the wheels go through `TimeScrollPicker`'s `onTimeChange` (like a text field's `onValueChange`),
 which commits them itself and defaults to setting them directly. `DateAndTimeState.Entry.time` reads this state, and
 `DateAndTimeEntry` passes its `onTimePicked` (its `TimeSession`'s `pickTime`), so corrections apply before the commit.
+A typed input (`TimeScrollPickerState.isEditing`) is a `TimeSession` of its own, correcting each typed value from the
+range before the input, so a prefix's corrections (the `1` of `12`) don't remain.
 
 ## Key Integration Points
 

@@ -20,6 +20,7 @@ package com.infomaniak.calendar.components.eventdetail.state
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import kotlinx.datetime.LocalTime
+import kotlin.time.Instant
 
 /**
  * Consecutive time picks on [entry], all corrected from the start and duration the session began with. A wheel picks every
@@ -27,22 +28,38 @@ import kotlinx.datetime.LocalTime
  *
  * It begins again when the range changed since its last pick (a date or time zone picked meanwhile), but not when its own
  * corrections move a date.
+ *
+ * While [isTyping], each pick is a whole typed value replacing the previous one (its prefix), so it's corrected from the
+ * range the input began with, dropping the corrections of the previous one.
  */
-internal class TimeSession(private val state: DateAndTimeState, private val entry: DateAndTimeState.Entry) {
+internal class TimeSession(
+    private val state: DateAndTimeState,
+    private val entry: DateAndTimeState.Entry,
+    private val isTyping: Boolean = false,
+) {
     private var initialRange = state.range()
     private var lastRange = initialRange
 
     fun pickTime(time: LocalTime) = with(state) {
-        if (range() != lastRange) initialRange = range()
+        when {
+            isTyping -> restore(initialRange)
+            range() != lastRange -> initialRange = range()
+        }
         entry.edit(initialRange) { entry.time = time }
         lastRange = range()
     }
 }
 
-/** A session lasts while [entry]'s time picker stays open ([isOpen]). */
+/** A session lasts while [entry]'s time picker stays open ([isOpen]), and a typed input is a session of its own. */
 @Composable
 internal fun DateAndTimeState.rememberTimeSession(entry: DateAndTimeState.Entry, isOpen: Boolean): TimeSession {
-    return remember(this, entry, isOpen) { TimeSession(this, entry) }
+    val isTyping = entry.timeState.isEditing
+    return remember(this, entry, isOpen, isTyping) { TimeSession(this, entry, isTyping) }
 }
 
 private fun DateAndTimeState.range() = start.instant to end.instant
+
+private fun DateAndTimeState.restore(range: Pair<Instant, Instant>) {
+    start.instant = range.first
+    end.instant = range.second
+}

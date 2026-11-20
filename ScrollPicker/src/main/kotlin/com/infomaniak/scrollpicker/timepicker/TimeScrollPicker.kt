@@ -191,6 +191,9 @@ class TimeScrollPickerState(initialTime: LocalTime = LocalTime(0, 0)) {
 
     private val group = ScrollPickerGroupState()
 
+    /** Whether a time is being typed rather than scrolled to. */
+    val isEditing: Boolean get() = group.isEditing
+
     /** Shared by both clocks' hour wheels, its index is the hour of the day. */
     internal val hourState = ScrollPickerState(initialIndex = initialTime.hour, group = group)
     internal val minuteState = ScrollPickerState(initialIndex = initialTime.minute, group = group)

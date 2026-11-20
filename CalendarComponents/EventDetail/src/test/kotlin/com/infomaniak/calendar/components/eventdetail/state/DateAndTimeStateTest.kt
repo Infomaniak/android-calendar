@@ -130,4 +130,16 @@ class DateAndTimeStateTest {
         start.pickTimeZone(TimeZone.of("America/New_York"))
         assertEquals(LocalTime(3, 30), end.time)
     }
+
+    @Test
+    fun typingAnEndTime_dropsTheCorrectionsOfItsPrefix() = with(
+        DateAndTimeState(start = entry(10), end = entry(11), hasEndEverBeenTouched = mutableStateOf(true)),
+    ) {
+        val session = TimeSession(this, end, isTyping = true)
+
+        session.pickTime(LocalTime(1, 0))
+        session.pickTime(LocalTime(12, 0))
+        assertEquals(LocalTime(10, 0), start.time)
+        assertEquals(LocalTime(12, 0), end.time)
+    }
 }
