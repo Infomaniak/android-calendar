@@ -115,4 +115,19 @@ class DateAndTimeStateTest {
         assertEquals(LocalDate(2026, 11, 13), start.date)
         assertEquals(LocalTime(10, 0), start.time)
     }
+
+    @Test
+    fun changingASharedTimeZone_leavesATouchedEndThatStaysAfterTheStart() = with(
+        DateAndTimeState(
+            start = entry(0, minute = 30),
+            end = entry(3, minute = 30),
+            hasEndEverBeenTouched = mutableStateOf(true),
+        ),
+    ) {
+        // The night New York moves to summer time, so 00:30 and 03:30 there are only two hours apart
+        start.date = LocalDate(2026, 3, 8)
+        end.date = LocalDate(2026, 3, 8)
+        start.pickTimeZone(TimeZone.of("America/New_York"))
+        assertEquals(LocalTime(3, 30), end.time)
+    }
 }

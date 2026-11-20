@@ -63,37 +63,40 @@ data class DateAndTimeState(
     }
 
     /**
-     * Applies [change], then corrects the other values from [initialStart] and [initialInterval], the current ones by default.
+     * Applies [change], then corrects the other values. A time session passes the [sessionRange] it began with, so the rows its
+     * wheel passes don't shrink the interval, otherwise the other entry is only moved if the edited one went past it.
      */
     // TODO: This interval displacement doesn't work if the user is setting an all day event and the time component of
     //  both entries are at 0:00 and the range comprises a day of 23 or 25 hours.
     //  Adapt the interval computation to take into account days 23 or 25 hours. Changing the date, should not change the time.
-    internal fun Entry.edit(
-        initialStart: Instant = start.instant,
-        initialInterval: Duration = end.instant - start.instant,
-        change: () -> Unit,
-    ) {
+    internal fun Entry.edit(sessionRange: Pair<Instant, Instant>? = null, change: () -> Unit) {
+        val (initialStart, initialEnd) = sessionRange ?: (start.instant to end.instant)
+        val initialInterval = initialEnd - initialStart
+
         change()
 
         val isEditingStart = this == start
         if (isEditingStart.not()) hasEndEverBeenTouched.value = true
 
-        applyCorrections(isEditingStart, initialStart, initialInterval)
+        // Read after [change], so a plain edit is compared with the other entry's new value (a time zone moves both)
+        applyCorrections(isEditingStart, initialInterval, bounds = sessionRange ?: (start.instant to end.instant))
     }
 
-    /** Single place adjusting the other values after the user picked a new one. */
-    private fun applyCorrections(isEditingStart: Boolean, initialStart: Instant, initialInterval: Duration) {
+    /**
+     * Single place adjusting the other values after the user picked a new one, once the edited entry went past the other's
+     * [bounds].
+     */
+    private fun applyCorrections(isEditingStart: Boolean, initialInterval: Duration, bounds: Pair<Instant, Instant>) {
+        val (startBound, endBound) = bounds
         if (isEditingStart) {
             when {
                 hasEndEverBeenTouched.value.not() -> end.instant = start.instant + initialInterval
                 // Only pushes the end forward, so it stays put when the start is scrolled back again
-                start.instant > initialStart + initialInterval -> {
-                    end.instant = maxOf(end.instant, start.instant + initialInterval)
-                }
+                start.instant > endBound -> end.instant = maxOf(end.instant, start.instant + initialInterval)
             }
         } else {
             // Only pushes the start back, so it stays put when the end is scrolled forward again
-            if (end.instant < initialStart) start.instant = minOf(start.instant, end.instant - initialInterval)
+            if (end.instant < startBound) start.instant = minOf(start.instant, end.instant - initialInterval)
         }
     }
 

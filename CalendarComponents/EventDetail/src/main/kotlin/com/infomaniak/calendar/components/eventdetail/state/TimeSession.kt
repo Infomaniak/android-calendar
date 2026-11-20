@@ -34,8 +34,7 @@ internal class TimeSession(private val state: DateAndTimeState, private val entr
 
     fun pickTime(time: LocalTime) = with(state) {
         if (range() != lastRange) initialRange = range()
-        val (initialStart, initialEnd) = initialRange
-        entry.edit(initialStart, initialEnd - initialStart) { entry.time = time }
+        entry.edit(initialRange) { entry.time = time }
         lastRange = range()
     }
 }
