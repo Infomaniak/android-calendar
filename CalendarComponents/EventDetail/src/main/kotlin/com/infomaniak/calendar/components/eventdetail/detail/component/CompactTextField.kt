@@ -81,7 +81,7 @@ fun CompactTextField(
     colors: TextFieldColors = CompactTextFieldDefaults.colors(),
     lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
     isError: Boolean = false,
-    supportingText: @Composable (() -> Unit)? = null,
+    errorText: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
@@ -162,7 +162,7 @@ fun CompactTextField(
                                     LocalContentColor provides colors.supportingTextColor(enabled, isError, focused),
                                     LocalTextStyle provides MaterialTheme.typography.bodySmall,
                                 ) {
-                                    supportingText?.invoke()
+                                    errorText?.invoke()
                                 }
 
                             }
@@ -250,7 +250,7 @@ private fun PreviewCompactTextFieldErrorAndTrailingIcon() {
         CompactTextField(
             state = rememberTextFieldState(stringResource(R.string.descriptionTitle)),
             isError = true,
-            supportingText = { Text(stringResource(R.string.eventValidationCharacterLimitExceeded)) },
+            errorText = { Text(stringResource(R.string.eventValidationCharacterLimitExceeded)) },
             trailingIcon = { Icon(EsdsIcons.CircleCrossFilled.ExtraSmall, contentDescription = "Clock") },
         )
     }
