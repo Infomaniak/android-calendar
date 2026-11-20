@@ -198,7 +198,7 @@ private fun MultiDayPagerContent(
             contentPadding = contentPadding.onlyHorizontalAndTop(),
         )
 
-        HighlightedEventOverlay(highlightState, modifier = Modifier.matchParentSize())
+        HighlightedEventOverlay(highlightState, modifier = Modifier.matchParentSize(), contentPadding = contentPadding)
     }
 }
 

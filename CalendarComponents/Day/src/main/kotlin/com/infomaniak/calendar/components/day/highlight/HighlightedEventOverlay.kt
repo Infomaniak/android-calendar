@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.day.highlight
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -32,6 +33,8 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.EventItem
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 private const val SCRIM_ALPHA = 0.32f
@@ -44,10 +47,15 @@ private val FingerClearance = 24.dp
  *
  * The card unfolds from its place in its column to the whole width of its area, written the way the
  * Planning writes an event. It opens just above the finger so the finger doesn't hide it, or just
- * below when there is no room above, and always fully inside the area.
+ * below when there is no room above, and always fully inside the area, out of the [contentPadding]
+ * where bars may be drawn over the overlay.
  */
 @Composable
-internal fun HighlightedEventOverlay(state: EventHighlightState, modifier: Modifier = Modifier) {
+internal fun HighlightedEventOverlay(
+    state: EventHighlightState,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
     val highlight = state.highlight
     val scrimColor = MaterialTheme.colorScheme.scrim
     val cardShape = MaterialTheme.shapes.small
@@ -78,7 +86,12 @@ internal fun HighlightedEventOverlay(state: EventHighlightState, modifier: Modif
         },
     ) { measurables, constraints ->
         val card = highlight?.let { measurables.firstOrNull() }?.let { measurable ->
-            val area = highlight.areaBounds
+            val area = highlight.areaBounds.let {
+                it.copy(
+                    top = max(it.top, contentPadding.calculateTopPadding().toPx()),
+                    bottom = min(it.bottom, constraints.maxHeight - contentPadding.calculateBottomPadding().toPx()),
+                )
+            }
             val height = measurable.minIntrinsicHeight(area.width.roundToInt()).toFloat()
             val unfolded = unfoldedBounds(highlight.fingerY, area, height, margin, clearance)
             val bounds = lerp(highlight.startBounds, unfolded, state.progress)

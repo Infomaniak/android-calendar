@@ -86,7 +86,7 @@ fun DayPager(
             )
         }
 
-        HighlightedEventOverlay(highlightState, modifier = Modifier.matchParentSize())
+        HighlightedEventOverlay(highlightState, modifier = Modifier.matchParentSize(), contentPadding = contentPadding)
     }
 }
 
