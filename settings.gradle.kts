@@ -80,6 +80,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Calendar"
 include(":app")
+include(":CalendarComponents:Absence")
 include(":CalendarComponents:Calendar")
 include(":CalendarComponents:Day")
 include(":CalendarComponents:Event")

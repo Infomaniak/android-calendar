@@ -18,6 +18,7 @@ android-calendar/
 │   ├── src/test/                   # Unit tests (JUnit)
 │   └── src/androidTest/            # Instrumented / Compose UI tests
 ├── CalendarComponents/             # Portable Android UI component library (this repo)
+│   ├── Absence/                    # EmojiSegmentedListItem Composable
 │   ├── Foundation/                 # Shared models + base Compose components
 │   ├── Event/                      # EventItem Composable
 │   ├── EventDetail/                # Event detail module (`detail` UI + reusable `form` UI)
@@ -99,7 +100,14 @@ git submodule update --remote Core
 Gradle subprojects (not a composite build). They hold all calendar-specific Compose UI that could eventually be
 extracted and shared with other Infomaniak apps.
 
+Every UI component must have a Compose `@Preview` in the same file. Cover meaningful states and useful design cases,
+such as long labels, large text, or grouped layouts.
+
 ### Design intent
+
+For segmented rows with a leading emoji, reuse `EmojiSegmentedListItem` from `:CalendarComponents:Absence` instead of
+recreating it by hand. It was designed with UI/UX to handle varying emoji glyph widths and keep emojis aligned with
+standard row icons across font scales. Preserve its design-system icon size, bounded font autosizing, and fixed line height.
 
 The group is intentionally **self-contained**: no dependency on `:app`, no DI framework, no KMP types leaking in.
 `VisibleDayState` lives in `Foundation`: date jumps request navigation, and the content reports the date it reaches.
@@ -124,7 +132,7 @@ only narrow to `Normal<*>` and would still need an unchecked cast — an unsafe 
 
 ### Flavors
 
-Every CalendarComponents module that contains **code** (`Foundation`, `Event`, `Planning`, `Day`, `Calendar`, `EventDetail`)
+Most CalendarComponents modules that contain **code** (`Foundation`, `Event`, `Planning`, `Day`, `Calendar`, `EventDetail`)
 applies the `core.plugins.infomaniak.android.library.flavor.aware` convention plugin instead of the plain
 `core.plugins.android.library`. That plugin declares the same `distribution` flavor dimension (`standard` default /
 `fdroid`) as the app. It is required because `Foundation` depends on `core.infomaniak.core.avatar`, which is itself
@@ -134,12 +142,13 @@ it (directly or transitively via `api`) had to follow so the variant graph resol
 stays on plain `core.plugins.android.library`: it holds only `res/values*/strings.xml`, has no Kotlin code and no
 dependency on `Foundation` or any flavored library, so there is nothing that needs a `standard`/`fdroid` split.
 When adding a new CalendarComponents module, apply the flavor-aware plugin if it depends (even transitively) on
-`Foundation` or another flavored library; keep the plain plugin only for modules with no such dependency (like `Resources`).
+`Foundation` or another flavored library; keep the plain plugin for modules with no such dependency (like `Resources` and `Absence`).
 
 ### Modules
 
 | Gradle path                       | Package                                          | Purpose                                                                                                                   |
 |-----------------------------------|--------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
+| `:CalendarComponents:Absence`     | `com.infomaniak.calendar.components.absence`    | `EmojiSegmentedListItem` Composable in the `component` package — renders a segmented row with a leading emoji. |
 | `:CalendarComponents:Foundation`  | `com.infomaniak.calendar.components.foundation`  | Shared models (`EventSummaryUi`, `LocationUi` (an event's place or bookable room, shared by the event detail, its form and the location search) with `RoomAvailability`, `YearWeek`, `WeekNumbering`) and base Compose components (`DayCircle`, `DateState`, `CurrentTimeLine` (the current time line with its dot, shared by Day and Planning), the search screens' `SearchLayout` (shared padding and spacing), `SearchBar`, `EmptyState` and `HighlightedText`, the case- and accent-insensitive `SearchableText`, and `rememberInitialFocusRequester` to focus a field once on screen entry) used by all other CalendarComponents modules. |
 | `:CalendarComponents:Resources`   | `com.infomaniak.calendar.components.resources`   | String-only module: `res/values/strings.xml` (+ translations). No Kotlin code, no Compose. Centralises all CalendarComponents string resources. |
 | `:CalendarComponents:Event`       | `com.infomaniak.calendar.components.event`       | `EventItem` Composable — renders a single event row. Re-exports Foundation via `api`. |
@@ -153,6 +162,7 @@ When adding a new CalendarComponents module, apply the flavor-aware plugin if it
 
 | Module     | `api` dependency | `implementation` dependencies |
 |------------|-------------------|--------------------------------|
+| `Absence`  | —                 | —                              |
 | `Foundation` | —               | `Resources`                    |
 | `Event`    | `Foundation`      | —                              |
 | `Planning` | `Foundation`      | `Event`, `Resources`           |
@@ -161,7 +171,7 @@ When adding a new CalendarComponents module, apply the flavor-aware plugin if it
 | `TimeZoneSearch` | `Foundation` | `Resources`                |
 | `LocationSearch` | `Foundation` | `Resources`                |
 
-`Resources` is the only module with no CalendarComponents dependency; `Foundation` depends on it only as `implementation`
+`Absence` and `Resources` have no CalendarComponents dependencies; `Foundation` depends on `Resources` only as `implementation`
 (for resource ids carried by its models, e.g. `ParticipationStatus.countPluralRes`). `Event` re-exports `Foundation` via `api` since its
 public `EventItem` signature exposes `Foundation` types. `Planning` and `Day` each declare their own **direct** `api`
 dependency on `Foundation` (its types appear in their own public signatures) and depend on `Event` and `Resources` as
