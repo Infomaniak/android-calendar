@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.component.DayView
 import com.infomaniak.calendar.components.day.component.FollowSelectedDate
 import com.infomaniak.calendar.components.day.highlight.HighlightedEventOverlay
+import com.infomaniak.calendar.components.day.highlight.releaseHighlightOnSecondPointer
 import com.infomaniak.calendar.components.day.highlight.rememberEventHighlightState
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.DayPages
@@ -67,7 +68,7 @@ fun DayPager(
     val highlightState = rememberEventHighlightState()
 
     // The highlighted event is drawn over the pager, so neither the page edge nor the header hides it.
-    Box(modifier = modifier, propagateMinConstraints = true) {
+    Box(modifier = modifier.releaseHighlightOnSecondPointer(highlightState), propagateMinConstraints = true) {
         HorizontalPager(state = pagerState, userScrollEnabled = !highlightState.isHeld) { page ->
             val date = pages.firstDateOf(page)
 

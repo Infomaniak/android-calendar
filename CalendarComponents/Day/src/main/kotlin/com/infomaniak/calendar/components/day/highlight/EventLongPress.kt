@@ -40,7 +40,7 @@ import com.infomaniak.calendar.components.day.model.TimedEvent
  * Until the long press is recognised, the gesture belongs to whoever claims it: a tap still opens the
  * event, and a scroll, a swipe or a pinch that starts first cancels the long press. Once recognised,
  * the gesture is the highlight's own: every change is consumed, ahead of the card's click and the
- * timeline's scrolling, until the finger lifts. A second finger lets the event go, for a pinch.
+ * timeline's scrolling, until the finger lifts or [releaseHighlightOnSecondPointer] lets the event go.
  */
 internal fun Modifier.highlightOnLongPress(state: EventHighlightState, timedEvent: TimedEvent): Modifier {
     return this then LongPressHighlightElement(state, timedEvent)
@@ -93,7 +93,8 @@ private class LongPressHighlightNode(
             do {
                 // On the initial pass, ahead of the card's click, which would otherwise open the event on release.
                 val event = awaitPointerEvent(PointerEventPass.Initial)
-                if (event.changes.count { it.pressed } > 1) break
+                // Let go by a second finger (see releaseHighlightOnSecondPointer): the gesture is the pinch's now.
+                if (!state.isHeld) break
                 event.changes.forEach { it.consume() }
             } while (event.changes.any { it.pressed })
         } finally {

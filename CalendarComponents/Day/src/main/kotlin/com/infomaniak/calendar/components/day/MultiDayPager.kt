@@ -72,6 +72,7 @@ import com.infomaniak.calendar.components.day.component.verticalTimelineScroll
 import com.infomaniak.calendar.components.day.highlight.EventHighlightState
 import com.infomaniak.calendar.components.day.highlight.HighlightedEventOverlay
 import com.infomaniak.calendar.components.day.highlight.eventHighlightArea
+import com.infomaniak.calendar.components.day.highlight.releaseHighlightOnSecondPointer
 import com.infomaniak.calendar.components.day.highlight.rememberEventHighlightState
 import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults.GridLineThickness
 import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
@@ -174,7 +175,7 @@ private fun MultiDayPagerContent(
     val pageSize = remember(pages, visibleDayCount) { DaysPageSize(pages.daysPerPage, visibleDayCount) }
     val highlightState = rememberEventHighlightState()
 
-    Box(modifier) {
+    Box(modifier.releaseHighlightOnSecondPointer(highlightState)) {
         MultiDayTimeline(
             pagerState = pagerState,
             pages = pages,
