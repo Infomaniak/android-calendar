@@ -92,7 +92,10 @@ internal fun HighlightedEventOverlay(
                     bottom = min(it.bottom, constraints.maxHeight - contentPadding.calculateBottomPadding().toPx()),
                 )
             }
+            // A short area (landscape, large font) can't fit the whole card: it is clipped rather than pushed out of the area.
             val height = measurable.minIntrinsicHeight(area.width.roundToInt()).toFloat()
+                .coerceAtMost(area.height - 2 * margin)
+                .coerceAtLeast(0f)
             val unfolded = unfoldedBounds(highlight.fingerY, area, height, margin, clearance)
             val bounds = lerp(highlight.startBounds, unfolded, state.progress)
 
