@@ -142,4 +142,16 @@ class DateAndTimeStateTest {
         assertEquals(LocalTime(10, 0), start.time)
         assertEquals(LocalTime(12, 0), end.time)
     }
+
+    @Test
+    fun typingAnEndTime_keepsADatePickedDuringTheInput() = with(
+        DateAndTimeState(start = entry(10), end = entry(11), hasEndEverBeenTouched = mutableStateOf(true)),
+    ) {
+        val session = TimeSession(this, end, isTyping = true)
+
+        session.pickTime(LocalTime(12, 0))
+        end.pickDate(LocalDate(2026, 11, 17))
+        session.pickTime(LocalTime(13, 0))
+        assertEquals(LocalDate(2026, 11, 17), end.date)
+    }
 }

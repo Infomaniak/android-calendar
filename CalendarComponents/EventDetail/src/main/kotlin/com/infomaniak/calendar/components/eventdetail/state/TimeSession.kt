@@ -26,28 +26,32 @@ import kotlin.time.Instant
  * Consecutive time picks on [entry], all corrected from the start and duration the session began with. A wheel picks every
  * row it passes, so the duration would otherwise already be zero once one entry goes past the other.
  *
- * It begins again when the range changed since its last pick (a date or time zone picked meanwhile), but not when its own
- * corrections move a date.
- *
- * While [isTyping], each pick is a whole typed value replacing the previous one (its prefix), so it's corrected from the
- * range the input began with, dropping the corrections of the previous one.
+ * It starts over when the range changed since its last pick, but not when its own corrections move a date.
  */
 internal class TimeSession(
     private val state: DateAndTimeState,
     private val entry: DateAndTimeState.Entry,
     private val isTyping: Boolean = false,
 ) {
-    private var initialRange = state.range()
-    private var lastRange = initialRange
+    /** The range the picks are corrected from. */
+    private var sessionInitialRange = state.range()
+    private var previousPickTimeRange = sessionInitialRange
 
     fun pickTime(time: LocalTime) = with(state) {
-        when {
-            isTyping -> restore(initialRange)
-            range() != lastRange -> initialRange = range()
-        }
-        entry.edit(initialRange) { entry.time = time }
-        lastRange = range()
+        if (range() != previousPickTimeRange) restartSession()
+        if (isTyping) undoPreviousPick()
+
+        entry.edit(sessionInitialRange) { entry.time = time }
+        previousPickTimeRange = range()
     }
+
+    /** A date or time zone was edited since the last pick. */
+    private fun DateAndTimeState.restartSession() {
+        sessionInitialRange = range()
+    }
+
+    /** A typed value replaces the previous one (its prefix) rather than following it, as a wheel row does. */
+    private fun DateAndTimeState.undoPreviousPick() = restore(sessionInitialRange)
 }
 
 /** A session lasts while [entry]'s time picker stays open ([isOpen]), and a typed input is a session of its own. */
