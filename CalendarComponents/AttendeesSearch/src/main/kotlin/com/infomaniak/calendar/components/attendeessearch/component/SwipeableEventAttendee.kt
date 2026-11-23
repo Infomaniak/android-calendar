@@ -41,7 +41,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -65,7 +64,7 @@ import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
-import com.infomaniak.designsystem.icons.symbols.Cross
+import com.infomaniak.designsystem.icons.symbols.Check
 import com.infomaniak.designsystem.icons.symbols.Trash
 import kotlinx.coroutines.flow.drop
 import kotlin.math.abs
@@ -130,15 +129,18 @@ private fun EventAttendee(
         onClick = onClick.takeIf { enabled },
         shapes = shapes,
         colors = ListItemDefaults.segmentedColors(containerColor = ComponentColors.SegmentedItemColor),
-        modifier = modifier
-            .alpha(if (enabled) 1f else EsdsTheme.opacity.medium)
-            .semantics { if (!enabled) disabled() },
+        modifier = modifier.semantics { if (!enabled) disabled() },
         verticalAlignment = Alignment.CenterVertically,
         leadingContent = {
             Avatar(
                 avatarType = AvatarType.fromAttendee(attendee).value,
                 modifier = Modifier.size(EsdsTheme.icon.sizeXl),
             )
+        },
+        trailingContent = {
+            if (!enabled) {
+                Icon(imageVector = EsdsIcons.Check.Small, contentDescription = null)
+            }
         },
         overlineContent = attendee.status?.let {
             { AttendeeParticipationStatus(it, attendee.isOrganizer) }
@@ -267,7 +269,7 @@ private fun PreviewAttendeePending() {
 private fun Preview() {
     Surface {
         EventAttendee(
-            AttendeeUi("alice@example.com", "Alice", null, AvatarStrategy.ToCompute),
+            AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted, AvatarStrategy.ToCompute),
             enabled = false,
             shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
         )
