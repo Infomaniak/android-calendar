@@ -36,7 +36,7 @@ import com.infomaniak.designsystem.icons.symbols.DotsThreeHorizontal
  * has, and opens them.
  */
 @Composable
-internal fun HiddenEventsIndicator(modifier: Modifier = Modifier) {
+internal fun OverflowEventsIndicator(modifier: Modifier = Modifier) {
     Box(modifier, contentAlignment = Alignment.Center) {
         Icon(
             imageVector = EsdsIcons.DotsThreeHorizontal.ExtraSmall,
@@ -51,7 +51,7 @@ internal fun HiddenEventsIndicator(modifier: Modifier = Modifier) {
 private fun Preview() {
     MaterialTheme {
         Surface {
-            HiddenEventsIndicator(Modifier.size(width = 48.dp, height = MonthDefaults.LaneHeight))
+            OverflowEventsIndicator(Modifier.size(width = 48.dp, height = MonthDefaults.LaneHeight))
         }
     }
 }

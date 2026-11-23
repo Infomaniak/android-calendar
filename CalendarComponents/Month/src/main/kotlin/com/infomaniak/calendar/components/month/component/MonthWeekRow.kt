@@ -117,7 +117,7 @@ private fun WeekEvents(
             visibleWeek.hasHiddenEvents.forEachIndexed { column, hasHiddenEvents ->
                 if (hasHiddenEvents) {
                     key(column) {
-                        HiddenEventsIndicator(Modifier.layoutId(EventSlot(column, span = 1, lane = visibleWeek.indicatorLane)))
+                        OverflowEventsIndicator(Modifier.layoutId(EventSlot(column, span = 1, lane = visibleWeek.indicatorLane)))
                     }
                 }
             }
