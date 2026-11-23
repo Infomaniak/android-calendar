@@ -34,20 +34,16 @@ internal object MonthDefaults {
     // Just like all day events for coherence
     val EventTitleStyle: TextStyle @Composable @ReadOnlyComposable get() = EventItemDefaults.AllDayTitleStyle
 
-    /** The day number's circle: one line of [DayNumberStyle] with room around it. */
+    // The day number at the top, inside a cell. It needs to adapt to the user font size accessibility settings and grow but be at
+    // least 20.dp. Because this is required for LaneMetrics computations, it must be computed here and heightIn(min = 20.dp) is
+    // not enough.
     val DayNumberSize: Dp
         @Composable @ReadOnlyComposable get() {
-            return max(
-                DayNumberStyle.lineHeightDp() + EsdsTheme.spacing.twoXs * 2,
-                20.dp,
-            )
+            return max(20.dp, DayNumberStyle.lineHeightDp() + EsdsTheme.spacing.twoXs * 2)
         }
-    /** Room between the day number's circle and the edges of its cell, above the first lane. */
+    // Room between the day number's circle and the edges of its cell, above the first lane.
     val DayNumberPadding: PaddingValues
-        @Composable @ReadOnlyComposable get() = PaddingValues(
-            top = EsdsTheme.spacing.twoXs,
-            bottom = EsdsTheme.spacing.md,
-        )
+        @Composable @ReadOnlyComposable get() = PaddingValues(top = EsdsTheme.spacing.twoXs, bottom = EsdsTheme.spacing.md)
 
     // Padding inside the EventItemCard
     val EventTitlePadding: PaddingValues @Composable @ReadOnlyComposable get() = PaddingValues(start = EsdsTheme.spacing.xs)
@@ -57,7 +53,7 @@ internal object MonthDefaults {
             calculateTopPadding() + EventTitleStyle.lineHeightDp() + calculateBottomPadding()
         }
     val LaneSpacing: Dp @Composable @ReadOnlyComposable get() = EsdsTheme.spacing.twoXs
-    /** Room between an event and the edges of the first and last days it covers. */
+    // Room between an event and the edges of the first and last days it covers.
     val EventHorizontalInset: Dp @Composable @ReadOnlyComposable get() = EsdsTheme.spacing.xs
 
     @Composable
