@@ -29,14 +29,14 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import kotlin.time.Instant
 
-class VisibleWeekTest {
+class VisibleWeekEventsTest {
 
     @Test
     fun anEmptyWeekShowsNothingAndHidesNothing() {
-        val visibleWeek = week().visibleIn(laneCount = 3)
+        val visibleEvents = week().visibleEventsIn(laneCount = 3)
 
-        assertEquals(emptyList<MonthEventSegmentUi>(), visibleWeek.segments)
-        assertEquals(List(7) { false }, visibleWeek.hasHiddenEvents)
+        assertEquals(emptyList<MonthEventSegmentUi>(), visibleEvents.segments)
+        assertEquals(List(7) { false }, visibleEvents.hasHiddenEvents)
     }
 
     @Test
@@ -46,10 +46,10 @@ class VisibleWeekTest {
         val overflowing = segment(startColumn = 3, span = 2, lane = 1)
         val beyond = segment(startColumn = 4, span = 1, lane = 2)
 
-        val visibleWeek = week(fitting, aboveTheOverflow, overflowing, beyond).visibleIn(laneCount = 2)
+        val visibleEvents = week(fitting, aboveTheOverflow, overflowing, beyond).visibleEventsIn(laneCount = 2)
 
-        assertEquals(listOf(fitting, aboveTheOverflow), visibleWeek.segments)
-        assertEquals(listOf(false, false, false, true, true, false, false), visibleWeek.hasHiddenEvents)
+        assertEquals(listOf(fitting, aboveTheOverflow), visibleEvents.segments)
+        assertEquals(listOf(false, false, false, true, true, false, false), visibleEvents.hasHiddenEvents)
     }
 
     @Test
@@ -57,20 +57,20 @@ class VisibleWeekTest {
         val first = segment(startColumn = 0, span = 1, lane = 0)
         val spanning = segment(startColumn = 0, span = 4, lane = 1)
 
-        val visibleWeek = week(first, spanning).visibleIn(laneCount = 1)
+        val visibleEvents = week(first, spanning).visibleEventsIn(laneCount = 1)
 
-        assertEquals(emptyList<MonthEventSegmentUi>(), visibleWeek.segments)
-        assertEquals(listOf(true, true, true, true, false, false, false), visibleWeek.hasHiddenEvents)
+        assertEquals(emptyList<MonthEventSegmentUi>(), visibleEvents.segments)
+        assertEquals(listOf(true, true, true, true, false, false, false), visibleEvents.hasHiddenEvents)
     }
 
     @Test
     fun noLaneHidesEveryEvent() {
         val event = segment(startColumn = 2, span = 2, lane = 0)
 
-        val visibleWeek = week(event).visibleIn(laneCount = 0)
+        val visibleEvents = week(event).visibleEventsIn(laneCount = 0)
 
-        assertEquals(emptyList<MonthEventSegmentUi>(), visibleWeek.segments)
-        assertEquals(listOf(false, false, true, true, false, false, false), visibleWeek.hasHiddenEvents)
+        assertEquals(emptyList<MonthEventSegmentUi>(), visibleEvents.segments)
+        assertEquals(listOf(false, false, true, true, false, false, false), visibleEvents.hasHiddenEvents)
     }
 
     private fun week(vararg segments: MonthEventSegmentUi): MonthWeekUi {

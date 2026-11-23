@@ -42,7 +42,7 @@ import com.infomaniak.calendar.components.foundation.utils.HorizontalGridLine
 import com.infomaniak.calendar.components.month.layout.LaneMetrics
 import com.infomaniak.calendar.components.month.layout.MonthDefaults
 import com.infomaniak.calendar.components.month.layout.laneMetrics
-import com.infomaniak.calendar.components.month.layout.visibleIn
+import com.infomaniak.calendar.components.month.layout.visibleEventsIn
 import com.infomaniak.calendar.components.month.model.MonthWeekUi
 import com.infomaniak.calendar.components.month.preview.previewFiveWeeksMonth
 import com.infomaniak.calendar.components.month.preview.previewMonth
@@ -100,12 +100,12 @@ private fun WeekEvents(
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val visibleWeek = remember(week, laneCount) { week.visibleIn(laneCount) }
+    val visibleEvents = remember(week, laneCount) { week.visibleEventsIn(laneCount) }
     val horizontalInset = MonthDefaults.EventHorizontalInset
 
     Layout(
         content = {
-            visibleWeek.segments.forEach { segment ->
+            visibleEvents.segments.forEach { segment ->
                 key(segment.event.id, segment.startColumn) {
                     MonthEventChip(
                         event = segment.event,
@@ -114,10 +114,11 @@ private fun WeekEvents(
                     )
                 }
             }
-            visibleWeek.hasHiddenEvents.forEachIndexed { column, hasHiddenEvents ->
+            visibleEvents.hasHiddenEvents.forEachIndexed { column, hasHiddenEvents ->
                 if (hasHiddenEvents) {
                     key(column) {
-                        OverflowEventsIndicator(Modifier.layoutId(EventSlot(column, span = 1, lane = visibleWeek.indicatorLane)))
+                        val slot = EventSlot(column, span = 1, lane = visibleEvents.overflowEventsIndicatorLane)
+                        OverflowEventsIndicator(Modifier.layoutId(slot))
                     }
                 }
             }

@@ -23,10 +23,10 @@ import com.infomaniak.calendar.components.month.model.MonthWeekUi
 
 /**
  * Keeps the segments fitting in [laneCount] lanes. The last lane shows an event only if none of the days it covers has
- * more events than lanes: otherwise that lane holds the hidden events indicator of those days, and the event is hidden
+ * more events than lanes: otherwise that lane holds the overflow events indicator of those days, and the event is hidden
  * whole, in every day it covers.
  */
-internal fun MonthWeekUi.visibleIn(laneCount: Int): VisibleWeek {
+internal fun MonthWeekUi.visibleEventsIn(laneCount: Int): VisibleWeekEvents {
     val usedLanes = IntArray(dates.size)
     segments.forEach { segment -> segment.columns.forEach { usedLanes[it] = maxOf(usedLanes[it], segment.lane + 1) } }
 
@@ -38,16 +38,16 @@ internal fun MonthWeekUi.visibleIn(laneCount: Int): VisibleWeek {
     val hasHiddenEvents = BooleanArray(dates.size)
     hidden.forEach { segment -> segment.columns.forEach { hasHiddenEvents[it] = true } }
 
-    return VisibleWeek(visible, hasHiddenEvents.asList(), indicatorLane = lastLane)
+    return VisibleWeekEvents(visible, hasHiddenEvents.asList(), overflowEventsIndicatorLane = lastLane)
 }
 
 /**
- * What a week shows once its lanes are limited: the [segments] drawn, and for each column whether segments are hidden
- * over it, which [indicatorLane] then indicates.
+ * The events a week shows once its lanes are limited: the [segments] drawn, and for each column whether events are
+ * hidden over it, flagged by an indicator in [overflowEventsIndicatorLane].
  */
 @Immutable
-internal data class VisibleWeek(
+internal data class VisibleWeekEvents(
     val segments: List<MonthEventSegmentUi>,
     val hasHiddenEvents: List<Boolean>,
-    val indicatorLane: Int,
+    val overflowEventsIndicatorLane: Int,
 )
