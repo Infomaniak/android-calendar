@@ -17,7 +17,6 @@
   -->
 <resources>
     <string name="accountsTitle">Accounts</string>
-    <string name="attendeesSearchTitle">Add attendees</string>
     <string name="buttonAddAccount">Add an account</string>
     <string name="buttonAllEvents">All the events</string>
     <string name="buttonLogOut">Log Out</string>
@@ -37,7 +36,6 @@
     <string name="generalSettingsNotificationsLabel">Notifications</string>
     <string name="monthTitle">Month</string>
     <string name="noWritableCalendar">No writable calendars found</string>
-    <string name="notificationAllDay">All day</string>
     <string name="notificationChannelEventRemindersDescription">Notifications for upcoming events and reminders</string>
     <string name="notificationChannelEventRemindersTitle">Event reminders</string>
     <string name="notificationDefaultDescription">Event Alert</string>
@@ -56,6 +54,6 @@
     <string name="signOutAccountAlertConfirm">Sign out of the account</string>
     <string name="signOutAccountAlertDescription">This account and its associated calendars will be disconnected from the “Calendar” app. They will remain available in your Infomaniak online account.</string>
     <string name="syncEventsError">Error while retrieving events</string>
-    <string name="threeDaysTitle">Three days</string>
+    <string name="threeDaysTitle">3 days</string>
     <string name="weekTitle">Week</string>
 </resources>

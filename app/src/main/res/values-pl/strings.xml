@@ -17,7 +17,6 @@
   -->
 <resources>
     <string name="accountsTitle">Konta</string>
-    <string name="attendeesSearchTitle">Dodaj uczestników</string>
     <string name="buttonAddAccount">Dodaj konto</string>
     <string name="buttonAllEvents">Wszystkie wydarzenia</string>
     <string name="buttonLogOut">Wyloguj się</string>
@@ -37,7 +36,6 @@
     <string name="generalSettingsNotificationsLabel">Powiadomienia</string>
     <string name="monthTitle">Miesiąc</string>
     <string name="noWritableCalendar">Nie znaleziono edytowalnego kalendarza</string>
-    <string name="notificationAllDay">Cały dzień</string>
     <string name="notificationChannelEventRemindersDescription">Powiadomienia o nadchodzących wydarzeniach i przypomnieniach</string>
     <string name="notificationChannelEventRemindersTitle">Przypomnienia o wydarzeniach</string>
     <string name="notificationDefaultDescription">Alarm zdarzenia</string>
@@ -56,6 +54,6 @@
     <string name="signOutAccountAlertConfirm">Wyloguj się z konta</string>
     <string name="signOutAccountAlertDescription">To konto oraz powiązane z nim kalendarze zostaną odłączone od aplikacji „Kalendarz”. Będą one nadal dostępne na Twoim koncie internetowym Infomaniak.</string>
     <string name="syncEventsError">Błąd podczas pobierania wydarzeń</string>
-    <string name="threeDaysTitle">Trzy dni</string>
+    <string name="threeDaysTitle">3 dni</string>
     <string name="weekTitle">Tydzień</string>
 </resources>

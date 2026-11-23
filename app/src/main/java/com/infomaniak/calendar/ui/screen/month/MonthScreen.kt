@@ -114,7 +114,7 @@ private fun MonthScreen(
             monthRange = NAVIGABLE_MONTHS,
             selectedDate = { visibleDayState.visibleDate },
             monthOf = { months()[it] },
-            onVisibleMonthChanged = visibleDayState::showMonth,
+            onVisibleMonthChanged = { visibleDayState.updateVisibleDate(it.firstDay) },
             onDayClick = { date ->
                 visibleDayState.updateVisibleDate(date)
                 goToDay()
@@ -126,11 +126,6 @@ private fun MonthScreen(
                 .hazeSource(hazeState),
         )
     }
-}
-
-/** Keeps the visible day while its month stays visible, so Day still opens on it. */
-private fun VisibleDayState.showMonth(month: YearMonth) {
-    if (month != visibleDate.yearMonth) updateVisibleDate(month.firstDay)
 }
 
 @Preview

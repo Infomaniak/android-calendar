@@ -20,7 +20,7 @@ package com.infomaniak.calendar.components.day.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -80,6 +80,7 @@ internal fun ResizableEventItem(
     visibleHeight: () -> Float,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    textOverflow: TextOverflow = TextOverflow.Ellipsis,
 ) {
     val status = timedEvent.event.toEventItemStatus()
 
@@ -94,6 +95,7 @@ internal fun ResizableEventItem(
             titleSizing = titleSizing,
             visibleHeight = visibleHeight,
             textDecoration = status.textDecoration,
+            textOverflow = textOverflow,
         )
     }
 }
@@ -112,6 +114,7 @@ private fun EventDetails(
     titleSizing: TitleSizing,
     visibleHeight: () -> Float,
     textDecoration: TextDecoration?,
+    textOverflow: TextOverflow,
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
@@ -131,10 +134,11 @@ private fun EventDetails(
                     icons = event.toEventIcons(),
                     titleSizing = titleSizing,
                     textDecoration = textDecoration,
+                    textOverflow = textOverflow,
                 )
             },
-            { DetailLine(hours, textDecoration) },
-            { event.location?.let { DetailLine(it, textDecoration) } },
+            { DetailLine(hours, textDecoration, textOverflow) },
+            { event.location?.let { DetailLine(it, textDecoration, textOverflow) } },
         ),
     ) { (titleMeasurables, timeMeasurables, locationMeasurables), constraints ->
         val available = visibleHeight()
@@ -143,7 +147,7 @@ private fun EventDetails(
         // The width a line has is only known here, once the accent bar and the padding have taken
         // their share of the card.
         fun isTextDisplayed(text: String?, style: TextStyle): Boolean {
-            return text != null && textMeasurer.hasRoomForText(constraints.maxWidth, text, style)
+            return text != null && textMeasurer.hasRoomForText(constraints.maxWidth, text, style, textOverflow)
         }
 
         val lines = ArrayList<Placeable>(1 + MaxDetailLines)
@@ -183,32 +187,32 @@ private fun EventDetails(
 
 /**
  * Whether [text] has room to show anything in [maxWidth] pixels: all of it, or a first letter with
- * the ellipsis trailing it.
+ * the ellipsis trailing it ([TextOverflow.Ellipsis]) or alone ([TextOverflow.Clip]).
  *
  * A card too narrow for that writes nothing at all. An ellipsis on its own names no event and reads
  * as content that was never there, where the bare card at least reads as the block of time it is.
  */
-private fun TextMeasurer.hasRoomForText(maxWidth: Int, text: String, style: TextStyle): Boolean {
+private fun TextMeasurer.hasRoomForText(maxWidth: Int, text: String, style: TextStyle, overflow: TextOverflow): Boolean {
     if (text.isEmpty() || maxWidth <= 0) return false
 
     // By code point, or a title opening on an emoji would be measured on half of one.
     val firstCharacter = text.substring(0, text.offsetByCodePoints(0, 1))
+    val shortestCut = if (overflow == TextOverflow.Ellipsis) firstCharacter + ELLIPSIS else firstCharacter
 
-    val letterAndEllipsis = measure(firstCharacter + ELLIPSIS, style, maxLines = 1).size.width
-    if (letterAndEllipsis <= maxWidth) return true
+    if (measure(shortestCut, style, maxLines = 1).size.width <= maxWidth) return true
 
     // Only a text not longer than the ellipsis it would be cut down to can still fit whole here.
     return measure(text, style, maxLines = 1).size.width <= maxWidth
 }
 
 @Composable
-private fun DetailLine(text: String, textDecoration: TextDecoration?) {
+private fun DetailLine(text: String, textDecoration: TextDecoration?, textOverflow: TextOverflow) {
     Text(
         text = text,
         style = MaterialTheme.typography.bodySmall,
         textDecoration = textDecoration,
         maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
+        overflow = textOverflow,
     )
 }
 
@@ -218,6 +222,7 @@ private fun TitleRow(
     icons: Set<EventIcons>,
     titleSizing: TitleSizing,
     textDecoration: TextDecoration?,
+    textOverflow: TextOverflow,
     modifier: Modifier = Modifier,
 ) {
     val iconsSpacing = with(LocalDensity.current) { EsdsTheme.spacing.xs.roundToPx() }
@@ -232,7 +237,7 @@ private fun TitleRow(
                     fontWeight = FontWeight.Medium,
                     textDecoration = textDecoration,
                     maxLines = titleSizing.maxLines,
-                    overflow = TextOverflow.Ellipsis,
+                    overflow = textOverflow,
                 )
             },
             { TrailingIcons(icons, titleSizing.iconSize) },
@@ -333,16 +338,49 @@ private fun TextUnit.roundedToStep(): TextUnit = ((value / TitleSizeStep.value).
 @Preview(widthDp = 220)
 @Composable
 private fun ResizableEventItemPreview() {
+    ResizableEventItemSample(width = 220.dp, height = TimelineDefaults.HourHeight)
+}
+
+/** A card narrow enough to cut its texts, which end on an ellipsis. */
+@Preview(widthDp = 48)
+@Composable
+private fun NarrowResizableEventItemPreview() {
+    ResizableEventItemSample(width = 48.dp, height = TimelineDefaults.HourHeight)
+}
+
+/** The same narrow card, its texts clipped at its edge instead, as the week view shows them. */
+@Preview(widthDp = 48)
+@Composable
+private fun ClippedResizableEventItemPreview() {
+    ResizableEventItemSample(width = 48.dp, height = TimelineDefaults.HourHeight, textOverflow = TextOverflow.Clip)
+}
+
+/** A card too narrow to show even one character of its texts: only its colour remains. */
+@Preview(widthDp = 20)
+@Composable
+private fun TooNarrowResizableEventItemPreview() {
+    ResizableEventItemSample(width = 20.dp, height = TimelineDefaults.HourHeight)
+}
+
+/** A card so short its title is down to [MinTitleSize], on one line with no details under it. */
+@Preview(widthDp = 220)
+@Composable
+private fun ShortResizableEventItemPreview() {
+    ResizableEventItemSample(width = 220.dp, height = MinTitleHeight)
+}
+
+@Composable
+private fun ResizableEventItemSample(width: Dp, height: Dp, textOverflow: TextOverflow = TextOverflow.Ellipsis) {
     Surface {
-        val cardHeight = TimelineDefaults.HourHeight
-        val cardHeightPx = with(LocalDensity.current) { cardHeight.toPx() }
+        val heightPx = with(LocalDensity.current) { height.toPx() }
 
         ResizableEventItem(
             timedEvent = previewDayEvents.timed.first(),
-            titleSizing = titleSizingFor(visibleHeight = cardHeight, width = 220.dp),
-            visibleHeight = { cardHeightPx },
+            titleSizing = titleSizingFor(visibleHeight = height, width = width),
+            visibleHeight = { heightPx },
             onClick = {},
-            modifier = Modifier.height(cardHeight),
+            modifier = Modifier.size(width, height),
+            textOverflow = textOverflow,
         )
     }
 }

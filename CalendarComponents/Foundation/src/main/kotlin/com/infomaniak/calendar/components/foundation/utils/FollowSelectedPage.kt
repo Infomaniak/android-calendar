@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 /**
  * Animates [pagerState] to [selectedPage] whenever something other than a swipe changes it, and reports
- * through [onPageChanged] the pages the user moves to.
+ * through [onPageChanged] the pages the user moves to, unless that page is already [selectedPage].
  *
  * The pages a jump crosses on its way are not reported: they are the jump's own doing, and reported back
  * as a page the user moved to, they would end the jump at the first page it passes over.
@@ -57,7 +57,7 @@ fun FollowSelectedPage(pagerState: PagerState, selectedPage: () -> Int, onPageCh
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
-            if (!isJumping) currentOnPageChanged(page)
+            if (!isJumping && page != currentSelectedPage()) currentOnPageChanged(page)
         }
     }
 }

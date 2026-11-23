@@ -17,7 +17,6 @@
   -->
 <resources>
     <string name="accountsTitle">Konten</string>
-    <string name="attendeesSearchTitle">Teilnehmer hinzufügen</string>
     <string name="buttonAddAccount">Konto hinzufügen</string>
     <string name="buttonAllEvents">Alle Anlässe</string>
     <string name="buttonLogOut">Abmelden</string>
@@ -37,7 +36,6 @@
     <string name="generalSettingsNotificationsLabel">Benachrichtigungen</string>
     <string name="monthTitle">Monat</string>
     <string name="noWritableCalendar">Kein bearbeitbarer Kalender gefunden</string>
-    <string name="notificationAllDay">Ganztägig</string>
     <string name="notificationChannelEventRemindersDescription">Benachrichtigungen für bevorstehende Anlässe und Erinnerungen</string>
     <string name="notificationChannelEventRemindersTitle">Event-Erinnerungen</string>
     <string name="notificationDefaultDescription">Ereignisalarm</string>
@@ -56,6 +54,6 @@
     <string name="signOutAccountAlertConfirm">Sich aus dem Konto abmelden</string>
     <string name="signOutAccountAlertDescription">Dieses Konto und die dazugehörigen Kalender werden von der App „Kalender“ getrennt. Sie bleiben in Ihrem Infomaniak-Online-Konto weiterhin verfügbar.</string>
     <string name="syncEventsError">Fehler beim Abrufen der Termine</string>
-    <string name="threeDaysTitle">Drei Tage</string>
+    <string name="threeDaysTitle">3 Tage</string>
     <string name="weekTitle">Woche</string>
 </resources>

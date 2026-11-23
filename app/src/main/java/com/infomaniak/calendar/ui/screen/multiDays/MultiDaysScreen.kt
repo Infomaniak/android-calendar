@@ -26,6 +26,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -33,13 +34,14 @@ import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendarDefaults
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
-import com.infomaniak.calendar.components.day.component.MultiDayPager
+import com.infomaniak.calendar.components.day.MultiDayPager
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
+import com.infomaniak.calendar.components.foundation.utils.NAVIGABLE_DATES
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
@@ -52,13 +54,14 @@ import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
-import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.plus
 
 private const val DAYS_PER_WEEK = 7
 
-/** A week when [dayCount] is a full week, else [dayCount] days starting on the visible date. */
+/**
+ * A week when [dayCount] is a full week, swiped a week at a time, else [dayCount] days starting on the
+ * visible date, swiped a day at a time.
+ */
 @Composable
 fun MultiDaysScreen(
     dayCount: Int,
@@ -128,18 +131,28 @@ private fun MultiDaysScreen(
         modifier = modifier,
     ) { contentPadding ->
         val weekNumbering = WeekNumbering.ISO_8601 //TODO[weekNumbering]: Use week numbering from LocalSettings
-        val visibleDate = visibleDayState.visibleDate
-        val firstDay = if (dayCount == DAYS_PER_WEEK) weekNumbering.weekOf(visibleDate).firstDay else visibleDate
-        val dates = remember(firstDay, dayCount) { List(dayCount) { firstDay.plus(it, DateTimeUnit.DAY) } }
+        val isWeek = dayCount == DAYS_PER_WEEK
+        // A week is swiped as a whole, so its pages have to start on the first day of a week.
+        val dateRange = remember(isWeek, weekNumbering) {
+            if (isWeek) weekNumbering.weekOf(NAVIGABLE_DATES.start).firstDay..NAVIGABLE_DATES.endInclusive else NAVIGABLE_DATES
+        }
         MultiDayPager(
-            dates = dates,
+            dateRange = dateRange,
+            visibleDayCount = dayCount,
+            daysPerPage = if (isWeek) DAYS_PER_WEEK else 1,
+            selectedDate = { visibleDayState.visibleDate },
             eventsOf = { uiState().eventsOf(it) },
             state = timelineState,
             weekNumbering = weekNumbering,
+            onVisibleDateChanged = { visibleDayState.updateVisibleDate(it) },
             onEventClick = { goToEventDetail(it.occurrenceId) },
             headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
             timelineModifier = Modifier.hazeSource(hazeState),
             contentPadding = contentPadding + PaddingValues(bottom = Dimens.FloatingToolbarClearance),
+            // A week's columns are too narrow for an ellipsis: it would take the room of the few letters that fit.
+            eventTextOverflow = TextOverflow.Clip,
+            // Placed here rather than on each page: the hour grid's vertical scroll reaches it through
+            // the pager, which only consumes the horizontal axis.
             modifier = Modifier
                 .fillMaxSize()
                 .collapseCalendarOnScroll(calendarExpansionState),

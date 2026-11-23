@@ -35,7 +35,7 @@ data class EventLayoutConfig(
 )
 
 object EventLayoutDefaults {
-    val HorizontalSpacing: Dp @Composable get() = EsdsTheme.spacing.xs
+    val HorizontalSpacing: Dp @Composable get() = EsdsTheme.spacing.twoXs
     val HorizontalPadding: Dp @Composable get() = EsdsTheme.spacing.md
     val TitleHeight: Dp @Composable get() = EsdsTheme.spacing.twoXl
     val MinEventWidth: Dp @Composable get() = EsdsTheme.spacing.xs
