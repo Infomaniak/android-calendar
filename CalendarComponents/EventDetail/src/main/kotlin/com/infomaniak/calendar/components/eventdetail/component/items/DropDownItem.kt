@@ -36,7 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
-import com.infomaniak.calendar.components.foundation.component.ListItemClickable
+import com.infomaniak.calendar.components.foundation.component.SegmentedListItemClickable
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ChevronsUpDown
@@ -53,7 +53,7 @@ internal fun DropDownItem(
     contentPadding: PaddingValues = ListItemDefaults.ContentPadding,
     symbol: Symbol? = null,
 ) {
-    ListItemClickable(
+    SegmentedListItemClickable(
         onClick = onClick,
         contentPadding = contentPadding,
         content = content,

@@ -33,7 +33,7 @@ import com.infomaniak.calendar.components.eventdetail.component.items.ClickableI
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItemDefaults
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
-import com.infomaniak.calendar.components.foundation.component.ListItemClickable
+import com.infomaniak.calendar.components.foundation.component.SegmentedListItemClickable
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Cross
 import com.infomaniak.designsystem.icons.symbols.MapPin
@@ -92,7 +92,7 @@ internal fun PlaceEditable(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
 ) {
-    ListItemClickable(
+    SegmentedListItemClickable(
         onClick = onClick,
         shapes = shapes,
         colors = CustomColors.EventFormItemColors,

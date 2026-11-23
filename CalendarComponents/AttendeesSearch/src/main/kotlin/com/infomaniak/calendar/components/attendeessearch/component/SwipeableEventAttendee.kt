@@ -54,7 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.HighlightedText
-import com.infomaniak.calendar.components.foundation.component.ListItemClickable
+import com.infomaniak.calendar.components.foundation.component.SegmentedListItemClickable
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.AvatarStrategy
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
@@ -126,7 +126,7 @@ private fun EventAttendee(
     onClick: (() -> Unit)? = null,
     enabled: Boolean = true,
 ) {
-    ListItemClickable(
+    SegmentedListItemClickable(
         onClick = onClick.takeIf { enabled },
         shapes = shapes,
         colors = ListItemDefaults.segmentedColors(containerColor = ComponentColors.SegmentedItemColor),
