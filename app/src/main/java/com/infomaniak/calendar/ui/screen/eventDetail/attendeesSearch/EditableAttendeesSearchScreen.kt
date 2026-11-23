@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -65,6 +66,10 @@ fun EditableAttendeesSearchScreen(
     eventDetailSharedDataViewModel: EventDetailSharedDataViewModel = viewModel(LocalSharedViewModelStoreOwner.current),
 ) {
     val eventDetailUi by eventDetailSharedDataViewModel.eventDetailUi.collectAsState()
+
+    LaunchedEffect(config.occurrenceId) {
+        eventDetailSharedDataViewModel.setOccurrenceId(config.occurrenceId)
+    }
 
     when (val eventUi = eventDetailUi) {
         EventDetailUiState.Displayable.Loading -> Unit // The parent provides it right away, so nothing to show
