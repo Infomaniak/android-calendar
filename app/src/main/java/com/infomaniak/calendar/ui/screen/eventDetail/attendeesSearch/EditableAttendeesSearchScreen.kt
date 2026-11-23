@@ -92,7 +92,7 @@ fun EditableAttendeesSearchScreen(
                         occurrenceId = config.occurrenceId,
                         attendeesUpdatePayload = AttendeesUpdatePayload(
                             attendees = attendeesSearchState.attendees,
-                            organizer = (attendeesSearchState.organizerSource as? OrganizerSource.Static)?.organizer,
+                            organizer = attendeesSearchState.organizerSource?.organizer,
                             calendarId = CalendarId(config.calendarId),
                         ),
                         scope = scope,
