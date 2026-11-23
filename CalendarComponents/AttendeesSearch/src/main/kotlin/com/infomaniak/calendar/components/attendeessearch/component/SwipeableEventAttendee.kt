@@ -18,11 +18,12 @@
 package com.infomaniak.calendar.components.attendeessearch.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -174,17 +175,22 @@ private fun DeleteBackground(state: SwipeToDismissBoxState) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
         val maxWidthPx = with(LocalDensity.current) { maxWidth.toPx() }
         val progress = abs(state.requireOffset() / maxWidthPx)
+        val width = maxWidth * progress
 
-        Icon(
-            imageVector = EsdsIcons.Trash.Small,
-            contentDescription = stringResource(RCore.string.deleteButton),
+        Box(
             modifier = Modifier
-                .width(maxWidth * progress)
+                .width(width)
+                .fillMaxHeight()
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.error)
-                .padding(EsdsTheme.spacing.xl),
-            tint = Color.White,
-        )
+                .background(MaterialTheme.colorScheme.error),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = EsdsIcons.Trash.Small,
+                contentDescription = stringResource(RCore.string.deleteButton),
+                tint = Color.White,
+            )
+        }
     }
 }
 
