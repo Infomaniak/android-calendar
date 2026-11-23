@@ -83,10 +83,6 @@ fun EventDetailScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.synchronizeAttendeesSearchState(eventDetailSharedDataViewModel.eventDetailUi)
-    }
-
-    LaunchedEffect(Unit) {
         for (request in eventDetailSharedDataViewModel.goBackRequests) goBack()
     }
 
