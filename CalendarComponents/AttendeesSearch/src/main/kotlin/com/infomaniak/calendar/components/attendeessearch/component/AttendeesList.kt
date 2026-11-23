@@ -19,17 +19,19 @@ package com.infomaniak.calendar.components.attendeessearch.component
 
 import android.os.Parcelable
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -41,6 +43,7 @@ import com.infomaniak.calendar.components.attendeessearch.component.ItemKey.Comp
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.AttendeesSearchResult
 import com.infomaniak.calendar.components.foundation.preview.previewAttendees
+import com.infomaniak.calendar.components.foundation.theme.ComponentColors
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
@@ -62,16 +65,21 @@ internal fun AttendeesList(
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
         contentPadding = contentPadding,
     ) {
-        items(
-            items = results(),
-            key = { item -> item.itemKey },
-        ) { item ->
+        val results = results()
+
+        itemsIndexed(
+            items = results,
+            key = { _, item -> item.itemKey },
+        ) { index, item ->
+            val shapes = ListItemDefaults.segmentedShapes(index, results.size)
             when (item) {
                 is AttendeeUi -> SwipeableEventAttendee(
                     attendee = item,
                     onDismiss = { onRemove(item) },
+                    shapes = shapes,
                     query = query,
                     onClick = onClick?.let { { it(item) } },
                     enabled = isEnabled(item),
@@ -81,6 +89,7 @@ internal fun AttendeesList(
                 AttendeesSearchResult.AddCustomAttendee -> AddCustomAttendee(
                     query = query,
                     onClick = onAddCustomAttendee,
+                    shapes = shapes,
                     modifier = Modifier.animateItem(),
                 )
             }
@@ -89,10 +98,12 @@ internal fun AttendeesList(
 }
 
 @Composable
-private fun AddCustomAttendee(query: () -> String, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    ListItem(
+private fun AddCustomAttendee(query: () -> String, onClick: () -> Unit, shapes: ListItemShapes, modifier: Modifier = Modifier) {
+    SegmentedListItem(
         modifier = modifier,
         onClick = onClick,
+        shapes = shapes,
+        colors = ListItemDefaults.segmentedColors(containerColor = ComponentColors.SegmentedItemColor),
         leadingContent = {
             Box(
                 Modifier
@@ -110,7 +121,6 @@ private fun AddCustomAttendee(query: () -> String, onClick: () -> Unit, modifier
         },
         content = { Text(query()) },
         supportingContent = { Text(stringResource(R.string.attendeeIncompleteEmailMessage)) },
-        shapes = ListItemDefaults.shapes(MaterialTheme.shapes.large),
     )
 }
 
