@@ -91,7 +91,7 @@ internal fun MonthWeekRow(
     }
 }
 
-/** Places each visible event over the days it covers, on its lane, and the hidden events indicators in the last lane. */
+/** Places each visible event over the days it covers, on its lane, and the overflow events indicators in the last lane. */
 @Composable
 private fun WeekEvents(
     week: MonthWeekUi,

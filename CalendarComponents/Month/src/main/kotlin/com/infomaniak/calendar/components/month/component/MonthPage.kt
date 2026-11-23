@@ -20,9 +20,9 @@ package com.infomaniak.calendar.components.month.component
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -46,8 +46,8 @@ import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.calendar.components.foundation.utils.horizontalBottomDivider
 import com.infomaniak.calendar.components.foundation.utils.onlyHorizontalAndTop
-import com.infomaniak.calendar.components.foundation.utils.verticalStartDivider
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortDayNameUppercase
+import com.infomaniak.calendar.components.foundation.utils.verticalStartDivider
 import com.infomaniak.calendar.components.month.layout.laneMetrics
 import com.infomaniak.calendar.components.month.layout.monthRowHeights
 import com.infomaniak.calendar.components.month.model.MonthUi
@@ -73,7 +73,8 @@ internal fun MonthPage(
     today: LocalDate = rememberToday().value,
 ) {
     val layoutDirection = LocalLayoutDirection.current
-    // Pages touch, so the grids of consecutive months do too unless some horizontal padding separates them.
+    // We need to know if two pages are touching or if they are separated because some system padding is present. This is used to
+    // avoid drawing two vertical consecutive divider.
     val touchesPreviousGrid = contentPadding.calculateStartPadding(layoutDirection) == 0.dp &&
             contentPadding.calculateEndPadding(layoutDirection) == 0.dp
 
