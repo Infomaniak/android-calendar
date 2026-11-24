@@ -31,6 +31,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -60,6 +63,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -82,6 +86,7 @@ fun CompactTextField(
     colors: TextFieldColors = CompactTextFieldDefaults.colors(),
     lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
     isError: Boolean = false,
+    allowsLineBreak: Boolean = true,
     errorText: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -127,6 +132,12 @@ fun CompactTextField(
                 }
             },
             interactionSource = interactionSource,
+            inputTransformation = if (allowsLineBreak) null else NoLineBreakTransformation,
+            keyboardOptions = (if (allowsLineBreak) {
+                KeyboardOptions(imeAction = ImeAction.Default)
+            } else {
+                KeyboardOptions(imeAction = ImeAction.Done)
+            }),
             cursorBrush = SolidColor(colors.cursorColor(isError)),
             modifier = modifier
                 .fillMaxWidth()
@@ -180,6 +191,15 @@ fun CompactTextField(
                 }
             },
         )
+    }
+}
+
+object NoLineBreakTransformation : InputTransformation {
+    override fun TextFieldBuffer.transformInput() {
+        val text = asCharSequence()
+        for (i in text.indices.reversed()) {
+            if (text[i] == '\n' || text[i] == '\r') replace(i, i + 1, " ") // pasted line breaks become spaces
+        }
     }
 }
 

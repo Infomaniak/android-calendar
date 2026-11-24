@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -31,7 +30,6 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,16 +37,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIconDefaults
+import com.infomaniak.calendar.components.eventdetail.detail.component.MaxCharacterTextField
 import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.theme.MaterialPreviewTheme
 
 private const val MAX_LINES = Int.MAX_VALUE
+private const val MAX_CHARACTERS = 1_000
 
 @Composable
 internal fun Title(dotColor: Color, title: String, shapes: ListItemShapes, modifier: Modifier = Modifier) {
@@ -69,28 +68,23 @@ internal fun TitleEditable(
     modifier: Modifier = Modifier,
 ) {
     SegmentedListItem(
-        leadingContent = { EventColorDot(dotColor()) },
         shapes = shapes,
         colors = CustomColors.EventFormItemColors,
         content = {
-            BasicTextField(
+            MaxCharacterTextField(
                 state = textFieldState,
+                maxAmountCharacters = MAX_CHARACTERS,
                 textStyle = MaterialTheme.typography.titleLargeEmphasized.copy(LocalContentColor.current),
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = MAX_LINES),
                 modifier = Modifier.fillMaxWidth(),
-                decorator = { innerTextField ->
-                    Box {
-                        if (textFieldState.text.isEmpty()) {
-                            Text(
-                                text = stringResource(R.string.eventTitle),
-                                style = MaterialTheme.typography.titleLargeEmphasized,
-                                color = OutlinedTextFieldDefaults.colors().unfocusedPlaceholderColor,
-                            )
-                        }
-                        innerTextField()
-                    }
+                placeholder = {
+                    Text(
+                        stringResource(R.string.eventTitle),
+                        style = MaterialTheme.typography.titleLargeEmphasized,
+                    )
                 },
+                allowsLineBreak = false,
+                leadingIcon = { EventColorDot(dotColor()) },
             )
         },
         modifier = modifier,
@@ -109,6 +103,16 @@ private fun EventColorDot(color: Color) {
 }
 
 private const val PREVIEW_TITLE = "End of the year vacations with Santa Claus"
+private const val PREVIEW_TITLE_TOO_LONG =
+    "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. " +
+            "Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, " +
+            "pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, " +
+            "vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede" +
+            " mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. " +
+            "Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, " +
+            "feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies" +
+            " nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget " +
+            "condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. No"
 
 @PreviewLightDark
 @Composable
@@ -133,3 +137,19 @@ private fun PreviewEditable() {
         }
     }
 }
+
+@PreviewLightDark
+@Composable
+private fun PreviewEditableTooLong() {
+    MaterialPreviewTheme {
+        Surface {
+            TitleEditable(
+                dotColor = { Color.Red },
+                textFieldState = rememberTextFieldState(PREVIEW_TITLE_TOO_LONG),
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            )
+        }
+    }
+}
+
+
