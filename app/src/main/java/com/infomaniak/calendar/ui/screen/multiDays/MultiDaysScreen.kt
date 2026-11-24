@@ -39,6 +39,7 @@ import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.event.EventQuickAction
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
+import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
@@ -49,6 +50,8 @@ import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
 import com.infomaniak.calendar.ui.model.TimelineUiState
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
+import com.infomaniak.calendar.ui.screen.eventQuickActions.EventQuickActionViewModel
+import com.infomaniak.calendar.ui.screen.eventQuickActions.EventQuickActionsHost
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
@@ -69,6 +72,7 @@ fun MultiDaysScreen(
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MultiDaysViewModel = viewModel(),
+    quickActionsViewModel: EventQuickActionViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
@@ -88,7 +92,7 @@ fun MultiDaysScreen(
     MultiDaysScreen(
         dayCount = dayCount,
         goToEventDetail = goToEventDetail,
-        onEventQuickAction = viewModel::onEventQuickAction,
+        onEventQuickAction = quickActionsViewModel::onEventQuickAction,
         uiState = { uiState },
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventDots },
@@ -96,13 +100,14 @@ fun MultiDaysScreen(
         timelineState = timelineState,
         modifier = modifier,
     )
+    EventQuickActionsHost(quickActionsViewModel)
 }
 
 @Composable
 private fun MultiDaysScreen(
     dayCount: Int,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
-    onEventQuickAction: (OccurrenceId, EventQuickAction) -> Unit,
+    onEventQuickAction: (EventSummaryUi.Normal, EventQuickAction) -> Unit,
     uiState: () -> TimelineUiState,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
@@ -149,7 +154,7 @@ private fun MultiDaysScreen(
             weekNumbering = weekNumbering,
             onVisibleDateChanged = { visibleDayState.updateVisibleDate(it) },
             onEventClick = { goToEventDetail(it.occurrenceId) },
-            onEventQuickAction = { event, action -> onEventQuickAction(event.occurrenceId, action) },
+            onEventQuickAction = onEventQuickAction,
             headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
             timelineModifier = Modifier.hazeSource(hazeState),
             contentPadding = contentPadding + PaddingValues(bottom = Dimens.FloatingToolbarClearance),

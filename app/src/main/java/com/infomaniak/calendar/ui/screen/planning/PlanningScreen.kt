@@ -49,6 +49,8 @@ import com.infomaniak.calendar.ui.component.ScreenLoader
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
+import com.infomaniak.calendar.ui.screen.eventQuickActions.EventQuickActionViewModel
+import com.infomaniak.calendar.ui.screen.eventQuickActions.EventQuickActionsHost
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -65,6 +67,7 @@ fun PlanningScreen(
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PlanningViewModel = viewModel(),
+    quickActionsViewModel: EventQuickActionViewModel = viewModel(),
 ) {
     val planningUiState: PlanningUiState by viewModel.planningUiState.collectAsStateWithLifecycle()
     val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
@@ -74,20 +77,21 @@ fun PlanningScreen(
     PlanningScreen(
         goToEventCreation = goToEventCreation,
         goToEventDetail = goToEventDetail,
-        onEventQuickAction = viewModel::onEventQuickAction,
+        onEventQuickAction = quickActionsViewModel::onEventQuickAction,
         planningUiState = { planningUiState },
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventsDots },
         visibleDayState = visibleDayState,
         modifier = modifier,
     )
+    EventQuickActionsHost(quickActionsViewModel)
 }
 
 @Composable
 private fun PlanningScreen(
     goToEventCreation: (LocalDate) -> Unit,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
-    onEventQuickAction: (OccurrenceId, EventQuickAction) -> Unit,
+    onEventQuickAction: (EventSummaryUi.Normal, EventQuickAction) -> Unit,
     planningUiState: () -> PlanningUiState,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
@@ -143,7 +147,7 @@ private fun SuccessPlanning(
     contentPadding: PaddingValues,
     goToEventCreation: (LocalDate) -> Unit,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
-    onEventQuickAction: (OccurrenceId, EventQuickAction) -> Unit,
+    onEventQuickAction: (EventSummaryUi.Normal, EventQuickAction) -> Unit,
     visibleDayState: VisibleDayState,
     modifier: Modifier = Modifier,
 ) {
@@ -165,7 +169,7 @@ private fun SuccessPlanning(
         contentPadding = contentPadding,
         goToEventCreation = goToEventCreation,
         onEventClick = { goToEventDetail(it.occurrenceId) },
-        onEventQuickAction = { event, action -> onEventQuickAction(event.occurrenceId, action) },
+        onEventQuickAction = onEventQuickAction,
     )
 }
 

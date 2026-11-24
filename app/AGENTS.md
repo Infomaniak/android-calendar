@@ -40,7 +40,6 @@ app/src/main/java/com/infomaniak/calendar/
 │   ├── BackgroundEventComposer.kt  # App-scoped, temporary until KMP is offline first: runs EventComposerUseCase's changes in
 │   │                               # the background for the event ViewModels, so their screens close at once; MainActivity shows
 │   │                               # its errors
-│   ├── EventQuickActionHandler.kt  # Runs an event's quick action (long-click menu); each calendar view's ViewModel forwards to it
 │   ├── VisibleDateManager.kt       # App-scoped: single visible-date source, restored/saved by MainViewModel
 │   ├── VisibleMonthManager.kt      # App-scoped: the months loaded around the shared visible date, and their event dots
 │   ├── VisibleEventsManager.kt     # App-scoped: one observation of the day-sliced events around the visible date, for every view
@@ -71,6 +70,8 @@ app/src/main/java/com/infomaniak/calendar/
     │                              # (months around the visible one, laid out with their events). pendingKmp/ (temporary, TODO[kmpMonth]):
     │                              #   buildMonths and packWeek lay a month's events into lanes, as iOS MonthWeekLayout does,
     │                              #   until KMP returns them; the package then goes and only MonthViewModel's source changes
+    │   ├── eventQuickActions/     # EventQuickActionViewModel runs the long-click menu's actions for the events of Planning,
+    │                              # Day and MultiDays; EventQuickActionsHost, beside each screen, asks the delete scope first
     │   ├── planning/              # PlanningScreen + PlanningViewModel (events from VisibleEventsManager) + PlanningEventGroupingExt
     │   ├── accounts/              # AccountsListScreen + AccountActionsScreen + AccountsViewModel + AccountItem
     │                              # Drawer-backed account list, per-account detail/logout screen, and remove-account flow

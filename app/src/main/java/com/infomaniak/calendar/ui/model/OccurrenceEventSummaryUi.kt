@@ -39,7 +39,10 @@ data class OccurrenceEventSummaryUi(
     override val hasAttendees: Boolean,
     override val myStatus: ParticipationStatus?,
     override val canEdit: Boolean,
+    val isRecurring: Boolean,
 ) : EventSummaryUi.Normal
 
 /** All [EventSummaryUi.Normal] used in the app are [OccurrenceEventSummaryUi] and we need to cast it to get the occurrence id back */
 val EventSummaryUi.Normal.occurrenceId: OccurrenceId get() = (this as OccurrenceEventSummaryUi).occurrenceId
+
+val EventSummaryUi.Normal.isRecurring: Boolean get() = (this as OccurrenceEventSummaryUi).isRecurring
