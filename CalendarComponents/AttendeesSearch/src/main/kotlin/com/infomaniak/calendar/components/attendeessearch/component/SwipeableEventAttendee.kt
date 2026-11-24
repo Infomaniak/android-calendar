@@ -58,7 +58,6 @@ import com.infomaniak.calendar.components.foundation.component.SegmentedListItem
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.AvatarStrategy
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
-import com.infomaniak.calendar.components.foundation.theme.ComponentColors
 import com.infomaniak.calendar.components.foundation.utils.fromAttendee
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.components.Avatar
@@ -129,7 +128,6 @@ private fun EventAttendee(
     SegmentedListItemClickable(
         onClick = onClick.takeIf { enabled },
         shapes = shapes,
-        colors = ComponentColors.SegmentedListItemColors,
         modifier = modifier.semantics { if (!enabled) disabled() },
         verticalAlignment = Alignment.CenterVertically,
         leadingContent = {

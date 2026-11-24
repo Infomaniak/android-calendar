@@ -59,7 +59,6 @@ internal fun DropDownItem(
         content = content,
         leadingContent = symbol?.let { { ItemIcon(it) } },
         shapes = shapes,
-        colors = CustomColors.EventFormItemColors,
         trailingContent = {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),

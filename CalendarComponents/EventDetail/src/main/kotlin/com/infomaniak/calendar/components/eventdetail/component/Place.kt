@@ -95,7 +95,6 @@ internal fun PlaceEditable(
     SegmentedListItemClickable(
         onClick = onClick,
         shapes = shapes,
-        colors = CustomColors.EventFormItemColors,
         content = { Text(name) },
         leadingContent = { ItemIcon(EsdsIcons.MapPin) },
         supportingContent = address?.let { { Text(it) } },
