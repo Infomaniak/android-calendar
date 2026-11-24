@@ -63,6 +63,7 @@ class EventFormState(
     participants: Set<ParticipantUi>,
     organizerSource: OrganizerSource?,
     isKMeetUrlEnabled: Boolean,
+    val descriptionTextState: TextFieldState,
     reminders: List<EventDetailUi.Reminder>,
     isOccupied: Boolean,
     isPublic: Boolean,
@@ -102,6 +103,8 @@ class EventFormState(
     internal val start get() = dateAndTimeState.start.date.atTime(dateAndTimeState.start.time)
     internal val end get() = dateAndTimeState.end.date.atTime(dateAndTimeState.end.time)
 
+    fun isValid(): Boolean = descriptionTextState.text.length <= DESCRIPTION_MAX_CHARACTERS
+
     /** Organizing a new event as the owner of [calendar], who must then not also be one of its attendees. */
     fun selectCalendar(calendar: EventDetailCalendar) {
         this.calendar = calendar
@@ -126,6 +129,7 @@ class EventFormState(
             attendees = attendees,
             initialOrganizer = (organizerSource as? OrganizerSource.Static)?.organizer,
             isKMeetUrlEnabled = isKMeetUrlEnabled.value,
+            description = descriptionTextState.text.toString().ifEmpty { null },
             reminders = reminders.toList(),
             isOccupied = isOccupied.value,
             isPublic = isPublic.value,
@@ -133,6 +137,8 @@ class EventFormState(
     }
 
     companion object {
+        const val DESCRIPTION_MAX_CHARACTERS = 10_000
+
         /** A new event on [date] in [calendar], lasting [eventDuration]. */
         fun default(
             calendar: EventDetailCalendar,
@@ -157,6 +163,7 @@ class EventFormState(
                 participants = emptySet(),
                 organizerSource = calendar.organizerAttendeeUi?.let(OrganizerSource::Dynamic),
                 isKMeetUrlEnabled = false,
+                descriptionTextState = TextFieldState(),
                 reminders = emptyList(),
                 isOccupied = true,
                 isPublic = true,

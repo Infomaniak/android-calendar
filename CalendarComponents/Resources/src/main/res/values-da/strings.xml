@@ -66,6 +66,7 @@
     <string name="descriptionTitle">Beskrivelse</string>
     <string name="emptyStateNoTimeZone">Ingen tidszoner fundet</string>
     <string name="eventTitle">Arrangementstitel</string>
+    <string name="eventValidationCharacterLimitExceeded">Tegngrænse overskredet</string>
     <string name="eventValidationTooManyAttendees">Du kan ikke have mere end %d gæster</string>
     <plurals name="hourAmount">
         <item quantity="one">%d time</item>

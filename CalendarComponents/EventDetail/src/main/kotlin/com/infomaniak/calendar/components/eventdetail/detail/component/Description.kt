@@ -21,6 +21,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
@@ -42,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
+import com.infomaniak.calendar.components.eventdetail.form.EventFormState.Companion.DESCRIPTION_MAX_CHARACTERS
 import com.infomaniak.calendar.components.eventdetail.state.CollapsibleTextState
 import com.infomaniak.calendar.components.eventdetail.state.animateCollapse
 import com.infomaniak.calendar.components.eventdetail.state.rememberCollapsibleTextState
@@ -63,14 +66,13 @@ internal fun DescriptionCollapsibleButton(
     val descriptionState = rememberCollapsibleTextState(isCollapsed, COLLAPSED_MAX_LINES)
 
     val descriptionTitle = R.string.descriptionTitle
-    val leadingIcon = EsdsIcons.List
 
     // Shows or hides the button to toggle the description based on if the text is actually overflowing when collapsed or not.
     if (descriptionState.isOverflowing) {
         SegmentedListItem(
             content = { Text(stringResource(descriptionTitle)) },
             supportingContent = { DescriptionContent(description, descriptionState) },
-            leadingContent = { ItemIcon(leadingIcon) },
+            leadingContent = { DescriptionIcon() },
             trailingContent = { AnimatedChevron { isCollapsed } },
             onClick = { isCollapsed = !isCollapsed },
             shapes = shapes,
@@ -81,7 +83,7 @@ internal fun DescriptionCollapsibleButton(
         SegmentedListItem(
             content = { Text(stringResource(descriptionTitle)) },
             supportingContent = { DescriptionContent(description, descriptionState) },
-            leadingContent = { ItemIcon(leadingIcon) },
+            leadingContent = { DescriptionIcon() },
             shapes = shapes,
             colors = CustomColors.EventFormItemColors,
             modifier = Modifier.padding(contentPadding),
@@ -103,6 +105,40 @@ private fun DescriptionContent(description: String, state: CollapsibleTextState)
 }
 
 @Composable
+internal fun DescriptionEditable(
+    state: TextFieldState,
+    shapes: ListItemShapes,
+    modifier: Modifier = Modifier,
+) {
+    val isTooLong = state.text.length > DESCRIPTION_MAX_CHARACTERS
+    val extraCharacters = DESCRIPTION_MAX_CHARACTERS - state.text.length
+    val errorMessage = stringResource(R.string.eventValidationCharacterLimitExceeded) + " $extraCharacters"
+
+    SegmentedListItem(
+        shapes = shapes,
+        colors = CustomColors.EventFormItemColors,
+        content = {
+            CompactTextField(
+                state = state,
+                isError = isTooLong,
+                placeholder = { Text(stringResource(R.string.descriptionTitle), maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                errorText = {
+                    Text(
+                        text = errorMessage,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                },
+                lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 1),
+                leadingIcon = { DescriptionIcon() },
+                trailingIcon = null,
+            )
+        },
+        modifier = modifier,
+    )
+}
+
+@Composable
 private fun AnimatedChevron(isCollapsed: () -> Boolean) {
     val animatedChevronRotation = animateFloatAsState(if (isCollapsed()) 0f else -180f, label = "Chevron rotation")
 
@@ -111,6 +147,11 @@ private fun AnimatedChevron(isCollapsed: () -> Boolean) {
         contentDescription = null,
         modifier = Modifier.graphicsLayer { rotationZ = animatedChevronRotation.value },
     )
+}
+
+@Composable
+private fun DescriptionIcon() {
+    ItemIcon(EsdsIcons.List)
 }
 
 @Preview
@@ -135,6 +176,19 @@ private fun PreviewOverflow() {
             DescriptionCollapsibleButton(
                 description = LoremIpsum(35).values.first(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewDescriptionEditable() {
+    MaterialTheme {
+        Surface {
+            DescriptionEditable(
+                state = TextFieldState("Description"),
                 shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             )
         }
