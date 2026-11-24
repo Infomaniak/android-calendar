@@ -65,7 +65,7 @@
     </plurals>
     <string name="descriptionTitle">Kuvaus</string>
     <string name="emptyStateNoTimeZone">Aikavyöhykkeitä ei löytynyt</string>
-    <string name="eventTitle">Tapahtuman nimi</string>
+    <string name="eventTitle">Otsikko</string>
     <string name="eventValidationCharacterLimitExceeded">Merkkiraja ylitetty</string>
     <string name="eventValidationTooManyAttendees">Vieraita voi olla enintään %d</string>
     <plurals name="hourAmount">

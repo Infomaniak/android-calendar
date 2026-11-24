@@ -65,7 +65,7 @@
     </plurals>
     <string name="descriptionTitle">Description</string>
     <string name="emptyStateNoTimeZone">No time zones found</string>
-    <string name="eventTitle">Event title</string>
+    <string name="eventTitle">Title</string>
     <string name="eventValidationCharacterLimitExceeded">Character limit exceeded</string>
     <string name="eventValidationTooManyAttendees">You cannot have more than %d attendees</string>
     <plurals name="hourAmount">
