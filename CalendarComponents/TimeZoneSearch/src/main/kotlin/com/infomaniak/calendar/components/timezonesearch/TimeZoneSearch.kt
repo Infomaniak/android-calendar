@@ -24,12 +24,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.snapshotFlow
@@ -91,7 +93,7 @@ private fun TimeZoneSearchContent(
     SearchLayout(modifier = modifier, contentPadding = contentPadding.onlyHorizontalAndTop()) {
         SearchBar(searchQuery, modifier = Modifier.focusRequester(rememberInitialFocusRequester()))
 
-        when (val results = searchResults) {
+        when (searchResults) {
             null -> Unit // Still loading
             emptyList<TimeZoneUi>() -> EmptyState(
                 text = stringResource(R.string.emptyStateNoTimeZone),
@@ -99,7 +101,7 @@ private fun TimeZoneSearchContent(
                 modifier = Modifier.padding(bottom = contentPadding.calculateBottomPadding()),
             )
             else -> TimeZoneResults(
-                results = results,
+                results = searchResults,
                 query = { searchQuery.text.toString().trim() },
                 onTimeZoneClick = onTimeZoneClick,
                 contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
@@ -115,7 +117,12 @@ private fun TimeZoneResults(
     onTimeZoneClick: (TimeZone) -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
+    val listState = rememberLazyListState()
+    val isQueryEmpty = query().isEmpty()
+    LaunchedEffect(isQueryEmpty) { if (isQueryEmpty) listState.scrollToItem(0) }
+
     LazyColumn(
+        state = listState,
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
         contentPadding = contentPadding + PaddingValues(vertical = EsdsTheme.spacing.sm),
