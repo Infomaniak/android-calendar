@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.foundation.theme
 
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 
@@ -24,4 +25,6 @@ object ComponentColors {
     val GridDividerColor @Composable get() = MaterialTheme.colorScheme.outlineVariant
 
     val SegmentedItemColor @Composable get() = MaterialTheme.colorScheme.surfaceBright
+
+    val SegmentedListItemColors @Composable get() = ListItemDefaults.segmentedColors(containerColor = SegmentedItemColor)
 }
