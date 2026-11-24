@@ -42,12 +42,12 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIconDefaults
 import com.infomaniak.calendar.components.eventdetail.detail.component.MaxCharacterTextField
+import com.infomaniak.calendar.components.eventdetail.form.EventFormState.Companion.TITLE_MAX_CHARACTERS
 import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.theme.MaterialPreviewTheme
 
 private const val MAX_LINES = Int.MAX_VALUE
-private const val MAX_CHARACTERS = 150
 
 @Composable
 internal fun Title(dotColor: Color, title: String, shapes: ListItemShapes, modifier: Modifier = Modifier) {
@@ -73,7 +73,7 @@ internal fun TitleEditable(
         content = {
             MaxCharacterTextField(
                 state = textFieldState,
-                maxAmountCharacters = MAX_CHARACTERS,
+                maxAmountCharacters = TITLE_MAX_CHARACTERS,
                 textStyle = MaterialTheme.typography.titleLargeEmphasized.copy(LocalContentColor.current),
                 lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = MAX_LINES),
                 modifier = Modifier.fillMaxWidth(),
