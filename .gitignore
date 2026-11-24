@@ -23,3 +23,4 @@ uitest-env.properties
 # CalDAV debug proxy root CAs, generated per machine. See CaldavDebugConfig.
 app/src/debug/assets/certificates/*
 app/standard/release/mapping.txt
+.import_loco_api
