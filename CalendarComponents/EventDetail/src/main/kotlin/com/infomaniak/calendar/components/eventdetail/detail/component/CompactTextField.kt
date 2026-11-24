@@ -198,7 +198,7 @@ object NoLineBreakTransformation : InputTransformation {
     override fun TextFieldBuffer.transformInput() {
         val text = asCharSequence()
         for (i in text.indices.reversed()) {
-            if (text[i] == '\n' || text[i] == '\r') replace(i, i + 1, " ") // pasted line breaks become spaces
+            if (text[i] == '\n' || text[i] == '\r') replace(i, i + 1, "")
         }
     }
 }
