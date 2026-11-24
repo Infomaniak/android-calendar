@@ -104,7 +104,8 @@ class EventFormState(
     internal val start get() = dateAndTimeState.start.date.atTime(dateAndTimeState.start.time)
     internal val end get() = dateAndTimeState.end.date.atTime(dateAndTimeState.end.time)
 
-    fun isValid(): Boolean = descriptionTextState.text.length <= DESCRIPTION_MAX_CHARACTERS
+    fun isValid(): Boolean = descriptionTextState.text.length <= DESCRIPTION_MAX_CHARACTERS &&
+            titleTextState.text.length <= TITLE_MAX_CHARACTERS
 
     /** Organizing a new event as the owner of [calendar], who must then not also be one of its attendees. */
     fun selectCalendar(calendar: EventDetailCalendar) {
@@ -139,6 +140,7 @@ class EventFormState(
 
     companion object {
         const val DESCRIPTION_MAX_CHARACTERS = 10_000
+        const val TITLE_MAX_CHARACTERS = 150
 
         /** A new event on [date] in [calendar], lasting [eventDuration]. */
         fun default(

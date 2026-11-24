@@ -31,6 +31,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -60,6 +63,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -78,10 +82,12 @@ fun CompactTextField(
     state: TextFieldState,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     textStyle: TextStyle = LocalTextStyle.current,
     colors: TextFieldColors = CompactTextFieldDefaults.colors(),
     lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
     isError: Boolean = false,
+    inputTransformation: InputTransformation? = null,
     errorText: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -127,6 +133,8 @@ fun CompactTextField(
                 }
             },
             interactionSource = interactionSource,
+            inputTransformation = inputTransformation,
+            keyboardOptions = keyboardOptions,
             cursorBrush = SolidColor(colors.cursorColor(isError)),
             modifier = modifier
                 .fillMaxWidth()
@@ -180,6 +188,50 @@ fun CompactTextField(
                 }
             },
         )
+    }
+}
+
+/**
+ * A compact text field that shows a defined error if the [maxAmountCharacters] is exceeded.
+ */
+@Composable
+fun CompactTextField(
+    state: TextFieldState,
+    maxAmountCharacters: Int,
+    modifier: Modifier = Modifier,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    textStyle: TextStyle = LocalTextStyle.current,
+    lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
+    inputTransformation: InputTransformation? = null,
+    placeholder: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+) {
+    val isTooLong = state.text.length > maxAmountCharacters
+    val extraCharacters = maxAmountCharacters - state.text.length
+    val errorMessage = stringResource(R.string.eventValidationCharacterLimitExceeded) + " $extraCharacters"
+
+    CompactTextField(
+        state = state,
+        isError = isTooLong,
+        placeholder = placeholder,
+        textStyle = textStyle,
+        errorText = { Text(text = errorMessage, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        lineLimits = lineLimits,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        keyboardOptions = keyboardOptions,
+        inputTransformation = inputTransformation,
+        modifier = modifier,
+    )
+}
+
+object NoLineBreakTransformation : InputTransformation {
+    override fun TextFieldBuffer.transformInput() {
+        val text = asCharSequence()
+        for (i in text.indices.reversed()) {
+            if (text[i] == '\n' || text[i] == '\r') replace(i, i + 1, "")
+        }
     }
 }
 
