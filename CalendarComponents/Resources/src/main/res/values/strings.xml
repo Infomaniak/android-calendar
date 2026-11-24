@@ -65,6 +65,7 @@
     </plurals>
     <string name="descriptionTitle">Description</string>
     <string name="emptyStateNoTimeZone">No time zones found</string>
+    <string name="endLabel">End</string>
     <string name="eventTitle">Title</string>
     <string name="eventValidationCharacterLimitExceeded">Character limit exceeded</string>
     <string name="eventValidationTooManyAttendees">You cannot have more than %d attendees</string>
@@ -100,6 +101,7 @@
     </plurals>
     <string name="sectionCalendarHeader">Calendar</string>
     <string name="sectionOrganizerHeader">Organizer</string>
+    <string name="startLabel">Start</string>
     <string name="statusAcceptedLabel">Accepted</string>
     <string name="statusDeclinedLabel">Declined</string>
     <string name="statusNeedsActionLabel">Pending</string>

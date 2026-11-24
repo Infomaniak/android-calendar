@@ -36,6 +36,7 @@ android {
 
 dependencies {
     api(project(":CalendarComponents:Foundation"))
+    api(project(":ScrollPicker"))
     implementation(project(":CalendarComponents:Resources"))
 
     api(core.infomaniak.core.filetypes)
@@ -57,4 +58,6 @@ dependencies {
     implementation(kmpCalendar.kotlinx.datetime)
 
     implementation(core.androidx.adaptive)
+
+    testImplementation(core.junit)
 }

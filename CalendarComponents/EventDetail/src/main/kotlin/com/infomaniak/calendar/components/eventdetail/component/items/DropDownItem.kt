@@ -22,14 +22,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +40,7 @@ import com.infomaniak.calendar.components.foundation.component.ListItemClickable
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ChevronsUpDown
+import com.infomaniak.designsystem.icons.symbols.Symbol
 
 @Composable
 internal fun DropDownItem(
@@ -48,13 +50,14 @@ internal fun DropDownItem(
     itemCount: Int,
     shapes: ListItemShapes,
     modifier: Modifier = Modifier,
-    leadingContent: @Composable (() -> Unit)? = null,
-    contentPadding: PaddingValues = PaddingValues(),
+    contentPadding: PaddingValues = ListItemDefaults.ContentPadding,
+    symbol: Symbol? = null,
 ) {
     ListItemClickable(
         onClick = onClick,
-        contentPadding = contentPadding + ListItemDefaults.ContentPadding,
+        contentPadding = contentPadding,
         content = content,
+        leadingContent = symbol?.let { { ItemIcon(it) } },
         shapes = shapes,
         colors = CustomColors.EventFormItemColors,
         trailingContent = {
@@ -62,11 +65,12 @@ internal fun DropDownItem(
                 horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                trailingContent()
+                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.labelLarge) {
+                    trailingContent()
+                }
                 if (itemCount > 1) Icon(EsdsIcons.ChevronsUpDown.Small, contentDescription = null)
             }
         },
-        leadingContent = leadingContent,
         modifier = modifier,
     )
 }
@@ -79,7 +83,6 @@ private fun Preview() {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 DropDownItem(
                     content = { Text("Dropdown item") },
-                    leadingContent = {},
                     trailingContent = { Text("Value") },
                     onClick = {},
                     shapes = ListItemDefaults.segmentedShapes(index = 0, count = 2),
@@ -88,7 +91,6 @@ private fun Preview() {
 
                 DropDownItem(
                     content = { Text("Disabled item") },
-                    leadingContent = {},
                     trailingContent = { Text("Value") },
                     onClick = {},
                     shapes = ListItemDefaults.segmentedShapes(index = 1, count = 2),
