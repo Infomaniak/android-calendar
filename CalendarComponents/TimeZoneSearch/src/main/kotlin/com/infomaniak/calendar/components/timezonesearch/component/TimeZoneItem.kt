@@ -22,6 +22,7 @@ import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.HighlightedText
@@ -38,6 +39,7 @@ internal fun TimeZoneItem(
     modifier: Modifier = Modifier,
 ) {
     SegmentedListItem(
+        verticalAlignment = Alignment.CenterVertically,
         shapes = shapes,
         colors = ComponentColors.SegmentedListItemColors,
         onClick = onClick,

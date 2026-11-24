@@ -125,7 +125,7 @@ private fun TimeZoneResults(
         state = listState,
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
-        contentPadding = contentPadding + PaddingValues(vertical = EsdsTheme.spacing.sm),
+        contentPadding = contentPadding,
     ) {
         itemsIndexed(items = results, key = { _, item -> item.timeZone.id }) { index, timeZone ->
             val shapes = ListItemDefaults.segmentedShapes(index, results.size)
