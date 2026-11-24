@@ -98,6 +98,7 @@ fun EventDetailScreen(
         goToEdit = goToEdit,
         onDelete = { scope -> if (viewModel.deleteEvent(occurrenceId, scope)) goBack() },
         onLocationClick = { location -> openLocationInMapApp(context, location) },
+        onJoinKMeet = { url -> openUrl(context, url) },
         goToEventAttendees = { canEdit, isRecurring, calendarId ->
             goToEventAttendees(EditAttendeesConfig(occurrenceId, canEdit, isRecurring, calendarId))
         },
@@ -113,6 +114,7 @@ private fun EventDetailScreen(
     goToEventAttendees: (canEdit: Boolean, isRecurring: Boolean, calendarId: String) -> Unit,
     onDelete: (RecurrentEventScope) -> Unit,
     onLocationClick: (String) -> Unit,
+    onJoinKMeet: (String) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
@@ -157,7 +159,7 @@ private fun EventDetailScreen(
 
                 EventDetail(
                     eventDetail = state.eventDetail,
-                    onJoinKMeet = { /*TODO[eventDetail]*/ },
+                    onJoinKMeet = { state.eventDetail.kMeetUrl?.let(onJoinKMeet) },
                     onCopyKMeet = { state.eventDetail.kMeetUrl?.let { clipboardManager.copy(it, copyFeedbackMessage) } },
                     onLocationClick = { state.eventDetail.location?.mapsQuery?.let(onLocationClick) },
                     goToEventAttendees = {
@@ -190,6 +192,10 @@ private fun openLocationInMapApp(context: Context, location: String) {
     context.safeStartActivity(mapIntent)
 }
 
+private fun openUrl(context: Context, url: String) {
+    context.safeStartActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+}
+
 @Preview
 @Composable
 private fun Preview() {
@@ -202,6 +208,7 @@ private fun Preview() {
                 goToEventAttendees = { _, _, _ -> },
                 onDelete = {},
                 onLocationClick = {},
+                onJoinKMeet = {},
             )
         }
     }
