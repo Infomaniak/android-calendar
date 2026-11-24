@@ -19,18 +19,18 @@ package com.infomaniak.calendar.components.eventdetail.detail.component
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.BottomAppBarDefaults
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FlexibleBottomAppBar
 import androidx.compose.material3.FloatingToolbarScrollBehavior
-import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -43,7 +43,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -71,35 +73,36 @@ fun ParticipationStatusButtonsToolbar(
 ) {
     var selectedStatus by remember(participationStatus) { mutableStateOf(participationStatus()) }
 
-    HorizontalFloatingToolbar(
-        expanded = true,
-        scrollBehavior = scrollBehavior,
-        shape = MaterialTheme.shapes.large,
-        expandedShadowElevation = elevation,
-        collapsedShadowElevation = elevation,
+    FlexibleBottomAppBar(
         modifier = modifier
             .fillMaxWidth()
-            .windowInsetsPadding(windowInsets)
-            .wrapContentWidth()
             .selectableGroup(),
+        containerColor = MaterialTheme.colorScheme.background,
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md)) {
-            ParticipationStatusButton.entries.forEach { participationStatusButton ->
-                ToggleButton(
-                    checked = selectedStatus == participationStatusButton.status,
-                    onCheckedChange = {
-                        selectedStatus = participationStatusButton.status
-                        onParticipationStatusChange(participationStatusButton.status)
-                    },
-                    colors = participationStatusButton.colors(),
-                    modifier = Modifier.semantics { role = Role.RadioButton },
-                ) {
-                    Icon(
-                        imageVector = participationStatusButton.icon.Small,
-                        contentDescription = null,
-                    )
-                    Spacer(modifier = Modifier.size(ToggleButtonDefaults.IconSpacing))
-                    Text(stringResource(participationStatusButton.label))
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(EsdsTheme.spacing.md),
+                modifier = Modifier
+                    .selectableGroup()
+                    .width(IntrinsicSize.Min),
+            ) {
+                ParticipationStatusButton.entries.forEach { participationStatusButton ->
+                    val checked = selectedStatus == participationStatusButton.status
+                    ToggleButton(
+                        checked = checked,
+                        onCheckedChange = {
+                            selectedStatus = participationStatusButton.status
+                            onParticipationStatusChange(participationStatusButton.status)
+                        },
+                        colors = participationStatusButton.colors(),
+                        border = if (checked.not()) ButtonDefaults.outlinedButtonBorder(true) else null,
+                        modifier = Modifier
+                            .semantics { role = Role.RadioButton }
+                            .weight(1f),
+                        icon = { Icon(imageVector = participationStatusButton.icon.Small, contentDescription = null) },
+                    ) {
+                        Text(stringResource(participationStatusButton.label))
+                    }
                 }
             }
         }
@@ -112,13 +115,14 @@ private enum class ParticipationStatusButton(
     @StringRes val label: Int,
 ) {
     Yes(ParticipationStatus.Accepted, EsdsIcons.CircleCheck, RCore.string.buttonYes),
-    No(ParticipationStatus.Declined, EsdsIcons.CircleCross, RCore.string.buttonNo),
     Maybe(ParticipationStatus.Tentative, EsdsIcons.CircleQuestion, RCore.string.buttonMaybe),
+    No(ParticipationStatus.Declined, EsdsIcons.CircleCross, RCore.string.buttonNo),
 }
 
 @Composable
 private fun ParticipationStatusButton.colors(): ToggleButtonColors {
     return ToggleButtonDefaults.colors(
+        containerColor = Color.Transparent,
         checkedContainerColor = status.statusColor(),
         checkedContentColor = status.onStatusColor(),
     )
