@@ -110,25 +110,14 @@ internal fun DescriptionEditable(
     shapes: ListItemShapes,
     modifier: Modifier = Modifier,
 ) {
-    val isTooLong = state.text.length > DESCRIPTION_MAX_CHARACTERS
-    val extraCharacters = DESCRIPTION_MAX_CHARACTERS - state.text.length
-    val errorMessage = stringResource(R.string.eventValidationCharacterLimitExceeded) + " $extraCharacters"
-
     SegmentedListItem(
         shapes = shapes,
         colors = CustomColors.EventFormItemColors,
         content = {
-            CompactTextField(
+            MaxCharacterTextField(
                 state = state,
-                isError = isTooLong,
+                maxAmountCharacters = DESCRIPTION_MAX_CHARACTERS,
                 placeholder = { Text(stringResource(R.string.descriptionTitle), maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                errorText = {
-                    Text(
-                        text = errorMessage,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                },
                 lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 1),
                 leadingIcon = { DescriptionIcon() },
                 trailingIcon = null,
