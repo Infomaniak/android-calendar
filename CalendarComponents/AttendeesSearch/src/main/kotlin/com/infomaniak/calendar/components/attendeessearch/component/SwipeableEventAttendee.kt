@@ -129,7 +129,7 @@ private fun EventAttendee(
     SegmentedListItemClickable(
         onClick = onClick.takeIf { enabled },
         shapes = shapes,
-        colors = ListItemDefaults.segmentedColors(containerColor = ComponentColors.SegmentedItemColor),
+        colors = ComponentColors.SegmentedListItemColors,
         modifier = modifier.semantics { if (!enabled) disabled() },
         verticalAlignment = Alignment.CenterVertically,
         leadingContent = {

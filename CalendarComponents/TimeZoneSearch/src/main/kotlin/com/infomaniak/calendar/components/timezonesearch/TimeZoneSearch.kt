@@ -17,14 +17,16 @@
  */
 package com.infomaniak.calendar.components.timezonesearch
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -39,8 +41,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.EmptyState
 import com.infomaniak.calendar.components.foundation.component.SearchBar
 import com.infomaniak.calendar.components.foundation.component.SearchLayout
-import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
 import com.infomaniak.calendar.components.foundation.utils.onlyHorizontalAndTop
+import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.calendar.components.timezonesearch.component.TimeZoneItem
 import com.infomaniak.calendar.components.timezonesearch.models.TimeZoneUi
@@ -115,10 +117,12 @@ private fun TimeZoneResults(
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
         contentPadding = contentPadding + PaddingValues(vertical = EsdsTheme.spacing.sm),
     ) {
-        items(results, key = { it.timeZone.id }) { timeZone ->
-            TimeZoneItem(timeZone, query, onClick = { onTimeZoneClick(timeZone.timeZone) })
+        itemsIndexed(items = results, key = { _, item -> item.timeZone.id }) { index, timeZone ->
+            val shapes = ListItemDefaults.segmentedShapes(index, results.size)
+            TimeZoneItem(timeZone, query, shapes = shapes, onClick = { onTimeZoneClick(timeZone.timeZone) })
         }
     }
 }
@@ -127,7 +131,7 @@ private fun TimeZoneResults(
 @Composable
 private fun Preview() {
     MaterialTheme {
-        Surface {
+        Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
             TimeZoneSearch(onTimeZoneClick = {})
         }
     }
@@ -137,7 +141,7 @@ private fun Preview() {
 @Composable
 private fun PreviewEmptyState() {
     MaterialTheme {
-        Surface {
+        Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
             TimeZoneSearchContent(
                 searchQuery = rememberTextFieldState("abcdef"),
                 searchResults = emptyList(),

@@ -17,18 +17,29 @@
  */
 package com.infomaniak.calendar.components.timezonesearch.component
 
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.HighlightedText
+import com.infomaniak.calendar.components.foundation.theme.ComponentColors
 import com.infomaniak.calendar.components.timezonesearch.models.TimeZoneUi
 import kotlinx.datetime.TimeZone
 
 @Composable
-internal fun TimeZoneItem(timeZone: TimeZoneUi, query: () -> String, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    ListItem(
+internal fun TimeZoneItem(
+    timeZone: TimeZoneUi,
+    query: () -> String,
+    shapes: ListItemShapes,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SegmentedListItem(
+        shapes = shapes,
+        colors = ComponentColors.SegmentedListItemColors,
         onClick = onClick,
         overlineContent = { HighlightedText(timeZone.name, query) },
         content = { HighlightedText(timeZone.location, query) },
@@ -44,6 +55,7 @@ private fun Preview() {
         TimeZoneItem(
             timeZone = TimeZoneUi(TimeZone.of("Europe/Zurich")),
             query = { "zur" },
+            shapes = ListItemDefaults.segmentedShapes(0, 1),
             onClick = {},
         )
     }
