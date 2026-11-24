@@ -65,7 +65,7 @@
     </plurals>
     <string name="descriptionTitle">Beschrijving</string>
     <string name="emptyStateNoTimeZone">Geen tijdzones gevonden</string>
-    <string name="eventTitle">Titel van het evenement</string>
+    <string name="eventTitle">Titel</string>
     <string name="eventValidationCharacterLimitExceeded">Tekenlimiet overschreden</string>
     <string name="eventValidationTooManyAttendees">Je kunt niet meer dan %d gasten uitnodigen</string>
     <plurals name="hourAmount">

@@ -65,7 +65,7 @@
     </plurals>
     <string name="descriptionTitle">Beskrivning</string>
     <string name="emptyStateNoTimeZone">Inga tidszoner hittades</string>
-    <string name="eventTitle">Evenemangstitel</string>
+    <string name="eventTitle">Titel</string>
     <string name="eventValidationCharacterLimitExceeded">Teckenbegränsning överskriden</string>
     <string name="eventValidationTooManyAttendees">Du kan inte ha fler än %d gäster</string>
     <plurals name="hourAmount">
