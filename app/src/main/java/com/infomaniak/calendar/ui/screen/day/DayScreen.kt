@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.day
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.plus
@@ -47,6 +48,7 @@ import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
 import com.infomaniak.calendar.ui.model.TimelineUiState
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
+import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationMode
 import com.infomaniak.calendar.ui.screen.eventQuickActions.EventQuickActionViewModel
 import com.infomaniak.calendar.ui.screen.eventQuickActions.EventQuickActionsHost
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
@@ -59,8 +61,8 @@ import kotlinx.datetime.LocalDate
 
 @Composable
 fun DayScreen(
+    goToEventCreation: (EventCreationMode) -> Unit,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
-    goToEventDuplication: (date: LocalDate, occurrenceId: OccurrenceId) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DayViewModel = viewModel(),
     quickActionsViewModel: EventQuickActionViewModel = viewModel(),
@@ -80,6 +82,12 @@ fun DayScreen(
 
     ApplyJumpRequests(visibleDayState)
 
+    @SuppressLint("ComposeViewModelForwarding")
+    EventQuickActionsHost(
+        viewModel = quickActionsViewModel,
+        goToEventDuplication = { goToEventCreation(EventCreationMode.Duplicate(it, visibleDayState.visibleDate)) },
+    )
+
     DayScreen(
         goToEventDetail = goToEventDetail,
         onEventQuickAction = quickActionsViewModel::onEventQuickAction,
@@ -89,10 +97,6 @@ fun DayScreen(
         visibleDayState = visibleDayState,
         timelineState = timelineState,
         modifier = modifier,
-    )
-    EventQuickActionsHost(
-        viewModel = quickActionsViewModel,
-        goToEventDuplication = { goToEventDuplication(visibleDayState.visibleDate, it) },
     )
 }
 

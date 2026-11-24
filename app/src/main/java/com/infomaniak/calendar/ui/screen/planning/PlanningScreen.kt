@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.planning
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -49,6 +50,7 @@ import com.infomaniak.calendar.ui.component.ScreenLoader
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
+import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationMode
 import com.infomaniak.calendar.ui.screen.eventQuickActions.EventQuickActionViewModel
 import com.infomaniak.calendar.ui.screen.eventQuickActions.EventQuickActionsHost
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
@@ -63,9 +65,8 @@ import kotlinx.datetime.LocalDate
 
 @Composable
 fun PlanningScreen(
-    goToEventCreation: (LocalDate) -> Unit,
+    goToEventCreation: (EventCreationMode) -> Unit,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
-    goToEventDuplication: (date: LocalDate, occurrenceId: OccurrenceId) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PlanningViewModel = viewModel(),
     quickActionsViewModel: EventQuickActionViewModel = viewModel(),
@@ -75,8 +76,14 @@ fun PlanningScreen(
     val eventsDots by viewModel.eventDots.collectAsStateWithLifecycle(initialValue = emptyMap())
     val visibleDayState = LocalVisibleDayState.current ?: return
 
+    @SuppressLint("ComposeViewModelForwarding")
+    EventQuickActionsHost(
+        viewModel = quickActionsViewModel,
+        goToEventDuplication = { goToEventCreation(EventCreationMode.Duplicate(it, visibleDayState.visibleDate)) },
+    )
+
     PlanningScreen(
-        goToEventCreation = goToEventCreation,
+        goToEventCreation = { goToEventCreation(EventCreationMode.Empty(it)) },
         goToEventDetail = goToEventDetail,
         onEventQuickAction = quickActionsViewModel::onEventQuickAction,
         planningUiState = { planningUiState },
@@ -84,10 +91,6 @@ fun PlanningScreen(
         eventsDots = { eventsDots },
         visibleDayState = visibleDayState,
         modifier = modifier,
-    )
-    EventQuickActionsHost(
-        viewModel = quickActionsViewModel,
-        goToEventDuplication = { goToEventDuplication(visibleDayState.visibleDate, it) },
     )
 }
 
