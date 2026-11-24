@@ -69,8 +69,9 @@ import kotlin.math.roundToInt
 import com.infomaniak.core.common.R as RCommon
 
 /**
- * A compact text field component that supports single-line and multi-line input,
- * with customizable colors, icons, and supporting text that is close to the input.
+ * A compact text field component that supports single-line and multi-line input, with customizable colors, icons, and
+ * supporting text that is close to the input. This component is especially meant to be used for SegmentedListItem that need
+ * TextFields so their error text can be shown without taking up too much space
  */
 @Composable
 fun CompactTextField(
