@@ -121,7 +121,7 @@ private fun participationSummary(attendees: List<AttendeeUi>): String {
 @Composable
 private fun StackedAvatars(attendees: List<AttendeeUi>) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy((-6).dp),
+        horizontalArrangement = Arrangement.spacedBy(-EsdsTheme.spacing.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         val border = BorderStroke(1.dp, MaterialTheme.colorScheme.surface)
