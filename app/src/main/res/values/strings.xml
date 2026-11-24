@@ -55,6 +55,5 @@
     <string name="signOutAccountAlertDescription">This account and its associated calendars will be disconnected from the “Calendar” app. They will remain available in your Infomaniak online account.</string>
     <string name="syncEventsError">Error while retrieving events</string>
     <string name="threeDaysTitle">3 days</string>
-    <string name="timeZoneLabel">Time zone</string>
     <string name="weekTitle">Week</string>
 </resources>

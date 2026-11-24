@@ -55,6 +55,5 @@
     <string name="signOutAccountAlertDescription">Tämä tili ja siihen liittyvät kalenterit irrotetaan ”Kalenteri”-sovelluksesta. Ne ovat edelleen käytettävissä Infomaniak-verkkotililläsi.</string>
     <string name="syncEventsError">Virhe noudettaessa tapahtumia</string>
     <string name="threeDaysTitle">3 päivää</string>
-    <string name="timeZoneLabel">Aikavyöhyke</string>
     <string name="weekTitle">Viikko</string>
 </resources>

@@ -55,6 +55,5 @@
     <string name="signOutAccountAlertDescription">Denne konto og de tilknyttede kalendere vil blive afkoblet fra appen »Kalender«. De vil fortsat være tilgængelige på din Infomaniak-onlinekonto.</string>
     <string name="syncEventsError">Fejl ved hentning af begivenheder</string>
     <string name="threeDaysTitle">3 dage</string>
-    <string name="timeZoneLabel">Tidszone</string>
     <string name="weekTitle">Uge</string>
 </resources>

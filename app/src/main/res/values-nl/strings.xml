@@ -55,6 +55,5 @@
     <string name="signOutAccountAlertDescription">Dit account en de bijbehorende agenda’s worden losgekoppeld van de app ‘Agenda’. Ze blijven beschikbaar in uw online Infomaniak-account.</string>
     <string name="syncEventsError">Fout bij het ophalen van gebeurtenissen</string>
     <string name="threeDaysTitle">3 dagen</string>
-    <string name="timeZoneLabel">Tijdzone</string>
     <string name="weekTitle">Week</string>
 </resources>
