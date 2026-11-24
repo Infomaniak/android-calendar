@@ -46,16 +46,17 @@ fun AvatarType.Companion.fromAttendee(attendee: AttendeeUi): State<AvatarType> {
         ),
     )
 
-    val initialValue = if (avatar is AvatarStrategy.Precomputed) {
+    val precomputedUrlData = if (avatar is AvatarStrategy.Precomputed) {
         avatarFinder.avatarUrlDataOf(avatar.avatarData)
     } else {
         null
     }
 
-    return produceState(getUrlOrInitials(initialValue), avatar) {
-        if (avatar is AvatarStrategy.ToCompute) {
-            val avatarData = avatarFinder.avatarOf(attendee.displayName, attendee.email)
-            value = getUrlOrInitials(avatarFinder.avatarUrlDataOf(avatarData))
+    return produceState(getUrlOrInitials(precomputedUrlData), avatar) {
+        value = if (avatar is AvatarStrategy.ToCompute) {
+            getUrlOrInitials(avatarFinder.avatarUrlDataOf(avatarFinder.avatarOf(attendee.displayName, attendee.email)))
+        } else {
+            getUrlOrInitials(precomputedUrlData)
         }
     }
 }
