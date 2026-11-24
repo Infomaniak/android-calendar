@@ -19,9 +19,12 @@ package com.infomaniak.calendar.ui.screen.planning
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.calendar.components.event.EventQuickAction
+import com.infomaniak.calendar.manager.EventQuickActionHandler
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.manager.VisibleEventsManager
 import com.infomaniak.calendar.manager.VisibleMonthManager
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
@@ -43,6 +46,7 @@ class PlanningViewModel(
     syncEventsManager: SyncEventsManager,
     visibleEventsManager: VisibleEventsManager,
     visibleMonthManager: VisibleMonthManager,
+    private val eventQuickActionHandler: EventQuickActionHandler,
 ) : ViewModel() {
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
 
@@ -60,4 +64,6 @@ class PlanningViewModel(
 
     val eventDots = visibleMonthManager.eventDots
         .stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
+
+    fun onEventQuickAction(occurrenceId: OccurrenceId, action: EventQuickAction) = eventQuickActionHandler.handle(occurrenceId, action)
 }

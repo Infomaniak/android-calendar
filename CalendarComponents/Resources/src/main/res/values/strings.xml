@@ -47,6 +47,9 @@
     <string name="availabilityUnknownLabel">Availability unknown</string>
     <string name="availableLabel">Available</string>
     <string name="buttonAddReminder">Add a reminder</string>
+    <string name="buttonCopy">Copy</string>
+    <string name="buttonDelete">Delete</string>
+    <string name="buttonDuplicate">Duplicate</string>
     <string name="buttonJoin">Join</string>
     <string name="contentDescriptionCreateEvent">Create an event</string>
     <plurals name="contentDescriptionEventCount">

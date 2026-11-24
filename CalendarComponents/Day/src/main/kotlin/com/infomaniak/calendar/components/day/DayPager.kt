@@ -31,6 +31,7 @@ import com.infomaniak.calendar.components.day.model.DayPages
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.event.EventQuickAction
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.utils.FollowSelectedPage
@@ -50,6 +51,7 @@ fun DayPager(
     weekNumbering: WeekNumbering,
     onVisibleDateChanged: (LocalDate) -> Unit,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
+    onEventQuickAction: (EventSummaryUi.Normal, EventQuickAction) -> Unit,
     modifier: Modifier = Modifier,
     headerModifier: Modifier = Modifier,
     timelineModifier: Modifier = Modifier,
@@ -74,6 +76,7 @@ fun DayPager(
             state = state,
             weekNumbering = weekNumbering,
             onEventClick = onEventClick,
+            onEventQuickAction = onEventQuickAction,
             headerModifier = headerModifier,
             timelineModifier = timelineModifier,
             contentPadding = contentPadding,
@@ -96,6 +99,7 @@ private fun DayPagerPreview() {
             weekNumbering = WeekNumbering.ISO_8601,
             onVisibleDateChanged = {},
             onEventClick = {},
+            onEventQuickAction = { _, _ -> },
         )
     }
 }

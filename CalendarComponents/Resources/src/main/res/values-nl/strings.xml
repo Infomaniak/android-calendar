@@ -47,6 +47,9 @@
     <string name="availabilityUnknownLabel">Beschikbaarheid onbekend</string>
     <string name="availableLabel">Beschikbaar</string>
     <string name="buttonAddReminder">Herinnering toevoegen</string>
+    <string name="buttonCopy">Kopiëren</string>
+    <string name="buttonDelete">Verwijderen</string>
+    <string name="buttonDuplicate">Dupliceren</string>
     <string name="buttonJoin">Lid worden</string>
     <string name="contentDescriptionCreateEvent">Een evenement maken</string>
     <plurals name="contentDescriptionEventCount">

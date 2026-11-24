@@ -47,6 +47,9 @@
     <string name="availabilityUnknownLabel">Ukendt tilgængelighed</string>
     <string name="availableLabel">Ledig</string>
     <string name="buttonAddReminder">Tilføj en påmindelse</string>
+    <string name="buttonCopy">Kopiér</string>
+    <string name="buttonDelete">Slet</string>
+    <string name="buttonDuplicate">Duplikér</string>
     <string name="buttonJoin">Tilmeld dig</string>
     <string name="contentDescriptionCreateEvent">Opret en begivenhed</string>
     <plurals name="contentDescriptionEventCount">

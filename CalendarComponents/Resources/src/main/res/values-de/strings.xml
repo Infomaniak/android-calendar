@@ -47,6 +47,9 @@
     <string name="availabilityUnknownLabel">Verfügbarkeit unbekannt</string>
     <string name="availableLabel">Verfügbar</string>
     <string name="buttonAddReminder">Erinnerung hinzufügen</string>
+    <string name="buttonCopy">Kopieren</string>
+    <string name="buttonDelete">Löschen</string>
+    <string name="buttonDuplicate">Duplizieren</string>
     <string name="buttonJoin">Beitreten</string>
     <string name="contentDescriptionCreateEvent">Anlass erstellen</string>
     <plurals name="contentDescriptionEventCount">

@@ -36,6 +36,7 @@ sealed interface EventSummaryUi {
         val colors: EventColorsUi
         val hasAttendees: Boolean
         val myStatus: ParticipationStatus?
+        val canEdit: Boolean
     }
 
     @Immutable

@@ -40,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.infomaniak.calendar.components.event.EventItem
 import com.infomaniak.calendar.components.event.EventItemDefaults
+import com.infomaniak.calendar.components.event.EventQuickAction
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.models.YearWeek
@@ -64,6 +65,7 @@ fun Planning(
     eventsOf: (LocalDate) -> List<EventSummaryUi>?,
     goToEventCreation: (LocalDate) -> Unit,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
+    onEventQuickAction: (EventSummaryUi.Normal, EventQuickAction) -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(),
@@ -94,6 +96,7 @@ fun Planning(
                     index = index,
                     goToEventCreation = goToEventCreation,
                     onEventClick = onEventClick,
+                    onEventQuickAction = onEventQuickAction,
                 )
             }
         }
@@ -110,6 +113,7 @@ private fun Day(
     index: Int,
     goToEventCreation: (LocalDate) -> Unit,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
+    onEventQuickAction: (EventSummaryUi.Normal, EventQuickAction) -> Unit,
 ) {
     Row(
         modifier = Modifier.padding(bottom = EsdsTheme.spacing.xl),
@@ -131,7 +135,7 @@ private fun Day(
                         index == currentTimeIndex -> DayCurrentTimeLine()
                         index > 0 -> Spacer(Modifier.height(EsdsTheme.spacing.md))
                     }
-                    key(event.id) { DayEvent(event, date, goToEventCreation, onEventClick) }
+                    key(event.id) { DayEvent(event, date, goToEventCreation, onEventClick, onEventQuickAction) }
                 }
 
                 if (currentTimeIndex == events.size) DayCurrentTimeLine()
@@ -147,16 +151,16 @@ private fun DayEvent(
     date: LocalDate,
     goToEventCreation: (LocalDate) -> Unit,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
+    onEventQuickAction: (EventSummaryUi.Normal, EventQuickAction) -> Unit,
 ) {
     when (event) {
-        is EventSummaryUi.Normal -> {
-            EventItem(
-                event = event,
-                onClick = { onEventClick(event) },
-                modifier = Modifier.fillMaxWidth(),
-                allDayTrailingContent = EventItemDefaults.AllDayLabel,
-            )
-        }
+        is EventSummaryUi.Normal -> EventItem(
+            event = event,
+            onClick = { onEventClick(event) },
+            onQuickActionClick = { onEventQuickAction(event, it) },
+            modifier = Modifier.fillMaxWidth(),
+            allDayTrailingContent = EventItemDefaults.AllDayLabel,
+        )
         is EventSummaryUi.TodayEmptyState -> TodayEmptyState(onClick = { goToEventCreation(date) }, Modifier.fillMaxWidth())
         is EventSummaryUi.EmptyState -> OtherDayEmptyState(onClick = { goToEventCreation(date) }, Modifier.fillMaxWidth())
     }
@@ -184,6 +188,7 @@ private fun PreviewPlanning(
             eventsOf = eventsByDate::get,
             goToEventCreation = {},
             onEventClick = {},
+            onEventQuickAction = { _, _ -> },
             lazyListState = rememberLazyListState(timeline.indexOf(eventsByDate.keys.min())),
         )
     }

@@ -47,6 +47,9 @@
     <string name="availabilityUnknownLabel">Saatavuus tuntematon</string>
     <string name="availableLabel">Vapaa</string>
     <string name="buttonAddReminder">Lisää muistutus</string>
+    <string name="buttonCopy">Kopioi</string>
+    <string name="buttonDelete">Poista</string>
+    <string name="buttonDuplicate">Monista</string>
     <string name="buttonJoin">Liity mukaan</string>
     <string name="contentDescriptionCreateEvent">Luo tapahtuma</string>
     <plurals name="contentDescriptionEventCount">

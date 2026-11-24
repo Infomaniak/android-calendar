@@ -38,6 +38,7 @@ data class OccurrenceEventSummaryUi(
     override val colors: EventColorsUi,
     override val hasAttendees: Boolean,
     override val myStatus: ParticipationStatus?,
+    override val canEdit: Boolean,
 ) : EventSummaryUi.Normal
 
 /** All [EventSummaryUi.Normal] used in the app are [OccurrenceEventSummaryUi] and we need to cast it to get the occurrence id back */

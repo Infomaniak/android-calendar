@@ -40,6 +40,7 @@ import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.model.TimedEvent
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
+import com.infomaniak.calendar.components.event.EventQuickAction
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import kotlin.math.roundToInt
 
@@ -49,6 +50,7 @@ internal fun ResizableEventLayout(
     timedEvents: List<TimedEvent>,
     placements: List<EventPlacement>,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
+    onEventQuickAction: (EventSummaryUi.Normal, EventQuickAction) -> Unit,
     modifier: Modifier = Modifier,
     textOverflow: TextOverflow = TextOverflow.Ellipsis,
 ) {
@@ -69,6 +71,7 @@ internal fun ResizableEventLayout(
                     ),
                     visibleHeight = remember(index) { { currentPlacements.value[index].visibleHeight } },
                     onClick = { onEventClick(timedEvent.event) },
+                    onQuickActionClick = { onEventQuickAction(timedEvent.event, it) },
                     textOverflow = textOverflow,
                 )
             }
@@ -130,6 +133,7 @@ private fun ResizableEventLayoutPreview() {
                     timedEvents = timedEvents,
                     placements = placements,
                     onEventClick = {},
+                    onEventQuickAction = { _, _ -> },
                     modifier = Modifier.matchParentSize(),
                 )
             }

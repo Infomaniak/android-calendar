@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.TimelineDefaults
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.event.EventItem
+import com.infomaniak.calendar.components.event.EventQuickAction
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -53,6 +54,7 @@ private val NextRowPeek = 12.dp
 internal fun AllDayEventsBand(
     events: List<EventSummaryUi.Normal>,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
+    onEventQuickAction: (EventSummaryUi.Normal, EventQuickAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (events.isEmpty()) return
@@ -88,7 +90,7 @@ internal fun AllDayEventsBand(
                 // rather than leaving the half it does not use empty.
                 span = { index, _ -> GridItemSpan(if (index == events.lastIndex) maxCurrentLineSpan else 1) },
             ) { _, event ->
-                EventItem(event, onClick = { onEventClick(event) })
+                EventItem(event, onClick = { onEventClick(event) }, onQuickActionClick = { onEventQuickAction(event, it) })
             }
         }
     }
@@ -99,6 +101,6 @@ internal fun AllDayEventsBand(
 @Composable
 private fun AllDayEventsBandPreview() {
     Surface {
-        AllDayEventsBand(events = previewDayEvents.allDay, onEventClick = {})
+        AllDayEventsBand(events = previewDayEvents.allDay, onEventClick = {}, onEventQuickAction = { _, _ -> })
     }
 }

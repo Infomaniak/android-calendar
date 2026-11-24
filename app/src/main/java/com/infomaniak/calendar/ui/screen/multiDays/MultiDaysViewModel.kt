@@ -20,11 +20,14 @@ package com.infomaniak.calendar.ui.screen.multiDays
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.calendar.components.event.EventQuickAction
 import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.DayEventsLoader
+import com.infomaniak.calendar.manager.EventQuickActionHandler
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.manager.VisibleMonthManager
 import com.infomaniak.calendar.ui.model.TimelineUiState
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
@@ -45,6 +48,7 @@ class MultiDaysViewModel(
     syncEventsManager: SyncEventsManager,
     visibleMonthManager: VisibleMonthManager,
     private val calendarDataValues: CalendarDataValues,
+    private val eventQuickActionHandler: EventQuickActionHandler,
 ) : ViewModel() {
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
 
@@ -56,4 +60,6 @@ class MultiDaysViewModel(
     val hourHeight: Flow<Dp> = calendarDataValues.dayViewHourHeight.flow
 
     suspend fun saveHourHeight(hourHeight: Dp) = calendarDataValues.dayViewHourHeight.setValue(hourHeight)
+
+    fun onEventQuickAction(occurrenceId: OccurrenceId, action: EventQuickAction) = eventQuickActionHandler.handle(occurrenceId, action)
 }

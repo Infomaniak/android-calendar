@@ -40,6 +40,7 @@ app/src/main/java/com/infomaniak/calendar/
 │   ├── BackgroundEventComposer.kt  # App-scoped, temporary until KMP is offline first: runs EventComposerUseCase's changes in
 │   │                               # the background for the event ViewModels, so their screens close at once; MainActivity shows
 │   │                               # its errors
+│   ├── EventQuickActionHandler.kt  # Runs an event's quick action (long-click menu); each calendar view's ViewModel forwards to it
 │   ├── VisibleDateManager.kt       # App-scoped: single visible-date source, restored/saved by MainViewModel
 │   ├── VisibleMonthManager.kt      # App-scoped: the months loaded around the shared visible date, and their event dots
 │   ├── VisibleEventsManager.kt     # App-scoped: one observation of the day-sliced events around the visible date, for every view

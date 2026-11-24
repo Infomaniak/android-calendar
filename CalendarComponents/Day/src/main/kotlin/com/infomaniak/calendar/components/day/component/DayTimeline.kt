@@ -35,6 +35,7 @@ import com.infomaniak.calendar.components.day.pinchToZoom
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.event.EventQuickAction
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
 import com.infomaniak.core.common.utils.today
@@ -50,6 +51,7 @@ internal fun DayTimeline(
     events: DayEvents,
     state: TimelineState,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
+    onEventQuickAction: (EventSummaryUi.Normal, EventQuickAction) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -77,6 +79,7 @@ internal fun DayTimeline(
             events = events.timed,
             hourHeight = state.hourHeight,
             onEventClick = onEventClick,
+            onEventQuickAction = onEventQuickAction,
             modifier = Modifier
                 .matchParentSize()
                 .padding(start = gutterWidth, end = endPadding),
@@ -103,6 +106,7 @@ private fun DayTimelinePreview() {
             events = previewDayEvents,
             state = rememberDayTimelineState({}, scrollState = rememberScrollState(initial = 430)),
             onEventClick = {},
+            onEventQuickAction = { _, _ -> },
         )
     }
 }
@@ -116,6 +120,7 @@ private fun DayTimelineZoomedOutPreview() {
             events = previewDayEvents,
             state = rememberDayTimelineState({}, initialHourHeight = TimelineDefaults.MinHourHeight),
             onEventClick = {},
+            onEventQuickAction = { _, _ -> },
         )
     }
 }

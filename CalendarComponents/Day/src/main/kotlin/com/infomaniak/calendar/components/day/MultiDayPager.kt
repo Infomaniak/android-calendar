@@ -74,6 +74,7 @@ import com.infomaniak.calendar.components.day.model.DayPages
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.event.EventQuickAction
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
@@ -115,6 +116,7 @@ fun MultiDayPager(
     weekNumbering: WeekNumbering,
     onVisibleDateChanged: (LocalDate) -> Unit,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
+    onEventQuickAction: (EventSummaryUi.Normal, EventQuickAction) -> Unit,
     modifier: Modifier = Modifier,
     headerModifier: Modifier = Modifier,
     timelineModifier: Modifier = Modifier,
@@ -143,6 +145,7 @@ fun MultiDayPager(
             state = state,
             weekNumbering = weekNumbering,
             onEventClick = onEventClick,
+            onEventQuickAction = onEventQuickAction,
             modifier = modifier,
             headerModifier = headerModifier,
             timelineModifier = timelineModifier,
@@ -161,6 +164,7 @@ private fun MultiDayPagerContent(
     state: TimelineState,
     weekNumbering: WeekNumbering,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
+    onEventQuickAction: (EventSummaryUi.Normal, EventQuickAction) -> Unit,
     modifier: Modifier = Modifier,
     headerModifier: Modifier = Modifier,
     timelineModifier: Modifier = Modifier,
@@ -181,6 +185,7 @@ private fun MultiDayPagerContent(
             eventsOf = eventsOf,
             state = state,
             onEventClick = onEventClick,
+            onEventQuickAction = onEventQuickAction,
             eventTextOverflow = eventTextOverflow,
             contentPadding = contentPadding + PaddingValues(top = headerHeight + EsdsTheme.spacing.md),
             modifier = timelineModifier.fillMaxSize(),
@@ -211,6 +216,7 @@ private fun MultiDayTimeline(
     eventsOf: (LocalDate) -> DayEvents,
     state: TimelineState,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
+    onEventQuickAction: (EventSummaryUi.Normal, EventQuickAction) -> Unit,
     eventTextOverflow: TextOverflow,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
@@ -252,6 +258,7 @@ private fun MultiDayTimeline(
                         events = eventsOf(date).timed,
                         hourHeight = state.hourHeight,
                         onEventClick = onEventClick,
+                        onEventQuickAction = onEventQuickAction,
                         modifier = Modifier
                             .matchParentSize()
                             .padding(horizontal = 1.dp),
@@ -385,6 +392,7 @@ private fun MultiDayPagerPreview() {
             onVisibleDateChanged = {},
             headerModifier = Modifier.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)),
             onEventClick = {},
+            onEventQuickAction = { _, _ -> },
         )
     }
 }

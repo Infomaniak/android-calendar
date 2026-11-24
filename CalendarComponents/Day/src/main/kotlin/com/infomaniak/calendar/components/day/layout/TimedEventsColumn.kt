@@ -36,6 +36,7 @@ import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.model.TimedEvent
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
+import com.infomaniak.calendar.components.event.EventQuickAction
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import kotlin.math.roundToInt
 
@@ -53,6 +54,7 @@ internal fun TimedEventsColumn(
     events: List<TimedEvent>,
     hourHeight: Dp,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
+    onEventQuickAction: (EventSummaryUi.Normal, EventQuickAction) -> Unit,
     modifier: Modifier = Modifier,
     textOverflow: TextOverflow = TextOverflow.Ellipsis,
 ) {
@@ -75,6 +77,7 @@ internal fun TimedEventsColumn(
             timedEvents = events,
             placements = placements,
             onEventClick = onEventClick,
+            onEventQuickAction = onEventQuickAction,
             modifier = Modifier.matchParentSize(),
             textOverflow = textOverflow,
         )
@@ -105,6 +108,7 @@ private fun TimedEventsColumnPreview() {
                 events = timedEvents,
                 hourHeight = hourHeight,
                 onEventClick = {},
+                onEventQuickAction = { _, _ -> },
                 modifier = Modifier.matchParentSize(),
             )
         }

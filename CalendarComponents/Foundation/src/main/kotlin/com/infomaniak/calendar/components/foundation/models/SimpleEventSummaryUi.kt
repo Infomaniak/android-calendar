@@ -32,4 +32,5 @@ data class SimpleEventSummaryUi(
     override val colors: EventColorsUi,
     override val hasAttendees: Boolean,
     override val myStatus: ParticipationStatus?,
+    override val canEdit: Boolean = true,
 ) : EventSummaryUi.Normal

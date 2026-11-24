@@ -44,6 +44,7 @@ fun EventDaySlice.toEventUi(timeZone: TimeZone): OccurrenceEventSummaryUi = Occu
     colors = event.colors.toEventColorsUi(),
     hasAttendees = event.hasAttendees,
     myStatus = event.myStatus?.toParticipationStatus(),
+    canEdit = event.canEdit,
 )
 
 private fun KmpEventStatus?.toEventStatus(): EventStatus {

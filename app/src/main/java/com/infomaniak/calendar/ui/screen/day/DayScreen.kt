@@ -34,6 +34,7 @@ import com.infomaniak.calendar.components.calendar.component.rememberCalendarExp
 import com.infomaniak.calendar.components.day.DayPager
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.event.EventQuickAction
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
@@ -76,6 +77,7 @@ fun DayScreen(
 
     DayScreen(
         goToEventDetail = goToEventDetail,
+        onEventQuickAction = viewModel::onEventQuickAction,
         uiState = { uiState },
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventDots },
@@ -88,6 +90,7 @@ fun DayScreen(
 @Composable
 private fun DayScreen(
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
+    onEventQuickAction: (OccurrenceId, EventQuickAction) -> Unit,
     uiState: () -> TimelineUiState,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
@@ -125,6 +128,7 @@ private fun DayScreen(
             weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
             onVisibleDateChanged = { visibleDayState.updateVisibleDate(it) },
             onEventClick = { goToEventDetail(it.occurrenceId) },
+            onEventQuickAction = { event, action -> onEventQuickAction(event.occurrenceId, action) },
             headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
             timelineModifier = Modifier.hazeSource(hazeState),
             contentPadding = contentPadding + PaddingValues(bottom = Dimens.FloatingToolbarClearance),
@@ -146,6 +150,7 @@ private fun Preview() {
         CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
             DayScreen(
                 goToEventDetail = {},
+                onEventQuickAction = { _, _ -> },
                 uiState = { TimelineUiState.Success(emptyMap()) },
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },

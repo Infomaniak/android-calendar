@@ -47,6 +47,9 @@
     <string name="availabilityUnknownLabel">Άγνωστη διαθεσιμότητα</string>
     <string name="availableLabel">Διαθέσιμο</string>
     <string name="buttonAddReminder">Προσθήκη υπενθύμισης</string>
+    <string name="buttonCopy">Αντιγραφή</string>
+    <string name="buttonDelete">Διαγραφή</string>
+    <string name="buttonDuplicate">Δημιουργία αντιγράφου</string>
     <string name="buttonJoin">Εγγραφή</string>
     <string name="contentDescriptionCreateEvent">Δημιουργία εκδήλωσης</string>
     <plurals name="contentDescriptionEventCount">

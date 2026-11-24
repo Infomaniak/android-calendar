@@ -37,6 +37,7 @@ import com.infomaniak.calendar.components.calendar.component.rememberCalendarExp
 import com.infomaniak.calendar.components.day.MultiDayPager
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.event.EventQuickAction
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
@@ -87,6 +88,7 @@ fun MultiDaysScreen(
     MultiDaysScreen(
         dayCount = dayCount,
         goToEventDetail = goToEventDetail,
+        onEventQuickAction = viewModel::onEventQuickAction,
         uiState = { uiState },
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventDots },
@@ -100,6 +102,7 @@ fun MultiDaysScreen(
 private fun MultiDaysScreen(
     dayCount: Int,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
+    onEventQuickAction: (OccurrenceId, EventQuickAction) -> Unit,
     uiState: () -> TimelineUiState,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
@@ -146,6 +149,7 @@ private fun MultiDaysScreen(
             weekNumbering = weekNumbering,
             onVisibleDateChanged = { visibleDayState.updateVisibleDate(it) },
             onEventClick = { goToEventDetail(it.occurrenceId) },
+            onEventQuickAction = { event, action -> onEventQuickAction(event.occurrenceId, action) },
             headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
             timelineModifier = Modifier.hazeSource(hazeState),
             contentPadding = contentPadding + PaddingValues(bottom = Dimens.FloatingToolbarClearance),
@@ -169,6 +173,7 @@ private fun Preview() {
             MultiDaysScreen(
                 dayCount = 3,
                 goToEventDetail = {},
+                onEventQuickAction = { _, _ -> },
                 uiState = { TimelineUiState.Success(emptyMap()) },
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },

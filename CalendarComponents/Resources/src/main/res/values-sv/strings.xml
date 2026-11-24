@@ -47,6 +47,9 @@
     <string name="availabilityUnknownLabel">Tillgänglighet okänd</string>
     <string name="availableLabel">Ledig</string>
     <string name="buttonAddReminder">Lägg till en påminnelse</string>
+    <string name="buttonCopy">Kopiera</string>
+    <string name="buttonDelete">Ta bort</string>
+    <string name="buttonDuplicate">Duplicera</string>
     <string name="buttonJoin">Gå med</string>
     <string name="contentDescriptionCreateEvent">Skapa ett evenemang</string>
     <plurals name="contentDescriptionEventCount">

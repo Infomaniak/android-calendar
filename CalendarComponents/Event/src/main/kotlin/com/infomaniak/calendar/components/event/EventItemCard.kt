@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.event
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -27,14 +28,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
-import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -47,6 +48,7 @@ fun EventItemCard(
     status: EventItemStatus,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onLongClick: (() -> Unit)? = null,
     contentPadding: PaddingValues = EventItemCardDefaults.ContentPadding,
     shape: EventItemCardShape = EventItemCardDefaults.Shape,
     content: @Composable ColumnScope.() -> Unit,
@@ -54,21 +56,20 @@ fun EventItemCard(
     val cardShape = shape.shape()
 
     Box(modifier = modifier.height(IntrinsicSize.Min), propagateMinConstraints = true) {
-        // Card with onClick enforces minimumInteractiveComponentSize() which makes small events too big compared to the design.
-        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
-            Card(
-                onClick = onClick,
-                colors = status.cardColors(),
-                border = status.cardBorder(),
-                shape = cardShape,
-            ) {
-                Column(
-                    modifier = Modifier
-                        .cardStripes(status)
-                        .padding(contentPadding),
-                    content = content,
-                )
-            }
+        Card(
+            modifier = Modifier
+                .clip(cardShape)
+                .combinedClickable(onClick = onClick, onLongClick = onLongClick, role = Role.Button),
+            colors = status.cardColors(),
+            border = status.cardBorder(),
+            shape = cardShape,
+        ) {
+            Column(
+                modifier = Modifier
+                    .cardStripes(status)
+                    .padding(contentPadding),
+                content = content,
+            )
         }
 
         AccentBar(

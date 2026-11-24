@@ -57,21 +57,24 @@ import kotlin.time.Instant
 fun EventItem(
     event: EventSummaryUi.Normal,
     onClick: () -> Unit,
+    onQuickActionClick: (EventQuickAction) -> Unit,
     modifier: Modifier = Modifier,
     allDayTrailingContent: @Composable () -> Unit = {},
 ) {
-    EventItem(
-        start = event.start,
-        end = event.end,
-        title = event.title,
-        location = event.location,
-        status = event.toEventItemStatus(),
-        trailingIcons = event.toEventIcons(),
-        isAllDay = event.isAllDay,
-        onClick = onClick,
-        modifier = modifier,
-        allDayTrailingContent = allDayTrailingContent,
-    )
+    EventQuickActionsBox(canEdit = event.canEdit, onQuickActionClick = onQuickActionClick, modifier = modifier) { onLongClick ->
+        EventItem(
+            start = event.start,
+            end = event.end,
+            title = event.title,
+            location = event.location,
+            status = event.toEventItemStatus(),
+            trailingIcons = event.toEventIcons(),
+            isAllDay = event.isAllDay,
+            onClick = onClick,
+            onLongClick = onLongClick,
+            allDayTrailingContent = allDayTrailingContent,
+        )
+    }
 }
 
 @Composable
@@ -85,9 +88,10 @@ internal fun EventItem(
     isAllDay: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onLongClick: (() -> Unit)? = null,
     allDayTrailingContent: @Composable () -> Unit = {},
 ) {
-    EventItemCard(status, onClick = onClick, modifier = modifier) {
+    EventItemCard(status = status, onClick = onClick, modifier = modifier, onLongClick = onLongClick) {
         if (isAllDay) {
             AllDayContent(
                 title = title,

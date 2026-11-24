@@ -41,6 +41,7 @@ import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.event.EventQuickAction
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.utils.HorizontalGridLine
@@ -61,6 +62,7 @@ internal fun DayView(
     state: TimelineState,
     weekNumbering: WeekNumbering,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
+    onEventQuickAction: (EventSummaryUi.Normal, EventQuickAction) -> Unit,
     modifier: Modifier = Modifier,
     headerModifier: Modifier = Modifier,
     timelineModifier: Modifier = Modifier,
@@ -77,6 +79,7 @@ internal fun DayView(
             events = events,
             state = state,
             onEventClick = onEventClick,
+            onEventQuickAction = onEventQuickAction,
             contentPadding = dayPadding + PaddingValues(top = headerHeight + EsdsTheme.spacing.md),
             modifier = timelineModifier.fillMaxSize(),
         )
@@ -101,6 +104,7 @@ internal fun DayView(
                 AllDayEventsBand(
                     events = events.allDay,
                     onEventClick = onEventClick,
+                    onEventQuickAction = onEventQuickAction,
                     modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md),
                 )
             }
@@ -122,6 +126,7 @@ private fun DayViewPreview() {
             state = rememberDayTimelineState({}, scrollState = rememberScrollState(initial = 430)),
             weekNumbering = WeekNumbering.ISO_8601,
             onEventClick = {},
+            onEventQuickAction = { _, _ -> },
         )
     }
 }

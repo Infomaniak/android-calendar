@@ -47,6 +47,9 @@
     <string name="availabilityUnknownLabel">Disponibilità sconosciuta</string>
     <string name="availableLabel">Disponibile</string>
     <string name="buttonAddReminder">Aggiungi un promemoria</string>
+    <string name="buttonCopy">Copia</string>
+    <string name="buttonDelete">Elimina</string>
+    <string name="buttonDuplicate">Duplica</string>
     <string name="buttonJoin">Unirsi</string>
     <string name="contentDescriptionCreateEvent">Creare un evento</string>
     <plurals name="contentDescriptionEventCount">

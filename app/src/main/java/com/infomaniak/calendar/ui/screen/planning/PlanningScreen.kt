@@ -35,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
+import com.infomaniak.calendar.components.event.EventQuickAction
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
@@ -73,6 +74,7 @@ fun PlanningScreen(
     PlanningScreen(
         goToEventCreation = goToEventCreation,
         goToEventDetail = goToEventDetail,
+        onEventQuickAction = viewModel::onEventQuickAction,
         planningUiState = { planningUiState },
         isLoadingEvents = { isLoadingEvents },
         eventsDots = { eventsDots },
@@ -85,6 +87,7 @@ fun PlanningScreen(
 private fun PlanningScreen(
     goToEventCreation: (LocalDate) -> Unit,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
+    onEventQuickAction: (OccurrenceId, EventQuickAction) -> Unit,
     planningUiState: () -> PlanningUiState,
     isLoadingEvents: () -> Boolean,
     eventsDots: () -> Map<LocalDate, List<EventColorsUi>>,
@@ -120,6 +123,7 @@ private fun PlanningScreen(
                     contentPadding = contentPadding + PaddingValues(EsdsTheme.spacing.xl),
                     goToEventCreation = goToEventCreation,
                     goToEventDetail = goToEventDetail,
+                    onEventQuickAction = onEventQuickAction,
                     visibleDayState = visibleDayState,
                     modifier = Modifier
                         .hazeSource(hazeState)
@@ -139,6 +143,7 @@ private fun SuccessPlanning(
     contentPadding: PaddingValues,
     goToEventCreation: (LocalDate) -> Unit,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
+    onEventQuickAction: (OccurrenceId, EventQuickAction) -> Unit,
     visibleDayState: VisibleDayState,
     modifier: Modifier = Modifier,
 ) {
@@ -160,6 +165,7 @@ private fun SuccessPlanning(
         contentPadding = contentPadding,
         goToEventCreation = goToEventCreation,
         onEventClick = { goToEventDetail(it.occurrenceId) },
+        onEventQuickAction = { event, action -> onEventQuickAction(event.occurrenceId, action) },
     )
 }
 
@@ -173,6 +179,7 @@ private fun Preview(@PreviewParameter(PlanningPreviewParameter::class) eventsByD
                 planningUiState = { PlanningUiState.Success(eventsByDate.toImmutableMap()) },
                 goToEventCreation = {},
                 goToEventDetail = {},
+                onEventQuickAction = { _, _ -> },
                 isLoadingEvents = { false },
                 eventsDots = { emptyMap() },
                 visibleDayState = visibleDayState,

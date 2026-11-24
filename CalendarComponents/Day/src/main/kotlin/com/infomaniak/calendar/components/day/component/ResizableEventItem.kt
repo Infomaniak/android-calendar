@@ -49,6 +49,8 @@ import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.event.EventIcons
 import com.infomaniak.calendar.components.event.EventItemCard
 import com.infomaniak.calendar.components.event.EventItemCardDefaults
+import com.infomaniak.calendar.components.event.EventQuickAction
+import com.infomaniak.calendar.components.event.EventQuickActionsBox
 import com.infomaniak.calendar.components.event.toEventIcons
 import com.infomaniak.calendar.components.event.toEventItemStatus
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
@@ -79,24 +81,31 @@ internal fun ResizableEventItem(
     titleSizing: TitleSizing,
     visibleHeight: () -> Float,
     onClick: () -> Unit,
+    onQuickActionClick: (EventQuickAction) -> Unit,
     modifier: Modifier = Modifier,
     textOverflow: TextOverflow = TextOverflow.Ellipsis,
 ) {
     val status = timedEvent.event.toEventItemStatus()
 
-    EventItemCard(
-        status = status,
-        onClick = onClick,
+    EventQuickActionsBox(
+        canEdit = timedEvent.event.canEdit,
+        onQuickActionClick = onQuickActionClick,
         modifier = modifier,
-        contentPadding = PaddingValues(horizontal = EventItemCardDefaults.HorizontalPaddingValue),
-    ) {
-        EventDetails(
-            event = timedEvent.event,
-            titleSizing = titleSizing,
-            visibleHeight = visibleHeight,
-            textDecoration = status.textDecoration,
-            textOverflow = textOverflow,
-        )
+    ) { onLongClick ->
+        EventItemCard(
+            status = status,
+            onClick = onClick,
+            onLongClick = onLongClick,
+            contentPadding = PaddingValues(horizontal = EventItemCardDefaults.HorizontalPaddingValue),
+        ) {
+            EventDetails(
+                event = timedEvent.event,
+                titleSizing = titleSizing,
+                visibleHeight = visibleHeight,
+                textDecoration = status.textDecoration,
+                textOverflow = textOverflow,
+            )
+        }
     }
 }
 
@@ -379,6 +388,7 @@ private fun ResizableEventItemSample(width: Dp, height: Dp, textOverflow: TextOv
             titleSizing = titleSizingFor(visibleHeight = height, width = width),
             visibleHeight = { heightPx },
             onClick = {},
+            onQuickActionClick = {},
             modifier = Modifier.size(width, height),
             textOverflow = textOverflow,
         )
