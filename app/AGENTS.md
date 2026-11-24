@@ -72,6 +72,7 @@ app/src/main/java/com/infomaniak/calendar/
     │                              #   until KMP returns them; the package then goes and only MonthViewModel's source changes
     │   ├── eventQuickActions/     # EventQuickActionViewModel runs the long-click menu's actions for the events of Planning,
     │                              # Day and MultiDays; EventQuickActionsHost, beside each screen, asks the delete scope first
+    │                              # and opens the duplicated event's creation form on the visible date
     │   ├── planning/              # PlanningScreen + PlanningViewModel (events from VisibleEventsManager) + PlanningEventGroupingExt
     │   ├── accounts/              # AccountsListScreen + AccountActionsScreen + AccountsViewModel + AccountItem
     │                              # Drawer-backed account list, per-account detail/logout screen, and remove-account flow
@@ -170,7 +171,8 @@ app/
   `EventFormState` holds one state per field, like Material state holders: the title's `TextFieldState`, the participants'
   `SnapshotStateSet`, the notifications' `SnapshotStateList`, a `MutableState` for each other field, and the dates'
   `DateAndTimeState`. It also holds the selected `calendar` itself and the calendars it can be put in, and builds
-  `toEventDraft()`; `EventFormState.default` starts a new event. The ViewModel saves it under one `SavedStateHandle` key
+  `toEventDraft()`. `EventCreation.mode` (`EventCreationMode`) picks how a new event starts on its `date`: `Empty`
+  from `EventFormState.default`, `Duplicate(occurrenceId, date)` from that event's fields moved to `date`. The ViewModel saves it under one `SavedStateHandle` key
   through `saveable` and `EventFormState.Saver` (`EventFormStateSaver.kt`: one constant key per field, delegating to each
   state's own saver or `autoSaver` where one exists), read live from the states when Android saves, and restores it when the
   ViewModel is created, so a child screen restored alone after a process death still gets it. The form's screen initializes

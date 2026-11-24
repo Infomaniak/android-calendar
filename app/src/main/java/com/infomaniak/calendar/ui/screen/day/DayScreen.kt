@@ -60,6 +60,7 @@ import kotlinx.datetime.LocalDate
 @Composable
 fun DayScreen(
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
+    goToEventDuplication: (date: LocalDate, occurrenceId: OccurrenceId) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DayViewModel = viewModel(),
     quickActionsViewModel: EventQuickActionViewModel = viewModel(),
@@ -89,7 +90,10 @@ fun DayScreen(
         timelineState = timelineState,
         modifier = modifier,
     )
-    EventQuickActionsHost(quickActionsViewModel)
+    EventQuickActionsHost(
+        viewModel = quickActionsViewModel,
+        goToEventDuplication = { goToEventDuplication(visibleDayState.visibleDate, it) },
+    )
 }
 
 @Composable

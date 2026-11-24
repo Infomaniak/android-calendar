@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.ui.screen.eventQuickActions
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -41,11 +42,20 @@ import dev.zacsweers.metro.AssistedInject
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactory
 import dev.zacsweers.metrox.viewmodel.ViewModelAssistedFactoryKey
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.serialization.Serializable
 
-/** Shows what the quick actions handled by [viewModel] need from the user, like the delete confirmation. */
+/**
+ * Shows what the quick actions handled by [viewModel] need from the user, like the delete confirmation, and opens the screens
+ * they lead to.
+ */
 @Composable
-fun EventQuickActionsHost(viewModel: EventQuickActionViewModel) {
+fun EventQuickActionsHost(viewModel: EventQuickActionViewModel, goToEventDuplication: (OccurrenceId) -> Unit) {
+    LaunchedEffect(Unit) {
+        for (occurrenceId in viewModel.duplicationRequests) goToEventDuplication(occurrenceId)
+    }
+
     viewModel.pendingDeletion?.let { pendingDeletion ->
         DeleteEventDialog(
             isRecurring = { pendingDeletion.isRecurring },
@@ -65,9 +75,12 @@ class EventQuickActionViewModel(
     var pendingDeletion: PendingDeletion? by savedStateHandle.saveable(stateSaver = serializableSaver()) { mutableStateOf(null) }
         private set
 
+    private val _duplicationRequests = Channel<OccurrenceId>(Channel.BUFFERED)
+    val duplicationRequests: ReceiveChannel<OccurrenceId> = _duplicationRequests
+
     fun onEventQuickAction(event: EventSummaryUi.Normal, action: EventQuickAction) {
         when (action) {
-            EventQuickAction.Duplicate -> Unit // TODO[quickActions]
+            EventQuickAction.Duplicate -> _duplicationRequests.trySend(event.occurrenceId)
             EventQuickAction.Copy -> Unit // TODO[quickActions]
             EventQuickAction.Delete -> pendingDeletion = PendingDeletion(event.occurrenceId, event.isRecurring)
         }

@@ -65,6 +65,7 @@ import kotlinx.datetime.LocalDate
 fun PlanningScreen(
     goToEventCreation: (LocalDate) -> Unit,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
+    goToEventDuplication: (date: LocalDate, occurrenceId: OccurrenceId) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PlanningViewModel = viewModel(),
     quickActionsViewModel: EventQuickActionViewModel = viewModel(),
@@ -84,7 +85,10 @@ fun PlanningScreen(
         visibleDayState = visibleDayState,
         modifier = modifier,
     )
-    EventQuickActionsHost(quickActionsViewModel)
+    EventQuickActionsHost(
+        viewModel = quickActionsViewModel,
+        goToEventDuplication = { goToEventDuplication(visibleDayState.visibleDate, it) },
+    )
 }
 
 @Composable

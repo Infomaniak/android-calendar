@@ -39,6 +39,7 @@ import com.infomaniak.calendar.components.foundation.models.AvatarStrategy
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.models.ParticipantUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
+import com.infomaniak.calendar.components.foundation.utils.addParticipant
 import com.infomaniak.core.common.utils.isEmailRfc5321Compliant
 import com.infomaniak.calendar.components.resources.R as RComponents
 import com.infomaniak.core.common.R as RCore
@@ -92,11 +93,7 @@ class AttendeesSearchState<T : OrganizerSource>(
     }
 
     private fun innerAddAttendee(attendee: AttendeeUi) {
-        // Only add Me when creating a new event, which we organize
-        if (participants.isEmpty() && organizerSource is OrganizerSource.Dynamic) {
-            participants.add(ParticipantUi.Me)
-        }
-        participants.add(if (attendee.email.equals(me?.email, ignoreCase = true)) ParticipantUi.Me else attendee)
+        participants.addParticipant(attendee, organizerSource)
         searchQueryTextFieldState.clearText()
     }
 

@@ -70,6 +70,7 @@ private const val DAYS_PER_WEEK = 7
 fun MultiDaysScreen(
     dayCount: Int,
     goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
+    goToEventDuplication: (date: LocalDate, occurrenceId: OccurrenceId) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MultiDaysViewModel = viewModel(),
     quickActionsViewModel: EventQuickActionViewModel = viewModel(),
@@ -100,7 +101,10 @@ fun MultiDaysScreen(
         timelineState = timelineState,
         modifier = modifier,
     )
-    EventQuickActionsHost(quickActionsViewModel)
+    EventQuickActionsHost(
+        viewModel = quickActionsViewModel,
+        goToEventDuplication = { goToEventDuplication(visibleDayState.visibleDate, it) },
+    )
 }
 
 @Composable

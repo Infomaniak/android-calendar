@@ -113,7 +113,7 @@ class EventFormState(
         val owner = calendar.organizerAttendeeUi
         if (organizerSource is OrganizerSource.Static || owner == null) return
 
-        participants.removeAll { it is AttendeeUi && it.email == owner.email }
+        participants.removeAll { it is AttendeeUi && it.email.equals(owner.email, ignoreCase = true) }
         organizerSource = OrganizerSource.Dynamic(owner)
     }
 

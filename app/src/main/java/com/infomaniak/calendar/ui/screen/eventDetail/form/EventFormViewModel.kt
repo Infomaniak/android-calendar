@@ -31,11 +31,24 @@ import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState
 import com.infomaniak.calendar.components.eventdetail.form.Saver
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendar
+import com.infomaniak.calendar.components.eventdetail.models.EventDetailCalendarGroup
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
+import com.infomaniak.calendar.components.foundation.models.AttendeeUi
+import com.infomaniak.calendar.components.foundation.models.AvatarStrategy
+import com.infomaniak.calendar.components.foundation.models.OrganizerSource
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource.Static
+import com.infomaniak.calendar.components.foundation.models.ParticipantUi
+import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
+import com.infomaniak.calendar.components.foundation.utils.addParticipant
 import com.infomaniak.calendar.data.SettingsDataValues
 import com.infomaniak.calendar.ui.screen.eventDetail.EventCreationCalendarsUseCase
+import com.infomaniak.calendar.ui.screen.eventDetail.EventDetailUiState
+import com.infomaniak.calendar.ui.screen.eventDetail.EventLoader
+import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationMode
+import com.infomaniak.calendar.ui.screen.eventDetail.model.EventCreationCalendars
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -50,7 +63,9 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
+import kotlinx.datetime.daysUntil
 import kotlinx.datetime.minus
+import kotlinx.datetime.plus
 
 /**
  * Holds the [EventFormState] of an event form, shared with the screens it opens through its ViewModelStore.
@@ -63,6 +78,7 @@ import kotlinx.datetime.minus
 class EventFormViewModel(
     @Assisted private val savedStateHandle: SavedStateHandle,
     private val eventCreationCalendarsUseCase: EventCreationCalendarsUseCase,
+    private val eventLoader: EventLoader,
     private val settingsDataValues: SettingsDataValues,
 ) : ViewModel() {
     /** The form once loaded, for the screens it opens. */
@@ -71,22 +87,18 @@ class EventFormViewModel(
 
     private var isInitialized = false
 
-    fun initCreation(date: LocalDate) {
+    fun initCreation(mode: EventCreationMode) {
         if (isInitialized) return
         isInitialized = true
 
         viewModelScope.launch {
             if (formState != null) return@launch
             val creationCalendars = eventCreationCalendarsUseCase.creationCalendars.filterNotNull().first()
-            val defaultEventDuration = settingsDataValues.defaultEventDuration.flow.first()
 
-            formState = EventFormState.default(
-                calendar = creationCalendars.initialCalendar,
-                date = date,
-                timeZone = TimeZone.currentSystemDefault(),
-                eventDuration = defaultEventDuration,
-                calendars = creationCalendars.calendars,
-            )
+            formState = when (mode) {
+                is EventCreationMode.Empty -> emptyForm(mode.date, creationCalendars)
+                is EventCreationMode.Duplicate -> duplicateForm(mode.occurrenceId, mode.date, creationCalendars)
+            }
         }
     }
 
@@ -95,29 +107,57 @@ class EventFormViewModel(
         if (isInitialized) return
         isInitialized = true
 
-        val start = event.start.atTimeZone
-        val end = event.end.atTimeZone
-        // KMP ends an all-day event on the day after it, the form shows its last day
-        val endDate = if (event.isAllDay) end.date.minus(1, DateTimeUnit.DAY) else end.date
-        formState = EventFormState(
-            titleTextState = TextFieldState(event.title),
+        formState = event.toFormState(
+            startDate = event.start.atTimeZone.date,
             calendar = event.calendar,
-            eventColor = event.eventColorChoice,
-            isAllDay = event.isAllDay,
-            start = start,
-            startTimeZone = event.start.timeZone,
-            end = endDate.atTime(end.time),
-            endTimeZone = event.end.timeZone,
-            hasEndEverBeenTouched = false,
-            location = event.location,
+            calendars = event.calendars,
             participants = event.attendees.all.toSet(),
             organizerSource = Static(event.organizer),
-            isKMeetUrlEnabled = event.kMeetUrl != null,
-            descriptionTextState = TextFieldState(event.description.orEmpty()),
-            reminders = event.reminders,
-            isOccupied = event.isOccupied,
-            isPublic = event.classification == EventDetailUi.Classification.Public,
-            calendars = event.calendars,
+        )
+    }
+
+    private suspend fun emptyForm(date: LocalDate, creationCalendars: EventCreationCalendars): EventFormState {
+        return EventFormState.default(
+            calendar = creationCalendars.initialCalendar,
+            date = date,
+            timeZone = TimeZone.currentSystemDefault(),
+            eventDuration = settingsDataValues.defaultEventDuration.flow.first(),
+            calendars = creationCalendars.calendars,
+        )
+    }
+
+    /** A copy of the event of [occurrenceId] moved to [date], or an empty form when that event no longer exists. */
+    private suspend fun duplicateForm(
+        occurrenceId: OccurrenceId,
+        date: LocalDate,
+        creationCalendars: EventCreationCalendars,
+    ): EventFormState {
+        val eventState = eventLoader
+            .eventDetailUi(eventLoader.eventAndCalendar(occurrenceId))
+            .first { it != EventDetailUiState.Displayable.Loading }
+        val event = (eventState as? EventDetailUiState.Displayable.Success)?.eventDetail
+            ?: return emptyForm(date, creationCalendars)
+
+        val eventCalendar = creationCalendars
+            .calendars
+            .flatMap { it.calendars }
+            .find { it.id == event.calendar.id }
+            ?: creationCalendars.initialCalendar
+        val organizerSource = eventCalendar.organizerAttendeeUi?.let(OrganizerSource::Dynamic)
+
+        val participants = buildSet {
+            // Invites the attendees anew, without their replies nor organizer role, the owner of calendar organizes the copy as Me
+            event.invitees().forEach {
+                addParticipant(it.copy(status = ParticipationStatus.NeedsAction, isOrganizer = false), organizerSource)
+            }
+        }
+
+        return event.toFormState(
+            startDate = date,
+            calendar = eventCalendar,
+            calendars = creationCalendars.calendars,
+            participants = participants,
+            organizerSource = organizerSource,
         )
     }
 
@@ -138,6 +178,57 @@ class EventFormViewModel(
             restore = EventFormState.Saver::restore,
         )
     }
+}
+
+/** The form of the event, moved to [startDate] with the same start time and duration. */
+private fun EventDetailUi.toFormState(
+    startDate: LocalDate,
+    calendar: EventDetailCalendar,
+    calendars: List<EventDetailCalendarGroup>,
+    participants: Set<ParticipantUi>,
+    organizerSource: OrganizerSource?,
+): EventFormState {
+    val startDateTime = start.atTimeZone
+    val endDateTime = end.atTimeZone
+    val dayShift = startDateTime.date.daysUntil(startDate)
+    // KMP ends an all-day event on the day after it, the form shows its last day
+    val endDate = if (isAllDay) endDateTime.date.minus(1, DateTimeUnit.DAY) else endDateTime.date
+
+    return EventFormState(
+        titleTextState = TextFieldState(title),
+        calendar = calendar,
+        eventColor = eventColorChoice,
+        isAllDay = isAllDay,
+        start = startDate.atTime(startDateTime.time),
+        startTimeZone = start.timeZone,
+        end = endDate.plus(dayShift, DateTimeUnit.DAY).atTime(endDateTime.time),
+        endTimeZone = end.timeZone,
+        hasEndEverBeenTouched = false,
+        location = location,
+        participants = participants,
+        organizerSource = organizerSource,
+        isKMeetUrlEnabled = kMeetUrl != null,
+        descriptionTextState = TextFieldState(description.orEmpty()),
+        reminders = reminders,
+        isOccupied = isOccupied,
+        isPublic = classification == EventDetailUi.Classification.Public,
+        calendars = calendars,
+    )
+}
+
+/** The attendees of the event, led by its organizer when the attendees leave the organizer out. */
+private fun EventDetailUi.invitees(): List<AttendeeUi> {
+    val organizer = organizer ?: return attendees.all
+    if (attendees.all.any { it.email.equals(organizer.email, ignoreCase = true) }) return attendees.all
+
+    val organizerAttendee = AttendeeUi(
+        email = organizer.email,
+        displayName = organizer.displayName,
+        status = ParticipationStatus.Accepted,
+        avatar = AvatarStrategy.ToCompute,
+        isOrganizer = true,
+    )
+    return listOf(organizerAttendee) + attendees.all
 }
 
 private val EventDetailTiming.timeZone: TimeZone

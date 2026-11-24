@@ -50,14 +50,13 @@ import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.CalendarCross
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 
 @Composable
 fun EventCreationScreen(
-    date: LocalDate,
+    mode: EventCreationMode,
     goBack: () -> Unit,
     navigation: EventFormNavigation,
     modifier: Modifier = Modifier,
@@ -68,7 +67,7 @@ fun EventCreationScreen(
     val calendarsUiState by eventCreationViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        eventFormViewModel.initCreation(date)
+        eventFormViewModel.initCreation(mode)
     }
 
     val formState = eventFormViewModel.formState

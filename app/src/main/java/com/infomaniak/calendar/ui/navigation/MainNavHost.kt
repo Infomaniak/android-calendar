@@ -55,6 +55,7 @@ import com.infomaniak.calendar.ui.screen.accounts.AccountsListScreen
 import com.infomaniak.calendar.ui.screen.day.DayScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.AttendeesSearchScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.attendeesSearch.EditableAttendeesSearchScreen
+import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationMode
 import com.infomaniak.calendar.ui.screen.eventDetail.creation.EventCreationScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.customReminder.CustomReminderScreen
 import com.infomaniak.calendar.ui.screen.eventDetail.detail.EventDetailScreen
@@ -74,6 +75,7 @@ import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.utils.NavigationTransition
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
 
 @Composable
@@ -113,13 +115,17 @@ private fun baseEntryProvider(
     when (destination) {
         is NavDestination.CalendarView.Planning -> NavEntry(destination, metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
             PlanningScreen(
-                goToEventCreation = { backStack.addOnce(NavDestination.EventForm.EventCreation(it)) },
+                goToEventCreation = { backStack.addOnce(NavDestination.EventForm.EventCreation(EventCreationMode.Empty(it))) },
                 goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) },
+                goToEventDuplication = backStack::goToEventDuplication,
             )
         }
 
         is NavDestination.CalendarView.Day -> NavEntry(destination, metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-            DayScreen(goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) })
+            DayScreen(
+                goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) },
+                goToEventDuplication = backStack::goToEventDuplication,
+            )
         }
 
         // One branch (and content key) so the screen's composition is kept when switching between both.
@@ -131,6 +137,7 @@ private fun baseEntryProvider(
             MultiDaysScreen(
                 dayCount = if (destination is NavDestination.CalendarView.Week) 7 else 3,
                 goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) },
+                goToEventDuplication = backStack::goToEventDuplication,
             )
         }
 
@@ -148,7 +155,7 @@ private fun baseEntryProvider(
             metadata = metaDataOf(ResponsiveDialog),
         ) {
             EventCreationScreen(
-                date = destination.date,
+                mode = destination.mode,
                 goBack = { backStack.popOrReplaceRoot(defaultCalendarView) },
                 navigation = backStack.eventFormNavigation(form = destination, editedOccurrenceId = null),
             )
@@ -301,6 +308,10 @@ private fun NavBackStack<NavDestination>.settingsSubPageEntry(
     }
 }
 
+private fun NavBackStack<NavDestination>.goToEventDuplication(date: LocalDate, occurrenceId: OccurrenceId) {
+    addOnce(NavDestination.EventForm.EventCreation(EventCreationMode.Duplicate(occurrenceId, date)))
+}
+
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 private fun <T : NavKey> sceneStrategies(windowSizeClass: WindowSizeClass): List<SceneStrategy<T>> {
@@ -332,7 +343,7 @@ private fun sceneDecoratorStrategies(
                         CalendarFab(
                             onClick = {
                                 backStack.addOnce(
-                                    NavDestination.EventForm.EventCreation(visibleDayState?.visibleDate ?: Clock.today()),
+                                    NavDestination.EventForm.EventCreation(EventCreationMode.Empty(visibleDayState?.visibleDate ?: Clock.today())),
                                 )
                             },
                             modifier = Modifier.fillMaxSize(),
