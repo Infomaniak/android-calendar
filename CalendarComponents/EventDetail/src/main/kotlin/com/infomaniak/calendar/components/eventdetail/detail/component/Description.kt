@@ -114,7 +114,7 @@ internal fun DescriptionEditable(
         shapes = shapes,
         colors = CustomColors.EventFormItemColors,
         content = {
-            MaxCharacterTextField(
+            CompactTextField(
                 state = state,
                 maxAmountCharacters = DESCRIPTION_MAX_CHARACTERS,
                 placeholder = { Text(stringResource(R.string.descriptionTitle), maxLines = 1, overflow = TextOverflow.Ellipsis) },

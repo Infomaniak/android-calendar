@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -38,10 +39,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIconDefaults
-import com.infomaniak.calendar.components.eventdetail.detail.component.MaxCharacterTextField
+import com.infomaniak.calendar.components.eventdetail.detail.component.CompactTextField
+import com.infomaniak.calendar.components.eventdetail.detail.component.NoLineBreakTransformation
 import com.infomaniak.calendar.components.eventdetail.form.EventFormState.Companion.TITLE_MAX_CHARACTERS
 import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.resources.R
@@ -71,19 +74,20 @@ internal fun TitleEditable(
         shapes = shapes,
         colors = CustomColors.EventFormItemColors,
         content = {
-            MaxCharacterTextField(
+            CompactTextField(
                 state = textFieldState,
                 maxAmountCharacters = TITLE_MAX_CHARACTERS,
                 textStyle = MaterialTheme.typography.titleLargeEmphasized.copy(LocalContentColor.current),
                 lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = MAX_LINES),
                 modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                inputTransformation = NoLineBreakTransformation,
                 placeholder = {
                     Text(
                         stringResource(R.string.eventTitle),
                         style = MaterialTheme.typography.titleLargeEmphasized,
                     )
                 },
-                allowsLineBreak = false,
                 leadingIcon = { EventColorDot(dotColor()) },
             )
         },

@@ -63,7 +63,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -82,11 +82,12 @@ fun CompactTextField(
     state: TextFieldState,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     textStyle: TextStyle = LocalTextStyle.current,
     colors: TextFieldColors = CompactTextFieldDefaults.colors(),
     lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
     isError: Boolean = false,
-    allowsLineBreak: Boolean = true,
+    inputTransformation: InputTransformation? = null,
     errorText: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -132,12 +133,8 @@ fun CompactTextField(
                 }
             },
             interactionSource = interactionSource,
-            inputTransformation = if (allowsLineBreak) null else NoLineBreakTransformation,
-            keyboardOptions = (if (allowsLineBreak) {
-                KeyboardOptions(imeAction = ImeAction.Default)
-            } else {
-                KeyboardOptions(imeAction = ImeAction.Done)
-            }),
+            inputTransformation = inputTransformation,
+            keyboardOptions = keyboardOptions,
             cursorBrush = SolidColor(colors.cursorColor(isError)),
             modifier = modifier
                 .fillMaxWidth()
@@ -192,6 +189,41 @@ fun CompactTextField(
             },
         )
     }
+}
+
+/**
+ * A compact text field that shows a defined error if the [maxAmountCharacters] is exceeded.
+ */
+@Composable
+fun CompactTextField(
+    state: TextFieldState,
+    maxAmountCharacters: Int,
+    modifier: Modifier = Modifier,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    textStyle: TextStyle = LocalTextStyle.current,
+    lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
+    inputTransformation: InputTransformation? = null,
+    placeholder: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+) {
+    val isTooLong = state.text.length > maxAmountCharacters
+    val extraCharacters = maxAmountCharacters - state.text.length
+    val errorMessage = stringResource(R.string.eventValidationCharacterLimitExceeded) + " $extraCharacters"
+
+    CompactTextField(
+        state = state,
+        isError = isTooLong,
+        placeholder = placeholder,
+        textStyle = textStyle,
+        errorText = { Text(text = errorMessage, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        lineLimits = lineLimits,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        keyboardOptions = keyboardOptions,
+        inputTransformation = inputTransformation,
+        modifier = modifier,
+    )
 }
 
 object NoLineBreakTransformation : InputTransformation {
