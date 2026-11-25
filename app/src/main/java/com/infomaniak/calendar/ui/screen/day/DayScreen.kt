@@ -18,7 +18,9 @@
 package com.infomaniak.calendar.ui.screen.day
 
 import android.util.Log
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.plus
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -46,6 +48,7 @@ import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
@@ -125,7 +128,7 @@ private fun DayScreen(
             onEventClick = { goToEventDetail(it.occurrenceId) },
             headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
             timelineModifier = Modifier.hazeSource(hazeState),
-            contentPadding = contentPadding,
+            contentPadding = contentPadding + PaddingValues(bottom = Dimens.FloatingToolbarClearance),
             //TODO[eventDragAndDrop]: Move the event to the slot it was dropped on
             onEventMoved = { event, newStart -> Log.d("EventDragAndDrop", "${event.title} dropped at $newStart") },
             // Placed here rather than on each page: the hour grid's vertical scroll reaches it through

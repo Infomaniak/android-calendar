@@ -57,8 +57,10 @@ import com.infomaniak.calendar.components.eventdetail.component.Section
 import com.infomaniak.calendar.components.eventdetail.component.TitleEditable
 import com.infomaniak.calendar.components.eventdetail.component.dateAndTimeEditable
 import com.infomaniak.calendar.components.eventdetail.component.item
+import com.infomaniak.calendar.components.eventdetail.component.rememberSelectedEntryState
 import com.infomaniak.calendar.components.eventdetail.component.reminder.AddReminderButton
 import com.infomaniak.calendar.components.eventdetail.component.reminder.ReminderOffsetDialog
+import com.infomaniak.calendar.components.eventdetail.detail.component.DescriptionEditable
 import com.infomaniak.calendar.components.eventdetail.detail.locations
 import com.infomaniak.calendar.components.eventdetail.form.component.AllDaySwitch
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
@@ -72,6 +74,8 @@ import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetail
 import com.infomaniak.calendar.components.eventdetail.preview.previewEventDetailCalendarGroups
 import com.infomaniak.calendar.components.foundation.utils.rememberInitialFocusRequester
 import com.infomaniak.core.common.utils.today
+import com.infomaniak.designsystem.icons.EsdsIcons
+import com.infomaniak.designsystem.icons.symbols.List
 import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
@@ -109,6 +113,7 @@ fun EventForm(
             }
         }
 
+        val selectedEntryState = rememberSelectedEntryState()
         Section {
             item { shapes ->
                 AllDaySwitch(
@@ -121,6 +126,7 @@ fun EventForm(
             dateAndTimeEditable(
                 dateAndTimeState = state.dateAndTimeState,
                 isAllDay = state.isAllDay::value,
+                selectedEntryState = selectedEntryState,
                 onTimeZoneClick = onTimeZoneClick,
             )
         }
@@ -149,6 +155,15 @@ fun EventForm(
                 onClick = onLocationClick,
                 onRemoveClick = { state.location = null },
             )
+        }
+
+        Section {
+            item {
+                DescriptionEditable(
+                    state = state.descriptionTextState,
+                    shapes = it,
+                )
+            }
         }
 
         var isReminderOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }

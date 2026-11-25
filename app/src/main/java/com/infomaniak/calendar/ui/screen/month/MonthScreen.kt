@@ -17,66 +17,142 @@
  */
 package com.infomaniak.calendar.ui.screen.month
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.plus
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.infomaniak.calendar.components.calendar.component.HorizontalMonthSelector
+import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
+import com.infomaniak.calendar.components.foundation.state.VisibleDayState
+import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
+import com.infomaniak.calendar.components.foundation.utils.NAVIGABLE_MONTHS
+import com.infomaniak.calendar.components.month.MonthPager
+import com.infomaniak.calendar.components.month.model.MonthUi
+import com.infomaniak.calendar.components.month.preview.mockPreviewMonth
+import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
+import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
+import com.infomaniak.calendar.ui.model.occurrenceId
+import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.calendar.ui.theme.Dimens
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
+import kotlinx.datetime.YearMonth
+import kotlinx.datetime.yearMonth
 
 @Composable
-fun MonthScreen(modifier: Modifier = Modifier, monthViewModel: MonthViewModel = viewModel()) {
-    val isLoadingEvents by monthViewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
-    MonthScreen(modifier, isLoadingEvents = { isLoadingEvents })
+fun MonthScreen(
+    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
+    goToDay: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: MonthViewModel = viewModel(),
+) {
+    val months by viewModel.months.collectAsStateWithLifecycle()
+    val isLoadingEvents by viewModel.isLoadingEvents.collectAsStateWithLifecycle(initialValue = false)
+
+    val visibleDayState = LocalVisibleDayState.current ?: return
+
+    ApplyJumpRequests(visibleDayState)
+
+    MonthScreen(
+        goToEventDetail = goToEventDetail,
+        goToDay = goToDay,
+        months = { months },
+        isLoadingEvents = { isLoadingEvents },
+        visibleDayState = visibleDayState,
+        modifier = modifier,
+    )
 }
 
 @Composable
-private fun MonthScreen(modifier: Modifier = Modifier, isLoadingEvents: () -> Boolean) {
+private fun MonthScreen(
+    goToEventDetail: (occurrenceId: OccurrenceId) -> Unit,
+    goToDay: () -> Unit,
+    months: () -> Map<YearMonth, MonthUi>,
+    isLoadingEvents: () -> Boolean,
+    visibleDayState: VisibleDayState,
+    modifier: Modifier = Modifier,
+) {
+    val calendarExpansionState = rememberCalendarExpansionState()
     val hazeState = rememberHazeState()
-    Scaffold(
+
+    OverlaidTopBarScaffold(
         topBar = {
             CalendarTopAppBar(
-                onToggleCalendar = {},
                 isLoadingEvents = isLoadingEvents,
-                calendarExpansionProgress = { 0f },
+                onToggleCalendar = calendarExpansionState::toggle,
+                calendarExpansionProgress = { calendarExpansionState.progress },
                 hazeState = hazeState,
+                calendar = {
+                    AnimatedVisibility(
+                        visible = calendarExpansionState.isExpanded,
+                        enter = expandVertically(),
+                        exit = shrinkVertically(),
+                    ) {
+                        HorizontalMonthSelector(
+                            selectedMonth = { visibleDayState.visibleDate.yearMonth },
+                            onMonthSelected = { visibleDayState.jumpTo(it.firstDay) },
+                        )
+                    }
+                },
             )
         },
         modifier = modifier,
-    ) { paddingValues ->
-        LazyColumn(
+    ) { contentPadding ->
+        MonthPager(
+            monthRange = NAVIGABLE_MONTHS,
+            selectedDate = { visibleDayState.visibleDate },
+            monthOf = { months()[it] },
+            onVisibleMonthChanged = { visibleDayState.updateVisibleDate(it.firstDay) },
+            onDayClick = { date ->
+                visibleDayState.updateVisibleDate(date)
+                goToDay()
+            },
+            onEventClick = { goToEventDetail(it.occurrenceId) },
+            contentPadding = contentPadding + PaddingValues(bottom = Dimens.FloatingToolbarClearance),
             modifier = Modifier
                 .fillMaxSize()
                 .hazeSource(hazeState),
-            contentPadding = paddingValues,
-        ) {
-            items(50) { index ->
-                Text(
-                    text = "Event of the month n°$index",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                )
-            }
-        }
+        )
     }
 }
 
 @Preview
 @Composable
-private fun MonthScreenPreview() {
+private fun Preview() {
+    PreviewMonthScreen(months = { mapOf(it to mockPreviewMonth(it)) }, isLoadingEvents = false)
+}
+
+@Preview
+@Composable
+private fun NotLoadedPreview() {
+    PreviewMonthScreen(months = { emptyMap() }, isLoadingEvents = true)
+}
+
+@Composable
+private fun PreviewMonthScreen(months: (visibleMonth: YearMonth) -> Map<YearMonth, MonthUi>, isLoadingEvents: Boolean) {
     CalendarThemeForPreview {
-        MonthScreen()
+        val visibleDayState = rememberVisibleDayState()
+
+        CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
+            MonthScreen(
+                goToEventDetail = {},
+                goToDay = {},
+                months = { months(visibleDayState.visibleDate.yearMonth) },
+                isLoadingEvents = { isLoadingEvents },
+                visibleDayState = visibleDayState,
+            )
+        }
     }
 }

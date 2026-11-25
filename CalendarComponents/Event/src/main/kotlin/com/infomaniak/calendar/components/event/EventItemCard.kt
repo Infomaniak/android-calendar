@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.event
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -29,9 +30,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -46,9 +49,10 @@ fun EventItemCard(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = EventItemCardDefaults.ContentPadding,
+    shape: EventItemCardShape = EventItemCardDefaults.Shape,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val cardShape = MaterialTheme.shapes.small
+    val cardShape = shape.shape()
     val cardContent: @Composable ColumnScope.() -> Unit = {
         Column(
             modifier = Modifier
@@ -83,15 +87,19 @@ fun EventItemCard(
 }
 
 object EventItemCardDefaults {
-    val HorizontalPaddingValue: Dp
-        @Composable get() = EsdsTheme.spacing.lg
-    val VerticalPaddingValue: Dp
-        @Composable get() = EsdsTheme.spacing.md
+    val HorizontalPaddingValue: Dp @Composable get() = EsdsTheme.spacing.lg
+    val VerticalPaddingValue: Dp @Composable get() = EsdsTheme.spacing.md
 
     val ContentPadding: PaddingValues
         @Composable get() = PaddingValues(horizontal = HorizontalPaddingValue, vertical = VerticalPaddingValue)
+
+    val Shape = EventItemCardShape.Rounded
 }
 
+enum class EventItemCardShape(val shape: @Composable () -> Shape) {
+    Rounded({ MaterialTheme.shapes.small }), // Every use in the app apart from exceptions
+    Squared({ MaterialTheme.shapes.extraSmall }), // For small events only, right now only used by the month
+}
 
 @Preview
 @Composable
@@ -100,16 +108,28 @@ private fun EventItemCardPreview() {
 
     MaterialTheme {
         Surface {
-            EventItemCard(
-                status = status,
-                onClick = {},
-                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+            Column(
                 modifier = Modifier.padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                // Sample content for the preview
-                Column {
-                    androidx.compose.material3.Text(text = "Event Title", style = MaterialTheme.typography.titleMedium)
-                    androidx.compose.material3.Text(text = "Event Details", style = MaterialTheme.typography.bodyMedium)
+                EventItemCard(
+                    status = status,
+                    onClick = {},
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                ) {
+                    Column {
+                        Text(text = "Event Title", style = MaterialTheme.typography.titleMedium)
+                        Text(text = "Event Details", style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+
+                EventItemCard(
+                    status = status,
+                    onClick = {},
+                    contentPadding = PaddingValues(horizontal = 8.dp),
+                    shape = EventItemCardShape.Squared,
+                ) {
+                    Text(text = "Event Title", style = MaterialTheme.typography.titleMedium)
                 }
             }
         }

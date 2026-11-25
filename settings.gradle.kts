@@ -90,6 +90,7 @@ include(":CalendarComponents:Foundation")
 include(":CalendarComponents:Planning")
 include(":CalendarComponents:TimeZoneSearch")
 include(":CalendarComponents:LocationSearch")
+include(":CalendarComponents:Month")
 include(":CalendarComponents:Resources")
 include(":ScrollPicker")
 

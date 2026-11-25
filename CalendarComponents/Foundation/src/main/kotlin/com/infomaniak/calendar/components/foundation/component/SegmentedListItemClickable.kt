@@ -18,16 +18,17 @@
 package com.infomaniak.calendar.components.foundation.component
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemColors
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.infomaniak.calendar.components.foundation.theme.ComponentColors
 
 @Composable
-fun ListItemClickable(
+fun SegmentedListItemClickable(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -37,12 +38,12 @@ fun ListItemClickable(
     supportingContent: @Composable (() -> Unit)? = null,
     verticalAlignment: Alignment.Vertical = ListItemDefaults.verticalAlignment(),
     shapes: ListItemShapes = ListItemDefaults.shapes(),
-    colors: ListItemColors = ListItemDefaults.colors(),
+    colors: ListItemColors = ComponentColors.SegmentedListItemColors,
     contentPadding: PaddingValues = ListItemDefaults.ContentPadding,
     content: @Composable () -> Unit,
 ) {
     if (onClick == null) {
-        ListItem(
+        SegmentedListItem (
             enabled = enabled,
             leadingContent = leadingContent,
             trailingContent = trailingContent,
@@ -56,7 +57,7 @@ fun ListItemClickable(
             modifier = modifier,
         )
     } else {
-        ListItem(
+        SegmentedListItem (
             onClick = onClick,
             enabled = enabled,
             leadingContent = leadingContent,
