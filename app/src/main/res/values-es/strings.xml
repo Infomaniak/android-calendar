@@ -36,6 +36,12 @@
     <string name="generalSettingsNotificationsLabel">Notificaciones</string>
     <string name="monthTitle">Mes</string>
     <string name="noWritableCalendar">No se ha encontrado ningún calendario editable</string>
+    <string name="notificationActionOpenMap">Abrir mapa</string>
+    <plurals name="notificationActionSnooze">
+        <!-- Button on an event reminder notification: shows the reminder again after this many minutes. Keep it short, abbreviate "minutes" (e.g. "min"). -->
+        <item quantity="one">Recordar en %d min</item>
+        <item quantity="other">Recordar en %d min</item>
+    </plurals>
     <string name="notificationChannelEventRemindersDescription">Notificaciones de eventos próximos y recordatorios</string>
     <string name="notificationChannelEventRemindersTitle">Recordatorios de eventos</string>
     <string name="notificationDefaultDescription">Alarma de evento</string>
