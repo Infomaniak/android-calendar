@@ -68,17 +68,17 @@ import com.infomaniak.calendar.components.day.component.HourLabels
 import com.infomaniak.calendar.components.day.component.HourLines
 import com.infomaniak.calendar.components.day.component.minuteOfDay
 import com.infomaniak.calendar.components.day.component.verticalTimelineScroll
-import com.infomaniak.calendar.components.day.highlight.EventHighlightState
-import com.infomaniak.calendar.components.day.highlight.HighlightedEventOverlay
-import com.infomaniak.calendar.components.day.highlight.eventHighlightArea
-import com.infomaniak.calendar.components.day.highlight.releaseHighlightOnSecondPointer
-import com.infomaniak.calendar.components.day.highlight.rememberEventHighlightState
 import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.DayPages
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.event.highlight.EventHighlightState
+import com.infomaniak.calendar.components.event.highlight.HighlightedEventOverlay
+import com.infomaniak.calendar.components.event.highlight.eventHighlightArea
+import com.infomaniak.calendar.components.event.highlight.releaseHighlightOnSecondPointer
+import com.infomaniak.calendar.components.event.highlight.rememberEventHighlightState
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
@@ -90,11 +90,11 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import kotlin.time.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlin.time.Clock
 
 /**
  * Several days side by side, [visibleDayCount] columns on screen, swiped [daysPerPage] days at a time.

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.day.highlight
+package com.infomaniak.calendar.components.event.highlight
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEvent

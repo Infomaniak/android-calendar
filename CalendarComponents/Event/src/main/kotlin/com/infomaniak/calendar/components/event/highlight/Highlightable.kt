@@ -15,20 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.day.highlight
+package com.infomaniak.calendar.components.event.highlight
 
-import androidx.compose.runtime.Immutable
-import androidx.compose.ui.geometry.Rect
-import com.infomaniak.calendar.components.day.model.TimedEvent
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 
 /**
- * An event held up by a long press. Its card grows from where it sat in its column, [startBounds], to the whole width
- * of [areaBounds], opening near the finger, [fingerY]. All of them are in the coordinates of the overlay drawing it.
+ * Lets a long press hold [event] up in [state], and hides this card while [HighlightedEventOverlay] draws it in its place.
+ *
+ * [key] tells this card apart from the others showing the same event, like the slices of an event over several days.
  */
-@Immutable
-internal data class EventHighlight(
-    val timedEvent: TimedEvent,
-    val startBounds: Rect,
-    val areaBounds: Rect,
-    val fingerY: Float,
-)
+fun Modifier.highlightable(state: EventHighlightState, event: EventSummaryUi.Normal, key: Any = event): Modifier = this
+    .highlightOnLongPress(state, event, key)
+    .graphicsLayer { alpha = if (state.isHighlighting(key)) 0f else 1f }

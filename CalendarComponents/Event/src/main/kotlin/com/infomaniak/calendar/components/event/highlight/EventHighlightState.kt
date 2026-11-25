@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.day.highlight
+package com.infomaniak.calendar.components.event.highlight
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
@@ -33,31 +33,31 @@ import kotlinx.coroutines.launch
 private const val HIGHLIGHT_DAMPING_RATIO = 0.8f
 
 @Composable
-internal fun rememberEventHighlightState(): EventHighlightState {
+fun rememberEventHighlightState(): EventHighlightState {
     val scope = rememberCoroutineScope()
     return remember(scope) { EventHighlightState(scope) }
 }
 
 /** The [EventHighlight] a long press holds up, unfolded as [progress] goes from 0 to 1 and folded back once released. */
 @Stable
-internal class EventHighlightState(private val scope: CoroutineScope) {
+class EventHighlightState internal constructor(private val scope: CoroutineScope) {
 
     private val highlightState = mutableStateOf<EventHighlight?>(null)
-    val highlight: EventHighlight? by highlightState
+    internal val highlight: EventHighlight? by highlightState
 
     private val isHeldState = mutableStateOf(false)
     /** Whether the finger still holds the event up: the timeline stays put until it lifts. */
     val isHeld: Boolean by isHeldState
 
     /** Set while laid out, and only read once a long press needs to know where its card is. */
-    var overlayCoordinates: LayoutCoordinates? = null
+    internal var overlayCoordinates: LayoutCoordinates? = null
 
     private val progressAnimatable = Animatable(0f)
-    val progress: Float get() = progressAnimatable.value
+    internal val progress: Float get() = progressAnimatable.value
 
     // Each animation cancels the running one, so a cancelled fold-back never clears the highlight.
-    fun show(highlight: EventHighlight) {
-        val isAnotherEvent = this.highlight?.timedEvent != highlight.timedEvent
+    internal fun show(highlight: EventHighlight) {
+        val isAnotherEvent = this.highlight?.key != highlight.key
         highlightState.value = highlight
         isHeldState.value = true
 
@@ -68,7 +68,7 @@ internal class EventHighlightState(private val scope: CoroutineScope) {
         }
     }
 
-    fun hide() {
+    internal fun hide() {
         if (!isHeld) return
         isHeldState.value = false
 
@@ -77,6 +77,9 @@ internal class EventHighlightState(private val scope: CoroutineScope) {
             highlightState.value = null
         }
     }
+
+    /** Whether the card [key] identifies is the one held up, which the overlay draws in its place. */
+    fun isHighlighting(key: Any): Boolean = highlight?.key == key
 
     private companion object {
         val highlightSpring = spring<Float>(dampingRatio = HIGHLIGHT_DAMPING_RATIO, stiffness = Spring.StiffnessMediumLow)

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.day.highlight
+package com.infomaniak.calendar.components.event.highlight
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.node.ModifierNodeElement
@@ -25,7 +25,7 @@ import androidx.compose.ui.node.TraversableNode
  * Marks the area a highlighted event unfolds across: its whole width, and the height it can show.
  * A card held by [highlightOnLongPress] unfolds across the nearest of these around it.
  */
-internal fun Modifier.eventHighlightArea(): Modifier = this then EventHighlightAreaElement
+fun Modifier.eventHighlightArea(): Modifier = this then EventHighlightAreaElement
 
 private data object EventHighlightAreaElement : ModifierNodeElement<EventHighlightAreaNode>() {
     override fun create() = EventHighlightAreaNode()

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.day.highlight
+package com.infomaniak.calendar.components.event.highlight
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
@@ -48,7 +48,7 @@ private val FingerClearance = 24.dp
  * where bars may be drawn over the overlay.
  */
 @Composable
-internal fun HighlightedEventOverlay(
+fun HighlightedEventOverlay(
     state: EventHighlightState,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
@@ -68,7 +68,7 @@ internal fun HighlightedEventOverlay(
         content = {
             if (highlight != null) {
                 EventItem(
-                    event = highlight.timedEvent.event,
+                    event = highlight.event,
                     onClick = null,
                     modifier = Modifier.graphicsLayer {
                         shadowElevation = HighlightElevation.toPx() * state.progress.coerceIn(0f, 1f)

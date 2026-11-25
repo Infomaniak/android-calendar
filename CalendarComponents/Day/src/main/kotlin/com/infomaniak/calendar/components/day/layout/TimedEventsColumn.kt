@@ -32,11 +32,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.infomaniak.calendar.components.day.TimelineDefaults
-import com.infomaniak.calendar.components.day.highlight.EventHighlightState
 import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.model.TimedEvent
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
+import com.infomaniak.calendar.components.event.highlight.EventHighlightState
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import kotlin.math.roundToInt
 

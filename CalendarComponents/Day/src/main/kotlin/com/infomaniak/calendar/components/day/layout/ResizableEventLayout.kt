@@ -28,7 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
@@ -37,12 +36,12 @@ import androidx.compose.ui.unit.Constraints
 import com.infomaniak.calendar.components.day.TimelineDefaults
 import com.infomaniak.calendar.components.day.component.ResizableEventItem
 import com.infomaniak.calendar.components.day.component.titleSizingFor
-import com.infomaniak.calendar.components.day.highlight.EventHighlightState
-import com.infomaniak.calendar.components.day.highlight.highlightOnLongPress
 import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.model.TimedEvent
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
+import com.infomaniak.calendar.components.event.highlight.EventHighlightState
+import com.infomaniak.calendar.components.event.highlight.highlightable
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import kotlin.math.roundToInt
 
@@ -74,7 +73,7 @@ internal fun ResizableEventLayout(
                     visibleHeight = remember(index) { { currentPlacements.value[index].visibleHeight } },
                     onClick = { onEventClick(timedEvent.event) },
                     textOverflow = textOverflow,
-                    modifier = highlightState?.let { Modifier.highlightable(it, timedEvent) } ?: Modifier,
+                    modifier = highlightState?.let { Modifier.highlightable(it, timedEvent.event, key = timedEvent) } ?: Modifier,
                 )
             }
         },
@@ -97,11 +96,6 @@ internal fun ResizableEventLayout(
         }
     }
 }
-
-/** Held up by a long press, and hidden while the overlay draws it in its place. */
-private fun Modifier.highlightable(state: EventHighlightState, timedEvent: TimedEvent): Modifier = this
-    .highlightOnLongPress(state, timedEvent)
-    .graphicsLayer { alpha = if (state.highlight?.timedEvent == timedEvent) 0f else 1f }
 
 /**
  * The layout only places what the solver hands it, so the preview has to resolve the overlaps

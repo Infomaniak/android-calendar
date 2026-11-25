@@ -27,23 +27,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.component.DayView
-import com.infomaniak.calendar.components.day.highlight.HighlightedEventOverlay
-import com.infomaniak.calendar.components.day.highlight.releaseHighlightOnSecondPointer
-import com.infomaniak.calendar.components.day.highlight.rememberEventHighlightState
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.DayPages
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.event.highlight.HighlightedEventOverlay
+import com.infomaniak.calendar.components.event.highlight.releaseHighlightOnSecondPointer
+import com.infomaniak.calendar.components.event.highlight.rememberEventHighlightState
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.utils.FollowSelectedPage
 import com.infomaniak.core.common.utils.today
+import kotlin.time.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlin.time.Clock
 
 @Composable
 fun DayPager(
