@@ -27,6 +27,7 @@ import kotlinx.datetime.toKotlinDayOfWeek
 import java.time.temporal.WeekFields
 import java.util.Locale
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 @SingleIn(AppScope::class)
 class SettingsDataValues @Inject constructor(appContext: Context) : DataValues(appContext, name = "settingsData") {

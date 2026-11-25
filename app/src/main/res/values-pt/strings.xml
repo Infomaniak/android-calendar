@@ -32,7 +32,9 @@
     <string name="editRecurringEventAlertTitle">Que eventos deseja editar?</string>
     <string name="eventOccurrenceNotFound">Este evento já não está disponível.</string>
     <string name="generalSettingsAuthorizationsLabel">Autorizações</string>
+    <string name="generalSettingsDefaultEventDurationLabel">Duração predefinida</string>
     <string name="generalSettingsDisplayLabel">Ecrã</string>
+    <string name="generalSettingsEventLabel">Evento</string>
     <string name="generalSettingsNotificationsLabel">Notificações</string>
     <string name="generalSettingsStartOfWeekLabel">Início da semana</string>
     <string name="monthTitle">Mês</string>
