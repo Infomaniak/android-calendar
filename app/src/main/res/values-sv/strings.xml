@@ -34,11 +34,11 @@
     <string name="generalSettingsAuthorizationsLabel">Behörigheter</string>
     <string name="generalSettingsDisplayLabel">Visning</string>
     <string name="generalSettingsNotificationsLabel">Aviseringar</string>
+    <string name="generalSettingsStartOfWeekLabel">Veckans början</string>
     <string name="monthTitle">Månad</string>
     <string name="noWritableCalendar">Ingen redigerbar kalender hittades</string>
     <string name="notificationActionOpenMap">Öppna karta</string>
     <plurals name="notificationActionSnooze">
-        <!-- Button on an event reminder notification: shows the reminder again after this many minutes. Keep it short, abbreviate "minutes" (e.g. "min"). -->
         <item quantity="one">Påminn om %d min</item>
         <item quantity="other">Påminn om %d min</item>
     </plurals>

@@ -34,11 +34,11 @@
     <string name="generalSettingsAuthorizationsLabel">Machtigingen</string>
     <string name="generalSettingsDisplayLabel">Weergave</string>
     <string name="generalSettingsNotificationsLabel">Meldingen</string>
+    <string name="generalSettingsStartOfWeekLabel">Begin van de week</string>
     <string name="monthTitle">Maand</string>
     <string name="noWritableCalendar">Geen bewerkbare kalender gevonden</string>
     <string name="notificationActionOpenMap">Kaart openen</string>
     <plurals name="notificationActionSnooze">
-        <!-- Button on an event reminder notification: shows the reminder again after this many minutes. Keep it short, abbreviate "minutes" (e.g. "min"). -->
         <item quantity="one">Herinner over %d min</item>
         <item quantity="other">Herinner over %d min</item>
     </plurals>

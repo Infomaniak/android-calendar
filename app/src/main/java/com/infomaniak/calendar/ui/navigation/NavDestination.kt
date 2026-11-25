@@ -81,6 +81,9 @@ sealed interface NavDestination : NavKey {
 
         @Serializable
         data object Theme : Settings
+
+        @Serializable
+        data object FirstDayOfWeek : Settings
     }
 
     @Serializable
