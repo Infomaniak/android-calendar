@@ -35,7 +35,6 @@ import com.infomaniak.calendar.components.day.DayPager
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
-import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
 import com.infomaniak.calendar.components.foundation.utils.NAVIGABLE_DATES
@@ -144,10 +143,7 @@ private fun Preview() {
     CalendarThemeForPreview {
         val visibleDayState = rememberVisibleDayState()
 
-        CompositionLocalProvider(
-            LocalVisibleDayState provides visibleDayState,
-            LocalWeekNumbering provides WeekNumbering.ISO_8601,
-        ) {
+        CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
             DayScreen(
                 goToEventDetail = {},
                 uiState = { TimelineUiState.Success(emptyMap()) },
