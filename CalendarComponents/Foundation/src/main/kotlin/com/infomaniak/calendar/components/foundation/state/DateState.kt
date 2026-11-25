@@ -51,6 +51,12 @@ enum class DateState(
         borderColor = { Color.Transparent },
         showDots = false,
     ),
+    SelectedNotToday(
+        containerColor = { MaterialTheme.colorScheme.secondaryContainer },
+        contentColor = { MaterialTheme.colorScheme.onSecondaryContainer },
+        borderColor = { Color.Transparent },
+        showDots = false,
+    ),
     None(
         containerColor = { Color.Transparent },
         contentColor = { MaterialTheme.colorScheme.onSurface },
@@ -89,6 +95,7 @@ private fun Preview() {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 Item(DateState.None)
                 Item(DateState.Selected)
+                Item(DateState.SelectedNotToday)
                 Item(DateState.Today)
                 Item(DateState.NotMonth)
             }
