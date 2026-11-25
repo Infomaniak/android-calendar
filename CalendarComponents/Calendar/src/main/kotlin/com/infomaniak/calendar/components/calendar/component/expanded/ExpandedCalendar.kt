@@ -129,6 +129,7 @@ private fun DayContent(
             val isSelected = day.date == selectedDate()
             val isToday = day.date == today()
             when {
+                day.position != DayPosition.MonthDate -> DateState.NotMonth
                 isSelected && isToday -> DateState.Selected
                 isSelected -> DateState.SelectedNotToday
                 isToday -> DateState.Today
