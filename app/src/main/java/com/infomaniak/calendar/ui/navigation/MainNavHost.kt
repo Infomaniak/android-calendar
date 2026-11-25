@@ -68,6 +68,7 @@ import com.infomaniak.calendar.ui.screen.onboarding.login.LoginOnboardingScreen
 import com.infomaniak.calendar.ui.screen.onboarding.permissions.PermissionsOnboardingPage
 import com.infomaniak.calendar.ui.screen.onboarding.permissions.PermissionsOnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
+import com.infomaniak.calendar.ui.screen.settings.SettingFirstDayOfWeekScreen
 import com.infomaniak.calendar.ui.screen.settings.SettingScreen
 import com.infomaniak.calendar.ui.screen.settings.SettingThemeScreen
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
@@ -250,11 +251,16 @@ private fun baseEntryProvider(
             SettingScreen(
                 goBack = { backStack.popOrReplaceRoot(backStack.getLastCalendarView() ?: defaultCalendarView) },
                 goToTheme = { backStack.replaceAbove(destination, NavDestination.Settings.Theme) },
+                goToFirstDayOfWeek = { backStack.replaceAbove(destination, NavDestination.Settings.FirstDayOfWeek) },
             )
         }
 
         is NavDestination.Settings.Theme -> backStack.settingsSubPageEntry(destination) { goBack ->
             SettingThemeScreen(goBack = goBack)
+        }
+
+        is NavDestination.Settings.FirstDayOfWeek -> backStack.settingsSubPageEntry(destination) { goBack ->
+            SettingFirstDayOfWeekScreen(goBack = goBack)
         }
 
         is NavDestination.Onboarding.Login -> NavEntry(destination) {

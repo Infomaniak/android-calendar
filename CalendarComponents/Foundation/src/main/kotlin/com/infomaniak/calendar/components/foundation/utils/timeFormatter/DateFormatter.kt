@@ -39,6 +39,9 @@ private const val SHORT_DATE_WITH_YEAR_PATTERN = "d MMM y"
 @Composable
 fun DayOfWeek.formatNarrowDayName(): String = toJavaDayOfWeek().getDisplayName(TextStyle.NARROW_STANDALONE, currentLocale())
 
+@Composable
+fun DayOfWeek.formatFullDayName(): String = toJavaDayOfWeek().getDisplayName(TextStyle.FULL_STANDALONE, currentLocale())
+
 /** `Wed` */
 @Composable
 fun LocalDate.formatShortDayName(locale: Locale = currentLocale()): String {

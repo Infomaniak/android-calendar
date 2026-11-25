@@ -23,10 +23,17 @@ import com.infomaniak.core.datavalue.DataValues
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
+import kotlinx.datetime.toKotlinDayOfWeek
+import java.time.temporal.WeekFields
+import java.util.Locale
 import kotlin.time.Duration.Companion.hours
 
 @SingleIn(AppScope::class)
 class SettingsDataValues @Inject constructor(appContext: Context) : DataValues(appContext, name = "settingsData") {
     val theme = dataValue(key = "theme", defaultValue = SettingThemeOption.System)
     val defaultEventDuration = dataValue(key = "defaultEventDuration", defaultValue = 1.hours)
+    val firstDayOfWeek = dataValue(
+        key = "firstDayOfWeek",
+        defaultValue = WeekFields.of(Locale.getDefault()).firstDayOfWeek.toKotlinDayOfWeek(),
+    )
 }
