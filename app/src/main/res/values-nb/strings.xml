@@ -32,7 +32,9 @@
     <string name="editRecurringEventAlertTitle">Hvilke hendelser vil du redigere?</string>
     <string name="eventOccurrenceNotFound">Denne hendelsen er ikke lenger tilgjengelig.</string>
     <string name="generalSettingsAuthorizationsLabel">Tillatelser</string>
+    <string name="generalSettingsDefaultEventDurationLabel">Standardvarighet</string>
     <string name="generalSettingsDisplayLabel">Visning</string>
+    <string name="generalSettingsEventLabel">Hendelse</string>
     <string name="generalSettingsNotificationsLabel">Varsler</string>
     <string name="generalSettingsStartOfWeekLabel">Ukestart</string>
     <string name="monthTitle">Måned</string>
