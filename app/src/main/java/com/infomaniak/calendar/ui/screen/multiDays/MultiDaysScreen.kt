@@ -39,7 +39,6 @@ import com.infomaniak.calendar.components.days.MultiDayPager
 import com.infomaniak.calendar.components.days.state.TimelineState
 import com.infomaniak.calendar.components.days.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
-import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
 import com.infomaniak.calendar.components.foundation.utils.NAVIGABLE_DATES
@@ -169,10 +168,7 @@ private fun MultiDaysScreen(
 private fun Preview() {
     CalendarThemeForPreview {
         val visibleDayState = rememberVisibleDayState()
-        CompositionLocalProvider(
-            LocalVisibleDayState provides visibleDayState,
-            LocalWeekNumbering provides WeekNumbering.ISO_8601,
-        ) {
+        CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
             MultiDaysScreen(
                 dayCount = 3,
                 goToEventDetail = {},

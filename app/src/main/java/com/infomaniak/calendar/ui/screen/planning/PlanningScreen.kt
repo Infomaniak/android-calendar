@@ -38,7 +38,6 @@ import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnS
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
-import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
 import com.infomaniak.calendar.components.planning.Planning
@@ -173,10 +172,7 @@ private fun SuccessPlanning(
 private fun Preview(@PreviewParameter(PlanningPreviewParameter::class) eventsByDate: Map<LocalDate, List<EventSummaryUi>>) {
     CalendarThemeForPreview {
         val visibleDayState = rememberVisibleDayState(remember { mutableStateOf(eventsByDate.keys.min()) })
-        CompositionLocalProvider(
-            LocalVisibleDayState provides visibleDayState,
-            LocalWeekNumbering provides WeekNumbering.ISO_8601,
-        ) {
+        CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
             PlanningScreen(
                 planningUiState = { PlanningUiState.Success(eventsByDate.toImmutableMap()) },
                 goToEventCreation = {},

@@ -20,4 +20,4 @@ package com.infomaniak.calendar.ui.state
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 
-val LocalWeekNumbering = staticCompositionLocalOf<WeekNumbering> { error("No LocalWeekNumbering provided!") }
+val LocalWeekNumbering = staticCompositionLocalOf { WeekNumbering.ISO_8601 }
