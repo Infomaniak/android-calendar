@@ -37,6 +37,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
+import com.infomaniak.calendar.components.event.highlight.EventHighlightState
+import com.infomaniak.calendar.components.event.highlight.eventDropTarget
+import com.infomaniak.calendar.components.event.highlight.highlightable
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.utils.HorizontalGridLine
 import com.infomaniak.calendar.components.month.layout.LaneMetrics
@@ -67,6 +70,7 @@ internal fun MonthWeekRow(
     onDayClick: (LocalDate) -> Unit,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
+    highlightState: EventHighlightState? = null,
 ) {
     Box(modifier) {
         Row(Modifier.fillMaxSize()) {
@@ -80,14 +84,15 @@ internal fun MonthWeekRow(
                     onClick = { onDayClick(date) },
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight(),
+                        .fillMaxHeight()
+                        .then(highlightState?.let { Modifier.eventDropTarget(it, date) } ?: Modifier),
                 )
             }
         }
 
         HorizontalGridLine()
 
-        if (laneCount > 0) WeekEvents(week, laneMetrics, laneCount, onEventClick, Modifier.matchParentSize())
+        if (laneCount > 0) WeekEvents(week, laneMetrics, laneCount, onEventClick, highlightState, Modifier.matchParentSize())
     }
 }
 
@@ -98,6 +103,7 @@ private fun WeekEvents(
     laneMetrics: LaneMetrics,
     laneCount: Int,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
+    highlightState: EventHighlightState?,
     modifier: Modifier = Modifier,
 ) {
     val visibleEvents = remember(week, laneCount) { week.visibleEventsIn(laneCount) }
@@ -110,7 +116,16 @@ private fun WeekEvents(
                     MonthEventChip(
                         event = segment.event,
                         onClick = { onEventClick(segment.event) },
-                        modifier = Modifier.layoutId(EventSlot(segment.startColumn, segment.span, segment.lane)),
+                        modifier = Modifier
+                            .layoutId(EventSlot(segment.startColumn, segment.span, segment.lane))
+                            // An event over several weeks has a segment in each, alike but for their week.
+                            .then(
+                                highlightState?.let {
+                                    Modifier.highlightable(it, segment.event, key = week.dates.first() to segment) { draggedModifier ->
+                                        MonthEventChip(event = segment.event, onClick = {}, modifier = draggedModifier)
+                                    }
+                                } ?: Modifier,
+                            ),
                     )
                 }
             }

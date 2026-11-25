@@ -28,7 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
@@ -37,12 +36,12 @@ import androidx.compose.ui.unit.Constraints
 import com.infomaniak.calendar.components.day.TimelineDefaults
 import com.infomaniak.calendar.components.day.component.ResizableEventItem
 import com.infomaniak.calendar.components.day.component.titleSizingFor
-import com.infomaniak.calendar.components.day.highlight.EventHighlightState
-import com.infomaniak.calendar.components.day.highlight.highlightOnLongPress
 import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.model.TimedEvent
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
+import com.infomaniak.calendar.components.event.highlight.EventHighlightState
+import com.infomaniak.calendar.components.event.highlight.highlightable
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import kotlin.math.roundToInt
 
@@ -64,17 +63,30 @@ internal fun ResizableEventLayout(
         content = {
             timedEvents.forEachIndexed { index, timedEvent ->
                 val placement = placements[index]
+                val titleSizing = titleSizingFor(
+                    visibleHeight = with(density) { placement.visibleHeight.toDp() },
+                    width = with(density) { placement.width.toDp() },
+                )
+                val visibleHeight = remember(index) { { currentPlacements.value[index].visibleHeight } }
 
                 ResizableEventItem(
                     timedEvent = timedEvent,
-                    titleSizing = titleSizingFor(
-                        visibleHeight = with(density) { placement.visibleHeight.toDp() },
-                        width = with(density) { placement.width.toDp() },
-                    ),
-                    visibleHeight = remember(index) { { currentPlacements.value[index].visibleHeight } },
+                    titleSizing = titleSizing,
+                    visibleHeight = visibleHeight,
                     onClick = { onEventClick(timedEvent.event) },
                     textOverflow = textOverflow,
-                    modifier = highlightState?.let { Modifier.highlightable(it, timedEvent, textOverflow) } ?: Modifier,
+                    modifier = highlightState?.let {
+                        Modifier.highlightable(it, timedEvent.event, key = timedEvent) { draggedModifier ->
+                            ResizableEventItem(
+                                timedEvent = timedEvent,
+                                titleSizing = titleSizing,
+                                visibleHeight = visibleHeight,
+                                onClick = {},
+                                textOverflow = textOverflow,
+                                modifier = draggedModifier,
+                            )
+                        }
+                    } ?: Modifier,
                 )
             }
         },
@@ -97,19 +109,6 @@ internal fun ResizableEventLayout(
         }
     }
 }
-
-/** Held up by a long press, hidden while the overlay draws it in its place, and only traced while dragged elsewhere. */
-private fun Modifier.highlightable(state: EventHighlightState, timedEvent: TimedEvent, textOverflow: TextOverflow): Modifier = this
-    .highlightOnLongPress(state, timedEvent, textOverflow)
-    .graphicsLayer {
-        alpha = when {
-            state.highlight?.timedEvent != timedEvent -> 1f
-            state.isDragging -> DRAGGED_TRACE_ALPHA
-            else -> 0f
-        }
-    }
-
-private const val DRAGGED_TRACE_ALPHA = 0.35f
 
 /**
  * The layout only places what the solver hands it, so the preview has to resolve the overlaps

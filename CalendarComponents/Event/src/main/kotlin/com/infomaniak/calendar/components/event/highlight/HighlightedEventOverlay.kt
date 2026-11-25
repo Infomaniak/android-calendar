@@ -15,14 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.day.highlight
+package com.infomaniak.calendar.components.event.highlight
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.lerp
 import androidx.compose.ui.graphics.graphicsLayer
@@ -31,36 +30,31 @@ import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
-import com.infomaniak.calendar.components.day.component.ResizableEventItem
-import com.infomaniak.calendar.components.day.component.titleSizingFor
 import com.infomaniak.calendar.components.event.EventItem
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-private const val SCRIM_ALPHA = 0.32f
 private val HighlightElevation = 8.dp
 private val FingerClearance = 24.dp
 
 /**
- * Draws the event [state] holds up above everything it covers, the neighbouring days included,
- * with a scrim fading in behind it.
+ * Draws the event [state] holds up above everything it covers, the neighbouring days included.
  *
- * The card unfolds from its place in its column to the whole width of its area, written the way the
- * Planning writes an event. It opens just above the finger so the finger doesn't hide it, or just
+ * The card unfolds from its place in its column to the width of its area, a margin off each side, written the
+ * way the Planning writes an event. It opens just above the finger so the finger doesn't hide it, or just
  * below when there is no room above, and always fully inside the area, out of the [contentPadding]
- * where bars may be drawn over the overlay. Dragged, it folds back to the size and the look it has in
- * its column, shifted by the finger's way.
+ * where bars may be drawn over the overlay. Pulled or dragged, it is shifted after the finger, and once
+ * dragged, it is drawn by the highlight's own dragged card.
  */
 @Composable
-internal fun HighlightedEventOverlay(
+fun HighlightedEventOverlay(
     state: EventHighlightState,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val highlight = state.highlight
-    val scrimColor = MaterialTheme.colorScheme.scrim
     val cardShape = MaterialTheme.shapes.small
     // The card colours are translucent tints, so an opaque backing keeps the events below from showing through.
     val backingColor = MaterialTheme.colorScheme.surface
@@ -71,32 +65,20 @@ internal fun HighlightedEventOverlay(
     Layout(
         modifier = modifier
             .letPointersThrough()
-            .onPlaced { state.overlayCoordinates = it }
-            .drawBehind {
-                if (state.highlight != null) drawRect(scrimColor, alpha = SCRIM_ALPHA * state.progress.coerceIn(0f, 1f))
-            },
+            .onPlaced { state.overlayCoordinates = it },
         content = {
             if (highlight != null) {
                 val cardModifier = Modifier.graphicsLayer {
-                    val lift = if (state.isDragging) 1f else state.progress.coerceIn(0f, 1f)
-                    shadowElevation = HighlightElevation.toPx() * lift
+                    val elevation = if (state.isDragging) 1f else state.progress.coerceIn(0f, 1f)
+                    shadowElevation = HighlightElevation.toPx() * elevation
                     shape = cardShape
                 }.background(backingColor, cardShape)
 
-                if (state.isDragging) {
-                    val startBounds = highlight.startBounds
-                    ResizableEventItem(
-                        timedEvent = highlight.timedEvent,
-                        titleSizing = with(density) {
-                            titleSizingFor(visibleHeight = startBounds.height.toDp(), width = startBounds.width.toDp())
-                        },
-                        visibleHeight = { startBounds.height },
-                        onClick = {},
-                        modifier = cardModifier,
-                        textOverflow = highlight.textOverflow,
-                    )
+                val draggedCard = highlight.draggedCard
+                if (state.isDragging && draggedCard != null) {
+                    draggedCard(cardModifier)
                 } else {
-                    EventItem(event = highlight.timedEvent.event, onClick = null, modifier = cardModifier)
+                    EventItem(event = highlight.event, onClick = null, modifier = cardModifier)
                 }
             }
         },
@@ -108,15 +90,10 @@ internal fun HighlightedEventOverlay(
                     bottom = min(it.bottom, constraints.maxHeight - contentPadding.calculateBottomPadding().toPx()),
                 )
             }
-            val height = if (state.isDragging) {
-                // Loose, the card folds back to its own height, whatever it would take across the area.
-                highlight.startBounds.height
-            } else {
-                // A short area (landscape, large font) can't fit the whole card: it is clipped rather than pushed out of the area.
-                measurable.minIntrinsicHeight(area.width.roundToInt()).toFloat()
-                    .coerceAtMost(area.height - 2 * margin)
-                    .coerceAtLeast(0f)
-            }
+            // A short area (landscape, large font) can't fit the whole card: it is clipped rather than pushed out of the area.
+            val height = measurable.minIntrinsicHeight((area.width - 2 * margin).roundToInt().coerceAtLeast(0)).toFloat()
+                .coerceAtMost(area.height - 2 * margin)
+                .coerceAtLeast(0f)
             val unfolded = unfoldedBounds(highlight.fingerY, area, height, margin, clearance)
             val bounds = lerp(highlight.startBounds, unfolded, state.progress).translate(state.dragOffset)
 
@@ -131,12 +108,12 @@ internal fun HighlightedEventOverlay(
     }
 }
 
-/** Across the whole [area], [clearance] above [fingerY] (below it if it doesn't fit), kept [margin] inside the area. */
+/** Across the [area], [clearance] above [fingerY] (below it if it doesn't fit), kept [margin] inside the area on every side. */
 private fun unfoldedBounds(fingerY: Float, area: Rect, height: Float, margin: Float, clearance: Float): Rect {
     val above = fingerY - clearance - height
     val top = (if (above >= area.top + margin) above else fingerY + clearance)
         .coerceAtMost(area.bottom - margin - height)
         .coerceAtLeast(area.top + margin)
 
-    return Rect(left = area.left, top = top, right = area.right, bottom = top + height)
+    return Rect(left = area.left + margin, top = top, right = area.right - margin, bottom = top + height)
 }

@@ -29,15 +29,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.TimelineDefaults
-import com.infomaniak.calendar.components.day.highlight.EventHighlightState
-import com.infomaniak.calendar.components.day.highlight.eventDropTarget
-import com.infomaniak.calendar.components.day.highlight.eventHighlightArea
 import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.pinchToZoom
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.event.highlight.EventHighlightState
+import com.infomaniak.calendar.components.event.highlight.eventHighlightArea
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
 import com.infomaniak.core.common.utils.today
@@ -85,7 +84,7 @@ internal fun DayTimeline(
                 .matchParentSize()
                 .padding(start = gutterWidth, end = endPadding)
                 .eventHighlightArea()
-                .then(highlightState?.let { Modifier.eventDropTarget(it, date) } ?: Modifier),
+                .then(highlightState?.let { Modifier.timelineDropTarget(it, date) } ?: Modifier),
             highlightState = highlightState,
         )
 

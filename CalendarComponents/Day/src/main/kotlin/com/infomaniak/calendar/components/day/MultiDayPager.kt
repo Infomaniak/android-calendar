@@ -65,21 +65,21 @@ import com.infomaniak.calendar.components.day.component.CurrentTimeIndicator
 import com.infomaniak.calendar.components.day.component.DayColumnHeader
 import com.infomaniak.calendar.components.day.component.HourLabelOverhang
 import com.infomaniak.calendar.components.day.component.HourLabels
+import com.infomaniak.calendar.components.day.component.timelineDropTarget
 import com.infomaniak.calendar.components.day.component.HourLines
 import com.infomaniak.calendar.components.day.component.minuteOfDay
 import com.infomaniak.calendar.components.day.component.verticalTimelineScroll
-import com.infomaniak.calendar.components.day.highlight.EventHighlightState
-import com.infomaniak.calendar.components.day.highlight.HighlightedEventOverlay
-import com.infomaniak.calendar.components.day.highlight.eventHighlightArea
-import com.infomaniak.calendar.components.day.highlight.releaseHighlightOnSecondPointer
-import com.infomaniak.calendar.components.day.highlight.eventDropTarget
-import com.infomaniak.calendar.components.day.highlight.rememberEventHighlightState
 import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.DayPages
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.event.highlight.EventHighlightState
+import com.infomaniak.calendar.components.event.highlight.HighlightedEventOverlay
+import com.infomaniak.calendar.components.event.highlight.eventHighlightArea
+import com.infomaniak.calendar.components.event.highlight.releaseHighlightOnSecondPointer
+import com.infomaniak.calendar.components.event.highlight.rememberEventHighlightState
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
@@ -91,12 +91,12 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import kotlin.time.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlin.time.Clock
 
 /**
  * Several days side by side, [visibleDayCount] columns on screen, swiped [daysPerPage] days at a time.
@@ -184,7 +184,11 @@ private fun MultiDayPagerContent(
     // The grid runs to the end edge, keeping all the room it can for the days' content.
     val contentPadding = contentPadding + PaddingValues(start = EsdsTheme.spacing.md)
     val pageSize = remember(pages, visibleDayCount) { DaysPageSize(pages.daysPerPage, visibleDayCount) }
-    val highlightState = rememberEventHighlightState(onEventMoved)
+    val highlightState = rememberEventHighlightState(
+        onEventDropped = onEventMoved?.let { moved ->
+            { event, drop -> drop.time?.let { moved(event, LocalDateTime(drop.date, it)) } }
+        },
+    )
 
     Box(modifier.releaseHighlightOnSecondPointer(highlightState)) {
         MultiDayTimeline(
@@ -280,7 +284,7 @@ private fun MultiDayTimeline(
                         modifier = Modifier
                             .matchParentSize()
                             .padding(horizontal = 1.dp)
-                            .eventDropTarget(highlightState, date),
+                            .timelineDropTarget(highlightState, date),
                         textOverflow = eventTextOverflow,
                         highlightState = highlightState,
                     )

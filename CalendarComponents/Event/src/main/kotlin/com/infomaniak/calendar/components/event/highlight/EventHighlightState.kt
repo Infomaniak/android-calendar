@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.day.highlight
+package com.infomaniak.calendar.components.event.highlight
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
@@ -32,13 +32,11 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
-import com.infomaniak.calendar.components.day.model.TimedEvent
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.LocalTime
+import kotlinx.datetime.LocalDate
 import kotlin.math.sqrt
 
 private const val HIGHLIGHT_DAMPING_RATIO = 0.8f
@@ -47,13 +45,15 @@ private const val BOUNCE_DAMPING_RATIO = 0.45f
 /** How much of the finger's way the unfolded card follows before it comes loose. */
 private const val HELD_RESISTANCE = 0.35f
 
+/**
+ * @param onEventDropped Called when a held event is dragged and dropped on an [eventDropTarget]. Without it,
+ * held events can't be dragged.
+ */
 @Composable
-internal fun rememberEventHighlightState(
-    onEventMoved: ((EventSummaryUi.Normal, LocalDateTime) -> Unit)? = null,
-): EventHighlightState {
+fun rememberEventHighlightState(onEventDropped: ((EventSummaryUi.Normal, EventDrop) -> Unit)? = null): EventHighlightState {
     val scope = rememberCoroutineScope()
-    val currentOnEventMoved = rememberUpdatedState(onEventMoved)
-    return remember(scope) { EventHighlightState(scope, currentOnEventMoved) }
+    val currentOnEventDropped = rememberUpdatedState(onEventDropped)
+    return remember(scope) { EventHighlightState(scope, currentOnEventDropped) }
 }
 
 /**
@@ -61,47 +61,53 @@ internal fun rememberEventHighlightState(
  *
  * Moving the finger first pulls the unfolded card along with some resistance, springing after it. Pulled far
  * enough, it comes loose: it folds back to its own size and follows the finger, shifted by [dragOffset], until
- * it is dropped on the day and quarter of an hour under it.
+ * it is dropped on the [eventDropTarget] under the finger.
  */
 @Stable
-internal class EventHighlightState(
+class EventHighlightState internal constructor(
     private val scope: CoroutineScope,
-    private val onEventMoved: State<((EventSummaryUi.Normal, LocalDateTime) -> Unit)?>,
+    private val onEventDropped: State<((EventSummaryUi.Normal, EventDrop) -> Unit)?>,
 ) {
 
     private val highlightState = mutableStateOf<EventHighlight?>(null)
-    val highlight: EventHighlight? by highlightState
+    internal val highlight: EventHighlight? by highlightState
 
     private val isHeldState = mutableStateOf(false)
     /** Whether the finger still holds the event up: the timeline stays put until it lifts. */
     val isHeld: Boolean by isHeldState
 
     private val isDraggingState = mutableStateOf(false)
-    /** Whether the card came loose and follows the finger. */
+    /** Whether the held card came loose and follows the finger. */
     val isDragging: Boolean by isDraggingState
 
-    /** Set while laid out, and only read once a long press needs to know where its card is. */
-    var overlayCoordinates: LayoutCoordinates? = null
+    internal val canDrag: Boolean get() = onEventDropped.value != null
 
-    /** The days' columns an event can be dropped on, each knowing its date. */
+    /** Set while laid out, and only read once a long press needs to know where its card is. */
+    internal var overlayCoordinates: LayoutCoordinates? = null
+
+    /** Where an event can be dropped, each knowing its date. */
     internal val dropTargets = mutableSetOf<EventDropTargetNode>()
 
+    /** The day the held event was picked up on. */
+    private var fromDate: LocalDate? = null
+
     private val progressAnimatable = Animatable(0f)
-    val progress: Float get() = progressAnimatable.value
+    internal val progress: Float get() = progressAnimatable.value
 
     private val dragOffsetAnimatable = Animatable(Offset.Zero, Offset.VectorConverter)
-    val dragOffset: Offset get() = dragOffsetAnimatable.value
+    internal val dragOffset: Offset get() = dragOffsetAnimatable.value
 
     private var fingerTarget = Offset.Zero
     // Snaps the offset every frame, so it is cancelled by hand before any other animation of the offset.
     private var fingerFollowing: Job? = null
 
     // Each animation cancels the running one, so a cancelled fold-back never clears the highlight.
-    fun show(highlight: EventHighlight) {
-        val isAnotherEvent = this.highlight?.timedEvent != highlight.timedEvent
+    internal fun show(highlight: EventHighlight, finger: Offset) {
+        val isAnotherEvent = this.highlight?.key != highlight.key
         highlightState.value = highlight
         isHeldState.value = true
         isDraggingState.value = false
+        fromDate = dropTargetAt(finger)?.date
 
         fingerFollowing?.cancel()
         fingerTarget = Offset.Zero
@@ -114,12 +120,12 @@ internal class EventHighlightState(
     }
 
     /** The finger moved by [delta] from where it pressed, while the card is still unfolded. */
-    fun pull(delta: Offset) {
+    internal fun pull(delta: Offset) {
         if (isHeld && !isDragging) followFinger(delta * HELD_RESISTANCE)
     }
 
     /** The card comes loose: it folds back to its own size and catches up with the finger. */
-    fun startDrag(delta: Offset) {
+    internal fun startDrag(delta: Offset) {
         if (!isHeld || isDragging) return
         isDraggingState.value = true
 
@@ -128,22 +134,31 @@ internal class EventHighlightState(
     }
 
     /** The finger moved by [delta] from where it pressed, while the card follows it. */
-    fun dragTo(delta: Offset) {
+    internal fun dragTo(delta: Offset) {
         if (isDragging) followFinger(delta)
     }
 
     /**
-     * Lets go of the card at [fingerX], [delta] away from where it was pressed, and reports the slot it lands on.
+     * Lets go of the card under [finger], [delta] away from where it was pressed, and reports where it lands.
      * The card then goes back to its place.
      */
-    fun drop(fingerX: Float, delta: Offset) {
+    internal fun drop(finger: Offset, delta: Offset) {
         val highlight = highlight?.takeIf { isHeld && isDragging } ?: return
-        val cardTop = highlight.startBounds.top + delta.y
-        dropSlotOf(highlight.timedEvent, fingerX, cardTop)?.let { onEventMoved.value?.invoke(highlight.timedEvent.event, it) }
+        val overlay = overlayCoordinates?.takeIf { it.isAttached }
+        val target = dropTargetAt(finger)
+        if (overlay != null && target != null) {
+            val cardBounds = highlight.startBounds.translate(delta)
+            val drop = EventDrop(
+                fromDate = fromDate ?: target.date,
+                date = target.date,
+                time = target.timeAt(overlay, cardBounds.top, cardBounds.height),
+            )
+            onEventDropped.value?.invoke(highlight.event, drop)
+        }
         hide()
     }
 
-    fun hide() {
+    internal fun hide() {
         if (!isHeld) return
         isHeldState.value = false
 
@@ -155,6 +170,18 @@ internal class EventHighlightState(
             isDraggingState.value = false
             highlightState.value = null
         }
+    }
+
+    /** Whether the card [key] identifies is the one held up, which the overlay draws in its place. */
+    fun isHighlighting(key: Any): Boolean = highlight?.key == key
+
+    /** The drop target under [finger], or the nearest one: the finger can stray off them, like over a timeline's gutter. */
+    private fun dropTargetAt(finger: Offset): EventDropTargetNode? {
+        val overlay = overlayCoordinates?.takeIf { it.isAttached } ?: return null
+        return dropTargets
+            .mapNotNull { target -> target.distanceTo(overlay, finger)?.let { target to it } }
+            .minByOrNull { (_, distance) -> distance }
+            ?.first
     }
 
     /**
@@ -187,16 +214,7 @@ internal class EventHighlightState(
         }
     }
 
-    /** The day under [fingerX] and the quarter of an hour nearest to [cardTop] in it. */
-    private fun dropSlotOf(timedEvent: TimedEvent, fingerX: Float, cardTop: Float): LocalDateTime? {
-        val overlay = overlayCoordinates?.takeIf { it.isAttached } ?: return null
-        val target = dropTargets.firstOrNull { it.containsX(overlay, fingerX) } ?: return null
-        val startMinute = target.minuteOfDayAt(overlay, cardTop, timedEvent.durationMinutes) ?: return null
-        return LocalDateTime(target.date, LocalTime.fromSecondOfDay(startMinute * SECONDS_PER_MINUTE))
-    }
-
     private companion object {
-        const val SECONDS_PER_MINUTE = 60
         const val NANOS_PER_SECOND = 1_000_000_000f
         const val MAX_FRAME_SECONDS = 1f / 30f
         const val SPRING_STEP_SECONDS = 1f / 240f

@@ -15,23 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.day.highlight
+package com.infomaniak.calendar.components.event.highlight
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.text.style.TextOverflow
-import com.infomaniak.calendar.components.day.model.TimedEvent
+import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 
 /**
- * An event held up by a long press. Its card grows from where it sat in its column, [startBounds], to the whole width
- * of [areaBounds], opening near the finger, [fingerY]. All of them are in the coordinates of the overlay drawing it.
- * Dragged, it is drawn the way its column draws it again, its texts cut by [textOverflow].
+ * An event held up by a long press on the card [key] identifies. The card grows from where it sat, [startBounds], to
+ * the whole width of [areaBounds], opening near the finger, [fingerY]. All of them are in the coordinates of the
+ * overlay drawing it. Dragged, it is drawn by [draggedCard], the way it looks where it sat.
  */
 @Immutable
 internal data class EventHighlight(
-    val timedEvent: TimedEvent,
+    val event: EventSummaryUi.Normal,
+    val key: Any,
     val startBounds: Rect,
     val areaBounds: Rect,
     val fingerY: Float,
-    val textOverflow: TextOverflow,
+    val draggedCard: (@Composable (Modifier) -> Unit)?,
 )

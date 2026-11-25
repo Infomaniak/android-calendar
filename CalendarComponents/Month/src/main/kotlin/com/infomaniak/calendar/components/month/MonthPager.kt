@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.month
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -29,6 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
+import com.infomaniak.calendar.components.event.highlight.HighlightedEventOverlay
+import com.infomaniak.calendar.components.event.highlight.releaseHighlightOnSecondPointer
+import com.infomaniak.calendar.components.event.highlight.rememberEventHighlightState
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.utils.FollowSelectedPage
 import com.infomaniak.calendar.components.month.component.MonthPage
@@ -38,6 +42,7 @@ import com.infomaniak.calendar.components.month.preview.mockPreviewMonth
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
+import kotlinx.datetime.daysUntil
 import kotlinx.datetime.minus
 import kotlinx.datetime.monthsUntil
 import kotlinx.datetime.onDay
@@ -47,6 +52,9 @@ import kotlinx.datetime.yearMonth
 /**
  * Pages through the months of [monthRange], following the month of [selectedDate], which is marked. A month [monthOf]
  * doesn't have yet stays blank until it does.
+ *
+ * @param onEventMoved Called when an event held up by a long press is dragged and dropped on another day,
+ * with how many days it was moved by, from the day it was picked up on to the day under the finger.
  */
 @Composable
 fun MonthPager(
@@ -58,6 +66,7 @@ fun MonthPager(
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    onEventMoved: ((EventSummaryUi.Normal, dayShift: Int) -> Unit)? = null,
 ) {
     val pageCount = remember(monthRange) { monthRange.monthCount }
     val selectedMonth = { selectedDate().yearMonth }
@@ -69,16 +78,28 @@ fun MonthPager(
         onPageChanged = { onVisibleMonthChanged(monthRange.monthAt(it)) },
     )
 
-    HorizontalPager(state = pagerState, modifier = modifier) { page ->
-        monthOf(monthRange.monthAt(page))?.let { month ->
-            MonthPage(
-                month = month,
-                selectedDate = selectedDate,
-                onDayClick = onDayClick,
-                onEventClick = onEventClick,
-                contentPadding = contentPadding,
-            )
+    val highlightState = rememberEventHighlightState(
+        onEventDropped = onEventMoved?.let { moved ->
+            { event, drop -> drop.fromDate.daysUntil(drop.date).takeIf { it != 0 }?.let { moved(event, it) } }
+        },
+    )
+
+    // The highlighted event is drawn over the pager, so neither the neighbouring days nor the page edge hide it.
+    Box(modifier = modifier.releaseHighlightOnSecondPointer(highlightState), propagateMinConstraints = true) {
+        HorizontalPager(state = pagerState, userScrollEnabled = !highlightState.isHeld) { page ->
+            monthOf(monthRange.monthAt(page))?.let { month ->
+                MonthPage(
+                    month = month,
+                    selectedDate = selectedDate,
+                    onDayClick = onDayClick,
+                    onEventClick = onEventClick,
+                    contentPadding = contentPadding,
+                    highlightState = highlightState,
+                )
+            }
         }
+
+        HighlightedEventOverlay(highlightState, modifier = Modifier.matchParentSize(), contentPadding = contentPadding)
     }
 }
 

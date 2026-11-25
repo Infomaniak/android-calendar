@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.day.highlight
+package com.infomaniak.calendar.components.event.highlight
 
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.ui.Modifier
@@ -28,7 +28,7 @@ import androidx.compose.ui.input.pointer.pointerInput
  * Placed around everything the fingers can touch, it sees a second finger the held card never gets
  * (one on another day or on an empty hour), ahead of the card and the timelines it encloses.
  */
-internal fun Modifier.releaseHighlightOnSecondPointer(state: EventHighlightState): Modifier = pointerInput(state) {
+fun Modifier.releaseHighlightOnSecondPointer(state: EventHighlightState): Modifier = pointerInput(state) {
     awaitEachGesture {
         do {
             val event = awaitPointerEvent(PointerEventPass.Initial)
