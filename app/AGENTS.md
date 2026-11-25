@@ -134,6 +134,9 @@ app/
   declares `configChanges="uiMode"`: a mode change updates its configuration without recreating it, so Compose
   (`isSystemInDarkTheme()`) and the system bars follow the configuration, never the setting directly. The splash stays
   up until the stored theme has been applied, to avoid drawing a first frame in the wrong mode.
+- **First day of week**: `SettingsDataValues.firstDayOfWeek` (defaulting to the locale's) is the single source of the
+  week layout. `MainViewModel` turns it into a `WeekNumbering`, which `MainActivity` provides through
+  `LocalWeekNumbering` to every calendar screen; `MonthViewModel` reads the setting directly to lay out its weeks.
 - **Splash screen**: `androidx.core:core-splashscreen`. `MainActivity` launches with `AppThemeLauncher`, which hands over to
   `Theme.Calendar` (`postSplashScreenTheme`). The splash and the content read the same state: `MainViewModel.uiState`
   stays `MainUiState.Loading` until both the users and the last calendar view are read, and the splash stays up meanwhile. Android 12+ draws it from `values-v31/themes.xml` (launcher foreground, `splashscreenBackground`,

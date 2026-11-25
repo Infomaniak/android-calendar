@@ -50,7 +50,6 @@ import com.infomaniak.calendar.components.foundation.utils.startOfWeek
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.daysUntil
-import kotlinx.datetime.toKotlinDayOfWeek
 import kotlinx.datetime.yearMonth
 
 private const val MONTH_MARGIN = 1
@@ -87,7 +86,7 @@ fun ExpandableCalendar(
     modifier: Modifier = Modifier,
     collapsedContent: @Composable CollapsedCalendarScope.() -> Unit = ExpandableCalendarDefaults.Week,
 ) {
-    val firstDayOfWeek = remember(weekNumbering) { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
+    val firstDayOfWeek = weekNumbering.firstDayOfWeek
 
     val headerState = rememberCalendarHeaderState()
 

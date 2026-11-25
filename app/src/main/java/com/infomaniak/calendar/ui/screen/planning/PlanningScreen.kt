@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -49,6 +50,7 @@ import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.navigation.state.scrollableToolbar
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
+import com.infomaniak.calendar.ui.state.LocalWeekNumbering
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
@@ -104,7 +106,7 @@ private fun PlanningScreen(
                     ExpandableCalendar(
                         visibleDayState = visibleDayState,
                         expansionState = calendarExpansionState,
-                        weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
+                        weekNumbering = LocalWeekNumbering.current,
                         eventsDots = eventsDots,
                     )
                 },
@@ -142,25 +144,28 @@ private fun SuccessPlanning(
     visibleDayState: VisibleDayState,
     modifier: Modifier = Modifier,
 ) {
-    val timeline = remember {
-        PlanningTimeline(WeekNumbering.ISO_8601) //TODO[weekNumbering]: Use week numbering from LocalSettings
+    val weekNumbering = LocalWeekNumbering.current
+
+    // A list state counts items, so it can't carry its position over to the timeline of another week numbering.
+    key(weekNumbering.firstDayOfWeek) {
+        val timeline = remember { PlanningTimeline(weekNumbering) }
+        val lazyListState = rememberLazyListState(timeline.indexOf(visibleDayState.visibleDate))
+
+        ProcessJumpRequests(lazyListState, visibleDayState, timeline)
+        ReportVisibleDate(lazyListState, timeline, onVisibleDateChanged = visibleDayState::updateVisibleDate)
+
+        Planning(
+            timeline = timeline,
+            eventsOf = eventsByDate::get,
+            lazyListState = lazyListState,
+            modifier = modifier
+                .scrollableToolbar()
+                .fillMaxSize(),
+            contentPadding = contentPadding,
+            goToEventCreation = goToEventCreation,
+            onEventClick = { goToEventDetail(it.occurrenceId) },
+        )
     }
-    val lazyListState = rememberLazyListState(timeline.indexOf(visibleDayState.visibleDate))
-
-    ProcessJumpRequests(lazyListState, visibleDayState, timeline)
-    ReportVisibleDate(lazyListState, timeline, onVisibleDateChanged = visibleDayState::updateVisibleDate)
-
-    Planning(
-        timeline = timeline,
-        eventsOf = eventsByDate::get,
-        lazyListState = lazyListState,
-        modifier = modifier
-            .scrollableToolbar()
-            .fillMaxSize(),
-        contentPadding = contentPadding,
-        goToEventCreation = goToEventCreation,
-        onEventClick = { goToEventDetail(it.occurrenceId) },
-    )
 }
 
 @Preview
@@ -168,7 +173,10 @@ private fun SuccessPlanning(
 private fun Preview(@PreviewParameter(PlanningPreviewParameter::class) eventsByDate: Map<LocalDate, List<EventSummaryUi>>) {
     CalendarThemeForPreview {
         val visibleDayState = rememberVisibleDayState(remember { mutableStateOf(eventsByDate.keys.min()) })
-        CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
+        CompositionLocalProvider(
+            LocalVisibleDayState provides visibleDayState,
+            LocalWeekNumbering provides WeekNumbering.ISO_8601,
+        ) {
             PlanningScreen(
                 planningUiState = { PlanningUiState.Success(eventsByDate.toImmutableMap()) },
                 goToEventCreation = {},

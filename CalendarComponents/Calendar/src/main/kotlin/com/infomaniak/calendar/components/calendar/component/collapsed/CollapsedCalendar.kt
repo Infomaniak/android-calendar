@@ -21,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -43,7 +44,6 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlinx.datetime.toKotlinDayOfWeek
 import kotlin.time.Clock
 
 /** Margins held on each side at startup, so the first swipes never have to grow the range. */
@@ -59,17 +59,19 @@ internal fun CollapsedCalendar(
     modifier: Modifier = Modifier,
     headerState: CalendarHeaderState = rememberCalendarHeaderState(),
 ) {
-    val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
+    val firstDayOfWeek = weekNumbering.firstDayOfWeek
     val today by rememberToday()
 
-    val initialWeekStart = remember { selectedDate().startOfWeek(firstDayOfWeek) }
-
-    val weekState = rememberWeekCalendarState(
-        startDate = remember { initialWeekStart.minus(INITIAL_MARGINS * monthMargin, DateTimeUnit.MONTH) },
-        endDate = remember { initialWeekStart.plus(INITIAL_MARGINS * monthMargin, DateTimeUnit.MONTH) },
-        firstVisibleWeekDate = initialWeekStart,
-        firstDayOfWeek = firstDayOfWeek,
-    )
+    // Creates a new state for each first day of week: a restored state keeps the first day of week it was saved with.
+    val weekState = key(firstDayOfWeek) {
+        val initialWeekStart = remember { selectedDate().startOfWeek(firstDayOfWeek) }
+        rememberWeekCalendarState(
+            startDate = remember { initialWeekStart.minus(INITIAL_MARGINS * monthMargin, DateTimeUnit.MONTH) },
+            endDate = remember { initialWeekStart.plus(INITIAL_MARGINS * monthMargin, DateTimeUnit.MONTH) },
+            firstVisibleWeekDate = initialWeekStart,
+            firstDayOfWeek = firstDayOfWeek,
+        )
+    }
     val pager = rememberWeekPager(state = weekState, firstDayOfWeek = firstDayOfWeek, monthMargin = monthMargin)
 
     FollowExternalSelection(pager = pager, selectedDate = selectedDate)
