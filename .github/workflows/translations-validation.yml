@@ -55,3 +55,8 @@ jobs:
         run: |
           source ink_utils/venv/bin/activate
           python ink_utils/main.py loco --module CalendarComponents/Resources --check --verbose
+
+      - name: Run Ink validation for ScrollPicker
+        run: |
+          source ink_utils/venv/bin/activate
+          python ink_utils/main.py loco --module ScrollPicker --check --verbose

@@ -18,16 +18,18 @@
 package com.infomaniak.calendar.components.attendeessearch.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
@@ -40,7 +42,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -53,7 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.HighlightedText
-import com.infomaniak.calendar.components.foundation.component.ListItemClickable
+import com.infomaniak.calendar.components.foundation.component.SegmentedListItemClickable
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.AvatarStrategy
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
@@ -63,7 +64,8 @@ import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
-import com.infomaniak.designsystem.icons.symbols.Cross
+import com.infomaniak.designsystem.icons.symbols.Check
+import com.infomaniak.designsystem.icons.symbols.Trash
 import kotlinx.coroutines.flow.drop
 import kotlin.math.abs
 import com.infomaniak.core.common.R as RCore
@@ -72,6 +74,7 @@ import com.infomaniak.core.common.R as RCore
 internal fun SwipeableEventAttendee(
     attendee: AttendeeUi,
     onDismiss: () -> Unit,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     query: () -> String = { "" },
     onClick: (() -> Unit)? = null,
@@ -104,7 +107,7 @@ internal fun SwipeableEventAttendee(
             onDismiss()
         },
         content = {
-            EventAttendee(attendee, query = query, onClick = onClick, enabled = enabled)
+            EventAttendee(attendee, shapes = shapes, query = query, onClick = onClick, enabled = enabled)
         },
         backgroundContent = {
             if (state.dismissDirection == SwipeToDismissBoxValue.EndToStart) DeleteBackground(state)
@@ -116,22 +119,27 @@ internal fun SwipeableEventAttendee(
 @Composable
 private fun EventAttendee(
     attendee: AttendeeUi,
+    shapes: ListItemShapes,
     modifier: Modifier = Modifier,
     query: () -> String = { "" },
     onClick: (() -> Unit)? = null,
     enabled: Boolean = true,
 ) {
-    ListItemClickable(
+    SegmentedListItemClickable(
         onClick = onClick.takeIf { enabled },
-        modifier = modifier
-            .alpha(if (enabled) 1f else EsdsTheme.opacity.medium)
-            .semantics { if (!enabled) disabled() },
+        shapes = shapes,
+        modifier = modifier.semantics { if (!enabled) disabled() },
         verticalAlignment = Alignment.CenterVertically,
         leadingContent = {
             Avatar(
                 avatarType = AvatarType.fromAttendee(attendee).value,
                 modifier = Modifier.size(EsdsTheme.icon.sizeXl),
             )
+        },
+        trailingContent = {
+            if (!enabled) {
+                Icon(imageVector = EsdsIcons.Check.Small, contentDescription = null)
+            }
         },
         overlineContent = attendee.status?.let {
             { AttendeeParticipationStatus(it, attendee.isOrganizer) }
@@ -157,7 +165,6 @@ private fun EventAttendee(
                 )
             }
         },
-        shapes = ListItemDefaults.shapes(MaterialTheme.shapes.large),
     )
 }
 
@@ -166,17 +173,22 @@ private fun DeleteBackground(state: SwipeToDismissBoxState) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
         val maxWidthPx = with(LocalDensity.current) { maxWidth.toPx() }
         val progress = abs(state.requireOffset() / maxWidthPx)
+        val width = maxWidth * progress
 
-        Icon(
-            imageVector = EsdsIcons.Cross.Medium,
-            contentDescription = stringResource(RCore.string.deleteButton),
+        Box(
             modifier = Modifier
-                .width(maxWidth * progress)
+                .width(width)
+                .fillMaxHeight()
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.error)
-                .padding(EsdsTheme.spacing.xl),
-            tint = Color.White,
-        )
+                .background(MaterialTheme.colorScheme.error),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = EsdsIcons.Trash.Small,
+                contentDescription = stringResource(RCore.string.deleteButton),
+                tint = Color.White,
+            )
+        }
     }
 }
 
@@ -216,7 +228,10 @@ private fun ParticipationStatusText(text: String, color: Color, isOrganizer: Boo
 @Composable
 private fun PreviewAttendeeAccepted() {
     Surface {
-        EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted, AvatarStrategy.ToCompute, true))
+        EventAttendee(
+            AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted, AvatarStrategy.ToCompute, true),
+            shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+        )
     }
 }
 
@@ -224,7 +239,10 @@ private fun PreviewAttendeeAccepted() {
 @Composable
 private fun PreviewAttendeeDeclined() {
     Surface {
-        EventAttendee(AttendeeUi("alice@example.com", null, ParticipationStatus.Declined, AvatarStrategy.ToCompute))
+        EventAttendee(
+            AttendeeUi("alice@example.com", null, ParticipationStatus.Declined, AvatarStrategy.ToCompute),
+            shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+        )
     }
 }
 
@@ -232,7 +250,10 @@ private fun PreviewAttendeeDeclined() {
 @Composable
 private fun PreviewAttendeeMaybe() {
     Surface {
-        EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Tentative, AvatarStrategy.ToCompute))
+        EventAttendee(
+            AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Tentative, AvatarStrategy.ToCompute),
+            shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+        )
     }
 }
 
@@ -240,7 +261,10 @@ private fun PreviewAttendeeMaybe() {
 @Composable
 private fun PreviewAttendeePending() {
     Surface {
-        EventAttendee(AttendeeUi("alice@example.com", "Alice", ParticipationStatus.NeedsAction, AvatarStrategy.ToCompute))
+        EventAttendee(
+            AttendeeUi("alice@example.com", "Alice", ParticipationStatus.NeedsAction, AvatarStrategy.ToCompute),
+            shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+        )
     }
 }
 
@@ -248,7 +272,11 @@ private fun PreviewAttendeePending() {
 @Composable
 private fun Preview() {
     Surface {
-        EventAttendee(AttendeeUi("alice@example.com", "Alice", null, AvatarStrategy.ToCompute), enabled = false)
+        EventAttendee(
+            AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted, AvatarStrategy.ToCompute),
+            enabled = false,
+            shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+        )
     }
 }
 
@@ -258,6 +286,7 @@ private fun SwipeableAttendeePreview() {
     Surface {
         SwipeableEventAttendee(
             AttendeeUi("alice@example.com", "Alice", ParticipationStatus.Accepted, AvatarStrategy.ToCompute),
+            shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
             onDismiss = {},
             state = rememberSwipeToDismissBoxState(initialValue = SwipeToDismissBoxValue.EndToStart),
         )

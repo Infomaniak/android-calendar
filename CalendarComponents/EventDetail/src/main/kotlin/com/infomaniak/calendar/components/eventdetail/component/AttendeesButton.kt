@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.infomaniak.calendar.components.eventdetail.component.items.ClickableItem
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIcon
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
@@ -56,6 +56,7 @@ import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import com.infomaniak.designsystem.core.theme.EsdsTheme.extendedColorScheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.ChevronRight
 import com.infomaniak.designsystem.icons.symbols.UsersStacked
@@ -119,12 +120,21 @@ private fun participationSummary(attendees: List<AttendeeUi>): String {
 
 @Composable
 private fun StackedAvatars(attendees: List<AttendeeUi>) {
-    Row(horizontalArrangement = Arrangement.spacedBy((-8).dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(-EsdsTheme.spacing.sm),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         val border = BorderStroke(1.dp, MaterialTheme.colorScheme.surface)
         val size = EsdsTheme.icon.sizeLg
 
-        attendees.take(AVATAR_STACK_LIMIT).forEach { attendee ->
-            Avatar(AvatarType.fromAttendee(attendee).value, Modifier.size(size), border)
+        attendees.take(AVATAR_STACK_LIMIT).forEachIndexed { index, attendee ->
+            Avatar(
+                AvatarType.fromAttendee(attendee).value,
+                Modifier
+                    .size(size)
+                    .zIndex((AVATAR_STACK_LIMIT - index).toFloat()),
+                border,
+            )
         }
         if (attendees.size > AVATAR_STACK_LIMIT) ExtraCountIndicator(attendees.size, border, Modifier.size(size))
     }
@@ -135,16 +145,16 @@ private fun ExtraCountIndicator(extraCount: Int, border: BorderStroke, modifier:
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
+            .background(MaterialTheme.extendedColorScheme.datavizGray, CircleShape)
             .border(border, CircleShape),
     ) {
-        val onPrimaryContainer = MaterialTheme.colorScheme.onPrimaryContainer
+        val textColor = MaterialTheme.extendedColorScheme.onDatavizGray
         val textStyle = MaterialTheme.typography.labelLargeEmphasized
 
         BasicText(
             text = "+${extraCount - AVATAR_STACK_LIMIT}",
             style = textStyle,
-            color = { onPrimaryContainer },
+            color = { textColor },
             autoSize = TextAutoSize.StepBased(minFontSize = 8.sp, maxFontSize = textStyle.fontSize),
             maxLines = 1,
         )

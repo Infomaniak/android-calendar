@@ -226,7 +226,22 @@ hours "9" jumps to minutes); the last picker of a chain should use `Done`. A `Fo
 Closing the keyboard ends the input and brings the wheels back. The selected item follows the wheel's selected row, but
 setting `selectedIndex` takes effect at once and the wheel animates there on its own, unless a drag interrupts it;
 manual input and snapping/haptics are kept separately from the wheel's rendering. The wheel exposes an adjustable value
-and an edit action to accessibility services; while editing, the text field exposes its own semantics.
+and an edit action to accessibility services, following Material's `ScrollField`: a
+`contentDescription` naming what the wheel selects, and the selected item read through `itemAccessibilityDescription`
+(the label by default); while editing, the text field keeps the same `contentDescription` through non-clearing semantics,
+preserving its native text-editing actions. `TimeScrollPicker` describes its wheels with
+its own copy of the `unitHours` / `unitMinutes` and `hourAmount` / `minuteAmount` plurals, duplicated from
+`:CalendarComponents:Resources` (with their translations) since the module can't depend on it.
+`TimeScrollPicker`'s 12-hour wheel holds all 24 hours (labelled 12 to 11 twice), so one
+`hourState` serves both clocks and its index is the hour of the day; the AM/PM wheel only mirrors its half.
+Like `TextFieldState`, `TimeScrollPickerState` (`rememberTimeScrollPickerState`) is the single source of truth of the
+time, seconds included: it holds the wheels' states internally, saves only the time and rebuilds them from it, and
+moves them to it when it is set from code or the picker is shown again.
+Only times picked on the wheels go through `TimeScrollPicker`'s `onTimeChange` (like a text field's `onValueChange`),
+which commits them itself and defaults to setting them directly. `DateAndTimeState.Entry.time` reads this state, and
+`DateAndTimeEntry` passes its `onTimePicked` (its `TimeSession`'s `pickTime`), so corrections apply before the commit.
+A typed input (`TimeScrollPickerState.isEditing`) is a `TimeSession` of its own, correcting each typed value from the
+range before the input, so a prefix's corrections (the `1` of `12`) don't remain.
 
 ## Key Integration Points
 

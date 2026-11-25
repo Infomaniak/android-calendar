@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -31,7 +31,6 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,11 +38,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.eventdetail.component.items.ItemIconDefaults
+import com.infomaniak.calendar.components.eventdetail.detail.component.CompactTextField
+import com.infomaniak.calendar.components.eventdetail.detail.component.NoLineBreakTransformation
+import com.infomaniak.calendar.components.eventdetail.form.EventFormState.Companion.TITLE_MAX_CHARACTERS
 import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.ui.compose.theme.MaterialPreviewTheme
@@ -69,28 +71,24 @@ internal fun TitleEditable(
     modifier: Modifier = Modifier,
 ) {
     SegmentedListItem(
-        leadingContent = { EventColorDot(dotColor()) },
         shapes = shapes,
         colors = CustomColors.EventFormItemColors,
         content = {
-            BasicTextField(
+            CompactTextField(
                 state = textFieldState,
+                maxAmountCharacters = TITLE_MAX_CHARACTERS,
                 textStyle = MaterialTheme.typography.titleLargeEmphasized.copy(LocalContentColor.current),
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = MAX_LINES),
                 modifier = Modifier.fillMaxWidth(),
-                decorator = { innerTextField ->
-                    Box {
-                        if (textFieldState.text.isEmpty()) {
-                            Text(
-                                text = stringResource(R.string.eventTitle),
-                                style = MaterialTheme.typography.titleLargeEmphasized,
-                                color = OutlinedTextFieldDefaults.colors().unfocusedPlaceholderColor,
-                            )
-                        }
-                        innerTextField()
-                    }
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                inputTransformation = NoLineBreakTransformation,
+                placeholder = {
+                    Text(
+                        stringResource(R.string.eventTitle),
+                        style = MaterialTheme.typography.titleLargeEmphasized,
+                    )
                 },
+                leadingIcon = { EventColorDot(dotColor()) },
             )
         },
         modifier = modifier,
@@ -109,6 +107,8 @@ private fun EventColorDot(color: Color) {
 }
 
 private const val PREVIEW_TITLE = "End of the year vacations with Santa Claus"
+private const val PREVIEW_TITLE_TOO_LONG = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean " +
+        "commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis pa"
 
 @PreviewLightDark
 @Composable
@@ -133,3 +133,19 @@ private fun PreviewEditable() {
         }
     }
 }
+
+@PreviewLightDark
+@Composable
+private fun PreviewEditableTooLong() {
+    MaterialPreviewTheme {
+        Surface {
+            TitleEditable(
+                dotColor = { Color.Red },
+                textFieldState = rememberTextFieldState(PREVIEW_TITLE_TOO_LONG),
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+            )
+        }
+    }
+}
+
+
