@@ -36,6 +36,8 @@ import com.infomaniak.calendar.ui.screen.settings.components.SettingItemOpen
 import com.infomaniak.calendar.ui.screen.settings.components.SettingScaffold
 import com.infomaniak.calendar.ui.screen.settings.components.SettingSection
 import com.infomaniak.calendar.ui.screen.settings.components.SettingShape
+import com.infomaniak.calendar.ui.screen.settings.firstDayOfWeek.SettingFirstDayOfWeekViewModel
+import com.infomaniak.calendar.ui.screen.settings.theme.SettingThemeViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Bell

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.ui.screen.settings
+package com.infomaniak.calendar.ui.screen.settings.firstDayOfWeek
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,41 +24,44 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.infomaniak.calendar.model.settings.SettingThemeOption
+import com.infomaniak.calendar.R
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatFullDayName
 import com.infomaniak.calendar.ui.screen.settings.components.SettingChoices
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import com.infomaniak.core.common.R as RCore
+import kotlinx.datetime.DayOfWeek
 
 @Composable
-fun SettingThemeScreen(
+fun SettingFirstDayOfWeekScreen(
     goBack: (() -> Unit)?,
     modifier: Modifier = Modifier,
-    settingThemeViewModel: SettingThemeViewModel = viewModel(),
+    firstDayOfWeekViewModel: SettingFirstDayOfWeekViewModel = viewModel(),
 ) {
-    val theme by settingThemeViewModel.theme.collectAsStateWithLifecycle()
+    val firstDayOfWeek by firstDayOfWeekViewModel.firstDayOfWeek.collectAsStateWithLifecycle()
 
     Content(
+        firstDayOfWeek = firstDayOfWeek,
         goBack = goBack,
+        onItemClick = { firstDayOfWeekViewModel.onFirstDayOfWeekClick(it) },
         modifier = modifier,
-        theme = { theme },
-        onThemeClick = { settingThemeViewModel.onThemeClick(it) },
     )
 }
 
 @Composable
 private fun Content(
-    theme: () -> SettingThemeOption?,
-    onThemeClick: (SettingThemeOption) -> Unit,
+    firstDayOfWeek: DayOfWeek?,
     goBack: (() -> Unit)?,
+    onItemClick: (DayOfWeek) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SettingChoices(
-        title = stringResource(RCore.string.themeTitle),
-        items = SettingThemeOption.entries,
-        selectedItem = { theme() },
-        itemLabel = { it.title },
-        itemSymbol = { it.symbol },
-        onItemClick = { onThemeClick(it) },
+        title = stringResource(R.string.generalSettingsStartOfWeekLabel),
+        items = DayOfWeek.entries,
+        selectedItem = { firstDayOfWeek },
+        itemLabel = { it.formatFullDayName() },
+        onItemClick = {
+            onItemClick(it)
+            goBack?.invoke()
+        },
         goBack = goBack,
         modifier = modifier,
     )
@@ -68,6 +71,10 @@ private fun Content(
 @Composable
 private fun Preview() {
     CalendarThemeForPreview {
-        Content(goBack = {}, theme = { SettingThemeOption.System }, onThemeClick = {})
+        Content(
+            firstDayOfWeek = DayOfWeek.MONDAY,
+            goBack = {},
+            onItemClick = {},
+        )
     }
 }
