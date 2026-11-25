@@ -17,8 +17,6 @@
  */
 package com.infomaniak.calendar.ui.screen.settings
 
-import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.ListItemShapes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -28,13 +26,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatFullDayName
-import com.infomaniak.calendar.model.settings.SettingThemeOption
-import com.infomaniak.calendar.ui.screen.settings.components.SettingItemSwitch
-import com.infomaniak.calendar.ui.screen.settings.components.SettingScaffold
-import com.infomaniak.calendar.ui.screen.settings.components.SettingSection
+import com.infomaniak.calendar.ui.screen.settings.components.SettingChoices
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import kotlinx.datetime.DayOfWeek
-import com.infomaniak.core.common.R as RCore
 
 @Composable
 fun SettingFirstDayOfWeekScreen(
@@ -45,47 +39,31 @@ fun SettingFirstDayOfWeekScreen(
     val firstDayOfWeek by firstDayOfWeekViewModel.firstDayOfWeek.collectAsStateWithLifecycle()
 
     Content(
+        firstDayOfWeek = firstDayOfWeek,
         goBack = goBack,
+        onItemClick = { firstDayOfWeekViewModel.onFirstDayOfWeekClick(it) },
         modifier = modifier,
-        firstDayOfWeek = { firstDayOfWeek },
-        onFirstDayOfWeekClick = { firstDayOfWeekViewModel.onFirstDayOfWeekClick(it) },
     )
 }
 
 @Composable
 private fun Content(
-    firstDayOfWeek: () -> DayOfWeek?,
-    onFirstDayOfWeekClick: (DayOfWeek) -> Unit,
+    firstDayOfWeek: DayOfWeek?,
     goBack: (() -> Unit)?,
+    onItemClick: (DayOfWeek) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    SettingScaffold(
+    SettingChoices(
         title = stringResource(R.string.generalSettingsStartOfWeekLabel),
+        items = DayOfWeek.entries,
+        selectedItem = { firstDayOfWeek },
+        itemLabel = { it.formatFullDayName() },
+        onItemClick = {
+            onItemClick(it)
+            goBack?.invoke()
+        },
         goBack = goBack,
         modifier = modifier,
-    ) {
-        SettingSection {
-            val currentFirstDayOfWeek = firstDayOfWeek()
-            DayOfWeek.entries.forEachIndexed { index, option ->
-                val shapes = ListItemDefaults.segmentedShapes(index, DayOfWeek.entries.size)
-                FirstDayOfWeekItem(shapes, option, currentFirstDayOfWeek, onFirstDayOfWeekClick)
-            }
-        }
-    }
-}
-
-@Composable
-private fun FirstDayOfWeekItem(
-    shapes: ListItemShapes,
-    option: DayOfWeek,
-    currentFirstDayOfWeek: DayOfWeek?,
-    onFirstDayOfWeekClick: (DayOfWeek) -> Unit,
-) {
-    SettingItemSwitch(
-        shapes = shapes,
-        text = option.formatFullDayName(),
-        checked = { currentFirstDayOfWeek == option },
-        onCheckedChange = { onFirstDayOfWeekClick(option) },
     )
 }
 
@@ -93,6 +71,10 @@ private fun FirstDayOfWeekItem(
 @Composable
 private fun Preview() {
     CalendarThemeForPreview {
-        Content(goBack = {}, firstDayOfWeek = { DayOfWeek.MONDAY }, onFirstDayOfWeekClick = {})
+        Content(
+            firstDayOfWeek = DayOfWeek.MONDAY,
+            goBack = {},
+            onItemClick = {},
+        )
     }
 }
