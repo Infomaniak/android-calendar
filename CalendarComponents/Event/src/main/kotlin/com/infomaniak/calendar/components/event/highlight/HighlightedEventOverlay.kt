@@ -42,8 +42,8 @@ private val FingerClearance = 24.dp
 /**
  * Draws the event [state] holds up above everything it covers, the neighbouring days included.
  *
- * The card unfolds from its place in its column to the whole width of its area, written the way the
- * Planning writes an event. It opens just above the finger so the finger doesn't hide it, or just
+ * The card unfolds from its place in its column to the width of its area, a margin off each side, written the
+ * way the Planning writes an event. It opens just above the finger so the finger doesn't hide it, or just
  * below when there is no room above, and always fully inside the area, out of the [contentPadding]
  * where bars may be drawn over the overlay.
  */
@@ -86,7 +86,7 @@ fun HighlightedEventOverlay(
                 )
             }
             // A short area (landscape, large font) can't fit the whole card: it is clipped rather than pushed out of the area.
-            val height = measurable.minIntrinsicHeight(area.width.roundToInt()).toFloat()
+            val height = measurable.minIntrinsicHeight((area.width - 2 * margin).roundToInt().coerceAtLeast(0)).toFloat()
                 .coerceAtMost(area.height - 2 * margin)
                 .coerceAtLeast(0f)
             val unfolded = unfoldedBounds(highlight.fingerY, area, height, margin, clearance)
@@ -103,12 +103,12 @@ fun HighlightedEventOverlay(
     }
 }
 
-/** Across the whole [area], [clearance] above [fingerY] (below it if it doesn't fit), kept [margin] inside the area. */
+/** Across the [area], [clearance] above [fingerY] (below it if it doesn't fit), kept [margin] inside the area on every side. */
 private fun unfoldedBounds(fingerY: Float, area: Rect, height: Float, margin: Float, clearance: Float): Rect {
     val above = fingerY - clearance - height
     val top = (if (above >= area.top + margin) above else fingerY + clearance)
         .coerceAtMost(area.bottom - margin - height)
         .coerceAtLeast(area.top + margin)
 
-    return Rect(left = area.left, top = top, right = area.right, bottom = top + height)
+    return Rect(left = area.left + margin, top = top, right = area.right - margin, bottom = top + height)
 }
