@@ -170,28 +170,40 @@ class AlarmScheduler @Inject constructor(
     )
 
     // Exact alarms need no permission below Android 12
-    fun canScheduleExactAlarms(): Boolean {
+    private fun canScheduleExactAlarms(): Boolean {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager?.canScheduleExactAlarms() == true
+    }
+
+    /**
+     * Fires [intent] at [triggerAtMs], replacing any alarm already registered with the same intent data and [requestCode].
+     * Also used for the reminders fired again later, which need their own intent data so the alarms sync leaves them alone.
+     * Throws if the AlarmManager refuses it.
+     */
+    fun scheduleReminder(intent: Intent, requestCode: Int, triggerAtMs: Long, isExact: Boolean = canScheduleExactAlarms()) {
+        val alarmManager = alarmManager ?: return
+        val pendingIntent = PendingIntent.getBroadcast(
+            appContext,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        if (isExact) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMs, pendingIntent)
+        } else {
+            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMs, pendingIntent)
+        }
     }
 
     /** Returns whether the alarm got registered. */
     private fun scheduleAlarm(registration: AlarmRegistration): Boolean {
-        val alarmManager = alarmManager ?: return false
-        val triggerAtMs = registration.triggerAtMs
-        val intent = createAlarmIntent(registration)
-        val pendingIntent = PendingIntent.getBroadcast(
-            appContext,
-            registration.alarmId.hashCode(),
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        )
-
+        if (alarmManager == null) return false
         return runCatching {
-            if (registration.isExact) {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMs, pendingIntent)
-            } else {
-                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMs, pendingIntent)
-            }
+            scheduleReminder(
+                intent = createAlarmIntent(registration),
+                requestCode = registration.alarmId.hashCode(),
+                triggerAtMs = registration.triggerAtMs,
+                isExact = registration.isExact,
+            )
         }.onFailure { exception ->
             Log.w(TAG, "Failed to schedule alarm for ${registration.alarmId}", exception)
             // Its PendingIntent may have been updated while the AlarmManager still holds it as it was: as it's no longer

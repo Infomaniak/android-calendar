@@ -17,7 +17,6 @@
  */
 package com.infomaniak.calendar.notification
 
-import android.app.AlarmManager
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -25,7 +24,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import com.infomaniak.calendar.extensions.appGraph
 import com.infomaniak.core.sentry.SentryLog
@@ -121,20 +119,9 @@ class AlarmReceiver : BroadcastReceiver() {
             .setAction(AlarmScheduler.ACTION_EVENT_REMINDER)
             .setData("calendar://alarm-snooze/${Uri.encode(tag)}".toUri())
         reminderIntent.removeExtra(EXTRA_NOTIFICATION_TAG)
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            tag.hashCode(),
-            reminderIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        )
-        val alarmManager = context.getSystemService<AlarmManager>() ?: return
         val triggerAtMs = System.currentTimeMillis() + SNOOZE_DELAY.inWholeMilliseconds
         runCatching {
-            if (context.appGraph.alarmScheduler.canScheduleExactAlarms()) {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMs, pendingIntent)
-            } else {
-                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMs, pendingIntent)
-            }
+            context.appGraph.alarmScheduler.scheduleReminder(reminderIntent, tag.hashCode(), triggerAtMs)
         }.onFailure { exception ->
             SentryLog.e(TAG, "Failed to snooze a reminder", exception)
         }
@@ -173,15 +160,9 @@ class AlarmReceiver : BroadcastReceiver() {
         val retryIntent = Intent(this)
             .setData("calendar://alarm-retry/$alarmId".toUri())
             .putExtra(EXTRA_RETRY_COUNT, retryCount + 1)
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            alarmId.hashCode(),
-            retryIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        )
         val triggerAtMs = System.currentTimeMillis() + RETRY_DELAY.inWholeMilliseconds
         runCatching {
-            context.getSystemService<AlarmManager>()?.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMs, pendingIntent)
+            context.appGraph.alarmScheduler.scheduleReminder(retryIntent, alarmId.hashCode(), triggerAtMs, isExact = false)
         }.onFailure { exception ->
             SentryLog.e(TAG, "Failed to schedule a reminder retry", exception)
         }

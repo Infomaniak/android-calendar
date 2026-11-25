@@ -204,7 +204,8 @@ app/
   alarms sync leaves it alone, and lost on reboot like retries), `BootReceiver` reschedules on
   boot, app update, time / time zone change and once exact alarm access is granted. The 30-day window doesn't follow the
   clock, so each refresh also sets an inexact, non-wakeup `ACTION_REFRESH_ALARMS` alarm one day later (handled by
-  `AlarmReceiver`) to move it forward.
+  `AlarmReceiver`) to move it forward. Alarms, snoozes and retries all go through `AlarmScheduler.scheduleReminder`, which
+  registers a reminder intent, exact when allowed (retries stay inexact).
   Reminders go to one notification channel per calendar (`CalendarNotificationChannels`, started from `MainApplication`),
   grouped per account under its email, like Mail's per-mailbox channels. Channels follow `CalendarManager.observeCalendars`:
   created / renamed with their calendar and deleted with it (a channel created again gets its settings back). Each alarm
