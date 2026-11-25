@@ -31,6 +31,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorPosition
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxState
@@ -54,6 +56,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.foundation.component.HighlightedText
+import com.infomaniak.calendar.components.foundation.component.QuickActionsBox
 import com.infomaniak.calendar.components.foundation.component.SegmentedListItemClickable
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.AvatarStrategy
@@ -107,7 +110,24 @@ internal fun SwipeableEventAttendee(
             onDismiss()
         },
         content = {
-            EventAttendee(attendee, shapes = shapes, query = query, onClick = onClick, enabled = enabled)
+            QuickActionsBox(
+                actions = AttendeeQuickAction.entries,
+                onActionClick = { action ->
+                    when (action) {
+                        AttendeeQuickAction.Delete -> onDismiss()
+                    }
+                },
+                popupPositionProvider = MenuDefaults.rememberDropdownMenuPopupPositionProvider(MenuAnchorPosition.Above),
+            ) { onLongClick ->
+                EventAttendee(
+                    attendee,
+                    shapes = shapes,
+                    query = query,
+                    onClick = onClick,
+                    onLongClick = onLongClick.takeIf { enableDismissFromEndToStart() },
+                    enabled = enabled,
+                )
+            }
         },
         backgroundContent = {
             if (state.dismissDirection == SwipeToDismissBoxValue.EndToStart) DeleteBackground(state)
@@ -123,10 +143,12 @@ private fun EventAttendee(
     modifier: Modifier = Modifier,
     query: () -> String = { "" },
     onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
     enabled: Boolean = true,
 ) {
     SegmentedListItemClickable(
         onClick = onClick.takeIf { enabled },
+        onLongClick = onLongClick,
         shapes = shapes,
         modifier = modifier.semantics { if (!enabled) disabled() },
         verticalAlignment = Alignment.CenterVertically,
