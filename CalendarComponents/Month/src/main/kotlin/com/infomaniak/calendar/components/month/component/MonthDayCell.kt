@@ -55,7 +55,7 @@ import kotlinx.datetime.LocalDate
 internal fun MonthDayCell(
     date: LocalDate,
     isInMonth: Boolean,
-    isSelected: Boolean,
+    isSelected: () -> Boolean,
     isToday: Boolean,
     eventCount: Int,
     onClick: () -> Unit,
@@ -63,7 +63,7 @@ internal fun MonthDayCell(
 ) {
     val dateState = when {
         !isInMonth -> DateState.NotMonth
-        isSelected -> DateState.Selected
+        isSelected() -> DateState.Selected
         isToday -> DateState.Today
         else -> DateState.None
     }
@@ -125,5 +125,5 @@ private fun PreviewCell(
     eventCount: Int,
     modifier: Modifier = Modifier,
 ) {
-    MonthDayCell(date, isInMonth, isSelected, isToday, eventCount, onClick = {}, modifier = modifier)
+    MonthDayCell(date, isInMonth, { isSelected }, isToday, eventCount, onClick = {}, modifier = modifier)
 }

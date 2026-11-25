@@ -74,7 +74,7 @@ internal fun MonthWeekRow(
                 MonthDayCell(
                     date = date,
                     isInMonth = date.yearMonth == month,
-                    isSelected = date == selectedDate(),
+                    isSelected = { date == selectedDate() },
                     isToday = date == today,
                     eventCount = week.eventCountOf(column),
                     onClick = { onDayClick(date) },
