@@ -17,8 +17,6 @@
  */
 package com.infomaniak.calendar.ui.screen.settings
 
-import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.ListItemShapes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -27,9 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.model.settings.SettingThemeOption
-import com.infomaniak.calendar.ui.screen.settings.components.SettingItemSwitch
-import com.infomaniak.calendar.ui.screen.settings.components.SettingScaffold
-import com.infomaniak.calendar.ui.screen.settings.components.SettingSection
+import com.infomaniak.calendar.ui.screen.settings.components.SettingChoices
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.core.common.R as RCore
 
@@ -41,7 +37,7 @@ fun SettingThemeScreen(
 ) {
     val theme by settingThemeViewModel.theme.collectAsStateWithLifecycle()
 
-    SettingThemeContent(
+    Content(
         goBack = goBack,
         modifier = modifier,
         theme = { theme },
@@ -50,47 +46,28 @@ fun SettingThemeScreen(
 }
 
 @Composable
-private fun SettingThemeContent(
+private fun Content(
     theme: () -> SettingThemeOption?,
     onThemeClick: (SettingThemeOption) -> Unit,
     goBack: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
-    SettingScaffold(
+    SettingChoices(
         title = stringResource(RCore.string.themeTitle),
+        items = SettingThemeOption.entries,
+        selectedItem = { theme() },
+        itemLabel = { it.title },
+        itemSymbol = { it.symbol },
+        onItemClick = { onThemeClick(it) },
         goBack = goBack,
         modifier = modifier,
-    ) {
-        SettingSection {
-            val currentTheme = theme()
-            SettingThemeOption.entries.forEachIndexed { index, option ->
-                val shapes = ListItemDefaults.segmentedShapes(index, SettingThemeOption.entries.size)
-                ThemeItem(shapes, option, currentTheme, onThemeClick)
-            }
-        }
-    }
-}
-
-@Composable
-private fun ThemeItem(
-    shapes: ListItemShapes,
-    option: SettingThemeOption,
-    currentTheme: SettingThemeOption?,
-    onThemeClick: (SettingThemeOption) -> Unit,
-) {
-    SettingItemSwitch(
-        shapes = shapes,
-        text = option.title,
-        symbol = option.symbol,
-        checked = { currentTheme == option },
-        onCheckedChange = { onThemeClick(option) },
     )
 }
 
 @Preview
 @Composable
-private fun SettingThemePreview() {
+private fun Preview() {
     CalendarThemeForPreview {
-        SettingThemeContent(goBack = {}, theme = { SettingThemeOption.System }, onThemeClick = {})
+        Content(goBack = {}, theme = { SettingThemeOption.System }, onThemeClick = {})
     }
 }
