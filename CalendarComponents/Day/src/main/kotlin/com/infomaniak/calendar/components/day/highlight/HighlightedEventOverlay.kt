@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.lerp
 import androidx.compose.ui.graphics.graphicsLayer
@@ -37,13 +36,11 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-private const val SCRIM_ALPHA = 0.32f
 private val HighlightElevation = 8.dp
 private val FingerClearance = 24.dp
 
 /**
- * Draws the event [state] holds up above everything it covers, the neighbouring days included,
- * with a scrim fading in behind it.
+ * Draws the event [state] holds up above everything it covers, the neighbouring days included.
  *
  * The card unfolds from its place in its column to the whole width of its area, written the way the
  * Planning writes an event. It opens just above the finger so the finger doesn't hide it, or just
@@ -57,7 +54,6 @@ internal fun HighlightedEventOverlay(
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val highlight = state.highlight
-    val scrimColor = MaterialTheme.colorScheme.scrim
     val cardShape = MaterialTheme.shapes.small
     // The card colours are translucent tints, so an opaque backing keeps the events below from showing through.
     val backingColor = MaterialTheme.colorScheme.surface
@@ -68,10 +64,7 @@ internal fun HighlightedEventOverlay(
     Layout(
         modifier = modifier
             .letPointersThrough()
-            .onPlaced { state.overlayCoordinates = it }
-            .drawBehind {
-                if (state.highlight != null) drawRect(scrimColor, alpha = SCRIM_ALPHA * state.progress.coerceIn(0f, 1f))
-            },
+            .onPlaced { state.overlayCoordinates = it },
         content = {
             if (highlight != null) {
                 EventItem(
