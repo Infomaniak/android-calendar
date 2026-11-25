@@ -19,7 +19,6 @@ package com.infomaniak.calendar.ui.screen.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.calendar.model.settings.SettingThemeOption
 import com.infomaniak.calendar.data.SettingsDataValues
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
@@ -35,7 +34,7 @@ import kotlin.time.Duration.Companion.seconds
 @Inject
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
-class FirstDayOfWeekViewModel(private val settingsDataValues: SettingsDataValues) : ViewModel() {
+class SettingFirstDayOfWeekViewModel(private val settingsDataValues: SettingsDataValues) : ViewModel() {
     val firstDayOfWeek = settingsDataValues.firstDayOfWeek.flow.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), null)
 
     fun onFirstDayOfWeekClick(dayOfWeek: DayOfWeek) {
