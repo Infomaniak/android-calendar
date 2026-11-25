@@ -68,9 +68,9 @@ import com.infomaniak.calendar.ui.screen.onboarding.login.LoginOnboardingScreen
 import com.infomaniak.calendar.ui.screen.onboarding.permissions.PermissionsOnboardingPage
 import com.infomaniak.calendar.ui.screen.onboarding.permissions.PermissionsOnboardingScreen
 import com.infomaniak.calendar.ui.screen.planning.PlanningScreen
-import com.infomaniak.calendar.ui.screen.settings.SettingFirstDayOfWeekScreen
+import com.infomaniak.calendar.ui.screen.settings.firstDayOfWeek.SettingFirstDayOfWeekScreen
 import com.infomaniak.calendar.ui.screen.settings.SettingScreen
-import com.infomaniak.calendar.ui.screen.settings.SettingThemeScreen
+import com.infomaniak.calendar.ui.screen.settings.theme.SettingThemeScreen
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.utils.NavigationTransition
 import com.infomaniak.core.common.utils.today
