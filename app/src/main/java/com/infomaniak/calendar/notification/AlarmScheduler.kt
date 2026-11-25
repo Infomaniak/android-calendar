@@ -170,7 +170,7 @@ class AlarmScheduler @Inject constructor(
     )
 
     // Exact alarms need no permission below Android 12
-    private fun canScheduleExactAlarms(): Boolean {
+    fun canScheduleExactAlarms(): Boolean {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager?.canScheduleExactAlarms() == true
     }
 
@@ -268,6 +268,7 @@ class AlarmScheduler @Inject constructor(
 
         const val ACTION_EVENT_REMINDER = "com.infomaniak.calendar.ACTION_EVENT_REMINDER"
         const val ACTION_REFRESH_ALARMS = "com.infomaniak.calendar.ACTION_REFRESH_ALARMS"
+        const val ACTION_SNOOZE_REMINDER = "com.infomaniak.calendar.ACTION_SNOOZE_REMINDER"
         const val EXTRA_ALARM_ID = "com.infomaniak.calendar.EXTRA_ALARM_ID"
         const val EXTRA_OCCURRENCE_ID_JSON = "com.infomaniak.calendar.EXTRA_OCCURRENCE_ID_JSON"
         const val EXTRA_CALENDAR_ID = "com.infomaniak.calendar.EXTRA_CALENDAR_ID"

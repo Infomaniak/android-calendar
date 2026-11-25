@@ -37,6 +37,11 @@
     <string name="monthTitle">Mês</string>
     <string name="noWritableCalendar">Não foi encontrado nenhum calendário editável</string>
     <string name="notificationActionOpenMap">Abrir mapa</string>
+    <plurals name="notificationActionSnooze">
+        <!-- Button on an event reminder notification: shows the reminder again after this many minutes. Keep it short, abbreviate "minutes" (e.g. "min"). -->
+        <item quantity="one">Lembrar em %d min</item>
+        <item quantity="other">Lembrar em %d min</item>
+    </plurals>
     <string name="notificationChannelEventRemindersDescription">Notificações de próximos eventos e lembretes</string>
     <string name="notificationChannelEventRemindersTitle">Lembretes de eventos</string>
     <string name="notificationDefaultDescription">Alarme de evento</string>

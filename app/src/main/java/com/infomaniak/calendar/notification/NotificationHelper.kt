@@ -39,6 +39,7 @@ import kotlinx.datetime.LocalDateRange
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
+import kotlin.time.Duration
 import kotlin.time.Instant
 import com.infomaniak.calendar.components.resources.R as RComponents
 
@@ -57,6 +58,8 @@ object NotificationHelper {
         endInstantMs: Long,
         allDayDates: LocalDateRange?,
         kMeetUrl: String?,
+        snoozeIntent: PendingIntent?,
+        snoozeDelay: Duration,
     ): Notification {
         val clickIntent = Intent(context, MainActivity::class.java).apply {
             action = Intent.ACTION_VIEW
@@ -89,8 +92,15 @@ object NotificationHelper {
 
         kMeetUrl?.let { builder.addAction(createJoinKMeetAction(context, it)) }
         mapsQuery?.let { builder.addAction(createOpenMapAction(context, it)) }
+        snoozeIntent?.let { builder.addAction(createSnoozeAction(context, it, snoozeDelay)) }
 
         return builder.build()
+    }
+
+    private fun createSnoozeAction(context: Context, snoozeIntent: PendingIntent, delay: Duration): NotificationCompat.Action {
+        val minutes = delay.inWholeMinutes.toInt()
+        val label = context.resources.getQuantityString(R.plurals.notificationActionSnooze, minutes, minutes)
+        return NotificationCompat.Action.Builder(null, label, snoozeIntent).build()
     }
 
     // Opens the meeting straight from the notification: a trampoline through a receiver can't start an activity since Android 12

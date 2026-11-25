@@ -199,7 +199,9 @@ app/
   `AlarmManager` alarms. `AlarmReceiver` posts the notification (tap opens `EventDetail`; a "Join kMeet" action opens the
   meeting when the event has a meet room, its URL read from `CalendarManager.getOccurrence` when it fires, capped at 1 s,
   since `EventSummary` only carries `hasMeetRoom`; for a place, not a bookable room, an "Open map" action opens its
-  `mapsQuery` straight in a maps app, computed at registration), `BootReceiver` reschedules on
+  `mapsQuery` straight in a maps app, computed at registration; until the event ends, a "Remind in 5 min" action dismisses
+  it and fires the reminder again after `AlarmReceiver.SNOOZE_DELAY`, under its own `calendar://alarm-snooze/` URI so the
+  alarms sync leaves it alone, and lost on reboot like retries), `BootReceiver` reschedules on
   boot, app update, time / time zone change and once exact alarm access is granted. The 30-day window doesn't follow the
   clock, so each refresh also sets an inexact, non-wakeup `ACTION_REFRESH_ALARMS` alarm one day later (handled by
   `AlarmReceiver`) to move it forward.

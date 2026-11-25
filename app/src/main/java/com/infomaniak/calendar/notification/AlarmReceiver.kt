@@ -23,6 +23,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
@@ -37,6 +38,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateRange
 import kotlinx.serialization.json.Json
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class AlarmReceiver : BroadcastReceiver() {
@@ -45,6 +47,7 @@ class AlarmReceiver : BroadcastReceiver() {
         when (intent.action) {
             AlarmScheduler.ACTION_EVENT_REMINDER -> runAsync { handleEventReminder(context, intent) }
             AlarmScheduler.ACTION_REFRESH_ALARMS -> runAsync { syncAlarms(context) }
+            AlarmScheduler.ACTION_SNOOZE_REMINDER -> snoozeReminder(context, intent)
         }
     }
 
@@ -67,6 +70,9 @@ class AlarmReceiver : BroadcastReceiver() {
             return null
         }
 
+        // Tagged with the full ID, as its hash code could be the same as another reminder's
+        val tag = alarmId ?: occurrenceIdJson
+        val endMs = getLongExtra(AlarmScheduler.EXTRA_EVENT_END_MS, 0L)
         val notification = NotificationHelper.buildEventNotification(
             context = context,
             channelId = CalendarNotificationChannels.channelId(calendarId),
@@ -75,12 +81,63 @@ class AlarmReceiver : BroadcastReceiver() {
             location = getStringExtra(AlarmScheduler.EXTRA_EVENT_LOCATION),
             mapsQuery = getStringExtra(AlarmScheduler.EXTRA_EVENT_MAPS_QUERY),
             startInstantMs = getLongExtra(AlarmScheduler.EXTRA_EVENT_START_MS, 0L),
-            endInstantMs = getLongExtra(AlarmScheduler.EXTRA_EVENT_END_MS, 0L),
+            endInstantMs = endMs,
             allDayDates = getAllDayDates(),
             kMeetUrl = getKMeetUrl(context, occurrenceIdJson),
+            // Reminding again once the event is over would be pointless
+            snoozeIntent = if (System.currentTimeMillis() + SNOOZE_DELAY.inWholeMilliseconds < endMs) {
+                createSnoozeIntent(context, tag)
+            } else {
+                null
+            },
+            snoozeDelay = SNOOZE_DELAY,
         )
-        // Tagged with the full ID, as its hash code could be the same as another reminder's
-        return (alarmId ?: occurrenceIdJson) to notification
+        return tag to notification
+    }
+
+    private fun Intent.createSnoozeIntent(context: Context, tag: String): PendingIntent {
+        val snoozeIntent = Intent(this)
+            .setAction(AlarmScheduler.ACTION_SNOOZE_REMINDER)
+            .setData("calendar://alarm-snooze-action/${Uri.encode(tag)}".toUri())
+            .putExtra(EXTRA_NOTIFICATION_TAG, tag)
+        snoozeIntent.removeExtra(EXTRA_RETRY_COUNT)
+        return PendingIntent.getBroadcast(
+            context,
+            tag.hashCode(),
+            snoozeIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    }
+
+    /**
+     * Dismisses the notification and fires its reminder again after [SNOOZE_DELAY], with its own URI so that the alarms sync,
+     * which cancels the alarms it no longer tracks, leaves it alone. Like retries, it doesn't survive a reboot.
+     */
+    private fun snoozeReminder(context: Context, intent: Intent) {
+        val tag = intent.getStringExtra(EXTRA_NOTIFICATION_TAG) ?: return
+        NotificationManagerCompat.from(context).cancel(tag, NOTIFICATION_ID)
+
+        val reminderIntent = Intent(intent)
+            .setAction(AlarmScheduler.ACTION_EVENT_REMINDER)
+            .setData("calendar://alarm-snooze/${Uri.encode(tag)}".toUri())
+        reminderIntent.removeExtra(EXTRA_NOTIFICATION_TAG)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            tag.hashCode(),
+            reminderIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        val alarmManager = context.getSystemService<AlarmManager>() ?: return
+        val triggerAtMs = System.currentTimeMillis() + SNOOZE_DELAY.inWholeMilliseconds
+        runCatching {
+            if (context.appGraph.alarmScheduler.canScheduleExactAlarms()) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMs, pendingIntent)
+            } else {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMs, pendingIntent)
+            }
+        }.onFailure { exception ->
+            SentryLog.e(TAG, "Failed to snooze a reminder", exception)
+        }
     }
 
     /** Read when the reminder fires, as alarms only carry an event summary, which tells if it has a meet room, not its URL. */
@@ -167,5 +224,9 @@ class AlarmReceiver : BroadcastReceiver() {
         private const val EXTRA_RETRY_COUNT = "com.infomaniak.calendar.EXTRA_RETRY_COUNT"
         private const val MAX_RETRIES = 3
         private val RETRY_DELAY = 30.seconds
+
+        /** How long the notification's snooze action postpones its reminder. */
+        val SNOOZE_DELAY = 5.minutes
+        private const val EXTRA_NOTIFICATION_TAG = "com.infomaniak.calendar.EXTRA_NOTIFICATION_TAG"
     }
 }

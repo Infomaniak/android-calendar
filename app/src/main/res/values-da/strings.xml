@@ -37,6 +37,11 @@
     <string name="monthTitle">Måned</string>
     <string name="noWritableCalendar">Ingen redigerbar kalender fundet</string>
     <string name="notificationActionOpenMap">Åbn kort</string>
+    <plurals name="notificationActionSnooze">
+        <!-- Button on an event reminder notification: shows the reminder again after this many minutes. Keep it short, abbreviate "minutes" (e.g. "min"). -->
+        <item quantity="one">Påmind om %d min</item>
+        <item quantity="other">Påmind om %d min</item>
+    </plurals>
     <string name="notificationChannelEventRemindersDescription">Notifikationer om kommende arrangementer og påmindelser</string>
     <string name="notificationChannelEventRemindersTitle">Begivenhedspåmindelser</string>
     <string name="notificationDefaultDescription">Hændelsesalarm</string>

@@ -37,6 +37,11 @@
     <string name="monthTitle">Kuukausi</string>
     <string name="noWritableCalendar">Muokattavaa kalenteria ei löytynyt</string>
     <string name="notificationActionOpenMap">Avaa kartta</string>
+    <plurals name="notificationActionSnooze">
+        <!-- Button on an event reminder notification: shows the reminder again after this many minutes. Keep it short, abbreviate "minutes" (e.g. "min"). -->
+        <item quantity="one">Muistuta %d min päästä</item>
+        <item quantity="other">Muistuta %d min päästä</item>
+    </plurals>
     <string name="notificationChannelEventRemindersDescription">Ilmoitukset tulevista tapahtumista ja muistutuksista</string>
     <string name="notificationChannelEventRemindersTitle">Tapahtumamuistutukset</string>
     <string name="notificationDefaultDescription">Tapahtumahälytys</string>
