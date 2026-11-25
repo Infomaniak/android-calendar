@@ -113,6 +113,7 @@ class EventFormViewModel(
             participants = event.attendees.all.toSet(),
             organizerSource = Static(event.organizer),
             isKMeetUrlEnabled = event.kMeetUrl != null,
+            descriptionTextState = TextFieldState(event.description.orEmpty()),
             reminders = event.reminders,
             isOccupied = event.isOccupied,
             isPublic = event.classification == EventDetailUi.Classification.Public,

@@ -65,7 +65,9 @@
     </plurals>
     <string name="descriptionTitle">Description</string>
     <string name="emptyStateNoTimeZone">Aucun fuseau horaire trouvé</string>
-    <string name="eventTitle">Évènement</string>
+    <string name="endLabel">Fin</string>
+    <string name="eventTitle">Titre</string>
+    <string name="eventValidationCharacterLimitExceeded">Limite de caractères dépassée</string>
     <string name="eventValidationTooManyAttendees">Vous ne pouvez pas avoir plus de %d invités</string>
     <plurals name="hourAmount">
         <item quantity="one">%d heure</item>
@@ -99,6 +101,7 @@
     </plurals>
     <string name="sectionCalendarHeader">Calendrier</string>
     <string name="sectionOrganizerHeader">Organisateur</string>
+    <string name="startLabel">Début</string>
     <string name="statusAcceptedLabel">Accepté</string>
     <string name="statusDeclinedLabel">Refusé</string>
     <string name="statusNeedsActionLabel">En attente</string>

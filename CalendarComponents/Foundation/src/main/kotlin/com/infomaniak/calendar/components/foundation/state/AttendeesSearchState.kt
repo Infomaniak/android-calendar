@@ -150,12 +150,12 @@ class AttendeesSearchState<T : OrganizerSource>(
  * Mutations to its snapshot collections update consumers and are restored after state recreation.
  */
 @Composable
-fun rememberSaveableAttendeesSearchState(
-    organizerSource: OrganizerSource?,
+fun <T : OrganizerSource> rememberSaveableAttendeesSearchState(
+    organizerSource: T?,
     participants: SnapshotStateSet<ParticipantUi> = rememberSaveable { mutableStateSetOf() },
     results: SnapshotStateList<AttendeesSearchResult> = rememberSaveable { mutableStateListOf() },
     searchQuery: String = "",
-): AttendeesSearchState<OrganizerSource> = rememberSaveable(saver = AttendeesSearchState.Saver()) {
+): AttendeesSearchState<T> = rememberSaveable(saver = AttendeesSearchState.Saver<T>()) {
     AttendeesSearchState(
         searchQueryTextFieldState = TextFieldState(initialText = searchQuery),
         results = results,

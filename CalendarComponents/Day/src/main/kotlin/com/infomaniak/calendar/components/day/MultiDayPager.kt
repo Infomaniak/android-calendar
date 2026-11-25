@@ -63,7 +63,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.component.CurrentTimeIndicator
 import com.infomaniak.calendar.components.day.component.DayColumnHeader
-import com.infomaniak.calendar.components.day.component.FollowSelectedDate
 import com.infomaniak.calendar.components.day.component.HourLabelOverhang
 import com.infomaniak.calendar.components.day.component.HourLabels
 import com.infomaniak.calendar.components.day.component.HourLines
@@ -74,7 +73,6 @@ import com.infomaniak.calendar.components.day.highlight.HighlightedEventOverlay
 import com.infomaniak.calendar.components.day.highlight.eventHighlightArea
 import com.infomaniak.calendar.components.day.highlight.releaseHighlightOnSecondPointer
 import com.infomaniak.calendar.components.day.highlight.rememberEventHighlightState
-import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults.GridLineThickness
 import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.DayPages
@@ -85,7 +83,9 @@ import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
 import com.infomaniak.calendar.components.foundation.theme.ComponentColors
+import com.infomaniak.calendar.components.foundation.utils.FollowSelectedPage
 import com.infomaniak.calendar.components.foundation.utils.onlyHorizontalAndTop
+import com.infomaniak.calendar.components.foundation.utils.verticalEndDivider
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
@@ -134,7 +134,11 @@ fun MultiDayPager(
     key(pages) {
         val pagerState = rememberPagerState(initialPage = pages.pageOf(selectedDate())) { pages.count }
 
-        FollowSelectedDate(pagerState, pages, selectedDate, onVisibleDateChanged)
+        FollowSelectedPage(
+            pagerState = pagerState,
+            selectedPage = { pages.pageOf(selectedDate()) },
+            onPageChanged = { onVisibleDateChanged(pages.firstDateOf(it)) },
+        )
 
         MultiDayPagerContent(
             pagerState = pagerState,
@@ -381,18 +385,6 @@ private class DaysPageSize(private val daysPerPage: Int, private val visibleDayC
     override fun Density.calculateMainAxisPageSize(availableSpace: Int, pageSpacing: Int): Int {
         return availableSpace * daysPerPage / visibleDayCount
     }
-}
-
-/** A vertical line, drawn at the end of the component */
-@Composable
-private fun Modifier.verticalEndDivider(color: Color = ComponentColors.GridDividerColor): Modifier = drawBehind {
-    val x = if (layoutDirection == LayoutDirection.Ltr) size.width else 0f
-    drawLine(
-        color = color,
-        start = Offset(x, 0f),
-        end = Offset(x, size.height),
-        strokeWidth = GridLineThickness.toPx(),
-    )
 }
 
 @Preview

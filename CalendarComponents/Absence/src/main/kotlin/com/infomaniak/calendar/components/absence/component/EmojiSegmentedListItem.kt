@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -41,6 +42,7 @@ private val EmojiIconSize @Composable get() = EsdsTheme.icon.sizeSm
 internal fun EmojiSegmentedListItem(emoji: String, text: String, shapes: ListItemShapes, modifier: Modifier = Modifier) {
     SegmentedListItem(
         modifier = modifier,
+        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceBright),
         leadingContent = {
             Text(
                 text = emoji,

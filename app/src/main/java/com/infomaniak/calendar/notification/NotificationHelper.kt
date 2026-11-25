@@ -40,6 +40,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.Instant
+import com.infomaniak.calendar.components.resources.R as RComponents
 
 object NotificationHelper {
 
@@ -98,7 +99,7 @@ object NotificationHelper {
 
         if (allDayDates != null) {
             val firstDay = allDayDates.start
-            if (firstDay == allDayDates.endInclusive && firstDay == today) return context.getString(R.string.notificationAllDay)
+            if (firstDay == allDayDates.endInclusive && firstDay == today) return context.getString(RComponents.string.notificationAllDay)
             return formatShortDateRange(firstDay, allDayDates.endInclusive, locale, today.year)
         }
 

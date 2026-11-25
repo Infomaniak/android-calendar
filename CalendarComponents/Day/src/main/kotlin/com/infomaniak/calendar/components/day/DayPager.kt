@@ -27,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.component.DayView
-import com.infomaniak.calendar.components.day.component.FollowSelectedDate
 import com.infomaniak.calendar.components.day.highlight.HighlightedEventOverlay
 import com.infomaniak.calendar.components.day.highlight.releaseHighlightOnSecondPointer
 import com.infomaniak.calendar.components.day.highlight.rememberEventHighlightState
@@ -38,6 +37,7 @@ import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
+import com.infomaniak.calendar.components.foundation.utils.FollowSelectedPage
 import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -63,7 +63,11 @@ fun DayPager(
     val pages = remember(dateRange) { DayPages(dateRange, daysPerPage = 1) }
     val pagerState = rememberPagerState(initialPage = pages.pageOf(selectedDate())) { pages.count }
 
-    FollowSelectedDate(pagerState, pages, selectedDate, onVisibleDateChanged)
+    FollowSelectedPage(
+        pagerState = pagerState,
+        selectedPage = { pages.pageOf(selectedDate()) },
+        onPageChanged = { onVisibleDateChanged(pages.firstDateOf(it)) },
+    )
 
     val highlightState = rememberEventHighlightState()
 

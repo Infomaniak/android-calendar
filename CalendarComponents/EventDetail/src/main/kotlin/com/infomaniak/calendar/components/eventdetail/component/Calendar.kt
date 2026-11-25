@@ -83,7 +83,7 @@ internal fun CalendarEditable(
     DropDownItem(
         onClick = { isDialogVisible = true },
         content = { Text(stringResource(id = R.string.sectionCalendarHeader)) },
-        leadingContent = { ItemIcon(EsdsIcons.Calendar) },
+        symbol = EsdsIcons.Calendar,
         trailingContent = {
             CalendarDot(selectedCalendar.color)
             Text(text = selectedCalendar.name, style = MaterialTheme.typography.labelLarge)

@@ -17,7 +17,6 @@
   -->
 <resources>
     <string name="accountsTitle">Accounts</string>
-    <string name="attendeesSearchTitle">Deelnemers toevoegen</string>
     <string name="buttonAddAccount">Een account toevoegen</string>
     <string name="buttonAllEvents">Alle evenementen</string>
     <string name="buttonLogOut">Uitloggen</string>
@@ -37,7 +36,6 @@
     <string name="generalSettingsNotificationsLabel">Meldingen</string>
     <string name="monthTitle">Maand</string>
     <string name="noWritableCalendar">Geen bewerkbare kalender gevonden</string>
-    <string name="notificationAllDay">De hele dag</string>
     <string name="notificationChannelEventRemindersDescription">Meldingen voor aankomende evenementen en herinneringen</string>
     <string name="notificationChannelEventRemindersTitle">Herinneringen aan evenementen</string>
     <string name="notificationDefaultDescription">Gebeurteniswaarschuwing</string>
@@ -56,6 +54,6 @@
     <string name="signOutAccountAlertConfirm">Meld je af bij het account</string>
     <string name="signOutAccountAlertDescription">Dit account en de bijbehorende agenda’s worden losgekoppeld van de app ‘Agenda’. Ze blijven beschikbaar in uw online Infomaniak-account.</string>
     <string name="syncEventsError">Fout bij het ophalen van gebeurtenissen</string>
-    <string name="threeDaysTitle">Drie dagen</string>
+    <string name="threeDaysTitle">3 dagen</string>
     <string name="weekTitle">Week</string>
 </resources>

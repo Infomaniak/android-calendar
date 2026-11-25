@@ -135,7 +135,11 @@ private fun baseEntryProvider(
         }
 
         is NavDestination.CalendarView.Month -> NavEntry(destination, metadata = metaDataOf(FloatingToolbarWithFab, Drawer)) {
-            MonthScreen()
+            MonthScreen(
+                goToEventDetail = { backStack.addOnce(NavDestination.EventDetail(it)) },
+                // Above Month rather than replacing it, so back returns to Month.
+                goToDay = { backStack.addOnce(NavDestination.CalendarView.Day) },
+            )
         }
 
         is NavDestination.EventForm.EventCreation -> NavEntry(
