@@ -99,7 +99,7 @@ object NotificationHelper {
             Intent(Intent.ACTION_VIEW, kMeetUrl.toUri()),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
-        return NotificationCompat.Action.Builder(null, context.getString(R.string.notificationActionJoinKMeet), pendingIntent)
+        return NotificationCompat.Action.Builder(null, context.getString(RComponents.string.participateKMeetTitle), pendingIntent)
             .build()
     }
 
