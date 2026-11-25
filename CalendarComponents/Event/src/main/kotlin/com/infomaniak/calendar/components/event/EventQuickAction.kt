@@ -21,6 +21,7 @@ import androidx.annotation.StringRes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.infomaniak.calendar.components.foundation.models.QuickAction
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.SquaresStacked
@@ -29,10 +30,10 @@ import com.infomaniak.designsystem.icons.symbols.Symbol
 import com.infomaniak.designsystem.icons.symbols.Trash
 
 enum class EventQuickAction(
-    @StringRes val titleRes: Int,
-    val symbol: Symbol,
-    val contentColor: @Composable () -> Color = { MaterialTheme.colorScheme.onSurface },
-) {
+    @StringRes override val titleRes: Int,
+    override val symbol: Symbol,
+    override val contentColor: @Composable () -> Color = { MaterialTheme.colorScheme.onSurface },
+) : QuickAction {
     Duplicate(R.string.buttonDuplicate, EsdsIcons.SquaresStackedPlus),
     Copy(R.string.buttonCopy, EsdsIcons.SquaresStacked),
     Delete(R.string.buttonDelete, EsdsIcons.Trash, { MaterialTheme.colorScheme.error }),

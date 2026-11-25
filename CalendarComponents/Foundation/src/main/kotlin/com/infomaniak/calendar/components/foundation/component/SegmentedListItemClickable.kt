@@ -31,6 +31,7 @@ import com.infomaniak.calendar.components.foundation.theme.ComponentColors
 fun SegmentedListItemClickable(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
+    onLongClick: (() -> Unit)? = null,
     enabled: Boolean = true,
     leadingContent: @Composable (() -> Unit)? = null,
     trailingContent: @Composable (() -> Unit)? = null,
@@ -42,7 +43,7 @@ fun SegmentedListItemClickable(
     contentPadding: PaddingValues = ListItemDefaults.ContentPadding,
     content: @Composable () -> Unit,
 ) {
-    if (onClick == null) {
+    if (onClick == null && onLongClick == null) {
         SegmentedListItem (
             enabled = enabled,
             leadingContent = leadingContent,
@@ -58,7 +59,8 @@ fun SegmentedListItemClickable(
         )
     } else {
         SegmentedListItem (
-            onClick = onClick,
+            onClick = onClick ?: {},
+            onLongClick = onLongClick,
             enabled = enabled,
             leadingContent = leadingContent,
             trailingContent = trailingContent,

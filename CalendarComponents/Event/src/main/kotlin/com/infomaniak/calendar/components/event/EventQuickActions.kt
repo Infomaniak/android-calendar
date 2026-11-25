@@ -18,28 +18,19 @@
 package com.infomaniak.calendar.components.event
 
 import androidx.collection.intListOf
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.DropdownMenuGroup
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.DropdownMenuPopup
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorPosition
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.LayoutDirection
+import com.infomaniak.calendar.components.foundation.component.QuickActionsBox
+import com.infomaniak.calendar.components.foundation.component.QuickActionsMenu
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 /** Opens the event quick actions menu below [content] when [content] calls the long click it is given. */
@@ -50,60 +41,24 @@ fun EventQuickActionsBox(
     modifier: Modifier = Modifier,
     content: @Composable (onLongClick: () -> Unit) -> Unit,
 ) {
-    var expanded by rememberSaveable { mutableStateOf(false) }
-
-    Box(modifier = modifier, propagateMinConstraints = true) {
-        content { expanded = true }
-
-        EventQuickActions(
-            expanded = expanded,
-            canEdit = canEdit,
-            onDismissRequest = { expanded = false },
-            onActionClick = onQuickActionClick,
-        )
-    }
-}
-
-@Composable
-private fun EventQuickActions(
-    expanded: Boolean,
-    canEdit: Boolean,
-    onDismissRequest: () -> Unit,
-    onActionClick: (EventQuickAction) -> Unit,
-) {
-    DropdownMenuPopup(
-        expanded = expanded,
-        onDismissRequest = onDismissRequest,
-        modifier = Modifier.padding(top = EsdsTheme.spacing.md),
+    QuickActionsBox(
+        actions = eventQuickActions(canEdit),
+        onActionClick = onQuickActionClick,
+        modifier = modifier,
+        menuModifier = Modifier.padding(top = EsdsTheme.spacing.md),
         popupPositionProvider = MenuDefaults.rememberDropdownMenuPopupPositionProvider(BelowEndAligned),
-    ) {
-        val actions = listOfNotNull(EventQuickAction.Duplicate, EventQuickAction.Delete.takeIf { canEdit })
-
-        DropdownMenuGroup(shapes = MenuDefaults.groupShape(index = 0, count = 1)) {
-            actions.forEachIndexed { index, action ->
-                val textColor = action.contentColor()
-
-                DropdownMenuItem(
-                    onClick = {
-                        onDismissRequest()
-                        onActionClick(action)
-                    },
-                    text = { Text(stringResource(action.titleRes)) },
-                    leadingIcon = { Icon(action.symbol.Small, contentDescription = null) },
-                    colors = MenuDefaults.itemColors(textColor = textColor, leadingIconColor = textColor),
-                    shape = MenuDefaults.itemShape(index = index, count = actions.size).shape,
-                )
-            }
-        }
-    }
+        content = content,
+    )
 }
+
+private fun eventQuickActions(canEdit: Boolean) = listOfNotNull(EventQuickAction.Duplicate, EventQuickAction.Delete.takeIf { canEdit })
 
 @Preview
 @Composable
 private fun EventQuickActionsPreview(@PreviewParameter(CanEditPreviewParameter::class) canEdit: Boolean) {
     MaterialTheme {
         Surface {
-            EventQuickActions(expanded = true, canEdit = canEdit, onDismissRequest = {}, onActionClick = {})
+            QuickActionsMenu(expanded = true, onDismissRequest = {}, actions = eventQuickActions(canEdit), onActionClick = {})
         }
     }
 }
