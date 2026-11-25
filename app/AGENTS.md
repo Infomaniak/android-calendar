@@ -41,7 +41,7 @@ app/src/main/java/com/infomaniak/calendar/
 │   │                               # the background for the event ViewModels, so their screens close at once; MainActivity shows
 │   │                               # its errors
 │   ├── VisibleDateManager.kt       # App-scoped: single visible-date source, restored/saved by MainViewModel
-│   ├── VisibleMonthManager.kt      # App-scoped: event dots derived from the shared visible date's month
+│   ├── VisibleMonthManager.kt      # App-scoped: the months loaded around the shared visible date, and their event dots
 │   ├── VisibleEventsManager.kt     # App-scoped: one observation of the day-sliced events around the visible date, for every view
 │   ├── DayEventsLoader.kt          # App-scoped: VisibleEventsManager's events split into all-day and timed, for the day views
 │   └── PlaceSearcher.kt            # Location search's places, from the platform Geocoder (none on devices without one)
@@ -66,7 +66,10 @@ app/src/main/java/com/infomaniak/calendar/
     ├── screen/
     │   ├── day/                   # DayScreen + DayViewModel
     │   ├── multiDays/             # MultiDaysScreen(dayCount) + MultiDaysViewModel — 3-day and week views share one entry (same contentKey)
-    │   ├── month/                 # MonthScreen + MonthViewModel
+    │   ├── month/                 # MonthScreen (CalendarComponents' MonthPager; a day tap opens Day on it) + MonthViewModel
+    │                              # (months around the visible one, laid out with their events). pendingKmp/ (temporary, TODO[kmpMonth]):
+    │                              #   buildMonths and packWeek lay a month's events into lanes, as iOS MonthWeekLayout does,
+    │                              #   until KMP returns them; the package then goes and only MonthViewModel's source changes
     │   ├── planning/              # PlanningScreen + PlanningViewModel (events from VisibleEventsManager) + PlanningEventGroupingExt
     │   ├── accounts/              # AccountsListScreen + AccountActionsScreen + AccountsViewModel + AccountItem
     │                              # Drawer-backed account list, per-account detail/logout screen, and remove-account flow
@@ -142,6 +145,8 @@ app/
   DSL): the DSL can't read the key while building `metadata`, which `AttendeeSearch` needs in order to declare its parent.
   Entries are decorated with `rememberSaveableStateHolderNavEntryDecorator()` followed by
   `rememberSharedViewModelStoreNavEntryDecorator()`, in that order.
+- **Calendar views are roots**: picking one replaces the whole back stack, so back leaves the app. The one exception is
+  a Month day click, which opens Day above Month so back returns to Month.
 - **List/detail (Settings)**: Material 3's `ListDetailSceneStrategy` (`adaptive-navigation3`) lays settings out side by
   side on wide windows. The root settings entry is always `metaDataOf(SettingsListPane)` (it brings the
   `SettingDetailPlaceholder` shown while nothing is opened). Build every sub-page with `backStack.settingsSubPageEntry`
@@ -393,8 +398,9 @@ fun MyComponent(
   `snapshotFlow` for date-dependent queries. `MainViewModel` binds the manager to `SavedStateHandle` under
   `"visibleDate"`; the saved-state provider stores the date string in a `Bundle` under the same key, and binding restores
   it when present. Restoration only initializes a fresh manager. `MainActivity` passes the same mutable state to Foundation's
-  `VisibleDayState`, provided through `LocalVisibleDayState`. Months are derived in `VisibleMonthManager`; screens do
-  not report them separately. Jump commands remain independent of the date the content reaches.
+  `VisibleDayState`, provided through `LocalVisibleDayState`. Months are derived in `VisibleMonthManager`: its
+  `loadedMonths` (the visible one and its neighbours) feed both the mini calendar's dots and the Month view; screens do not
+  report them separately. Jump commands remain independent of the date the content reaches.
 
 ### Testing
 

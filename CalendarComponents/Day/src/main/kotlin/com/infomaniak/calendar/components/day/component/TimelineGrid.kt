@@ -41,12 +41,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import com.infomaniak.calendar.components.day.TimelineDefaults
-import com.infomaniak.calendar.components.day.layout.EventLayoutDefaults
 import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.theme.ComponentColors
+import com.infomaniak.calendar.components.foundation.theme.Dimens
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatShortTimeLabel
 import kotlinx.datetime.LocalTime
 
@@ -65,8 +65,8 @@ internal val HourLabelOverhang: Dp
     @Composable @ReadOnlyComposable get() = with(LocalDensity.current) { HourLabelStyle.lineHeight.toDp() / 2 }
 
 /**
- * Scrolls the day vertically, with room above for midnight's label and below for the last events to
- * clear whatever overlays the bottom of the screen.
+ * Scrolls the day vertically, with room above and below for midnight's labels, plus the [contentPadding] the host
+ * keeps clear of its own overlays.
  *
  * A pinch reads its own y as an hour, so any [pinchToZoom][com.infomaniak.calendar.components.day.pinchToZoom]
  * goes after this modifier, inside the padding: it has to start counting where the first hour line
@@ -85,7 +85,7 @@ internal fun Modifier.verticalTimelineScroll(
     .verticalScroll(state.scrollState, overscrollEffect, enabled = !state.isPinching)
     .padding(
         top = HourLabelOverhang + contentPadding.calculateTopPadding(),
-        bottom = TimelineDefaults.BottomPadding + contentPadding.calculateBottomPadding(),
+        bottom = HourLabelOverhang + contentPadding.calculateBottomPadding(),
     )
 
 /**
@@ -106,7 +106,7 @@ internal fun HourLines(state: TimelineState, modifier: Modifier = Modifier) {
                         color = color,
                         start = Offset(0f, y),
                         end = Offset(size.width, y),
-                        strokeWidth = EventLayoutDefaults.GridLineThickness.toPx(),
+                        strokeWidth = Dimens.GridLineThickness.toPx(),
                     )
                 }
             },

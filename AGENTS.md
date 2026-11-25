@@ -132,8 +132,8 @@ only narrow to `Normal<*>` and would still need an unchecked cast — an unsafe 
 
 ### Flavors
 
-Most CalendarComponents modules that contain **code** (`Foundation`, `Event`, `Planning`, `Day`, `Calendar`, `EventDetail`)
-applies the `core.plugins.infomaniak.android.library.flavor.aware` convention plugin instead of the plain
+Most CalendarComponents modules that contain **code** (`Foundation`, `Event`, `Planning`, `Day`, `Month`, `Calendar`,
+`EventDetail`) apply the `core.plugins.infomaniak.android.library.flavor.aware` convention plugin instead of the plain
 `core.plugins.android.library`. That plugin declares the same `distribution` flavor dimension (`standard` default /
 `fdroid`) as the app. It is required because `Foundation` depends on `core.infomaniak.core.avatar`, which is itself
 flavor-aware (see `Core/Avatar/build.gradle.kts`) — AGP requires a consumer module to declare matching product flavors
@@ -149,7 +149,7 @@ When adding a new CalendarComponents module, apply the flavor-aware plugin if it
 | Gradle path                       | Package                                          | Purpose                                                                                                                   |
 |-----------------------------------|--------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
 | `:CalendarComponents:Absence`     | `com.infomaniak.calendar.components.absence`    | `EmojiSegmentedListItem` Composable in the `component` package — renders a segmented row with a leading emoji. |
-| `:CalendarComponents:Foundation`  | `com.infomaniak.calendar.components.foundation`  | Shared models (`EventSummaryUi`, `LocationUi` (an event's place or bookable room, shared by the event detail, its form and the location search) with `RoomAvailability`, `YearWeek`, `WeekNumbering`) and base Compose components (`DayCircle`, `DateState`, `CurrentTimeLine` (the current time line with its dot, shared by Day and Planning), the search screens' `SearchLayout` (shared padding and spacing), `SearchBar`, `EmptyState` and `HighlightedText`, the case- and accent-insensitive `SearchableText`, and `rememberInitialFocusRequester` to focus a field once on screen entry) used by all other CalendarComponents modules. |
+| `:CalendarComponents:Foundation`  | `com.infomaniak.calendar.components.foundation`  | Shared models (`EventSummaryUi`, `LocationUi` (an event's place or bookable room, shared by the event detail, its form and the location search) with `RoomAvailability`, `YearWeek`, `WeekNumbering`) and base Compose components (`DayCircle`, `DateState`, `CurrentTimeLine` (the current time line with its dot, shared by Day and Planning), the grid lines (`Dimens.GridLineThickness`, `ComponentColors.GridDividerColor`, drawn by `HorizontalGridLine`, `VerticalGridLine` and the `verticalEndDivider` modifier, shared by the calendar grids, plus the `verticalStartDivider` and `horizontalBottomDivider` modifiers closing a grid's outer edges), the search screens' `SearchLayout` (shared padding and spacing), `SearchBar`, `EmptyState` and `HighlightedText`, the case- and accent-insensitive `SearchableText`, `rememberInitialFocusRequester` to focus a field once on screen entry, `dayContentDescription`, how the mini calendar and Month announce a day, and `FollowSelectedPage`, which keeps a `PagerState` on a selected page and reports the pages the user swipes to, ignoring the selected one and those a jump crosses) used by all other CalendarComponents modules. |
 | `:CalendarComponents:Resources`   | `com.infomaniak.calendar.components.resources`   | String-only module: `res/values/strings.xml` (+ translations). No Kotlin code, no Compose. Centralises all CalendarComponents string resources. |
 | `:CalendarComponents:Event`       | `com.infomaniak.calendar.components.event`       | `EventItem` Composable — renders a single event row. Re-exports Foundation via `api`. |
 | `:CalendarComponents:Planning`    | `com.infomaniak.calendar.components.planning`    | `Planning` Composable — a `LazyColumn` over a `PlanningTimeline`, which gives every date a fixed item index (each week: its header, then one item per day). Each day's events come from an `eventsOf(date)` lambda, `null` while that day isn't loaded. On today's row, a `CurrentTimeLine` takes the gap before the ongoing event that started last, otherwise before the next one to start, otherwise after the last event, all-day ones included (none on a day without events), its dot overhanging the gap before the events. Also provides the `stickyDayIndicator` `Modifier` extension. Re-exports Foundation via `api` (its types appear in `Planning`'s public signature); Event and Resources are internal implementation details and stay `implementation`. Week header design is a **placeholder**. |
@@ -157,6 +157,7 @@ When adding a new CalendarComponents module, apply the flavor-aware plugin if it
 | `:CalendarComponents:EventDetail` | `com.infomaniak.calendar.components.eventdetail` | Event detail module — the `detail` package contains the read-only `EventDetail` Composable, while the `form` package contains the editable `EventForm` shared by event editing and creation (it takes an `EventFormState`, one state per field, saved through `EventFormState.Saver`), and `CustomReminder`, the content of the screen making a custom reminder. Matching fields can opt into shared-element transitions through optional Compose animation scopes and internal element keys, without depending on app navigation or domain identifier types. Re-exports Foundation and `core.infomaniak.core.filetypes` via `api` since both appear in `EventDetailUi`. |
 | `:CalendarComponents:TimeZoneSearch` | `com.infomaniak.calendar.components.timezonesearch` | `TimeZoneSearch` Composable — searchable list of ICU's canonical location time zones, each with its localized name, city and country, and UTC offset (formatters in Foundation's `TimeZoneFormatter`). Filters locally; reports the clicked `TimeZone`. Re-exports Foundation and `kotlinx-datetime` via `api`. |
 | `:CalendarComponents:LocationSearch` | `com.infomaniak.calendar.components.locationsearch` | `LocationSearch` Composable — the location search bar over one segmented list of Foundation's `LocationUi` it is given, merged and filtered by the caller: places (`LocationUi.Place`, their name above their address) and bookable rooms (`LocationUi.Room`, with their `RoomAvailability` above their name). The search text is highlighted in them (Foundation's `HighlightedText`), except in the typed place leading the results while something is typed. Picking a place or a room reports it through `onLocationClick`. Each room shows Foundation's `RoomDetails` (capacity and floor), also used by the event detail's room. Re-exports Foundation via `api`. |
+| `:CalendarComponents:Month` | `com.infomaniak.calendar.components.month` | Month view. Its input is a `MonthUi` per month: the weeks it touches, each carrying its 7 dates and the event segments packed over them (`MonthEventSegmentUi`: start column, span, lane). Packing happens on the data side. `MonthPager(monthRange, selectedDate, monthOf, …)` pages through the months, following the selected date's one like `DayPager` (Foundation's `FollowSelectedPage`) and marking that date as the mini calendar does; a month `monthOf` returns `null` for stays blank until loaded. Each page shows the weekday header over the weeks, which share its height above the bottom content padding (or the width / 7 when wider than tall, then scrolling, that padding below the last week) and show as many event lanes as fit, a "…" in the last one when some are hidden. Re-exports Foundation via `api`. |
 
 ### Dependency graph
 
@@ -167,16 +168,17 @@ When adding a new CalendarComponents module, apply the flavor-aware plugin if it
 | `Event`    | `Foundation`      | —                              |
 | `Planning` | `Foundation`      | `Event`, `Resources`           |
 | `Day`      | `Foundation`      | `Event`, `Resources`           |
+| `Month`    | `Foundation`      | `Event`, `Resources`           |
 | `Calendar` | `Foundation`      | `Resources`                    |
 | `TimeZoneSearch` | `Foundation` | `Resources`                |
 | `LocationSearch` | `Foundation` | `Resources`                |
 
 `Absence` and `Resources` have no CalendarComponents dependencies; `Foundation` depends on `Resources` only as `implementation`
 (for resource ids carried by its models, e.g. `ParticipationStatus.countPluralRes`). `Event` re-exports `Foundation` via `api` since its
-public `EventItem` signature exposes `Foundation` types. `Planning` and `Day` each declare their own **direct** `api`
+public `EventItem` signature exposes `Foundation` types. `Planning`, `Day` and `Month` each declare their own **direct** `api`
 dependency on `Foundation` (its types appear in their own public signatures) and depend on `Event` and `Resources` as
 `implementation` only (internal implementation details, not part of their own public API surface — not re-exported).
-`Planning` and `Day` are the two top-level entry points for consumers, one per calendar view; each transitively brings
+`Planning`, `Day` and `Month` are the top-level entry points for consumers, one per calendar view; each transitively brings
 in the stack it needs.
 
 ### What is final vs placeholder

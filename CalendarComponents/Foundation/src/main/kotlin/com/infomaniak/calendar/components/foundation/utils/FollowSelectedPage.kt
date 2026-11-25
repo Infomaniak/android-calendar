@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.day.component
+package com.infomaniak.calendar.components.foundation.utils
 
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
@@ -23,45 +23,41 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
-import com.infomaniak.calendar.components.day.model.DayPages
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.datetime.LocalDate
 
 /**
- * Keeps [pagerState] on the page holding [selectedDate], and reports the first day of the page the
- * user settles on through [onVisibleDateChanged], unless that page already holds [selectedDate].
+ * Animates [pagerState] to [selectedPage] whenever something other than a swipe changes it, and reports
+ * through [onPageChanged] the pages the user moves to, unless that page is already [selectedPage].
+ *
+ * The pages a jump crosses on its way are not reported: they are the jump's own doing, and reported back
+ * as a page the user moved to, they would end the jump at the first page it passes over.
  */
 @Composable
-internal fun FollowSelectedDate(
-    pagerState: PagerState,
-    pages: DayPages,
-    selectedDate: () -> LocalDate,
-    onVisibleDateChanged: (LocalDate) -> Unit,
-) {
-    // The page a jump is travelling to, while it travels. The pager reports every page it crosses on
-    // the way, and those are the jump's own doing: reported back as a date the user moved to, they
-    // would end the jump at the first page it passes over.
-    var travellingTo by remember(pagerState) { mutableStateOf<Int?>(null) }
+fun FollowSelectedPage(pagerState: PagerState, selectedPage: () -> Int, onPageChanged: (Int) -> Unit) {
+    val currentSelectedPage by rememberUpdatedState(selectedPage)
+    val currentOnPageChanged by rememberUpdatedState(onPageChanged)
+
+    var isJumping by remember(pagerState) { mutableStateOf(false) }
 
     LaunchedEffect(pagerState) {
-        snapshotFlow { selectedDate() }.collectLatest { date ->
-            val page = pages.pageOf(date)
+        snapshotFlow { currentSelectedPage() }.collectLatest { page ->
             if (page == pagerState.currentPage) return@collectLatest
 
-            travellingTo = page
+            isJumping = true
             try {
                 pagerState.animateScrollToPage(page)
             } finally {
-                travellingTo = null
+                isJumping = false
             }
         }
     }
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
-            if (travellingTo == null && pages.pageOf(selectedDate()) != page) onVisibleDateChanged(pages.firstDateOf(page))
+            if (!isJumping && page != currentSelectedPage()) currentOnPageChanged(page)
         }
     }
 }

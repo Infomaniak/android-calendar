@@ -19,9 +19,24 @@ package com.infomaniak.calendar.ui.theme
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
 object Dimens {
     val EventDetailScreensHorizontalPadding: PaddingValues
         @Composable get() = PaddingValues(horizontal = EsdsTheme.spacing.lg)
+
+    /**
+     * Room to keep under a screen's content. The floating toolbar hovers over the bottom of the screen rather
+     * than sitting below the content, so without it the end of the content would stay under the toolbar however
+     * far it is scrolled.
+     *
+     * This is the height the toolbar reserves, not the height of its bar: HorizontalFloatingToolbar sets its own
+     * minimum to the largest size its FAB can take, and the FAB grows into it as the toolbar collapses. The height
+     * therefore does not change between the expanded and collapsed states. Material keeps that value internal, as
+     * `FloatingToolbarDefaults.FabSizeRange` (56dp to 80dp), so it cannot be read from the public API and is
+     * repeated here.
+     */
+    val FloatingToolbarClearance: Dp = 80.dp
 }
