@@ -52,7 +52,7 @@ import com.infomaniak.calendar.components.month.layout.laneMetrics
 import com.infomaniak.calendar.components.month.layout.monthRowHeights
 import com.infomaniak.calendar.components.month.model.MonthUi
 import com.infomaniak.calendar.components.month.preview.previewFiveWeeksMonth
-import com.infomaniak.calendar.components.month.preview.previewMonth
+import com.infomaniak.calendar.components.month.preview.mockPreviewMonth
 import com.infomaniak.calendar.components.month.preview.previewSixWeeksMonth
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlinx.datetime.LocalDate
@@ -171,25 +171,25 @@ private fun Modifier.outerGridEdges(touchesPreviousGrid: Boolean): Modifier {
 @Preview
 @Composable
 private fun Preview() {
-    PreviewMonthPage(previewMonth(previewFiveWeeksMonth), contentPadding = PaddingValues(bottom = 80.dp))
+    PreviewMonthPage(mockPreviewMonth(previewFiveWeeksMonth), contentPadding = PaddingValues(bottom = 80.dp))
 }
 
 @Preview(name = "Inset from the end")
 @Composable
 private fun PreviewInsetFromEnd() {
-    PreviewMonthPage(previewMonth(previewFiveWeeksMonth), contentPadding = PaddingValues(end = 24.dp))
+    PreviewMonthPage(mockPreviewMonth(previewFiveWeeksMonth), contentPadding = PaddingValues(end = 24.dp))
 }
 
 @Preview(name = "Six weeks")
 @Composable
 private fun PreviewSixWeeks() {
-    PreviewMonthPage(previewMonth(previewSixWeeksMonth))
+    PreviewMonthPage(mockPreviewMonth(previewSixWeeksMonth))
 }
 
 @Preview(name = "Wider than tall", widthDp = 800, heightDp = 400)
 @Composable
 private fun PreviewLandscape() {
-    PreviewMonthPage(previewMonth(previewFiveWeeksMonth))
+    PreviewMonthPage(mockPreviewMonth(previewFiveWeeksMonth))
 }
 
 @Composable

@@ -37,7 +37,7 @@ import com.infomaniak.calendar.components.foundation.state.rememberVisibleDaySta
 import com.infomaniak.calendar.components.foundation.utils.NAVIGABLE_MONTHS
 import com.infomaniak.calendar.components.month.MonthPager
 import com.infomaniak.calendar.components.month.model.MonthUi
-import com.infomaniak.calendar.components.month.preview.previewMonth
+import com.infomaniak.calendar.components.month.preview.mockPreviewMonth
 import com.infomaniak.calendar.ui.component.OverlaidTopBarScaffold
 import com.infomaniak.calendar.ui.component.topAppBar.CalendarTopAppBar
 import com.infomaniak.calendar.ui.effects.ApplyJumpRequests
@@ -131,7 +131,7 @@ private fun MonthScreen(
 @Preview
 @Composable
 private fun Preview() {
-    PreviewMonthScreen(months = { mapOf(it to previewMonth(it)) }, isLoadingEvents = false)
+    PreviewMonthScreen(months = { mapOf(it to mockPreviewMonth(it)) }, isLoadingEvents = false)
 }
 
 @Preview

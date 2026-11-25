@@ -38,23 +38,23 @@ import kotlin.time.Instant
 internal val previewSixWeeksMonth = YearMonth(2026, 3)
 internal val previewFiveWeeksMonth = YearMonth(2026, 5)
 
-internal val previewEvent: EventSummaryUi.Normal = previewEventOf("Review design Calendar", Color(0xFF8B5CF6))
-internal val previewCancelledEvent: EventSummaryUi.Normal = previewEventOf(
+internal val previewEvent: EventSummaryUi.Normal = mockPreviewEventOf("Review design Calendar", Color(0xFF8B5CF6))
+internal val previewCancelledEvent: EventSummaryUi.Normal = mockPreviewEventOf(
     title = "Meeting dev",
     color = Color(0xFFD4426E),
     status = EventStatus.Cancelled,
 )
-internal val previewDeclinedEvent: EventSummaryUi.Normal = previewEventOf(
+internal val previewDeclinedEvent: EventSummaryUi.Normal = mockPreviewEventOf(
     title = "Afterwork",
     color = Color(0xFF10B981),
     myStatus = ParticipationStatus.Declined,
 )
-internal val previewTentativeEvent: EventSummaryUi.Normal = previewEventOf(
+internal val previewTentativeEvent: EventSummaryUi.Normal = mockPreviewEventOf(
     title = "Dentist",
     color = Color(0xFF3B82F6),
     myStatus = ParticipationStatus.Tentative,
 )
-internal val previewPendingEvent: EventSummaryUi.Normal = previewEventOf(
+internal val previewPendingEvent: EventSummaryUi.Normal = mockPreviewEventOf(
     title = "Team lunch",
     color = Color(0xFFE5B94E),
     myStatus = ParticipationStatus.NeedsAction,
@@ -65,11 +65,11 @@ internal val previewPendingEvent: EventSummaryUi.Normal = previewEventOf(
  * week fully within its month, as segments never cover days of other months.
  */
 internal val previewSegments: List<MonthEventSegmentUi> = listOf(
-    MonthEventSegmentUi(previewEventOf("Vacations", Color(0xFFE5B94E)), startColumn = 0, span = 5, lane = 0),
+    MonthEventSegmentUi(mockPreviewEventOf("Vacations", Color(0xFFE5B94E)), startColumn = 0, span = 5, lane = 0),
     MonthEventSegmentUi(previewEvent, startColumn = 1, span = 1, lane = 1),
-    MonthEventSegmentUi(previewEventOf("Standup", Color(0xFF3B82F6)), startColumn = 1, span = 1, lane = 2),
-    MonthEventSegmentUi(previewEventOf("Tennis", Color(0xFF10B981)), startColumn = 1, span = 1, lane = 3),
-    MonthEventSegmentUi(previewEventOf("Go running", Color(0xFFD4426E)), startColumn = 1, span = 1, lane = 4),
+    MonthEventSegmentUi(mockPreviewEventOf("Standup", Color(0xFF3B82F6)), startColumn = 1, span = 1, lane = 2),
+    MonthEventSegmentUi(mockPreviewEventOf("Tennis", Color(0xFF10B981)), startColumn = 1, span = 1, lane = 3),
+    MonthEventSegmentUi(mockPreviewEventOf("Go running", Color(0xFFD4426E)), startColumn = 1, span = 1, lane = 4),
     MonthEventSegmentUi(previewCancelledEvent, startColumn = 3, span = 1, lane = 1),
     MonthEventSegmentUi(previewDeclinedEvent, startColumn = 4, span = 2, lane = 1),
     MonthEventSegmentUi(previewTentativeEvent, startColumn = 5, span = 1, lane = 0),
@@ -77,7 +77,7 @@ internal val previewSegments: List<MonthEventSegmentUi> = listOf(
 )
 
 /** The weeks of [month] from Monday, with [previewSegments] on its second week, the first one fully within it. */
-fun previewMonth(month: YearMonth): MonthUi {
+fun mockPreviewMonth(month: YearMonth): MonthUi {
     val weekStarts = generateSequence(month.firstDay.startOfWeek(DayOfWeek.MONDAY)) { it.plus(1, DateTimeUnit.WEEK) }
         .takeWhile { it <= month.lastDay }
 
@@ -91,7 +91,7 @@ fun previewMonth(month: YearMonth): MonthUi {
     return MonthUi(month, weeks.toList())
 }
 
-private fun previewEventOf(
+private fun mockPreviewEventOf(
     title: String,
     color: Color,
     status: EventStatus = EventStatus.Confirmed,

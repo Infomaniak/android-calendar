@@ -45,7 +45,7 @@ import com.infomaniak.calendar.components.month.layout.laneMetrics
 import com.infomaniak.calendar.components.month.layout.visibleEventsIn
 import com.infomaniak.calendar.components.month.model.MonthWeekUi
 import com.infomaniak.calendar.components.month.preview.previewFiveWeeksMonth
-import com.infomaniak.calendar.components.month.preview.previewMonth
+import com.infomaniak.calendar.components.month.preview.mockPreviewMonth
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.onDay
@@ -167,7 +167,7 @@ private fun PreviewRtl() {
 
 @Composable
 private fun PreviewWeekRow(weekIndex: Int, laneCount: Int) {
-    val month = previewMonth(previewFiveWeeksMonth)
+    val month = mockPreviewMonth(previewFiveWeeksMonth)
 
     MaterialTheme {
         Surface {

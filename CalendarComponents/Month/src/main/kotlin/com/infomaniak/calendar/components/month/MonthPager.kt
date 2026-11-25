@@ -34,7 +34,7 @@ import com.infomaniak.calendar.components.foundation.utils.FollowSelectedPage
 import com.infomaniak.calendar.components.month.component.MonthPage
 import com.infomaniak.calendar.components.month.model.MonthUi
 import com.infomaniak.calendar.components.month.preview.previewFiveWeeksMonth
-import com.infomaniak.calendar.components.month.preview.previewMonth
+import com.infomaniak.calendar.components.month.preview.mockPreviewMonth
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
@@ -107,7 +107,7 @@ private fun PreviewNotLoaded() {
 }
 
 @Composable
-private fun PreviewMonthPager(monthOf: (YearMonth) -> MonthUi? = ::previewMonth) {
+private fun PreviewMonthPager(monthOf: (YearMonth) -> MonthUi? = ::mockPreviewMonth) {
     MaterialTheme {
         Surface {
             MonthPager(
