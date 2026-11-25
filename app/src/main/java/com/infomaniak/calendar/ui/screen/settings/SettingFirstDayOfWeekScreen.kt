@@ -34,7 +34,7 @@ import kotlinx.datetime.DayOfWeek
 fun SettingFirstDayOfWeekScreen(
     goBack: (() -> Unit)?,
     modifier: Modifier = Modifier,
-    firstDayOfWeekViewModel: FirstDayOfWeekViewModel = viewModel(),
+    firstDayOfWeekViewModel: SettingFirstDayOfWeekViewModel = viewModel(),
 ) {
     val firstDayOfWeek by firstDayOfWeekViewModel.firstDayOfWeek.collectAsStateWithLifecycle()
 

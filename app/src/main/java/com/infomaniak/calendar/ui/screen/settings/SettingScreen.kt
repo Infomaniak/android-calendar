@@ -50,7 +50,7 @@ fun SettingScreen(
     goToFirstDayOfWeek: () -> Unit,
     modifier: Modifier = Modifier,
     settingThemeViewModel: SettingThemeViewModel = viewModel(),
-    firstDayOfWeekViewModel: FirstDayOfWeekViewModel = viewModel(),
+    firstDayOfWeekViewModel: SettingFirstDayOfWeekViewModel = viewModel(),
 ) {
     val theme by settingThemeViewModel.theme.collectAsStateWithLifecycle()
     val firstDayOfWeek by firstDayOfWeekViewModel.firstDayOfWeek.collectAsStateWithLifecycle()
