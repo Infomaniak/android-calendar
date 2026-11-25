@@ -29,12 +29,14 @@ import androidx.core.net.toUri
 import com.infomaniak.calendar.extensions.appGraph
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateRange
+import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.seconds
 
 class AlarmReceiver : BroadcastReceiver() {
@@ -74,9 +76,22 @@ class AlarmReceiver : BroadcastReceiver() {
             startInstantMs = getLongExtra(AlarmScheduler.EXTRA_EVENT_START_MS, 0L),
             endInstantMs = getLongExtra(AlarmScheduler.EXTRA_EVENT_END_MS, 0L),
             allDayDates = getAllDayDates(),
+            kMeetUrl = getKMeetUrl(context, occurrenceIdJson),
         )
         // Tagged with the full ID, as its hash code could be the same as another reminder's
         return (alarmId ?: occurrenceIdJson) to notification
+    }
+
+    /** Read when the reminder fires, as alarms only carry an event summary, which tells if it has a meet room, not its URL. */
+    private suspend fun Intent.getKMeetUrl(context: Context, occurrenceIdJson: String): String? {
+        if (!getBooleanExtra(AlarmScheduler.EXTRA_EVENT_HAS_MEET_ROOM, false)) return null
+        val occurrenceId = runCatching { Json.decodeFromString(OccurrenceId.serializer(), occurrenceIdJson) }.getOrNull()
+            ?: return null
+        return withTimeoutOrNull(KMEET_URL_TIMEOUT) {
+            runCatching { context.appGraph.calendarManager.getOccurrence(occurrenceId)?.meetRoomUrl }
+                .onFailure { exception -> SentryLog.e(TAG, "Failed to read a reminder's kMeet URL", exception) }
+                .getOrNull()
+        }
     }
 
     private fun Intent.getAllDayDates(): LocalDateRange? {
@@ -146,6 +161,7 @@ class AlarmReceiver : BroadcastReceiver() {
         private const val NOTIFICATION_ID = 0
         // Leaves the alarms sync most of the 10 s a broadcast receiver is given to finish
         private val CHANNEL_TIMEOUT = 1.seconds
+        private val KMEET_URL_TIMEOUT = 1.seconds
 
         private const val EXTRA_RETRY_COUNT = "com.infomaniak.calendar.EXTRA_RETRY_COUNT"
         private const val MAX_RETRIES = 3

@@ -55,6 +55,7 @@ object NotificationHelper {
         startInstantMs: Long,
         endInstantMs: Long,
         allDayDates: LocalDateRange?,
+        kMeetUrl: String?,
     ): Notification {
         val clickIntent = Intent(context, MainActivity::class.java).apply {
             action = Intent.ACTION_VIEW
@@ -75,7 +76,7 @@ object NotificationHelper {
         val contentText = if (!location.isNullOrBlank()) "$timeText • $location" else timeText
         val notificationTitle = title.ifBlank { context.getString(R.string.notificationDefaultEventTitle) }
 
-        return NotificationCompat.Builder(context, channelId)
+        val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(IconCompat.createWithBitmap(EsdsIcons.CalendarNumberOne.Medium.toBitmap(Density(context))))
             .setContentTitle(notificationTitle)
             .setContentText(contentText)
@@ -84,6 +85,21 @@ object NotificationHelper {
             .setAutoCancel(true)
             .setCategory(NotificationCompat.CATEGORY_EVENT)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+
+        kMeetUrl?.let { builder.addAction(createJoinKMeetAction(context, it)) }
+
+        return builder.build()
+    }
+
+    // Opens the meeting straight from the notification: a trampoline through a receiver can't start an activity since Android 12
+    private fun createJoinKMeetAction(context: Context, kMeetUrl: String): NotificationCompat.Action {
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            Intent(Intent.ACTION_VIEW, kMeetUrl.toUri()),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        return NotificationCompat.Action.Builder(null, context.getString(R.string.notificationActionJoinKMeet), pendingIntent)
             .build()
     }
 

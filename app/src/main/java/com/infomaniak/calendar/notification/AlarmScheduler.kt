@@ -159,6 +159,7 @@ class AlarmScheduler @Inject constructor(
         val endMs: Long,
         // Kept as dates: anchored in a time zone, they could be read as other days in another one
         val allDayDates: LocalDateRange?,
+        val hasMeetRoom: Boolean,
         // Granting exact alarm access back changes it for every alarm, so they all get registered again as exact ones
         val isExact: Boolean,
     )
@@ -245,6 +246,7 @@ class AlarmScheduler @Inject constructor(
                 putExtra(EXTRA_ALL_DAY_FIRST_DAY, it.start.toEpochDays())
                 putExtra(EXTRA_ALL_DAY_LAST_DAY, it.endInclusive.toEpochDays())
             }
+            putExtra(EXTRA_EVENT_HAS_MEET_ROOM, registration.hasMeetRoom)
         }
     }
 
@@ -269,6 +271,7 @@ class AlarmScheduler @Inject constructor(
         const val EXTRA_EVENT_END_MS = "com.infomaniak.calendar.EXTRA_EVENT_END_MS"
         const val EXTRA_ALL_DAY_FIRST_DAY = "com.infomaniak.calendar.EXTRA_ALL_DAY_FIRST_DAY"
         const val EXTRA_ALL_DAY_LAST_DAY = "com.infomaniak.calendar.EXTRA_ALL_DAY_LAST_DAY"
+        const val EXTRA_EVENT_HAS_MEET_ROOM = "com.infomaniak.calendar.EXTRA_EVENT_HAS_MEET_ROOM"
 
         private const val TAG = "AlarmScheduler"
         private val ALARM_HORIZON = 30.days
@@ -312,6 +315,7 @@ class AlarmScheduler @Inject constructor(
                 // An all-day event ends exclusively, at the start of the day following its last one
                 it.start..maxOf(it.start, it.end.minus(1, DateTimeUnit.DAY))
             },
+            hasMeetRoom = event.hasMeetRoom,
             isExact = isExact,
         )
     }

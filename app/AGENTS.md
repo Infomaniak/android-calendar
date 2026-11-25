@@ -196,7 +196,9 @@ app/
 - **Edge-to-edge**: Call `enableEdgeToEdge()` in `onCreate` before `setContent` (already wired in `MainActivity`).
 - **Event reminders**: `AlarmScheduler` (`AppScope` singleton, started from `MainApplication`) mirrors
   `CalendarManager.observeUpcomingAlarms` (device alarms only: `DISPLAY` / `AUDIO`, max 400 over 30 days) into exact
-  `AlarmManager` alarms. `AlarmReceiver` posts the notification (tap opens `EventDetail`), `BootReceiver` reschedules on
+  `AlarmManager` alarms. `AlarmReceiver` posts the notification (tap opens `EventDetail`; a "Join kMeet" action opens the
+  meeting when the event has a meet room, its URL read from `CalendarManager.getOccurrence` when it fires, capped at 1 s,
+  since `EventSummary` only carries `hasMeetRoom`), `BootReceiver` reschedules on
   boot, app update, time / time zone change and once exact alarm access is granted. The 30-day window doesn't follow the
   clock, so each refresh also sets an inexact, non-wakeup `ACTION_REFRESH_ALARMS` alarm one day later (handled by
   `AlarmReceiver`) to move it forward.

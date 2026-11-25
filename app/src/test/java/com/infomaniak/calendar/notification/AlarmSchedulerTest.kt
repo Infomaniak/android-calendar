@@ -194,6 +194,27 @@ class AlarmSchedulerTest {
     }
 
     @Test
+    fun `an alarm is registered again once its event gets a meet room`() {
+        val nowMs = 1_000_000L
+        val initialPlan = AlarmScheduler.computeAlarmSyncPlan(
+            upcomingAlarms = listOf(testAlarm(id = "alarm-1", firesAtMs = nowMs + 1000)),
+            previouslyScheduledIds = emptySet(),
+            registeredAlarms = emptyMap(),
+            nowMs = nowMs,
+        )
+
+        val plan = AlarmScheduler.computeAlarmSyncPlan(
+            upcomingAlarms = listOf(testAlarm(id = "alarm-1", firesAtMs = nowMs + 1000, hasMeetRoom = true)),
+            previouslyScheduledIds = initialPlan.wantedIds(),
+            registeredAlarms = initialPlan.registered(),
+            nowMs = nowMs,
+        )
+
+        assertTrue(plan.unchanged.isEmpty())
+        assertTrue(plan.toSchedule.single().hasMeetRoom)
+    }
+
+    @Test
     fun `every alarm is registered again once exact alarm access is granted`() {
         val nowMs = 1_000_000L
         val alarms = listOf(
@@ -274,6 +295,7 @@ class AlarmSchedulerTest {
         id: String,
         firesAtMs: Long,
         title: String = "Test Event $id",
+        hasMeetRoom: Boolean = false,
         bounds: EventBounds = EventBounds.Zoned(
             start = ZonedWallClock(LocalDateTime(2026, 9, 18, 10, 0), TimeZone.UTC),
             end = ZonedWallClock(LocalDateTime(2026, 9, 18, 11, 0), TimeZone.UTC),
@@ -288,7 +310,7 @@ class AlarmSchedulerTest {
             colors = EventColors.from(eventSourceColor = 0, calendarSourceColor = 0),
             timing = EventTiming(bounds = bounds),
             hasAttendees = false,
-            hasMeetRoom = false,
+            hasMeetRoom = hasMeetRoom,
             hasPlace = false,
             isBookable = false,
             isRecurring = false,
