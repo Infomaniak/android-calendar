@@ -49,6 +49,7 @@ import com.infomaniak.calendar.ui.model.TimelineUiState
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
+import com.infomaniak.calendar.ui.state.LocalWeekNumbering
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
@@ -121,7 +122,7 @@ private fun MultiDaysScreen(
                     ExpandableCalendar(
                         visibleDayState = visibleDayState,
                         expansionState = calendarExpansionState,
-                        weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
+                        weekNumbering = LocalWeekNumbering.current,
                         eventsDots = eventsDots,
                         collapsedContent = ExpandableCalendarDefaults.None,
                     )
@@ -130,7 +131,7 @@ private fun MultiDaysScreen(
         },
         modifier = modifier,
     ) { contentPadding ->
-        val weekNumbering = WeekNumbering.ISO_8601 //TODO[weekNumbering]: Use week numbering from LocalSettings
+        val weekNumbering = LocalWeekNumbering.current
         val isWeek = dayCount == DAYS_PER_WEEK
         // A week is swiped as a whole, so its pages have to start on the first day of a week.
         val dateRange = remember(isWeek, weekNumbering) {
@@ -165,7 +166,10 @@ private fun MultiDaysScreen(
 private fun Preview() {
     CalendarThemeForPreview {
         val visibleDayState = rememberVisibleDayState()
-        CompositionLocalProvider(LocalVisibleDayState provides visibleDayState) {
+        CompositionLocalProvider(
+            LocalVisibleDayState provides visibleDayState,
+            LocalWeekNumbering provides WeekNumbering.ISO_8601,
+        ) {
             MultiDaysScreen(
                 dayCount = 3,
                 goToEventDetail = {},

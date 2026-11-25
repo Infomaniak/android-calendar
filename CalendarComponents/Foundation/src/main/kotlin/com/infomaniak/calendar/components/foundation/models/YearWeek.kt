@@ -20,12 +20,13 @@ package com.infomaniak.calendar.components.foundation.models
 import android.os.Parcelable
 import androidx.compose.runtime.Immutable
 import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
+import kotlinx.datetime.toJavaDayOfWeek
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toKotlinLocalDate
 import kotlinx.parcelize.Parcelize
-import java.time.DayOfWeek
 import java.time.format.TextStyle
 import java.time.temporal.WeekFields
 import java.util.Locale
@@ -62,15 +63,12 @@ data class YearWeek(val firstDay: LocalDate, val weekNumber: Int) : Parcelable, 
 }
 
 /**
- * Describes how calendar weeks are numbered and which weekday a week starts on.
- *
- * Only supports ISO_8601 for now, but new week numbering can be instantiated by defining other [WeekFields] as needed.
- *
- * The Java [LocalDate] is needed to provide this [WeekFields] customization.
+ * Describes how calendar weeks are numbered: they start on [firstDayOfWeek], and week 1 is the first week with at least
+ * 4 of its days in the new year, as in ISO-8601.
  */
 @Immutable
-class WeekNumbering private constructor(internal val weekFields: WeekFields) {
-    val firstDayOfWeek: DayOfWeek by weekFields::firstDayOfWeek
+data class WeekNumbering(val firstDayOfWeek: DayOfWeek) {
+    private val weekFields = WeekFields.of(firstDayOfWeek.toJavaDayOfWeek(), ISO_MINIMAL_DAYS_IN_FIRST_WEEK)
 
     /** Returns the [YearWeek] that [date] belongs to under this numbering scheme. */
     fun weekOf(date: LocalDate): YearWeek {
@@ -91,10 +89,9 @@ class WeekNumbering private constructor(internal val weekFields: WeekFields) {
     }
 
     companion object {
-        /**
-         * ISO-8601 numbering: weeks start on Monday and week 1 is the first week with at least 4 of its
-         * days in the new year — i.e. the week containing the first Thursday of January.
-         */
-        val ISO_8601: WeekNumbering = WeekNumbering(WeekFields.ISO)
+        private const val ISO_MINIMAL_DAYS_IN_FIRST_WEEK = 4
+
+        /** ISO-8601 numbering: weeks start on Monday and week 1 is the week containing the first Thursday of January. */
+        val ISO_8601: WeekNumbering = WeekNumbering(DayOfWeek.MONDAY)
     }
 }

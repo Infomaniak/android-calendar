@@ -19,8 +19,8 @@ package com.infomaniak.calendar.ui.screen.month
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.month.model.MonthUi
+import com.infomaniak.calendar.data.SettingsDataValues
 import com.infomaniak.calendar.manager.SyncEventsManager
 import com.infomaniak.calendar.manager.VisibleMonthManager
 import com.infomaniak.calendar.ui.screen.month.pendingKmp.buildMonths
@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
@@ -46,7 +47,6 @@ import kotlinx.datetime.YearMonth
 import kotlinx.datetime.YearMonthRange
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.plus
-import kotlinx.datetime.toKotlinDayOfWeek
 import kotlin.time.Duration.Companion.seconds
 
 @Inject
@@ -54,6 +54,7 @@ import kotlin.time.Duration.Companion.seconds
 @ViewModelKey
 class MonthViewModel(
     private val calendarManager: CalendarManager,
+    private val settingsDataValues: SettingsDataValues,
     visibleMonthManager: VisibleMonthManager,
     syncEventsManager: SyncEventsManager,
 ) : ViewModel() {
@@ -70,13 +71,13 @@ class MonthViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeMonths(months: YearMonthRange): Flow<Map<YearMonth, MonthUi>> {
-        return calendarManager.observeDaySlices(
+        val daySlices = calendarManager.observeDaySlices(
             start = months.start.firstDay.atStartOfDayIn(timeZone),
             end = months.endInclusive.plus(1, DateTimeUnit.MONTH).firstDay.atStartOfDayIn(timeZone),
             timeZone = timeZone,
-        ).mapLatest { slicesByDate ->
-            // TODO[weekNumbering]: Follow the user's week numbering once it is a setting.
-            buildMonths(months, WeekNumbering.ISO_8601.firstDayOfWeek.toKotlinDayOfWeek(), slicesByDate.toEventsByDate(timeZone))
+        )
+        return combine(daySlices, settingsDataValues.firstDayOfWeek.flow, ::Pair).mapLatest { (slicesByDate, firstDayOfWeek) ->
+            buildMonths(months, firstDayOfWeek, slicesByDate.toEventsByDate(timeZone))
         }
     }
 }

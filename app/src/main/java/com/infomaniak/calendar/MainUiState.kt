@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar
 
+import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.model.settings.SettingThemeOption
 import com.infomaniak.calendar.ui.navigation.NavDestination
 
@@ -26,5 +27,6 @@ sealed interface MainUiState {
         val isUserConnected: Boolean,
         val lastCalendarView: NavDestination.CalendarView,
         val theme: SettingThemeOption,
+        val weekNumbering: WeekNumbering,
     ) : MainUiState
 }

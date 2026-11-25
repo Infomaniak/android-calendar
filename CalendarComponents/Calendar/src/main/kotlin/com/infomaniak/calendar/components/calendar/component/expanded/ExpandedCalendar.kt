@@ -22,6 +22,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -47,7 +48,6 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlinx.datetime.toKotlinDayOfWeek
 import kotlinx.datetime.yearMonth
 import kotlin.time.Clock
 
@@ -66,14 +66,17 @@ internal fun ExpandedCalendar(
     headerState: CalendarHeaderState = rememberCalendarHeaderState(),
     notMonthFraction: () -> Float = { 1f },
 ) {
-    val firstDayOfWeek = remember { weekNumbering.firstDayOfWeek.toKotlinDayOfWeek() }
-    val initialMonth = remember { selectedDate().yearMonth }
-    val monthState = rememberCalendarState(
-        startMonth = remember { initialMonth.minus(INITIAL_MARGINS * monthMargin, DateTimeUnit.MONTH) },
-        endMonth = remember { initialMonth.plus(INITIAL_MARGINS * monthMargin, DateTimeUnit.MONTH) },
-        firstVisibleMonth = initialMonth,
-        firstDayOfWeek = firstDayOfWeek,
-    )
+    val firstDayOfWeek = weekNumbering.firstDayOfWeek
+    // Creates a new state for each first day of week: a restored state keeps the first day of week it was saved with.
+    val monthState = key(firstDayOfWeek) {
+        val initialMonth = remember { selectedDate().yearMonth }
+        rememberCalendarState(
+            startMonth = remember { initialMonth.minus(INITIAL_MARGINS * monthMargin, DateTimeUnit.MONTH) },
+            endMonth = remember { initialMonth.plus(INITIAL_MARGINS * monthMargin, DateTimeUnit.MONTH) },
+            firstVisibleMonth = initialMonth,
+            firstDayOfWeek = firstDayOfWeek,
+        )
+    }
     val pager = rememberMonthPager(state = monthState, monthMargin = monthMargin)
 
     val today by rememberToday()

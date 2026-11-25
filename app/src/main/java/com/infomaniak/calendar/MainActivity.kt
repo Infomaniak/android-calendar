@@ -64,6 +64,7 @@ import com.infomaniak.calendar.ui.navigation.state.LocalToolbarScrollableState
 import com.infomaniak.calendar.ui.navigation.state.rememberCustomSnackbarHostState
 import com.infomaniak.calendar.ui.navigation.state.rememberToolbarScrollableState
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
+import com.infomaniak.calendar.ui.state.LocalWeekNumbering
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -200,6 +201,7 @@ private fun MainContent(
                 LocalToolbarScrollableState provides rememberToolbarScrollableState(),
                 LocalDrawerState provides rememberDrawerState(initialValue = DrawerValue.Closed),
                 LocalAvatarFinder provides avatarFinder,
+                LocalWeekNumbering provides uiState.weekNumbering,
             ) {
                 ObserveSyncError(loadingEventsError)
                 ObserveSaveEventError(savingEventError)
