@@ -52,6 +52,7 @@ object NotificationHelper {
         occurrenceIdJson: String,
         title: String,
         location: String?,
+        mapsQuery: String?,
         startInstantMs: Long,
         endInstantMs: Long,
         allDayDates: LocalDateRange?,
@@ -87,6 +88,7 @@ object NotificationHelper {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
 
         kMeetUrl?.let { builder.addAction(createJoinKMeetAction(context, it)) }
+        mapsQuery?.let { builder.addAction(createOpenMapAction(context, it)) }
 
         return builder.build()
     }
@@ -101,6 +103,17 @@ object NotificationHelper {
         )
         return NotificationCompat.Action.Builder(null, context.getString(RComponents.string.participateKMeetTitle), pendingIntent)
             .build()
+    }
+
+    // Opens the maps app straight from the notification: a trampoline through a receiver can't start an activity since Android 12
+    private fun createOpenMapAction(context: Context, mapsQuery: String): NotificationCompat.Action {
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            Intent(Intent.ACTION_VIEW, "geo:0,0?q=${Uri.encode(mapsQuery)}".toUri()),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        return NotificationCompat.Action.Builder(null, context.getString(R.string.notificationActionOpenMap), pendingIntent).build()
     }
 
     private fun formatTimingText(

@@ -36,6 +36,7 @@
     <string name="generalSettingsNotificationsLabel">Benachrichtigungen</string>
     <string name="monthTitle">Monat</string>
     <string name="noWritableCalendar">Kein bearbeitbarer Kalender gefunden</string>
+    <string name="notificationActionOpenMap">Karte öffnen</string>
     <string name="notificationChannelEventRemindersDescription">Benachrichtigungen für bevorstehende Anlässe und Erinnerungen</string>
     <string name="notificationChannelEventRemindersTitle">Event-Erinnerungen</string>
     <string name="notificationDefaultDescription">Ereignisalarm</string>

@@ -36,6 +36,7 @@
     <string name="generalSettingsNotificationsLabel">Meldingen</string>
     <string name="monthTitle">Maand</string>
     <string name="noWritableCalendar">Geen bewerkbare kalender gevonden</string>
+    <string name="notificationActionOpenMap">Kaart openen</string>
     <string name="notificationChannelEventRemindersDescription">Meldingen voor aankomende evenementen en herinneringen</string>
     <string name="notificationChannelEventRemindersTitle">Herinneringen aan evenementen</string>
     <string name="notificationDefaultDescription">Gebeurteniswaarschuwing</string>

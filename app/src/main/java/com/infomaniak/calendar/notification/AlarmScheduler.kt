@@ -25,9 +25,12 @@ import android.os.Build
 import android.util.Log
 import androidx.core.content.getSystemService
 import com.infomaniak.calendar.data.CalendarDataValues
+import com.infomaniak.calendar.utils.toLocationUi
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventBounds
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventSummary
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.Location
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.alarm.UpcomingAlarm
 import com.infomaniak.multiplatform_calendar.core.managers.CalendarManager
@@ -155,6 +158,8 @@ class AlarmScheduler @Inject constructor(
         val calendarIdUrl: String,
         val title: String,
         val location: String?,
+        /** What the notification's maps action searches. */
+        val mapsQuery: String?,
         val startMs: Long,
         val endMs: Long,
         // Kept as dates: anchored in a time zone, they could be read as other days in another one
@@ -240,6 +245,7 @@ class AlarmScheduler @Inject constructor(
             putExtra(EXTRA_CALENDAR_ID, registration.calendarIdUrl)
             putExtra(EXTRA_EVENT_TITLE, registration.title)
             putExtra(EXTRA_EVENT_LOCATION, registration.location)
+            putExtra(EXTRA_EVENT_MAPS_QUERY, registration.mapsQuery)
             putExtra(EXTRA_EVENT_START_MS, registration.startMs)
             putExtra(EXTRA_EVENT_END_MS, registration.endMs)
             registration.allDayDates?.let {
@@ -267,6 +273,7 @@ class AlarmScheduler @Inject constructor(
         const val EXTRA_CALENDAR_ID = "com.infomaniak.calendar.EXTRA_CALENDAR_ID"
         const val EXTRA_EVENT_TITLE = "com.infomaniak.calendar.EXTRA_EVENT_TITLE"
         const val EXTRA_EVENT_LOCATION = "com.infomaniak.calendar.EXTRA_EVENT_LOCATION"
+        const val EXTRA_EVENT_MAPS_QUERY = "com.infomaniak.calendar.EXTRA_EVENT_MAPS_QUERY"
         const val EXTRA_EVENT_START_MS = "com.infomaniak.calendar.EXTRA_EVENT_START_MS"
         const val EXTRA_EVENT_END_MS = "com.infomaniak.calendar.EXTRA_EVENT_END_MS"
         const val EXTRA_ALL_DAY_FIRST_DAY = "com.infomaniak.calendar.EXTRA_ALL_DAY_FIRST_DAY"
@@ -309,6 +316,7 @@ class AlarmScheduler @Inject constructor(
             calendarIdUrl = event.calendarId.url,
             title = event.title,
             location = event.location,
+            mapsQuery = event.mapsQuery(),
             startMs = event.timing.startInstant(timeZone).toEpochMilliseconds(),
             endMs = event.timing.endInstant(timeZone).toEpochMilliseconds(),
             allDayDates = (event.timing.bounds as? EventBounds.AllDay)?.let {
@@ -318,5 +326,11 @@ class AlarmScheduler @Inject constructor(
             hasMeetRoom = event.hasMeetRoom,
             isExact = isExact,
         )
+
+        /** Searched as the event detail does, only for a place: a bookable room isn't found by its name. */
+        private fun EventSummary.mapsQuery(): String? {
+            val place = location?.takeIf { hasPlace && it.isNotBlank() } ?: return null
+            return Location.Place(place).toLocationUi()?.mapsQuery
+        }
     }
 }

@@ -36,6 +36,7 @@
     <string name="generalSettingsNotificationsLabel">Ειδοποιήσεις</string>
     <string name="monthTitle">Μήνας</string>
     <string name="noWritableCalendar">Δεν βρέθηκε επεξεργάσιμο ημερολόγιο</string>
+    <string name="notificationActionOpenMap">Άνοιγμα χάρτη</string>
     <string name="notificationChannelEventRemindersDescription">Ειδοποιήσεις για επερχόμενες εκδηλώσεις και υπενθυμίσεις</string>
     <string name="notificationChannelEventRemindersTitle">Υπενθυμίσεις εκδηλώσεων</string>
     <string name="notificationDefaultDescription">Συναγερμός συμβάντος</string>

@@ -73,6 +73,7 @@ class AlarmReceiver : BroadcastReceiver() {
             occurrenceIdJson = occurrenceIdJson,
             title = getStringExtra(AlarmScheduler.EXTRA_EVENT_TITLE).orEmpty(),
             location = getStringExtra(AlarmScheduler.EXTRA_EVENT_LOCATION),
+            mapsQuery = getStringExtra(AlarmScheduler.EXTRA_EVENT_MAPS_QUERY),
             startInstantMs = getLongExtra(AlarmScheduler.EXTRA_EVENT_START_MS, 0L),
             endInstantMs = getLongExtra(AlarmScheduler.EXTRA_EVENT_END_MS, 0L),
             allDayDates = getAllDayDates(),

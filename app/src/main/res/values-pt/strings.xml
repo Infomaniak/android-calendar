@@ -36,6 +36,7 @@
     <string name="generalSettingsNotificationsLabel">Notificações</string>
     <string name="monthTitle">Mês</string>
     <string name="noWritableCalendar">Não foi encontrado nenhum calendário editável</string>
+    <string name="notificationActionOpenMap">Abrir mapa</string>
     <string name="notificationChannelEventRemindersDescription">Notificações de próximos eventos e lembretes</string>
     <string name="notificationChannelEventRemindersTitle">Lembretes de eventos</string>
     <string name="notificationDefaultDescription">Alarme de evento</string>

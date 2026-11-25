@@ -36,6 +36,7 @@
     <string name="generalSettingsNotificationsLabel">Ilmoitukset</string>
     <string name="monthTitle">Kuukausi</string>
     <string name="noWritableCalendar">Muokattavaa kalenteria ei löytynyt</string>
+    <string name="notificationActionOpenMap">Avaa kartta</string>
     <string name="notificationChannelEventRemindersDescription">Ilmoitukset tulevista tapahtumista ja muistutuksista</string>
     <string name="notificationChannelEventRemindersTitle">Tapahtumamuistutukset</string>
     <string name="notificationDefaultDescription">Tapahtumahälytys</string>

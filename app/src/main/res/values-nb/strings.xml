@@ -36,6 +36,7 @@
     <string name="generalSettingsNotificationsLabel">Varsler</string>
     <string name="monthTitle">Måned</string>
     <string name="noWritableCalendar">Ingen redigerbar kalender funnet</string>
+    <string name="notificationActionOpenMap">Åpne kart</string>
     <string name="notificationChannelEventRemindersDescription">Varsler om kommende arrangementer og påminnelser</string>
     <string name="notificationChannelEventRemindersTitle">Hendelsespåminnelser</string>
     <string name="notificationDefaultDescription">Hendelsesvarsel</string>
