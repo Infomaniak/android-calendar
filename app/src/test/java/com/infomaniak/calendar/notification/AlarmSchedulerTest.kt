@@ -194,6 +194,44 @@ class AlarmSchedulerTest {
     }
 
     @Test
+    fun `an alarm is registered again once its event gets a meet room`() {
+        val nowMs = 1_000_000L
+        val initialPlan = AlarmScheduler.computeAlarmSyncPlan(
+            upcomingAlarms = listOf(testAlarm(id = "alarm-1", firesAtMs = nowMs + 1000)),
+            previouslyScheduledIds = emptySet(),
+            registeredAlarms = emptyMap(),
+            nowMs = nowMs,
+        )
+
+        val plan = AlarmScheduler.computeAlarmSyncPlan(
+            upcomingAlarms = listOf(testAlarm(id = "alarm-1", firesAtMs = nowMs + 1000, hasMeetRoom = true)),
+            previouslyScheduledIds = initialPlan.wantedIds(),
+            registeredAlarms = initialPlan.registered(),
+            nowMs = nowMs,
+        )
+
+        assertTrue(plan.unchanged.isEmpty())
+        assertTrue(plan.toSchedule.single().hasMeetRoom)
+    }
+
+    @Test
+    fun `only a place gets searched in maps, by its address when it has one`() {
+        val nowMs = 1_000_000L
+        val plan = AlarmScheduler.computeAlarmSyncPlan(
+            upcomingAlarms = listOf(
+                testAlarm(id = "address", firesAtMs = nowMs + 1000, location = "Office\nRue Eugène-Marziano 25", hasPlace = true),
+                testAlarm(id = "name", firesAtMs = nowMs + 2000, location = "Office", hasPlace = true),
+                testAlarm(id = "room", firesAtMs = nowMs + 3000, location = "Meeting room", hasPlace = false),
+            ),
+            previouslyScheduledIds = emptySet(),
+            registeredAlarms = emptyMap(),
+            nowMs = nowMs,
+        )
+
+        assertEquals(listOf("Rue Eugène-Marziano 25", "Office", null), plan.toSchedule.map { it.mapsQuery })
+    }
+
+    @Test
     fun `every alarm is registered again once exact alarm access is granted`() {
         val nowMs = 1_000_000L
         val alarms = listOf(
@@ -274,6 +312,9 @@ class AlarmSchedulerTest {
         id: String,
         firesAtMs: Long,
         title: String = "Test Event $id",
+        hasMeetRoom: Boolean = false,
+        location: String? = null,
+        hasPlace: Boolean = false,
         bounds: EventBounds = EventBounds.Zoned(
             start = ZonedWallClock(LocalDateTime(2026, 9, 18, 10, 0), TimeZone.UTC),
             end = ZonedWallClock(LocalDateTime(2026, 9, 18, 11, 0), TimeZone.UTC),
@@ -283,13 +324,13 @@ class AlarmSchedulerTest {
             occurrenceId = OccurrenceId.Master(EventId("event://$id")),
             calendarId = CalendarId("calendar://main"),
             title = title,
-            location = null,
+            location = location,
             status = null,
             colors = EventColors.from(eventSourceColor = 0, calendarSourceColor = 0),
             timing = EventTiming(bounds = bounds),
             hasAttendees = false,
-            hasMeetRoom = false,
-            hasPlace = false,
+            hasMeetRoom = hasMeetRoom,
+            hasPlace = hasPlace,
             isBookable = false,
             isRecurring = false,
             myStatus = null,

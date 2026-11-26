@@ -98,7 +98,7 @@ internal fun Day(
             ) { onClick() }
             .clearAndSetSemantics {
                 contentDescription = dayDescription
-                selected = dateState == DateState.Selected
+                selected = dateState == DateState.Selected || dateState == DateState.SelectedNotToday
                 stateDescriptionToday?.let { stateDescription = it }
             }
             .padding(EsdsTheme.spacing.xs),
@@ -142,7 +142,7 @@ private fun DayCircleContent(
         modifier = modifier
             .fillMaxHeight()
             .then(
-                if (dateState == DateState.Selected || dateState == DateState.Today) {
+                if (dateState == DateState.Selected || dateState == DateState.SelectedNotToday || dateState == DateState.Today) {
                     Modifier.aspectRatio(1f, matchHeightConstraintsFirst = true)
                 } else {
                     Modifier

@@ -126,10 +126,13 @@ private fun DayContent(
 ) {
     val dateState by remember(day) {
         derivedStateOf {
+            val isSelected = day.date == selectedDate()
+            val isToday = day.date == today()
             when {
                 day.position != DayPosition.MonthDate -> DateState.NotMonth
-                day.date == selectedDate() -> DateState.Selected
-                day.date == today() -> DateState.Today
+                isSelected && isToday -> DateState.Selected
+                isSelected -> DateState.SelectedNotToday
+                isToday -> DateState.Today
                 else -> DateState.None
             }
         }
