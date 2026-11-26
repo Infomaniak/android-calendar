@@ -23,6 +23,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.node.LayoutAwareModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.platform.InspectorInfo
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 
@@ -46,6 +47,13 @@ private data class EventDropTargetElement(
 ) : ModifierNodeElement<EventDropTargetNode>() {
     override fun create() = EventDropTargetNode(state, date, timeAt)
     override fun update(node: EventDropTargetNode) = node.update(state, date, timeAt)
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "eventDropTarget"
+        properties["state"] = state
+        properties["date"] = date
+        properties["timeAt"] = timeAt
+    }
 }
 
 internal class EventDropTargetNode(

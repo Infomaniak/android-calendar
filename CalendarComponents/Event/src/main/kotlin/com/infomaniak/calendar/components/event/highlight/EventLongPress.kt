@@ -33,10 +33,11 @@ import androidx.compose.ui.node.currentValueOf
 import androidx.compose.ui.node.findNearestAncestor
 import androidx.compose.ui.node.requireLayoutCoordinates
 import androidx.compose.ui.node.requireLayoutDirection
+import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 
 /** How far the finger pulls the held card before it comes loose and can be dropped elsewhere. */
@@ -72,6 +73,15 @@ private data class LongPressHighlightElement(
 ) : ModifierNodeElement<LongPressHighlightNode>() {
     override fun create() = LongPressHighlightNode(state, event, key, draggedCardPlacement, draggedCard)
     override fun update(node: LongPressHighlightNode) = node.update(state, event, key, draggedCardPlacement, draggedCard)
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "highlightOnLongPress"
+        properties["state"] = state
+        properties["event"] = event
+        properties["key"] = key
+        properties["draggedCardPlacement"] = draggedCardPlacement
+        properties["draggedCard"] = draggedCard
+    }
 }
 
 private class LongPressHighlightNode(

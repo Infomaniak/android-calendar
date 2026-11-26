@@ -46,9 +46,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -56,7 +53,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.component.CurrentTimeIndicator
 import com.infomaniak.calendar.components.day.component.DayColumnHeader
@@ -84,7 +80,6 @@ import com.infomaniak.calendar.components.event.highlight.releaseHighlightOnSeco
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
-import com.infomaniak.calendar.components.foundation.theme.ComponentColors
 import com.infomaniak.calendar.components.foundation.utils.FollowSelectedPage
 import com.infomaniak.calendar.components.foundation.utils.HorizontalGridLine
 import com.infomaniak.calendar.components.foundation.utils.onlyHorizontalAndTop

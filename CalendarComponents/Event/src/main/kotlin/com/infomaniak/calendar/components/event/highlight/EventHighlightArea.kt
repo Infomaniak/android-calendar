@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.TraversableNode
+import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 
@@ -37,6 +38,11 @@ private data class EventHighlightAreaElement(val padding: PaddingValues) : Modif
     override fun create() = EventHighlightAreaNode(padding)
     override fun update(node: EventHighlightAreaNode) {
         node.padding = padding
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "eventHighlightArea"
+        properties["padding"] = padding
     }
 }
 
