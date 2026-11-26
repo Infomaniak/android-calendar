@@ -34,17 +34,21 @@ import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatF
 import com.infomaniak.calendar.model.settings.SettingThemeOption
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemClickable
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemOpen
+import com.infomaniak.calendar.ui.screen.settings.components.SettingItemSwitch
 import com.infomaniak.calendar.ui.screen.settings.components.SettingScaffold
 import com.infomaniak.calendar.ui.screen.settings.components.SettingSection
 import com.infomaniak.calendar.ui.screen.settings.components.SettingShape
+import com.infomaniak.calendar.ui.screen.settings.components.SwitchType
 import com.infomaniak.calendar.ui.screen.settings.defaultEventDuration.SettingDefaultEventDurationViewModel
 import com.infomaniak.calendar.ui.screen.settings.firstDayOfWeek.SettingFirstDayOfWeekViewModel
 import com.infomaniak.calendar.ui.screen.settings.theme.SettingThemeViewModel
+import com.infomaniak.calendar.ui.screen.settings.timezone.SettingTimeZoneViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Bell
 import com.infomaniak.designsystem.icons.symbols.BubbleTopRightCircle
 import com.infomaniak.designsystem.icons.symbols.CalendarDots
+import com.infomaniak.designsystem.icons.symbols.Globe
 import kotlinx.datetime.DayOfWeek
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -60,19 +64,23 @@ fun SettingScreen(
     settingThemeViewModel: SettingThemeViewModel = viewModel(),
     firstDayOfWeekViewModel: SettingFirstDayOfWeekViewModel = viewModel(),
     defaultEventDurationViewModel: SettingDefaultEventDurationViewModel = viewModel(),
+    settingTimeZoneViewModel: SettingTimeZoneViewModel = viewModel(),
 ) {
     val theme by settingThemeViewModel.theme.collectAsStateWithLifecycle()
     val firstDayOfWeek by firstDayOfWeekViewModel.firstDayOfWeek.collectAsStateWithLifecycle()
     val defaultEventDuration by defaultEventDurationViewModel.defaultEventDuration.collectAsStateWithLifecycle()
+    val isTimeZoneChecked by settingTimeZoneViewModel.isCustomTimeZoneEnabled.collectAsStateWithLifecycle()
 
     SettingContent(
         theme = { theme },
         firstDayOfWeek = { firstDayOfWeek },
         defaultEventDuration = { defaultEventDuration },
+        isTimeZoneChecked = { isTimeZoneChecked },
         goBack = goBack,
         goToTheme = goToTheme,
         goToFirstDayOfWeek = goToFirstDayOfWeek,
         goToDefaultEventDuration = goToDefaultEventDuration,
+        onTimeZonCheckedChange = { settingTimeZoneViewModel.setIsCustomTimeZoneEnabled(it) },
         modifier = modifier,
     )
 }
@@ -82,10 +90,12 @@ private fun SettingContent(
     theme: () -> SettingThemeOption?,
     firstDayOfWeek: () -> DayOfWeek?,
     defaultEventDuration: () -> Duration?,
+    isTimeZoneChecked: () -> Boolean,
     goBack: () -> Unit,
     goToTheme: () -> Unit,
     goToFirstDayOfWeek: () -> Unit,
     goToDefaultEventDuration: () -> Unit,
+    onTimeZonCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -110,11 +120,19 @@ private fun SettingContent(
 
         SettingSection(title = stringResource(R.string.generalSettingsEventLabel)) {
             SettingItemClickable(
-                shapes = SettingShape.Single,
+                shapes = SettingShape.First,
                 text = stringResource(R.string.generalSettingsDefaultEventDurationLabel),
                 onClick = goToDefaultEventDuration,
                 symbol = EsdsIcons.BubbleTopRightCircle,
                 supportingText = defaultEventDuration()?.formatDuration(),
+            )
+            SettingItemSwitch(
+                shapes = SettingShape.Last,
+                text = stringResource(R.string.generalSettingsUseDeviceTimeZoneLabel),
+                checked = isTimeZoneChecked,
+                onCheckedChange = onTimeZonCheckedChange,
+                symbol = EsdsIcons.Globe,
+                switchType = SwitchType.Switch,
             )
         }
 
@@ -143,10 +161,12 @@ private fun SettingScreenPreview() {
             theme = { SettingThemeOption.System },
             firstDayOfWeek = { DayOfWeek.MONDAY },
             defaultEventDuration = { 1.hours },
+            isTimeZoneChecked = { true },
             goBack = {},
             goToTheme = {},
             goToFirstDayOfWeek = {},
             goToDefaultEventDuration = {},
+            onTimeZonCheckedChange = {},
         )
     }
 }

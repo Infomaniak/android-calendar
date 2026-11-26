@@ -37,6 +37,7 @@
     <string name="generalSettingsEventLabel">Évènement</string>
     <string name="generalSettingsNotificationsLabel">Notifications</string>
     <string name="generalSettingsStartOfWeekLabel">Début de la semaine</string>
+    <string name="generalSettingsUseDeviceTimeZoneLabel">Fuseau horaire automatique</string>
     <string name="monthTitle">Mois</string>
     <string name="noWritableCalendar">Aucun calendrier modifiable trouvé</string>
     <string name="notificationActionOpenMap">Ouvrir le plan</string>

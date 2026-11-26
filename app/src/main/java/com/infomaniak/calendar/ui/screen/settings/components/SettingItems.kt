@@ -31,6 +31,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.CustomColors
@@ -94,23 +95,22 @@ fun SettingItemSwitch(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     symbol: Symbol? = null,
-    trailingSwitch: SwitchType = SwitchType.Check,
+    switchType: SwitchType = SwitchType.Check,
     supportingText: String? = null,
     enabled: () -> Boolean = { true },
-    colors: ListItemColors = SettingItemsDefault.colors(),
 ) {
     val isChecked = checked()
 
     SegmentedListItem(
         checked = isChecked,
         onCheckedChange = onCheckedChange,
-        shapes = shapes,
+        shapes = switchType.shapeOf(shapes),
         modifier = modifier,
         enabled = enabled(),
         leadingContent = symbol?.let { { SettingIcon(it) } },
-        trailingContent = { trailingSwitch.content(isChecked)?.invoke() },
+        trailingContent = { switchType.content(isChecked)?.invoke() },
         supportingContent = supportingText?.let { { Text(it) } },
-        colors = colors,
+        colors = switchType.colors(),
         content = { Text(text) },
     )
 }
@@ -142,14 +142,28 @@ private fun SettingItem(
 
 object SettingItemsDefault {
     @Composable
-    fun colors(): ListItemColors {
-        return ListItemDefaults.segmentedColors(containerColor = CustomColors.SettingItemContainerColor)
-    }
+    fun colors(selectedContainerColor: Color = Color.Unspecified): ListItemColors = ListItemDefaults.segmentedColors(
+        containerColor = CustomColors.SettingItemContainerColor,
+        selectedContainerColor = selectedContainerColor,
+        selectedContentColor = MaterialTheme.colorScheme.onSurface,
+    )
 }
 
-enum class SwitchType(val content: ((isChecked: Boolean) -> @Composable (() -> Unit)?)) {
-    Switch(content = { checked -> { Switch(checked, null) } }),
-    Check(content = { checked -> if (checked) ({ SettingIcon(EsdsIcons.Check) }) else null }),
+enum class SwitchType(
+    val content: ((isChecked: Boolean) -> @Composable (() -> Unit)?),
+    val shapeOf: (ListItemShapes) -> ListItemShapes,
+    val colors: @Composable () -> ListItemColors,
+) {
+    Switch(
+        content = { checked -> { Switch(checked, null) } },
+        shapeOf = { it.copy(selectedShape = it.shape) },
+        colors = { SettingItemsDefault.colors(selectedContainerColor = CustomColors.SettingItemContainerColor) },
+    ),
+    Check(
+        content = { checked -> if (checked) ({ SettingIcon(EsdsIcons.Check) }) else null },
+        shapeOf = { it },
+        colors = { ListItemDefaults.segmentedColors() },
+    ),
 }
 
 object SettingShape {
@@ -184,7 +198,7 @@ private fun SettingSectionPreview() {
             text = "Switch",
             checked = { true },
             onCheckedChange = {},
-            trailingSwitch = SwitchType.Switch,
+            switchType = SwitchType.Switch,
         )
         SettingItemOpen(shapes = SettingShape.Last, text = "Open", onClick = {})
     }
@@ -226,7 +240,7 @@ private fun SettingItemSwitchPreview() {
             onCheckedChange = {},
             supportingText = "Supporting text",
             symbol = EsdsIcons.Cog,
-            trailingSwitch = SwitchType.Switch,
+            switchType = SwitchType.Switch,
         )
         SettingItemSwitch(
             shapes = SettingShape.Last,

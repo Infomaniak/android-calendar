@@ -37,6 +37,7 @@
     <string name="generalSettingsEventLabel">Tapahtuma</string>
     <string name="generalSettingsNotificationsLabel">Ilmoitukset</string>
     <string name="generalSettingsStartOfWeekLabel">Viikon aloituspäivä</string>
+    <string name="generalSettingsUseDeviceTimeZoneLabel">Automaattinen aikavyöhyke</string>
     <string name="monthTitle">Kuukausi</string>
     <string name="noWritableCalendar">Muokattavaa kalenteria ei löytynyt</string>
     <string name="notificationActionOpenMap">Avaa kartta</string>

@@ -37,6 +37,7 @@
     <string name="generalSettingsEventLabel">Händelse</string>
     <string name="generalSettingsNotificationsLabel">Aviseringar</string>
     <string name="generalSettingsStartOfWeekLabel">Veckans början</string>
+    <string name="generalSettingsUseDeviceTimeZoneLabel">Automatisk tidszon</string>
     <string name="monthTitle">Månad</string>
     <string name="noWritableCalendar">Ingen redigerbar kalender hittades</string>
     <string name="notificationActionOpenMap">Öppna karta</string>
