@@ -27,7 +27,7 @@ import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
  * An event held up by a long press on the card [key] identifies. The card grows from where it sat, [startBounds], to
  * the whole width of [areaBounds], opening near the finger, [fingerY]. All of them are in the coordinates of the
  * overlay drawing it. Dragged, it is drawn by [draggedCard], the way it looks where it sat, in [draggedBounds] while
- * the finger is where it pressed.
+ * the finger is where it pressed, then back in [startBounds] once dropped.
  */
 @Immutable
 internal data class EventHighlight(

@@ -31,6 +31,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import kotlinx.coroutines.CoroutineScope
@@ -95,6 +96,13 @@ class EventHighlightState internal constructor(
     private val dragOffsetAnimatable = Animatable(Offset.Zero, Offset.VectorConverter)
     internal val dragOffset: Offset get() = dragOffsetAnimatable.value
 
+    private val returningFromState = mutableStateOf<Rect?>(null)
+    /** Where a dropped card was let go, while it goes back to its place, [startBounds][EventHighlight.startBounds]. */
+    internal val returningFrom: Rect? by returningFromState
+
+    private val returnAnimatable = Animatable(0f)
+    internal val returnProgress: Float get() = returnAnimatable.value
+
     private var fingerTarget = Offset.Zero
     // Snaps the offset every frame, so it is cancelled by hand before any other animation of the offset.
     private var fingerFollowing: Job? = null
@@ -114,6 +122,8 @@ class EventHighlightState internal constructor(
             progressAnimatable.animateTo(1f, highlightSpring)
         }
         scope.launch { dragOffsetAnimatable.snapTo(Offset.Zero) }
+        returningFromState.value = null
+        scope.launch { returnAnimatable.snapTo(0f) }
     }
 
     /** The finger moved by [delta] from where it pressed, while the card is still unfolded. */
@@ -153,13 +163,20 @@ class EventHighlightState internal constructor(
         isHeldState.value = false
 
         fingerFollowing?.cancel()
-        // A dragged card is placed apart from where it sat: it is moved back there.
-        val place = highlight?.takeIf { isDragging }?.let { it.startBounds.topLeft - it.draggedBounds.topLeft } ?: Offset.Zero
+        // A dragged card goes back to where it sat, growing back to its own size and content.
+        val returningFrom = highlight?.takeIf { isDragging }?.draggedBounds?.translate(dragOffset)
+        returningFromState.value = returningFrom
+        isDraggingState.value = false
         scope.launch {
-            val goingBack = launch { dragOffsetAnimatable.animateTo(place, highlightOffsetSpring) }
+            val goingBack = launch {
+                returnAnimatable.snapTo(0f)
+                if (returningFrom != null) returnAnimatable.animateTo(1f, highlightSpring)
+            }
             progressAnimatable.animateTo(0f, highlightSpring)
             goingBack.join()
-            isDraggingState.value = false
+            // Pressed again meanwhile, the card is held anew.
+            if (isHeld) return@launch
+            returningFromState.value = null
             highlightState.value = null
         }
     }
@@ -217,6 +234,5 @@ class EventHighlightState internal constructor(
         const val BOUNCE_STIFFNESS = Spring.StiffnessMedium
         val bounceDamping = 2f * BOUNCE_DAMPING_RATIO * sqrt(BOUNCE_STIFFNESS)
         val highlightSpring = spring<Float>(dampingRatio = HIGHLIGHT_DAMPING_RATIO, stiffness = Spring.StiffnessMediumLow)
-        val highlightOffsetSpring = spring<Offset>(dampingRatio = HIGHLIGHT_DAMPING_RATIO, stiffness = Spring.StiffnessMediumLow)
     }
 }

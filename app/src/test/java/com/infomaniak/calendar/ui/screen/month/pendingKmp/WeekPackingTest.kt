@@ -27,6 +27,7 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
+import kotlinx.datetime.atTime
 import kotlinx.datetime.plus
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -129,6 +130,8 @@ class WeekPackingTest {
         colors = EventColorsUi(0, 0, 0, ThemedColorUi(0, 0), 0, ThemedColorUi(0, 0)),
         hasAttendees = false,
         myStatus = null,
+        eventStart = date.atTime(0, 0),
+        eventEnd = date.atTime(0, 0),
     )
 
     private fun march(vararg days: Int) = days.map { LocalDate(2027, 3, it) }

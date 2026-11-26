@@ -29,8 +29,8 @@ private const val DRAGGED_TRACE_ALPHA = 0.35f
  * Once dragged, only a trace is left of every card showing the same event: the whole event moves with it.
  *
  * [key] tells this card apart from the others showing the same event, like the slices of an event over several days.
- * [draggedCard] draws the card while it is dragged, where [draggedCardPlacement] puts it: the Planning's event item
- * when not given.
+ * [draggedCard] draws the card while it is dragged, where [draggedCardPlacement] puts it, then while it goes back to
+ * its place once dropped, [EventHighlightState.isDragging] no longer set: the Planning's event item when not given.
  */
 fun Modifier.highlightable(
     state: EventHighlightState,

@@ -57,7 +57,8 @@ private val FingerClearance = 24.dp
  * way the Planning writes an event. It opens just above the finger so the finger doesn't hide it, or just
  * below when there is no room above, and always fully inside the area, out of the [contentPadding]
  * where bars may be drawn over the overlay. Pulled or dragged, it is shifted after the finger, and once
- * dragged, it is drawn by the highlight's own dragged card, where its [DraggedCardPlacement] puts it.
+ * dragged, it is drawn by the highlight's own dragged card, where its [DraggedCardPlacement] puts it, until it is
+ * back where it sat.
  */
 @Composable
 fun HighlightedEventOverlay(
@@ -80,13 +81,17 @@ fun HighlightedEventOverlay(
         content = {
             if (highlight != null) {
                 val cardModifier = Modifier.graphicsLayer {
-                    val elevation = if (state.isDragging) 1f else state.progress.coerceIn(0f, 1f)
+                    val elevation = when {
+                        state.isDragging -> 1f
+                        state.returningFrom != null -> 1f - state.returnProgress.coerceIn(0f, 1f)
+                        else -> state.progress.coerceIn(0f, 1f)
+                    }
                     shadowElevation = HighlightElevation.toPx() * elevation
                     shape = cardShape
                 }.background(backingColor, cardShape)
 
                 val draggedCard = highlight.draggedCard
-                if (state.isDragging && draggedCard != null) {
+                if ((state.isDragging || state.returningFrom != null) && draggedCard != null) {
                     draggedCard(cardModifier)
                 } else {
                     EventItem(event = highlight.event, onClick = null, modifier = cardModifier)
@@ -106,8 +111,13 @@ fun HighlightedEventOverlay(
                 .coerceAtMost(area.height - 2 * margin)
                 .coerceAtLeast(0f)
             val unfolded = unfoldedBounds(highlight.fingerY, area, height, margin, clearance)
-            val home = if (state.isDragging) highlight.draggedBounds else highlight.startBounds
-            val bounds = lerp(home, unfolded, state.progress).translate(state.dragOffset)
+            val returningFrom = state.returningFrom
+            val bounds = if (returningFrom != null) {
+                lerp(returningFrom, highlight.startBounds, state.returnProgress)
+            } else {
+                val home = if (state.isDragging) highlight.draggedBounds else highlight.startBounds
+                lerp(home, unfolded, state.progress).translate(state.dragOffset)
+            }
 
             measurable.measure(
                 Constraints.fixed(bounds.width.roundToInt().coerceAtLeast(0), bounds.height.roundToInt().coerceAtLeast(0)),

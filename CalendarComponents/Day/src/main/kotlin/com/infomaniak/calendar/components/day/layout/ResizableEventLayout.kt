@@ -104,9 +104,11 @@ internal fun ResizableEventLayout(
                                 DraggedCardPlacement.AsGrabbed
                             },
                         ) { draggedModifier ->
+                            // Dropped, the card goes back to this piece.
+                            val showsFirstDay = isOverSeveralDays && it.isDragging
                             ResizableEventItem(
-                                timedEvent = if (isOverSeveralDays) firstDay else timedEvent,
-                                titleSizing = if (isOverSeveralDays) {
+                                timedEvent = if (showsFirstDay) firstDay else timedEvent,
+                                titleSizing = if (showsFirstDay) {
                                     titleSizingFor(
                                         visibleHeight = with(density) { draggedHeight.toDp() },
                                         width = with(density) { placement.width.toDp() },
@@ -114,7 +116,7 @@ internal fun ResizableEventLayout(
                                 } else {
                                     titleSizing
                                 },
-                                visibleHeight = if (isOverSeveralDays) ({ draggedHeight }) else visibleHeight,
+                                visibleHeight = if (showsFirstDay) ({ draggedHeight }) else visibleHeight,
                                 onClick = {},
                                 textOverflow = textOverflow,
                                 modifier = draggedModifier,

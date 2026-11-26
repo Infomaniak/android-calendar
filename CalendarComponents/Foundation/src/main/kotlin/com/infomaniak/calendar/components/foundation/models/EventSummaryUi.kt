@@ -20,6 +20,8 @@ package com.infomaniak.calendar.components.foundation.models
 import androidx.compose.runtime.Immutable
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
 @Immutable
@@ -38,10 +40,10 @@ sealed interface EventSummaryUi {
         val isAllDay: Boolean
         /**
          * When the whole event starts and ends, on the calendar's clock, while [start] and [end] are this piece's.
-         * Null when not known, the piece then standing for the whole event.
+         * This piece's by default, then standing for the whole event.
          */
-        val eventStart: LocalDateTime? get() = null
-        val eventEnd: LocalDateTime? get() = null
+        val eventStart: LocalDateTime get() = start.toLocalDateTime(TimeZone.currentSystemDefault())
+        val eventEnd: LocalDateTime get() = end.toLocalDateTime(TimeZone.currentSystemDefault())
         val colors: EventColorsUi
         val hasAttendees: Boolean
         val myStatus: ParticipationStatus?

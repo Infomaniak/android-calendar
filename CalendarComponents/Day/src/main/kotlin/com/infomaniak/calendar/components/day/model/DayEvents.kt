@@ -53,11 +53,11 @@ data class TimedEvent(
 
 /**
  * The first day of the event this is a piece of, the one drawn while the event is dragged by any of its pieces,
- * its start under the finger. This piece when the event's own bounds aren't known.
+ * its start under the finger.
  */
 internal fun TimedEvent.firstDayOfEvent(timeZone: TimeZone = TimeZone.currentSystemDefault()): TimedEvent {
-    val start = event.eventStart ?: return this
-    val end = minOf(event.eventEnd ?: return this, start.date.plus(1, DateTimeUnit.DAY).atTime(0, 0))
+    val start = event.eventStart
+    val end = minOf(event.eventEnd, start.date.plus(1, DateTimeUnit.DAY).atTime(0, 0))
     return TimedEvent(
         event = FirstDayOfEvent(event, start = start.toInstant(timeZone), end = end.toInstant(timeZone)),
         startMinuteOfDay = start.hour * MINUTES_PER_HOUR + start.minute,
@@ -65,13 +65,9 @@ internal fun TimedEvent.firstDayOfEvent(timeZone: TimeZone = TimeZone.currentSys
     )
 }
 
-/** Whether the event runs past the midnight ending its first day, when its own bounds are known. */
+/** Whether the event runs past the midnight ending its first day. */
 internal val EventSummaryUi.Normal.isOverSeveralDays: Boolean
-    get() {
-        val start = eventStart ?: return false
-        val end = eventEnd ?: return false
-        return end > start.date.plus(1, DateTimeUnit.DAY).atTime(0, 0)
-    }
+    get() = eventEnd > eventStart.date.plus(1, DateTimeUnit.DAY).atTime(0, 0)
 
 fun EventSummaryUi.Normal.toTimedEvent(date: LocalDate, timeZone: TimeZone): TimedEvent = TimedEvent(
     event = this,

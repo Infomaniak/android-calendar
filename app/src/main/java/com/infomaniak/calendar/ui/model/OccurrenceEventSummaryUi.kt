@@ -39,8 +39,8 @@ data class OccurrenceEventSummaryUi(
     override val colors: EventColorsUi,
     override val hasAttendees: Boolean,
     override val myStatus: ParticipationStatus?,
-    override val eventStart: LocalDateTime? = null,
-    override val eventEnd: LocalDateTime? = null,
+    override val eventStart: LocalDateTime,
+    override val eventEnd: LocalDateTime,
 ) : EventSummaryUi.Normal {
     override val eventId: String get() = occurrenceId.value
 }

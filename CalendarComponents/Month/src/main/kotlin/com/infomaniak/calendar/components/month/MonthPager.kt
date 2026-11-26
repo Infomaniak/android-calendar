@@ -79,7 +79,7 @@ fun MonthPager(
 
     val highlightState = rememberEventHighlightState(
         onEventDropped = onEventMoved?.let { moved ->
-            { event, drop -> if (drop.date != event.eventStart?.date) moved(event, drop.date) }
+            { event, drop -> if (drop.date != event.eventStart.date) moved(event, drop.date) }
         },
     )
 
