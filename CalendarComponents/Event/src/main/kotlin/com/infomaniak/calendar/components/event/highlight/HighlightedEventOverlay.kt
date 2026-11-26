@@ -105,7 +105,7 @@ fun HighlightedEventOverlay(
             val height = measurable.minIntrinsicHeight((area.width - 2 * margin).roundToInt().coerceAtLeast(0)).toFloat()
                 .coerceAtMost(area.height - 2 * margin)
                 .coerceAtLeast(0f)
-            val unfolded = unfoldedBounds(highlight.startBounds, highlight.fingerY, area, height, margin, clearance)
+            val unfolded = unfoldedBounds(highlight.fingerY, area, height, margin, clearance)
             val bounds = lerp(highlight.startBounds, unfolded, state.progress).translate(state.dragOffset)
 
             measurable.measure(
@@ -119,14 +119,8 @@ fun HighlightedEventOverlay(
     }
 }
 
-/**
- * Across the [area], kept [margin] inside it on both sides. A card already tall enough for its content (a long event)
- * keeps its exact height and position and only widens. A shorter one gets its content's [height], [clearance] above
- * [fingerY] (below it if it doesn't fit), kept [margin] inside the area.
- */
-private fun unfoldedBounds(start: Rect, fingerY: Float, area: Rect, height: Float, margin: Float, clearance: Float): Rect {
-    if (start.height >= height) return Rect(left = area.left + margin, top = start.top, right = area.right - margin, bottom = start.bottom)
-
+/** Across the [area], [clearance] above [fingerY] (below it if it doesn't fit), kept [margin] inside the area on every side. */
+private fun unfoldedBounds(fingerY: Float, area: Rect, height: Float, margin: Float, clearance: Float): Rect {
     val above = fingerY - clearance - height
     val top = (if (above >= area.top + margin) above else fingerY + clearance)
         .coerceAtMost(area.bottom - margin - height)
