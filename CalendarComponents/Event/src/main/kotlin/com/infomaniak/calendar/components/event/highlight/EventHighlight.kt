@@ -35,5 +35,5 @@ internal data class EventHighlight(
     val startBounds: Rect,
     val areaBounds: Rect,
     val fingerY: Float,
-    val draggedCard: (@Composable (Modifier) -> Unit)?,
+    val draggedCard: (@Composable (Modifier) -> Unit)? = null,
 )

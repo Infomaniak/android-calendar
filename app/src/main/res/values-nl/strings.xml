@@ -36,6 +36,12 @@
     <string name="generalSettingsNotificationsLabel">Meldingen</string>
     <string name="monthTitle">Maand</string>
     <string name="noWritableCalendar">Geen bewerkbare kalender gevonden</string>
+    <string name="notificationActionOpenMap">Kaart openen</string>
+    <plurals name="notificationActionSnooze">
+        <!-- Button on an event reminder notification: shows the reminder again after this many minutes. Keep it short, abbreviate "minutes" (e.g. "min"). -->
+        <item quantity="one">Herinner over %d min</item>
+        <item quantity="other">Herinner over %d min</item>
+    </plurals>
     <string name="notificationChannelEventRemindersDescription">Meldingen voor aankomende evenementen en herinneringen</string>
     <string name="notificationChannelEventRemindersTitle">Herinneringen aan evenementen</string>
     <string name="notificationDefaultDescription">Gebeurteniswaarschuwing</string>

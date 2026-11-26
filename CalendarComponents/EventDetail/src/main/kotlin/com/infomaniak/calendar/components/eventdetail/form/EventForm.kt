@@ -273,8 +273,10 @@ private fun ReminderItemsSection(
             }
         }
 
-        item {
-            AddReminderButton(onClick = onAddClick, shapes = it)
+        if (reminders.size < EventFormState.MAX_REMINDERS) {
+            item {
+                AddReminderButton(onClick = onAddClick, shapes = it)
+            }
         }
     }
 }

@@ -141,6 +141,7 @@ class EventFormState(
     companion object {
         const val DESCRIPTION_MAX_CHARACTERS = 10_000
         const val TITLE_MAX_CHARACTERS = 150
+        const val MAX_REMINDERS = 5
 
         /** A new event on [date] in [calendar], lasting [eventDuration]. */
         fun default(

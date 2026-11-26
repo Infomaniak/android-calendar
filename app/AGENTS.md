@@ -196,10 +196,16 @@ app/
 - **Edge-to-edge**: Call `enableEdgeToEdge()` in `onCreate` before `setContent` (already wired in `MainActivity`).
 - **Event reminders**: `AlarmScheduler` (`AppScope` singleton, started from `MainApplication`) mirrors
   `CalendarManager.observeUpcomingAlarms` (device alarms only: `DISPLAY` / `AUDIO`, max 400 over 30 days) into exact
-  `AlarmManager` alarms. `AlarmReceiver` posts the notification (tap opens `EventDetail`), `BootReceiver` reschedules on
+  `AlarmManager` alarms. `AlarmReceiver` posts the notification (tap opens `EventDetail`; a "Join kMeet" action opens the
+  meeting when the event has a meet room, its URL read from `CalendarManager.getOccurrence` when it fires, capped at 1 s,
+  since `EventSummary` only carries `hasMeetRoom`; for a place, not a bookable room, an "Open map" action opens its
+  `mapsQuery` straight in a maps app, computed at registration; until the event ends, a "Remind in 5 min" action dismisses
+  it and fires the reminder again after `AlarmReceiver.SNOOZE_DELAY`, under its own `calendar://alarm-snooze/` URI so the
+  alarms sync leaves it alone, and lost on reboot like retries), `BootReceiver` reschedules on
   boot, app update, time / time zone change and once exact alarm access is granted. The 30-day window doesn't follow the
   clock, so each refresh also sets an inexact, non-wakeup `ACTION_REFRESH_ALARMS` alarm one day later (handled by
-  `AlarmReceiver`) to move it forward.
+  `AlarmReceiver`) to move it forward. Alarms, snoozes and retries all go through `AlarmScheduler.scheduleReminder`, which
+  registers a reminder intent, exact when allowed (retries stay inexact).
   Reminders go to one notification channel per calendar (`CalendarNotificationChannels`, started from `MainApplication`),
   grouped per account under its email, like Mail's per-mailbox channels. Channels follow `CalendarManager.observeCalendars`:
   created / renamed with their calendar and deleted with it (a channel created again gets its settings back). Each alarm

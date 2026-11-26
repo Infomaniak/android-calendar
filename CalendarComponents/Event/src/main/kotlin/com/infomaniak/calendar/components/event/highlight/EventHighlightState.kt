@@ -53,7 +53,7 @@ private const val HELD_RESISTANCE = 0.35f
 fun rememberEventHighlightState(onEventDropped: ((EventSummaryUi.Normal, EventDrop) -> Unit)? = null): EventHighlightState {
     val scope = rememberCoroutineScope()
     val currentOnEventDropped = rememberUpdatedState(onEventDropped)
-    return remember(scope) { EventHighlightState(scope, currentOnEventDropped) }
+    return remember(scope) { EventHighlightState(scope, onEventDropped = currentOnEventDropped) }
 }
 
 /**
@@ -66,13 +66,15 @@ fun rememberEventHighlightState(onEventDropped: ((EventSummaryUi.Normal, EventDr
 @Stable
 class EventHighlightState internal constructor(
     private val scope: CoroutineScope,
-    private val onEventDropped: State<((EventSummaryUi.Normal, EventDrop) -> Unit)?>,
+    initialHighlight: EventHighlight? = null,
+    initialProgress: Float = 0f,
+    private val onEventDropped: State<((EventSummaryUi.Normal, EventDrop) -> Unit)?> = mutableStateOf(null),
 ) {
 
-    private val highlightState = mutableStateOf<EventHighlight?>(null)
+    private val highlightState = mutableStateOf(initialHighlight)
     internal val highlight: EventHighlight? by highlightState
 
-    private val isHeldState = mutableStateOf(false)
+    private val isHeldState = mutableStateOf(initialHighlight != null)
     /** Whether the finger still holds the event up: the timeline stays put until it lifts. */
     val isHeld: Boolean by isHeldState
 
@@ -91,7 +93,7 @@ class EventHighlightState internal constructor(
     /** The day the held event was picked up on. */
     private var fromDate: LocalDate? = null
 
-    private val progressAnimatable = Animatable(0f)
+    private val progressAnimatable = Animatable(initialProgress)
     internal val progress: Float get() = progressAnimatable.value
 
     private val dragOffsetAnimatable = Animatable(Offset.Zero, Offset.VectorConverter)

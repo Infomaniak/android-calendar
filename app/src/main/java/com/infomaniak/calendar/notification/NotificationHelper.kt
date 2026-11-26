@@ -39,6 +39,7 @@ import kotlinx.datetime.LocalDateRange
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
+import kotlin.time.Duration
 import kotlin.time.Instant
 import com.infomaniak.calendar.components.resources.R as RComponents
 
@@ -52,9 +53,13 @@ object NotificationHelper {
         occurrenceIdJson: String,
         title: String,
         location: String?,
+        mapsQuery: String?,
         startInstantMs: Long,
         endInstantMs: Long,
         allDayDates: LocalDateRange?,
+        kMeetUrl: String?,
+        snoozeIntent: PendingIntent?,
+        snoozeDelay: Duration,
     ): Notification {
         val clickIntent = Intent(context, MainActivity::class.java).apply {
             action = Intent.ACTION_VIEW
@@ -75,7 +80,7 @@ object NotificationHelper {
         val contentText = if (!location.isNullOrBlank()) "$timeText • $location" else timeText
         val notificationTitle = title.ifBlank { context.getString(R.string.notificationDefaultEventTitle) }
 
-        return NotificationCompat.Builder(context, channelId)
+        val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(IconCompat.createWithBitmap(EsdsIcons.CalendarNumberOne.Medium.toBitmap(Density(context))))
             .setContentTitle(notificationTitle)
             .setContentText(contentText)
@@ -84,7 +89,41 @@ object NotificationHelper {
             .setAutoCancel(true)
             .setCategory(NotificationCompat.CATEGORY_EVENT)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+
+        kMeetUrl?.let { builder.addAction(createJoinKMeetAction(context, it)) }
+        mapsQuery?.let { builder.addAction(createOpenMapAction(context, it)) }
+        snoozeIntent?.let { builder.addAction(createSnoozeAction(context, it, snoozeDelay)) }
+
+        return builder.build()
+    }
+
+    private fun createSnoozeAction(context: Context, snoozeIntent: PendingIntent, delay: Duration): NotificationCompat.Action {
+        val minutes = delay.inWholeMinutes.toInt()
+        val label = context.resources.getQuantityString(R.plurals.notificationActionSnooze, minutes, minutes)
+        return NotificationCompat.Action.Builder(null, label, snoozeIntent).build()
+    }
+
+    // Opens the meeting straight from the notification: a trampoline through a receiver can't start an activity since Android 12
+    private fun createJoinKMeetAction(context: Context, kMeetUrl: String): NotificationCompat.Action {
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            Intent(Intent.ACTION_VIEW, kMeetUrl.toUri()),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        return NotificationCompat.Action.Builder(null, context.getString(RComponents.string.participateKMeetTitle), pendingIntent)
             .build()
+    }
+
+    // Opens the maps app straight from the notification: a trampoline through a receiver can't start an activity since Android 12
+    private fun createOpenMapAction(context: Context, mapsQuery: String): NotificationCompat.Action {
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            Intent(Intent.ACTION_VIEW, "geo:0,0?q=${Uri.encode(mapsQuery)}".toUri()),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        return NotificationCompat.Action.Builder(null, context.getString(R.string.notificationActionOpenMap), pendingIntent).build()
     }
 
     private fun formatTimingText(
