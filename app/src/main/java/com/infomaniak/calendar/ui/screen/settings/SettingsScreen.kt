@@ -65,6 +65,7 @@ fun SettingsScreen(
     goToTheme: () -> Unit,
     goToFirstDayOfWeek: () -> Unit,
     goToDefaultEventDuration: () -> Unit,
+    goToTimeZone: () -> Unit,
     modifier: Modifier = Modifier,
     settingThemeViewModel: SettingThemeViewModel = viewModel(),
     firstDayOfWeekViewModel: SettingFirstDayOfWeekViewModel = viewModel(),
@@ -88,7 +89,7 @@ fun SettingsScreen(
         goToFirstDayOfWeek = goToFirstDayOfWeek,
         goToDefaultEventDuration = goToDefaultEventDuration,
         onTimeZonCheckedChange = { settingTimeZoneViewModel.setIsCustomTimeZoneEnabled(it) },
-        goToTimeZone = {},
+        goToTimeZone = goToTimeZone,
         modifier = modifier,
     )
 }

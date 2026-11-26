@@ -72,6 +72,7 @@ import com.infomaniak.calendar.ui.screen.settings.firstDayOfWeek.SettingFirstDay
 import com.infomaniak.calendar.ui.screen.settings.defaultEventDuration.SettingDefaultEventDurationScreen
 import com.infomaniak.calendar.ui.screen.settings.SettingsScreen
 import com.infomaniak.calendar.ui.screen.settings.theme.SettingThemeScreen
+import com.infomaniak.calendar.ui.screen.settings.timezone.SettingTimeZoneScreen
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.utils.NavigationTransition
 import com.infomaniak.core.common.utils.today
@@ -254,6 +255,7 @@ private fun baseEntryProvider(
                 goToTheme = { backStack.replaceAbove(destination, NavDestination.Settings.Theme) },
                 goToFirstDayOfWeek = { backStack.replaceAbove(destination, NavDestination.Settings.FirstDayOfWeek) },
                 goToDefaultEventDuration = { backStack.replaceAbove(destination, NavDestination.Settings.DefaultEventDuration) },
+                goToTimeZone = { backStack.replaceAbove(destination, NavDestination.Settings.TimeZone) },
             )
         }
 
@@ -267,6 +269,10 @@ private fun baseEntryProvider(
 
         is NavDestination.Settings.DefaultEventDuration -> backStack.settingsSubPageEntry(destination) { goBack ->
             SettingDefaultEventDurationScreen(goBack = goBack)
+        }
+
+        is NavDestination.Settings.TimeZone -> backStack.settingsSubPageEntry(destination) { goBack ->
+            SettingTimeZoneScreen(goBack = goBack)
         }
 
         is NavDestination.Onboarding.Login -> NavEntry(destination) {
