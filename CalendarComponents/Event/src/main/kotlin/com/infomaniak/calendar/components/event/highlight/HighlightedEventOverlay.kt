@@ -19,8 +19,13 @@ package com.infomaniak.calendar.components.event.highlight
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.lerp
@@ -28,13 +33,19 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.EventItem
+import com.infomaniak.calendar.components.foundation.models.EventStatus
+import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
+import com.infomaniak.calendar.components.foundation.models.SimpleEventSummaryUi
+import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+import kotlin.time.Instant
 
 private val HighlightElevation = 8.dp
 private val FingerClearance = 24.dp
@@ -111,4 +122,51 @@ private fun unfoldedBounds(fingerY: Float, area: Rect, height: Float, margin: Fl
         .coerceAtLeast(area.top + margin)
 
     return Rect(left = area.left + margin, top = top, right = area.right - margin, bottom = top + height)
+}
+
+@Preview
+@Composable
+private fun UnfoldingPreview() {
+    HighlightedEventOverlayPreview(progress = 0.5f)
+}
+
+@Preview
+@Composable
+private fun UnfoldedPreview() {
+    HighlightedEventOverlayPreview(progress = 1f)
+}
+
+@Composable
+private fun HighlightedEventOverlayPreview(progress: Float) {
+    val density = LocalDensity.current
+    val event = SimpleEventSummaryUi(
+        id = "preview",
+        title = "Weekly sync with the whole team",
+        location = "Meeting room 3",
+        status = EventStatus.Confirmed,
+        start = Instant.parse("2025-01-01T10:00:00Z"),
+        end = Instant.parse("2025-01-01T11:00:00Z"),
+        isAllDay = false,
+        colors = LocalEventColorsUiFactory.current.create(0xFF0098FF.toInt()),
+        hasAttendees = true,
+        myStatus = ParticipationStatus.Accepted,
+    )
+    // A compressed card in the middle one of three day columns, next to a 48dp hour gutter.
+    val highlight = with(density) {
+        EventHighlight(
+            event = event,
+            key = event,
+            startBounds = Rect(left = 152.dp.toPx(), top = 200.dp.toPx(), right = 248.dp.toPx(), bottom = 260.dp.toPx()),
+            areaBounds = Rect(left = 48.dp.toPx(), top = 0f, right = 360.dp.toPx(), bottom = 480.dp.toPx()),
+            fingerY = 230.dp.toPx(),
+        )
+    }
+    val scope = rememberCoroutineScope()
+    val state = remember(scope) { EventHighlightState(scope, highlight, progress) }
+
+    MaterialTheme {
+        Surface(Modifier.size(width = 360.dp, height = 480.dp)) {
+            HighlightedEventOverlay(state, Modifier.fillMaxSize())
+        }
+    }
 }

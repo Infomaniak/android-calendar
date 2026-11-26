@@ -40,19 +40,23 @@ fun rememberEventHighlightState(): EventHighlightState {
 
 /** The [EventHighlight] a long press holds up, unfolded as [progress] goes from 0 to 1 and folded back once released. */
 @Stable
-class EventHighlightState internal constructor(private val scope: CoroutineScope) {
+class EventHighlightState internal constructor(
+    private val scope: CoroutineScope,
+    initialHighlight: EventHighlight? = null,
+    initialProgress: Float = 0f,
+) {
 
-    private val highlightState = mutableStateOf<EventHighlight?>(null)
+    private val highlightState = mutableStateOf(initialHighlight)
     internal val highlight: EventHighlight? by highlightState
 
-    private val isHeldState = mutableStateOf(false)
+    private val isHeldState = mutableStateOf(initialHighlight != null)
     /** Whether the finger still holds the event up: the timeline stays put until it lifts. */
     val isHeld: Boolean by isHeldState
 
     /** Set while laid out, and only read once a long press needs to know where its card is. */
     internal var overlayCoordinates: LayoutCoordinates? = null
 
-    private val progressAnimatable = Animatable(0f)
+    private val progressAnimatable = Animatable(initialProgress)
     internal val progress: Float get() = progressAnimatable.value
 
     // Each animation cancels the running one, so a cancelled fold-back never clears the highlight.
