@@ -20,6 +20,7 @@ package com.infomaniak.calendar.ui.screen.settings.timezone
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.data.SettingsDataValues
+import com.infomaniak.calendar.model.settings.SettingTimeZone
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
@@ -34,22 +35,10 @@ import kotlin.time.Duration.Companion.seconds
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
 class SettingTimeZoneViewModel(private val settingsDataValues: SettingsDataValues) : ViewModel() {
-    val isCustomTimeZoneEnabled = settingsDataValues.isCustomTimeZoneEnabled.flow
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), false)
-
-    val defaultZoneId = settingsDataValues.defaultZoneId.flow
+    val timeZone = settingsDataValues.timeZone.flow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), null)
 
-    fun setIsCustomTimeZoneEnabled(enabled: Boolean) {
-        viewModelScope.launch {
-            settingsDataValues.isCustomTimeZoneEnabled.setValue(enabled)
-            settingsDataValues.defaultZoneId.setValue(null)
-        }
-    }
-
-    fun setDefaultZoneId(zoneId: String?) {
-        viewModelScope.launch {
-            settingsDataValues.defaultZoneId.setValue(zoneId)
-        }
+    fun setTimeZone(timeZone: SettingTimeZone) {
+        viewModelScope.launch { settingsDataValues.timeZone.setValue(timeZone) }
     }
 }

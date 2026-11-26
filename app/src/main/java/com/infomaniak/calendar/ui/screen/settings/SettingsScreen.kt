@@ -34,6 +34,7 @@ import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatC
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDuration
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatFullDayName
 import com.infomaniak.calendar.model.settings.SettingThemeOption
+import com.infomaniak.calendar.model.settings.SettingTimeZone
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemClickable
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemOpen
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemSwitch
@@ -53,7 +54,6 @@ import com.infomaniak.designsystem.icons.symbols.CalendarDots
 import com.infomaniak.designsystem.icons.symbols.Globe
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
-import java.time.ZoneId
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import com.infomaniak.calendar.components.resources.R as RComponents
@@ -75,20 +75,18 @@ fun SettingsScreen(
     val theme by settingThemeViewModel.theme.collectAsStateWithLifecycle()
     val firstDayOfWeek by firstDayOfWeekViewModel.firstDayOfWeek.collectAsStateWithLifecycle()
     val defaultEventDuration by defaultEventDurationViewModel.defaultEventDuration.collectAsStateWithLifecycle()
-    val isTimeZoneChecked by settingTimeZoneViewModel.isCustomTimeZoneEnabled.collectAsStateWithLifecycle()
-    val defaultZoneId by settingTimeZoneViewModel.defaultZoneId.collectAsStateWithLifecycle()
+    val timeZone by settingTimeZoneViewModel.timeZone.collectAsStateWithLifecycle()
 
     SettingsScreen(
         theme = { theme },
         firstDayOfWeek = { firstDayOfWeek },
         defaultEventDuration = { defaultEventDuration },
-        isTimeZoneChecked = { isTimeZoneChecked },
-        zoneId = { defaultZoneId },
+        timeZone = { timeZone },
         goBack = goBack,
         goToTheme = goToTheme,
         goToFirstDayOfWeek = goToFirstDayOfWeek,
         goToDefaultEventDuration = goToDefaultEventDuration,
-        onTimeZonCheckedChange = { settingTimeZoneViewModel.setIsCustomTimeZoneEnabled(it) },
+        onTimeZoneChange = settingTimeZoneViewModel::setTimeZone,
         goToTimeZone = goToTimeZone,
         modifier = modifier,
     )
@@ -99,13 +97,12 @@ private fun SettingsScreen(
     theme: () -> SettingThemeOption?,
     firstDayOfWeek: () -> DayOfWeek?,
     defaultEventDuration: () -> Duration?,
-    isTimeZoneChecked: () -> Boolean,
-    zoneId: () -> String?,
+    timeZone: () -> SettingTimeZone?,
     goBack: () -> Unit,
     goToTheme: () -> Unit,
     goToFirstDayOfWeek: () -> Unit,
     goToDefaultEventDuration: () -> Unit,
-    onTimeZonCheckedChange: (Boolean) -> Unit,
+    onTimeZoneChange: (SettingTimeZone) -> Unit,
     goToTimeZone: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -140,18 +137,22 @@ private fun SettingsScreen(
             SettingItemSwitch(
                 shapes = SettingShape.Middle,
                 text = stringResource(R.string.generalSettingsUseDeviceTimeZoneLabel),
-                checked = isTimeZoneChecked,
-                onCheckedChange = onTimeZonCheckedChange,
+                checked = { timeZone() == SettingTimeZone.Disabled },
+                onCheckedChange = { isAutomatic ->
+                    onTimeZoneChange(if (isAutomatic) SettingTimeZone.Disabled else SettingTimeZone.Enabled.Unset)
+                },
                 symbol = EsdsIcons.Globe,
                 switchType = SwitchType.Switch,
             )
-            val selectedTimeZone = (zoneId()?.let(TimeZone::of) ?: run { rememberCurrentTimeZone().value }).formatCityAndCountry()
             SettingItemClickable(
                 shapes = SettingShape.Last,
                 text = stringResource(RComponents.string.timeZoneLabel),
                 onClick = goToTimeZone,
-                supportingText = selectedTimeZone,
-                enabled = isTimeZoneChecked,
+                supportingText = when (val selectedTimeZone = timeZone()) {
+                    is SettingTimeZone.Enabled.Custom -> TimeZone.of(selectedTimeZone.zoneId)
+                    else -> rememberCurrentTimeZone().value
+                }.formatCityAndCountry(),
+                enabled = { timeZone() is SettingTimeZone.Enabled },
             )
         }
 
@@ -180,13 +181,12 @@ private fun SettingScreenPreview() {
             theme = { SettingThemeOption.System },
             firstDayOfWeek = { DayOfWeek.MONDAY },
             defaultEventDuration = { 1.hours },
-            isTimeZoneChecked = { false },
-            zoneId = { ZoneId.of("Europe/Zurich").id },
+            timeZone = { SettingTimeZone.Enabled.Custom("Europe/Zurich") },
             goBack = {},
             goToTheme = {},
             goToFirstDayOfWeek = {},
             goToDefaultEventDuration = {},
-            onTimeZonCheckedChange = {},
+            onTimeZoneChange = {},
             goToTimeZone = {},
         )
     }

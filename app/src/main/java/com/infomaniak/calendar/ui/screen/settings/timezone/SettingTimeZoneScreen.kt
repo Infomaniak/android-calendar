@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.infomaniak.calendar.model.settings.SettingTimeZone
 import com.infomaniak.calendar.ui.component.TimeZoneSearchScreenContent
 import com.infomaniak.calendar.ui.theme.CalendarTheme
 
@@ -33,7 +34,7 @@ fun SettingTimeZoneScreen(
 ) {
     TimeZoneSearchScreenContent(
         onTimeZoneSelected = { timeZone ->
-            viewModel.setDefaultZoneId(timeZone.id)
+            viewModel.setTimeZone(SettingTimeZone.Enabled.Custom(timeZone.id))
             goBack?.invoke()
         },
         goBack = goBack,
