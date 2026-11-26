@@ -41,7 +41,7 @@ fun SettingFirstDayOfWeekScreen(
     Content(
         firstDayOfWeek = firstDayOfWeek,
         goBack = goBack,
-        onItemClick = { firstDayOfWeekViewModel.onFirstDayOfWeekClick(it) },
+        onItemClick = { firstDayOfWeekViewModel.setFirstDayOfWeekClick(it) },
         modifier = modifier,
     )
 }
