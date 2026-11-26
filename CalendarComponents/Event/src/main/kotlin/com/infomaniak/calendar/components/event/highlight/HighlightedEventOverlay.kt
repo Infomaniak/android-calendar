@@ -29,12 +29,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.lerp
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.event.EventItem
 import com.infomaniak.calendar.components.foundation.models.EventStatus
@@ -58,7 +61,7 @@ private val FingerClearance = 24.dp
  * below when there is no room above, and always fully inside the area, out of the [contentPadding]
  * where bars may be drawn over the overlay. Pulled or dragged, it is shifted after the finger, and once
  * dragged, it is drawn by the highlight's own dragged card, where its [DraggedCardPlacement] puts it, until it is
- * back where it sat.
+ * back where it sat. On its way back, it slips under the [contentPadding] as its place in the grid does.
  */
 @Composable
 fun HighlightedEventOverlay(
@@ -77,7 +80,18 @@ fun HighlightedEventOverlay(
     Layout(
         modifier = modifier
             .letPointersThrough()
-            .onPlaced { state.overlayCoordinates = it },
+            .onPlaced { state.overlayCoordinates = it }
+            .drawWithContent {
+                val returningFrom = state.returningFrom
+                if (highlight != null && returningFrom != null) {
+                    // Only what the card was dropped over is let out of the area, less and less as it goes back.
+                    val visibleArea = visibleArea(highlight.areaBounds, contentPadding, size.height)
+                    val clip = lerp(visibleArea.union(returningFrom), visibleArea, state.returnProgress.coerceIn(0f, 1f))
+                    clipRect(clip.left, clip.top, clip.right, clip.bottom) { this@drawWithContent.drawContent() }
+                } else {
+                    drawContent()
+                }
+            },
         content = {
             if (highlight != null) {
                 val cardModifier = Modifier.graphicsLayer {
@@ -100,12 +114,7 @@ fun HighlightedEventOverlay(
         },
     ) { measurables, constraints ->
         val card = highlight?.let { measurables.firstOrNull() }?.let { measurable ->
-            val area = highlight.areaBounds.let {
-                it.copy(
-                    top = max(it.top, contentPadding.calculateTopPadding().toPx()),
-                    bottom = min(it.bottom, constraints.maxHeight - contentPadding.calculateBottomPadding().toPx()),
-                )
-            }
+            val area = visibleArea(highlight.areaBounds, contentPadding, constraints.maxHeight.toFloat())
             // A short area (landscape, large font) can't fit the whole card: it is clipped rather than pushed out of the area.
             val height = measurable.minIntrinsicHeight((area.width - 2 * margin).roundToInt().coerceAtLeast(0)).toFloat()
                 .coerceAtMost(area.height - 2 * margin)
@@ -129,6 +138,19 @@ fun HighlightedEventOverlay(
         }
     }
 }
+
+private fun Rect.union(other: Rect) = Rect(
+    left = min(left, other.left),
+    top = min(top, other.top),
+    right = max(right, other.right),
+    bottom = max(bottom, other.bottom),
+)
+
+/** The part of the [areaBounds] out of the [contentPadding] of an overlay this [height]. */
+private fun Density.visibleArea(areaBounds: Rect, contentPadding: PaddingValues, height: Float): Rect = areaBounds.copy(
+    top = max(areaBounds.top, contentPadding.calculateTopPadding().toPx()),
+    bottom = min(areaBounds.bottom, height - contentPadding.calculateBottomPadding().toPx()),
+)
 
 /** Across the [area], [clearance] above [fingerY] (below it if it doesn't fit), kept [margin] inside the area on every side. */
 private fun unfoldedBounds(fingerY: Float, area: Rect, height: Float, margin: Float, clearance: Float): Rect {

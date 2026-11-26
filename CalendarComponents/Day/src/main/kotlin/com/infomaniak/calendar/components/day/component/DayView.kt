@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
@@ -68,6 +69,7 @@ internal fun DayView(
     contentPadding: PaddingValues = PaddingValues(),
     highlightState: EventHighlightState? = null,
     headerTrailingContent: @Composable () -> Unit = {},
+    onHeaderHeightChanged: (Dp) -> Unit = {},
 ) {
     val density = LocalDensity.current
     var headerHeight by remember { mutableStateOf(0.dp) }
@@ -91,7 +93,10 @@ internal fun DayView(
                     .fillMaxWidth()
                     .padding(top = contentPadding.calculateTopPadding())
                     .padding(paddingValues = contentPadding.onlyHorizontal())
-                    .onSizeChanged { headerHeight = with(density) { it.height.toDp() } }
+                    .onSizeChanged {
+                        headerHeight = with(density) { it.height.toDp() }
+                        onHeaderHeightChanged(headerHeight)
+                    }
                     .then(headerModifier),
             ) {
                 DayHeader(

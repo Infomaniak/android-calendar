@@ -19,13 +19,18 @@ package com.infomaniak.calendar.components.day
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.component.DayView
 import com.infomaniak.calendar.components.day.component.timelineDropHandler
 import com.infomaniak.calendar.components.day.model.DayEvents
@@ -83,6 +88,9 @@ fun DayPager(
         onEventDropped = onEventMoved?.let(::timelineDropHandler),
     )
 
+    // Each page's header height, by page, so the highlighted event of the shown one is kept under its header.
+    val headerHeights = remember { mutableStateMapOf<Int, Dp>() }
+
     // The highlighted event is drawn over the pager, so neither the page edge nor the header hides it.
     Box(modifier = modifier.releaseHighlightOnSecondPointer(highlightState), propagateMinConstraints = true) {
         HorizontalPager(state = pagerState, userScrollEnabled = !highlightState.isHeld) { page ->
@@ -99,10 +107,17 @@ fun DayPager(
                 timelineModifier = timelineModifier,
                 contentPadding = contentPadding,
                 headerTrailingContent = headerTrailingContent,
+                onHeaderHeightChanged = { headerHeights[page] = it },
             )
+
+            DisposableEffect(page) { onDispose { headerHeights.remove(page) } }
         }
 
-        HighlightedEventOverlay(highlightState, modifier = Modifier.matchParentSize(), contentPadding = contentPadding)
+        HighlightedEventOverlay(
+            state = highlightState,
+            modifier = Modifier.matchParentSize(),
+            contentPadding = contentPadding + PaddingValues(top = headerHeights[pagerState.currentPage] ?: 0.dp),
+        )
     }
 }
 

@@ -213,7 +213,12 @@ private fun MultiDayPagerContent(
             contentPadding = contentPadding.onlyHorizontalAndTop(),
         )
 
-        HighlightedEventOverlay(highlightState, modifier = Modifier.matchParentSize(), contentPadding = contentPadding)
+        // Kept under the headers, which hide whatever part of the grid runs under them.
+        HighlightedEventOverlay(
+            state = highlightState,
+            modifier = Modifier.matchParentSize(),
+            contentPadding = contentPadding + PaddingValues(top = headerHeight),
+        )
     }
 }
 
