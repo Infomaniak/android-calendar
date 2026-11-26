@@ -33,9 +33,8 @@ typealias DayEventsByDate = Map<LocalDate, DayEvents>
 /**
  * Splits already day-sliced events into what the day view draws in each of its two areas.
  *
- * A slice goes to the all-day band as soon as it covers the whole day: true all-day events, but also
- * the middle days of a timed event spanning several days, which have no meaningful hours to show on
- * the grid. Everything else becomes a [TimedEvent] positioned in minutes within its own day.
+ * A slice goes to the all-day band if it is marked as isAllDay. Everything else becomes a [TimedEvent] positioned in minutes
+ * within its own day.
  */
 suspend fun Map<LocalDate, List<EventDaySlice>>.toDayEventsByDate(
     timeZone: TimeZone,
@@ -55,7 +54,7 @@ private fun List<EventDaySlice>.toDayEvents(
 
     forEach { slice ->
         val event = slice.toEventUi(timeZone)
-        if (slice.fillsWholeDay) allDay.add(event) else timed.add(event.toTimedEvent(date, timeZone))
+        if (slice.isAllDay) allDay.add(event) else timed.add(event.toTimedEvent(date, timeZone))
     }
 
     return DayEvents(allDay = allDay, timed = timed)
