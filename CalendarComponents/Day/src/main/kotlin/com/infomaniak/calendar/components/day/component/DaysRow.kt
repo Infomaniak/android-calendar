@@ -20,10 +20,16 @@ package com.infomaniak.calendar.components.day.component
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import com.infomaniak.core.common.utils.today
+import kotlin.time.Clock
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.plus
 
 /** One equally wide column per date. */
 @Composable
@@ -37,6 +43,28 @@ internal fun DaysRow(
             Box(contentAlignment = Alignment.TopCenter, modifier = Modifier.weight(1f)) {
                 content(date)
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ThreeDaysPreview() {
+    DaysRowSample(dayCount = 3)
+}
+
+@Preview
+@Composable
+private fun WeekPreview() {
+    DaysRowSample(dayCount = 7)
+}
+
+@Composable
+private fun DaysRowSample(dayCount: Int) {
+    val today = Clock.today()
+    Surface {
+        DaysRow(dates = List(dayCount) { today.plus(it, DateTimeUnit.DAY) }) { date ->
+            DayColumnHeader(date = date)
         }
     }
 }
