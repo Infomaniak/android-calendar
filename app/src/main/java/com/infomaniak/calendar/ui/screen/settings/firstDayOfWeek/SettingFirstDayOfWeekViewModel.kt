@@ -37,7 +37,7 @@ import kotlin.time.Duration.Companion.seconds
 class SettingFirstDayOfWeekViewModel(private val settingsDataValues: SettingsDataValues) : ViewModel() {
     val firstDayOfWeek = settingsDataValues.firstDayOfWeek.flow.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), null)
 
-    fun onFirstDayOfWeekClick(dayOfWeek: DayOfWeek) {
+    fun setFirstDayOfWeekClick(dayOfWeek: DayOfWeek) {
         viewModelScope.launch {
             settingsDataValues.firstDayOfWeek.setValue(dayOfWeek)
         }
