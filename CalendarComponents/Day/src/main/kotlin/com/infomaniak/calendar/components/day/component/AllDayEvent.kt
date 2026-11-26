@@ -30,7 +30,7 @@ import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
  * telling apart the chips of an event shown more than once.
  */
 @Composable
-internal fun AllDayChip(
+internal fun AllDayEvent(
     event: EventSummaryUi.Normal,
     onClick: () -> Unit,
     highlightState: EventHighlightState?,

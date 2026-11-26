@@ -56,9 +56,9 @@ private val NextRowPeek = 12.dp
 
 /** Room for two rows of chips, the top of a third one peeking below to tell more are scrolled to. */
 internal val AllDayBandMaxHeight: Dp
-    @Composable get() = ChipHeight * WHOLE_ROWS + AllDayChipSpacing * WHOLE_ROWS + NextRowPeek
+    @Composable get() = ChipHeight * WHOLE_ROWS + AllDayEventSpacing * WHOLE_ROWS + NextRowPeek
 
-internal val AllDayChipSpacing: Dp
+internal val AllDayEventSpacing: Dp
     @Composable get() = EsdsTheme.spacing.xs
 
 /**
@@ -81,8 +81,8 @@ internal fun AllDayEventsBand(
         LazyVerticalGrid(
             columns = GridCells.Adaptive(MinChipWidth),
             userScrollEnabled = highlightState?.isHeld != true,
-            verticalArrangement = Arrangement.spacedBy(AllDayChipSpacing),
-            horizontalArrangement = Arrangement.spacedBy(AllDayChipSpacing),
+            verticalArrangement = Arrangement.spacedBy(AllDayEventSpacing),
+            horizontalArrangement = Arrangement.spacedBy(AllDayEventSpacing),
             modifier = Modifier
                 .weight(1f)
                 .padding(end = TimelineDefaults.TimelineEndPadding)
@@ -95,7 +95,7 @@ internal fun AllDayEventsBand(
                 // rather than leaving the half it does not use empty.
                 span = { index, _ -> GridItemSpan(if (index == events.lastIndex) maxCurrentLineSpan else 1) },
             ) { _, event ->
-                AllDayChip(event = event, onClick = { onEventClick(event) }, highlightState = highlightState)
+                AllDayEvent(event = event, onClick = { onEventClick(event) }, highlightState = highlightState)
             }
         }
     }

@@ -128,7 +128,7 @@ private fun AllDayColumn(
     highlightState: EventHighlightState?,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(AllDayChipSpacing),
+        verticalArrangement = Arrangement.spacedBy(AllDayEventSpacing),
         // The same gap between the days' chips as between their timed events.
         modifier = Modifier
             .fillMaxWidth()
@@ -136,7 +136,7 @@ private fun AllDayColumn(
     ) {
         events.forEach { event ->
             key(event.id) {
-                AllDayChip(
+                AllDayEvent(
                     event = event,
                     onClick = { onEventClick(event) },
                     highlightState = highlightState,
