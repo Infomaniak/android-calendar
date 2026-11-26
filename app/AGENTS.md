@@ -141,6 +141,8 @@ app/
   `SettingTimeZone.toTimeZone()` (the device's unless a custom one is picked). Outside Compose, `TimeZoneManager.timeZone`
   follows it (event loading, sync, form defaults, reminders); in Compose, `MainActivity` provides it as Foundation's
   `LocalTimeZone`, which `rememberToday()`, `rememberCurrentDateTime()` and the date formatters default to.
+  Every new feature must use this time zone: never `TimeZone.currentSystemDefault()` or a zone-less `Clock.today()` outside
+  previews, and pass the zone explicitly to KMP APIs whose `timeZone` parameter defaults to the device's.
 - **Splash screen**: `androidx.core:core-splashscreen`. `MainActivity` launches with `AppThemeLauncher`, which hands over to
   `Theme.Calendar` (`postSplashScreenTheme`). The splash and the content read the same state: `MainViewModel.uiState`
   stays `MainUiState.Loading` until both the users and the last calendar view are read, and the splash stays up meanwhile. Android 12+ draws it from `values-v31/themes.xml` (launcher foreground, `splashscreenBackground`,

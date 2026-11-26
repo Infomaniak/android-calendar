@@ -110,6 +110,7 @@ recreating it by hand. It was designed with UI/UX to handle varying emoji glyph 
 standard row icons across font scales. Preserve its design-system icon size, bounded font autosizing, and fixed line height.
 
 The group is intentionally **self-contained**: no dependency on `:app`, no DI framework, no KMP types leaking in.
+Dates and times are shown in `LocalTimeZone` (provided by the host), never in `TimeZone.currentSystemDefault()` outside previews.
 `VisibleDayState` lives in `Foundation`: date jumps request navigation, and the content reports the date it reaches.
 It wraps mutable Compose state, so hosts can share the same date with their ViewModels.
 `ExpandableCalendar` accepts this state or explicit date/click callbacks; expansion state stays independent.

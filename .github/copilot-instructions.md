@@ -9,6 +9,8 @@
   by `CalendarComponents/*` must go in `CalendarComponents/Resources/src/main/res/values*/*` (and translations in the
   corresponding `values-<lang>` folders). Do not add strings to other `CalendarComponents/*` modules.
 - Make sure fdroid is not forgotten when adding new behavior.
+- Make sure dates and times follow the time zone chosen in the settings (`TimeZoneManager.timeZone` or `LocalTimeZone`), not
+  `TimeZone.currentSystemDefault()` or a zone-less `Clock.today()` (previews excepted), including KMP calls whose `timeZone` defaults to the device's.
 - When adding/removing a runtime dependency, update `LICENSES.md` at the repo root.
 - If a module contains strings, make sure it is covered in `workflows/translations-validation.yml` and validated there. If it is
   missing, add:- If a module contains strings, make sure the module is correctly validated inside
