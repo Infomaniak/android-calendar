@@ -43,6 +43,8 @@ import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.event.highlight.EventHighlightState
+import com.infomaniak.calendar.components.day.TimelineDefaults
+import com.infomaniak.calendar.components.event.highlight.eventHighlightArea
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.utils.HorizontalGridLine
@@ -75,7 +77,13 @@ internal fun DayView(
     var headerHeight by remember { mutableStateOf(0.dp) }
     val dayPadding = contentPadding + PaddingValues(horizontal = EsdsTheme.spacing.md)
 
-    Box(modifier = modifier) {
+    // Where a held all-day chip unfolds: across the whole day, since its band is too short to show it, but
+    // beside the hour gutter, like a held timed event.
+    val allDayHighlightPadding = dayPadding.onlyHorizontal() + PaddingValues(
+        start = TimelineDefaults.HourGutterWidth,
+        end = TimelineDefaults.TimelineEndPadding,
+    )
+    Box(modifier = modifier.eventHighlightArea(allDayHighlightPadding)) {
         DayTimeline(
             date = date,
             events = events,
@@ -107,8 +115,10 @@ internal fun DayView(
                 )
 
                 AllDayEventsBand(
+                    date = date,
                     events = events.allDay,
                     onEventClick = onEventClick,
+                    highlightState = highlightState,
                     modifier = Modifier.padding(horizontal = EsdsTheme.spacing.md),
                 )
             }

@@ -59,6 +59,7 @@ fun EventItem(
     event: EventSummaryUi.Normal,
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
+    allDayTextOverflow: TextOverflow = TextOverflow.Ellipsis,
     allDayTrailingContent: @Composable () -> Unit = {},
 ) {
     EventItem(
@@ -71,6 +72,7 @@ fun EventItem(
         isAllDay = event.isAllDay,
         onClick = onClick,
         modifier = modifier,
+        allDayTextOverflow = allDayTextOverflow,
         allDayTrailingContent = allDayTrailingContent,
     )
 }
@@ -86,6 +88,7 @@ internal fun EventItem(
     isAllDay: Boolean,
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
+    allDayTextOverflow: TextOverflow = TextOverflow.Ellipsis,
     allDayTrailingContent: @Composable () -> Unit = {},
 ) {
     EventItemCard(status, onClick = onClick, modifier = modifier) {
@@ -93,6 +96,7 @@ internal fun EventItem(
             AllDayContent(
                 title = title,
                 textDecoration = status.textDecoration,
+                textOverflow = allDayTextOverflow,
                 trailingContent = allDayTrailingContent,
             )
         } else {
@@ -105,6 +109,7 @@ internal fun EventItem(
 private fun AllDayContent(
     title: String,
     textDecoration: TextDecoration?,
+    textOverflow: TextOverflow,
     modifier: Modifier = Modifier,
     trailingContent: @Composable () -> Unit = {},
 ) {
@@ -118,7 +123,7 @@ private fun AllDayContent(
             style = EventItemDefaults.AllDayTitleStyle,
             textDecoration = textDecoration,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+            overflow = textOverflow,
             modifier = modifier.weight(1f),
         )
         trailingContent()

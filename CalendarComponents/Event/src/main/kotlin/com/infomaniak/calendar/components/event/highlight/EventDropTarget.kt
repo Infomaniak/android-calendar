@@ -78,12 +78,10 @@ internal class EventDropTargetNode(
         this.coordinates = coordinates
     }
 
-    /** How far [finger], as seen by [overlay], is from the visible part of this target, or null when none of it shows. */
-    fun distanceTo(overlay: LayoutCoordinates, finger: Offset): Float? {
+    /** The part of this target [overlay] shows, or null when none of it shows. */
+    fun visibleBounds(overlay: LayoutCoordinates): Rect? {
         val target = coordinates?.takeIf { it.isAttached } ?: return null
-        val bounds = overlay.localBoundingBoxOf(target, clipBounds = true).takeUnless(Rect::isEmpty) ?: return null
-        val nearest = Offset(finger.x.coerceIn(bounds.left, bounds.right), finger.y.coerceIn(bounds.top, bounds.bottom))
-        return (finger - nearest).getDistance()
+        return overlay.localBoundingBoxOf(target, clipBounds = true).takeUnless(Rect::isEmpty)
     }
 
     /** The time a card, its top at [cardTop] as seen by [overlay], starts at once dropped here. */

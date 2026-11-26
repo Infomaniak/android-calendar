@@ -187,13 +187,20 @@ class EventHighlightState internal constructor(
     /** Whether [event] is dragged, from any of its pieces: all of them move with it. */
     internal fun isDragging(event: EventSummaryUi.Normal): Boolean = isDragging && highlight?.event?.eventId == event.eventId
 
-    /** The drop target under [finger], or the nearest one: the finger can stray off them, like over a timeline's gutter. */
+    /**
+     * The drop target under [finger], or the nearest one: the finger can stray off them, like over a timeline's gutter.
+     * Of the targets under it, the smallest is the one laid over the others, like an all-day band over a timeline.
+     */
     private fun dropTargetAt(finger: Offset): EventDropTargetNode? {
         val overlay = overlayCoordinates?.takeIf { it.isAttached } ?: return null
         return dropTargets
-            .mapNotNull { target -> target.distanceTo(overlay, finger)?.let { target to it } }
-            .minByOrNull { (_, distance) -> distance }
+            .mapNotNull { target -> target.visibleBounds(overlay)?.let { target to it } }
+            .minWithOrNull(compareBy({ (_, bounds) -> bounds.distanceTo(finger) }, { (_, bounds) -> bounds.width * bounds.height }))
             ?.first
+    }
+
+    private fun Rect.distanceTo(point: Offset): Float {
+        return (point - Offset(point.x.coerceIn(left, right), point.y.coerceIn(top, bottom))).getDistance()
     }
 
     /**

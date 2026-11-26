@@ -19,9 +19,9 @@ package com.infomaniak.calendar.components.day
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -46,33 +46,34 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.component.CurrentTimeIndicator
 import com.infomaniak.calendar.components.day.component.DayColumnHeader
+import com.infomaniak.calendar.components.day.component.DaysRow
 import com.infomaniak.calendar.components.day.component.HourLabelOverhang
 import com.infomaniak.calendar.components.day.component.HourLabels
 import com.infomaniak.calendar.components.day.component.HourLines
+import com.infomaniak.calendar.components.day.component.MultiDayAllDayBand
+import com.infomaniak.calendar.components.day.component.PagerAlignedPages
 import com.infomaniak.calendar.components.day.component.minuteOfDay
-import com.infomaniak.calendar.components.day.component.timelineDropHandler
+import com.infomaniak.calendar.components.day.component.rememberDayHighlightState
 import com.infomaniak.calendar.components.day.component.timelineDropTarget
 import com.infomaniak.calendar.components.day.component.verticalTimelineScroll
 import com.infomaniak.calendar.components.day.layout.TimedEventsColumn
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.DayPages
+import com.infomaniak.calendar.components.day.model.EventMove
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
@@ -80,12 +81,12 @@ import com.infomaniak.calendar.components.event.highlight.EventHighlightState
 import com.infomaniak.calendar.components.event.highlight.HighlightedEventOverlay
 import com.infomaniak.calendar.components.event.highlight.eventHighlightArea
 import com.infomaniak.calendar.components.event.highlight.releaseHighlightOnSecondPointer
-import com.infomaniak.calendar.components.event.highlight.rememberEventHighlightState
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
 import com.infomaniak.calendar.components.foundation.theme.ComponentColors
 import com.infomaniak.calendar.components.foundation.utils.FollowSelectedPage
+import com.infomaniak.calendar.components.foundation.utils.HorizontalGridLine
 import com.infomaniak.calendar.components.foundation.utils.onlyHorizontalAndTop
 import com.infomaniak.calendar.components.foundation.utils.verticalEndDivider
 import com.infomaniak.calendar.components.resources.R
@@ -95,7 +96,6 @@ import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlin.time.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 
@@ -111,9 +111,10 @@ import kotlinx.datetime.plus
  *
  * @param eventTextOverflow How the events' texts are cut. Narrow columns show more of them with
  * [TextOverflow.Clip], the ellipsis taking the room of the letters it replaces.
- * @param onEventMoved Called when an event held up by a long press is dragged and dropped, with where it now
- * starts: on the day under the finger, at the quarter of an hour nearest to the dragged card's top. Whichever of
- * its days is grabbed, the dragged card is the event's first day, its start under the finger.
+ * @param onEventMoved Called when an event held up by a long press, timed or all-day, is dragged and
+ * dropped: on an hour grid, an [EventMove.Timed] starting on the day under the finger at the quarter of an
+ * hour nearest to the card's top; on the all-day events, an [EventMove.AllDay] starting on the day under the
+ * finger. Whichever of its days is grabbed, the dragged card is the event's first day, its start under the finger.
  */
 @Composable
 fun MultiDayPager(
@@ -131,7 +132,7 @@ fun MultiDayPager(
     timelineModifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     eventTextOverflow: TextOverflow = TextOverflow.Ellipsis,
-    onEventMoved: ((EventSummaryUi.Normal, newStart: LocalDateTime) -> Unit)? = null,
+    onEventMoved: ((EventSummaryUi.Normal, EventMove) -> Unit)? = null,
 ) {
     require(daysPerPage in 1..visibleDayCount) { "daysPerPage must be between 1 and visibleDayCount" }
 
@@ -179,18 +180,19 @@ private fun MultiDayPagerContent(
     timelineModifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     eventTextOverflow: TextOverflow = TextOverflow.Ellipsis,
-    onEventMoved: ((EventSummaryUi.Normal, newStart: LocalDateTime) -> Unit)? = null,
+    onEventMoved: ((EventSummaryUi.Normal, EventMove) -> Unit)? = null,
 ) {
     val density = LocalDensity.current
     var headerHeight by remember { mutableStateOf(0.dp) }
     // The grid runs to the end edge, keeping all the room it can for the days' content.
     val contentPadding = contentPadding + PaddingValues(start = EsdsTheme.spacing.md)
     val pageSize = remember(pages, visibleDayCount) { DaysPageSize(pages.daysPerPage, visibleDayCount) }
-    val highlightState = rememberEventHighlightState(
-        onEventDropped = onEventMoved?.let(::timelineDropHandler),
-    )
+    val highlightState = rememberDayHighlightState(onEventMoved)
 
-    Box(modifier.releaseHighlightOnSecondPointer(highlightState)) {
+    // Where a held all-day chip unfolds: across the whole view, since its band is too short to show it, but
+    // beside the hour gutter, like a held timed event.
+    val allDayHighlightPadding = contentPadding.onlyHorizontal() + PaddingValues(start = TimelineDefaults.HourGutterWidth)
+    Box(modifier.releaseHighlightOnSecondPointer(highlightState).eventHighlightArea(allDayHighlightPadding)) {
         MultiDayTimeline(
             pagerState = pagerState,
             pages = pages,
@@ -207,7 +209,11 @@ private fun MultiDayPagerContent(
         OverlaidHeaders(
             pagerState = pagerState,
             pages = pages,
+            eventsOf = eventsOf,
             weekNumbering = weekNumbering,
+            onEventClick = onEventClick,
+            eventTextOverflow = eventTextOverflow,
+            highlightState = highlightState,
             onHeightChanged = { headerHeight = with(density) { it.toDp() } },
             modifier = headerModifier.fillMaxWidth(),
             contentPadding = contentPadding.onlyHorizontalAndTop(),
@@ -310,90 +316,76 @@ private fun MultiDayTimeline(
     }
 }
 
-/** The week number over the hour gutter, then the headers of the days in view, following the pager. */
+/**
+ * The week number over the hour gutter, then the headers of the days in view, and under them the
+ * band of their all-day events, both following the pager.
+ */
 @Composable
 private fun OverlaidHeaders(
     pagerState: PagerState,
     pages: DayPages,
+    eventsOf: (LocalDate) -> DayEvents,
     weekNumbering: WeekNumbering,
+    onEventClick: (EventSummaryUi.Normal) -> Unit,
+    eventTextOverflow: TextOverflow,
+    highlightState: EventHighlightState,
     onHeightChanged: (Int) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val firstVisibleDate = pages.firstDateOf(pagerState.currentPage)
+    val currentEventsOf by rememberUpdatedState(eventsOf)
+    // Like the single day's band, only shown when there is something in it, as soon as a day holding
+    // all-day events starts coming into view.
+    val hasAllDayEvents by remember(pagerState, pages) {
+        derivedStateOf {
+            pagerState.layoutInfo.visiblePagesInfo.any { page ->
+                pages.datesOf(page.index).any { currentEventsOf(it).allDay.isNotEmpty() }
+            }
+        }
+    }
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+    Column(
         modifier = modifier
-            .padding(contentPadding)
-            // Measured inside the padding: the timeline already makes room for it on its own.
+            .padding(top = contentPadding.calculateTopPadding())
+            // Measured below the top padding, which the timeline already makes room for on its own,
+            // and around the band, so the timeline also starts below it.
             .onSizeChanged { onHeightChanged(it.height) },
     ) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.width(TimelineDefaults.HourGutterWidth)) {
-            Text(
-                text = stringResource(R.string.weekHeaderWeekNumber, weekNumbering.weekOf(firstVisibleDate).weekNumber),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+        Column(modifier = Modifier.padding(contentPadding.onlyHorizontal())) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.width(TimelineDefaults.HourGutterWidth)) {
+                    Text(
+                        text = stringResource(
+                            R.string.weekHeaderWeekNumber,
+                            weekNumbering.weekOf(firstVisibleDate).weekNumber,
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
 
-        PagedDayHeaders(pagerState = pagerState, pages = pages, modifier = Modifier.weight(1f))
-    }
-}
-
-/**
- * The headers of the pages the pager shows, each placed where the pager places its page.
- *
- * They are not a pager of their own: two pagers could only be kept in step after the fact, a frame
- * late. Here the pager's own layout positions them.
- */
-@Composable
-private fun PagedDayHeaders(pagerState: PagerState, pages: DayPages, modifier: Modifier = Modifier) {
-    val visiblePages by remember(pagerState) {
-        derivedStateOf { pagerState.layoutInfo.visiblePagesInfo.map { it.index } }
-    }
-
-    Layout(
-        modifier = modifier.clipToBounds(),
-        content = {
-            visiblePages.forEach { page ->
-                key(page) {
+                PagerAlignedPages(pagerState = pagerState, modifier = Modifier.weight(1f)) { page ->
                     DaysRow(dates = pages.datesOf(page)) { date ->
                         DayColumnHeader(date, modifier = Modifier.padding(bottom = EsdsTheme.spacing.xl))
                     }
                 }
             }
-        },
-    ) { measurables, constraints ->
-        val layoutInfo = pagerState.layoutInfo
-        val placeables = measurables.map { it.measure(Constraints.fixedWidth(layoutInfo.pageSize.coerceAtLeast(0))) }
-        val height = placeables.maxOfOrNull { it.height } ?: 0
 
-        layout(constraints.maxWidth, height) {
-            placeables.forEachIndexed { index, placeable ->
-                val pageInfo = layoutInfo.visiblePagesInfo.firstOrNull { it.index == visiblePages.getOrNull(index) }
-                pageInfo?.let { placeable.placeRelative(x = it.offset, y = 0) }
+            if (hasAllDayEvents) {
+                MultiDayAllDayBand(
+                    pagerState = pagerState,
+                    pages = pages,
+                    eventsOf = eventsOf,
+                    onEventClick = onEventClick,
+                    textOverflow = eventTextOverflow,
+                    highlightState = highlightState,
+                    modifier = Modifier.padding(bottom = EsdsTheme.spacing.xl),
+                )
             }
         }
-    }
-}
 
-/** One equally wide column per date. */
-@Composable
-private fun DaysRow(
-    dates: List<LocalDate>,
-    modifier: Modifier = Modifier,
-    content: @Composable (LocalDate) -> Unit,
-) {
-    Row(modifier = modifier.fillMaxWidth()) {
-        dates.forEach { date -> DayColumn { content(date) } }
-    }
-}
-
-@Composable
-private fun RowScope.DayColumn(content: @Composable () -> Unit) {
-    Box(contentAlignment = Alignment.TopCenter, modifier = Modifier.weight(1f)) {
-        content()
+        if (hasAllDayEvents) HorizontalGridLine()
     }
 }
 

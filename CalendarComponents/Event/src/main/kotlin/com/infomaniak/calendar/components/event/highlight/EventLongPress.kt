@@ -32,6 +32,7 @@ import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.currentValueOf
 import androidx.compose.ui.node.findNearestAncestor
 import androidx.compose.ui.node.requireLayoutCoordinates
+import androidx.compose.ui.node.requireLayoutDirection
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.toSize
@@ -105,9 +106,12 @@ private class LongPressHighlightNode(
         val longPress = awaitLongPressOrCancellation(down.id) ?: return@awaitEachGesture
 
         val overlay = state.overlayCoordinates?.takeIf { it.isAttached } ?: return@awaitEachGesture
-        val area = (findNearestAncestor(EventHighlightAreaNode.TraverseKey) as? EventHighlightAreaNode)
-            ?.requireLayoutCoordinates()
-            ?: return@awaitEachGesture
+        val area = findNearestAncestor(EventHighlightAreaNode.TraverseKey) as? EventHighlightAreaNode ?: return@awaitEachGesture
+        val areaBounds = area.inset(
+            bounds = overlay.localBoundingBoxOf(area.requireLayoutCoordinates(), clipBounds = true),
+            density = this,
+            layoutDirection = requireLayoutDirection(),
+        )
 
         currentValueOf(LocalHapticFeedback).performHapticFeedback(HapticFeedbackType.LongPress)
         val card = requireLayoutCoordinates()
@@ -121,7 +125,7 @@ private class LongPressHighlightNode(
                 event = event,
                 key = key,
                 startBounds = overlay.localBoundingBoxOf(card, clipBounds = true),
-                areaBounds = overlay.localBoundingBoxOf(area, clipBounds = true),
+                areaBounds = areaBounds,
                 fingerY = pressedAt.y,
                 draggedCard = draggedCard,
                 draggedBounds = draggedBounds,

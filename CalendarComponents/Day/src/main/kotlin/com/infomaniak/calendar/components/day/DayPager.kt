@@ -32,15 +32,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.component.DayView
-import com.infomaniak.calendar.components.day.component.timelineDropHandler
+import com.infomaniak.calendar.components.day.component.rememberDayHighlightState
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.DayPages
+import com.infomaniak.calendar.components.day.model.EventMove
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.event.highlight.HighlightedEventOverlay
 import com.infomaniak.calendar.components.event.highlight.releaseHighlightOnSecondPointer
-import com.infomaniak.calendar.components.event.highlight.rememberEventHighlightState
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.utils.FollowSelectedPage
@@ -48,16 +48,16 @@ import com.infomaniak.core.common.utils.today
 import kotlin.time.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 
 /**
  * One day per page, swiped a day at a time.
  *
- * @param onEventMoved Called when an event held up by a long press is dragged and dropped, with where it now
- * starts: the quarter of an hour nearest to the dragged card's top. Whichever of its days is grabbed, the dragged
- * card is the event's first day, its start under the finger.
+ * @param onEventMoved Called when an event held up by a long press, timed or all-day, is dragged and
+ * dropped: on an hour grid, an [EventMove.Timed] starting on the day under the finger at the quarter of an
+ * hour nearest to the card's top; on the all-day events, an [EventMove.AllDay] starting on the day under the
+ * finger. Whichever of its days is grabbed, the dragged card is the event's first day, its start under the finger.
  */
 @Composable
 fun DayPager(
@@ -73,7 +73,7 @@ fun DayPager(
     timelineModifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     headerTrailingContent: @Composable () -> Unit = {},
-    onEventMoved: ((EventSummaryUi.Normal, newStart: LocalDateTime) -> Unit)? = null,
+    onEventMoved: ((EventSummaryUi.Normal, EventMove) -> Unit)? = null,
 ) {
     val pages = remember(dateRange) { DayPages(dateRange, daysPerPage = 1) }
     val pagerState = rememberPagerState(initialPage = pages.pageOf(selectedDate())) { pages.count }
@@ -84,9 +84,7 @@ fun DayPager(
         onPageChanged = { onVisibleDateChanged(pages.firstDateOf(it)) },
     )
 
-    val highlightState = rememberEventHighlightState(
-        onEventDropped = onEventMoved?.let(::timelineDropHandler),
-    )
+    val highlightState = rememberDayHighlightState(onEventMoved)
 
     // Each page's header height, by page, so the highlighted event of the shown one is kept under its header.
     val headerHeights = remember { mutableStateMapOf<Int, Dp>() }

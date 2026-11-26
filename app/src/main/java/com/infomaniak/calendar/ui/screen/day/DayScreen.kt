@@ -130,7 +130,7 @@ private fun DayScreen(
             timelineModifier = Modifier.hazeSource(hazeState),
             contentPadding = contentPadding + PaddingValues(bottom = Dimens.FloatingToolbarClearance),
             //TODO[eventDragAndDrop]: Move the whole event by the shift it was dragged by
-            onEventMoved = { event, newStart -> Log.d("EventDragAndDrop", "${event.title} moved to $newStart") },
+            onEventMoved = { event, move -> Log.d("EventDragAndDrop", "${event.title} moved: $move") },
             // Placed here rather than on each page: the hour grid's vertical scroll reaches it through
             // the pager, which only consumes the horizontal axis.
             modifier = Modifier

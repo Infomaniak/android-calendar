@@ -34,13 +34,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.TimelineDefaults
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
-import com.infomaniak.calendar.components.event.EventItem
+import com.infomaniak.calendar.components.event.highlight.EventHighlightState
+import com.infomaniak.calendar.components.event.highlight.eventDropTarget
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.resources.R
+import com.infomaniak.core.common.utils.today
 import com.infomaniak.designsystem.core.theme.EsdsTheme
+import kotlin.time.Clock
+import kotlinx.datetime.LocalDate
 
 private val ChipHeight = 32.dp
 
@@ -49,37 +54,39 @@ private val MinChipWidth = 120.dp
 private const val WHOLE_ROWS = 2
 private val NextRowPeek = 12.dp
 
+/** Room for two rows of chips, the top of a third one peeking below to tell more are scrolled to. */
+internal val AllDayBandMaxHeight: Dp
+    @Composable get() = ChipHeight * WHOLE_ROWS + AllDayChipSpacing * WHOLE_ROWS + NextRowPeek
+
+internal val AllDayChipSpacing: Dp
+    @Composable get() = EsdsTheme.spacing.xs
+
+/**
+ * The all-day events of [date], named from the hour gutter. With a [highlightState], a long press holds
+ * a chip up to drag it, and the band is where an event can be dropped on [date], all day long.
+ */
 @Composable
 internal fun AllDayEventsBand(
+    date: LocalDate,
     events: List<EventSummaryUi.Normal>,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
+    highlightState: EventHighlightState? = null,
 ) {
     if (events.isEmpty()) return
 
-    val spacing = EsdsTheme.spacing.xs
-
-    Row(modifier = modifier) {
-        Text(
-            text = stringResource(R.string.allDayLabel),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            // Held against the chips it names, at the gutter's end rather than at the screen's edge.
-            textAlign = TextAlign.End,
-            // The label stays inside the gutter so the chips still begin where the events do.
-            modifier = Modifier
-                .width(TimelineDefaults.HourGutterWidth)
-                .padding(end = EsdsTheme.spacing.lg),
-        )
+    Row(modifier = modifier.then(highlightState?.let { Modifier.eventDropTarget(it, date) } ?: Modifier)) {
+        AllDayLabel()
 
         LazyVerticalGrid(
             columns = GridCells.Adaptive(MinChipWidth),
-            verticalArrangement = Arrangement.spacedBy(spacing),
-            horizontalArrangement = Arrangement.spacedBy(spacing),
+            userScrollEnabled = highlightState?.isHeld != true,
+            verticalArrangement = Arrangement.spacedBy(AllDayChipSpacing),
+            horizontalArrangement = Arrangement.spacedBy(AllDayChipSpacing),
             modifier = Modifier
                 .weight(1f)
                 .padding(end = TimelineDefaults.TimelineEndPadding)
-                .heightIn(max = ChipHeight * WHOLE_ROWS + spacing * WHOLE_ROWS + NextRowPeek),
+                .heightIn(max = AllDayBandMaxHeight),
         ) {
             itemsIndexed(
                 items = events,
@@ -88,10 +95,25 @@ internal fun AllDayEventsBand(
                 // rather than leaving the half it does not use empty.
                 span = { index, _ -> GridItemSpan(if (index == events.lastIndex) maxCurrentLineSpan else 1) },
             ) { _, event ->
-                EventItem(event, onClick = { onEventClick(event) })
+                AllDayChip(event = event, onClick = { onEventClick(event) }, highlightState = highlightState)
             }
         }
     }
+}
+
+/** Names the all-day band from the hour gutter, so the chips still begin where the timed events do. */
+@Composable
+internal fun AllDayLabel(modifier: Modifier = Modifier) {
+    Text(
+        text = stringResource(R.string.allDayLabel),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        // Held against the chips it names, at the gutter's end rather than at the screen's edge.
+        textAlign = TextAlign.End,
+        modifier = modifier
+            .width(TimelineDefaults.HourGutterWidth)
+            .padding(end = EsdsTheme.spacing.lg),
+    )
 }
 
 /** Four chips: enough to see them fill the rows two at a time on a phone's width. */
@@ -99,6 +121,6 @@ internal fun AllDayEventsBand(
 @Composable
 private fun AllDayEventsBandPreview() {
     Surface {
-        AllDayEventsBand(events = previewDayEvents.allDay, onEventClick = {})
+        AllDayEventsBand(date = Clock.today(), events = previewDayEvents.allDay, onEventClick = {})
     }
 }

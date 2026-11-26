@@ -20,14 +20,10 @@ package com.infomaniak.calendar.components.day.component
 import androidx.compose.ui.Modifier
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
-import com.infomaniak.calendar.components.event.highlight.EventDrop
 import com.infomaniak.calendar.components.event.highlight.EventHighlightState
 import com.infomaniak.calendar.components.event.highlight.eventDropTarget
-import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.atTime
 import kotlin.math.roundToInt
 
 private const val DROP_STEP_MINUTES = 15
@@ -44,12 +40,4 @@ private fun quarterHourAt(topFraction: Float): LocalTime {
     val minute = ((topFraction * MINUTES_PER_DAY / DROP_STEP_MINUTES).roundToInt() * DROP_STEP_MINUTES)
         .coerceIn(0, MINUTES_PER_DAY - DROP_STEP_MINUTES)
     return LocalTime(hour = minute / MINUTES_PER_HOUR, minute = minute % MINUTES_PER_HOUR)
-}
-
-/** Reports where a dropped event now starts to [onEventMoved], unless it starts there already. */
-internal fun timelineDropHandler(
-    onEventMoved: (EventSummaryUi.Normal, newStart: LocalDateTime) -> Unit,
-): (EventSummaryUi.Normal, EventDrop) -> Unit = { event, drop ->
-    val newStart = drop.date.atTime(drop.time ?: LocalTime(0, 0))
-    if (newStart != event.eventStart) onEventMoved(event, newStart)
 }
