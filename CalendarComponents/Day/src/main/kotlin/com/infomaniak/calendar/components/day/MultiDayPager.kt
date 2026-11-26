@@ -60,8 +60,8 @@ import com.infomaniak.calendar.components.day.component.DaysRow
 import com.infomaniak.calendar.components.day.component.HourLabelOverhang
 import com.infomaniak.calendar.components.day.component.HourLabels
 import com.infomaniak.calendar.components.day.component.HourLines
-import com.infomaniak.calendar.components.day.component.MultiDayAllDayBand
 import com.infomaniak.calendar.components.day.component.PagerAlignedPages
+import com.infomaniak.calendar.components.day.component.allday.MultiDayAllDayBand
 import com.infomaniak.calendar.components.day.component.minuteOfDay
 import com.infomaniak.calendar.components.day.component.rememberDayHighlightState
 import com.infomaniak.calendar.components.day.component.timelineDropTarget

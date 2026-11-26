@@ -15,51 +15,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.day.component
+package com.infomaniak.calendar.components.day.component.allday
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.TimelineDefaults
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.event.highlight.EventHighlightState
 import com.infomaniak.calendar.components.event.highlight.eventDropTarget
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
-import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.core.common.utils.today
-import com.infomaniak.designsystem.core.theme.EsdsTheme
 import kotlin.time.Clock
 import kotlinx.datetime.LocalDate
 
-private val ChipHeight = 32.dp
-
 /** A chip narrower than this has no room left to read a title in. */
 private val MinChipWidth = 120.dp
-private const val WHOLE_ROWS = 2
-private val NextRowPeek = 12.dp
-
-/** Room for two rows of chips, the top of a third one peeking below to tell more are scrolled to. */
-internal val AllDayBandMaxHeight: Dp
-    @Composable get() = ChipHeight * WHOLE_ROWS + AllDayEventSpacing * WHOLE_ROWS + NextRowPeek
-
-internal val AllDayEventSpacing: Dp
-    @Composable get() = EsdsTheme.spacing.xs
 
 /**
  * The all-day events of [date], named from the hour gutter. With a [highlightState], a long press holds
@@ -99,21 +80,6 @@ internal fun AllDayEventsBand(
             }
         }
     }
-}
-
-/** Names the all-day band from the hour gutter, so the chips still begin where the timed events do. */
-@Composable
-internal fun AllDayLabel(modifier: Modifier = Modifier) {
-    Text(
-        text = stringResource(R.string.allDayLabel),
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        // Held against the chips it names, at the gutter's end rather than at the screen's edge.
-        textAlign = TextAlign.End,
-        modifier = modifier
-            .width(TimelineDefaults.HourGutterWidth)
-            .padding(end = EsdsTheme.spacing.lg),
-    )
 }
 
 /** Four chips: enough to see them fill the rows two at a time on a phone's width. */

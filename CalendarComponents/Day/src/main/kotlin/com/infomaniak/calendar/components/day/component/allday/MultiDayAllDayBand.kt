@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.calendar.components.day.component
+package com.infomaniak.calendar.components.day.component.allday
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,6 +40,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infomaniak.calendar.components.day.TimelineDefaults
+import com.infomaniak.calendar.components.day.component.DaysRow
+import com.infomaniak.calendar.components.day.component.PagerAlignedPages
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.DayPages
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
