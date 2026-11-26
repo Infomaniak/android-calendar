@@ -82,7 +82,7 @@ rootProject.name = "Calendar"
 include(":app")
 include(":CalendarComponents:Absence")
 include(":CalendarComponents:Calendar")
-include(":CalendarComponents:Day")
+include(":CalendarComponents:Days")
 include(":CalendarComponents:Event")
 include(":CalendarComponents:EventDetail")
 include(":CalendarComponents:AttendeesSearch")

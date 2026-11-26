@@ -19,7 +19,7 @@ package com.infomaniak.calendar.data
 
 import android.content.Context
 import androidx.compose.ui.unit.Dp
-import com.infomaniak.calendar.components.day.TimelineDefaults
+import com.infomaniak.calendar.components.days.TimelineDefaults
 import com.infomaniak.calendar.secured.EncryptedDavCredentialSerializer
 import com.infomaniak.calendar.secured.KeystoreCipher
 import com.infomaniak.calendar.ui.navigation.NavDestination.CalendarView

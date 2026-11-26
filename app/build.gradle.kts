@@ -149,7 +149,7 @@ sentry {
 dependencies {
     implementation(project(":CalendarComponents:AttendeesSearch"))
     implementation(project(":CalendarComponents:Calendar"))
-    implementation(project(":CalendarComponents:Day"))
+    implementation(project(":CalendarComponents:Days"))
     implementation(project(":CalendarComponents:EventDetail"))
     implementation(project(":CalendarComponents:Foundation"))
     implementation(project(":CalendarComponents:Month"))

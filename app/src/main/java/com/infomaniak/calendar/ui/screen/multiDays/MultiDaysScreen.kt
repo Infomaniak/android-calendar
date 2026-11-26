@@ -35,9 +35,9 @@ import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendarDefaults
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
-import com.infomaniak.calendar.components.day.MultiDayPager
-import com.infomaniak.calendar.components.day.state.TimelineState
-import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.days.MultiDayPager
+import com.infomaniak.calendar.components.days.state.TimelineState
+import com.infomaniak.calendar.components.days.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
