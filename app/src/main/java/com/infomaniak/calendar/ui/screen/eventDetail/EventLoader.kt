@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.ui.screen.eventDetail
 
 import com.infomaniak.calendar.manager.CachedCalendarManager
+import com.infomaniak.calendar.manager.TimeZoneManager
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.toEventDetailCalendarGroups
 import com.infomaniak.calendar.utils.toEventDetailUi
@@ -38,6 +39,7 @@ class EventLoader @Inject constructor(
     private val accountUtils: AccountUtils,
     private val calendarManager: CalendarManager,
     private val cachedCalendarManager: CachedCalendarManager,
+    private val timeZoneManager: TimeZoneManager,
 ) {
     fun eventDetailUi(eventAndCalendar: Flow<EventAndCalendarState>): Flow<EventDetailUiState> = combine(
         eventAndCalendar,
@@ -57,8 +59,8 @@ class EventLoader @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun eventAndCalendar(occurrenceId: OccurrenceId): Flow<EventAndCalendarState> = calendarManager
-        .observeOccurrence(occurrenceId)
+    fun eventAndCalendar(occurrenceId: OccurrenceId): Flow<EventAndCalendarState> = timeZoneManager.timeZone
+        .flatMapLatest { timeZone -> calendarManager.observeOccurrence(occurrenceId, timeZone) }
         .flatMapLatest { event ->
             if (event == null) {
                 flowOf(EventAndCalendarState.EventNotFound)
