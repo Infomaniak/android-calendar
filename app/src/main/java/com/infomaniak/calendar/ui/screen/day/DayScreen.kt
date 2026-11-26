@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.day
 
+import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.plus
@@ -31,9 +32,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
-import com.infomaniak.calendar.components.day.DayPager
-import com.infomaniak.calendar.components.day.state.TimelineState
-import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.days.DayPager
+import com.infomaniak.calendar.components.days.state.TimelineState
+import com.infomaniak.calendar.components.days.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
@@ -128,6 +129,8 @@ private fun DayScreen(
             headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),
             timelineModifier = Modifier.hazeSource(hazeState),
             contentPadding = contentPadding + PaddingValues(bottom = Dimens.FloatingToolbarClearance),
+            //TODO[eventDragAndDrop]: Move the whole event by the shift it was dragged by
+            onEventMoved = { event, move -> Log.d("EventDragAndDrop", "${event.title} moved: $move") },
             // Placed here rather than on each page: the hour grid's vertical scroll reaches it through
             // the pager, which only consumes the horizontal axis.
             modifier = Modifier

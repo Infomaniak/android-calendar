@@ -22,6 +22,7 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.PointerInputModifierNode
+import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.IntSize
 
 /**
@@ -35,6 +36,10 @@ internal fun Modifier.letPointersThrough(): Modifier = this then LetPointersThro
 private data object LetPointersThroughElement : ModifierNodeElement<LetPointersThroughNode>() {
     override fun create() = LetPointersThroughNode()
     override fun update(node: LetPointersThroughNode) = Unit
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "letPointersThrough"
+    }
 }
 
 private class LetPointersThroughNode : Modifier.Node(), PointerInputModifierNode {

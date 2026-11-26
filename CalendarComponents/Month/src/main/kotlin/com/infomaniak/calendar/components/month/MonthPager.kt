@@ -51,6 +51,9 @@ import kotlinx.datetime.yearMonth
 /**
  * Pages through the months of [monthRange], following the month of [selectedDate], which is marked. A month [monthOf]
  * doesn't have yet stays blank until it does.
+ *
+ * @param onEventMoved Called when an event held up by a long press is dragged and dropped, with the day it now
+ * starts on: the one under the finger, which the dragged chip's first day is held over.
  */
 @Composable
 fun MonthPager(
@@ -62,6 +65,7 @@ fun MonthPager(
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    onEventMoved: ((EventSummaryUi.Normal, newStartDate: LocalDate) -> Unit)? = null,
 ) {
     val pageCount = remember(monthRange) { monthRange.monthCount }
     val selectedMonth = { selectedDate().yearMonth }
@@ -73,7 +77,11 @@ fun MonthPager(
         onPageChanged = { onVisibleMonthChanged(monthRange.monthAt(it)) },
     )
 
-    val highlightState = rememberEventHighlightState()
+    val highlightState = rememberEventHighlightState(
+        onEventDropped = onEventMoved?.let { moved ->
+            { event, drop -> if (drop.date != event.eventStart.date) moved(event, drop.date) }
+        },
+    )
 
     // The highlighted event is drawn over the pager, so neither the neighbouring days nor the page edge hide it.
     Box(modifier = modifier.releaseHighlightOnSecondPointer(highlightState), propagateMinConstraints = true) {

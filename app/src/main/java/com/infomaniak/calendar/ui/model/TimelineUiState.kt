@@ -17,7 +17,7 @@
  */
 package com.infomaniak.calendar.ui.model
 
-import com.infomaniak.calendar.components.day.model.DayEvents
+import com.infomaniak.calendar.components.days.model.DayEvents
 import com.infomaniak.calendar.utils.DayEventsByDate
 import kotlinx.datetime.LocalDate
 

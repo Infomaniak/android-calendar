@@ -1,0 +1,92 @@
+/*
+ * Infomaniak Calendar - Android
+ * Copyright (C) 2026 Infomaniak Network SA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.infomaniak.calendar.components.days.component.allday
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.days.TimelineDefaults
+import com.infomaniak.calendar.components.days.preview.previewDayEvents
+import com.infomaniak.calendar.components.event.highlight.EventHighlightState
+import com.infomaniak.calendar.components.event.highlight.eventDropTarget
+import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
+import com.infomaniak.core.common.utils.today
+import kotlin.time.Clock
+import kotlinx.datetime.LocalDate
+
+/** A chip narrower than this has no room left to read a title in. */
+private val MinChipWidth = 120.dp
+
+/**
+ * The all-day events of [date], named from the hour gutter. With a [highlightState], a long press holds
+ * a chip up to drag it, and the band is where an event can be dropped on [date], all day long.
+ */
+@Composable
+internal fun AllDayEventsBand(
+    date: LocalDate,
+    events: List<EventSummaryUi.Normal>,
+    onEventClick: (EventSummaryUi.Normal) -> Unit,
+    modifier: Modifier = Modifier,
+    highlightState: EventHighlightState? = null,
+) {
+    if (events.isEmpty()) return
+
+    Row(modifier = modifier.then(highlightState?.let { Modifier.eventDropTarget(it, date) } ?: Modifier)) {
+        AllDayLabel()
+
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(MinChipWidth),
+            userScrollEnabled = highlightState?.isHeld != true,
+            verticalArrangement = Arrangement.spacedBy(AllDayEventSpacing),
+            horizontalArrangement = Arrangement.spacedBy(AllDayEventSpacing),
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = TimelineDefaults.TimelineEndPadding)
+                .heightIn(max = AllDayBandMaxHeight),
+        ) {
+            itemsIndexed(
+                items = events,
+                key = { _, event -> event.id },
+                // Only the last chip can end up alone on its row, and it takes the whole of it
+                // rather than leaving the half it does not use empty.
+                span = { index, _ -> GridItemSpan(if (index == events.lastIndex) maxCurrentLineSpan else 1) },
+            ) { _, event ->
+                AllDayEvent(event = event, onClick = { onEventClick(event) }, highlightState = highlightState)
+            }
+        }
+    }
+}
+
+/** Four chips: enough to see them fill the rows two at a time on a phone's width. */
+@Preview
+@Composable
+private fun AllDayEventsBandPreview() {
+    Surface {
+        AllDayEventsBand(date = Clock.today(), events = previewDayEvents.allDay, onEventClick = {})
+    }
+}

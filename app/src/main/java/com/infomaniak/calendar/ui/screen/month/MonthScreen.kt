@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.month
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -121,6 +122,8 @@ private fun MonthScreen(
             },
             onEventClick = { goToEventDetail(it.occurrenceId) },
             contentPadding = contentPadding + PaddingValues(bottom = Dimens.FloatingToolbarClearance),
+            //TODO[eventDragAndDrop]: Move the event by the days it was dragged over
+            onEventMoved = { event, newStartDate -> Log.d("EventDragAndDrop", "${event.title} moved to $newStartDate") },
             modifier = Modifier
                 .fillMaxSize()
                 .hazeSource(hazeState),

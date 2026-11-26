@@ -17,15 +17,33 @@
  */
 package com.infomaniak.calendar.components.event.highlight
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 
+private const val DRAGGED_TRACE_ALPHA = 0.35f
+
 /**
  * Lets a long press hold [event] up in [state], and hides this card while [HighlightedEventOverlay] draws it in its place.
+ * Once dragged, only a trace is left of every card showing the same event: the whole event moves with it.
  *
  * [key] tells this card apart from the others showing the same event, like the slices of an event over several days.
+ * [draggedCard] draws the card while it is dragged, where [draggedCardPlacement] puts it, then while it goes back to
+ * its place once dropped, [EventHighlightState.isDragging] no longer set: the Planning's event item when not given.
  */
-fun Modifier.highlightable(state: EventHighlightState, event: EventSummaryUi.Normal, key: Any = event): Modifier = this
-    .highlightOnLongPress(state, event, key)
-    .graphicsLayer { alpha = if (state.isHighlighting(key)) 0f else 1f }
+fun Modifier.highlightable(
+    state: EventHighlightState,
+    event: EventSummaryUi.Normal,
+    key: Any = event,
+    draggedCardPlacement: DraggedCardPlacement = DraggedCardPlacement.AsGrabbed,
+    draggedCard: (@Composable (Modifier) -> Unit)? = null,
+): Modifier = this
+    .highlightOnLongPress(state, event, key, draggedCardPlacement, draggedCard)
+    .graphicsLayer {
+        alpha = when {
+            state.isDragging(event) -> DRAGGED_TRACE_ALPHA
+            state.isHighlighting(key) -> 0f
+            else -> 1f
+        }
+    }

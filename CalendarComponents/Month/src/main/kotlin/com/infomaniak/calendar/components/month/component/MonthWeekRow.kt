@@ -29,6 +29,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalDensity
@@ -37,7 +38,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
+import com.infomaniak.calendar.components.event.highlight.DraggedCardPlacement
 import com.infomaniak.calendar.components.event.highlight.EventHighlightState
+import com.infomaniak.calendar.components.event.highlight.eventDropTarget
 import com.infomaniak.calendar.components.event.highlight.highlightable
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.utils.HorizontalGridLine
@@ -83,7 +86,8 @@ internal fun MonthWeekRow(
                     onClick = { onDayClick(date) },
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight(),
+                        .fillMaxHeight()
+                        .then(highlightState?.let { Modifier.eventDropTarget(it, date) } ?: Modifier),
                 )
             }
         }
@@ -106,6 +110,7 @@ private fun WeekEvents(
 ) {
     val visibleEvents = remember(week, laneCount) { week.visibleEventsIn(laneCount) }
     val horizontalInset = MonthDefaults.EventHorizontalInset
+    val chipInset = with(LocalDensity.current) { horizontalInset.toPx() }
 
     Layout(
         content = {
@@ -117,7 +122,18 @@ private fun WeekEvents(
                         modifier = Modifier
                             .layoutId(EventSlot(segment.startColumn, segment.span, segment.lane))
                             // An event over several weeks has a segment in each, alike but for their week.
-                            .then(highlightState?.let { Modifier.highlightable(it, segment.event, key = week.dates.first() to segment) } ?: Modifier),
+                            .then(
+                                highlightState?.let {
+                                    Modifier.highlightable(
+                                        state = it,
+                                        event = segment.event,
+                                        key = week.dates.first() to segment,
+                                        draggedCardPlacement = firstDayUnderFinger(segment.span, chipInset),
+                                    ) { draggedModifier ->
+                                        MonthEventChip(event = segment.event, onClick = {}, modifier = draggedModifier)
+                                    }
+                                } ?: Modifier,
+                            ),
                     )
                 }
             }
@@ -147,6 +163,18 @@ private fun WeekEvents(
             placeables.forEach { (placeable, position) -> placeable.placeRelative(position) }
         }
     }
+}
+
+/**
+ * Holds a dragged chip [span] days long by its first day, under the finger as far into it as the finger was into
+ * the day it grabbed, so wherever the chip is grabbed, its first day is the one it is dropped on.
+ */
+private fun firstDayUnderFinger(span: Int, inset: Float) = DraggedCardPlacement { card, grab, layoutDirection ->
+    val columnWidth = (card.width + 2 * inset) / span
+    val fromStart = if (layoutDirection == LayoutDirection.Ltr) grab.x else card.width - grab.x
+    val startEdge = inset - (fromStart + inset) % columnWidth
+    val left = if (layoutDirection == LayoutDirection.Ltr) startEdge else -startEdge - card.width
+    Rect(left = left, top = -grab.y, right = left + card.width, bottom = card.height - grab.y)
 }
 
 /** How many events cover the day of [column], hidden ones included. */

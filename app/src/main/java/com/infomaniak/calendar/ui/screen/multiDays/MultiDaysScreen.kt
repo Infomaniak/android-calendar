@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.ui.screen.multiDays
 
+import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.plus
@@ -34,9 +35,9 @@ import com.infomaniak.calendar.components.calendar.component.ExpandableCalendar
 import com.infomaniak.calendar.components.calendar.component.ExpandableCalendarDefaults
 import com.infomaniak.calendar.components.calendar.component.collapseCalendarOnScroll
 import com.infomaniak.calendar.components.calendar.component.rememberCalendarExpansionState
-import com.infomaniak.calendar.components.day.MultiDayPager
-import com.infomaniak.calendar.components.day.state.TimelineState
-import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.days.MultiDayPager
+import com.infomaniak.calendar.components.days.state.TimelineState
+import com.infomaniak.calendar.components.days.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
@@ -151,6 +152,8 @@ private fun MultiDaysScreen(
             contentPadding = contentPadding + PaddingValues(bottom = Dimens.FloatingToolbarClearance),
             // A week's columns are too narrow for an ellipsis: it would take the room of the few letters that fit.
             eventTextOverflow = TextOverflow.Clip,
+            //TODO[eventDragAndDrop]: Move the whole event by the shift it was dragged by
+            onEventMoved = { event, move -> Log.d("EventDragAndDrop", "${event.title} moved: $move") },
             // Placed here rather than on each page: the hour grid's vertical scroll reaches it through
             // the pager, which only consumes the horizontal axis.
             modifier = Modifier

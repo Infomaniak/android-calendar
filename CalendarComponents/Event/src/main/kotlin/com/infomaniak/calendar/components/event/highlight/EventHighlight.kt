@@ -17,14 +17,17 @@
  */
 package com.infomaniak.calendar.components.event.highlight
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 
 /**
  * An event held up by a long press on the card [key] identifies. The card grows from where it sat, [startBounds], to
  * the whole width of [areaBounds], opening near the finger, [fingerY]. All of them are in the coordinates of the
- * overlay drawing it.
+ * overlay drawing it. Dragged, it is drawn by [draggedCard], the way it looks where it sat, in [draggedBounds] while
+ * the finger is where it pressed, then back in [startBounds] once dropped.
  */
 @Immutable
 internal data class EventHighlight(
@@ -33,4 +36,6 @@ internal data class EventHighlight(
     val startBounds: Rect,
     val areaBounds: Rect,
     val fingerY: Float,
+    val draggedCard: (@Composable (Modifier) -> Unit)? = null,
+    val draggedBounds: Rect = startBounds,
 )

@@ -17,9 +17,9 @@
  */
 package com.infomaniak.calendar.utils
 
-import com.infomaniak.calendar.components.day.model.DayEvents
-import com.infomaniak.calendar.components.day.model.TimedEvent
-import com.infomaniak.calendar.components.day.model.toTimedEvent
+import com.infomaniak.calendar.components.days.model.DayEvents
+import com.infomaniak.calendar.components.days.model.TimedEvent
+import com.infomaniak.calendar.components.days.model.toTimedEvent
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySlice
 import kotlinx.coroutines.Dispatchers

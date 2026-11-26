@@ -20,6 +20,7 @@ package com.infomaniak.calendar.components.event.highlight
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.awaitLongPressOrCancellation
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -31,8 +32,16 @@ import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.currentValueOf
 import androidx.compose.ui.node.findNearestAncestor
 import androidx.compose.ui.node.requireLayoutCoordinates
+import androidx.compose.ui.node.requireLayoutDirection
+import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
+
+/** How far the finger pulls the held card before it comes loose and can be dropped elsewhere. */
+private val DetachDistance = 40.dp
 
 /**
  * Holds [event] up in [state] for as long as a long press on its card, which [key] identifies, lasts.
@@ -41,29 +50,60 @@ import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
  * event, and a scroll, a swipe or a pinch that starts first cancels the long press. Once recognised,
  * the gesture is the highlight's own: every change is consumed, ahead of the card's click and the
  * timeline's scrolling, until the finger lifts or [releaseHighlightOnSecondPointer] lets the event go.
+ *
+ * When [state] takes drops, moving the finger pulls the card, until it comes loose and is dragged, drawn by
+ * [draggedCard] where [draggedCardPlacement] puts it, to be dropped where the finger lifts.
  */
-internal fun Modifier.highlightOnLongPress(state: EventHighlightState, event: EventSummaryUi.Normal, key: Any): Modifier {
-    return this then LongPressHighlightElement(state, event, key)
+internal fun Modifier.highlightOnLongPress(
+    state: EventHighlightState,
+    event: EventSummaryUi.Normal,
+    key: Any,
+    draggedCardPlacement: DraggedCardPlacement,
+    draggedCard: (@Composable (Modifier) -> Unit)?,
+): Modifier {
+    return this then LongPressHighlightElement(state, event, key, draggedCardPlacement, draggedCard)
 }
 
 private data class LongPressHighlightElement(
     val state: EventHighlightState,
     val event: EventSummaryUi.Normal,
     val key: Any,
+    val draggedCardPlacement: DraggedCardPlacement,
+    val draggedCard: (@Composable (Modifier) -> Unit)?,
 ) : ModifierNodeElement<LongPressHighlightNode>() {
-    override fun create() = LongPressHighlightNode(state, event, key)
-    override fun update(node: LongPressHighlightNode) = node.update(state, event, key)
+    override fun create() = LongPressHighlightNode(state, event, key, draggedCardPlacement, draggedCard)
+    override fun update(node: LongPressHighlightNode) = node.update(state, event, key, draggedCardPlacement, draggedCard)
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "highlightOnLongPress"
+        properties["state"] = state
+        properties["event"] = event
+        properties["key"] = key
+        properties["draggedCardPlacement"] = draggedCardPlacement
+        properties["draggedCard"] = draggedCard
+    }
 }
 
 private class LongPressHighlightNode(
     private var state: EventHighlightState,
     private var event: EventSummaryUi.Normal,
     private var key: Any,
+    // Only read once held, so a new lambda on every recomposition doesn't restart the gesture.
+    private var draggedCardPlacement: DraggedCardPlacement,
+    private var draggedCard: (@Composable (Modifier) -> Unit)?,
 ) : DelegatingNode(), CompositionLocalConsumerModifierNode {
 
     private val pointerInput = delegate(SuspendingPointerInputModifierNode { highlightOnLongPress() })
 
-    fun update(state: EventHighlightState, event: EventSummaryUi.Normal, key: Any) {
+    fun update(
+        state: EventHighlightState,
+        event: EventSummaryUi.Normal,
+        key: Any,
+        draggedCardPlacement: DraggedCardPlacement,
+        draggedCard: (@Composable (Modifier) -> Unit)?,
+    ) {
+        this.draggedCardPlacement = draggedCardPlacement
+        this.draggedCard = draggedCard
         if (state == this.state && event == this.event && key == this.key) return
         this.state = state
         this.event = event
@@ -76,32 +116,61 @@ private class LongPressHighlightNode(
         val longPress = awaitLongPressOrCancellation(down.id) ?: return@awaitEachGesture
 
         val overlay = state.overlayCoordinates?.takeIf { it.isAttached } ?: return@awaitEachGesture
-        val area = (findNearestAncestor(EventHighlightAreaNode.TraverseKey) as? EventHighlightAreaNode)
-            ?.requireLayoutCoordinates()
-            ?: return@awaitEachGesture
+        val area = findNearestAncestor(EventHighlightAreaNode.TraverseKey) as? EventHighlightAreaNode ?: return@awaitEachGesture
+        val areaBounds = area.inset(
+            bounds = overlay.localBoundingBoxOf(area.requireLayoutCoordinates(), clipBounds = true),
+            density = this,
+            layoutDirection = requireLayoutDirection(),
+        )
 
         currentValueOf(LocalHapticFeedback).performHapticFeedback(HapticFeedbackType.LongPress)
         val card = requireLayoutCoordinates()
+        val pressedAt = overlay.localPositionOf(card, longPress.position)
+        val cardSize = card.size.toSize()
+        val draggedBounds = draggedCardPlacement
+            .bounds(cardSize, grab = longPress.position, layoutDirection = currentValueOf(LocalLayoutDirection))
+            .translate(pressedAt)
         state.show(
             EventHighlight(
                 event = event,
                 key = key,
                 startBounds = overlay.localBoundingBoxOf(card, clipBounds = true),
-                areaBounds = overlay.localBoundingBoxOf(area, clipBounds = true),
-                fingerY = overlay.localPositionOf(card, longPress.position).y,
+                areaBounds = areaBounds,
+                fingerY = pressedAt.y,
+                draggedCard = draggedCard,
+                draggedBounds = draggedBounds,
             ),
         )
         longPress.consume()
 
+        val detachDistance = DetachDistance.toPx()
+        var finger = pressedAt
         try {
             do {
                 // On the initial pass, ahead of the card's click, which would otherwise open the event on release.
                 val event = awaitPointerEvent(PointerEventPass.Initial)
                 // Let go by a second finger (see releaseHighlightOnSecondPointer): the gesture is the pinch's now.
                 if (!state.isHeld) break
+                event.changes.firstOrNull { it.id == longPress.id }?.let { change ->
+                    if (card.isAttached && overlay.isAttached) finger = overlay.localPositionOf(card, change.position)
+                }
                 event.changes.forEach { it.consume() }
-            } while (event.changes.any { it.pressed })
+
+                val delta = finger - pressedAt
+                val isLifted = event.changes.none { it.pressed }
+                when {
+                    !state.canDrag -> Unit
+                    state.isDragging && isLifted -> state.drop(finger)
+                    state.isDragging -> state.dragTo(delta)
+                    delta.getDistance() > detachDistance -> {
+                        currentValueOf(LocalHapticFeedback).performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                        state.startDrag(delta)
+                    }
+                    else -> state.pull(delta)
+                }
+            } while (!isLifted)
         } finally {
+            // Already let go of when dropped, or by a second finger.
             state.hide()
         }
     }
