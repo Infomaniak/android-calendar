@@ -137,6 +137,10 @@ app/
 - **First day of week**: `SettingsDataValues.firstDayOfWeek` (defaulting to the locale's) is the single source of the
   week layout. `MainViewModel` turns it into a `WeekNumbering`, which `MainActivity` provides through
   `LocalWeekNumbering` to every calendar screen; `MonthViewModel` reads the setting directly to lay out its weeks.
+- **Time zone**: `SettingsDataValues.timeZone` is the single source of the time zone dates are shown in, resolved by
+  `SettingTimeZone.toTimeZone()` (the device's unless a custom one is picked). Outside Compose, `TimeZoneManager.timeZone`
+  follows it (event loading, sync, form defaults, reminders); in Compose, `MainActivity` provides it as Foundation's
+  `LocalTimeZone`, which `rememberToday()`, `rememberCurrentDateTime()` and the date formatters default to.
 - **Splash screen**: `androidx.core:core-splashscreen`. `MainActivity` launches with `AppThemeLauncher`, which hands over to
   `Theme.Calendar` (`postSplashScreenTheme`). The splash and the content read the same state: `MainViewModel.uiState`
   stays `MainUiState.Loading` until both the users and the last calendar view are read, and the splash stays up meanwhile. Android 12+ draws it from `values-v31/themes.xml` (launcher foreground, `splashscreenBackground`,

@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.model.settings
 
+import kotlinx.datetime.TimeZone
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -26,4 +27,10 @@ sealed interface SettingTimeZone {
 
     @Serializable
     data class Custom(val zoneId: String) : SettingTimeZone
+}
+
+/** The time zone the app shows dates in: the custom one when chosen, the device's otherwise. */
+fun SettingTimeZone.toTimeZone(): TimeZone = when (this) {
+    is SettingTimeZone.Custom -> TimeZone.of(zoneId)
+    SettingTimeZone.Automatic -> TimeZone.currentSystemDefault()
 }

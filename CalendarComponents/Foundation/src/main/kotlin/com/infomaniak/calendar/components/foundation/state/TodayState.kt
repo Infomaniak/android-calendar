@@ -22,12 +22,9 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
-/** Current date, updated when the day rolls over so that composables reading it recompose with the new date. */
 @Composable
 fun rememberToday(): State<LocalDate> {
-    val currentInstant = rememberCurrentInstant()
-    return remember { derivedStateOf { currentInstant.value.toLocalDateTime(TimeZone.currentSystemDefault()).date } }
+    val currentDateTime = rememberCurrentDateTime()
+    return remember(currentDateTime) { derivedStateOf { currentDateTime.value.date } }
 }

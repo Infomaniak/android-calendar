@@ -27,12 +27,12 @@ import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.YearMonthRange
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
@@ -43,9 +43,8 @@ import kotlinx.datetime.yearMonth
 class VisibleMonthManager(
     private val calendarManager: CalendarManager,
     visibleDateManager: VisibleDateManager,
+    timeZoneManager: TimeZoneManager,
 ) {
-    private val timeZone = TimeZone.currentSystemDefault()
-
     /** The visible month and those around it, kept loaded so a swipe lands on a month that already has its content. */
     val loadedMonths: Flow<YearMonthRange> = visibleDateManager.visibleDateFlow
         .map { it.yearMonth }
@@ -53,8 +52,8 @@ class VisibleMonthManager(
         .map { it.minus(MONTH_MARGIN, DateTimeUnit.MONTH)..it.plus(MONTH_MARGIN, DateTimeUnit.MONTH) }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val eventDots: Flow<Map<LocalDate, List<EventColorsUi>>> = loadedMonths
-        .flatMapLatest { months ->
+    val eventDots: Flow<Map<LocalDate, List<EventColorsUi>>> = combine(loadedMonths, timeZoneManager.timeZone, ::Pair)
+        .flatMapLatest { (months, timeZone) ->
             calendarManager.observeMonthlyDotColors(
                 startMonth = months.start,
                 endMonth = months.endInclusive,

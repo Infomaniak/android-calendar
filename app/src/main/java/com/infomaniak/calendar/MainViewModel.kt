@@ -29,6 +29,7 @@ import com.infomaniak.calendar.data.SettingsDataValues
 import com.infomaniak.calendar.manager.AppAvatarFinder
 import com.infomaniak.calendar.manager.BackgroundEventComposer
 import com.infomaniak.calendar.manager.SyncEventsManager
+import com.infomaniak.calendar.manager.TimeZoneManager
 import com.infomaniak.calendar.manager.VisibleDateManager
 import com.infomaniak.calendar.ui.navigation.NavDestination
 import com.infomaniak.calendar.utils.account.AccountUtils
@@ -58,6 +59,7 @@ class MainViewModel(
     backgroundEventComposer: BackgroundEventComposer,
     private val calendarDataValues: CalendarDataValues,
     settingsDataValues: SettingsDataValues,
+    timeZoneManager: TimeZoneManager,
     visibleDateManager: VisibleDateManager,
     appAvatarFinder: AppAvatarFinder,
 ) : ViewModel() {
@@ -69,12 +71,14 @@ class MainViewModel(
         calendarDataValues.lastCalendarView.flow,
         settingsDataValues.theme.flow,
         settingsDataValues.firstDayOfWeek.flow,
-    ) { users, lastCalendarView, theme, firstDayOfWeek ->
+        timeZoneManager.timeZone,
+    ) { users, lastCalendarView, theme, firstDayOfWeek, timeZone ->
         MainUiState.Loaded(
             isUserConnected = users.isNotEmpty(),
             lastCalendarView = lastCalendarView,
             theme = theme,
             weekNumbering = WeekNumbering(firstDayOfWeek),
+            timeZone = timeZone,
         )
     }.stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = MainUiState.Loading)
 

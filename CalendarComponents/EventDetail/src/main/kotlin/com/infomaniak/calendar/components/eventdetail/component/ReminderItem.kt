@@ -41,13 +41,13 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.eventdetail.models.ReminderTime
 import com.infomaniak.calendar.components.eventdetail.modifier.reminderSharedBounds
 import com.infomaniak.calendar.components.eventdetail.theme.CustomColors
+import com.infomaniak.calendar.components.foundation.state.LocalTimeZone
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDateTime
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDurationOffset
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Cross
-import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
@@ -86,7 +86,7 @@ internal fun reminderTimeText(time: ReminderTime): String {
     return when (time) {
         is ReminderTime.Offset -> time.duration.formatDurationOffset()
         is ReminderTime.Absolute -> {
-            val timeZone = TimeZone.currentSystemDefault()
+            val timeZone = LocalTimeZone.current
             val currentYear = Clock.today(timeZone).year
             time.instant.formatDateTime(timeZone = timeZone, currentYear = currentYear)
         }

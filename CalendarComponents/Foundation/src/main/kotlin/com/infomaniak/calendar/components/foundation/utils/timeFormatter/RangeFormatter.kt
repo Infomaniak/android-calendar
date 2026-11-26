@@ -18,6 +18,7 @@
 package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
 import androidx.compose.runtime.Composable
+import com.infomaniak.calendar.components.foundation.state.LocalTimeZone
 import com.infomaniak.core.common.utils.today
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -36,7 +37,7 @@ private const val RANGE_SEPARATOR = " - "
 //region Exposed formatting methods
 /** `08:00 - 09:00`. Only for single day time ranges */
 @Composable
-fun formatTimeRange(start: Instant, end: Instant, timeZone: TimeZone = TimeZone.currentSystemDefault()): String {
+fun formatTimeRange(start: Instant, end: Instant, timeZone: TimeZone = LocalTimeZone.current): String {
     return formatTimeRange(start, end, currentLocale(), timeZone, isUsing24HourFormat())
 }
 
@@ -45,7 +46,7 @@ fun formatTimeRange(start: Instant, end: Instant, timeZone: TimeZone = TimeZone.
 fun formatDateTimeRange(
     start: LocalDateTime,
     end: LocalDateTime,
-    timeZone: TimeZone = TimeZone.currentSystemDefault(),
+    timeZone: TimeZone = LocalTimeZone.current,
     currentYear: Int = Clock.today(timeZone).year,
 ): String = formatDateTimeRange(start, end, currentLocale(), isUsing24HourFormat(), currentYear)
 
@@ -76,7 +77,7 @@ fun formatDateTimeRangeWithZone(
 fun formatDateRange(
     startDate: LocalDate,
     endDate: LocalDate,
-    timeZone: TimeZone = TimeZone.currentSystemDefault(),
+    timeZone: TimeZone = LocalTimeZone.current,
     currentYear: Int = Clock.today(timeZone).year,
 ): String = formatDateRange(startDate, endDate, currentLocale(), currentYear)
 

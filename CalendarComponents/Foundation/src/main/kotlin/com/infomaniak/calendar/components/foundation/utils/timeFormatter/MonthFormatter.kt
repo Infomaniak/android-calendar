@@ -18,12 +18,11 @@
 package com.infomaniak.calendar.components.foundation.utils.timeFormatter
 
 import androidx.compose.runtime.Composable
-import com.infomaniak.core.common.utils.today
+import com.infomaniak.calendar.components.foundation.state.rememberCurrentYear
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.number
 import java.time.Month
 import java.time.format.TextStyle
-import kotlin.time.Clock
 
 /** `May` */
 @Composable
@@ -31,7 +30,7 @@ fun YearMonth.formatShortMonth(): String = javaMonth().getDisplayName(TextStyle.
 
 /** `May` or `May 2024`, gaining the year when the month leaves [currentYear]. */
 @Composable
-fun YearMonth.formatMonthAndOptionalYear(currentYear: Int = Clock.today().year): String {
+fun YearMonth.formatMonthAndOptionalYear(currentYear: Int = rememberCurrentYear().value): String {
     val locale = currentLocale()
     val monthName = javaMonth().getDisplayName(TextStyle.FULL_STANDALONE, locale).titlecaseFirstChar(locale)
 

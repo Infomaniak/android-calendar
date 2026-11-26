@@ -25,6 +25,7 @@ import android.os.Build
 import android.util.Log
 import androidx.core.content.getSystemService
 import com.infomaniak.calendar.data.CalendarDataValues
+import com.infomaniak.calendar.manager.TimeZoneManager
 import com.infomaniak.calendar.utils.toLocationUi
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.core.sentry.SentryLog
@@ -67,6 +68,7 @@ class AlarmScheduler @Inject constructor(
     private val appContext: Context,
     private val calendarManager: CalendarManager,
     private val calendarDataValues: CalendarDataValues,
+    private val timeZoneManager: TimeZoneManager,
 ) {
     private val alarmManager by lazy { appContext.getSystemService<AlarmManager>() }
     private val refreshRequests = MutableSharedFlow<RefreshRequest>(
@@ -133,6 +135,7 @@ class AlarmScheduler @Inject constructor(
             registeredAlarms = registeredAlarms,
             nowMs = System.currentTimeMillis(),
             isExact = canScheduleExactAlarms(),
+            timeZone = timeZoneManager.timeZone.first(),
         )
 
         // Not cancellable, so that the AlarmManager, registeredAlarms and the persisted IDs can't drift apart

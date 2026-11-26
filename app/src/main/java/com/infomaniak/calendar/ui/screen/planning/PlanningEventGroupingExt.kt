@@ -38,7 +38,7 @@ import kotlin.time.Clock
 /** Every day of [days] with its events, or a single empty-state placeholder when it has none. */
 suspend fun Map<LocalDate, List<EventDaySlice>>.groupByDay(
     days: ClosedRange<LocalDate>,
-    timeZone: TimeZone = TimeZone.currentSystemDefault(),
+    timeZone: TimeZone,
 ): ImmutableMap<LocalDate, List<EventSummaryUi>> = withContext(Dispatchers.Default) {
     val eventsByDay = HashMap<LocalDate, List<EventSummaryUi>>()
 

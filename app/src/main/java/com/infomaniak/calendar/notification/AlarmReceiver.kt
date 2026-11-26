@@ -31,6 +31,7 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.datetime.LocalDate
@@ -82,6 +83,7 @@ class AlarmReceiver : BroadcastReceiver() {
             endInstantMs = endMs,
             allDayDates = getAllDayDates(),
             kMeetUrl = getKMeetUrl(context, occurrenceIdJson),
+            timeZone = context.appGraph.timeZoneManager.timeZone.first(),
             // Reminding again once the event is over would be pointless
             snoozeIntent = if (System.currentTimeMillis() + SNOOZE_DELAY.inWholeMilliseconds < endMs) {
                 createSnoozeIntent(context, tag)

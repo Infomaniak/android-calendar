@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.calendar.components.month.model.MonthUi
 import com.infomaniak.calendar.data.SettingsDataValues
 import com.infomaniak.calendar.manager.SyncEventsManager
+import com.infomaniak.calendar.manager.TimeZoneManager
 import com.infomaniak.calendar.manager.VisibleMonthManager
 import com.infomaniak.calendar.ui.screen.month.pendingKmp.buildMonths
 import com.infomaniak.calendar.ui.screen.month.pendingKmp.toEventsByDate
@@ -57,20 +58,19 @@ class MonthViewModel(
     private val settingsDataValues: SettingsDataValues,
     visibleMonthManager: VisibleMonthManager,
     syncEventsManager: SyncEventsManager,
+    timeZoneManager: TimeZoneManager,
 ) : ViewModel() {
-    private val timeZone = TimeZone.currentSystemDefault() // TODO: Adapt to user settings
-
     val isLoadingEvents: Flow<Boolean> = syncEventsManager.isLoadingEvents
 
     /** The loaded months, laid out with their events, around the visible one. */
     @OptIn(ExperimentalCoroutinesApi::class)
-    val months: StateFlow<Map<YearMonth, MonthUi>> = visibleMonthManager.loadedMonths
-        .flatMapLatest(::observeMonths)
+    val months: StateFlow<Map<YearMonth, MonthUi>> = combine(visibleMonthManager.loadedMonths, timeZoneManager.timeZone, ::Pair)
+        .flatMapLatest { (months, timeZone) -> observeMonths(months, timeZone) }
         .flowOn(Dispatchers.Default)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), emptyMap())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun observeMonths(months: YearMonthRange): Flow<Map<YearMonth, MonthUi>> {
+    private fun observeMonths(months: YearMonthRange, timeZone: TimeZone): Flow<Map<YearMonth, MonthUi>> {
         val daySlices = calendarManager.observeDaySlices(
             start = months.start.firstDay.atStartOfDayIn(timeZone),
             end = months.endInclusive.plus(1, DateTimeUnit.MONTH).firstDay.atStartOfDayIn(timeZone),

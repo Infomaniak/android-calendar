@@ -58,6 +58,7 @@ object NotificationHelper {
         endInstantMs: Long,
         allDayDates: LocalDateRange?,
         kMeetUrl: String?,
+        timeZone: TimeZone,
         snoozeIntent: PendingIntent?,
         snoozeDelay: Duration,
     ): Notification {
@@ -76,7 +77,7 @@ object NotificationHelper {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-        val timeText = formatTimingText(context, startInstantMs, endInstantMs, allDayDates)
+        val timeText = formatTimingText(context, startInstantMs, endInstantMs, allDayDates, timeZone)
         val contentText = if (!location.isNullOrBlank()) "$timeText • $location" else timeText
         val notificationTitle = title.ifBlank { context.getString(R.string.notificationDefaultEventTitle) }
 
@@ -131,8 +132,8 @@ object NotificationHelper {
         startInstantMs: Long,
         endInstantMs: Long,
         allDayDates: LocalDateRange?,
+        timeZone: TimeZone,
     ): String {
-        val timeZone = TimeZone.currentSystemDefault()
         val locale = context.resources.configuration.locales[0]
         val today = Clock.today(timeZone)
 
