@@ -55,7 +55,7 @@ private fun List<EventDaySlice>.toDayEvents(
 
     forEach { slice ->
         val event = slice.toEventUi(timeZone)
-        if (slice.fillsWholeDay) allDay.add(event) else timed.add(event.toTimedEvent(date, timeZone))
+        if (slice.isAllDay) allDay.add(event) else timed.add(event.toTimedEvent(date, timeZone))
     }
 
     return DayEvents(allDay = allDay, timed = timed)
