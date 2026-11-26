@@ -37,6 +37,7 @@
     <string name="generalSettingsEventLabel">Evenement</string>
     <string name="generalSettingsNotificationsLabel">Meldingen</string>
     <string name="generalSettingsStartOfWeekLabel">Begin van de week</string>
+    <string name="generalSettingsUseDeviceTimeZoneLabel">Automatische tijdzone</string>
     <string name="monthTitle">Maand</string>
     <string name="noWritableCalendar">Geen bewerkbare kalender gevonden</string>
     <string name="notificationActionOpenMap">Kaart openen</string>

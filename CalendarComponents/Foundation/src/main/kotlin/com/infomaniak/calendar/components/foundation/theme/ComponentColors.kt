@@ -26,5 +26,9 @@ object ComponentColors {
 
     val SegmentedItemColor @Composable get() = MaterialTheme.colorScheme.surfaceBright
 
-    val SegmentedListItemColors @Composable get() = ListItemDefaults.segmentedColors(containerColor = SegmentedItemColor)
+    val SegmentedListItemColors
+        @Composable get() = ListItemDefaults.segmentedColors(
+            containerColor = SegmentedItemColor,
+            disabledContainerColor = SegmentedItemColor,
+        )
 }

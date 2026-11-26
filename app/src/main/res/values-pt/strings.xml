@@ -37,6 +37,7 @@
     <string name="generalSettingsEventLabel">Evento</string>
     <string name="generalSettingsNotificationsLabel">Notificações</string>
     <string name="generalSettingsStartOfWeekLabel">Início da semana</string>
+    <string name="generalSettingsUseDeviceTimeZoneLabel">Fuso horário automático</string>
     <string name="monthTitle">Mês</string>
     <string name="noWritableCalendar">Não foi encontrado nenhum calendário editável</string>
     <string name="notificationActionOpenMap">Abrir mapa</string>
