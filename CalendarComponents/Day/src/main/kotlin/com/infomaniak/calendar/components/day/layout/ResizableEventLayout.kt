@@ -40,6 +40,8 @@ import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.model.TimedEvent
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
+import com.infomaniak.calendar.components.event.highlight.EventHighlightState
+import com.infomaniak.calendar.components.event.highlight.highlightable
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import kotlin.math.roundToInt
 
@@ -51,6 +53,7 @@ internal fun ResizableEventLayout(
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
     textOverflow: TextOverflow = TextOverflow.Ellipsis,
+    highlightState: EventHighlightState? = null,
 ) {
     val density = LocalDensity.current
     val currentPlacements = rememberUpdatedState(placements)
@@ -70,6 +73,7 @@ internal fun ResizableEventLayout(
                     visibleHeight = remember(index) { { currentPlacements.value[index].visibleHeight } },
                     onClick = { onEventClick(timedEvent.event) },
                     textOverflow = textOverflow,
+                    modifier = highlightState?.let { Modifier.highlightable(it, timedEvent.event, key = timedEvent) } ?: Modifier,
                 )
             }
         },

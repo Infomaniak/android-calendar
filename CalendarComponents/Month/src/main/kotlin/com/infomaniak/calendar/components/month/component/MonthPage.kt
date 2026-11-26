@@ -42,6 +42,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.infomaniak.calendar.components.event.highlight.EventHighlightState
+import com.infomaniak.calendar.components.event.highlight.eventHighlightArea
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.calendar.components.foundation.utils.horizontalBottomDivider
@@ -71,6 +73,7 @@ internal fun MonthPage(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     today: LocalDate = rememberToday().value,
+    highlightState: EventHighlightState? = null,
 ) {
     val layoutDirection = LocalLayoutDirection.current
     // We need to know if two pages are touching or if they are separated because some system padding is present. This is used to
@@ -88,6 +91,7 @@ internal fun MonthPage(
             touchesPreviousGrid = touchesPreviousGrid,
             onDayClick = onDayClick,
             onEventClick = onEventClick,
+            highlightState = highlightState,
             modifier = Modifier.weight(1f),
         )
     }
@@ -123,11 +127,12 @@ private fun WeekRows(
     touchesPreviousGrid: Boolean,
     onDayClick: (LocalDate) -> Unit,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
+    highlightState: EventHighlightState?,
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
 
-    BoxWithConstraints(modifier) {
+    BoxWithConstraints(modifier.eventHighlightArea()) {
         val laneMetrics = laneMetrics()
         val rowsSize = IntSize(constraints.maxWidth, constraints.maxHeight - with(density) { bottomPadding.roundToPx() })
         val rowHeights = monthRowHeights(rowsSize, month.weeks, laneMetrics)
@@ -135,7 +140,7 @@ private fun WeekRows(
 
         Column(
             Modifier
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState(), enabled = highlightState?.isHeld != true)
                 .padding(bottom = bottomPadding)
                 .outerGridEdges(touchesPreviousGrid),
         ) {
@@ -150,6 +155,7 @@ private fun WeekRows(
                     laneCount = laneCount,
                     onDayClick = onDayClick,
                     onEventClick = onEventClick,
+                    highlightState = highlightState,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(with(density) { height.toDp() }),

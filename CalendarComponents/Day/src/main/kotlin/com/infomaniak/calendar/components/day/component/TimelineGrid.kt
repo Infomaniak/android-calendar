@@ -81,8 +81,9 @@ internal fun Modifier.verticalTimelineScroll(
     state: TimelineState,
     contentPadding: PaddingValues,
     overscrollEffect: OverscrollEffect? = rememberOverscrollEffect(),
+    enabled: Boolean = true,
 ): Modifier = this
-    .verticalScroll(state.scrollState, overscrollEffect, enabled = !state.isPinching)
+    .verticalScroll(state.scrollState, overscrollEffect, enabled = enabled && !state.isPinching)
     .padding(
         top = HourLabelOverhang + contentPadding.calculateTopPadding(),
         bottom = HourLabelOverhang + contentPadding.calculateBottomPadding(),

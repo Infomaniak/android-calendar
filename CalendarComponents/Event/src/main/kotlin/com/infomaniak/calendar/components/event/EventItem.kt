@@ -53,10 +53,11 @@ import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Instant
 
+/** Without [onClick], the event is only shown: it takes no click. */
 @Composable
 fun EventItem(
     event: EventSummaryUi.Normal,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     allDayTrailingContent: @Composable () -> Unit = {},
 ) {
@@ -83,7 +84,7 @@ internal fun EventItem(
     status: EventItemStatus,
     trailingIcons: Set<EventIcons>,
     isAllDay: Boolean,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     allDayTrailingContent: @Composable () -> Unit = {},
 ) {

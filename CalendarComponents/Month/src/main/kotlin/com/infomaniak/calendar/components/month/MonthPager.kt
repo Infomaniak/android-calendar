@@ -17,6 +17,7 @@
  */
 package com.infomaniak.calendar.components.month
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -29,6 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
+import com.infomaniak.calendar.components.event.highlight.HighlightedEventOverlay
+import com.infomaniak.calendar.components.event.highlight.releaseHighlightOnSecondPointer
+import com.infomaniak.calendar.components.event.highlight.rememberEventHighlightState
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.utils.FollowSelectedPage
 import com.infomaniak.calendar.components.month.component.MonthPage
@@ -69,16 +73,24 @@ fun MonthPager(
         onPageChanged = { onVisibleMonthChanged(monthRange.monthAt(it)) },
     )
 
-    HorizontalPager(state = pagerState, modifier = modifier) { page ->
-        monthOf(monthRange.monthAt(page))?.let { month ->
-            MonthPage(
-                month = month,
-                selectedDate = selectedDate,
-                onDayClick = onDayClick,
-                onEventClick = onEventClick,
-                contentPadding = contentPadding,
-            )
+    val highlightState = rememberEventHighlightState()
+
+    // The highlighted event is drawn over the pager, so neither the neighbouring days nor the page edge hide it.
+    Box(modifier = modifier.releaseHighlightOnSecondPointer(highlightState), propagateMinConstraints = true) {
+        HorizontalPager(state = pagerState, userScrollEnabled = !highlightState.isHeld) { page ->
+            monthOf(monthRange.monthAt(page))?.let { month ->
+                MonthPage(
+                    month = month,
+                    selectedDate = selectedDate,
+                    onDayClick = onDayClick,
+                    onEventClick = onEventClick,
+                    contentPadding = contentPadding,
+                    highlightState = highlightState,
+                )
+            }
         }
+
+        HighlightedEventOverlay(highlightState, modifier = Modifier.matchParentSize(), contentPadding = contentPadding)
     }
 }
 

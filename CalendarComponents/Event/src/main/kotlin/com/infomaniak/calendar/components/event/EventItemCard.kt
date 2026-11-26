@@ -42,31 +42,38 @@ import com.infomaniak.calendar.components.event.component.cardStripes
 import com.infomaniak.calendar.components.foundation.preview.LocalEventColorsUiFactory
 import com.infomaniak.designsystem.core.theme.EsdsTheme
 
+/** Without [onClick], the card is only shown: it takes no click. */
 @Composable
 fun EventItemCard(
     status: EventItemStatus,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = EventItemCardDefaults.ContentPadding,
     shape: EventItemCardShape = EventItemCardDefaults.Shape,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val cardShape = shape.shape()
+    val cardContent: @Composable ColumnScope.() -> Unit = {
+        Column(
+            modifier = Modifier
+                .cardStripes(status)
+                .padding(contentPadding),
+            content = content,
+        )
+    }
 
     Box(modifier = modifier.height(IntrinsicSize.Min), propagateMinConstraints = true) {
-        // Card with onClick enforces minimumInteractiveComponentSize() which makes small events too big compared to the design.
-        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
-            Card(
-                onClick = onClick,
-                colors = status.cardColors(),
-                border = status.cardBorder(),
-                shape = cardShape,
-            ) {
-                Column(
-                    modifier = Modifier
-                        .cardStripes(status)
-                        .padding(contentPadding),
-                    content = content,
+        if (onClick == null) {
+            Card(colors = status.cardColors(), border = status.cardBorder(), shape = cardShape, content = cardContent)
+        } else {
+            // Card with onClick enforces minimumInteractiveComponentSize() which makes small events too big compared to the design.
+            CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
+                Card(
+                    onClick = onClick,
+                    colors = status.cardColors(),
+                    border = status.cardBorder(),
+                    shape = cardShape,
+                    content = cardContent,
                 )
             }
         }

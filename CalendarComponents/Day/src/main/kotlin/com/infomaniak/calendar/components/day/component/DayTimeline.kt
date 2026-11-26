@@ -35,6 +35,8 @@ import com.infomaniak.calendar.components.day.pinchToZoom
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.event.highlight.EventHighlightState
+import com.infomaniak.calendar.components.event.highlight.eventHighlightArea
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.state.rememberCurrentDateTime
 import com.infomaniak.core.common.utils.today
@@ -52,6 +54,7 @@ internal fun DayTimeline(
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    highlightState: EventHighlightState? = null,
 ) {
     val currentDateTime by rememberCurrentDateTime()
     val gutterWidth = TimelineDefaults.HourGutterWidth
@@ -61,7 +64,7 @@ internal fun DayTimeline(
         modifier = modifier
             .fillMaxWidth()
             .padding(contentPadding.onlyHorizontal())
-            .verticalTimelineScroll(state, contentPadding)
+            .verticalTimelineScroll(state, contentPadding, enabled = highlightState?.isHeld != true)
             .pinchToZoom(state), // Pinch to zoom after scroll which adds some more paddings
     ) {
         HourLabels(state = state, modifier = Modifier.width(gutterWidth))
@@ -79,7 +82,9 @@ internal fun DayTimeline(
             onEventClick = onEventClick,
             modifier = Modifier
                 .matchParentSize()
-                .padding(start = gutterWidth, end = endPadding),
+                .padding(start = gutterWidth, end = endPadding)
+                .eventHighlightArea(),
+            highlightState = highlightState,
         )
 
         if (currentDateTime.date == date) {

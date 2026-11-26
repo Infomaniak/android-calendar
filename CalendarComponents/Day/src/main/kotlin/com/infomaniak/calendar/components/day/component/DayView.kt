@@ -41,14 +41,15 @@ import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
 import com.infomaniak.calendar.components.day.state.TimelineState
 import com.infomaniak.calendar.components.day.state.rememberDayTimelineState
+import com.infomaniak.calendar.components.event.highlight.EventHighlightState
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.utils.HorizontalGridLine
 import com.infomaniak.core.common.utils.today
 import com.infomaniak.core.ui.compose.basics.onlyHorizontal
 import com.infomaniak.designsystem.core.theme.EsdsTheme
-import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
+import kotlinx.datetime.LocalDate
 
 /**
  * A single day: its header, the all-day events pinned at the top, and the scrollable hour grid
@@ -65,6 +66,7 @@ internal fun DayView(
     headerModifier: Modifier = Modifier,
     timelineModifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    highlightState: EventHighlightState? = null,
     headerTrailingContent: @Composable () -> Unit = {},
 ) {
     val density = LocalDensity.current
@@ -76,6 +78,7 @@ internal fun DayView(
             date = date,
             events = events,
             state = state,
+            highlightState = highlightState,
             onEventClick = onEventClick,
             contentPadding = dayPadding + PaddingValues(top = headerHeight + EsdsTheme.spacing.md),
             modifier = timelineModifier.fillMaxSize(),
