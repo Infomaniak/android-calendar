@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @Inject
@@ -38,9 +37,19 @@ class SettingTimeZoneViewModel(private val settingsDataValues: SettingsDataValue
     val isCustomTimeZoneEnabled = settingsDataValues.isCustomTimeZoneEnabled.flow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), false)
 
+    val defaultZoneId = settingsDataValues.defaultZoneId.flow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), null)
+
     fun setIsCustomTimeZoneEnabled(enabled: Boolean) {
         viewModelScope.launch {
             settingsDataValues.isCustomTimeZoneEnabled.setValue(enabled)
+            settingsDataValues.defaultZoneId.setValue(null)
+        }
+    }
+
+    fun setDefaultZoneId(zoneId: String?) {
+        viewModelScope.launch {
+            settingsDataValues.defaultZoneId.setValue(zoneId)
         }
     }
 }

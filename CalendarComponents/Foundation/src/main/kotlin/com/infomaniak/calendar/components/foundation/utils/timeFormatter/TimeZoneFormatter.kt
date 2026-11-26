@@ -46,7 +46,11 @@ fun TimeZone.formatUtcOffset(locale: Locale, instant: Instant): String {
 }
 
 /** `Zurich, Switzerland`. */
-fun TimeZone.formatCityAndCountry(locale: Locale): String {
+@Composable
+fun TimeZone.formatCityAndCountry(locale: Locale = currentLocale()): String = formatCityAndCountryWith(locale)
+
+/** `Zurich, Switzerland`. */
+fun TimeZone.formatCityAndCountryWith(locale: Locale): String {
     val country = Locale.Builder().setRegion(IcuTimeZone.getRegion(id)).build().getDisplayCountry(locale)
     return "${formatLocalizedCityName(locale)}, $country"
 }

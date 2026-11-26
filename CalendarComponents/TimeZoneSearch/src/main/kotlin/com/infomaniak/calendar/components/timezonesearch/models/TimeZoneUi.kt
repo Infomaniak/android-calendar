@@ -18,7 +18,7 @@
 package com.infomaniak.calendar.components.timezonesearch.models
 
 import com.infomaniak.calendar.components.foundation.models.SearchableText
-import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatCityAndCountry
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatCityAndCountryWith
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatLongName
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatUtcOffset
 import kotlinx.datetime.TimeZone
@@ -35,7 +35,7 @@ internal data class TimeZoneUi private constructor(
     constructor(timeZone: TimeZone) : this(
         timeZone = timeZone,
         name = SearchableText(timeZone.formatLongName(Locale.getDefault(), Clock.System.now())),
-        location = SearchableText(timeZone.formatCityAndCountry(Locale.getDefault())),
+        location = SearchableText(timeZone.formatCityAndCountryWith(Locale.getDefault())),
         utcOffset = SearchableText(timeZone.formatUtcOffset(Locale.getDefault(), Clock.System.now())),
     )
 

@@ -46,7 +46,7 @@ class TimeZoneFormatterTest {
         val summer = Instant.parse("2026-07-01T12:00:00Z")
 
         assertEquals("Central European Summer Time", zurich.formatLongName(Locale.US, summer))
-        assertEquals("Zurich, Switzerland", zurich.formatCityAndCountry(Locale.US))
+        assertEquals("Zurich, Switzerland", zurich.formatCityAndCountryWith(Locale.US))
         assertEquals("GMT+2", zurich.formatUtcOffset(Locale.US, summer))
     }
 
@@ -56,7 +56,7 @@ class TimeZoneFormatterTest {
         val summer = Instant.parse("2026-07-01T12:00:00Z")
 
         assertEquals("heure d’été d’Europe centrale", zurich.formatLongName(Locale.FRENCH, summer))
-        assertEquals("Zurich, Suisse", zurich.formatCityAndCountry(Locale.FRENCH))
+        assertEquals("Zurich, Suisse", zurich.formatCityAndCountryWith(Locale.FRENCH))
         assertEquals("UTC+2", zurich.formatUtcOffset(Locale.FRENCH, summer))
     }
 }

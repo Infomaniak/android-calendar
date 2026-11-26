@@ -37,4 +37,5 @@ class SettingsDataValues @Inject constructor(appContext: Context) : DataValues(a
         defaultValue = WeekFields.of(Locale.getDefault()).firstDayOfWeek.toKotlinDayOfWeek(),
     )
     val isCustomTimeZoneEnabled = dataValue(key = "isCustomTimeZoneEnabled", defaultValue = false)
+    val defaultZoneId = dataValue<String?>(key = "defaultZoneId", defaultValue = null)
 }
