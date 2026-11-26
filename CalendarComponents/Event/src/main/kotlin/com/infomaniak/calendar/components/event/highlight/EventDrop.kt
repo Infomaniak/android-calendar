@@ -22,8 +22,8 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 
 /**
- * Where a dragged event was dropped: on [date], at [time] when the drop target tells the time (a timeline does,
- * a month's day doesn't). [fromDate] is the day it was picked up on, so an event can be shifted by as many days.
+ * Where a dragged event now starts: on [date], at [time] when the drop target tells the time (a timeline does,
+ * a month's day doesn't). It is read at the start of the dragged card, placed by its [DraggedCardPlacement].
  */
 @Immutable
-data class EventDrop(val fromDate: LocalDate, val date: LocalDate, val time: LocalTime?)
+data class EventDrop(val date: LocalDate, val time: LocalTime?)

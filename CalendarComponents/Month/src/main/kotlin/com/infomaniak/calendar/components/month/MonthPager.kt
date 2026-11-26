@@ -42,7 +42,6 @@ import com.infomaniak.calendar.components.month.preview.mockPreviewMonth
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
-import kotlinx.datetime.daysUntil
 import kotlinx.datetime.minus
 import kotlinx.datetime.monthsUntil
 import kotlinx.datetime.onDay
@@ -53,8 +52,8 @@ import kotlinx.datetime.yearMonth
  * Pages through the months of [monthRange], following the month of [selectedDate], which is marked. A month [monthOf]
  * doesn't have yet stays blank until it does.
  *
- * @param onEventMoved Called when an event held up by a long press is dragged and dropped on another day,
- * with how many days it was moved by, from the day it was picked up on to the day under the finger.
+ * @param onEventMoved Called when an event held up by a long press is dragged and dropped, with the day it now
+ * starts on: the one under the finger, which the dragged chip's first day is held over.
  */
 @Composable
 fun MonthPager(
@@ -66,7 +65,7 @@ fun MonthPager(
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
-    onEventMoved: ((EventSummaryUi.Normal, dayShift: Int) -> Unit)? = null,
+    onEventMoved: ((EventSummaryUi.Normal, newStartDate: LocalDate) -> Unit)? = null,
 ) {
     val pageCount = remember(monthRange) { monthRange.monthCount }
     val selectedMonth = { selectedDate().yearMonth }
@@ -80,7 +79,7 @@ fun MonthPager(
 
     val highlightState = rememberEventHighlightState(
         onEventDropped = onEventMoved?.let { moved ->
-            { event, drop -> drop.fromDate.daysUntil(drop.date).takeIf { it != 0 }?.let { moved(event, it) } }
+            { event, drop -> if (drop.date != event.eventStart?.date) moved(event, drop.date) }
         },
     )
 

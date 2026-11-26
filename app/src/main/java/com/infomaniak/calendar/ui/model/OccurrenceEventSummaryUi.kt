@@ -23,6 +23,7 @@ import com.infomaniak.calendar.components.foundation.models.EventStatus
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import com.infomaniak.calendar.components.foundation.models.ParticipationStatus
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
+import kotlinx.datetime.LocalDateTime
 import kotlin.time.Instant
 
 @Immutable
@@ -38,7 +39,11 @@ data class OccurrenceEventSummaryUi(
     override val colors: EventColorsUi,
     override val hasAttendees: Boolean,
     override val myStatus: ParticipationStatus?,
-) : EventSummaryUi.Normal
+    override val eventStart: LocalDateTime? = null,
+    override val eventEnd: LocalDateTime? = null,
+) : EventSummaryUi.Normal {
+    override val eventId: String get() = occurrenceId.value
+}
 
 /** All [EventSummaryUi.Normal] used in the app are [OccurrenceEventSummaryUi] and we need to cast it to get the occurrence id back */
 val EventSummaryUi.Normal.occurrenceId: OccurrenceId get() = (this as OccurrenceEventSummaryUi).occurrenceId

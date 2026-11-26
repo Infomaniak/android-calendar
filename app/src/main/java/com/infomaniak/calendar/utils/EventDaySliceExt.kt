@@ -24,13 +24,14 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventDaySli
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.EventStatus as KmpEventStatus
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 
 /**
  * Translation of the KMP event model into the UI model consumed by CalendarComponents, shared by
  * every calendar view so they all render the same event identically.
  *
  * The resulting [OccurrenceEventSummaryUi] carries the slice's own day-clamped bounds, converted to an
- * absolute instant in [timeZone].
+ * absolute instant in [timeZone], and the whole event's, read on [timeZone]'s clock.
  */
 fun EventDaySlice.toEventUi(timeZone: TimeZone): OccurrenceEventSummaryUi = OccurrenceEventSummaryUi(
     id = "${event.occurrenceId.value}@$date",
@@ -44,6 +45,8 @@ fun EventDaySlice.toEventUi(timeZone: TimeZone): OccurrenceEventSummaryUi = Occu
     colors = event.colors.toEventColorsUi(),
     hasAttendees = event.hasAttendees,
     myStatus = event.myStatus?.toParticipationStatus(),
+    eventStart = event.timing.startInstant(timeZone).toLocalDateTime(timeZone),
+    eventEnd = event.timing.endInstant(timeZone).toLocalDateTime(timeZone),
 )
 
 private fun KmpEventStatus?.toEventStatus(): EventStatus {

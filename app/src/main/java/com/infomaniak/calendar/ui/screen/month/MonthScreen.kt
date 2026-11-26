@@ -123,7 +123,7 @@ private fun MonthScreen(
             onEventClick = { goToEventDetail(it.occurrenceId) },
             contentPadding = contentPadding + PaddingValues(bottom = Dimens.FloatingToolbarClearance),
             //TODO[eventDragAndDrop]: Move the event by the days it was dragged over
-            onEventMoved = { event, dayShift -> Log.d("EventDragAndDrop", "${event.title} moved by $dayShift days") },
+            onEventMoved = { event, newStartDate -> Log.d("EventDragAndDrop", "${event.title} moved to $newStartDate") },
             modifier = Modifier
                 .fillMaxSize()
                 .hazeSource(hazeState),

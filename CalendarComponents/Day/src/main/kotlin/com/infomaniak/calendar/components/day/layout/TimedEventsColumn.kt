@@ -67,17 +67,15 @@ internal fun TimedEventsColumn(
         check(constraints.hasBoundedWidth) { "TimedEventsColumn needs a bounded width, e.g. Modifier.width(...)" }
         val width = constraints.maxWidth
 
-        val placements = remember(events, width, hourHeight, config, density) {
-            events.resolveOverlaps(
-                layoutWidth = width.toFloat(),
-                pixelsPerMinute = with(density) { hourHeight.toPx() } / MINUTES_PER_HOUR,
-                config = config,
-            )
+        val pixelsPerMinute = with(density) { hourHeight.toPx() } / MINUTES_PER_HOUR
+        val placements = remember(events, width, pixelsPerMinute, config) {
+            events.resolveOverlaps(layoutWidth = width.toFloat(), pixelsPerMinute = pixelsPerMinute, config = config)
         }
 
         ResizableEventLayout(
             timedEvents = events,
             placements = placements,
+            pixelsPerMinute = pixelsPerMinute,
             onEventClick = onEventClick,
             modifier = Modifier.matchParentSize(),
             textOverflow = textOverflow,

@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.component.DayView
+import com.infomaniak.calendar.components.day.component.timelineDropHandler
 import com.infomaniak.calendar.components.day.model.DayEvents
 import com.infomaniak.calendar.components.day.model.DayPages
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
@@ -49,8 +50,9 @@ import kotlinx.datetime.plus
 /**
  * One day per page, swiped a day at a time.
  *
- * @param onEventMoved Called when an event held up by a long press is dragged and dropped, with the
- * start it was dropped on: the quarter of an hour nearest to the card's top.
+ * @param onEventMoved Called when an event held up by a long press is dragged and dropped, with where it now
+ * starts: the quarter of an hour nearest to the dragged card's top. Whichever of its days is grabbed, the dragged
+ * card is the event's first day, its start under the finger.
  */
 @Composable
 fun DayPager(
@@ -66,7 +68,7 @@ fun DayPager(
     timelineModifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     headerTrailingContent: @Composable () -> Unit = {},
-    onEventMoved: ((EventSummaryUi.Normal, LocalDateTime) -> Unit)? = null,
+    onEventMoved: ((EventSummaryUi.Normal, newStart: LocalDateTime) -> Unit)? = null,
 ) {
     val pages = remember(dateRange) { DayPages(dateRange, daysPerPage = 1) }
     val pagerState = rememberPagerState(initialPage = pages.pageOf(selectedDate())) { pages.count }
@@ -78,9 +80,7 @@ fun DayPager(
     )
 
     val highlightState = rememberEventHighlightState(
-        onEventDropped = onEventMoved?.let { moved ->
-            { event, drop -> drop.time?.let { moved(event, LocalDateTime(drop.date, it)) } }
-        },
+        onEventDropped = onEventMoved?.let(::timelineDropHandler),
     )
 
     // The highlighted event is drawn over the pager, so neither the page edge nor the header hides it.

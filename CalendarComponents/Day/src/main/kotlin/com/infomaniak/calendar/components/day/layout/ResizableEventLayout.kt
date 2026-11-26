@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
@@ -39,23 +40,33 @@ import com.infomaniak.calendar.components.day.component.titleSizingFor
 import com.infomaniak.calendar.components.day.model.HOURS_PER_DAY
 import com.infomaniak.calendar.components.day.model.MINUTES_PER_HOUR
 import com.infomaniak.calendar.components.day.model.TimedEvent
+import com.infomaniak.calendar.components.day.model.firstDayOfEvent
+import com.infomaniak.calendar.components.day.model.isOverSeveralDays
 import com.infomaniak.calendar.components.day.preview.previewDayEvents
+import com.infomaniak.calendar.components.event.highlight.DraggedCardPlacement
 import com.infomaniak.calendar.components.event.highlight.EventHighlightState
 import com.infomaniak.calendar.components.event.highlight.highlightable
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import kotlin.math.roundToInt
 
-/** Places every card where the solver put it, relative to its own start edge. */
+/**
+ * Places every card where the solver put it, relative to its own start edge.
+ *
+ * A card dragged from one day of an event running over several is drawn as the event's first day instead, its
+ * start under the finger, [pixelsPerMinute] telling how tall that day is.
+ */
 @Composable
 internal fun ResizableEventLayout(
     timedEvents: List<TimedEvent>,
     placements: List<EventPlacement>,
+    pixelsPerMinute: Float,
     onEventClick: (EventSummaryUi.Normal) -> Unit,
     modifier: Modifier = Modifier,
     textOverflow: TextOverflow = TextOverflow.Ellipsis,
     highlightState: EventHighlightState? = null,
 ) {
     val density = LocalDensity.current
+    val config = eventLayoutConfig()
     val currentPlacements = rememberUpdatedState(placements)
 
     Layout(
@@ -76,11 +87,34 @@ internal fun ResizableEventLayout(
                     onClick = { onEventClick(timedEvent.event) },
                     textOverflow = textOverflow,
                     modifier = highlightState?.let {
-                        Modifier.highlightable(it, timedEvent.event, key = timedEvent) { draggedModifier ->
+                        val firstDay = timedEvent.firstDayOfEvent()
+                        val isOverSeveralDays = timedEvent.event.isOverSeveralDays
+                        val draggedHeight = (firstDay.durationMinutes * pixelsPerMinute - config.verticalSpacing)
+                            .coerceAtLeast(config.minEventHeight)
+
+                        Modifier.highlightable(
+                            state = it,
+                            event = timedEvent.event,
+                            key = timedEvent,
+                            draggedCardPlacement = if (isOverSeveralDays) {
+                                DraggedCardPlacement { card, grab, _ ->
+                                    Rect(left = -grab.x, top = 0f, right = card.width - grab.x, bottom = draggedHeight)
+                                }
+                            } else {
+                                DraggedCardPlacement.AsGrabbed
+                            },
+                        ) { draggedModifier ->
                             ResizableEventItem(
-                                timedEvent = timedEvent,
-                                titleSizing = titleSizing,
-                                visibleHeight = visibleHeight,
+                                timedEvent = if (isOverSeveralDays) firstDay else timedEvent,
+                                titleSizing = if (isOverSeveralDays) {
+                                    titleSizingFor(
+                                        visibleHeight = with(density) { draggedHeight.toDp() },
+                                        width = with(density) { placement.width.toDp() },
+                                    )
+                                } else {
+                                    titleSizing
+                                },
+                                visibleHeight = if (isOverSeveralDays) ({ draggedHeight }) else visibleHeight,
                                 onClick = {},
                                 textOverflow = textOverflow,
                                 modifier = draggedModifier,
@@ -146,6 +180,7 @@ private fun ResizableEventLayoutPreview() {
                 ResizableEventLayout(
                     timedEvents = timedEvents,
                     placements = placements,
+                    pixelsPerMinute = pixelsPerMinute,
                     onEventClick = {},
                     modifier = Modifier.matchParentSize(),
                 )

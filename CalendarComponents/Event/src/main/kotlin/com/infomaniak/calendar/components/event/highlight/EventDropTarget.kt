@@ -30,19 +30,19 @@ import kotlinx.datetime.LocalTime
  * Marks this as where [state]'s held event can be dropped on [date], the drop target nearest to the finger
  * being the one it lands on.
  *
- * [timeAt] tells the time a card dropped here starts at, from where its top and its height are, both as
- * fractions of this target's height: a day's timeline tells it, a month's day doesn't.
+ * [timeAt] tells the time a card dropped here starts at, from where its top is, as a fraction of this target's
+ * height: a day's timeline tells it, a month's day doesn't.
  */
 fun Modifier.eventDropTarget(
     state: EventHighlightState,
     date: LocalDate,
-    timeAt: ((topFraction: Float, heightFraction: Float) -> LocalTime)? = null,
+    timeAt: ((topFraction: Float) -> LocalTime)? = null,
 ): Modifier = this then EventDropTargetElement(state, date, timeAt)
 
 private data class EventDropTargetElement(
     val state: EventHighlightState,
     val date: LocalDate,
-    val timeAt: ((Float, Float) -> LocalTime)?,
+    val timeAt: ((Float) -> LocalTime)?,
 ) : ModifierNodeElement<EventDropTargetNode>() {
     override fun create() = EventDropTargetNode(state, date, timeAt)
     override fun update(node: EventDropTargetNode) = node.update(state, date, timeAt)
@@ -51,12 +51,12 @@ private data class EventDropTargetElement(
 internal class EventDropTargetNode(
     private var state: EventHighlightState,
     var date: LocalDate,
-    private var timeAt: ((Float, Float) -> LocalTime)?,
+    private var timeAt: ((Float) -> LocalTime)?,
 ) : Modifier.Node(), LayoutAwareModifierNode {
 
     private var coordinates: LayoutCoordinates? = null
 
-    fun update(state: EventHighlightState, date: LocalDate, timeAt: ((Float, Float) -> LocalTime)?) {
+    fun update(state: EventHighlightState, date: LocalDate, timeAt: ((Float) -> LocalTime)?) {
         this.date = date
         this.timeAt = timeAt
         if (state == this.state) return
@@ -86,12 +86,12 @@ internal class EventDropTargetNode(
         return (finger - nearest).getDistance()
     }
 
-    /** The time a card [cardHeight] high, its top at [cardTop] as seen by [overlay], starts at once dropped here. */
-    fun timeAt(overlay: LayoutCoordinates, cardTop: Float, cardHeight: Float): LocalTime? {
+    /** The time a card, its top at [cardTop] as seen by [overlay], starts at once dropped here. */
+    fun timeAt(overlay: LayoutCoordinates, cardTop: Float): LocalTime? {
         val timeAt = timeAt ?: return null
         val target = coordinates?.takeIf { it.isAttached && it.size.height > 0 } ?: return null
         val height = target.size.height.toFloat()
         val top = target.localPositionOf(overlay, Offset(0f, cardTop)).y
-        return timeAt(top / height, cardHeight / height)
+        return timeAt(top / height)
     }
 }

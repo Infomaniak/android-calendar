@@ -57,7 +57,7 @@ private val FingerClearance = 24.dp
  * way the Planning writes an event. It opens just above the finger so the finger doesn't hide it, or just
  * below when there is no room above, and always fully inside the area, out of the [contentPadding]
  * where bars may be drawn over the overlay. Pulled or dragged, it is shifted after the finger, and once
- * dragged, it is drawn by the highlight's own dragged card.
+ * dragged, it is drawn by the highlight's own dragged card, where its [DraggedCardPlacement] puts it.
  */
 @Composable
 fun HighlightedEventOverlay(
@@ -106,7 +106,8 @@ fun HighlightedEventOverlay(
                 .coerceAtMost(area.height - 2 * margin)
                 .coerceAtLeast(0f)
             val unfolded = unfoldedBounds(highlight.fingerY, area, height, margin, clearance)
-            val bounds = lerp(highlight.startBounds, unfolded, state.progress).translate(state.dragOffset)
+            val home = if (state.isDragging) highlight.draggedBounds else highlight.startBounds
+            val bounds = lerp(home, unfolded, state.progress).translate(state.dragOffset)
 
             measurable.measure(
                 Constraints.fixed(bounds.width.roundToInt().coerceAtLeast(0), bounds.height.roundToInt().coerceAtLeast(0)),

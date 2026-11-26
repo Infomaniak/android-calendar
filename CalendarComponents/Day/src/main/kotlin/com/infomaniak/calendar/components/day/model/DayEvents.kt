@@ -19,8 +19,12 @@ package com.infomaniak.calendar.components.day.model
 
 import androidx.compose.runtime.Immutable
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
+import kotlinx.datetime.plus
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
@@ -46,6 +50,28 @@ data class TimedEvent(
 ) {
     val durationMinutes: Int = endMinuteOfDay - startMinuteOfDay
 }
+
+/**
+ * The first day of the event this is a piece of, the one drawn while the event is dragged by any of its pieces,
+ * its start under the finger. This piece when the event's own bounds aren't known.
+ */
+internal fun TimedEvent.firstDayOfEvent(timeZone: TimeZone = TimeZone.currentSystemDefault()): TimedEvent {
+    val start = event.eventStart ?: return this
+    val end = minOf(event.eventEnd ?: return this, start.date.plus(1, DateTimeUnit.DAY).atTime(0, 0))
+    return TimedEvent(
+        event = FirstDayOfEvent(event, start = start.toInstant(timeZone), end = end.toInstant(timeZone)),
+        startMinuteOfDay = start.hour * MINUTES_PER_HOUR + start.minute,
+        endMinuteOfDay = if (end.date > start.date) MINUTES_PER_DAY else end.hour * MINUTES_PER_HOUR + end.minute,
+    )
+}
+
+/** Whether the event runs past the midnight ending its first day, when its own bounds are known. */
+internal val EventSummaryUi.Normal.isOverSeveralDays: Boolean
+    get() {
+        val start = eventStart ?: return false
+        val end = eventEnd ?: return false
+        return end > start.date.plus(1, DateTimeUnit.DAY).atTime(0, 0)
+    }
 
 fun EventSummaryUi.Normal.toTimedEvent(date: LocalDate, timeZone: TimeZone): TimedEvent = TimedEvent(
     event = this,

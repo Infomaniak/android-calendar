@@ -36,7 +36,6 @@ import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
 import kotlin.math.sqrt
 
 private const val HIGHLIGHT_DAMPING_RATIO = 0.8f
@@ -60,8 +59,8 @@ fun rememberEventHighlightState(onEventDropped: ((EventSummaryUi.Normal, EventDr
  * The [EventHighlight] a long press holds up, unfolded as [progress] goes from 0 to 1 and folded back once released.
  *
  * Moving the finger first pulls the unfolded card along with some resistance, springing after it. Pulled far
- * enough, it comes loose: it folds back to its own size and follows the finger, shifted by [dragOffset], until
- * it is dropped on the [eventDropTarget] under the finger.
+ * enough, it comes loose: it folds back to the size its [DraggedCardPlacement] gives it and follows the finger,
+ * shifted by [dragOffset], until it is dropped on the [eventDropTarget] under the finger.
  */
 @Stable
 class EventHighlightState internal constructor(
@@ -90,9 +89,6 @@ class EventHighlightState internal constructor(
     /** Where an event can be dropped, each knowing its date. */
     internal val dropTargets = mutableSetOf<EventDropTargetNode>()
 
-    /** The day the held event was picked up on. */
-    private var fromDate: LocalDate? = null
-
     private val progressAnimatable = Animatable(initialProgress)
     internal val progress: Float get() = progressAnimatable.value
 
@@ -104,12 +100,11 @@ class EventHighlightState internal constructor(
     private var fingerFollowing: Job? = null
 
     // Each animation cancels the running one, so a cancelled fold-back never clears the highlight.
-    internal fun show(highlight: EventHighlight, finger: Offset) {
+    internal fun show(highlight: EventHighlight) {
         val isAnotherEvent = this.highlight?.key != highlight.key
         highlightState.value = highlight
         isHeldState.value = true
         isDraggingState.value = false
-        fromDate = dropTargetAt(finger)?.date
 
         fingerFollowing?.cancel()
         fingerTarget = Offset.Zero
@@ -140,21 +135,14 @@ class EventHighlightState internal constructor(
         if (isDragging) followFinger(delta)
     }
 
-    /**
-     * Lets go of the card under [finger], [delta] away from where it was pressed, and reports where it lands.
-     * The card then goes back to its place.
-     */
-    internal fun drop(finger: Offset, delta: Offset) {
+    /** Lets go of the card under [finger] and reports where its start lands. The card then goes back to its place. */
+    internal fun drop(finger: Offset) {
         val highlight = highlight?.takeIf { isHeld && isDragging } ?: return
         val overlay = overlayCoordinates?.takeIf { it.isAttached }
         val target = dropTargetAt(finger)
         if (overlay != null && target != null) {
-            val cardBounds = highlight.startBounds.translate(delta)
-            val drop = EventDrop(
-                fromDate = fromDate ?: target.date,
-                date = target.date,
-                time = target.timeAt(overlay, cardBounds.top, cardBounds.height),
-            )
+            val cardTop = finger.y + highlight.draggedBounds.top - highlight.fingerY
+            val drop = EventDrop(date = target.date, time = target.timeAt(overlay, cardTop))
             onEventDropped.value?.invoke(highlight.event, drop)
         }
         hide()
@@ -165,8 +153,10 @@ class EventHighlightState internal constructor(
         isHeldState.value = false
 
         fingerFollowing?.cancel()
+        // A dragged card is placed apart from where it sat: it is moved back there.
+        val place = highlight?.takeIf { isDragging }?.let { it.startBounds.topLeft - it.draggedBounds.topLeft } ?: Offset.Zero
         scope.launch {
-            val goingBack = launch { dragOffsetAnimatable.animateTo(Offset.Zero, highlightOffsetSpring) }
+            val goingBack = launch { dragOffsetAnimatable.animateTo(place, highlightOffsetSpring) }
             progressAnimatable.animateTo(0f, highlightSpring)
             goingBack.join()
             isDraggingState.value = false
@@ -176,6 +166,9 @@ class EventHighlightState internal constructor(
 
     /** Whether the card [key] identifies is the one held up, which the overlay draws in its place. */
     fun isHighlighting(key: Any): Boolean = highlight?.key == key
+
+    /** Whether [event] is dragged, from any of its pieces: all of them move with it. */
+    internal fun isDragging(event: EventSummaryUi.Normal): Boolean = isDragging && highlight?.event?.eventId == event.eventId
 
     /** The drop target under [finger], or the nearest one: the finger can stray off them, like over a timeline's gutter. */
     private fun dropTargetAt(finger: Offset): EventDropTargetNode? {
