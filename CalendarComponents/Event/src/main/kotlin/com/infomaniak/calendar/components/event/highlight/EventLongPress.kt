@@ -105,6 +105,7 @@ private class LongPressHighlightNode(
                 event = event,
                 key = key,
                 startBounds = overlay.localBoundingBoxOf(card, clipBounds = true),
+                cardBounds = overlay.localBoundingBoxOf(card, clipBounds = false),
                 areaBounds = overlay.localBoundingBoxOf(area, clipBounds = true),
                 fingerY = pressedAt.y,
                 draggedCard = draggedCard,

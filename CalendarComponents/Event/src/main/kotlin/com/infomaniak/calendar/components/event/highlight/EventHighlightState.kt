@@ -149,7 +149,7 @@ class EventHighlightState internal constructor(
         val overlay = overlayCoordinates?.takeIf { it.isAttached }
         val target = dropTargetAt(finger)
         if (overlay != null && target != null) {
-            val cardBounds = highlight.startBounds.translate(delta)
+            val cardBounds = highlight.cardBounds.translate(delta)
             val drop = EventDrop(
                 fromDate = fromDate ?: target.date,
                 date = target.date,
@@ -169,6 +169,8 @@ class EventHighlightState internal constructor(
             val goingBack = launch { dragOffsetAnimatable.animateTo(Offset.Zero, highlightOffsetSpring) }
             progressAnimatable.animateTo(0f, highlightSpring)
             goingBack.join()
+            // Pressed again meanwhile, the card is held anew.
+            if (isHeld) return@launch
             isDraggingState.value = false
             highlightState.value = null
         }

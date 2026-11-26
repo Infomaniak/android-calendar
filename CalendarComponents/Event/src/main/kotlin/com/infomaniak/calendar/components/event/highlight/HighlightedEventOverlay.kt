@@ -158,10 +158,12 @@ private fun HighlightedEventOverlayPreview(progress: Float) {
     )
     // A compressed card in the middle one of three day columns, next to a 48dp hour gutter.
     val highlight = with(density) {
+        val cardBounds = Rect(left = 152.dp.toPx(), top = 200.dp.toPx(), right = 248.dp.toPx(), bottom = 260.dp.toPx())
         EventHighlight(
             event = event,
             key = event,
-            startBounds = Rect(left = 152.dp.toPx(), top = 200.dp.toPx(), right = 248.dp.toPx(), bottom = 260.dp.toPx()),
+            startBounds = cardBounds,
+            cardBounds = cardBounds,
             areaBounds = Rect(left = 48.dp.toPx(), top = 0f, right = 360.dp.toPx(), bottom = 480.dp.toPx()),
             fingerY = 230.dp.toPx(),
         )

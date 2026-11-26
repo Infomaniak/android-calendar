@@ -26,13 +26,15 @@ import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
 /**
  * An event held up by a long press on the card [key] identifies. The card grows from where it sat, [startBounds], to
  * the whole width of [areaBounds], opening near the finger, [fingerY]. All of them are in the coordinates of the
- * overlay drawing it. Dragged, it is drawn by [draggedCard], the way it looks where it sat.
+ * overlay drawing it. [cardBounds] is the whole card, even where it is scrolled out of view, from which a drop is
+ * placed. Dragged, it is drawn by [draggedCard], the way it looks where it sat.
  */
 @Immutable
 internal data class EventHighlight(
     val event: EventSummaryUi.Normal,
     val key: Any,
     val startBounds: Rect,
+    val cardBounds: Rect,
     val areaBounds: Rect,
     val fingerY: Float,
     val draggedCard: (@Composable (Modifier) -> Unit)? = null,

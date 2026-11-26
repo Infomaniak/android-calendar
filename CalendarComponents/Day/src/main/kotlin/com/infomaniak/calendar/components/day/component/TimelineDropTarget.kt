@@ -38,7 +38,8 @@ internal fun Modifier.timelineDropTarget(state: EventHighlightState, date: Local
 
 private fun quarterHourAt(topFraction: Float, heightFraction: Float): LocalTime {
     val duration = (heightFraction * MINUTES_PER_DAY).roundToInt().coerceIn(DROP_STEP_MINUTES, MINUTES_PER_DAY)
+    val latestStart = (MINUTES_PER_DAY - duration) / DROP_STEP_MINUTES * DROP_STEP_MINUTES
     val minute = ((topFraction * MINUTES_PER_DAY / DROP_STEP_MINUTES).roundToInt() * DROP_STEP_MINUTES)
-        .coerceIn(0, MINUTES_PER_DAY - duration)
+        .coerceIn(0, latestStart)
     return LocalTime(hour = minute / MINUTES_PER_HOUR, minute = minute % MINUTES_PER_HOUR)
 }
