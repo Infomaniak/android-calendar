@@ -20,11 +20,13 @@ package com.infomaniak.calendar.components.day.component.allday
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.calendar.components.day.TimelineDefaults
 import com.infomaniak.calendar.components.resources.R
 import com.infomaniak.designsystem.core.theme.EsdsTheme
@@ -42,4 +44,21 @@ internal fun AllDayLabel(modifier: Modifier = Modifier) {
             .width(TimelineDefaults.HourGutterWidth)
             .padding(end = EsdsTheme.spacing.lg),
     )
+}
+
+@Preview
+@Composable
+private fun AllDayLabelPreview() {
+    Surface {
+        AllDayLabel()
+    }
+}
+
+/** The label wraps within the gutter rather than widening it. */
+@Preview(fontScale = 2f)
+@Composable
+private fun AllDayLabelLargeTextPreview() {
+    Surface {
+        AllDayLabel()
+    }
 }
