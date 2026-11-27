@@ -90,9 +90,11 @@ object NotificationHelper {
             .setCategory(NotificationCompat.CATEGORY_EVENT)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
 
-        kMeetUrl?.let { builder.addAction(createJoinKMeetAction(context, it)) }
-        mapsQuery?.let { builder.addAction(createOpenMapAction(context, it)) }
         snoozeIntent?.let { builder.addAction(createSnoozeAction(context, it, snoozeDelay)) }
+        when { // Display at most 2 action. Always display snooze. Display kMeet over maps
+            kMeetUrl != null -> builder.addAction(createJoinKMeetAction(context, kMeetUrl))
+            mapsQuery != null -> builder.addAction(createOpenMapAction(context, mapsQuery))
+        }
 
         return builder.build()
     }
@@ -123,7 +125,8 @@ object NotificationHelper {
             Intent(Intent.ACTION_VIEW, "geo:0,0?q=${Uri.encode(mapsQuery)}".toUri()),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
-        return NotificationCompat.Action.Builder(null, context.getString(R.string.notificationActionOpenMap), pendingIntent).build()
+        return NotificationCompat.Action.Builder(null, context.getString(R.string.notificationActionOpenMap), pendingIntent)
+            .build()
     }
 
     private fun formatTimingText(
