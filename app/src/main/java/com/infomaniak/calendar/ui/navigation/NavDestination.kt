@@ -87,6 +87,9 @@ sealed interface NavDestination : NavKey {
 
         @Serializable
         data object DefaultEventDuration : Settings
+
+        @Serializable
+        data object TimeZone : Settings
     }
 
     @Serializable

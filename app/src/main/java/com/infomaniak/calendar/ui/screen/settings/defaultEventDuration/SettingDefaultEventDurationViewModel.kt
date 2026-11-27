@@ -27,7 +27,6 @@ import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -38,9 +37,7 @@ class SettingDefaultEventDurationViewModel(private val settingsDataValues: Setti
     val defaultEventDuration = settingsDataValues.defaultEventDuration.flow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), null)
 
-    fun setDefaultEventDuration(duration: Duration) {
-        viewModelScope.launch {
-            settingsDataValues.defaultEventDuration.setValue(duration)
-        }
+    suspend fun setDefaultEventDuration(duration: Duration) {
+        settingsDataValues.defaultEventDuration.setValue(duration)
     }
 }

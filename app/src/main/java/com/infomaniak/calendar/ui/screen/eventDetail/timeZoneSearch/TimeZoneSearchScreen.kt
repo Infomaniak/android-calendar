@@ -17,26 +17,14 @@
  */
 package com.infomaniak.calendar.ui.screen.eventDetail.timeZoneSearch
 
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.union
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScaffoldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.infomaniak.calendar.components.timezonesearch.TimeZoneSearch
-import com.infomaniak.calendar.ui.component.topAppBar.TopAppBarButtons
+import com.infomaniak.calendar.ui.component.TimeZoneSearchScreenContent
 import com.infomaniak.calendar.ui.navigation.LocalSharedViewModelStoreOwner
 import com.infomaniak.calendar.ui.screen.eventDetail.form.EventFormViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
-import kotlinx.datetime.TimeZone
-import com.infomaniak.calendar.components.resources.R as RComponents
 
 @Composable
 fun TimeZoneSearchScreen(
@@ -45,7 +33,7 @@ fun TimeZoneSearchScreen(
     modifier: Modifier = Modifier,
     eventFormViewModel: EventFormViewModel = viewModel(LocalSharedViewModelStoreOwner.current), // shared from parent
 ) {
-    TimeZoneSearchScreen(
+    TimeZoneSearchScreenContent(
         onTimeZoneSelected = { timeZone ->
             eventFormViewModel.formState?.dateAndTimeState?.run { (if (isStart) start else end).pickTimeZone(timeZone) }
             goBack()
@@ -55,34 +43,10 @@ fun TimeZoneSearchScreen(
     )
 }
 
-@Composable
-private fun TimeZoneSearchScreen(
-    onTimeZoneSelected: (TimeZone) -> Unit,
-    goBack: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                navigationIcon = { TopAppBarButtons.BackButton(onClick = goBack) },
-                title = { Text(stringResource(RComponents.string.timeZoneLabel)) },
-            )
-        },
-        modifier = modifier,
-        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.union(WindowInsets.ime),
-    ) { contentPadding ->
-        TimeZoneSearch(
-            onTimeZoneClick = onTimeZoneSelected,
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = contentPadding,
-        )
-    }
-}
-
 @Preview
 @Composable
 private fun Preview() {
     CalendarThemeForPreview {
-        TimeZoneSearchScreen(onTimeZoneSelected = {}, goBack = {})
+        TimeZoneSearchScreenContent(onTimeZoneSelected = {}, goBack = {})
     }
 }

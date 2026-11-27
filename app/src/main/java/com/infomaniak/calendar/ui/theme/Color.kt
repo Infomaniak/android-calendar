@@ -30,5 +30,5 @@ data class CustomColorScheme(val avatarInitialsColor: Color = Color.Unspecified)
 
 object CustomColors {
     val MenuDrawerContainerBackground @Composable get() = ComponentColors.SegmentedItemColor
-    val SettingItemContainerColor @Composable get() = ComponentColors.SegmentedItemColor
+    val SettingItemColors @Composable get() = ComponentColors.SegmentedListItemColors
 }

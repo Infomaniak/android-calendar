@@ -19,6 +19,7 @@ package com.infomaniak.calendar.ui.screen.settings.firstDayOfWeek
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +29,7 @@ import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatFullDayName
 import com.infomaniak.calendar.ui.screen.settings.components.SettingChoices
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
 
 @Composable
@@ -37,11 +39,17 @@ fun SettingFirstDayOfWeekScreen(
     firstDayOfWeekViewModel: SettingFirstDayOfWeekViewModel = viewModel(),
 ) {
     val firstDayOfWeek by firstDayOfWeekViewModel.firstDayOfWeek.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
 
     SettingFirstDayOfWeekScreen(
         firstDayOfWeek = firstDayOfWeek,
         goBack = goBack,
-        onItemClick = { firstDayOfWeekViewModel.setFirstDayOfWeekClick(it) },
+        onItemClick = {
+            scope.launch {
+                firstDayOfWeekViewModel.setFirstDayOfWeekClick(it)
+                goBack?.invoke()
+            }
+        },
         modifier = modifier,
     )
 }

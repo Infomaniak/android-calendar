@@ -19,6 +19,7 @@ package com.infomaniak.calendar.data
 
 import android.content.Context
 import com.infomaniak.calendar.model.settings.SettingThemeOption
+import com.infomaniak.calendar.model.settings.SettingTimeZone
 import com.infomaniak.core.datavalue.DataValues
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
@@ -36,4 +37,5 @@ class SettingsDataValues @Inject constructor(appContext: Context) : DataValues(a
         key = "firstDayOfWeek",
         defaultValue = WeekFields.of(Locale.getDefault()).firstDayOfWeek.toKotlinDayOfWeek(),
     )
+    val timeZone = dataValue<SettingTimeZone>(key = "timeZone", defaultValue = SettingTimeZone.Automatic)
 }

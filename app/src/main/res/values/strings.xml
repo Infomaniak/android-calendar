@@ -37,6 +37,7 @@
     <string name="generalSettingsEventLabel">Event</string>
     <string name="generalSettingsNotificationsLabel">Notifications</string>
     <string name="generalSettingsStartOfWeekLabel">Start of the week</string>
+    <string name="generalSettingsUseDeviceTimeZoneLabel">Automatic timezone</string>
     <string name="monthTitle">Month</string>
     <string name="noWritableCalendar">No writable calendars found</string>
     <string name="notificationActionOpenMap">Open map</string>

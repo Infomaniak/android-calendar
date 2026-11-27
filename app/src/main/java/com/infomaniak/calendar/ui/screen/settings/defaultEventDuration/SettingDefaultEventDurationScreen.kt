@@ -19,6 +19,7 @@ package com.infomaniak.calendar.ui.screen.settings.defaultEventDuration
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +29,7 @@ import com.infomaniak.calendar.R
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDuration
 import com.infomaniak.calendar.ui.screen.settings.components.SettingChoices
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -39,11 +41,17 @@ fun SettingDefaultEventDurationScreen(
     settingDefaultEventDurationViewModel: SettingDefaultEventDurationViewModel = viewModel(),
 ) {
     val defaultEventDuration by settingDefaultEventDurationViewModel.defaultEventDuration.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
 
     SettingDefaultEventDurationScreen(
         defaultEventDuration = defaultEventDuration,
         goBack = goBack,
-        onItemClick = { settingDefaultEventDurationViewModel.setDefaultEventDuration(it.duration) },
+        onItemClick = {
+            scope.launch {
+                settingDefaultEventDurationViewModel.setDefaultEventDuration(it.duration)
+                goBack?.invoke()
+            }
+        },
         modifier = modifier,
     )
 }
