@@ -56,7 +56,7 @@ private fun Content(
     modifier: Modifier = Modifier,
 ) {
     SettingChoices(
-        title = stringResource(R.string.generalSettingsStartOfWeekLabel),
+        title = stringResource(R.string.generalSettingsDefaultEventDurationLabel),
         items = EventDuration.entries,
         selectedItem = { EventDuration.entries.find { it.duration == defaultEventDuration } },
         itemLabel = { it.duration.formatDuration() },
