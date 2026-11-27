@@ -45,7 +45,7 @@ fun <T> SettingChoices(
         SettingSection(title = subtitle) {
             val currentItem = selectedItem()
             items.forEachIndexed { index, option ->
-                val shapes = ListItemDefaults.segmentedShapes(index, DayOfWeek.entries.size)
+                val shapes = ListItemDefaults.segmentedShapes(index, items.size)
                 Item(shapes, option, currentItem, onItemClick, itemLabel, itemSymbol)
             }
         }
