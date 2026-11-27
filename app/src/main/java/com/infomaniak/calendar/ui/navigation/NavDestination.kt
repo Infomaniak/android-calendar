@@ -84,6 +84,9 @@ sealed interface NavDestination : NavKey {
 
         @Serializable
         data object FirstDayOfWeek : Settings
+
+        @Serializable
+        data object DefaultEventDuration : Settings
     }
 
     @Serializable

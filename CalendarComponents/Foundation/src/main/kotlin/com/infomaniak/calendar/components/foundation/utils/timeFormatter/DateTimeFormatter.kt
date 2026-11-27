@@ -59,23 +59,29 @@ internal fun LocalDate.formatShortNumericDate(locale: Locale, currentYear: Int):
 }
 
 /** `1 hour, 30 minutes before`, `At the event time`, `2 days after`, weeks being the largest unit of duration we display. */
-
 @Composable
 @ReadOnlyComposable
 fun Duration.formatDurationOffset(): String {
     if (absoluteValue.inWholeSeconds == 0L) {
         return stringResource(R.string.notificationTimeAtStart)
     }
+
+    val durationText = formatDuration()
+    return if (isNegative()) {
+        stringResource(R.string.notificationTimeBefore, durationText)
+    } else {
+        stringResource(R.string.notificationTimeAfter, durationText)
+    }
+}
+
+/** `1 hour, 30 minutes`, `30 minutes`, weeks being the largest unit of duration we display. */
+@Composable
+@ReadOnlyComposable
+fun Duration.formatDuration(): String {
     absoluteValue.toComponents { totalDays, hours, minutes, _, _ ->
         val weeks = (totalDays / DateTimeUnit.WEEK.days).toInt()
         val days = (totalDays % DateTimeUnit.WEEK.days).toInt()
-        val durationText = formatDurationParts(weeks, days, hours, minutes)
-
-        return if (isNegative()) {
-            stringResource(R.string.notificationTimeBefore, durationText)
-        } else {
-            stringResource(R.string.notificationTimeAfter, durationText)
-        }
+        return formatDurationParts(weeks, days, hours, minutes)
     }
 }
 

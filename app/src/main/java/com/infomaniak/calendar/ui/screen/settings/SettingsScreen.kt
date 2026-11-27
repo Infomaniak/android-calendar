@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDuration
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatFullDayName
 import com.infomaniak.calendar.model.settings.SettingThemeOption
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemClickable
@@ -36,13 +37,17 @@ import com.infomaniak.calendar.ui.screen.settings.components.SettingItemOpen
 import com.infomaniak.calendar.ui.screen.settings.components.SettingScaffold
 import com.infomaniak.calendar.ui.screen.settings.components.SettingSection
 import com.infomaniak.calendar.ui.screen.settings.components.SettingShape
+import com.infomaniak.calendar.ui.screen.settings.defaultEventDuration.SettingDefaultEventDurationViewModel
 import com.infomaniak.calendar.ui.screen.settings.firstDayOfWeek.SettingFirstDayOfWeekViewModel
 import com.infomaniak.calendar.ui.screen.settings.theme.SettingThemeViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Bell
+import com.infomaniak.designsystem.icons.symbols.BubbleTopRightCircle
 import com.infomaniak.designsystem.icons.symbols.CalendarDots
 import kotlinx.datetime.DayOfWeek
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 import com.infomaniak.core.common.R as RCore
 
 @Composable
@@ -50,19 +55,24 @@ fun SettingsScreen(
     goBack: () -> Unit,
     goToTheme: () -> Unit,
     goToFirstDayOfWeek: () -> Unit,
+    goToDefaultEventDuration: () -> Unit,
     modifier: Modifier = Modifier,
     settingThemeViewModel: SettingThemeViewModel = viewModel(),
     firstDayOfWeekViewModel: SettingFirstDayOfWeekViewModel = viewModel(),
+    defaultEventDurationViewModel: SettingDefaultEventDurationViewModel = viewModel(),
 ) {
     val theme by settingThemeViewModel.theme.collectAsStateWithLifecycle()
     val firstDayOfWeek by firstDayOfWeekViewModel.firstDayOfWeek.collectAsStateWithLifecycle()
+    val defaultEventDuration by defaultEventDurationViewModel.defaultEventDuration.collectAsStateWithLifecycle()
 
     SettingsScreen(
         theme = { theme },
         firstDayOfWeek = { firstDayOfWeek },
+        defaultEventDuration = { defaultEventDuration },
         goBack = goBack,
         goToTheme = goToTheme,
         goToFirstDayOfWeek = goToFirstDayOfWeek,
+        goToDefaultEventDuration = goToDefaultEventDuration,
         modifier = modifier,
     )
 }
@@ -71,9 +81,11 @@ fun SettingsScreen(
 private fun SettingsScreen(
     theme: () -> SettingThemeOption?,
     firstDayOfWeek: () -> DayOfWeek?,
+    defaultEventDuration: () -> Duration?,
     goBack: () -> Unit,
     goToTheme: () -> Unit,
     goToFirstDayOfWeek: () -> Unit,
+    goToDefaultEventDuration: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -93,6 +105,16 @@ private fun SettingsScreen(
                 onClick = goToFirstDayOfWeek,
                 symbol = EsdsIcons.CalendarDots,
                 supportingText = firstDayOfWeek()?.formatFullDayName(),
+            )
+        }
+
+        SettingSection(title = stringResource(R.string.generalSettingsEventLabel)) {
+            SettingItemClickable(
+                shapes = SettingShape.Single,
+                text = stringResource(R.string.generalSettingsDefaultEventDurationLabel),
+                onClick = goToDefaultEventDuration,
+                symbol = EsdsIcons.BubbleTopRightCircle,
+                supportingText = defaultEventDuration()?.formatDuration(),
             )
         }
 
@@ -120,9 +142,11 @@ private fun SettingScreenPreview() {
         SettingsScreen(
             theme = { SettingThemeOption.System },
             firstDayOfWeek = { DayOfWeek.MONDAY },
+            defaultEventDuration = { 1.hours },
             goBack = {},
             goToTheme = {},
             goToFirstDayOfWeek = {},
+            goToDefaultEventDuration = {},
         )
     }
 }
