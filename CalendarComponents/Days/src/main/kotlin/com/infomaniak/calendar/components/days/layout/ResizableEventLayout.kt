@@ -47,6 +47,7 @@ import com.infomaniak.calendar.components.event.highlight.DraggedCardPlacement
 import com.infomaniak.calendar.components.event.highlight.EventHighlightState
 import com.infomaniak.calendar.components.event.highlight.highlightable
 import com.infomaniak.calendar.components.foundation.models.EventSummaryUi
+import com.infomaniak.calendar.components.foundation.state.LocalTimeZone
 import kotlin.math.roundToInt
 
 /**
@@ -68,6 +69,7 @@ internal fun ResizableEventLayout(
     val density = LocalDensity.current
     val config = eventLayoutConfig()
     val currentPlacements = rememberUpdatedState(placements)
+    val timeZone = LocalTimeZone.current
 
     Layout(
         modifier = modifier,
@@ -87,7 +89,7 @@ internal fun ResizableEventLayout(
                     onClick = { onEventClick(timedEvent.event) },
                     textOverflow = textOverflow,
                     modifier = highlightState?.let {
-                        val firstDay = timedEvent.firstDayOfEvent()
+                        val firstDay = timedEvent.firstDayOfEvent(timeZone)
                         val isOverSeveralDays = timedEvent.event.isOverSeveralDays
                         val draggedHeight = (firstDay.durationMinutes * pixelsPerMinute - config.verticalSpacing)
                             .coerceAtLeast(config.minEventHeight)

@@ -55,8 +55,7 @@ data class TimedEvent(
  * The first day of the event this is a piece of, the one drawn while the event is dragged by any of its pieces,
  * its start under the finger.
  */
-// TODO: Pass the app's time zone, which the user can force in the settings, once it is available.
-internal fun TimedEvent.firstDayOfEvent(timeZone: TimeZone = TimeZone.currentSystemDefault()): TimedEvent {
+internal fun TimedEvent.firstDayOfEvent(timeZone: TimeZone): TimedEvent {
     val start = event.eventStart
     val end = minOf(event.eventEnd, start.date.plus(1, DateTimeUnit.DAY).atTime(0, 0))
     return TimedEvent(
