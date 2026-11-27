@@ -40,7 +40,7 @@ fun SettingDefaultEventDurationScreen(
 ) {
     val defaultEventDuration by settingDefaultEventDurationViewModel.defaultEventDuration.collectAsStateWithLifecycle()
 
-    Content(
+    SettingDefaultEventDurationScreen(
         defaultEventDuration = defaultEventDuration,
         goBack = goBack,
         onItemClick = { settingDefaultEventDurationViewModel.setDefaultEventDuration(it.duration) },
@@ -49,7 +49,7 @@ fun SettingDefaultEventDurationScreen(
 }
 
 @Composable
-private fun Content(
+private fun SettingDefaultEventDurationScreen(
     defaultEventDuration: Duration?,
     goBack: (() -> Unit)?,
     onItemClick: (EventDuration) -> Unit,
@@ -82,7 +82,7 @@ private enum class EventDuration(val duration: Duration) {
 @Composable
 private fun Preview() {
     CalendarThemeForPreview {
-        Content(
+        SettingDefaultEventDurationScreen(
             defaultEventDuration = 15.minutes,
             goBack = {},
             onItemClick = {},
