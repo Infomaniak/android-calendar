@@ -38,7 +38,7 @@ fun SettingFirstDayOfWeekScreen(
 ) {
     val firstDayOfWeek by firstDayOfWeekViewModel.firstDayOfWeek.collectAsStateWithLifecycle()
 
-    Content(
+    SettingFirstDayOfWeekScreen(
         firstDayOfWeek = firstDayOfWeek,
         goBack = goBack,
         onItemClick = { firstDayOfWeekViewModel.setFirstDayOfWeekClick(it) },
@@ -47,7 +47,7 @@ fun SettingFirstDayOfWeekScreen(
 }
 
 @Composable
-private fun Content(
+private fun SettingFirstDayOfWeekScreen(
     firstDayOfWeek: DayOfWeek?,
     goBack: (() -> Unit)?,
     onItemClick: (DayOfWeek) -> Unit,
@@ -71,7 +71,7 @@ private fun Content(
 @Composable
 private fun Preview() {
     CalendarThemeForPreview {
-        Content(
+        SettingFirstDayOfWeekScreen(
             firstDayOfWeek = DayOfWeek.MONDAY,
             goBack = {},
             onItemClick = {},

@@ -46,7 +46,7 @@ import kotlinx.datetime.DayOfWeek
 import com.infomaniak.core.common.R as RCore
 
 @Composable
-fun SettingScreen(
+fun SettingsScreen(
     goBack: () -> Unit,
     goToTheme: () -> Unit,
     goToFirstDayOfWeek: () -> Unit,
@@ -57,7 +57,7 @@ fun SettingScreen(
     val theme by settingThemeViewModel.theme.collectAsStateWithLifecycle()
     val firstDayOfWeek by firstDayOfWeekViewModel.firstDayOfWeek.collectAsStateWithLifecycle()
 
-    SettingContent(
+    SettingsScreen(
         theme = { theme },
         firstDayOfWeek = { firstDayOfWeek },
         goBack = goBack,
@@ -68,7 +68,7 @@ fun SettingScreen(
 }
 
 @Composable
-private fun SettingContent(
+private fun SettingsScreen(
     theme: () -> SettingThemeOption?,
     firstDayOfWeek: () -> DayOfWeek?,
     goBack: () -> Unit,
@@ -117,7 +117,7 @@ private fun goToSystemNotificationScreen(context: Context) {
 @Composable
 private fun SettingScreenPreview() {
     CalendarThemeForPreview {
-        SettingContent(
+        SettingsScreen(
             theme = { SettingThemeOption.System },
             firstDayOfWeek = { DayOfWeek.MONDAY },
             goBack = {},
