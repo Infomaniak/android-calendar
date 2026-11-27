@@ -19,6 +19,7 @@ package com.infomaniak.calendar.components.foundation.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.key
 import androidx.compose.runtime.produceState
 import com.infomaniak.calendar.components.foundation.manager.AvatarFinder
 import com.infomaniak.calendar.components.foundation.models.AttendeeUi
@@ -52,10 +53,12 @@ fun AvatarType.Companion.fromAttendee(attendee: AttendeeUi): State<AvatarType> {
         null
     }
 
-    return produceState(getUrlOrInitials(initialValue), avatar) {
-        if (avatar is AvatarStrategy.ToCompute) {
-            val avatarData = avatarFinder.avatarOf(attendee.displayName, attendee.email)
-            value = getUrlOrInitials(avatarFinder.avatarUrlDataOf(avatarData))
+    return key(attendee.email, attendee.displayName, attendee.avatar) {
+        produceState(getUrlOrInitials(initialValue)) {
+            if (avatar is AvatarStrategy.ToCompute) {
+                val avatarData = avatarFinder.avatarOf(attendee.displayName, attendee.email)
+                value = getUrlOrInitials(avatarFinder.avatarUrlDataOf(avatarData))
+            }
         }
     }
 }
