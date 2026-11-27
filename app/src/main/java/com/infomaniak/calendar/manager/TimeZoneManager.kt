@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.datetime.TimeZone
 
 /** The time zone the whole app shows dates in, following the time zone setting. */
+// TODO[timeZone]: Observe device time zone updates to notify consumers so they can update data that depend on it.
 @Inject
 @SingleIn(AppScope::class)
 class TimeZoneManager(settingsDataValues: SettingsDataValues) {
