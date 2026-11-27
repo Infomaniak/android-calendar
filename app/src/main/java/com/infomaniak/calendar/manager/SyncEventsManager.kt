@@ -31,6 +31,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -43,7 +44,10 @@ import kotlin.time.Duration.Companion.milliseconds
 import com.infomaniak.core.common.R as RCore
 
 @SingleIn(AppScope::class)
-class SyncEventsManager @Inject constructor(private val calendarManager: CalendarManager) {
+class SyncEventsManager @Inject constructor(
+    private val calendarManager: CalendarManager,
+    private val timeZoneManager: TimeZoneManager,
+) {
 
     private val _isLoadingEvents = MutableStateFlow(false)
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -56,7 +60,7 @@ class SyncEventsManager @Inject constructor(private val calendarManager: Calenda
     val loadingError: ReceiveChannel<SyncError> = _loadingError
 
     suspend fun loadCurrentMonths(visibleDate: LocalDate) {
-        val timeZone = TimeZone.currentSystemDefault()
+        val timeZone = timeZoneManager.timeZone.first()
         val firstDay = visibleDate.yearMonth.minus(SYNC_WINDOW_MONTHS_BEFORE, DateTimeUnit.MONTH).firstDay
         val lastDay = visibleDate.yearMonth.plus(SYNC_WINDOW_MONTHS_AFTER, DateTimeUnit.MONTH).lastDay.plus(1, DateTimeUnit.DAY)
 

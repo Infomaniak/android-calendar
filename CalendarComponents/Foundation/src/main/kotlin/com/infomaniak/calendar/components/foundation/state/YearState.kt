@@ -20,11 +20,10 @@ package com.infomaniak.calendar.components.foundation.state
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 
 @Composable
 fun rememberCurrentYear(): State<Int> {
-    val today by rememberToday()
-    return remember { derivedStateOf { today.year } }
+    val today = rememberToday()
+    return remember(today) { derivedStateOf { today.value.year } }
 }

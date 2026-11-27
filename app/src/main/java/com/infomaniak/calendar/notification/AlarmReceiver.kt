@@ -31,10 +31,12 @@ import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.Calendar
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateRange
+import kotlinx.datetime.TimeZone
 import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -70,6 +72,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         // Tagged with the full ID, as its hash code could be the same as another reminder's
         val tag = alarmId ?: occurrenceIdJson
+        val timeZone = context.appGraph.timeZoneManager.timeZone.first()
         val endMs = getLongExtra(AlarmScheduler.EXTRA_EVENT_END_MS, 0L)
         val notification = NotificationHelper.buildEventNotification(
             context = context,
@@ -81,7 +84,8 @@ class AlarmReceiver : BroadcastReceiver() {
             startInstantMs = getLongExtra(AlarmScheduler.EXTRA_EVENT_START_MS, 0L),
             endInstantMs = endMs,
             allDayDates = getAllDayDates(),
-            kMeetUrl = getKMeetUrl(context, occurrenceIdJson),
+            kMeetUrl = getKMeetUrl(context, occurrenceIdJson, timeZone),
+            timeZone = timeZone,
             // Reminding again once the event is over would be pointless
             snoozeIntent = if (System.currentTimeMillis() + SNOOZE_DELAY.inWholeMilliseconds < endMs) {
                 createSnoozeIntent(context, tag)
@@ -128,12 +132,12 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 
     /** Read when the reminder fires, as alarms only carry an event summary, which tells if it has a meet room, not its URL. */
-    private suspend fun Intent.getKMeetUrl(context: Context, occurrenceIdJson: String): String? {
+    private suspend fun Intent.getKMeetUrl(context: Context, occurrenceIdJson: String, timeZone: TimeZone): String? {
         if (!getBooleanExtra(AlarmScheduler.EXTRA_EVENT_HAS_MEET_ROOM, false)) return null
         val occurrenceId = runCatching { Json.decodeFromString(OccurrenceId.serializer(), occurrenceIdJson) }.getOrNull()
             ?: return null
         return withTimeoutOrNull(KMEET_URL_TIMEOUT) {
-            runCatching { context.appGraph.calendarManager.getOccurrence(occurrenceId)?.meetRoomUrl }
+            runCatching { context.appGraph.calendarManager.getOccurrence(occurrenceId, timeZone)?.meetRoomUrl }
                 .onFailure { exception -> SentryLog.e(TAG, "Failed to read a reminder's kMeet URL", exception) }
                 .getOrNull()
         }

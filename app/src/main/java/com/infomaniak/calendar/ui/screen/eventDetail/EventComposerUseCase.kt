@@ -22,6 +22,7 @@ import com.infomaniak.calendar.components.foundation.models.AttendeeUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerUi
 import com.infomaniak.calendar.data.CalendarDataValues
 import com.infomaniak.calendar.manager.CachedCalendarManager
+import com.infomaniak.calendar.manager.TimeZoneManager
 import com.infomaniak.calendar.ui.screen.eventDetail.scope.RecurrentEventScope
 import com.infomaniak.calendar.utils.account.AccountUtils
 import com.infomaniak.calendar.utils.account.accountId
@@ -32,6 +33,7 @@ import com.infomaniak.calendar.utils.typedCalendarId
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.multiplatform_calendar.core.domain.model.calendar.CalendarId
+import com.infomaniak.multiplatform_calendar.core.domain.model.event.Event
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.Organizer
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.recurrence.RecurrenceScope
@@ -50,6 +52,7 @@ class EventComposerUseCase @Inject constructor(
     private val cachedCalendarManager: CachedCalendarManager,
     private val accountUtils: AccountUtils,
     private val calendarDataValues: CalendarDataValues,
+    private val timeZoneManager: TimeZoneManager,
 ) {
     suspend fun createEvent(eventDraft: EventDraft): SaveEventResult {
         return runCatching {
@@ -64,7 +67,7 @@ class EventComposerUseCase @Inject constructor(
 
     suspend fun updateEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope, eventDraft: EventDraft): SaveEventResult {
         return runCatching {
-            val event = calendarManager.getOccurrence(occurrenceId) ?: return SaveEventResult.Error
+            val event = getOccurrence(occurrenceId) ?: return SaveEventResult.Error
             val editData = calendarManager.getEditData(occurrenceId) ?: return SaveEventResult.Error
             calendarManager.updateEvent(
                 target = event.targetFor(scope.toRecurrenceScope()),
@@ -87,7 +90,7 @@ class EventComposerUseCase @Inject constructor(
         attendeesUpdatePayload: AttendeesUpdatePayload,
     ): SaveEventResult {
         return runCatching {
-            val event = calendarManager.getOccurrence(occurrenceId) ?: return SaveEventResult.Error
+            val event = getOccurrence(occurrenceId) ?: return SaveEventResult.Error
             val editData = calendarManager.getEditData(occurrenceId) ?: return SaveEventResult.Error
             calendarManager.updateEvent(
                 target = event.targetFor(scope.toRecurrenceScope()),
@@ -103,10 +106,14 @@ class EventComposerUseCase @Inject constructor(
 
     suspend fun deleteEvent(occurrenceId: OccurrenceId, scope: RecurrentEventScope): DeleteEventResult {
         return runCatching {
-            val event = calendarManager.getOccurrence(occurrenceId) ?: return DeleteEventResult.Error
+            val event = getOccurrence(occurrenceId) ?: return DeleteEventResult.Error
             calendarManager.deleteEvent(event.targetFor(scope.toRecurrenceScope()))
             DeleteEventResult.Success
         }.cancellable().getOrDefault(DeleteEventResult.Error)
+    }
+
+    private suspend fun getOccurrence(occurrenceId: OccurrenceId): Event? {
+        return calendarManager.getOccurrence(occurrenceId, timeZoneManager.timeZone.first())
     }
 
     private suspend fun CalendarId.toOrganizer(): Organizer? {

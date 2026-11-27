@@ -25,6 +25,7 @@ import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -36,6 +37,7 @@ import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.scene.SceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import androidx.window.core.layout.WindowSizeClass
+import com.infomaniak.calendar.components.foundation.state.rememberToday
 import com.infomaniak.calendar.ui.component.CalendarFab
 import com.infomaniak.calendar.ui.component.drawer.MenuDrawer
 import com.infomaniak.calendar.ui.modifier.LocalSharedTransitionScope
@@ -75,9 +77,7 @@ import com.infomaniak.calendar.ui.screen.settings.theme.SettingThemeScreen
 import com.infomaniak.calendar.ui.screen.settings.timezone.SettingTimeZoneScreen
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
 import com.infomaniak.calendar.utils.NavigationTransition
-import com.infomaniak.core.common.utils.today
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
-import kotlin.time.Clock
 
 @Composable
 fun MainNavHost(
@@ -338,19 +338,20 @@ private fun sceneDecoratorStrategies(
         NavigationDecoratorStrategy(
             floatingToolbar = {
                 val visibleDayState = LocalVisibleDayState.current
+                val today by rememberToday()
 
                 CalendarHorizontalFloatingToolbar(
                     onNavigationButtonClicked = { destination ->
                         onCalendarViewSelected(destination)
                         backStack.replaceRoot(destination)
                     },
-                    onCurrentDayClicked = { visibleDayState?.jumpTo(Clock.today()) },
+                    onCurrentDayClicked = { visibleDayState?.jumpTo(today) },
                     currentDestination = { backStack.getLastCalendarView() },
                     floatingActionButton = {
                         CalendarFab(
                             onClick = {
                                 backStack.addOnce(
-                                    NavDestination.EventForm.EventCreation(visibleDayState?.visibleDate ?: Clock.today()),
+                                    NavDestination.EventForm.EventCreation(visibleDayState?.visibleDate ?: today),
                                 )
                             },
                             modifier = Modifier.fillMaxSize(),

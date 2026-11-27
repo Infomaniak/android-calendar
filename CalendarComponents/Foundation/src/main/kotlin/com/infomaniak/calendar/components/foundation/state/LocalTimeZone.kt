@@ -17,22 +17,8 @@
  */
 package com.infomaniak.calendar.components.foundation.state
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.datetime.TimeZone
 
-/**
- * Remembers the current timezone and emits a new value on each timezone update.
- *
- * The returned State holds the current device timezone and is intended to update automatically
- * whenever the user updates it, so that composables reading it recompose with the new date.
- *
- * Note: the automatic update logic is not yet implemented. For now this simply holds the
- * timezone captured at first composition and never changes.
- */
-@Composable
-fun rememberCurrentTimeZone(): State<TimeZone> {
-    return remember { mutableStateOf(TimeZone.currentSystemDefault()) }
-}
+/** The time zone dates and times are shown in, the device's unless a host provides another one. */
+val LocalTimeZone = staticCompositionLocalOf { TimeZone.currentSystemDefault() }

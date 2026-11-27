@@ -25,6 +25,7 @@ import android.os.Build
 import android.util.Log
 import androidx.core.content.getSystemService
 import com.infomaniak.calendar.data.CalendarDataValues
+import com.infomaniak.calendar.manager.TimeZoneManager
 import com.infomaniak.calendar.utils.toLocationUi
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.core.sentry.SentryLog
@@ -44,6 +45,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -67,6 +69,7 @@ class AlarmScheduler @Inject constructor(
     private val appContext: Context,
     private val calendarManager: CalendarManager,
     private val calendarDataValues: CalendarDataValues,
+    private val timeZoneManager: TimeZoneManager,
 ) {
     private val alarmManager by lazy { appContext.getSystemService<AlarmManager>() }
     private val refreshRequests = MutableSharedFlow<RefreshRequest>(
@@ -99,16 +102,18 @@ class AlarmScheduler @Inject constructor(
         scope.launch {
             refreshRequests
                 .onEach { request -> scheduleWindowRefresh(at = request.from + WINDOW_REFRESH_INTERVAL) }
-                .flatMapLatest { request ->
+                .combine(timeZoneManager.timeZone, ::Pair)
+                .flatMapLatest { (request, timeZone) ->
                     calendarManager.observeUpcomingAlarms(
                         limit = MAX_SCHEDULED_ALARMS,
                         horizon = ALARM_HORIZON,
                         from = request.from,
-                    ).map { upcomingAlarms -> request.id to upcomingAlarms }
+                        timeZone = timeZone,
+                    ).map { upcomingAlarms -> Triple(request.id, upcomingAlarms, timeZone) }
                 }
-                .collectLatest { (requestId, upcomingAlarms) ->
+                .collectLatest { (requestId, upcomingAlarms, timeZone) ->
                     // An uncaught failure would crash the app. The next refresh or database change retries it.
-                    runCatching { syncAlarms(upcomingAlarms) }.cancellable().onFailure { exception ->
+                    runCatching { syncAlarms(upcomingAlarms, timeZone) }.cancellable().onFailure { exception ->
                         SentryLog.e(TAG, "Failed to sync the upcoming alarms", exception)
                     }
                     lastSyncedRequestId.value = requestId
@@ -125,7 +130,7 @@ class AlarmScheduler @Inject constructor(
 
     private data class RefreshRequest(val id: Long, val from: Instant)
 
-    private suspend fun syncAlarms(upcomingAlarms: List<UpcomingAlarm>) {
+    private suspend fun syncAlarms(upcomingAlarms: List<UpcomingAlarm>, timeZone: TimeZone) {
         val previouslyScheduledIds = calendarDataValues.scheduledAlarmIds.flow.first()
         val plan = computeAlarmSyncPlan(
             upcomingAlarms = upcomingAlarms,
@@ -133,6 +138,7 @@ class AlarmScheduler @Inject constructor(
             registeredAlarms = registeredAlarms,
             nowMs = System.currentTimeMillis(),
             isExact = canScheduleExactAlarms(),
+            timeZone = timeZone,
         )
 
         // Not cancellable, so that the AlarmManager, registeredAlarms and the persisted IDs can't drift apart

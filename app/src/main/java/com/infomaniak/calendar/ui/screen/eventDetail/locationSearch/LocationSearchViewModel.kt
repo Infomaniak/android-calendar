@@ -25,6 +25,7 @@ import com.infomaniak.calendar.components.foundation.models.LocationUi
 import com.infomaniak.calendar.components.foundation.models.RoomAvailability
 import com.infomaniak.calendar.components.foundation.models.SearchableText
 import com.infomaniak.calendar.manager.PlaceSearcher
+import com.infomaniak.calendar.manager.TimeZoneManager
 import com.infomaniak.core.common.cancellable
 import com.infomaniak.multiplatform_calendar.bookable_resources.domain.model.BookableResource
 import com.infomaniak.multiplatform_calendar.bookable_resources.domain.model.BookableResourceUuid
@@ -56,6 +57,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -69,6 +71,7 @@ class LocationSearchViewModel(
     private val calendarBookableResourcesManager: CalendarBookableResourcesManager,
     private val calendarManager: CalendarManager,
     private val placeSearcher: PlaceSearcher,
+    timeZoneManager: TimeZoneManager,
 ) : ViewModel() {
     private val typedQuery = MutableStateFlow("")
     private val query = typedQuery.map { it.trim() }.distinctUntilChanged()
@@ -77,9 +80,9 @@ class LocationSearchViewModel(
 
     /** Null until known: the rooms are listed meanwhile with an unknown availability, then sorted once it is known. */
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val availability: Flow<Map<BookableResourceUuid, Boolean>?> = availabilityRequest.transformLatest { request ->
+    private val availability: Flow<Map<BookableResourceUuid, Boolean>?> = combine(availabilityRequest, timeZoneManager.timeZone, ::Pair).transformLatest { (request, timeZone) ->
         emit(null)
-        if (request != null) emit(availabilityOf(request))
+        if (request != null) emit(availabilityOf(request, timeZone))
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -140,11 +143,11 @@ class LocationSearchViewModel(
             }
     }
 
-    private suspend fun availabilityOf(request: RoomAvailabilityRequest): Map<BookableResourceUuid, Boolean> {
+    private suspend fun availabilityOf(request: RoomAvailabilityRequest, timeZone: TimeZone): Map<BookableResourceUuid, Boolean> {
         return runCatching {
             val editedTiming = request.editedOccurrenceId?.let { editedTimingOf(it) }
             val timing = editedTiming?.copy(bounds = request.bounds) ?: EventTiming(bounds = request.bounds)
-            calendarBookableResourcesManager.availability(request.calendarId, timing)
+            calendarBookableResourcesManager.availability(request.calendarId, timing, timeZone)
         }.cancellable().getOrDefault(emptyMap())
     }
 

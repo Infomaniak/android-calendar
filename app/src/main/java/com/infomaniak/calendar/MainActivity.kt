@@ -49,6 +49,7 @@ import androidx.navigation3.runtime.serialization.NavBackStackSerializer
 import androidx.navigation3.runtime.serialization.NavKeySerializer
 import com.infomaniak.calendar.components.foundation.manager.AvatarFinder
 import com.infomaniak.calendar.components.foundation.state.LocalAvatarFinder
+import com.infomaniak.calendar.components.foundation.state.LocalTimeZone
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
 import com.infomaniak.calendar.extensions.appGraph
@@ -202,6 +203,7 @@ private fun MainContent(
                 LocalDrawerState provides rememberDrawerState(initialValue = DrawerValue.Closed),
                 LocalAvatarFinder provides avatarFinder,
                 LocalWeekNumbering provides uiState.weekNumbering,
+                LocalTimeZone provides uiState.timeZone,
             ) {
                 ObserveSyncError(loadingEventsError)
                 ObserveSaveEventError(savingEventError)

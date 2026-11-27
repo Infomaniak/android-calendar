@@ -35,6 +35,7 @@ import com.infomaniak.calendar.components.eventdetail.models.EventDetailTiming
 import com.infomaniak.calendar.components.eventdetail.models.EventDetailUi
 import com.infomaniak.calendar.components.foundation.models.OrganizerSource.Static
 import com.infomaniak.calendar.data.SettingsDataValues
+import com.infomaniak.calendar.manager.TimeZoneManager
 import com.infomaniak.calendar.ui.screen.eventDetail.EventCreationCalendarsUseCase
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Assisted
@@ -64,6 +65,7 @@ class EventFormViewModel(
     @Assisted private val savedStateHandle: SavedStateHandle,
     private val eventCreationCalendarsUseCase: EventCreationCalendarsUseCase,
     private val settingsDataValues: SettingsDataValues,
+    private val timeZoneManager: TimeZoneManager,
 ) : ViewModel() {
     /** The form once loaded, for the screens it opens. */
     var formState: EventFormState? by savedStateHandle.saveable(FORM_KEY, stateSaver = NullableFormSaver) { mutableStateOf(null) }
@@ -83,7 +85,7 @@ class EventFormViewModel(
             formState = EventFormState.default(
                 calendar = creationCalendars.initialCalendar,
                 date = date,
-                timeZone = TimeZone.currentSystemDefault(),
+                timeZone = timeZoneManager.timeZone.first(),
                 eventDuration = defaultEventDuration,
                 calendars = creationCalendars.calendars,
             )
@@ -95,30 +97,33 @@ class EventFormViewModel(
         if (isInitialized) return
         isInitialized = true
 
-        val start = event.start.atTimeZone
-        val end = event.end.atTimeZone
-        // KMP ends an all-day event on the day after it, the form shows its last day
-        val endDate = if (event.isAllDay) end.date.minus(1, DateTimeUnit.DAY) else end.date
-        formState = EventFormState(
-            titleTextState = TextFieldState(event.title),
-            calendar = event.calendar,
-            eventColor = event.eventColorChoice,
-            isAllDay = event.isAllDay,
-            start = start,
-            startTimeZone = event.start.timeZone,
-            end = endDate.atTime(end.time),
-            endTimeZone = event.end.timeZone,
-            hasEndEverBeenTouched = false,
-            location = event.location,
-            participants = event.attendees.all.toSet(),
-            organizerSource = Static(event.organizer),
-            isKMeetUrlEnabled = event.kMeetUrl != null,
-            descriptionTextState = TextFieldState(event.description.orEmpty()),
-            reminders = event.reminders,
-            isOccupied = event.isOccupied,
-            isPublic = event.classification == EventDetailUi.Classification.Public,
-            calendars = event.calendars,
-        )
+        viewModelScope.launch {
+            val defaultTimeZone = timeZoneManager.timeZone.first()
+            val start = event.start.atTimeZone
+            val end = event.end.atTimeZone
+            // KMP ends an all-day event on the day after it, the form shows its last day
+            val endDate = if (event.isAllDay) end.date.minus(1, DateTimeUnit.DAY) else end.date
+            formState = EventFormState(
+                titleTextState = TextFieldState(event.title),
+                calendar = event.calendar,
+                eventColor = event.eventColorChoice,
+                isAllDay = event.isAllDay,
+                start = start,
+                startTimeZone = event.start.timeZoneOr(defaultTimeZone),
+                end = endDate.atTime(end.time),
+                endTimeZone = event.end.timeZoneOr(defaultTimeZone),
+                hasEndEverBeenTouched = false,
+                location = event.location,
+                participants = event.attendees.all.toSet(),
+                organizerSource = Static(event.organizer),
+                isKMeetUrlEnabled = event.kMeetUrl != null,
+                descriptionTextState = TextFieldState(event.description.orEmpty()),
+                reminders = event.reminders,
+                isOccupied = event.isOccupied,
+                isPublic = event.classification == EventDetailUi.Classification.Public,
+                calendars = event.calendars,
+            )
+        }
     }
 
     @AssistedFactory
@@ -140,5 +145,4 @@ class EventFormViewModel(
     }
 }
 
-private val EventDetailTiming.timeZone: TimeZone
-    get() = (this as? EventDetailTiming.Precise)?.timeZone ?: TimeZone.currentSystemDefault()
+private fun EventDetailTiming.timeZoneOr(default: TimeZone): TimeZone = (this as? EventDetailTiming.Precise)?.timeZone ?: default

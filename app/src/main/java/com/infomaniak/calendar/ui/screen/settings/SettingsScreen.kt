@@ -22,6 +22,8 @@ import android.content.Intent
 import android.provider.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -29,12 +31,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
-import com.infomaniak.calendar.components.foundation.state.rememberCurrentTimeZone
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatCityAndCountry
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatDuration
 import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatFullDayName
 import com.infomaniak.calendar.model.settings.SettingThemeOption
 import com.infomaniak.calendar.model.settings.SettingTimeZone
+import com.infomaniak.calendar.model.settings.toTimeZone
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemClickable
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemOpen
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemSwitch
@@ -135,7 +137,9 @@ private fun SettingsScreen(
                 supportingText = defaultEventDuration()?.formatDuration(),
             )
 
-            val deviceTimeZone = rememberCurrentTimeZone()
+            // This is the only place where we can actual reference the device default time zone instead of the setting one.
+            // TODO[timeZone]: Observe device time zone updates to notify consumers so they can update data that depend on it.
+            val deviceTimeZone = remember { mutableStateOf(TimeZone.currentSystemDefault()) }
             SettingItemSwitch(
                 shapes = SettingShape.Middle,
                 text = stringResource(R.string.generalSettingsUseDeviceTimeZoneLabel),
@@ -152,10 +156,7 @@ private fun SettingsScreen(
                 shapes = SettingShape.Last,
                 text = stringResource(RComponents.string.timeZoneLabel),
                 onClick = goToTimeZone,
-                supportingText = when (val selectedTimeZone = timeZone()) {
-                    is SettingTimeZone.Custom -> TimeZone.of(selectedTimeZone.zoneId)
-                    else -> deviceTimeZone.value
-                }.formatCityAndCountry(),
+                supportingText = timeZone()?.toTimeZone()?.formatCityAndCountry(),
                 enabled = { timeZone() is SettingTimeZone.Custom },
             )
         }

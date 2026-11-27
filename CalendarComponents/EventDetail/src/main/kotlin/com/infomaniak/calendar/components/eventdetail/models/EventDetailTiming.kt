@@ -19,7 +19,7 @@ package com.infomaniak.calendar.components.eventdetail.models
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import com.infomaniak.calendar.components.foundation.state.rememberCurrentTimeZone
+import com.infomaniak.calendar.components.foundation.state.LocalTimeZone
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.UtcOffset
@@ -36,10 +36,10 @@ sealed interface EventDetailTiming {
     @Immutable
     data class Precise(private val _instant: Instant, val timeZone: TimeZone) : EventDetailTiming {
         override val atTimeZone: LocalDateTime = _instant.toLocalDateTime(timeZone)
-        override val atLocale: LocalDateTime @Composable get() = _instant.toLocalDateTime(rememberCurrentTimeZone().value)
+        override val atLocale: LocalDateTime @Composable get() = _instant.toLocalDateTime(LocalTimeZone.current)
 
         val utcOffsetAtTimeZone: UtcOffset = timeZone.offsetAt(_instant)
-        val utcOffsetAtLocale: UtcOffset @Composable get() = rememberCurrentTimeZone().value.offsetAt(_instant)
+        val utcOffsetAtLocale: UtcOffset @Composable get() = LocalTimeZone.current.offsetAt(_instant)
     }
 
     @Immutable

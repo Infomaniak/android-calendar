@@ -29,6 +29,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -45,9 +46,12 @@ import kotlin.time.Duration.Companion.seconds
 /** Observes the events of the days around the visible date, shared by every calendar view. */
 @SingleIn(AppScope::class)
 @Inject
-class VisibleEventsManager(calendarManager: CalendarManager, visibleDateManager: VisibleDateManager) {
+class VisibleEventsManager(
+    calendarManager: CalendarManager,
+    visibleDateManager: VisibleDateManager,
+    timeZoneManager: TimeZoneManager,
+) {
     private val managerScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private val timeZone = TimeZone.currentSystemDefault() // TODO: Adapt to user settings
 
     private val loadedDays = visibleDateManager.visibleDateFlow
         .scan(loadedDaysAround(visibleDateManager.visibleDate.value)) { loadedDays, visibleDate ->
@@ -56,8 +60,8 @@ class VisibleEventsManager(calendarManager: CalendarManager, visibleDateManager:
         .distinctUntilChanged()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val loadedEvents: StateFlow<LoadedEvents?> = loadedDays
-        .flatMapLatest { days ->
+    val loadedEvents: StateFlow<LoadedEvents?> = combine(loadedDays, timeZoneManager.timeZone, ::Pair)
+        .flatMapLatest { (days, timeZone) ->
             calendarManager.observeDaySlices(
                 start = days.start.atStartOfDayIn(timeZone),
                 end = days.endInclusive.plus(1, DateTimeUnit.DAY).atStartOfDayIn(timeZone),

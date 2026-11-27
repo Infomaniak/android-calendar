@@ -50,7 +50,7 @@ fun rememberCurrentInstant(): State<Instant> {
  * so the current time indicator moves to the next day on its own at midnight.
  */
 @Composable
-fun rememberCurrentDateTime(timeZone: TimeZone = TimeZone.currentSystemDefault()): State<LocalDateTime> {
+fun rememberCurrentDateTime(timeZone: TimeZone = LocalTimeZone.current): State<LocalDateTime> {
     val currentInstant = rememberCurrentInstant()
     return remember(timeZone) { derivedStateOf { currentInstant.value.toLocalDateTime(timeZone) } }
 }
