@@ -19,12 +19,14 @@ package com.infomaniak.calendar.ui.screen.settings.timezone
 
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.model.settings.SettingTimeZone
 import com.infomaniak.calendar.ui.component.TimeZoneSearchScreenContent
 import com.infomaniak.calendar.ui.theme.CalendarTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun SettingTimeZoneScreen(
@@ -32,10 +34,14 @@ fun SettingTimeZoneScreen(
     modifier: Modifier = Modifier,
     viewModel: SettingTimeZoneViewModel = viewModel(),
 ) {
+    val scope = rememberCoroutineScope()
+
     TimeZoneSearchScreenContent(
         onTimeZoneSelected = { timeZone ->
-            viewModel.setTimeZone(SettingTimeZone.Enabled.Custom(timeZone.id))
-            goBack?.invoke()
+            scope.launch {
+                viewModel.setTimeZoneSuspend(SettingTimeZone.Enabled.Custom(timeZone.id))
+                goBack?.invoke()
+            }
         },
         goBack = goBack,
         modifier = modifier,

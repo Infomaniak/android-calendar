@@ -38,7 +38,13 @@ class SettingTimeZoneViewModel(private val settingsDataValues: SettingsDataValue
     val timeZone = settingsDataValues.timeZone.flow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), null)
 
+    suspend fun setTimeZoneSuspend(timeZone: SettingTimeZone) {
+        settingsDataValues.timeZone.setValue(timeZone)
+    }
+
     fun setTimeZone(timeZone: SettingTimeZone) {
-        viewModelScope.launch { settingsDataValues.timeZone.setValue(timeZone) }
+        viewModelScope.launch {
+            settingsDataValues.timeZone.setValue(timeZone)
+        }
     }
 }

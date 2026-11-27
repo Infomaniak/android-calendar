@@ -27,7 +27,6 @@ import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
 import kotlin.time.Duration.Companion.seconds
 
@@ -35,11 +34,10 @@ import kotlin.time.Duration.Companion.seconds
 @ContributesIntoMap(AppScope::class)
 @ViewModelKey
 class SettingFirstDayOfWeekViewModel(private val settingsDataValues: SettingsDataValues) : ViewModel() {
-    val firstDayOfWeek = settingsDataValues.firstDayOfWeek.flow.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), null)
+    val firstDayOfWeek =
+        settingsDataValues.firstDayOfWeek.flow.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5.seconds), null)
 
-    fun setFirstDayOfWeekClick(dayOfWeek: DayOfWeek) {
-        viewModelScope.launch {
-            settingsDataValues.firstDayOfWeek.setValue(dayOfWeek)
-        }
+    suspend fun setFirstDayOfWeekClick(dayOfWeek: DayOfWeek) {
+        settingsDataValues.firstDayOfWeek.setValue(dayOfWeek)
     }
 }
