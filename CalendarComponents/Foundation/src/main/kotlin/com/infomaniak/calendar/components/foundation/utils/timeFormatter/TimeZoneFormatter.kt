@@ -42,7 +42,8 @@ fun TimeZone.formatLongName(locale: Locale, instant: Instant): String {
 
 /** `GMT+2`, written with the locale's own GMT/UTC notation. */
 fun TimeZone.formatUtcOffset(locale: Locale, instant: Instant): String {
-    return TimeZoneFormat.getInstance(locale).format(TimeZoneFormat.Style.LOCALIZED_GMT_SHORT, toIcu(), instant.toEpochMilliseconds())
+    return TimeZoneFormat.getInstance(locale)
+        .format(TimeZoneFormat.Style.LOCALIZED_GMT_SHORT, toIcu(), instant.toEpochMilliseconds())
 }
 
 /** `Zurich, Switzerland`. */
@@ -51,8 +52,11 @@ fun TimeZone.formatCityAndCountry(locale: Locale = currentLocale()): String = fo
 
 /** `Zurich, Switzerland`. */
 fun TimeZone.formatCityAndCountryWith(locale: Locale): String {
-    val country = Locale.Builder().setRegion(IcuTimeZone.getRegion(id)).build().getDisplayCountry(locale)
-    return "${formatLocalizedCityName(locale)}, $country"
+    val city = formatLocalizedCityName(locale)
+    val region = runCatching { IcuTimeZone.getRegion(id) }.getOrNull() ?: return city
+
+    val country = Locale.Builder().setRegion(region).build().getDisplayCountry(locale)
+    return "$city, $country"
 }
 //endregion
 
