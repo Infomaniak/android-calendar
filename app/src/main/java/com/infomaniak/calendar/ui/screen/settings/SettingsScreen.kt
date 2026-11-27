@@ -49,11 +49,14 @@ import com.infomaniak.calendar.ui.screen.settings.firstDayOfWeek.SettingFirstDay
 import com.infomaniak.calendar.ui.screen.settings.theme.SettingThemeViewModel
 import com.infomaniak.calendar.ui.screen.settings.timezone.SettingTimeZoneViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
+import com.infomaniak.core.common.extensions.openUrl
+import com.infomaniak.core.network.SUPPORT_URL
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Bell
 import com.infomaniak.designsystem.icons.symbols.BubbleTopRightCircle
 import com.infomaniak.designsystem.icons.symbols.CalendarDots
 import com.infomaniak.designsystem.icons.symbols.Globe
+import com.infomaniak.designsystem.icons.symbols.Headset
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
 import kotlin.time.Duration
@@ -167,6 +170,15 @@ private fun SettingsScreen(
                 text = stringResource(R.string.generalSettingsNotificationsLabel),
                 onClick = { goToSystemNotificationScreen(context) },
                 symbol = EsdsIcons.Bell,
+            )
+        }
+
+        SettingSection(title = stringResource(R.string.generalSettingsHelpAndPrivacyLabel)) {
+            SettingItemOpen(
+                shapes = SettingShape.Single,
+                text = stringResource(R.string.generalSettingsContactSupportLabel),
+                onClick = { context.openUrl(SUPPORT_URL) },
+                symbol = EsdsIcons.Headset,
             )
         }
     }
