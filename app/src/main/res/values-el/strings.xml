@@ -32,9 +32,11 @@
     <string name="editRecurringEventAlertTitle">Ποιες εκδηλώσεις θέλετε να επεξεργαστείτε;</string>
     <string name="eventOccurrenceNotFound">Αυτή η εκδήλωση δεν είναι πλέον διαθέσιμη.</string>
     <string name="generalSettingsAuthorizationsLabel">Άδειες</string>
+    <string name="generalSettingsContactSupportLabel">Επικοινωνία με την υποστήριξη</string>
     <string name="generalSettingsDefaultEventDurationLabel">Προεπιλεγμένη διάρκεια</string>
     <string name="generalSettingsDisplayLabel">Οθόνη</string>
     <string name="generalSettingsEventLabel">Γεγονός</string>
+    <string name="generalSettingsHelpAndPrivacyLabel">Βοήθεια &amp; Απόρρητο</string>
     <string name="generalSettingsNotificationsLabel">Ειδοποιήσεις</string>
     <string name="generalSettingsStartOfWeekLabel">Έναρξη εβδομάδας</string>
     <string name="generalSettingsUseDeviceTimeZoneLabel">Αυτόματη ζώνη ώρας</string>

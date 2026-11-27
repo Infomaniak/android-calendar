@@ -32,9 +32,11 @@
     <string name="editRecurringEventAlertTitle">Welke evenementen wil je bewerken?</string>
     <string name="eventOccurrenceNotFound">Dit evenement is niet meer beschikbaar.</string>
     <string name="generalSettingsAuthorizationsLabel">Machtigingen</string>
+    <string name="generalSettingsContactSupportLabel">Contact opnemen met support</string>
     <string name="generalSettingsDefaultEventDurationLabel">Standaardduur</string>
     <string name="generalSettingsDisplayLabel">Weergave</string>
     <string name="generalSettingsEventLabel">Evenement</string>
+    <string name="generalSettingsHelpAndPrivacyLabel">Hulp &amp; Privacy</string>
     <string name="generalSettingsNotificationsLabel">Meldingen</string>
     <string name="generalSettingsStartOfWeekLabel">Begin van de week</string>
     <string name="generalSettingsUseDeviceTimeZoneLabel">Automatische tijdzone</string>

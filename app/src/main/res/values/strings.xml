@@ -32,9 +32,11 @@
     <string name="editRecurringEventAlertTitle">Which events do you want to edit?</string>
     <string name="eventOccurrenceNotFound">This event is no longer available.</string>
     <string name="generalSettingsAuthorizationsLabel">Authorizations</string>
+    <string name="generalSettingsContactSupportLabel">Contact support</string>
     <string name="generalSettingsDefaultEventDurationLabel">Default duration</string>
     <string name="generalSettingsDisplayLabel">Display</string>
     <string name="generalSettingsEventLabel">Event</string>
+    <string name="generalSettingsHelpAndPrivacyLabel">Help &amp; Privacy</string>
     <string name="generalSettingsNotificationsLabel">Notifications</string>
     <string name="generalSettingsStartOfWeekLabel">Start of the week</string>
     <string name="generalSettingsUseDeviceTimeZoneLabel">Automatic timezone</string>

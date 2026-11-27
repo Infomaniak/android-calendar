@@ -32,9 +32,11 @@
     <string name="editRecurringEventAlertTitle">Mitä tapahtumia haluat muokata?</string>
     <string name="eventOccurrenceNotFound">Tämä tapahtuma ei ole enää saatavilla.</string>
     <string name="generalSettingsAuthorizationsLabel">Luvat</string>
+    <string name="generalSettingsContactSupportLabel">Ota yhteyttä tukeen</string>
     <string name="generalSettingsDefaultEventDurationLabel">Oletuskesto</string>
     <string name="generalSettingsDisplayLabel">Näyttö</string>
     <string name="generalSettingsEventLabel">Tapahtuma</string>
+    <string name="generalSettingsHelpAndPrivacyLabel">Ohjeet ja Yksityisyys</string>
     <string name="generalSettingsNotificationsLabel">Ilmoitukset</string>
     <string name="generalSettingsStartOfWeekLabel">Viikon aloituspäivä</string>
     <string name="generalSettingsUseDeviceTimeZoneLabel">Automaattinen aikavyöhyke</string>
