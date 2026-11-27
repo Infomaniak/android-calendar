@@ -22,14 +22,14 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface SettingTimeZone {
     @Serializable
-    data object Disabled : SettingTimeZone
+    data object Enabled : SettingTimeZone
 
     @Serializable
-    sealed interface Enabled : SettingTimeZone {
+    sealed interface Disabled : SettingTimeZone {
         @Serializable
-        data object Unset : Enabled
+        data object Unset : Disabled
 
         @Serializable
-        data class Custom(val zoneId: String) : Enabled
+        data class Custom(val zoneId: String) : Disabled
     }
 }

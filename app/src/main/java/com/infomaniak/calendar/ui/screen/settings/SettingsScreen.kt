@@ -137,9 +137,9 @@ private fun SettingsScreen(
             SettingItemSwitch(
                 shapes = SettingShape.Middle,
                 text = stringResource(R.string.generalSettingsUseDeviceTimeZoneLabel),
-                checked = { timeZone() == SettingTimeZone.Disabled },
+                checked = { timeZone() == SettingTimeZone.Enabled },
                 onCheckedChange = { isAutomatic ->
-                    onTimeZoneChange(if (isAutomatic) SettingTimeZone.Disabled else SettingTimeZone.Enabled.Unset)
+                    onTimeZoneChange(if (isAutomatic) SettingTimeZone.Enabled else SettingTimeZone.Disabled.Unset)
                 },
                 symbol = EsdsIcons.Globe,
                 switchType = SwitchType.Switch,
@@ -149,10 +149,10 @@ private fun SettingsScreen(
                 text = stringResource(RComponents.string.timeZoneLabel),
                 onClick = goToTimeZone,
                 supportingText = when (val selectedTimeZone = timeZone()) {
-                    is SettingTimeZone.Enabled.Custom -> TimeZone.of(selectedTimeZone.zoneId)
+                    is SettingTimeZone.Disabled.Custom -> TimeZone.of(selectedTimeZone.zoneId)
                     else -> rememberCurrentTimeZone().value
                 }.formatCityAndCountry(),
-                enabled = { timeZone() is SettingTimeZone.Enabled },
+                enabled = { timeZone() is SettingTimeZone.Disabled },
             )
         }
 
@@ -181,7 +181,7 @@ private fun SettingScreenPreview() {
             theme = { SettingThemeOption.System },
             firstDayOfWeek = { DayOfWeek.MONDAY },
             defaultEventDuration = { 1.hours },
-            timeZone = { SettingTimeZone.Enabled.Custom("Europe/Zurich") },
+            timeZone = { SettingTimeZone.Disabled.Custom("Europe/Zurich") },
             goBack = {},
             goToTheme = {},
             goToFirstDayOfWeek = {},
