@@ -34,11 +34,11 @@
     <string name="generalSettingsAuthorizationsLabel">Autorizzazioni</string>
     <string name="generalSettingsDisplayLabel">Visualizza</string>
     <string name="generalSettingsNotificationsLabel">Notifiche</string>
+    <string name="generalSettingsStartOfWeekLabel">Inizio della settimana</string>
     <string name="monthTitle">Mese</string>
     <string name="noWritableCalendar">Nessun calendario modificabile trovato</string>
     <string name="notificationActionOpenMap">Apri mappa</string>
     <plurals name="notificationActionSnooze">
-        <!-- Button on an event reminder notification: shows the reminder again after this many minutes. Keep it short, abbreviate "minutes" (e.g. "min"). -->
         <item quantity="one">Ricorda tra %d min</item>
         <item quantity="other">Ricorda tra %d min</item>
     </plurals>

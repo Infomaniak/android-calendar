@@ -29,33 +29,51 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infomaniak.calendar.R
+import com.infomaniak.calendar.components.foundation.utils.timeFormatter.formatFullDayName
 import com.infomaniak.calendar.model.settings.SettingThemeOption
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemClickable
 import com.infomaniak.calendar.ui.screen.settings.components.SettingItemOpen
 import com.infomaniak.calendar.ui.screen.settings.components.SettingScaffold
 import com.infomaniak.calendar.ui.screen.settings.components.SettingSection
 import com.infomaniak.calendar.ui.screen.settings.components.SettingShape
+import com.infomaniak.calendar.ui.screen.settings.firstDayOfWeek.SettingFirstDayOfWeekViewModel
+import com.infomaniak.calendar.ui.screen.settings.theme.SettingThemeViewModel
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.designsystem.icons.EsdsIcons
 import com.infomaniak.designsystem.icons.symbols.Bell
+import com.infomaniak.designsystem.icons.symbols.CalendarDots
+import kotlinx.datetime.DayOfWeek
 import com.infomaniak.core.common.R as RCore
 
 @Composable
 fun SettingScreen(
     goBack: () -> Unit,
     goToTheme: () -> Unit,
+    goToFirstDayOfWeek: () -> Unit,
     modifier: Modifier = Modifier,
     settingThemeViewModel: SettingThemeViewModel = viewModel(),
+    firstDayOfWeekViewModel: SettingFirstDayOfWeekViewModel = viewModel(),
 ) {
     val theme by settingThemeViewModel.theme.collectAsStateWithLifecycle()
-    SettingContent({ theme }, goBack, goToTheme, modifier)
+    val firstDayOfWeek by firstDayOfWeekViewModel.firstDayOfWeek.collectAsStateWithLifecycle()
+
+    SettingContent(
+        theme = { theme },
+        firstDayOfWeek = { firstDayOfWeek },
+        goBack = goBack,
+        goToTheme = goToTheme,
+        goToFirstDayOfWeek = goToFirstDayOfWeek,
+        modifier = modifier,
+    )
 }
 
 @Composable
 private fun SettingContent(
     theme: () -> SettingThemeOption?,
+    firstDayOfWeek: () -> DayOfWeek?,
     goBack: () -> Unit,
     goToTheme: () -> Unit,
+    goToFirstDayOfWeek: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -63,11 +81,18 @@ private fun SettingContent(
     SettingScaffold(stringResource(R.string.settingsTitle), goBack, modifier) {
         SettingSection(title = stringResource(R.string.generalSettingsDisplayLabel)) {
             SettingItemClickable(
-                shapes = SettingShape.Single,
+                shapes = SettingShape.First,
                 text = stringResource(RCore.string.themeTitle),
                 onClick = goToTheme,
                 symbol = theme()?.symbol,
                 supportingText = theme()?.title,
+            )
+            SettingItemClickable(
+                shapes = SettingShape.Last,
+                text = stringResource(R.string.generalSettingsStartOfWeekLabel),
+                onClick = goToFirstDayOfWeek,
+                symbol = EsdsIcons.CalendarDots,
+                supportingText = firstDayOfWeek()?.formatFullDayName(),
             )
         }
 
@@ -92,6 +117,12 @@ private fun goToSystemNotificationScreen(context: Context) {
 @Composable
 private fun SettingScreenPreview() {
     CalendarThemeForPreview {
-        SettingContent(theme = { SettingThemeOption.System }, goBack = {}, goToTheme = {})
+        SettingContent(
+            theme = { SettingThemeOption.System },
+            firstDayOfWeek = { DayOfWeek.MONDAY },
+            goBack = {},
+            goToTheme = {},
+            goToFirstDayOfWeek = {},
+        )
     }
 }

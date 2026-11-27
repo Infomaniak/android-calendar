@@ -34,11 +34,11 @@
     <string name="generalSettingsAuthorizationsLabel">Άδειες</string>
     <string name="generalSettingsDisplayLabel">Οθόνη</string>
     <string name="generalSettingsNotificationsLabel">Ειδοποιήσεις</string>
+    <string name="generalSettingsStartOfWeekLabel">Έναρξη εβδομάδας</string>
     <string name="monthTitle">Μήνας</string>
     <string name="noWritableCalendar">Δεν βρέθηκε επεξεργάσιμο ημερολόγιο</string>
     <string name="notificationActionOpenMap">Άνοιγμα χάρτη</string>
     <plurals name="notificationActionSnooze">
-        <!-- Button on an event reminder notification: shows the reminder again after this many minutes. Keep it short, abbreviate "minutes" (e.g. "min"). -->
         <item quantity="one">Υπενθύμιση σε %d λεπτό</item>
         <item quantity="other">Υπενθύμιση σε %d λεπτά</item>
     </plurals>
