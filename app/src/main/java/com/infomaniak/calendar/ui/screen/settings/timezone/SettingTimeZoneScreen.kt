@@ -39,7 +39,7 @@ fun SettingTimeZoneScreen(
     TimeZoneSearchScreenContent(
         onTimeZoneSelected = { timeZone ->
             scope.launch {
-                viewModel.setTimeZoneSuspend(SettingTimeZone.Disabled.Custom(timeZone.id))
+                viewModel.setTimeZoneSuspend(SettingTimeZone.Custom(timeZone.id))
                 goBack?.invoke()
             }
         },

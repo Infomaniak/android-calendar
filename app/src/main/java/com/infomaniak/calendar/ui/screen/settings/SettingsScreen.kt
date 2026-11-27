@@ -134,12 +134,16 @@ private fun SettingsScreen(
                 symbol = EsdsIcons.BubbleTopRightCircle,
                 supportingText = defaultEventDuration()?.formatDuration(),
             )
+
+            val deviceTimeZone = rememberCurrentTimeZone()
             SettingItemSwitch(
                 shapes = SettingShape.Middle,
                 text = stringResource(R.string.generalSettingsUseDeviceTimeZoneLabel),
-                checked = { timeZone() == SettingTimeZone.Enabled },
+                checked = { timeZone() == SettingTimeZone.Automatic },
                 onCheckedChange = { isAutomatic ->
-                    onTimeZoneChange(if (isAutomatic) SettingTimeZone.Enabled else SettingTimeZone.Disabled.Unset)
+                    onTimeZoneChange(
+                        if (isAutomatic) SettingTimeZone.Automatic else SettingTimeZone.Custom(deviceTimeZone.value.id),
+                    )
                 },
                 symbol = EsdsIcons.Globe,
                 switchType = SwitchType.Switch,
@@ -149,10 +153,10 @@ private fun SettingsScreen(
                 text = stringResource(RComponents.string.timeZoneLabel),
                 onClick = goToTimeZone,
                 supportingText = when (val selectedTimeZone = timeZone()) {
-                    is SettingTimeZone.Disabled.Custom -> TimeZone.of(selectedTimeZone.zoneId)
-                    else -> rememberCurrentTimeZone().value
+                    is SettingTimeZone.Custom -> TimeZone.of(selectedTimeZone.zoneId)
+                    else -> deviceTimeZone.value
                 }.formatCityAndCountry(),
-                enabled = { timeZone() is SettingTimeZone.Disabled },
+                enabled = { timeZone() is SettingTimeZone.Custom },
             )
         }
 
@@ -181,7 +185,7 @@ private fun SettingScreenPreview() {
             theme = { SettingThemeOption.System },
             firstDayOfWeek = { DayOfWeek.MONDAY },
             defaultEventDuration = { 1.hours },
-            timeZone = { SettingTimeZone.Disabled.Custom("Europe/Zurich") },
+            timeZone = { SettingTimeZone.Custom("Europe/Zurich") },
             goBack = {},
             goToTheme = {},
             goToFirstDayOfWeek = {},
