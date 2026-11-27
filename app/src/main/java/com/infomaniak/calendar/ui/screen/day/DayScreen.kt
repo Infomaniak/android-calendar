@@ -36,7 +36,6 @@ import com.infomaniak.calendar.components.days.DayPager
 import com.infomaniak.calendar.components.days.state.TimelineState
 import com.infomaniak.calendar.components.days.state.rememberDayTimelineState
 import com.infomaniak.calendar.components.foundation.models.EventColorsUi
-import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import com.infomaniak.calendar.components.foundation.state.VisibleDayState
 import com.infomaniak.calendar.components.foundation.state.rememberVisibleDayState
 import com.infomaniak.calendar.components.foundation.utils.NAVIGABLE_DATES
@@ -47,6 +46,7 @@ import com.infomaniak.calendar.ui.model.TimelineUiState
 import com.infomaniak.calendar.ui.model.occurrenceId
 import com.infomaniak.calendar.ui.modifier.backgroundBlur
 import com.infomaniak.calendar.ui.state.LocalVisibleDayState
+import com.infomaniak.calendar.ui.state.LocalWeekNumbering
 import com.infomaniak.calendar.ui.theme.CalendarThemeForPreview
 import com.infomaniak.calendar.ui.theme.Dimens
 import com.infomaniak.multiplatform_calendar.core.domain.model.event.OccurrenceId
@@ -110,7 +110,7 @@ private fun DayScreen(
                     ExpandableCalendar(
                         visibleDayState = visibleDayState,
                         expansionState = calendarExpansionState,
-                        weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
+                        weekNumbering = LocalWeekNumbering.current,
                         eventsDots = eventsDots,
                     )
                 },
@@ -123,7 +123,7 @@ private fun DayScreen(
             selectedDate = { visibleDayState.visibleDate },
             eventsOf = { uiState().eventsOf(it) },
             state = timelineState,
-            weekNumbering = WeekNumbering.ISO_8601, //TODO[weekNumbering]: Use week numbering from LocalSettings
+            weekNumbering = LocalWeekNumbering.current,
             onVisibleDateChanged = { visibleDayState.updateVisibleDate(it) },
             onEventClick = { goToEventDetail(it.occurrenceId) },
             headerModifier = Modifier.backgroundBlur(TopAppBarDefaults.topAppBarColors().containerColor, hazeState),

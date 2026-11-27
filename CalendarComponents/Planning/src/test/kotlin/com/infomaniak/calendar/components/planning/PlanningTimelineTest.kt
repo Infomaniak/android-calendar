@@ -19,6 +19,7 @@ package com.infomaniak.calendar.components.planning
 
 import com.infomaniak.calendar.components.foundation.models.WeekNumbering
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 import org.junit.Assert.assertEquals
@@ -55,6 +56,16 @@ class PlanningTimelineTest {
 
         assertEquals(LocalDate(2025, 12, 29), week.firstDay)
         assertEquals(1, week.weekNumber)
+    }
+
+    @Test
+    fun indexOf_placesTheWeekHeaderBeforeTheChosenFirstDayOfWeek() {
+        val sundayTimeline = PlanningTimeline(WeekNumbering(DayOfWeek.SUNDAY))
+        val sunday = LocalDate(2026, 1, 4)
+        val headerIndex = sundayTimeline.indexOf(sunday) - 1
+
+        assertTrue(sundayTimeline.isWeekHeader(headerIndex))
+        assertEquals(sunday, sundayTimeline.weekAt(headerIndex).firstDay)
     }
 
     @Test
