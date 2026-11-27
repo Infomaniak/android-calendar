@@ -37,7 +37,7 @@ fun SettingThemeScreen(
 ) {
     val theme by settingThemeViewModel.theme.collectAsStateWithLifecycle()
 
-    Content(
+    SettingThemeScreen(
         goBack = goBack,
         modifier = modifier,
         theme = { theme },
@@ -46,7 +46,7 @@ fun SettingThemeScreen(
 }
 
 @Composable
-private fun Content(
+private fun SettingThemeScreen(
     theme: () -> SettingThemeOption?,
     onThemeClick: (SettingThemeOption) -> Unit,
     goBack: (() -> Unit)?,
@@ -68,6 +68,6 @@ private fun Content(
 @Composable
 private fun Preview() {
     CalendarThemeForPreview {
-        Content(goBack = {}, theme = { SettingThemeOption.System }, onThemeClick = {})
+        SettingThemeScreen(goBack = {}, theme = { SettingThemeOption.System }, onThemeClick = {})
     }
 }
